@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 #include <complex>
 #include <cstdint>
@@ -396,7 +395,7 @@ constexpr bool isConvertableType<uint64_t> ()
 
 /** generate an invalid value for the various types*/
 template <class X>
-X invalidValue ()
+inline X invalidValue ()
 {
     return X ();
 }
@@ -411,6 +410,12 @@ template <>
 constexpr uint64_t invalidValue<uint64_t> ()
 {
     return std::numeric_limits<uint64_t>::max ();
+}
+
+template <>
+inline named_point invalidValue<named_point>()
+{
+    return { std::string(),std::nan("0") };
 }
 
 template <>

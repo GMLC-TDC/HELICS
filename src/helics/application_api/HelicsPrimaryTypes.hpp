@@ -59,21 +59,23 @@ inline int64_t make_valid(bool obj)
 
 /** this template should do nothing for most classes the specific overloads are the important ones*/
 template<class X>
-X &make_valid(X &obj)
+decltype(auto) make_valid(X &&obj)
 {
-    return obj;
+    return std::forward<X>(obj);
 }
-
-
-
+/** extract the value from a variant to a string*/
 void valueExtract (const defV &dv, std::string &val);
 
+/** extract the value from a variant to a complex number*/
 void valueExtract (const defV &dv, std::complex<double> &val);
 
+/** extract the value from a variant to a vector of doubles*/
 void valueExtract (const defV &dv, std::vector<double> &val);
 
+/** extract the value from a variant to a complex vector of doubles*/
 void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
+/** extract the value from a variant to a named point*/
 void valueExtract (const defV &dv, named_point &val);
 
 void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val);
@@ -86,7 +88,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
 
 void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val);
 
-/** for numeric types*/
+/** extract the value from a variant to a numerical type*/
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
 {
@@ -144,6 +146,19 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         else
         {
             val = X (0);
+        }
+        break;
+    }
+    case namedPointLoc:
+    {
+        auto &np = mpark::get<named_point>(dv);
+        if (isnan(np.value))
+        {
+
+        }
+        else
+        {
+            val = static_cast<X>(np.value);
         }
         break;
     }

@@ -185,6 +185,13 @@ void valueExtract (const defV &dv, std::string &val)
     case complexVectorLoc:  // vector
         val = helicsComplexVectorString (mpark::get<std::vector<std::complex<double>>> (dv));
         break;
+    case namedPointLoc:
+    {
+        auto &np = mpark::get<named_point>(dv);
+        val = (isnan(np.value)) ? np.name : helicsNamedPointString(np);
+        break;
+    }
+        
     }
 }
 
@@ -227,6 +234,19 @@ void valueExtract (const defV &dv, std::complex<double> &val)
         }
         break;
     }
+    case namedPointLoc:
+    {
+        auto &np = mpark::get<named_point>(dv);
+        if (isnan(np.value))
+        {
+            val = helicsGetComplex(np.name);
+        }
+        else
+        {
+            val = std::complex<double>(np.value, 0.0);
+        }
+    }
+    break;
     }
 }
 
@@ -257,13 +277,27 @@ void valueExtract (const defV &dv, std::vector<double> &val)
         break;
     case complexVectorLoc:  // complex
     {
-        auto cv = mpark::get<std::vector<std::complex<double>>> (dv);
+        auto &cv = mpark::get<std::vector<std::complex<double>>> (dv);
         val.resize (2 * cv.size ());
         for (auto &cval : cv)
         {
             val.push_back (cval.real ());
             val.push_back (cval.imag ());
         }
+    }
+    case namedPointLoc: //named point
+    {
+        auto &np = mpark::get<named_point>(dv);
+        if (isnan(np.value))
+        {
+            val = helicsGetVector(np.name);
+        }
+        else
+        {
+            val.resize(1);
+            val[0] = np.value;
+        }
+        break;
     }
     }
 }
@@ -301,6 +335,20 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
     case complexVectorLoc:  // complex
         val = mpark::get<std::vector<std::complex<double>>> (dv);
         break;
+    case namedPointLoc: //named point
+    {
+        auto &np = mpark::get<named_point>(dv);
+        if (isnan(np.value))
+        {
+            val = helicsGetComplexVector(np.name);
+        }
+        else
+        {
+            val.resize(1);
+            val[0] = std::complex<double>(np.value,0.0);
+        }
+        break;
+    }
     }
 }
 
@@ -354,6 +402,9 @@ void valueExtract (const defV &dv, named_point &val)
         }
         break;
     }
+    case namedPointLoc:
+        val = mpark::get<named_point>(dv);
+        break;
     }
 }
 
@@ -612,8 +663,17 @@ void valueExtract(const data_view &dv, helics_type_t baseType, named_point &val)
     case helics_type_t::helicsComplex:
     {
         auto cval = ValueConverter<std::complex<double>>::interpret (dv);
-        val.name = helicsComplexString(cval);
-        val.value = std::nan("0");
+        if (cval.imag() == 0)
+        {
+            val.name = "value";
+            val.value = cval.real();
+        }
+        else
+        {
+            val.name = helicsComplexString(cval);
+            val.value = std::nan("0");
+        }
+       
         break;
     }
     case helics_type_t::helicsComplexVector:

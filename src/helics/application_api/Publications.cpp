@@ -209,6 +209,71 @@ void Publication::publish (std::complex<double> val) const
     }
 }
 
+void Publication::publish(const named_point &np) const
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        if (changeDetected(prevValue, np, delta))
+        {
+            prevValue = np;
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert(pubType,np);
+        fed->publish(id, db);
+    }
+}
+
+void Publication::publish(const std::string &name,double val) const
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        named_point np(name, val);
+        if (changeDetected(prevValue, np, delta))
+        {
+            prevValue = std::move(np);
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert(pubType, name,val);
+        fed->publish(id, db);
+    }
+}
+
+void Publication::publish(const char *name, double val) const
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        named_point np(name, val);
+        if (changeDetected(prevValue, np, delta))
+        {
+            prevValue = std::move(np);
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert(pubType, name,val);
+        fed->publish(id, db);
+    }
+}
+
 data_block typeConvert (helics_type_t type, const defV &val)
 {
     switch (val.index ())

@@ -123,8 +123,34 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
-    BOOST_CHECK (s == valrx);
+    BOOST_CHECK_MESSAGE (s == valrx,std::string(typeid(TX).name())+" to "+ typeid(RX).name());
     vFed->finalize ();
+}
+
+template <class IX, class TX, class RX>
+void runPubSubThroughTypeTests(const TX &valtx, const RX &valrx)
+{
+    helics::FederateInfo fi("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    // register the publications
+    auto pubObj = helics::make_publication<IX>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+
+    auto subObj = helics::Subscription(vFed.get(), "pub1");
+    vFed->setTimeDelta(1.0);
+    vFed->enterExecutionState();
+    // publish string1 at time=0.0;
+    pubObj->publish(valtx);
+    auto gtime = vFed->requestTime(1.0);
+
+    BOOST_CHECK_EQUAL(gtime, 1.0);
+    auto s = subObj.getValue<RX>();
+    // int64_t val = subObj.getValue<int64_t>();
+    // make sure the object is what we expect
+    BOOST_CHECK_MESSAGE(s == valrx, std::string(typeid(TX).name()) + " -> " + typeid(IX).name() + " -> " + typeid(RX).name());
+    vFed->finalize();
 }
 
 #ifdef QUICK_TESTS_ONLY
@@ -174,6 +200,9 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     runPubSubTypeTests<std::string, c> ("-3.14159 - 2i", c (-3.14159, -2));
     runPubSubTypeTests<helics::named_point, c>({ "-3.14159 - 2i",std::nan("0") }, c(-3.14159, -2));
     runPubSubTypeTests<helics::named_point, c>({"",-3.14159 }, c(-3.14159,0));
+
+    SKIPTEST runPubSubTypeTests< c, helics::named_point>(c(-3.14159, -2), { "-3.14159 -2j",std::nan("0") } );
+    SKIPTEST runPubSubTypeTests< c, helics::named_point>(c(-3.14159, 0), { "value",-3.14159 });
     SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
 
     SKIPTEST runPubSubTypeTests<std::string, c> ("2i", c (0, 2));

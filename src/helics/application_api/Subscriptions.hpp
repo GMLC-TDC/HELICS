@@ -170,7 +170,7 @@ class Subscription : public SubscriptionBase
     template <class X>
     void setDefault (X &&val)
     {
-        lastValue = std::forward<X> (val);
+        lastValue = make_valid(std::forward<X> (val));
     }
 
     /** set the minimum delta for change detection

@@ -762,7 +762,7 @@ data_block typeConvert (helics_type_t type, const named_point &val)
         default:
             return ValueConverter<named_point>::convert(val);
         case helics_type_t::helicsString:
-             return helicsNamedPointString(val);
+            return (isnan(val.value)) ? val.name : helicsNamedPointString(val);
         case helics_type_t::helicsComplexVector:
         {
             std::complex<double> v2(val.value, 0.0);
