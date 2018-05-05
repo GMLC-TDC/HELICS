@@ -6865,6 +6865,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishBoolean(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_publication arg1 = (helics_publication) 0 ;
+  helics_bool_t arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsPublicationPublishBoolean",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishBoolean" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishBoolean" "', argument " "2"" of type '" "helics_bool_t""'");
+  } 
+  arg2 = (helics_bool_t)(val2);
+  result = (helics_status)helicsPublicationPublishBoolean(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsPublicationPublishDouble(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -6983,6 +7012,47 @@ fail:
   {
     if (arg2) free(arg2);
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsPublicationPublishNamedPoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_publication arg1 = (helics_publication) 0 ;
+  char *arg2 = (char *) 0 ;
+  double arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsPublicationPublishNamedPoint",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  result = (helics_status)helicsPublicationPublishNamedPoint(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -7116,6 +7186,36 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetInteger(PyObject *SWIGUNUSEDPARM
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int64_t, new_flags));
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetBoolean(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  helics_bool_t *arg2 = (helics_bool_t *) 0 ;
+  int res1 ;
+  helics_bool_t temp2 ;
+  int res2 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  arg2 = &temp2;
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetBoolean",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetBoolean" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  result = (helics_status)helicsSubscriptionGetBoolean(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (SWIG_IsTmpObj(res2)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_int((*arg2)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int, new_flags));
   }
   return resultobj;
 fail:
@@ -7262,6 +7362,56 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetNamedPoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  double *arg5 = (double *) 0 ;
+  int res1 ;
+  double temp5 ;
+  int res5 = SWIG_TMPOBJ ;
+  PyObject * obj0 = 0 ;
+  helics_status result;
+  
+  {
+    arg4=&(arg3);
+  }
+  arg5 = &temp5;
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetNamedPoint",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetNamedPoint" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  {
+    arg3=helicsSubscriptionGetValueSize(arg1)+2;
+    arg2 = (char *) malloc(arg3);
+  }
+  result = (helics_status)helicsSubscriptionGetNamedPoint(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_From_int((int)(result));
+  {
+    PyObject *o2=PyString_FromString(arg2);
+    resultobj = SWIG_Python_AppendOutput(resultobj, o2);
+  }
+  if (SWIG_IsTmpObj(res5)) {
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_double((*arg5)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_double, new_flags));
+  }
+  {
+    if (arg2) free(arg2);
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2) free(arg2);
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultRaw(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
@@ -7371,6 +7521,35 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultInteger(PyObject *SWIGUNU
   } 
   arg2 = (int64_t)(val2);
   result = (helics_status)helicsSubscriptionSetDefaultInteger(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultBoolean(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  helics_bool_t arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsSubscriptionSetDefaultBoolean",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultBoolean" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultBoolean" "', argument " "2"" of type '" "helics_bool_t""'");
+  } 
+  arg2 = (helics_bool_t)(val2);
+  result = (helics_status)helicsSubscriptionSetDefaultBoolean(arg1,arg2);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -7496,6 +7675,47 @@ fail:
   {
     if (arg2) free(arg2);
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsSubscriptionSetDefaultNamedPoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  char *arg2 = (char *) 0 ;
+  double arg3 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:helicsSubscriptionSetDefaultNamedPoint",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  ecode3 = SWIG_AsVal_double(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  result = (helics_status)helicsSubscriptionSetDefaultNamedPoint(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -10031,6 +10251,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsPublicationPublishBoolean", _wrap_helicsPublicationPublishBoolean, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishDouble", _wrap_helicsPublicationPublishDouble, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10043,6 +10264,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsPublicationPublishNamedPoint", _wrap_helicsPublicationPublishNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionGetValueSize", _wrap_helicsSubscriptionGetValueSize, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10056,6 +10278,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsSubscriptionGetBoolean", _wrap_helicsSubscriptionGetBoolean, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionGetDouble", _wrap_helicsSubscriptionGetDouble, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10085,6 +10308,7 @@ static PyMethodDef SwigMethods[] = {
 		"    pointer to variable to store the actual size\n"
 		"\n"
 		""},
+	 { (char *)"helicsSubscriptionGetNamedPoint", _wrap_helicsSubscriptionGetNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionSetDefaultRaw", _wrap_helicsSubscriptionSetDefaultRaw, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionSetDefaultString", _wrap_helicsSubscriptionSetDefaultString, METH_VARARGS, (char *)"\n"
 		"\n"
@@ -10094,6 +10318,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsSubscriptionSetDefaultBoolean", _wrap_helicsSubscriptionSetDefaultBoolean, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionSetDefaultDouble", _wrap_helicsSubscriptionSetDefaultDouble, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -10106,6 +10331,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsSubscriptionSetDefaultNamedPoint", _wrap_helicsSubscriptionSetDefaultNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionGetType", _wrap_helicsSubscriptionGetType, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -11158,6 +11384,8 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_INT",SWIG_From_int((int)(2)));
   SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_COMPLEX",SWIG_From_int((int)(3)));
   SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_VECTOR",SWIG_From_int((int)(4)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_NAMEDPOINT",SWIG_From_int((int)(6)));
+  SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_BOOLEAN",SWIG_From_int((int)(7)));
   SWIG_Python_SetConstant(d, "HELICS_DATA_TYPE_RAW",SWIG_From_int((int)(25)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;

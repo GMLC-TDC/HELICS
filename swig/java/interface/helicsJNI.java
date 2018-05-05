@@ -9,7 +9,9 @@
 package com.java.helics;
 
 public class helicsJNI {
-
+  static {
+    System.loadLibrary("JNIhelicsd");
+  }
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
@@ -136,6 +138,8 @@ public class helicsJNI {
   public final static native int HELICS_DATA_TYPE_INT_get();
   public final static native int HELICS_DATA_TYPE_COMPLEX_get();
   public final static native int HELICS_DATA_TYPE_VECTOR_get();
+  public final static native int HELICS_DATA_TYPE_NAMEDPOINT_get();
+  public final static native int HELICS_DATA_TYPE_BOOLEAN_get();
   public final static native int HELICS_DATA_TYPE_RAW_get();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3, String jarg4);
   public final static native long helicsFederateRegisterTypeSubscription(long jarg1, String jarg2, int jarg3, String jarg4);
@@ -148,23 +152,29 @@ public class helicsJNI {
   public final static native int helicsPublicationPublishRaw(long jarg1, long jarg2, int jarg3);
   public final static native int helicsPublicationPublishString(long jarg1, String jarg2);
   public final static native int helicsPublicationPublishInteger(long jarg1, long jarg2);
+  public final static native int helicsPublicationPublishBoolean(long jarg1, int jarg2);
   public final static native int helicsPublicationPublishDouble(long jarg1, double jarg2);
   public final static native int helicsPublicationPublishComplex(long jarg1, double jarg2, double jarg3);
   public final static native int helicsPublicationPublishVector(long jarg1, double[] jarg2, int jarg3);
+  public final static native int helicsPublicationPublishNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native int helicsSubscriptionGetValueSize(long jarg1);
   public final static native int helicsSubscriptionGetRawValue(long jarg1, long jarg2, int jarg3, int[] jarg4);
   public final static native int helicsSubscriptionGetString(long jarg1, byte[] jarg2, int[] jarg4);
   public final static native int helicsSubscriptionGetInteger(long jarg1, long[] jarg2);
+  public final static native int helicsSubscriptionGetBoolean(long jarg1, int[] jarg2);
   public final static native int helicsSubscriptionGetDouble(long jarg1, double[] jarg2);
   public final static native int helicsSubscriptionGetComplex(long jarg1, double[] jarg2, double[] jarg3);
   public final static native int helicsSubscriptionGetVectorSize(long jarg1);
   public final static native int helicsSubscriptionGetVector(long jarg1, long jarg2, int jarg3, int[] jarg4);
+  public final static native int helicsSubscriptionGetNamedPoint(long jarg1, byte[] jarg2, int[] jarg4, double[] jarg5);
   public final static native int helicsSubscriptionSetDefaultRaw(long jarg1, long jarg2, int jarg3);
   public final static native int helicsSubscriptionSetDefaultString(long jarg1, String jarg2);
   public final static native int helicsSubscriptionSetDefaultInteger(long jarg1, long jarg2);
+  public final static native int helicsSubscriptionSetDefaultBoolean(long jarg1, int jarg2);
   public final static native int helicsSubscriptionSetDefaultDouble(long jarg1, double jarg2);
   public final static native int helicsSubscriptionSetDefaultComplex(long jarg1, double jarg2, double jarg3);
   public final static native int helicsSubscriptionSetDefaultVector(long jarg1, double[] jarg2, int jarg3);
+  public final static native int helicsSubscriptionSetDefaultNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native int helicsSubscriptionGetType(long jarg1, byte[] jarg2);
   public final static native int helicsPublicationGetType(long jarg1, byte[] jarg2);
   public final static native int helicsSubscriptionGetKey(long jarg1, byte[] jarg2);

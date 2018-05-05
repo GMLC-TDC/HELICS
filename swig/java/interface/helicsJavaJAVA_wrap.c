@@ -2434,6 +2434,30 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1VECTO
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1NAMEDPOINT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(6);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1BOOLEAN_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (int)(7);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1RAW_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
@@ -2761,6 +2785,22 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishI
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishBoolean(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  helics_publication arg1 = (helics_publication) 0 ;
+  helics_bool_t arg2 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_publication *)&jarg1; 
+  arg2 = (helics_bool_t)jarg2; 
+  result = (helics_status)helicsPublicationPublishBoolean(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishDouble(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2) {
   jint jresult = 0 ;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -2826,6 +2866,29 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishV
     (*jenv)->SetDoubleArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
   
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsPublicationPublishNamedPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jdouble jarg3) {
+  jint jresult = 0 ;
+  helics_publication arg1 = (helics_publication) 0 ;
+  char *arg2 = (char *) 0 ;
+  double arg3 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_publication *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (double)jarg3; 
+  result = (helics_status)helicsPublicationPublishNamedPoint(arg1,(char const *)arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   return jresult;
 }
 
@@ -2950,6 +3013,39 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetInte
   {
     jlong jvalue = (jlong)temp2;
     (*jenv)->SetLongArrayRegion(jenv, jarg2, 0, 1, &jvalue);
+  }
+  
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetBoolean(JNIEnv *jenv, jclass jcls, jlong jarg1, jintArray jarg2) {
+  jint jresult = 0 ;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  helics_bool_t *arg2 = (helics_bool_t *) 0 ;
+  helics_bool_t temp2 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_subscription *)&jarg1; 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if ((*jenv)->GetArrayLength(jenv, jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    temp2 = (helics_bool_t)0;
+    arg2 = &temp2; 
+  }
+  result = (helics_status)helicsSubscriptionGetBoolean(arg1,arg2);
+  jresult = (jint)result; 
+  {
+    jint jvalue = (jint)temp2;
+    (*jenv)->SetIntArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
   
   return jresult;
@@ -3093,6 +3189,67 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetVect
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetNamedPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jbyteArray jarg2, jintArray jarg4, jdoubleArray jarg5) {
+  jint jresult = 0 ;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  double *arg5 = (double *) 0 ;
+  int temp4 ;
+  double temp5 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_subscription *)&jarg1; 
+  {
+    arg2 = (char*)(*jenv)->GetByteArrayElements(jenv, jarg2, 0);
+    arg3 = (int)(*jenv)->GetArrayLength(jenv, jarg2);
+  }
+  {
+    if (!jarg4) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if ((*jenv)->GetArrayLength(jenv, jarg4) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    temp4 = (int)0;
+    arg4 = &temp4; 
+  }
+  {
+    if (!jarg5) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if ((*jenv)->GetArrayLength(jenv, jarg5) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    temp5 = (double)0;
+    arg5 = &temp5; 
+  }
+  result = (helics_status)helicsSubscriptionGetNamedPoint(arg1,arg2,arg3,arg4,arg5);
+  jresult = (jint)result; 
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg2, (jbyte*)arg2, 0);
+  }
+  {
+    jint jvalue = (jint)temp4;
+    (*jenv)->SetIntArrayRegion(jenv, jarg4, 0, 1, &jvalue);
+  }
+  {
+    jdouble jvalue = (jdouble)temp5;
+    (*jenv)->SetDoubleArrayRegion(jenv, jarg5, 0, 1, &jvalue);
+  }
+  
+  
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionSetDefaultRaw(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
   jint jresult = 0 ;
   helics_subscription arg1 = (helics_subscription) 0 ;
@@ -3143,6 +3300,22 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionSetDefa
   arg1 = *(helics_subscription *)&jarg1; 
   arg2 = (int64_t)jarg2; 
   result = (helics_status)helicsSubscriptionSetDefaultInteger(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionSetDefaultBoolean(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  helics_bool_t arg2 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_subscription *)&jarg1; 
+  arg2 = (helics_bool_t)jarg2; 
+  result = (helics_status)helicsSubscriptionSetDefaultBoolean(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
 }
@@ -3213,6 +3386,29 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionSetDefa
     (*jenv)->SetDoubleArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
   
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionSetDefaultNamedPoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jdouble jarg3) {
+  jint jresult = 0 ;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  char *arg2 = (char *) 0 ;
+  double arg3 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_subscription *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  arg3 = (double)jarg3; 
+  result = (helics_status)helicsSubscriptionSetDefaultNamedPoint(arg1,(char const *)arg2,arg3);
+  jresult = (jint)result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   return jresult;
 }
 
