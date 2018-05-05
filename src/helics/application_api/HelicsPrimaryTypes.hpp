@@ -152,9 +152,16 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
     case namedPointLoc:
     {
         auto &np = mpark::get<named_point>(dv);
-        if (isnan(np.value))
+        if (std::isnan(np.value))
         {
-
+            if IF_CONSTEXPR(std::is_integral<X>::value)
+            {
+                val = static_cast<X> (std::stoll(mpark::get<std::string>(dv)));
+            }
+        else
+        {
+            val = static_cast<X> (std::stod(mpark::get<std::string>(dv)));
+        }
         }
         else
         {

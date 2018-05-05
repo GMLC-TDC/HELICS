@@ -113,7 +113,7 @@ public:
     {}
     bool operator==(const named_point &opt) const
     {
-        return ((isnan(value)) && (isnan(opt.value))) ? (name == opt.name) :((value == opt.value) && (name == opt.name));
+        return ((std::isnan(value)) && (std::isnan(opt.value))) ? (name == opt.name) :((value == opt.value) && (name == opt.name));
     }
     bool operator!=(const named_point &opt) const
     {

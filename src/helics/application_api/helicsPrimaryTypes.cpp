@@ -188,7 +188,7 @@ void valueExtract (const defV &dv, std::string &val)
     case namedPointLoc:
     {
         auto &np = mpark::get<named_point>(dv);
-        val = (isnan(np.value)) ? np.name : helicsNamedPointString(np);
+        val = (std::isnan(np.value)) ? np.name : helicsNamedPointString(np);
         break;
     }
         
@@ -237,7 +237,7 @@ void valueExtract (const defV &dv, std::complex<double> &val)
     case namedPointLoc:
     {
         auto &np = mpark::get<named_point>(dv);
-        if (isnan(np.value))
+        if (std::isnan(np.value))
         {
             val = helicsGetComplex(np.name);
         }
@@ -285,10 +285,11 @@ void valueExtract (const defV &dv, std::vector<double> &val)
             val.push_back (cval.imag ());
         }
     }
+    break;
     case namedPointLoc: //named point
     {
         auto &np = mpark::get<named_point>(dv);
-        if (isnan(np.value))
+        if (std::isnan(np.value))
         {
             val = helicsGetVector(np.name);
         }
@@ -338,7 +339,7 @@ void valueExtract (const defV &dv, std::vector<std::complex<double>> &val)
     case namedPointLoc: //named point
     {
         auto &np = mpark::get<named_point>(dv);
-        if (isnan(np.value))
+        if (std::isnan(np.value))
         {
             val = helicsGetComplexVector(np.name);
         }
