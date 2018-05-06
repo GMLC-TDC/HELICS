@@ -550,6 +550,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_DISCONNECT:
     {
         if ((command.dest_id == 0) || (command.dest_id == global_broker_id))

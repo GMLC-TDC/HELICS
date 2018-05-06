@@ -713,7 +713,7 @@ const char *helicsQueryExecuteComplete (helics_query query)
     return queryObj->response.c_str ();
 }
 
-HELICS_Export helics_bool_t helicsQueryIsCompleted (helics_query query)
+HELICS_EXPORT helics_bool_t helicsQueryIsCompleted (helics_query query)
 {
     if (query == nullptr)
     {
