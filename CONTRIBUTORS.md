@@ -1,5 +1,6 @@
 # Contributors
-This File describes the contributors to the HELICS library and the software used as part of this projects
+This file describes the contributors to the HELICS library and the software used as part of this projects
+If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIBUTING.md)
 ## Individual contributors
 ### Pacific Northwest National Lab
  - Jeff Daily (Now AMD)

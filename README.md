@@ -38,6 +38,9 @@ Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.
 
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
+## [CHANGELOG](CHANGELOG.md)
+## [ROADMAP](ROADMAP.md)
+
 # Tools with HELICS support
 
 As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the shoulders of giants by not reinventing trusted simulation tools, but instead, merely acting as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools.  
@@ -64,6 +67,8 @@ We are always looking for help adding support for more tools, so please contact 
 * [HELICS runner](https://github.com/GMLC-TDC/helics-runner) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
 * [Player](https://gmlc-tdc.github.io/HELICS-src/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
 * [Recorder](https://gmlc-tdc.github.io/HELICS-src/apps/Recorder.html), which acts as a simple received-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
+
+# [Contributors](CONTRIBUTORS.md)
 
 # Publications
 
