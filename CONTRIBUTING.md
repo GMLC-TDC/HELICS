@@ -6,9 +6,11 @@ The following is a set of guidelines for contributing to HELICS and associated p
 
 #### Table Of Contents
 
-[comment]: #  [Code of Conduct](#code-of-conduct)
+<!---
+#  [Code of Conduct](#code-of-conduct)
+--->
 
-If you just have a question check out the [Gitter Channel](https://gitter.im/GMLC-TDC/HELICS-src)
+If you just have a question check out [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
 
 ## How Can I Contribute?
 
@@ -16,8 +18,7 @@ If you just have a question check out the [Gitter Channel](https://gitter.im/GML
 
 This section guides you through submitting a bug report for HELICS. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
 
-Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please include as many details as possible.  Frequently, helpful information includes Operating System, Compiler used, API, interface, and some details about the function being performed.
-
+When you are creating a bug report, please include as many details as possible.  Frequently, helpful information includes Operating System, Compiler used, API, interface, and some details about the function being performed.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
 
