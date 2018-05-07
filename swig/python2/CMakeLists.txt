@@ -51,13 +51,6 @@ add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to
         "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
 endforeach(keyfile)
 
-add_custom_command(TARGET _helics2 POST_BUILD        # Adds a post-build event to api tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
-		
-
-
 
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
 INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)

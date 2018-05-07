@@ -87,10 +87,6 @@ subscription_id_t ValueFederate::registerRequiredSubscription (const std::string
                                                                const std::string &type,
                                                                const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register subscription after entering initialization mode"));
-    }
     return vfManager->registerRequiredSubscription (key, type, units);
 }
 
@@ -98,10 +94,6 @@ subscription_id_t ValueFederate::registerOptionalSubscription (const std::string
                                                                const std::string &type,
                                                                const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register subscription after entering initialization mode"));
-    }
     return vfManager->registerOptionalSubscription (key, type, units);
 }
 

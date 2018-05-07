@@ -27,12 +27,32 @@ UdpComms::UdpComms ()
     futurePort = promisePort.get_future ();
 }
 
-UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget)
-    : CommsInterface (brokerTarget, localTarget)
+UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork)
+    : CommsInterface (brokerTarget, localTarget,targetNetwork)
 {
     if (localTarget_.empty ())
     {
-        localTarget_ = "localhost";
+        if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost")||(brokerTarget_=="localhost"))
+        {
+            localTarget_ = "localhost";
+        }
+        else if (brokerTarget_.empty())
+        {
+            switch (interfaceNetwork)
+            {
+            case interface_networks::local:
+                localTarget_ = "localhost";
+                break;
+            default:
+                localTarget_ = "*";
+                break;
+            }
+        }
+        else
+        {
+            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
+
+        }
     }
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
@@ -43,7 +63,27 @@ UdpComms::UdpComms (const NetworkBrokerData &netInfo)
 {
     if (localTarget_.empty ())
     {
-        localTarget_ = "localhost";
+        if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost") || (brokerTarget_ == "localhost"))
+        {
+            localTarget_ = "localhost";
+        }
+        else if (brokerTarget_.empty())
+        {
+            switch (interfaceNetwork)
+            {
+            case interface_networks::local:
+                localTarget_ = "localhost";
+                break;
+            default:
+                localTarget_ = "*";
+                break;
+            }
+        }
+        else
+        {
+            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
+
+        }
     }
     if (netInfo.portStart > 0)
     {

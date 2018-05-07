@@ -1,12 +1,9 @@
-
 /*
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#ifndef HELICS_API_OBJECTS_H_
-#define HELICS_API_OBJECTS_H_
 #pragma once
 
 #include <memory>
@@ -71,7 +68,6 @@ namespace helics
     class SubscriptionObject;
     class PublicationObject;
     class EndpointObject;
-
 
 	/** object wrapping a federate for the c-api*/
 	class FedObject
@@ -169,17 +165,17 @@ std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
 class MasterObjectHolder
 {
 private:
-    guarded<std::vector<helics::BrokerObject *>> brokers;
-    guarded<std::vector<helics::CoreObject *>> cores;
-    guarded<std::vector<helics::FedObject *>> feds;
+    guarded<std::vector<std::unique_ptr<helics::BrokerObject>>> brokers;
+    guarded<std::vector<std::unique_ptr<helics::CoreObject>>> cores;
+    guarded<std::vector<std::unique_ptr<helics::FedObject>>> feds;
     tripwire::TripWireDetector tripDetect;
 public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
     helics::FedObject *findFed(const std::string &fedName);
-    int addBroker(helics::BrokerObject * broker);
-    int addCore(helics::CoreObject *core);
-    int addFed(helics::FedObject *fed);
+    int addBroker(std::unique_ptr<helics::BrokerObject> broker);
+    int addCore(std::unique_ptr<helics::CoreObject> core);
+    int addFed(std::unique_ptr<helics::FedObject> fed);
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);
@@ -188,6 +184,4 @@ public:
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder();
 void clearAllObjects();
-
-#endif
 

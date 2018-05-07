@@ -29,6 +29,7 @@ data-block-tests.cpp
 UdpCore-tests.cpp
 ForwardingTimeCoordinatorTests.cpp
 TimeCoordinatorTests.cpp
+networkInfoTests.cpp
 )
 
 if (NOT DISABLE_TCP_CORE)

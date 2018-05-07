@@ -4,6 +4,8 @@
 if [[ "$TRAVIS" == "true" ]]; then
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        export PATH="/usr/local/opt/ccache/libexec:$PATH"
     fi
 
     export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies

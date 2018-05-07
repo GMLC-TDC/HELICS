@@ -53,6 +53,7 @@ class FederateState
   private:
     shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
       subscriptions;  //!< storage for all the subscriptions
+    
     std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
     bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
@@ -66,6 +67,7 @@ class FederateState
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
+    std::string errorString; //!< storage for an error string populated on an error
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 
@@ -74,7 +76,7 @@ class FederateState
     bool timeGranted_mode =
       false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     // 1 byte free
-    int logLevel = 1;
+    int logLevel = 1;  //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
   private:
@@ -225,7 +227,8 @@ class FederateState
     /** get a reference to the global ids of dependent federates
      */
     const std::vector<Core::federate_id_t> &getDependents () const;
-
+    /** get the last error string */
+    const std::string &lastErrorString() const { return errorString; }
     void setCoreObject (CommonCore *parent);
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
