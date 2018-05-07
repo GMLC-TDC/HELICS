@@ -246,7 +246,7 @@ const std::string &typeNameStringRef (helics_type_t type);
 
 /** convert a string to a type*/
 helics_type_t getTypeFromString (const std::string &typeName);
-
+/** generate a string from a complex number real and imaginary parts*/
 std::string helicsComplexString (double real, double imag);
 std::string helicsComplexString (std::complex<double> val);
 std::string helicsVectorString (const std::vector<double> &val);
@@ -259,14 +259,19 @@ std::string helicsNamedPointString (const char *pointName, double val);
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
 std::vector<double> helicsGetVector (const std::string &val);
+void helicsGetVector(const std::string &val, std::vector<double> &data);
+
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
+void helicsGetComplexVector(const std::string &val, std::vector<std::complex<double>> &data);
 
+/** convert a string to a named point*/
 named_point helicsGetNamedPoint (const std::string &val);
+/** get a double from a string*/
+double getDoubleFromString(const std::string &val);
 
-void helicsGetVector (const std::string &val, std::vector<double> &data);
-void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
-
+double vectorNorm(const std::vector<double> &vec);
+double vectorNorm(const std::vector<std::complex<double>> &vec);
 /** convert a value to a data block to be interpreted using the specified type
 @param type the type used for the data conversion
 @param val a double to convert

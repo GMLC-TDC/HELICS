@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helicsTypes.hpp"
 #include "ValueConverter.hpp"
 #include <map>
+#include <numeric>
 #include <regex>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -46,6 +47,16 @@ const std::string &typeNameStringRef (helics_type_t type)
     default:
         return nullString;
     }
+}
+
+double vectorNorm(const std::vector<double> &vec)
+{
+    return std::sqrt(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0));
+}
+
+double vectorNorm(const std::vector<std::complex<double>> &vec)
+{
+    return std::sqrt(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0, std::plus<>() , [](const auto &a, const auto &b) {return (a*std::conj(b)).real(); }));
 }
 
 std::string helicsComplexString (double real, double imag)
@@ -274,6 +285,27 @@ std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val
 named_point helicsGetNamedPoint (const std::string &val)
 {
     auto loc = val.find_first_of ('{');
+    if (loc == std::string::npos)
+    {
+        auto fb = val.find_first_of('[');
+        if (fb != std::string::npos)
+        {
+            return { val,std::nan("0") };
+        }
+        else
+        {
+            auto V = helicsGetComplex(val);
+            if (V.real() < -1e48)
+            {
+                return { val,std::nan("0") };
+            }
+            if (V.imag() == 0)
+            {
+                return { "value",std::abs(V) };
+            }
+            return { val,V.real() };
+        }
+    }
     auto locsep = val.find_last_of (':');
     auto locend = val.find_last_of ('}');
     auto str1 = val.substr (loc + 1, locsep - loc);
@@ -293,6 +325,25 @@ static auto readSize (const std::string &val)
     auto fb = val.find_first_of ('[');
     auto size = std::stoull (val.substr (1, fb - 1));
     return size;
+}
+
+double getDoubleFromString(const std::string &val)
+{
+    if (val.empty())
+    {
+        return std::nan("0");
+    }
+    if ((val.front() == 'v')|| (val.front() == 'c'))
+    {
+        auto V = helicsGetVector(val);
+        return vectorNorm(V);
+    }
+    else if (val.front() == 'c')
+    {
+        auto cv = helicsGetComplexVector(val);
+        return vectorNorm(cv);
+    }
+    return std::abs(helicsGetComplex(val));
 }
 
 void helicsGetVector (const std::string &val, std::vector<double> &data)

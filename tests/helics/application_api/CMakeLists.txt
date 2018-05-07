@@ -10,8 +10,9 @@ MessageFederateKeyTests.cpp
 ValueFederateKeyTests.cpp
 FilterTests.cpp
 testFixtures.cpp
+PrimaryTypeConversionTests.cpp
 )
-
+ 
 set(application_api_test_headers
 testFixtures.hpp
 ValueFederateTestTemplates.hpp
