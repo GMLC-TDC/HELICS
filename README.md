@@ -38,8 +38,8 @@ Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.
 
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
-## [CHANGELOG](CHANGELOG.md)
-## [ROADMAP](ROADMAP.md)
+#### [CHANGELOG](CHANGELOG.md)
+#### [ROADMAP](ROADMAP.md)
 
 # Tools with HELICS support
 

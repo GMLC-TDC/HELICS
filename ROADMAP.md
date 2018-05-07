@@ -1,10 +1,9 @@
 # RoadMap
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change
 
-## [1.1] ~ 2018-06-13
+## [1.X] ~ 2018-06-13  Improvements planned before the 2.0 release
 ### Features
  - Support for TOML configuration
- - Addition of namedPoints to well defined type into the C and C++ interfaces
  - Octave support
  - addition of more convenient broker initialization so brokers can be easily added to executables
 
