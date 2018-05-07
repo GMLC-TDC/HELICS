@@ -37,11 +37,8 @@ This section guides you through submitting a feature request, or enhancement for
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to HELICS? You can start by looking through these `beginner` and `help-wanted` issues:
-
-* [Beginner issues][beginner] - issues which should only require a few lines of code, and a test or two.
-* [Help wanted issues][help-wanted] - issues which should be a bit more involved than `beginner` issues.
-
+Unsure where to begin contributing to HELICS? You can start by looking for `beginner` and `help-wanted` issues:
+Help with documentation and test cases is always welcome. 
 
 ## Styleguides
 Code formatting is controlled via clang-format, a somewhat higher level style guide can be found [HERE](https://gmlc-tdc.github.io/HELICS-src/developer-guide/style.html)
