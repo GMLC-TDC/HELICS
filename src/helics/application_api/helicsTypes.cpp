@@ -327,11 +327,42 @@ static auto readSize (const std::string &val)
     return size;
 }
 
+std::complex<double> getComplexFromString(const std::string &val)
+{
+    if (val.empty())
+    {
+        return invalidValue<std::complex<double>>();
+    }
+    if ((val.front() == 'v') || (val.front() == 'c'))
+    {
+        auto V = helicsGetVector(val);
+        if (V.empty())
+        {
+            return invalidValue<std::complex<double>>();
+        }
+        if (V.size() == 1)
+        {
+            return std::complex<double>(V[0], 0.0);
+        }
+        return std::complex<double>(V[0], V[1]);
+    }
+    else if (val.front() == 'c')
+    {
+        auto cv = helicsGetComplexVector(val);
+        if (cv.empty())
+        {
+            return invalidValue<std::complex<double>>();
+        }
+        return cv.front();
+    }
+    return helicsGetComplex(val);
+}
+
 double getDoubleFromString(const std::string &val)
 {
     if (val.empty())
     {
-        return std::nan("0");
+        return invalidValue<double>();
     }
     if ((val.front() == 'v')|| (val.front() == 'c'))
     {

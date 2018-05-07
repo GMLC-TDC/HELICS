@@ -269,6 +269,7 @@ void helicsGetComplexVector(const std::string &val, std::vector<std::complex<dou
 named_point helicsGetNamedPoint (const std::string &val);
 /** get a double from a string*/
 double getDoubleFromString(const std::string &val);
+std::complex<double> getComplexFromString(const std::string &val);
 
 double vectorNorm(const std::vector<double> &vec);
 double vectorNorm(const std::vector<std::complex<double>> &vec);

@@ -209,7 +209,7 @@ void valueExtract (const defV &dv, std::complex<double> &val)
         break;
     case stringLoc:  // string
     default:
-        val = helicsGetComplex (mpark::get<std::string> (dv));
+        val = getComplexFromString(mpark::get<std::string> (dv));
         break;
     case complexLoc:  // complex
         val = mpark::get<std::complex<double>> (dv);
@@ -241,7 +241,7 @@ void valueExtract (const defV &dv, std::complex<double> &val)
         auto &np = mpark::get<named_point>(dv);
         if (std::isnan(np.value))
         {
-            val = helicsGetComplex(np.name);
+            val = getComplexFromString(np.name);
         }
         else
         {

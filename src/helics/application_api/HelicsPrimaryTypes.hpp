@@ -155,14 +155,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         auto &np = mpark::get<named_point>(dv);
         if (std::isnan(np.value))
         {
-            if IF_CONSTEXPR(std::is_integral<X>::value)
-            {
-                val = static_cast<X> (std::stoll(mpark::get<std::string>(dv)));
-            }
-        else
-        {
-            val = static_cast<X> (std::stod(mpark::get<std::string>(dv)));
-        }
+            val=static_cast<X>(getDoubleFromString(np.name));
         }
         else
         {
@@ -212,28 +205,13 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             catch (const std::invalid_argument &ble)
             {  // well lets try a vector conversion
                 auto V = ValueConverter<std::vector<double>>::interpret (dv);
-                if (V.size () == 2)
-                {
-                    val = static_cast<X> (std::hypot (V[0], V[1]));
-                }
-                else
-                {
-                    val = (V.empty ()) ? X (0) : static_cast<X> (V.front ());
-                }
+                val = static_cast<X> (vectorNorm(V));
             }
         }
         break;
     }
     case helics_type_t::helicsString:
-        if
-            IF_CONSTEXPR (std::is_integral<X>::value)
-            {
-                val = static_cast<X> (std::stoll (ValueConverter<std::string>::interpret (dv)));
-            }
-        else
-        {
-            val = static_cast<X> (std::stod (ValueConverter<std::string>::interpret (dv)));
-        }
+        val = static_cast<X>(getDoubleFromString(dv.string()));
         break;
     case helics_type_t::helicsBool:
         val = static_cast<X> ((dv.string () == "0") ? false : true);
@@ -245,15 +223,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         {
             try
             {
-                if
-                    IF_CONSTEXPR(std::is_integral<X>::value)
-                {
-                    val = static_cast<X> (std::stoll(npval.name));
-                }
-                else
-                {
-                    val = static_cast<X> (std::stod(npval.name));
-                }
+                val = static_cast<X>(getDoubleFromString(npval.name));
             }
             catch (const std::invalid_argument &)
             {
