@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value converters
 */
-#include "helics/application_api/helicsPrimaryTypes.hpp"
+#include "helics/application_api/HelicsPrimaryTypes.hpp"
 
 using namespace std::string_literals;
 using namespace helics;
