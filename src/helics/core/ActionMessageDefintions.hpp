@@ -45,6 +45,7 @@ enum class action_t : int32_t
     cmd_reg_fed = -105,  //!< register a federate
     cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
     cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
+    cmd_broker_query=-37, //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
 
@@ -206,6 +207,7 @@ enum class action_t : int32_t
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
 
 #define CMD_QUERY action_message_def::action_t::cmd_query
+#define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
 
 // definitions for the protocol options
