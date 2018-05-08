@@ -105,20 +105,17 @@ using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_
 /** data class for pair of a string and double*/
 class named_point
 {
-public:
+  public:
     std::string name;
     double value;
-    named_point() = default;
-    named_point(std::string valname,double valval):name(std::move(valname)),value(valval)
-    {}
-    bool operator==(const named_point &opt) const
+    named_point () = default;
+    named_point (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
+    bool operator== (const named_point &opt) const
     {
-        return ((std::isnan(value)) && (std::isnan(opt.value))) ? (name == opt.name) :((value == opt.value) && (name == opt.name));
+        return ((std::isnan (value)) && (std::isnan (opt.value))) ? (name == opt.name) :
+                                                                    ((value == opt.value) && (name == opt.name));
     }
-    bool operator!=(const named_point &opt) const
-    {
-        return !operator==(opt);
-    }
+    bool operator!= (const named_point &opt) const { return !operator== (opt); }
 };
 
 /** template class for generating a known name of a type*/
@@ -259,20 +256,20 @@ std::string helicsNamedPointString (const char *pointName, double val);
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
 std::vector<double> helicsGetVector (const std::string &val);
-void helicsGetVector(const std::string &val, std::vector<double> &data);
+void helicsGetVector (const std::string &val, std::vector<double> &data);
 
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
-void helicsGetComplexVector(const std::string &val, std::vector<std::complex<double>> &data);
+void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
 /** convert a string to a named point*/
 named_point helicsGetNamedPoint (const std::string &val);
 /** get a double from a string*/
-double getDoubleFromString(const std::string &val);
-std::complex<double> getComplexFromString(const std::string &val);
+double getDoubleFromString (const std::string &val);
+std::complex<double> getComplexFromString (const std::string &val);
 
-double vectorNorm(const std::vector<double> &vec);
-double vectorNorm(const std::vector<std::complex<double>> &vec);
+double vectorNorm (const std::vector<double> &vec);
+double vectorNorm (const std::vector<std::complex<double>> &vec);
 /** convert a value to a data block to be interpreted using the specified type
 @param type the type used for the data conversion
 @param val a double to convert
@@ -419,9 +416,9 @@ constexpr uint64_t invalidValue<uint64_t> ()
 }
 
 template <>
-inline named_point invalidValue<named_point>()
+inline named_point invalidValue<named_point> ()
 {
-    return { std::string(),std::nan("0") };
+    return {std::string (), std::nan ("0")};
 }
 
 template <>

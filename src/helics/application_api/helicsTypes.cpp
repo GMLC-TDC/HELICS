@@ -49,14 +49,16 @@ const std::string &typeNameStringRef (helics_type_t type)
     }
 }
 
-double vectorNorm(const std::vector<double> &vec)
+double vectorNorm (const std::vector<double> &vec)
 {
-    return std::sqrt(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0));
+    return std::sqrt (std::inner_product (vec.begin (), vec.end (), vec.begin (), 0.0));
 }
 
-double vectorNorm(const std::vector<std::complex<double>> &vec)
+double vectorNorm (const std::vector<std::complex<double>> &vec)
 {
-    return std::sqrt(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0, std::plus<>() , [](const auto &a, const auto &b) {return (a*std::conj(b)).real(); }));
+    return std::sqrt (
+      std::inner_product (vec.begin (), vec.end (), vec.begin (), 0.0, std::plus<> (),
+                          [](const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
 }
 
 std::string helicsComplexString (double real, double imag)
@@ -287,23 +289,23 @@ named_point helicsGetNamedPoint (const std::string &val)
     auto loc = val.find_first_of ('{');
     if (loc == std::string::npos)
     {
-        auto fb = val.find_first_of('[');
+        auto fb = val.find_first_of ('[');
         if (fb != std::string::npos)
         {
-            return { val,std::nan("0") };
+            return {val, std::nan ("0")};
         }
         else
         {
-            auto V = helicsGetComplex(val);
-            if (V.real() < -1e48)
+            auto V = helicsGetComplex (val);
+            if (V.real () < -1e48)
             {
-                return { val,std::nan("0") };
+                return {val, std::nan ("0")};
             }
-            if (V.imag() == 0)
+            if (V.imag () == 0)
             {
-                return { "value",std::abs(V) };
+                return {"value", std::abs (V)};
             }
-            return { val,V.real() };
+            return {val, V.real ()};
         }
     }
     auto locsep = val.find_last_of (':');
@@ -327,54 +329,54 @@ static auto readSize (const std::string &val)
     return size;
 }
 
-std::complex<double> getComplexFromString(const std::string &val)
+std::complex<double> getComplexFromString (const std::string &val)
 {
-    if (val.empty())
+    if (val.empty ())
     {
-        return invalidValue<std::complex<double>>();
+        return invalidValue<std::complex<double>> ();
     }
-    if ((val.front() == 'v') || (val.front() == 'c'))
+    if ((val.front () == 'v') || (val.front () == 'c'))
     {
-        auto V = helicsGetVector(val);
-        if (V.empty())
+        auto V = helicsGetVector (val);
+        if (V.empty ())
         {
-            return invalidValue<std::complex<double>>();
+            return invalidValue<std::complex<double>> ();
         }
-        if (V.size() == 1)
+        if (V.size () == 1)
         {
-            return std::complex<double>(V[0], 0.0);
+            return std::complex<double> (V[0], 0.0);
         }
-        return std::complex<double>(V[0], V[1]);
+        return std::complex<double> (V[0], V[1]);
     }
-    else if (val.front() == 'c')
+    else if (val.front () == 'c')
     {
-        auto cv = helicsGetComplexVector(val);
-        if (cv.empty())
+        auto cv = helicsGetComplexVector (val);
+        if (cv.empty ())
         {
-            return invalidValue<std::complex<double>>();
+            return invalidValue<std::complex<double>> ();
         }
-        return cv.front();
+        return cv.front ();
     }
-    return helicsGetComplex(val);
+    return helicsGetComplex (val);
 }
 
-double getDoubleFromString(const std::string &val)
+double getDoubleFromString (const std::string &val)
 {
-    if (val.empty())
+    if (val.empty ())
     {
-        return invalidValue<double>();
+        return invalidValue<double> ();
     }
-    if ((val.front() == 'v')|| (val.front() == 'c'))
+    if ((val.front () == 'v') || (val.front () == 'c'))
     {
-        auto V = helicsGetVector(val);
-        return vectorNorm(V);
+        auto V = helicsGetVector (val);
+        return vectorNorm (V);
     }
-    else if (val.front() == 'c')
+    else if (val.front () == 'c')
     {
-        auto cv = helicsGetComplexVector(val);
-        return vectorNorm(cv);
+        auto cv = helicsGetComplexVector (val);
+        return vectorNorm (cv);
     }
-    return std::abs(helicsGetComplex(val));
+    return std::abs (helicsGetComplex (val));
 }
 
 void helicsGetVector (const std::string &val, std::vector<double> &data)
@@ -823,49 +825,48 @@ data_block typeConvert (helics_type_t type, const named_point &val)
 {
     if (type == helics_type_t::helicsNamedPoint)
     {
-        return ValueConverter<named_point>::convert(val);
+        return ValueConverter<named_point>::convert (val);
     }
-    if (isnan(val.value))
+    if (isnan (val.value))
     {
-        //just convert the string
-        return typeConvert(type, val.name);
+        // just convert the string
+        return typeConvert (type, val.name);
     }
-        switch (type)
-        {
-        case helics_type_t::helicsDouble:
-            return ValueConverter<double>::convert(val.value);
-        case helics_type_t::helicsInt:
-            return ValueConverter<int64_t>::convert(static_cast<int64_t> (val.value));
-        case helics_type_t::helicsComplex:
-            return ValueConverter<std::complex<double>>::convert(std::complex<double>(val.value, 0.0));
-        case helics_type_t::helicsBool:
-            return (val.value != 0) ? "1" : "0";
-        case helics_type_t::helicsNamedPoint:
-        default:
-            return ValueConverter<named_point>::convert(val);
-        case helics_type_t::helicsString:
-            return (isnan(val.value)) ? val.name : helicsNamedPointString(val);
-        case helics_type_t::helicsComplexVector:
-        {
-            std::complex<double> v2(val.value, 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
-        }
-        case helics_type_t::helicsVector:
-            return ValueConverter<double>::convert(&(val.value), 1);
-        }
-    
+    switch (type)
+    {
+    case helics_type_t::helicsDouble:
+        return ValueConverter<double>::convert (val.value);
+    case helics_type_t::helicsInt:
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (val.value));
+    case helics_type_t::helicsComplex:
+        return ValueConverter<std::complex<double>>::convert (std::complex<double> (val.value, 0.0));
+    case helics_type_t::helicsBool:
+        return (val.value != 0) ? "1" : "0";
+    case helics_type_t::helicsNamedPoint:
+    default:
+        return ValueConverter<named_point>::convert (val);
+    case helics_type_t::helicsString:
+        return (isnan (val.value)) ? val.name : helicsNamedPointString (val);
+    case helics_type_t::helicsComplexVector:
+    {
+        std::complex<double> v2 (val.value, 0.0);
+        return ValueConverter<std::complex<double>>::convert (&v2, 1);
+    }
+    case helics_type_t::helicsVector:
+        return ValueConverter<double>::convert (&(val.value), 1);
+    }
 }
 
 data_block typeConvert (helics_type_t type, const char *str, double val)
 {
     if (type == helics_type_t::helicsNamedPoint)
     {
-        return ValueConverter<named_point>::convert(named_point(str, val));
+        return ValueConverter<named_point>::convert (named_point (str, val));
     }
-    if (isnan(val))
+    if (isnan (val))
     {
-        //just convert the string
-        return typeConvert(type, str);
+        // just convert the string
+        return typeConvert (type, str);
     }
     switch (type)
     {
