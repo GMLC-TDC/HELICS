@@ -3,8 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef _HELICS_DELAYED_OBJECTS_
-#define _HELICS_DELAYED_OBJECTS_
 #pragma once
 
 #include <future>
@@ -99,5 +97,3 @@ class DelayedObjects
         }
     }
 };
-
-#endif /* _HELICS_DELAYED_OBJECTS_ */

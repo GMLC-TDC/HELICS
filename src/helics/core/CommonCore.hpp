@@ -283,6 +283,8 @@ class CommonCore : public Core, public BrokerBase
     bool checkForLocalPublication (ActionMessage &cmd);
     /** get an index for an airlock*/
     uint16_t getNextAirlockIndex();
+    /** generate results for core queries*/
+    std::string coreQuery(const std::string &queryStr) const;
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -293,7 +295,7 @@ class CommonCore : public Core, public BrokerBase
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent
-                                              //!< confustion
+                                              //!< confusion
 
     HandlePointerManager handles;  //!< local handle information;
 
@@ -363,7 +365,7 @@ class CommonCore : public Core, public BrokerBase
     @param federateID the identifier for the federate to query
     @param queryStr  the string containing the actual query
     */
-    std::string federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const;
+    std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);

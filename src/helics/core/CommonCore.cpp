@@ -1801,9 +1801,8 @@ void CommonCore::setQueryCallback (federate_id_t federateID,
     // TODO:: PT add a query callback processing
 }
 
-std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
+std::string CommonCore::federateQuery (const FederateState *fed, const std::string &queryStr) const
 {
-    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         if ((queryStr == "exists") || (queryStr == "exist"))
@@ -1824,52 +1823,108 @@ std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std
     {
         return std::to_string (static_cast<int> (fed->getState ()));
     }
-    if (queryStr == "dependencies")
-    {
-        return nullStr;
-    }
 
     return fed->processQuery (queryStr);
 }
 
+std::string  CommonCore::coreQuery(const std::string &queryStr) const
+{
+    if (queryStr == "federates")
+    {
+
+    }
+    else if (queryStr == "publications")
+    {
+    }
+    else if (queryStr == "endpoints")
+    {
+    }
+    else if (queryStr == "dependencies")
+    {
+
+    }
+    else if (queryStr == "isinit")
+    {
+        return (allInitReady()) ? "true" : "false";
+    }
+    return "#invalid";
+}
+
 std::string CommonCore::query (const std::string &target, const std::string &queryStr)
 {
-    if ((target == "core") || (target == getIdentifier ()))
+    if ((target == "core") || (target == getIdentifier()))
     {
-        // TODO:: move to a coreQuery Function
-        if (queryStr == "federates")
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = global_broker_id;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(index);
+        addActionMessage(std::move(querycmd));
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
+    }
+    else if ((target == "parent") || (target == "broker"))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = higher_broker_id;
+        querycmd.index = ++queryCounter;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        addActionMessage(querycmd);
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(querycmd.index);
+        return ret;
+    }
+    else if ((target == "root") || (target == "rootbroker"))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = 0;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        if (global_broker_id == invalid_fed_id)
         {
+            delayTransmitQueue.push(std::move(querycmd));
         }
-        else if (queryStr == "publications")
+        else
         {
+            transmit(0, querycmd);
         }
-        else if (queryStr == "endpoints")
-        {
-        }
-        else if (queryStr == "dependencies")
-        {
-        }
-        else if (queryStr == "isinit")
-        {
-            return (allInitReady ()) ? "true" : "false";
-        }
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
     }
     else
     {
-        auto id = getFederateId (target);
-        if (id != invalid_fed_id)
+        auto fed = getFederate (target);
+        if (fed != nullptr)
         {
-            return federateQuery (id, queryStr);
+            return federateQuery (fed, queryStr);
         }
         ActionMessage querycmd (CMD_QUERY);
         querycmd.source_id = global_broker_id;
-        querycmd.index = ++queryCounter;
+        auto index = ++queryCounter;
+        querycmd.index = index;
         querycmd.payload = queryStr;
         querycmd.info ().target = target;
         auto fut = ActiveQueries.getFuture (querycmd.index);
-        transmit (0, querycmd);
+        if (global_broker_id == invalid_fed_id)
+        {
+            delayTransmitQueue.push(std::move(querycmd));
+        }
+        else
+        {
+            transmit(0, querycmd);
+        }
+        
         auto ret = fut.get ();
-        ActiveQueries.finishedWithValue (querycmd.index);
+        ActiveQueries.finishedWithValue (index);
         return ret;
     }
     return "#invalid";
@@ -1940,7 +1995,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             }
 
             // push the command to the local queue
-            fed->addAction (command);
+            fed->addAction (std::move(command));
         }
     }
     break;
@@ -1958,6 +2013,30 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             addActionMessage (CMD_STOP);
         }
         break;
+    case CMD_BROKER_QUERY:
+        if (command.dest_id == global_broker_id)
+        {
+            std::string repStr = coreQuery(command.payload);
+            if (command.source_id == global_broker_id)
+            {
+                ActiveQueries.setDelayedValue(command.index, std::move(repStr));
+            }
+            else
+            {
+                ActionMessage queryResp(CMD_QUERY_REPLY);
+                queryResp.dest_id = command.source_id;
+                queryResp.source_id = global_broker_id;
+                queryResp.index = command.index;
+                queryResp.payload = std::move(repStr);
+
+                transmit(getRoute(queryResp.dest_id), queryResp);
+            }
+        }
+        else
+        {
+            routeMessage(std::move(command));
+        }
+        break;
     case CMD_QUERY:
     {
         std::string repStr;
@@ -1972,12 +2051,11 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
         else
         {
-            // TODO PT This could be done better
-            auto fedID = getFederateId (command.info ().target);
-            repStr = federateQuery (fedID, command.payload);
+            auto fedptr = getFederateCore(command.info().target);
+            repStr = federateQuery(fedptr, command.payload);
         }
 
-        queryResp.payload = repStr;
+        queryResp.payload = std::move(repStr);
 
         transmit (getRoute (queryResp.dest_id), queryResp);
     }
@@ -1995,9 +2073,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     {
         if (!isPriorityCommand (command))
         {
-            // make a copy and go through the regular processing
-            ActionMessage cmd (command);
-            processCommand (std::move (cmd));
+            processCommand (std::move (command));
         }
     }
 

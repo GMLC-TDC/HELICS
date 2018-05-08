@@ -390,6 +390,20 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     break;
     case CMD_REG_ROUTE:
         break;
+    case CMD_BROKER_QUERY:
+        if (command.dest_id == global_broker_id)
+        {
+            processLocalQuery(command);
+        }
+        else if ((isRoot()) && (command.dest_id == 0))
+        {
+            processLocalQuery(command);
+        }
+        else
+        {
+            transmit(getRoute(command.dest_id), command);
+        }
+        break;
     case CMD_QUERY:
         processQuery (command);
         break;
