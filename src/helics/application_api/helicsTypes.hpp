@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 #include <complex>
 #include <cstdint>
@@ -103,7 +102,21 @@ using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, in
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
-using named_point = std::pair<std::string, double>;
+/** data class for pair of a string and double*/
+class named_point
+{
+  public:
+    std::string name;
+    double value;
+    named_point () = default;
+    named_point (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
+    bool operator== (const named_point &opt) const
+    {
+        return ((std::isnan (value)) && (std::isnan (opt.value))) ? (name == opt.name) :
+                                                                    ((value == opt.value) && (name == opt.name));
+    }
+    bool operator!= (const named_point &opt) const { return !operator== (opt); }
+};
 
 /** template class for generating a known name of a type*/
 template <class X>
@@ -254,14 +267,20 @@ std::string helicsNamedPointString (const char *pointName, double val);
 std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
 std::vector<double> helicsGetVector (const std::string &val);
+void helicsGetVector (const std::string &val, std::vector<double> &data);
+
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
-
-named_point helicsGetNamedPoint (const std::string &val);
-
-void helicsGetVector (const std::string &val, std::vector<double> &data);
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
+/** convert a string to a named point*/
+named_point helicsGetNamedPoint (const std::string &val);
+/** get a double from a string*/
+double getDoubleFromString (const std::string &val);
+std::complex<double> getComplexFromString (const std::string &val);
+
+double vectorNorm (const std::vector<double> &vec);
+double vectorNorm (const std::vector<std::complex<double>> &vec);
 /** convert a value to a data block to be interpreted using the specified type
 @param type the type used for the data conversion
 @param val a double to convert
@@ -274,7 +293,7 @@ data_block typeConvert (helics_type_t type, const std::vector<double> &val);
 data_block typeConvert (helics_type_t type, const double *vals, size_t size);
 data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
 data_block typeConvert (helics_type_t type, const std::complex<double> &val);
-data_block typeConvert (helics_type_t type, named_point &val);
+data_block typeConvert (helics_type_t type, const named_point &val);
 data_block typeConvert (helics_type_t type, const char *str, double val);
 data_block typeConvert (helics_type_t type, const std::string &str, double val);
 data_block typeConvert (helics_type_t type, bool val);
@@ -390,7 +409,7 @@ constexpr bool isConvertableType<uint64_t> ()
 
 /** generate an invalid value for the various types*/
 template <class X>
-X invalidValue ()
+inline X invalidValue ()
 {
     return X ();
 }
@@ -405,6 +424,12 @@ template <>
 constexpr uint64_t invalidValue<uint64_t> ()
 {
     return std::numeric_limits<uint64_t>::max ();
+}
+
+template <>
+inline named_point invalidValue<named_point> ()
+{
+    return {std::string (), std::nan ("0")};
 }
 
 template <>

@@ -28,6 +28,11 @@ extern "C" {
 #define HELICS_DATA_TYPE_COMPLEX 3
 /** an array of doubles*/
 #define HELICS_DATA_TYPE_VECTOR 4
+/** a named point consisting of a string and a double*/
+#define HELICS_DATA_TYPE_NAMEDPOINT 6
+
+/** a boolean data type*/
+#define HELICS_DATA_TYPE_BOOLEAN 7
 /** raw data type*/
 #define HELICS_DATA_TYPE_RAW 25
 
@@ -51,8 +56,9 @@ HELICS_EXPORT helics_subscription helicsFederateRegisterSubscription (helics_fed
 for subscriptions and publications
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
-@param type a known type identifier  HELICS_STRING_TYPE, HELICS_INT_TYPE, HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE,
-HELICS_RAW_TYPE
+@param type a known type identifier  HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE,
+HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN,
+HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
@@ -82,7 +88,7 @@ for subscriptions and publications optional implies that there may or may not be
 @param fed the federate object in which to create a subscription
 @param key the identifier matching a publication to get a subscription for
 @param type a known type identifier HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX,
-HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_RAW
+HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
@@ -91,7 +97,7 @@ HELICS_EXPORT helics_subscription helicsFederateRegisterOptionalTypeSubscription
                                                                                   int type,
                                                                                   const char *units);
 
-/** register a publication with an arbritrary type
+/** register a publication with an arbitrary type
 @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
 for subscriptions and publications
 @param fed the federate object in which to create a publication
@@ -110,14 +116,14 @@ HELICS_EXPORT helics_publication helicsFederateRegisterPublication (helics_feder
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
-HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX,
+HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
 HELICS_EXPORT helics_publication helicsFederateRegisterTypePublication (helics_federate fed, const char *key, int type, const char *units);
 
-/** register a global named publication with an arbritrary type
+/** register a global named publication with an arbitrary type
 @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
 for subscriptions and publications
 @param fed the federate object in which to create a publication
@@ -136,8 +142,8 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication (helics
 for subscriptions and publications
 @param fed the federate object in which to create a publication
 @param key the identifier for the publication
-@param type a code identifying the type of the publication one of HELICS_STRING_TYPE, HELICS_DOUBLE_TYPE, HELICS_INT_TYPE,
-HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
+@param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX,
+HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN HELICS_DATA_TYPE_RAW
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -176,6 +182,13 @@ HELICS_EXPORT helics_status helicsPublicationPublishString (helics_publication p
 */
 HELICS_EXPORT helics_status helicsPublicationPublishInteger (helics_publication pub, int64_t val);
 
+/** publish a Boolean Value
+@param pub the publication to publish for
+@param val the boolean value to publish either helics_true or helics_false
+@return helics_ok if everything was OK
+*/
+HELICS_EXPORT helics_status helicsPublicationPublishBoolean(helics_publication pub, helics_bool_t val);
+
 /** publish a double floating point value
 @param pub the publication to publish for
 @param val the numerical value to publish
@@ -198,6 +211,14 @@ HELICS_EXPORT helics_status helicsPublicationPublishComplex (helics_publication 
 @return helics_ok if everything was OK
 */
 HELICS_EXPORT helics_status helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength);
+
+/** publish a named point
+@param pub the publication to publish for
+@param str a pointer a null terminated string
+@param val a double val to publish
+@return helics_ok if everything was OK
+*/
+HELICS_EXPORT helics_status helicsPublicationPublishNamedPoint(helics_publication pub, const char *str, double val);
 
 /**@}*/
 
@@ -225,6 +246,7 @@ HELICS_EXPORT helics_status helicsSubscriptionGetRawValue (helics_subscription s
 @param sub the subscription to get the data for
 @param[out] str storage for copying a null terminated string
 @param maxlen the maximum size of information that str can hold
+@param[out] the actual length of the string
 @return a helics_status value, helics_ok if everything went fine
 */
 HELICS_EXPORT helics_status helicsSubscriptionGetString (helics_subscription sub, char *outputString, int maxStringlen, int *actualLength);
@@ -235,6 +257,13 @@ HELICS_EXPORT helics_status helicsSubscriptionGetString (helics_subscription sub
 @return a helics_status value, helics_ok if everything went fine
 */
 HELICS_EXPORT helics_status helicsSubscriptionGetInteger (helics_subscription sub, int64_t *val);
+
+/** get a boolean value from a subscription
+@param sub the subscription to get the data for
+@param[out] val memory location to place the value
+@return a helics_status value, helics_ok if everything went fine
+*/
+HELICS_EXPORT helics_status helicsSubscriptionGetBoolean(helics_subscription sub, helics_bool_t *val);
 
 /** get a double value from a subscription
 @param sub the subscription to get the data for
@@ -263,6 +292,16 @@ HELICS_EXPORT int helicsSubscriptionGetVectorSize (helics_subscription sub);
 @param[out] actualSize pointer to variable to store the actual size
 */
 HELICS_EXPORT helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[], int maxlen, int *actualSize);
+
+
+/** get a named point from a subscription
+@param sub the subscription to get the result for
+@param[out] str storage for copying a null terminated string
+@param maxlen the maximum size of information that str can hold
+@param[out] the actual length of the string
+@param[out] val the double value for the named point
+*/
+HELICS_EXPORT helics_status helicsSubscriptionGetNamedPoint(helics_subscription sub, char *outputString, int maxStringlen, int *actualLength, double *val);
 
 /**@}*/
 
@@ -294,6 +333,13 @@ HELICS_EXPORT helics_status helicsSubscriptionSetDefaultString (helics_subscript
 */
 HELICS_EXPORT helics_status helicsSubscriptionSetDefaultInteger (helics_subscription sub, int64_t val);
 
+/** set the default as a boolean
+@param sub the subscription to set the default for
+@param val the default boolean value
+@return helics_ok if everything was OK
+*/
+HELICS_EXPORT helics_status helicsSubscriptionSetDefaultBoolean(helics_subscription sub, helics_bool_t val);
+
 /** set the default as a double
 @param sub the subscription to set the default for
 @param val the default double value
@@ -316,6 +362,16 @@ HELICS_EXPORT helics_status helicsSubscriptionSetDefaultComplex (helics_subscrip
 @return helics_ok if everything was OK
 */
 HELICS_EXPORT helics_status helicsSubscriptionSetDefaultVector (helics_subscription sub, const double *vectorInput, int vectorlength);
+
+
+/** set the default as a named_point
+@param sub the subscription to set the default for
+@param str a pointer to a string representing the name
+@param val a double value for the value of the named point
+@return helics_ok if everything was OK
+*/
+HELICS_EXPORT helics_status helicsSubscriptionSetDefaultNamedPoint(helics_subscription sub, const char *str, double val);
+
 
 /**@}*/
 

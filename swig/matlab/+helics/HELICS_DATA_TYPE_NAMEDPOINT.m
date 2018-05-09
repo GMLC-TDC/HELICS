@@ -1,7 +1,7 @@
-function v = HELICS_DATA_TYPE_RAW()
+function v = HELICS_DATA_TYPE_NAMEDPOINT()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 46);
+    vInitialized = helicsMEX(0, 44);
   end
   v = vInitialized;
 end
