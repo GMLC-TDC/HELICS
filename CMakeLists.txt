@@ -65,7 +65,7 @@ else()
 endif()
 
 
-IF(NOT WIN32)
+IF(NOT MSVC)
 	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
 	mark_as_advanced(BUILD_CXX_SHARED_LIB)
 ENDIF()
