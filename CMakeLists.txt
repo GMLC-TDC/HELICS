@@ -11,10 +11,11 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
-set (HELICS_VERSION_MINOR 0)
-set (HELICS_VERSION_PATCH 4)
+set (HELICS_VERSION_MINOR 1)
+set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD 0)
-set (HELICS_DATE "05-08-18")
+set (HELICS_DATE "05-09-18")
+
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
 
@@ -191,7 +192,7 @@ message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
 		target_compile_options(helics-static PUBLIC ${VERSION_OPTION})
-	ELSE()
+	ELSE(MSVC)
 		target_compile_options(helics-static PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
