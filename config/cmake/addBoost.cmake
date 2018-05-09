@@ -16,12 +16,12 @@ set(poss_prefixes
 C:
 C:/boost
 C:/local
-C:/boost
+C:/local/boost
 C:/Libraries
 D:
 D:/boost
 D:/local
-D:/boost
+D:/local/boost
 )
 
 # create an empty list

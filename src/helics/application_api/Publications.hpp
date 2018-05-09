@@ -148,6 +148,9 @@ class Publication : public PublicationBase
     void publish (std::complex<double> val) const;
     void publish (const defV &val) const;
     void publish (bool val) const;
+    void publish(const named_point &np) const;
+    void publish(const std::string &name, double val) const;
+    void publish(const char *str, double val) const;
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

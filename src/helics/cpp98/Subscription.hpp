@@ -51,6 +51,12 @@ public:
         helicsSubscriptionSetDefaultInteger(sub, val);
     }
 
+    void setDefaultValue(bool val)
+    {
+        // returns helics_status
+        helicsSubscriptionSetDefaultBoolean(sub, val?helics_true:helics_false);
+    }
+
     void setDefaultValue( double val)
     {
         // returns helics_status
@@ -96,11 +102,29 @@ public:
         return result;
     }
 
+    void getNamedPoint(std::string &name,double *val)
+    {
+        int size = helicsSubscriptionGetValueSize(sub);
+
+        name.resize(size + 1);
+        //this function results in a null terminated string
+        helicsSubscriptionGetNamedPoint(sub, &name[0], size + 1, &size,val);
+        name.resize(size);
+    }
+
     int64_t getInteger()
     {
         int64_t val;
         helicsSubscriptionGetInteger(sub, &val);
         return val;
+    }
+
+
+    bool getBoolean()
+    {
+        helics_bool_t val;
+        helicsSubscriptionGetBoolean(sub, &val);
+        return (val==helics_true);
     }
 
     double getDouble()

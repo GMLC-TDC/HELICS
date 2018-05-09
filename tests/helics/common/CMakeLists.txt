@@ -27,16 +27,9 @@ TimeTests.cpp
 
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers} )
-target_link_libraries(common-tests helics-static)
+target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
-
-target_link_libraries(common-tests ${Boost_LIBRARIES_test})
-
-
+target_include_directories(common-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
 set_target_properties (common-tests PROPERTIES FOLDER tests)

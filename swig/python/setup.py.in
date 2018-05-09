@@ -28,7 +28,8 @@ else:
 
 HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${CMAKE_CURRENT_BINARY_DIR}'))
 HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../../src/helics/shared_api_library/")))
-HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../src/helics/shared_api_library/")))
+HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", "${PROJECT_BINARY_DIR}/src/helics/shared_api_library/"))
+HELICS_ADDITIONAL_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../src/helics/shared_api_library/")))
 ZMQ_INCLUDE_DIR = os.path.abspath(os.getenv("ZMQ_INCLUDE", os.path.join(HELICS_INSTALL, ".")))
 ZMQ_LIB_DIR = os.path.abspath(os.getenv("ZMQ_LIB", os.path.join(HELICS_INSTALL, ".")))
 
@@ -38,8 +39,9 @@ if HELICS_INSTALL is None or "CMAKE_INSTALL_PREFIX" in HELICS_INSTALL:
     import sys
     sys.exit(1)
 
-os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cflags}'.format(
+os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cflags}'.format(
     HELICS_INCLUDE_DIR,
+	HELICS_ADDITIONAL_INCLUDE_DIR,
     os.path.join(HELICS_INCLUDE_DIR, 'helics'),
     os.path.join(HELICS_INCLUDE_DIR, 'shared_api_library'),
     ZMQ_INCLUDE_DIR,

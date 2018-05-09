@@ -159,10 +159,10 @@ if (HELICS_HAVE_ZEROMQ)
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
 endif (HELICS_HAVE_ZEROMQ)
 
-if (${MPI_C_FOUND})
+if (HELICS_HAVE_MPI)
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
-endif (${MPI_C_FOUND})
+endif (HELICS_HAVE_MPI)
 
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
@@ -178,10 +178,14 @@ if (APPLE)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
-if (${MPI_C_FOUND})
-source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
-endif (${MPI_C_FOUND})
-source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
+if (HELICS_HAVE_MPI)
+	source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
+endif (HELICS_HAVE_MPI)
+
+if (HELICS_HAVE_ZMQ)
+	source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
+endif(HELICS_HAVE_ZMQ)
+
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
 source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
@@ -198,7 +202,7 @@ if (HELICS_HAVE_ZEROMQ)
 endif (HELICS_HAVE_ZEROMQ)
 
 if (HELICS_HAVE_MPI)
-   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_PATH}")
+   target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}"  "${MPI_C_ADDITIONAL_INCLUDE_DIRS}")
 endif(HELICS_HAVE_MPI)
 
 install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core COMPONENT headers)
@@ -210,7 +214,6 @@ add_executable(helics_broker helics-broker.cpp)
    target_include_directories(helics_broker SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
-   #message(STATUS "bloc ${CMAKE_CURRENT_BINARY_DIR}")
    INSTALL(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build event to core tests

@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (converter_tests)
     compd v1{1.7, 0.9};
     compd v2{-34e5, 0.345};
     converterTests (v1, v2, sizeof (compd) + 1, sizeof (compd) + 1, "complex");
-    std::string testValue1 = "this is a string test";
+    std::string testValue1 = "this is a long string test";
     std::string test2;
     converterTests (testValue1, test2, testValue1.size (), test2.size (), "string");
     // test a vector
@@ -87,7 +87,19 @@ BOOST_AUTO_TEST_CASE (converter_tests)
     vecd vec1 = {45.4, 23.4, -45.2, 34.2234234};
     vecd testv2 (234, 0.45);
     converterTests<vecd> (vec1, testv2, 0, 0, "double_vector");
+
 }
+BOOST_AUTO_TEST_CASE(named_point_converter_tests)
+{
+    helics::named_point A{ "tests",47.676 };
+    helics::named_point B{ "this is a long string test",99.345345 };
+    converterTests<helics::named_point>(A, B, A.name.size() + 17, B.name.size() + 17, "named_point");
+
+    helics::named_point C{ "",std::nan("0") };
+    helics::named_point D{ "0",99.345345 };
+    converterTests<helics::named_point>(C, D, C.name.size() + 17, D.name.size() + 17, "named_point");
+}
+
 
 BOOST_AUTO_TEST_CASE (test_traits)
 {
@@ -117,6 +129,7 @@ BOOST_AUTO_TEST_CASE (test_minSize)
     BOOST_CHECK_EQUAL (helics::getMinSize<std::string> (), 0);
     BOOST_CHECK_EQUAL (helics::getMinSize<const char *> (), 0);
     BOOST_CHECK_EQUAL (helics::getMinSize<std::set<double>> (), 9);
+    BOOST_CHECK_EQUAL(helics::getMinSize<helics::named_point>(), 10);
 }
 
 /** this one is a bit annoying to use the template so it gets its own case

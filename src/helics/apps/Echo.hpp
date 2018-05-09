@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helicsApp.hpp"
 
 #include <mutex>
-#include "PrecHelper.hpp"
 
 namespace helics
 {
@@ -17,8 +16,8 @@ namespace apps
 {
 /** class implementing a Echo object, which will generate endpoint interfaces and send a data message back to the
 source at the with a specified delay
-@details  the Echo class is not threadsafe in general,  don't try to use it from multiple threads without external protection,
-that will result in undefined behavior.  setEchoDelay is threadsafe
+@details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads without external protection,
+that will result in undefined behavior.  the exception is the setEchoDelay function is threadsafe
 */
 class Echo:public App
 {
