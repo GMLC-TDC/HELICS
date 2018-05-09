@@ -187,7 +187,7 @@ HELICS_EXPORT helics_status helicsPublicationPublishInteger (helics_publication 
 @param val the boolean value to publish either helics_true or helics_false
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublishBoolean(helics_publication pub, helics_bool_t val);
+HELICS_EXPORT helics_status helicsPublicationPublishBoolean(helics_publication pub, helics_bool_t val);
 
 /** publish a double floating point value
 @param pub the publication to publish for
@@ -218,7 +218,7 @@ HELICS_EXPORT helics_status helicsPublicationPublishVector (helics_publication p
 @param val a double val to publish
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsPublicationPublishNamedPoint(helics_publication pub, const char *str, double val);
+HELICS_EXPORT helics_status helicsPublicationPublishNamedPoint(helics_publication pub, const char *str, double val);
 
 /**@}*/
 
@@ -263,7 +263,7 @@ HELICS_EXPORT helics_status helicsSubscriptionGetInteger (helics_subscription su
 @param[out] val memory location to place the value
 @return a helics_status value, helics_ok if everything went fine
 */
-HELICS_Export helics_status helicsSubscriptionGetBoolean(helics_subscription sub, helics_bool_t *val);
+HELICS_EXPORT helics_status helicsSubscriptionGetBoolean(helics_subscription sub, helics_bool_t *val);
 
 /** get a double value from a subscription
 @param sub the subscription to get the data for
@@ -301,7 +301,7 @@ HELICS_EXPORT helics_status helicsSubscriptionGetVector (helics_subscription sub
 @param[out] the actual length of the string
 @param[out] val the double value for the named point
 */
-HELICS_Export helics_status helicsSubscriptionGetNamedPoint(helics_subscription sub, char *outputString, int maxStringlen, int *actualLength, double *val);
+HELICS_EXPORT helics_status helicsSubscriptionGetNamedPoint(helics_subscription sub, char *outputString, int maxStringlen, int *actualLength, double *val);
 
 /**@}*/
 
@@ -338,7 +338,7 @@ HELICS_EXPORT helics_status helicsSubscriptionSetDefaultInteger (helics_subscrip
 @param val the default boolean value
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefaultBoolean(helics_subscription sub, helics_bool_t val);
+HELICS_EXPORT helics_status helicsSubscriptionSetDefaultBoolean(helics_subscription sub, helics_bool_t val);
 
 /** set the default as a double
 @param sub the subscription to set the default for
@@ -370,7 +370,7 @@ HELICS_EXPORT helics_status helicsSubscriptionSetDefaultVector (helics_subscript
 @param val a double value for the value of the named point
 @return helics_ok if everything was OK
 */
-HELICS_Export helics_status helicsSubscriptionSetDefaultNamedPoint(helics_subscription sub, const char *str, double val);
+HELICS_EXPORT helics_status helicsSubscriptionSetDefaultNamedPoint(helics_subscription sub, const char *str, double val);
 
 
 /**@}*/
