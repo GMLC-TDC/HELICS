@@ -250,7 +250,7 @@ case "$1" in
         echo "$0 zmq [version=HEAD] install_path"
 esac
 
-# Return to the original direcotry and get rid of the temp directory
+# Return to the original directory and get rid of the temp directory
 popd
 rm -rf ${dependency_temp_dir}
 
