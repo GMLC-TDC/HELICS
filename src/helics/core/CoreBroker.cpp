@@ -129,6 +129,24 @@ void CoreBroker::generateQueryResult (const ActionMessage &command)
             repStr.push_back (';');
         }
     }
+    else if (command.payload == "dependencies")
+    {
+        repStr.push_back('[');
+        for (const auto &dep : timeCoord->getDependencies())
+        {
+            repStr.append(std::to_string(dep));
+            repStr.push_back(';');
+        }
+    }
+    else if (command.payload == "dependents")
+    {
+        repStr.push_back('[');
+        for (const auto &dep : timeCoord->getDependents())
+        {
+            repStr.append(std::to_string(dep));
+            repStr.push_back(';');
+        }
+    }
     else
     {
         repStr = "#invalid";

@@ -18,6 +18,7 @@ enum action_message_flags : uint16_t
 
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
+    empty_flag=6, //!< flag indicating that the message is empty
     extra_flag1 = 7,  //!< extra flag
     forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
@@ -240,6 +241,8 @@ enum class action_t : int32_t
 
 //definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
+#define UPDATE_QUERY_CALLBACK 581
+#define UPDATE_LOGGING_CALLBACK 592
 
 /** check if the action has an info structure associated with it*/
 inline bool hasInfo (action_message_def::action_t action)

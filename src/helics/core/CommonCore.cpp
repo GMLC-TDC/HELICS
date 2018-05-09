@@ -1697,9 +1697,20 @@ void CommonCore::setLoggingCallback (
 {
     if (federateID == 0)
     {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        // TODO:: this is not totally threadsafe
-        setLoggerFunction (std::move (logFunction));
+        ActionMessage loggerUpdate(CMD_CORE_CONFIGURE);
+        loggerUpdate.index = UPDATE_LOGGING_CALLBACK;
+        if (logFunction)
+        {
+            auto ii = getNextAirlockIndex();
+            dataAirlocks[ii].load(std::move(logFunction));
+            loggerUpdate.counter = ii;
+        }
+        else
+        {
+            setActionFlag(loggerUpdate, empty_flag);
+        }
+
+        actionQueue.push(loggerUpdate);
     }
     else
     {
@@ -1791,14 +1802,14 @@ void CommonCore::setIdentifier (const std::string &name)
 }
 
 void CommonCore::setQueryCallback (federate_id_t federateID,
-                                   std::function<std::string (const std::string &)> /*queryFunction*/)
+                                   std::function<std::string (const std::string &)> queryFunction)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
-    // TODO:: PT add a query callback processing
+    fed->setQueryCallback(std::move(queryFunction));
 }
 
 std::string CommonCore::federateQuery (const FederateState *fed, const std::string &queryStr) const
@@ -1829,25 +1840,88 @@ std::string CommonCore::federateQuery (const FederateState *fed, const std::stri
 
 std::string  CommonCore::coreQuery(const std::string &queryStr) const
 {
+    std::string repStr;
+    bool listV = true;
     if (queryStr == "federates")
     {
-
+        repStr.push_back('[');
+        for (const auto &fed : loopFederates)
+        {
+            repStr.append(fed->getIdentifier());
+            repStr.push_back(';');
+        }
     }
     else if (queryStr == "publications")
     {
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        repStr.push_back('[');
+        for (const auto &handle : handles)
+        {
+            if (handle->handle_type == handle_type_t::publication)
+            {
+                repStr.append(handle->key);
+                repStr.push_back(';');
+            }
+        }
     }
     else if (queryStr == "endpoints")
     {
+        std::lock_guard<std::mutex> lock(_handlemutex);
+        repStr.push_back('[');
+        for (const auto &handle : handles)
+        {
+            if (handle->handle_type == handle_type_t::endpoint)
+            {
+                repStr.append(handle->key);
+                repStr.push_back(';');
+            }
+        }
     }
     else if (queryStr == "dependencies")
     {
-
+        repStr.push_back('[');
+        for (const auto &dep : timeCoord->getDependencies())
+        {
+            repStr.append(std::to_string(dep));
+            repStr.push_back(';');
+        }
+    }
+    else if (queryStr == "dependents")
+    {
+        repStr.push_back('[');
+        for (const auto &dep : timeCoord->getDependents())
+        {
+            repStr.append(std::to_string(dep));
+            repStr.push_back(';');
+        }
     }
     else if (queryStr == "isinit")
     {
-        return (allInitReady()) ? "true" : "false";
+        repStr=(allInitReady()) ? "true" : "false";
+        listV = false;
     }
-    return "#invalid";
+    else if (queryStr == "address")
+    {
+        repStr= getAddress();
+        listV = false;
+    }
+    else
+    {
+        return "#invalid";
+        listV = false;
+    }
+    if (listV)
+    {
+        if (repStr.size() > 1)
+        {
+            repStr.back() = ']';
+        }
+        else
+        {
+            repStr.push_back(']');
+        }
+    }
+    return repStr;
 }
 
 std::string CommonCore::query (const std::string &target, const std::string &queryStr)
@@ -2947,6 +3021,21 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         break;
     case UPDATE_LOG_LEVEL:
         setLogLevel (cmd.dest_id);
+        break;
+    case UPDATE_LOGGING_CALLBACK:
+        if (checkActionFlag(cmd, empty_flag))
+        {
+            setLoggerFunction(nullptr);
+        }
+        else
+        {
+            auto op = dataAirlocks[cmd.counter].try_unload();
+            if (op)
+            {
+                auto M = stx::any_cast<std::function<void(int,const std::string &, const std::string &)>> (std::move(*op));
+                setLoggerFunction(std::move(M));
+            }
+        }
         break;
     case UPDATE_FILTER_OPERATOR:
     {

@@ -132,10 +132,8 @@ must still be active in the process
 @return NULL if no fed is available by that name otherwise a helics_federate with that name*/
 HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName);
 
-/** get the network address associated with a broker
-@param broker the broker to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
+/** disconnect a broker
+@param broker the broker to disconnect
 @return a helics_status enumeration indicating any error condition
 */
 HELICS_EXPORT helics_status helicsBrokerDisconnect (helics_broker broker);
@@ -535,7 +533,7 @@ HELICS_EXPORT helics_query helicsCreateQuery (const char *target, const char *qu
 @param query the query object to use in the query
 @param fed a federate to send the query through
 @return a pointer to a string.  the string will remain valid until the query is freed or executed again
-the return will be nullptr if fed or query is an invalid object
+the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
 */
 HELICS_EXPORT const char *helicsQueryExecute (helics_query query, helics_federate fed);
 
