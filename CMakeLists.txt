@@ -34,7 +34,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
 		endif(MSYS)
-		
+
 	endif(WIN32)
 endif()
 
@@ -362,8 +362,8 @@ IF(BUILD_CXX_SHARED_LIB)
 		set_target_properties(helics-shared PROPERTIES
         LINK_FLAGS "-Wl,-all_load")
 	else ()
-		set_target_properties(helics-shared PROPERTIES
-        LINK_FLAGS "-Wl,--whole-archive")
+	#	set_target_properties(helics-shared PROPERTIES
+  #      LINK_FLAGS "-Wl,--whole-archive")
 	endif ()
 
 endif()
@@ -402,7 +402,7 @@ if (BUILD_HELICS_EXAMPLES)
 	add_subdirectory (examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-INSTALL(FILES ${KEY_LIBRARY_FILES} 
+INSTALL(FILES ${KEY_LIBRARY_FILES}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
 	COMPONENT runtime)
 # -------------------------------------------------------------
@@ -435,7 +435,7 @@ IF(BUILD_CXX_SHARED_LIB)
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-	
+
 	INSTALL(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 	INSTALL(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs)
 
@@ -455,7 +455,7 @@ ELSE()
 ENDIF()
 
 
-install (EXPORT helics-targets 
+install (EXPORT helics-targets
 	NAMESPACE Helics::
 	DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 	COMPONENT libs
@@ -522,7 +522,7 @@ if (CMAKE_INSTALL_PREFIX)
 endif()
 
 # -------------------------------------------------------------
-# CPack 
+# CPack
 # -------------------------------------------------------------
 OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
@@ -547,29 +547,29 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
  set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
 
-  
+
  set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
  set(CPACK_COMPONENT_JAVA_GROUP interfaces)
  set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
  set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
- 
+
  set(CPACK_COMPONENT_APPLICATION_DESCRIPTION "Executables and helper applications for HELICS")
  set(CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
  set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
  set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
- 
+
  set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "additional language interfaces for HELICS")
- 
+
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
  set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
- 
+
  set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable")
  if (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
-set(CPACK_NSIS_MENU_LINKS 
+set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
 	"https://www.helics.org" "Helics Web page"

@@ -1,11 +1,12 @@
 # Contributors
-This File describes the contributors to the HELICS library and the software used as part of this projects
+This file describes the contributors to the HELICS library and the software used as part of this projects
+If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIBUTING.md)
 ## Individual contributors
 ### Pacific Northwest National Lab
- - Jeff Daily
+ - Jeff Daily (Now AMD)
  - Andy Fisher
  - Jason Fuller
- - Shwetha
+ - Shwetha Niddodi
 
 ### Lawrence Livermore National Lab
  - Ryan Mast
@@ -18,7 +19,7 @@ This File describes the contributors to the HELICS library and the software used
  - Bryan Palmintier
 
 ### Argonne National Lab
- - Shriyang Abhyankar
+ - Shrirang Abhyankar
 
 ## Used Libraries or Code
 
@@ -46,7 +47,7 @@ The cereal library is used for serialization of messages sent around inside HELI
 ### [FNCS](https://github.com/FNCS/fncs), IGMS, and FSKIT
 While not used directly much of the inspiration for HELICS comes from three separate projects at the different National Labs.  These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL.  The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.  
 
-### [cpp17 headers](https://github.com/tcbrindle/cpp17_headers)
+### [c++17 headers](https://github.com/tcbrindle/cpp17_headers)
 Helics makes use of C++17 headers, but due to C++14 compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std::any, std::optional and std::string_view.  
 
 ###[mpark/variant](https://github.com/mpark/variant)
@@ -56,3 +57,4 @@ this variant was chosen for compatibility with C++17 over boost variant and bett
 Several cmake scripts came from other sources and were either used of modified for use in HELICS.
  - Lars Bilke CodeCoverage.cmake
  - NATIONAL HEART, LUNG, AND BLOOD INSTITUTE  FindOctave.cmake
+ - clang-format, clang-tidy scripts were creating using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
