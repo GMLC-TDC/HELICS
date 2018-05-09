@@ -26,7 +26,7 @@ class ZmqComms final:public CommsInterface {
 public:
 	/** default constructor*/
 	ZmqComms() = default;
-	ZmqComms(const std::string &brokerTarget, const std::string &localTarget);
+	ZmqComms(const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork = interface_networks::local);
     ZmqComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~ZmqComms();

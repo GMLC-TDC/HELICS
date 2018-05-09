@@ -28,6 +28,7 @@ data-block-tests.cpp
 UdpCore-tests.cpp
 ForwardingTimeCoordinatorTests.cpp
 TimeCoordinatorTests.cpp
+networkInfoTests.cpp
 )
 if (HELICS_HAVE_ZMQ)
 	list(APPEND core_test_sources ZeromqCore-tests.cpp)
