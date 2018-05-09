@@ -35,8 +35,6 @@ target_include_directories(helics_apps-static SYSTEM PRIVATE ${Boost_INCLUDE_DIR
 
 target_include_directories(helics_apps-static SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
 
-install(FILES ${helics_apps_library_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
-
 if (BUILD_PLAYER)
 	add_executable(helics_player playerMain.cpp)
 	target_link_libraries(helics_player helics_apps-static )
@@ -66,7 +64,7 @@ INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 #install(FILES $<TARGET_PDB_FILE:${helics_apps-static}> DESTINATION ${CMAKE_INSTALL_LIBDIR} OPTIONAL COMPONENT libs)
 
 INSTALL(FILES ${helics_apps_public_headers} 
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT headers)
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
 
 if (BUILD_PLAYER)
 INSTALL(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
@@ -92,7 +90,7 @@ endforeach(keyfile)
 endif()
 endif()
 
-if (BUILD_APPS)
+if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
 INSTALL(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 if (NOT BUILD_PLAYER AND NOT BUILD_RECORDER)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

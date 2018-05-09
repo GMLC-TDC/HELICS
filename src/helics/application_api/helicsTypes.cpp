@@ -8,8 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ValueConverter.hpp"
 #include <map>
 #include <regex>
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
+#include "../common/stringOps.h"
 
 namespace helics
 {
@@ -138,14 +138,14 @@ std::complex<double> helicsGetComplex (const std::string &val)
             if ((val.back () == 'j') || (val.back () == 'i'))
             {
                 auto strval = val.substr (0, val.size () - 1);
-                boost::algorithm::trim (strval);
+                stringOps::trimString (strval);
                 im = boost::lexical_cast<double> (strval);
                 re = 0.0;
             }
             else
             {
                 auto strval = val;
-                boost::algorithm::trim (strval);
+                stringOps::trimString(strval);
                 re = boost::lexical_cast<double> (strval);
             }
         }
@@ -277,13 +277,13 @@ named_point helicsGetNamedPoint (const std::string &val)
     auto locsep = val.find_last_of (':');
     auto locend = val.find_last_of ('}');
     auto str1 = val.substr (loc + 1, locsep - loc);
-    boost::algorithm::trim (str1);
+    stringOps::trimString(str1);
     str1.pop_back ();
 
     named_point point;
     point.first = str1.substr (1);
     auto vstr = val.substr (locsep + 1, locend - locsep - 1);
-    boost::algorithm::trim (vstr);
+    stringOps::trimString(vstr);
     point.second = boost::lexical_cast<double> (vstr);
     return point;
 }
@@ -313,7 +313,7 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
             try
             {
                 std::string vstr = val.substr (fb + 1, nc - fb - 1);
-                boost::algorithm::trim (vstr);
+                stringOps::trimString(vstr);
                 auto V = boost::lexical_cast<double> (vstr);
                 data.push_back (V);
             }
@@ -376,9 +376,9 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
             try
             {
                 std::string vstr1 = val.substr (fb + 1, nc - fb - 1);
-                boost::algorithm::trim (vstr1);
+                stringOps::trimString(vstr1);
                 std::string vstr2 = val.substr (nc + 1, nc2 - nc - 1);
-                boost::algorithm::trim (vstr2);
+                stringOps::trimString(vstr2);
                 auto V1 = boost::lexical_cast<double> (vstr1);
                 auto V2 = boost::lexical_cast<double> (vstr2);
                 data.emplace_back (V1, V2);

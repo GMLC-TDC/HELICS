@@ -12,8 +12,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <set>
 
-#include "PrecHelper.hpp"
-
 namespace helics
 {
 class CloningFilter;

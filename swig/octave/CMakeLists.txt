@@ -1,3 +1,9 @@
+##############################################################################
+#Copyright © 2017-2018,
+#Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
+##############################################################################
+
 # Generate SWIG wrapper (for Octave)
 MESSAGE(STATUS "Building Octave interface")
 
@@ -38,6 +44,7 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m
   -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helicsSharedLib> 
   -D BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp 
   -D LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/
+  -D OTHER_INCLUDE_LOCATION=${PROJECT_BINARY_DIR}/src/helics/shared_api_library/
   -D SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
   -P ${CMAKE_CURRENT_SOURCE_DIR}/generateOCTcreationScript.cmake
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp

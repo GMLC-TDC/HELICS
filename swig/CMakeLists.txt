@@ -1,3 +1,9 @@
+##############################################################################
+#Copyright © 2017-2018,
+#Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
+##############################################################################
+
 if (NOT DISABLE_SWIG)
 	FIND_PACKAGE(SWIG REQUIRED 3.0)
 	INCLUDE(${SWIG_USE_FILE})
@@ -6,6 +12,7 @@ endif()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
+INCLUDE_DIRECTORIES("${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
 	
 
 if (BUILD_PYTHON_INTERFACE)

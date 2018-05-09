@@ -36,7 +36,7 @@
 #cmakedefine HAVE_FALLTHROUGH
 
 #ifdef HAVE_FALLTHROUGH
-#define FALLTHROUGH [[fallthrough]];
+#define FALLTHROUGH [[fallthrough]]; /* FALLTHRU */
 #else
 #define FALLTHROUGH /* FALLTHRU */
 #endif

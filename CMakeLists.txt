@@ -12,11 +12,17 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 0)
-set (HELICS_VERSION_PATCH 3)
+set (HELICS_VERSION_PATCH 4)
 set (HELICS_VERSION_BUILD 0)
-set (HELICS_DATE "04-28-18")
+set (HELICS_DATE "05-08-18")
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
+
+#-----------------------------------------------------------------------------
+# set the module path and include some common macros
+#-----------------------------------------------------------------------------
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+include(extraMacros)
 
 #-----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -28,7 +34,7 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}/" CACHE PATH "default install path" FORCE )
 		endif(MSYS)
-		
+
 	endif(WIN32)
 endif()
 
@@ -48,17 +54,20 @@ OPTION(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
 OPTION(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
 OPTION(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
-if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
-set(INTERFACE_BUILD ON)
+if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
+	set(INTERFACE_BUILD ON)
+	HIDE_VARIABLE(BUILD_C_SHARED_LIB)
+	SHOW_VARIABLE(DISABLE_SWIG BOOL "Disable the use of swig to generate interface code and use repo code" OFF)
 else()
-set(INTERFACE_BUILD OFF)
+	set(INTERFACE_BUILD OFF)
+	HIDE_VARIABLE(DISABLE_SWIG)
+	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
-OPTION(DISABLE_SWIG "Disable the use of swig to generate interface code and use repo code" OFF)
 
-OPTION(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON)
 IF(NOT MSVC)
 	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface gcc/clang only" OFF)
+	mark_as_advanced(BUILD_CXX_SHARED_LIB)
 ENDIF()
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
@@ -68,15 +77,9 @@ else()
 endif()
 
 
-if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB)
-	set(BUILT_C_SHARED_LIB ON)
-endif()
-
 IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ENDIF()
-
-
 
 
 #-----------------------------------------------------------------------------
@@ -87,12 +90,12 @@ if (NOT CMAKE_DEBUG_POSTFIX)
 	set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 
+#these are for the common locations of build directories.  they will get copied over for install if needed outside of build
 include_directories ("${PROJECT_SOURCE_DIR}/ThirdParty")
 include_directories ("${PROJECT_BINARY_DIR}/libs/include")
 
-include(extraMacros)
+
 
 # Prohibit in-source build
 IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -106,13 +109,13 @@ IF(UNIX)
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
-  set(Boost_USE_MULTITHREADED      OFF)   # Needed if MT libraries not built
+  set(Boost_USE_MULTITHREADED OFF)   # Needed if MT libraries not built
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
 ELSE(UNIX)
   IF(MSYS)
 	option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   ELSE(MSYS)
-  #this would most likely be MSVC
+  #this will be MSYS or stand alone Mingw
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
   ENDIF(MSYS)
 ENDIF(UNIX)
@@ -125,19 +128,19 @@ ENDIF ()
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-IF(BUILD_HELICS_TESTS)
- option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
- if (TEST_CODE_COVERAGE)
- include(CodeCoverage)
+if(BUILD_HELICS_TESTS)
+	option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+	if (TEST_CODE_COVERAGE)
+		include(CodeCoverage)
 
- set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*')
- add_compile_options(${COVERAGE_COMPILER_FLAGS})
-  SETUP_TARGET_FOR_COVERAGE(
-     NAME helics_coverage                    # New target name
-     EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
-	)
+		set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*' 'build*/*')
+		add_compile_options(${COVERAGE_COMPILER_FLAGS})
+		SETUP_TARGET_FOR_COVERAGE(
+			NAME helics_coverage                    # New target name
+			EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
+		)
 
- endif(TEST_CODE_COVERAGE)
+	endif(TEST_CODE_COVERAGE)
  endif(BUILD_HELICS_TESTS)
 
 
@@ -148,21 +151,21 @@ IF(BUILD_HELICS_TESTS)
 set(CONFIGURE_TARGET_LOCATION ${PROJECT_BINARY_DIR}/libs/include/helics/)
 include(configGenerator)
 
-option (HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
+option (GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
-IF (HELICS_GENERATE_DOXYGEN_DOC)
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
+if (GENERATE_DOXYGEN_DOC)
+	find_package(Doxygen)
+	if(DOXYGEN_FOUND)
 
-	SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	add_custom_target(doc
-	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
-	COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
-endif(DOXYGEN_FOUND)
-endif (HELICS_GENERATE_DOXYGEN_DOC)
+		SHOW_VARIABLE(DOXYGEN_OUTPUT_DIR PATH "location to put Doxygen docs" "${PROJECT_BINARY_DIR}/docs")
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+		add_custom_target(doc
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
+			COMMENT "Generating API documentation with Doxygen" VERBATIM
+		)
+	endif(DOXYGEN_FOUND)
+endif (GENERATE_DOXYGEN_DOC)
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
@@ -174,11 +177,16 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 # -------------------------------------------------------------
 include(addBoost)
 
+# -------------------------------------------------------------
+# Add the main HELICS library
+# -------------------------------------------------------------
+
 add_library(helics-static STATIC
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
+
 message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
 IF (VERSION_OPTION)
 	IF (MSVC)
@@ -214,9 +222,9 @@ ENDIF(ZeroMQ_ENABLE)
 
 OPTION(MPI_ENABLE "Enable MPI networking library" OFF)
 IF (MPI_ENABLE)
-	find_package(MPI)
+	include(addMPI)
 	if (MPI_C_FOUND)
-   set(HELICS_HAVE_MPI TRUE)
+		set(HELICS_HAVE_MPI TRUE)
 	else()
 		set(HELICS_HAVE_MPI FALSE)
 	endif (MPI_C_FOUND)
@@ -227,7 +235,9 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
-set(THREADS_PREFER_PTHREAD_FLAG ON)
+if (NOT MSVC)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif(NOT MSVC)
 find_package(Threads REQUIRED)
 
 target_link_libraries(helics-static PUBLIC Threads::Threads)
@@ -236,46 +246,43 @@ IF (UNIX AND NOT APPLE)
 	target_link_libraries(helics-static PUBLIC rt)
 ENDIF()
 
-IF(MINGW)
+IF(MSYS)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	if (BOOST_VERSION_LEVEL GREATER 1)
-	#set(DISABLE_TCP_CORE TRUE)
-		set(DISABLE_TCP_CORE FALSE)
-		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
-	else()
-		set(DISABLE_TCP_CORE TRUE)
-		message(status, "disabling TCP core |${DISABLE_TCP_CORE}|")
-		target_link_libraries(helics-static PUBLIC ws2_32)
-	endif()
+		if (BOOST_VERSION_LEVEL GREATER 1)
+			#set(DISABLE_TCP_CORE TRUE)
+			set(DISABLE_TCP_CORE FALSE)
+			target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
+		else()
+			set(DISABLE_TCP_CORE TRUE)
+			message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
+			target_link_libraries(helics-static PUBLIC ws2_32)
+		endif()
 
 	else()
 		target_link_libraries(helics-static PUBLIC wsock32 ws2_32)
 	endif()
 
-ENDIF(MINGW)
+ENDIF(MSYS)
 
-if (${ZeroMQ_FOUND})
+if (HELICS_HAVE_ZEROMQ)
 	if (ZMQ_USE_STATIC_LIBRARY)
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
-		ADD_DEFINITIONS(-DZMQ_STATIC)
+		target_add_definitions(helics-static PUBLIC -DZMQ_STATIC)
 	else()
 		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
 	endif()
 	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics-static PUBLIC ${ZeroMQ_DEPENDENCY})
-else()
+else(HELICS_HAVE_ZEROMQ)
    if (ZeroMQ_ENABLE)
-   message(WARNING "ZeroMQ not found")
+	  message(WARNING "ZeroMQ not found")
    endif()
-endif ()
+endif (HELICS_HAVE_ZEROMQ)
 
-if (${MPI_C_FOUND})
+if (MPI_C_FOUND)
    target_link_libraries(helics-static PUBLIC ${MPI_C_LIBRARIES})
-endif (${MPI_C_FOUND})
+endif (MPI_C_FOUND)
 
-
-
-link_directories(${Boost_LIBRARY_DIRS})
 
 target_link_libraries(helics-static PUBLIC ${Boost_LIBRARIES_core})
 
@@ -313,13 +320,14 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 if (NOT Boost_USE_STATIC_LIBS)
-list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
 
-OPTION(BUILD_PLAYER "Build a helics player" ON)
-OPTION(BUILD_RECORDER "Build a helics recorder" ON)
+OPTION(BUILD_PLAYER "Build a helics player standalone executable" ON)
+OPTION(BUILD_RECORDER "Build a helics recorder standalone executable" ON)
+OPTION(BUILD_APPS "Build helics applications" ON)
 
 # we aren't ready for this for the whole library yet
 IF(BUILD_SHARED_LIBS AND NOT BUILD_CXX_SHARED_LIB)
@@ -354,8 +362,8 @@ IF(BUILD_CXX_SHARED_LIB)
 		set_target_properties(helics-shared PROPERTIES
         LINK_FLAGS "-Wl,-all_load")
 	else ()
-		set_target_properties(helics-shared PROPERTIES
-        LINK_FLAGS "-Wl,--whole-archive")
+	#	set_target_properties(helics-shared PROPERTIES
+  #      LINK_FLAGS "-Wl,--whole-archive")
 	endif ()
 
 endif()
@@ -365,8 +373,8 @@ message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 OPTION(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 if (NOT DISABLE_LOGGING)
-OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
-OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
+	OPTION(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
+	OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
 endif()
 
 
@@ -376,25 +384,25 @@ endif()
 
 add_subdirectory (src)
 
-if (BUILD_PYTHON_INTERFACE)
-SET(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
-find_package(PythonInterp 3)
-find_package(PythonLibs 3 REQUIRED )
-endif(BUILD_PYTHON_INTERFACE)
+
 
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
 IF(BUILD_HELICS_TESTS)
-include (CTest)
-add_subdirectory (tests)
+	include (CTest)
+	mark_as_advanced(BUILD_TESTING)
+	add_subdirectory (tests)
 ENDIF(BUILD_HELICS_TESTS)
 
+#-----------------------------------------------------------------------------
+# Setup Examples
+#-----------------------------------------------------------------------------
 if (BUILD_HELICS_EXAMPLES)
 	add_subdirectory (examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-INSTALL(FILES ${KEY_LIBRARY_FILES} 
+INSTALL(FILES ${KEY_LIBRARY_FILES}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
 	COMPONENT runtime)
 # -------------------------------------------------------------
@@ -408,7 +416,7 @@ if (ENABLE_CLANG_TOOLS)
 endif(ENABLE_CLANG_TOOLS)
 
 if (INTERFACE_BUILD)
-add_subdirectory(swig)
+	add_subdirectory(swig)
 endif()
 
 
@@ -423,11 +431,11 @@ install (TARGETS helics-static EXPORT helics-targets
 	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
 	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
-install (TARGETS helics-shared EXPORT helics-targets
+	install (TARGETS helics-shared EXPORT helics-targets
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-	
+
 	INSTALL(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 	INSTALL(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs)
 
@@ -447,7 +455,7 @@ ELSE()
 ENDIF()
 
 
-install (EXPORT helics-targets 
+install (EXPORT helics-targets
 	NAMESPACE Helics::
 	DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 	COMPONENT libs
@@ -459,15 +467,17 @@ IF (UNIX AND NOT APPLE)
 	list(APPEND helics_dependencies rt)
 ENDIF()
 
-IF(MINGW)
+IF(MSYS)
 	list(APPEND helics_dependencies wsock32 ws2_32)
-ENDIF(MINGW)
+ENDIF(MSYS)
 
-if (ZeroMQ_FOUND)
+if (HELICS_HAVE_ZEROMQ)
 	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
-endif(ZeroMQ_FOUND)
+endif(HELICS_HAVE_ZEROMQ)
 
-
+if (HELICS_HAVE_MPI)
+	list(APPEND helics_dependencies ${MPI_C_LIBRARIES})
+endif(HELICS_HAVE_MPI)
 
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
@@ -512,7 +522,7 @@ if (CMAKE_INSTALL_PREFIX)
 endif()
 
 # -------------------------------------------------------------
-# CPack 
+# CPack
 # -------------------------------------------------------------
 OPTION(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS" OFF)
 
@@ -537,29 +547,29 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
  set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
 
-  
+
  set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
  set(CPACK_COMPONENT_JAVA_GROUP interfaces)
  set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
  set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
- 
+
  set(CPACK_COMPONENT_APPLICATION_DESCRIPTION "Executables and helper applications for HELICS")
  set(CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
  set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
  set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
- 
+
  set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "additional language interfaces for HELICS")
- 
+
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
  set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
- 
+
  set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable")
  if (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
-set(CPACK_NSIS_MENU_LINKS 
+set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
 	"https://www.helics.org" "Helics Web page"

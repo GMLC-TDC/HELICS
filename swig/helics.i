@@ -1,6 +1,8 @@
 %include output.i
 %include "typemaps.i"
-#define __attribute__(x)
+#define HELICS_EXPORT
+#define HELICS_DEPRECATED
+
 #pragma SWIG nowarn=451
 
 %module helics
@@ -25,6 +27,7 @@
 
 %apply (char *outputString, int maxlen) { (char *identifier, int maxlen) };
 %apply (char *outputString, int maxlen) { (char *address, int maxlen) };
+
 
 %include "api-data.h"
 %include "helics.h"
