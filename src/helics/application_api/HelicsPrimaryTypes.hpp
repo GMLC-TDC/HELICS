@@ -42,23 +42,38 @@ enum type_location
 };
 /** detect a change from the previous values*/
 bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
+bool changeDetected (const defV &prevValue, const char *val, double deltaV);
 bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV);
 bool changeDetected (const defV &prevValue, const std::vector<std::complex<double>> &val, double deltaV);
 bool changeDetected (const defV &prevValue, const double *vals, size_t size, double deltaV);
 bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
-bool changeDetected (const defV &prevValue, named_point val, double deltaV);
+bool changeDetected (const defV &prevValue, const named_point &val, double deltaV);
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
+/** directly convert the boolean to integer*/
+inline int64_t make_valid (bool obj) { return (obj) ? 1 : 0; }
+
+/** this template should do nothing for most classes the specific overloads are the important ones*/
+template <class X>
+decltype (auto) make_valid (X &&obj)
+{
+    return std::forward<X> (obj);
+}
+/** extract the value from a variant to a string*/
 void valueExtract (const defV &dv, std::string &val);
 
+/** extract the value from a variant to a complex number*/
 void valueExtract (const defV &dv, std::complex<double> &val);
 
+/** extract the value from a variant to a vector of doubles*/
 void valueExtract (const defV &dv, std::vector<double> &val);
 
+/** extract the value from a variant to a complex vector of doubles*/
 void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
+/** extract the value from a variant to a named point*/
 void valueExtract (const defV &dv, named_point &val);
 
 void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val);
@@ -71,7 +86,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
 
 void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val);
 
-/** for numeric types*/
+/** extract the value from a variant to a numerical type*/
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
 {
@@ -132,6 +147,19 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
         }
         break;
     }
+    case namedPointLoc:
+    {
+        auto &np = mpark::get<named_point> (dv);
+        if (std::isnan (np.value))
+        {
+            val = static_cast<X> (getDoubleFromString (np.name));
+        }
+        else
+        {
+            val = static_cast<X> (np.value);
+        }
+        break;
+    }
     }
 }
 
@@ -174,28 +202,13 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             catch (const std::invalid_argument &ble)
             {  // well lets try a vector conversion
                 auto V = ValueConverter<std::vector<double>>::interpret (dv);
-                if (V.size () == 2)
-                {
-                    val = static_cast<X> (std::hypot (V[0], V[1]));
-                }
-                else
-                {
-                    val = (V.empty ()) ? X (0) : static_cast<X> (V.front ());
-                }
+                val = static_cast<X> (vectorNorm (V));
             }
         }
         break;
     }
     case helics_type_t::helicsString:
-        if
-            IF_CONSTEXPR (std::is_integral<X>::value)
-            {
-                val = static_cast<X> (std::stoll (ValueConverter<std::string>::interpret (dv)));
-            }
-        else
-        {
-            val = static_cast<X> (std::stod (ValueConverter<std::string>::interpret (dv)));
-        }
+        val = static_cast<X> (getDoubleFromString (dv.string ()));
         break;
     case helics_type_t::helicsBool:
         val = static_cast<X> ((dv.string () == "0") ? false : true);
@@ -203,7 +216,22 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsNamedPoint:
     {
         auto npval = ValueConverter<named_point>::interpret (dv);
-        val = static_cast<X> (npval.second);
+        if (std::isnan (npval.value))
+        {
+            try
+            {
+                val = static_cast<X> (getDoubleFromString (npval.name));
+            }
+            catch (const std::invalid_argument &)
+            {
+                val = static_cast<X> (invalidValue<double> ());
+            }
+        }
+        else
+        {
+            val = static_cast<X> (npval.value);
+        }
+
         break;
     }
     case helics_type_t::helicsDouble:

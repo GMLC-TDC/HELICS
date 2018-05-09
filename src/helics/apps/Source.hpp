@@ -12,7 +12,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include <map>
 
-#include "PrecHelper.hpp"
 #include <set>
 
 
@@ -52,7 +51,7 @@ public:
 
 /** class implementing a source federate, which is capable of generating signals of various kinds
 and sending signals at the appropriate times
-@details  the source class is not threadsafe,  don't try to use it from multiple threads without external
+@details  the source class is NOT threadsafe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
 class Source:public App

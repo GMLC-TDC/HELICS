@@ -804,6 +804,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             return processActionMessage(cmd);
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_EXEC_GRANT:
         switch (timeCoord->processTimeMessage (cmd))
         {
@@ -817,6 +818,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_EXEC_CHECK:  // just check the time for entry
     {
         if (state != HELICS_INITIALIZING)
@@ -915,6 +917,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             return processActionMessage(cmd);
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_TIME_GRANT:
         switch (timeCoord->processTimeMessage (cmd))
         {
@@ -928,6 +931,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         FALLTHROUGH
+       /* FALLTHROUGH */
     case CMD_TIME_CHECK:
     {
         if (state != HELICS_EXECUTING)

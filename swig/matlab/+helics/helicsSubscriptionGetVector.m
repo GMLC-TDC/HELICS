@@ -12,5 +12,5 @@ function varargout = helicsSubscriptionGetVector(varargin)
     %* `actualSize` :
     %    pointer to variable to store the actual size
     %
-  [varargout{1:nargout}] = helicsMEX(131, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(134, varargin{:});
 end

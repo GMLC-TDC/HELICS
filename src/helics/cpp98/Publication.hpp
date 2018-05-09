@@ -28,7 +28,7 @@ public:
         pub = publication.pub;
         return *this;
     }
-
+    //there is no need for move operators since copying the underlying object is fine, it is a non-owning pointer
     operator helics_publication() const { return pub; }
 
     helics_publication baseObject() const { return pub; }
@@ -39,7 +39,13 @@ void publish( const char *data, int len)
     helicsPublicationPublishRaw(pub, data, len);
 }
 
-void publish( std::string str)
+void publish(const char *str)
+{
+    // returns helics_status
+    helicsPublicationPublishString(pub,str);
+}
+
+void publish(const std::string &str)
 {
     // returns helics_status
     helicsPublicationPublishString(pub, str.c_str());
@@ -63,21 +69,23 @@ void publish( std::complex<double> cmplx)
     helicsPublicationPublishComplex(pub, cmplx.real(), cmplx.imag());
 }
 
-void publish(std::vector<double> data)
+void publish(const std::vector<double> &data)
 {
-    // c++98 doesn't guarantee vector data will be contiguous
-    // might make sense to have a pre-allocated array (that can grow) set aside for reuse
-    double *arr = (double*)malloc(data.size() * sizeof(double));
-    for (unsigned int i = 0; i < data.size(); i++)
-    {
-        arr[i] = data[i];
-    }
     // returns helics_status
-    helicsPublicationPublishVector(pub, arr, static_cast<int>(data.size() * sizeof(double)));
-    free(arr);
+    helicsPublicationPublishVector(pub, data.data(), static_cast<int>(data.size() * sizeof(double)));
 }
 
+void publish(const std::string &name, double val)
+{
+    // returns helics_status
+    helicsPublicationPublishNamedPoint(pub, name.c_str(), val);
+}
 
+void publish(bool val)
+{
+    // returns helics_status
+    helicsPublicationPublishBoolean(pub, val?helics_true:helics_false);
+}
 
 std::string getKey() const
 {

@@ -1245,6 +1245,10 @@ def helicsFederateSetLoggingLevel(fed: 'helics_federate', loggingLevel: 'int') -
     """
     return _helics.helicsFederateSetLoggingLevel(fed, loggingLevel)
 
+def helicsFederateSetMaxIterations(fi: 'helics_federate_info_t', maxIterations: 'int') -> "helics_status":
+    return _helics.helicsFederateSetMaxIterations(fi, maxIterations)
+helicsFederateSetMaxIterations = _helics.helicsFederateSetMaxIterations
+
 def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time_t *":
     """
 
@@ -1374,6 +1378,8 @@ HELICS_DATA_TYPE_DOUBLE = _helics.HELICS_DATA_TYPE_DOUBLE
 HELICS_DATA_TYPE_INT = _helics.HELICS_DATA_TYPE_INT
 HELICS_DATA_TYPE_COMPLEX = _helics.HELICS_DATA_TYPE_COMPLEX
 HELICS_DATA_TYPE_VECTOR = _helics.HELICS_DATA_TYPE_VECTOR
+HELICS_DATA_TYPE_NAMEDPOINT = _helics.HELICS_DATA_TYPE_NAMEDPOINT
+HELICS_DATA_TYPE_BOOLEAN = _helics.HELICS_DATA_TYPE_BOOLEAN
 HELICS_DATA_TYPE_RAW = _helics.HELICS_DATA_TYPE_RAW
 
 def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_subscription":
@@ -1524,8 +1530,8 @@ def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'ch
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
 
-def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *', datalen: 'int') -> "helics_status":
-    return _helics.helicsPublicationPublishRaw(pub, data, datalen)
+def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *') -> "int":
+    return _helics.helicsPublicationPublishRaw(pub, data)
 helicsPublicationPublishRaw = _helics.helicsPublicationPublishRaw
 
 def helicsPublicationPublishString(pub: 'helics_publication', str: 'char const *') -> "helics_status":
@@ -1541,6 +1547,10 @@ def helicsPublicationPublishInteger(pub: 'helics_publication', val: 'int64_t') -
 
     """
     return _helics.helicsPublicationPublishInteger(pub, val)
+
+def helicsPublicationPublishBoolean(pub: 'helics_publication', val: 'helics_bool_t') -> "helics_status":
+    return _helics.helicsPublicationPublishBoolean(pub, val)
+helicsPublicationPublishBoolean = _helics.helicsPublicationPublishBoolean
 
 def helicsPublicationPublishDouble(pub: 'helics_publication', val: 'double') -> "helics_status":
     """
@@ -1562,6 +1572,10 @@ def helicsPublicationPublishVector(pub: 'helics_publication', vectorInput: 'doub
 
     """
     return _helics.helicsPublicationPublishVector(pub, vectorInput)
+
+def helicsPublicationPublishNamedPoint(pub: 'helics_publication', str: 'char const *', val: 'double') -> "helics_status":
+    return _helics.helicsPublicationPublishNamedPoint(pub, str, val)
+helicsPublicationPublishNamedPoint = _helics.helicsPublicationPublishNamedPoint
 
 def helicsSubscriptionGetValueSize(sub: 'helics_subscription') -> "int":
     """
@@ -1587,6 +1601,10 @@ def helicsSubscriptionGetInteger(sub: 'helics_subscription') -> "int64_t *":
 
     """
     return _helics.helicsSubscriptionGetInteger(sub)
+
+def helicsSubscriptionGetBoolean(sub: 'helics_subscription') -> "int *":
+    return _helics.helicsSubscriptionGetBoolean(sub)
+helicsSubscriptionGetBoolean = _helics.helicsSubscriptionGetBoolean
 
 def helicsSubscriptionGetDouble(sub: 'helics_subscription') -> "double *":
     """
@@ -1629,8 +1647,12 @@ def helicsSubscriptionGetVector(sub: 'helics_subscription') -> "int *":
     """
     return _helics.helicsSubscriptionGetVector(sub)
 
-def helicsSubscriptionSetDefaultRaw(sub: 'helics_subscription', data: 'void const *', datalen: 'int') -> "helics_status":
-    return _helics.helicsSubscriptionSetDefaultRaw(sub, data, datalen)
+def helicsSubscriptionGetNamedPoint(sub: 'helics_subscription') -> "int *, double *":
+    return _helics.helicsSubscriptionGetNamedPoint(sub)
+helicsSubscriptionGetNamedPoint = _helics.helicsSubscriptionGetNamedPoint
+
+def helicsSubscriptionSetDefaultRaw(sub: 'helics_subscription', data: 'void const *') -> "int":
+    return _helics.helicsSubscriptionSetDefaultRaw(sub, data)
 helicsSubscriptionSetDefaultRaw = _helics.helicsSubscriptionSetDefaultRaw
 
 def helicsSubscriptionSetDefaultString(sub: 'helics_subscription', str: 'char const *') -> "helics_status":
@@ -1646,6 +1668,10 @@ def helicsSubscriptionSetDefaultInteger(sub: 'helics_subscription', val: 'int64_
 
     """
     return _helics.helicsSubscriptionSetDefaultInteger(sub, val)
+
+def helicsSubscriptionSetDefaultBoolean(sub: 'helics_subscription', val: 'helics_bool_t') -> "helics_status":
+    return _helics.helicsSubscriptionSetDefaultBoolean(sub, val)
+helicsSubscriptionSetDefaultBoolean = _helics.helicsSubscriptionSetDefaultBoolean
 
 def helicsSubscriptionSetDefaultDouble(sub: 'helics_subscription', val: 'double') -> "helics_status":
     """
@@ -1667,6 +1693,10 @@ def helicsSubscriptionSetDefaultVector(sub: 'helics_subscription', vectorInput: 
 
     """
     return _helics.helicsSubscriptionSetDefaultVector(sub, vectorInput)
+
+def helicsSubscriptionSetDefaultNamedPoint(sub: 'helics_subscription', str: 'char const *', val: 'double') -> "helics_status":
+    return _helics.helicsSubscriptionSetDefaultNamedPoint(sub, str, val)
+helicsSubscriptionSetDefaultNamedPoint = _helics.helicsSubscriptionSetDefaultNamedPoint
 
 def helicsSubscriptionGetType(sub: 'helics_subscription') -> "int":
     """
@@ -1965,12 +1995,12 @@ def helicsCoreRegisterDestinationFilter(core: 'helics_core', type: 'helics_filte
     """
     return _helics.helicsCoreRegisterDestinationFilter(core, type, target, name)
 
-def helicsCoreRegisterCloningFilter(fed: 'helics_core', deliveryEndpoint: 'char const *') -> "helics_filter":
+def helicsCoreRegisterCloningFilter(core: 'helics_core', deliveryEndpoint: 'char const *') -> "helics_filter":
     """
 
 
     """
-    return _helics.helicsCoreRegisterCloningFilter(fed, deliveryEndpoint)
+    return _helics.helicsCoreRegisterCloningFilter(core, deliveryEndpoint)
 
 def helicsFilterGetTarget(filt: 'helics_filter') -> "int":
     """

@@ -30,8 +30,16 @@ helicsCallbacks.cpp
 internal/api_objects.h
 )
 
+include(GenerateExportHeader)
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
+
+generate_export_header(helicsSharedLib
+	BASE_NAME helics)
+	
+target_include_directories(helicsSharedLib PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
 
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
 if (UNIX OR MINGW)
@@ -58,6 +66,8 @@ ELSE()
 	INSTALL(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs )
 	INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime)
 ENDIF()
+
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 
 IF (MSVC)
 install(FILES $<TARGET_PDB_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL COMPONENT libs)
