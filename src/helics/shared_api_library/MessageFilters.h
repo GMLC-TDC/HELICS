@@ -26,7 +26,7 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsFederateRegisterSourceFilter (helics_federate fed,
+HELICS_EXPORT helics_filter helicsFederateRegisterSourceFilter (helics_federate fed,
                                                                 helics_filter_type_t type,
                                                                 const char *target,
                                                                 const char *name);
@@ -40,7 +40,7 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
+HELICS_EXPORT helics_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
                                                                      helics_filter_type_t type,
                                                                      const char *target,
                                                                      const char *name);
@@ -52,7 +52,7 @@ through other functions
 @param deliveryEndpoint the specified endpoint to deliver the message
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint);
+HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint);
 
 /** create a source Filter on the specified core
 @details filters can be created through a federate or a core , linking through a federate allows
@@ -63,7 +63,7 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsCoreRegisterSourceFilter (helics_core core,
+HELICS_EXPORT helics_filter helicsCoreRegisterSourceFilter (helics_core core,
                                                             helics_filter_type_t type,
                                                             const char *target,
                                                             const char *name);
@@ -77,7 +77,7 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsCoreRegisterDestinationFilter (helics_core core,
+HELICS_EXPORT helics_filter helicsCoreRegisterDestinationFilter (helics_core core,
                                                                  helics_filter_type_t type,
                                                                  const char *target,
                                                                  const char *name);
@@ -89,35 +89,35 @@ through other functions
 @param deliveryEndpoint the specified endpoint to deliver the message
 @return a helics_filter object
 */
-HELICS_Export helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint);
+HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint);
 
 /** get the target of the filter and store in the given string
 @param filt the given filter
 @param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen);
+HELICS_EXPORT helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen);
 
 /** get the name of the filter and store in the given string
 @param filt the given filter
 @param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a helics_status enumeration helics_ok if everything worked*/
-HELICS_Export helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen);
+HELICS_EXPORT helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen);
 
 /** set a property on a filter
 @param filt the filter to modify
 @param property a string containing the property to set
 @param val a numerical value of the property
 */
-HELICS_Export helics_status helicsFilterSet (helics_filter filt, const char *property, double val);
+HELICS_EXPORT helics_status helicsFilterSet (helics_filter filt, const char *property, double val);
 
 /** set a string property on a filter
 @param filt the filter to modify
 @param property a string containing the property to set
 @param val a string containing the new value
 */
-HELICS_Export helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val);
+HELICS_EXPORT helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val);
 
 /**
 * \defgroup clone filter functions
@@ -127,25 +127,25 @@ HELICS_Export helics_status helicsFilterSetString (helics_filter filt, const cha
 
 /** add a destination target to a cloning filter
 @details all messages going to a destination are copied to the delivery address(es)*/
-HELICS_Export helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest);
+HELICS_EXPORT helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest);
 
 /** add a source target to a cloning filter
 @details all messages coming from a source are copied to the delivery address(es)*/
-HELICS_Export helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *source);
+HELICS_EXPORT helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *source);
 
 /** add a delivery endpoint to a cloning filter
 @details all cloned messages are sent to the delivery address(es)
 */
-HELICS_Export helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);
+HELICS_EXPORT helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);
 
 /** remove a destination target from a cloning filter*/
-HELICS_Export helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest);
+HELICS_EXPORT helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest);
 
 /** remove a source target from a cloning filter*/
-HELICS_Export helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source);
+HELICS_EXPORT helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source);
 
 /** remove a delivery destination from a cloning filter*/
-HELICS_Export helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);
+HELICS_EXPORT helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);
 
 /**@}*/
 #ifdef __cplusplus

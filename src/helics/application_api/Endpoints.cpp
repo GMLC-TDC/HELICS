@@ -13,7 +13,7 @@ Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
 {
     auto cnt = fed->getEndpointCount ();
     if ((endpointIndex >= cnt) || (cnt < 0))
-    {
+    { 
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
     id = static_cast<endpoint_id_t> (endpointIndex);

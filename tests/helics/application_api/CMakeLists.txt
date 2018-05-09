@@ -45,38 +45,29 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 #  QUICK API TESTS
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
-target_link_libraries(application-api-tests helics-static)
-
-target_link_libraries(application-api-tests ${Boost_LIBRARIES_test})
-
-set_target_properties (application-api-tests PROPERTIES FOLDER tests)
+target_link_libraries(application-api-tests helics-static helics_test_base)
 
 #  KEY TESTS
 add_executable(key-tests key-tests.cpp ${key_test_files} ${application_api_test_headers})
-target_link_libraries(key-tests helics-static)
+target_link_libraries(key-tests helics-static helics_test_base)
 
-target_link_libraries(key-tests ${Boost_LIBRARIES_test})
-
-set_target_properties (key-tests PROPERTIES FOLDER tests)
 
 #  EXTENDED TESTS
 add_executable(extended-api-tests ${application_api_test_sources} ${extended_test_sources} ${application_api_test_headers})
 
-target_link_libraries(extended-api-tests helics-static)
+target_link_libraries(extended-api-tests helics-static helics_test_base)
 
-target_link_libraries(extended-api-tests ${Boost_LIBRARIES_test})
-
-set_target_properties (extended-api-tests PROPERTIES FOLDER tests)
+set_target_properties (application-api-tests extended-api-tests key-tests PROPERTIES FOLDER tests)
 
 
 #add a bigobj indicator for this project
-IF(MINGW)
-target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")
-ENDIF(MINGW)
+#IF(MINGW)
+#	target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")
+#ENDIF(MINGW)
 
-if (MSVC)
-target_compile_options(application-api-tests PRIVATE /bigobj)
-endif(MSVC)
+#if (MSVC)
+#	target_compile_options(application-api-tests PRIVATE /bigobj)
+#endif(MSVC)
 
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")

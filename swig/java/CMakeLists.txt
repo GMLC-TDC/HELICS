@@ -1,9 +1,16 @@
+##############################################################################
+#Copyright © 2017-2018,
+#Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+#All rights reserved. See LICENSE file and DISCLAIMER for more details.
+##############################################################################
+
 FIND_PACKAGE(Java REQUIRED)
 FIND_PACKAGE(JNI REQUIRED)
 INCLUDE(UseJava)
 
 INCLUDE_DIRECTORIES(${JAVA_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(${JNI_INCLUDE_DIRS})
+
 IF (DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
 	FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/interface/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
@@ -28,7 +35,7 @@ ELSE(DISABLE_SWIG)
 	SWIG_LINK_LIBRARIES(JNIhelics helicsSharedLib)
 	SWIG_LINK_LIBRARIES(JNIhelics ${JAVA_LIBRARIES})
 
-
+	
 	set_target_properties (JNIhelics PROPERTIES FOLDER interfaces)
 
 	if (APPLE)

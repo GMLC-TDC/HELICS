@@ -243,7 +243,7 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Post an asynchronous receive
                 MPI_Request req;
-                MPI_Irecv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
+                MPI_Irecv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
                            mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
@@ -276,7 +276,7 @@ void MpiService::sendAndReceiveMessages ()
         MPI_Request req;
         auto sendRequestData = std::make_pair (req, msg);
 
-        int addr_delim_pos = address.find (":");
+        auto addr_delim_pos = address.find (":");
         int destRank = std::stoi (address.substr (0, addr_delim_pos));
         ;
         int destTag = std::stoi (address.substr (addr_delim_pos + 1, address.length ()));
@@ -284,7 +284,7 @@ void MpiService::sendAndReceiveMessages ()
         if (destRank != commRank)
         {
             // Send the message using asynchronous send
-            MPI_Isend (sendRequestData.second.data (), sendRequestData.second.size (), MPI_CHAR, destRank, destTag,
+            MPI_Isend (sendRequestData.second.data (), static_cast<int>(sendRequestData.second.size ()), MPI_CHAR, destRank, destTag,
                        mpiCommunicator, &sendRequestData.first);
             send_requests.push_back (sendRequestData);
         }
@@ -330,7 +330,7 @@ void MpiService::drainRemainingMessages ()
             buffer.resize (recv_size);
 
             // Receive the message
-            MPI_Recv (buffer.data (), buffer.capacity (), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
+            MPI_Recv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
                       mpiCommunicator, &status);
         }
     }

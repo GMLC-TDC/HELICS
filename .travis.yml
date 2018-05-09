@@ -100,7 +100,7 @@ jobs:
           packages:
             - clang-3.6
       env:
-        - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-3.6' && CXX='ccache clang++-3.6'"
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
         - SHARED_LIB_EXT=so
         - USE_SWIG=true
@@ -141,7 +141,7 @@ jobs:
             - libstdc++-6-dev
             - clang-5.0
       env:
-        - MATRIX_EVAL="COMPILER=clang && CC='ccache clang-5.0' && CXX='ccache clang++-5.0'"
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - SHARED_LIB_EXT=so
         - USE_SWIG=true
@@ -168,7 +168,7 @@ script:
     # - echo "$HELICS_OPTION_FLAGS"
     # - echo "$HELICS_DEPENDENCY_FLAGS"
   - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
-  - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
+  - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
