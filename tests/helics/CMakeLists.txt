@@ -8,14 +8,7 @@
 #add a baseline library for underlying dependencies and flags for test executables
 add_library(helics_test_base INTERFACE)
 target_link_libraries(helics_test_base INTERFACE ${Boost_LIBRARIES_test})
-
-target_include_directories(helics_test_base SYSTEM INTERFACE
-  $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-)
-
-#set_property(TARGET helics_test_base APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
-#  $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-#  )
+target_link_libraries(helics_test_base INTERFACE helics_base_includes)
   
 add_subdirectory(common)
 
