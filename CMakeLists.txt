@@ -279,9 +279,12 @@ target_link_libraries(helics_base INTERFACE ${Boost_LIBRARIES_core})
 target_include_directories(helics_base_includes INTERFACE
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 	$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/libs/include>
+	$<INSTALL_INTERFACE:include>
+)
+
+target_include_directories(helics_base_includes SYSTEM INTERFACE
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 	$<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-	$<INSTALL_INTERFACE:include>
 )
 
 include(GNUInstallDirs)
