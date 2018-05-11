@@ -90,13 +90,6 @@ target_include_directories(helics_common SYSTEM PRIVATE $<TARGET_PROPERTY:helics
 target_compile_definitions(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
 
 target_compile_options(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
-IF (VERSION_OPTION)
-	IF (MSVC)
-		target_compile_options(helics_common PUBLIC ${VERSION_OPTION})
-	ELSE()
-		target_compile_options(helics_common PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-	ENDIF (MSVC)
-ENDIF(VERSION_OPTION)
 
 if (HELICS_HAVE_ZEROMQ)
    target_include_directories (helics_common PRIVATE "${ZeroMQ_INCLUDE_DIR}")

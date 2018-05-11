@@ -29,7 +29,9 @@ additions include load store operations and template specialization for std::mut
 #include <mutex>
 #include <type_traits>
 
+#ifndef LIBGUARDED_NO_DEFAULT
 #include <shared_mutex>
+#endif
 
 namespace libguarded
 {
@@ -48,8 +50,13 @@ namespace libguarded
    The handle returned by the various lock methods is moveable but not
    copyable.
 */
+#ifdef LIBGUARDED_NO_DEFAULT
+template <typename T, typename M>
+class ordered_guarded
+#else
 template <typename T, typename M = std::shared_timed_mutex>
 class ordered_guarded
+#endif
 {
   private:
     class shared_deleter;

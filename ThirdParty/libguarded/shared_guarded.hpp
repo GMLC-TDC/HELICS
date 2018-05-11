@@ -28,7 +28,9 @@ additions include overloads for std::mutex and std::timed_mutex
 #include <memory>
 #include <type_traits>
 
+#ifndef LIBGUARDED_NO_DEFAULT
 #include <shared_mutex>
+#endif
 
 namespace libguarded
 {
@@ -36,7 +38,7 @@ namespace libguarded
 /**
    \headerfile shared_guarded.hpp <libguarded/shared_guarded.hpp>
 
-   This templated class wraps an object and allows only one thread at
+   This templated class wraps an object and allows only one thread at 
    a time to modify the protected object.
 
    This class will use std::shared_timed_mutex for the internal
@@ -46,8 +48,13 @@ namespace libguarded
    The handle returned by the various lock methods is moveable but not
    copyable.
 */
+#ifdef LIBGUARDED_NO_DEFAULT
+template <typename T, typename M>
+class shared_guarded
+#else
 template <typename T, typename M = std::shared_timed_mutex>
 class shared_guarded
+#endif
 {
   private:
     class deleter;

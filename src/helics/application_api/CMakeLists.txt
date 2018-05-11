@@ -54,13 +54,6 @@ target_include_directories(application_api PRIVATE $<TARGET_PROPERTY:helics_base
 target_include_directories(application_api SYSTEM PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 target_compile_definitions(application_api PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
 target_compile_options(application_api PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
-IF (VERSION_OPTION)
-	IF (MSVC)
-		target_compile_options(application_api PUBLIC ${VERSION_OPTION})
-	ELSE()
-		target_compile_options(application_api PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-	ENDIF (MSVC)
-ENDIF(VERSION_OPTION)
 
 install(FILES ${public_application_api_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api COMPONENT headers)
 
