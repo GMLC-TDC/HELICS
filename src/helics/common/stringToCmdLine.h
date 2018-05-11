@@ -14,8 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 * For details, see the LICENSE file.
 * LLNS Copyright End
 */
-#ifndef STRING_TO_CMD_LINE
-#define STRING_TO_CMD_LINE
 #pragma once
 
 #include <string>
@@ -43,6 +41,4 @@ private:
 	int argCount;	//!< the number of arguments
 
 };
-
-#endif
 

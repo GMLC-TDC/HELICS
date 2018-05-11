@@ -31,7 +31,7 @@ void CoreBroker::displayHelp ()
     std::cout << "Broker Specific options:\n";
     variable_map vm;
     const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, {});
+    argumentParser (2, argV, vm, extraArgs);
     BrokerBase::displayHelp ();
 }
 

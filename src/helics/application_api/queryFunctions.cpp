@@ -72,19 +72,20 @@ std::vector<std::string> vectorizeAndSortQueryResult (std::string &&queryres)
     return vec;
 }
 
-bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout)
+bool waitForInit (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query (fedName, "isinit");
-    int waitTime = 0;
+    std::chrono::milliseconds waitTime{ 0 };
+    const std::chrono::milliseconds delta{ 400 };
     while (res != "true")
     {
         if (res == "#invalid")
         {
             return false;
         }
-        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        std::this_thread::sleep_for (delta);
         res = fed->query (fedName, "isinit");
-        waitTime += 200;
+        waitTime += delta;
         if (waitTime >= timeout)
         {
             return false;
@@ -93,15 +94,16 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout
     return true;
 }
 
-bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout)
+bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query (fedName, "exists");
-    int waitTime = 0;
+    std::chrono::milliseconds waitTime{ 0 };
+    const std::chrono::milliseconds delta{ 400 };
     while (res != "true")
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        std::this_thread::sleep_for (delta);
         res = fed->query (fedName, "exists");
-        waitTime += 200;
+        waitTime += delta;
         if (waitTime >= timeout)
         {
             return false;

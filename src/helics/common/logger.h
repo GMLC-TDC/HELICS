@@ -15,8 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 * LLNS Copyright End
 */
 
-#ifndef UTILITIES_LOGGER_H_
-#define UTILITIES_LOGGER_H_
 #pragma once
 
 #include "BlockingQueue.hpp"
@@ -218,5 +216,4 @@ public:
 
 };
 }//namespace helics
-#endif
 
