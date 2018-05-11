@@ -437,7 +437,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
 
         addAction (exec);
-       
+
         auto ret = processQueue ();
         if (ret == iteration_state::next_step)
         {
@@ -763,13 +763,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             {
                 if (state == HELICS_INITIALIZING)
                 {
-                    cmd.setAction(CMD_EXEC_CHECK);
-                    return processActionMessage(cmd);
+                    cmd.setAction (CMD_EXEC_CHECK);
+                    return processActionMessage (cmd);
                 }
                 else if (state == HELICS_EXECUTING)
                 {
-                    cmd.setAction(CMD_TIME_CHECK);
-                    return processActionMessage(cmd);
+                    cmd.setAction (CMD_TIME_CHECK);
+                    return processActionMessage (cmd);
                 }
             }
         }
@@ -795,15 +795,16 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
-            auto ret = processDelayQueue();
+            auto ret = processDelayQueue ();
             if (ret != iteration_state::continue_processing)
             {
                 return ret;
             }
-            cmd.setAction(CMD_EXEC_CHECK);
-            return processActionMessage(cmd);
+            cmd.setAction (CMD_EXEC_CHECK);
+            return processActionMessage (cmd);
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_EXEC_GRANT:
         switch (timeCoord->processTimeMessage (cmd))
         {
@@ -817,6 +818,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_EXEC_CHECK:  // just check the time for entry
     {
         if (state != HELICS_INITIALIZING)
@@ -906,15 +908,16 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
-            auto ret=processDelayQueue ();
+            auto ret = processDelayQueue ();
             if (ret != iteration_state::continue_processing)
             {
                 return ret;
             }
-            cmd.setAction(CMD_TIME_CHECK);
-            return processActionMessage(cmd);
+            cmd.setAction (CMD_TIME_CHECK);
+            return processActionMessage (cmd);
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_TIME_GRANT:
         switch (timeCoord->processTimeMessage (cmd))
         {
@@ -928,6 +931,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         FALLTHROUGH
+        /* FALLTHROUGH */
     case CMD_TIME_CHECK:
     {
         if (state != HELICS_EXECUTING)
@@ -978,6 +982,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
+        errorString = commandErrorString (cmd.index);
         return iteration_state::error;
     case CMD_REG_PUB:
     {
@@ -1024,7 +1029,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
 
         break;
-   
+
     case CMD_FED_ACK:
         if (state != HELICS_CREATED)
         {
@@ -1035,6 +1040,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             if (checkActionFlag (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
+                errorString = commandErrorString (cmd.index);
                 return iteration_state::error;
             }
             global_id = cmd.dest_id;
@@ -1043,7 +1049,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         break;
     case CMD_FED_CONFIGURE:
-        processConfigUpdate(cmd);
+        processConfigUpdate (cmd);
         break;
     }
     return iteration_state::continue_processing;
@@ -1141,9 +1147,10 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
 
 std::string FederateState::processQuery (const std::string &query) const
 {
+    std::string ret;
+    bool listV = true;
     if (query == "publications")
     {
-        std::string ret;
         ret.push_back ('[');
         {
             auto pubHandle = publications.lock_shared ();
@@ -1153,19 +1160,9 @@ std::string FederateState::processQuery (const std::string &query) const
                 ret.push_back (';');
             }
         }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
     }
-    if (query == "endpoints")
+    else if (query == "endpoints")
     {
-        std::string ret;
         ret.push_back ('[');
         {
             auto endHandle = endpoints.lock_shared ();
@@ -1175,6 +1172,37 @@ std::string FederateState::processQuery (const std::string &query) const
                 ret.push_back (';');
             }
         }
+    }
+    else if (query == "dependencies")
+    {
+        ret.push_back ('[');
+        for (const auto &dep : timeCoord->getDependencies ())
+        {
+            ret.append (std::to_string (dep));
+            ret.push_back (';');
+        }
+    }
+    else if (query == "dependents")
+    {
+        ret.push_back ('[');
+        for (const auto &dep : timeCoord->getDependents ())
+        {
+            ret.append (std::to_string (dep));
+            ret.push_back (';');
+        }
+    }
+    else if (queryCallback)
+    {
+        ret = queryCallback (query);
+        listV = false;
+    }
+    else
+    {
+        ret = "#invalid";
+        listV = false;
+    }
+    if (listV)
+    {
         if (ret.size () > 1)
         {
             ret.back () = ']';
@@ -1183,12 +1211,8 @@ std::string FederateState::processQuery (const std::string &query) const
         {
             ret.push_back (']');
         }
-        return ret;
     }
-    if (queryCallback)
-    {
-        return queryCallback (query);
-    }
-    return "#invalid";
+
+    return ret;
 }
 }  // namespace helics

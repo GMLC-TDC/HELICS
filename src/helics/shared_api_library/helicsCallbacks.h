@@ -26,7 +26,7 @@ helicsCreateCombinationFederate
 the function arguments are loglevel,  an identifier, and a message string
 @return an object containing the subscription
 */
-HELICS_Export helics_status helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *));
+HELICS_EXPORT helics_status helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *));
 
 /** add a logging callback to a core
 @details add a logging callback function for the C The logging callback will be called when
@@ -37,7 +37,7 @@ helicsCreateCombinationFederate
 the function arguments are loglevel,  an identifier, and a message string
 @return an object containing the subscription
 */
-HELICS_Export helics_status helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const char *, const char *));
+HELICS_EXPORT helics_status helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const char *, const char *));
 
 /** add a logging callback to a federate
    @details add a logging callback function for the C The logging callback will be called when
@@ -48,7 +48,7 @@ HELICS_Export helics_status helicsCoreAddLoggingCallback (helics_core core, void
     the function arguments are loglevel,  an identifier, and a message string
    @return an object containing the subscription
    */
-HELICS_Export helics_status helicsFederateAddLoggingCallback (helics_federate fed, void (*logger) (int, const char *, const char *));
+HELICS_EXPORT helics_status helicsFederateAddLoggingCallback (helics_federate fed, void (*logger) (int, const char *, const char *));
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

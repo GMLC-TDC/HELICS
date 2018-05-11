@@ -7,6 +7,10 @@
 # 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
 #   HELICS_STATIC_LIBRARY -the static Library
 # 	HELICS_DEPENDENCIES -- list of dependencies in the helics project
+#   HELICS_PLAYER -- the player executable
+#  	HELICS_RECORDER -- the recorder executable
+#   HELICS_APP  -- the helics app executable
+#   HELICS_BROKER -- the helics broker executable
 @PACKAGE_INIT@
 
 set(PN HELICS)
@@ -28,5 +32,22 @@ set(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_s
 set(${PN}_STATIC_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file_debug@")
 
 set(${PN}_DEPENDENCIES "@helics_dependencies@")
+
+find_program(HELICS_PLAYER helics_player 
+	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	NO_DEFAULT_PATH)
+	
+find_program(HELICS_RECORDER helics_recorder 
+	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	NO_DEFAULT_PATH)
+	
+find_program(HELICS_APP helics_app 
+	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	NO_DEFAULT_PATH)
+	
+find_program(HELICS_BROKER helics_broker 
+	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	NO_DEFAULT_PATH)
+	
 check_required_components(${PN})
 

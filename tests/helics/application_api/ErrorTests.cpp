@@ -46,4 +46,33 @@ BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
     broker->disconnect ();
 }
 
+
+BOOST_AUTO_TEST_CASE(already_init_broker)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    fed1->enterInitializationState();
+    helics::FederateInfo fi("fed222",helics::core_type::TEST);
+    fi.coreInitString=std::string("--broker=") + broker->getIdentifier();
+    BOOST_CHECK_THROW(helics::ValueFederate fed3(fi), helics::RegistrationFailure);
+    broker->disconnect();
+
+}
+
+BOOST_AUTO_TEST_CASE(already_init_core)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    fed1->enterExecutionState();
+    helics::FederateInfo fi("fed2");
+    // get the core pointer from fed2 and using the name of fed1 should be an error
+    BOOST_CHECK_THROW(helics::ValueFederate fed2(fed1->getCorePointer(), fi), helics::RegistrationFailure);
+    broker->disconnect();
+
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

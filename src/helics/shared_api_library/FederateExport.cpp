@@ -92,136 +92,135 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     try
     {
         if (fi == nullptr)
         {
-            fed->fedptr = std::make_shared<helics::ValueFederate>(helics::FederateInfo());
+            FedI->fedptr = std::make_shared<helics::ValueFederate>(helics::FederateInfo());
         }
         else
         {
-            fed->fedptr = std::make_shared<helics::ValueFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr = std::make_shared<helics::ValueFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::valueFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::valueFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 helics_federate helicsCreateValueFederateFromJson (const char *json)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     try
     {
-        fed->fedptr = std::make_shared<helics::ValueFederate>((json != nullptr) ? std::string(json) : std::string());
+        FedI->fedptr = std::make_shared<helics::ValueFederate>((json != nullptr) ? std::string(json) : std::string());
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::valueFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::valueFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     try
     {
         if (fi == nullptr)
         {
-            fed->fedptr = std::make_shared<helics::MessageFederate>(helics::FederateInfo());
+            FedI->fedptr = std::make_shared<helics::MessageFederate>(helics::FederateInfo());
         }
         else
         {
-            fed->fedptr = std::make_shared<helics::MessageFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr = std::make_shared<helics::MessageFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
-    
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::messageFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::messageFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 helics_federate helicsCreateMessageFederateFromJson (const char *json)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     
     try
     {
-        fed->fedptr = std::make_shared<helics::MessageFederate>((json != nullptr) ? std::string(json) : std::string());
+        FedI->fedptr = std::make_shared<helics::MessageFederate>((json != nullptr) ? std::string(json) : std::string());
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::messageFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::messageFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 /* Creation and destruction of Federates */
 helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     try
     {
         if (fi == nullptr)
         {
-            fed->fedptr = std::make_shared<helics::CombinationFederate>(helics::FederateInfo());
+            FedI->fedptr = std::make_shared<helics::CombinationFederate>(helics::FederateInfo());
         }
         else
         {
-            fed->fedptr = std::make_shared<helics::CombinationFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr = std::make_shared<helics::CombinationFederate>(*reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::combinationFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::combinationFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 helics_federate helicsCreateCombinationFederateFromJson (const char *json)
 {
-    auto *fed = new helics::FedObject;
+    auto FedI = std::make_unique<helics::FedObject>();
     try
     {
-        fed->fedptr = std::make_shared<helics::CombinationFederate>((json != nullptr) ? std::string(json) : std::string());
+       FedI->fedptr = std::make_shared<helics::CombinationFederate>((json != nullptr) ? std::string(json) : std::string());
     }
     catch (const helics::RegistrationFailure &)
     {
-        delete fed;
         return nullptr;
     }
     
-    fed->index = getMasterHolder()->addFed(fed);
-    fed->type = helics::vtype::combinationFed;
-    fed->valid = fedValidationIdentifier;
-    return reinterpret_cast<void *> (fed);
+    FedI->type = helics::vtype::combinationFed;
+    FedI->valid = fedValidationIdentifier;
+    auto fed = reinterpret_cast<void *>(FedI.get());
+    getMasterHolder()->addFed(std::move(FedI));
+    return  (fed);
 }
 
 helics_federate helicsFederateClone (helics_federate fed)
@@ -231,12 +230,14 @@ helics_federate helicsFederateClone (helics_federate fed)
         return nullptr;
     }
     auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    auto *fedClone = new helics::FedObject;
+    auto fedClone = std::make_unique<helics::FedObject>();
     fedClone->fedptr = fedObj->fedptr;
-    fedClone->index = getMasterHolder ()->addFed (fedClone);
+   
     fedClone->type = fedObj->type;
     fedClone->valid = fedObj->valid;
-    return reinterpret_cast<void *> (fedClone);
+    auto fedB = reinterpret_cast<void *>(fedClone.get());
+    getMasterHolder()->addFed(std::move(fedClone));
+    return  (fedB);
 }
 
 helics_core helicsFederateGetCoreObject (helics_federate fed)
@@ -246,11 +247,12 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
     {
         return nullptr;
     }
-    auto *core = new helics::CoreObject;
-    core->index = getMasterHolder ()->addCore (core);
+    auto core = std::make_unique<helics::CoreObject>(); 
     core->valid = fedValidationIdentifier;
     core->coreptr = fedObj->getCorePointer ();
-    return reinterpret_cast<helics_core> (core);
+    auto retcore = reinterpret_cast<helics_core> (core.get());
+    getMasterHolder()->addCore(std::move(core));
+    return retcore;
 }
 
 helics_status helicsFederateFinalize (helics_federate fed)

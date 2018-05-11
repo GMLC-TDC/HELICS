@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
 
+
 /** these test cases test out the value federates with some additional tests
  */
 
@@ -270,6 +271,20 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core
     std::complex<double> v1 = std::polar (10.0, 0.43);
     std::complex<double> v2 = {-3e45, 1e-23};
     runDualFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
+}
+
+
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj10, bdata::make(core_types), core_type)
+{
+    helics::named_point def{ "trigger", 0.7 };
+    helics::named_point v1{ "response",-1e-12 };
+    helics::named_point v2{ "variance",45.23 };
+    runDualFederateTestObjv2<helics::named_point>(core_type, def, v1, v2);
+}
+
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj11, bdata::make(core_types), core_type)
+{
+    runDualFederateTestObj<bool>(core_type, true, false, true);
 }
 
 /** test the callback specification with a vector list*/

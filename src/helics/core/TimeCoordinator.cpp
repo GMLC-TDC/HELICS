@@ -332,6 +332,19 @@ bool TimeCoordinator::updateTimeFactors ()
 iteration_state TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
+    if (time_exec == Time::maxVal())
+    {
+        if (time_allow == Time::maxVal())
+        {
+            time_granted = Time::maxVal();
+            time_grantBase = Time::maxVal();
+
+            ActionMessage treq(CMD_DISCONNECT);
+            treq.source_id = source_id;
+            transmitTimingMessage(treq);
+            return iteration_state::halted;
+        }
+    }
     if (time_block <= time_exec)
     {
         return iteration_state::continue_processing;

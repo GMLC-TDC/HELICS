@@ -15,9 +15,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (source_tests)
+BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
 
-BOOST_AUTO_TEST_CASE (simple_source_test)
+BOOST_AUTO_TEST_CASE (simple_source_test )
 {
     helics::FederateInfo fi ("player1");
     fi.coreType = helics::core_type::TEST;
