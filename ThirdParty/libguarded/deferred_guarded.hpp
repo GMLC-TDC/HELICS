@@ -19,9 +19,8 @@
 #include <future>
 #include <memory>
 #include <vector>
-#ifndef LIBGUARDED_NO_DEFAULT
 #include <shared_mutex>
-#endif
+
 namespace libguarded
 {
 

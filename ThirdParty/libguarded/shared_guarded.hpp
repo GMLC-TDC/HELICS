@@ -28,9 +28,7 @@ additions include overloads for std::mutex and std::timed_mutex
 #include <memory>
 #include <type_traits>
 
-#ifndef LIBGUARDED_NO_DEFAULT
 #include <shared_mutex>
-#endif
 
 namespace libguarded
 {

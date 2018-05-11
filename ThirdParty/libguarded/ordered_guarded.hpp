@@ -29,9 +29,7 @@ additions include load store operations and template specialization for std::mut
 #include <mutex>
 #include <type_traits>
 
-#ifndef LIBGUARDED_NO_DEFAULT
 #include <shared_mutex>
-#endif
 
 namespace libguarded
 {
