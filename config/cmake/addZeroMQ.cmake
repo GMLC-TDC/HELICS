@@ -3,32 +3,34 @@
 OPTION(ZMQ_USE_STATIC_LIBRARY
   "use the ZMQ static library" OFF)
 
-SHOW_VARIABLE(ZeroMQ_LIBRARY_PATH PATH
+SHOW_VARIABLE(ZeroMQ_INSTALL_PATH PATH
   "path to the zmq libraries" "${PROJECT_BINARY_DIR}/libs")
 
-SHOW_VARIABLE(ZeroMQ_INCLUDE_PATH PATH
-  "path to the zmq headers" "${PROJECT_BINARY_DIR}/libs")
-
-set(ZeroMQ_FIND_QUIETLY ON)
-
-find_package(ZeroMQ
-	HINTS ${PROJECT_BINARY_DIR}/libs/
-	PATH_SUFFIXES 
-		cmake/ZeroMQ 
-		cmake
-		CMake/ZeroMQ)
+set(ZMQ_CMAKE_SUFFIXES 
+	cmake/ZeroMQ 
+	cmake
+	CMake/ZeroMQ
+	lib/cmake)
+	
+find_package(ZeroMQ QUIET
+	HINTS 
+		${ZeroMQ_INSTALL_PATH}
+		${PROJECT_BINARY_DIR}/libs/
+	PATH_SUFFIXES ${ZMQ_CMAKE_SUFFIXES}
+	)
 
 if (NOT ZeroMQ_FOUND)
 	if (ZMQ_USE_STATIC_LIBRARY OR AUTOBUILD_ZMQ)
 		include(buildlibZMQ)
 		build_libzmq()
 		find_package(ZeroMQ
-			HINTS ${PROJECT_BINARY_DIR}/libs/
-			PATH_SUFFIXES 
-				cmake/ZeroMQ 
-				cmake
-				CMake/ZeroMQ)
+			HINTS 
+				${ZeroMQ_INSTALL_PATH}
+				${PROJECT_BINARY_DIR}/libs/
+			PATH_SUFFIXES ${ZMQ_CMAKE_SUFFIXES}
+			)
 	else()
+		set(ZeroMQ_FIND_QUIETLY ON)
 		find_package(ZeroMQ)
 		if (NOT ZeroMQ_FOUND)
 			OPTION(AUTOBUILD_ZMQ "enable ZMQ to automatically download and build" ON)
@@ -36,11 +38,11 @@ if (NOT ZeroMQ_FOUND)
 				include(buildlibZMQ)
 				build_libzmq()
 				find_package(ZeroMQ
-					HINTS ${PROJECT_BINARY_DIR}/libs/
-					PATH_SUFFIXES 
-					cmake/ZeroMQ 
-					cmake
-					CMake/ZeroMQ)
+					HINTS 
+						${ZeroMQ_INSTALL_PATH}
+						${PROJECT_BINARY_DIR}/libs/
+					PATH_SUFFIXES ${ZMQ_CMAKE_SUFFIXES}
+				)
 			ENDIF(AUTOBUILD_ZMQ)
 		endif()
 	endif()

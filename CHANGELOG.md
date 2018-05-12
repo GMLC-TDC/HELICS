@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
  - upgrade autobuild ZMQ version to 4.2.5 and change CMake scripts to use zmq target
  - update cereal library with latest bug fixes
+ - update jsoncpp with latest version
  - the CXX shared library can now be built alongside the C shared library and can be built on Windows.
 
 ### Fixed
