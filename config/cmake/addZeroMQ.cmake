@@ -20,6 +20,7 @@ find_package(ZeroMQ QUIET
 	)
 
 if (NOT ZeroMQ_FOUND)
+	message(STATUS "initialZMQ not found")
 	if (ZMQ_USE_STATIC_LIBRARY OR AUTOBUILD_ZMQ)
 		include(buildlibZMQ)
 		build_libzmq()
@@ -48,3 +49,4 @@ if (NOT ZeroMQ_FOUND)
 	endif()
 endif()
 
+message(STATUS "includes $<TARGET_PROPERTY:libzmq,INTERFACE_INCLUDE_DIRECTORIES>")
