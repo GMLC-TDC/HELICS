@@ -85,19 +85,11 @@ list(APPEND common_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
-IF (VERSION_OPTION)
-	IF (MSVC)
-		target_compile_options(helics_common PUBLIC ${VERSION_OPTION})
-	ELSE()
-		target_compile_options(helics_common PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-	ENDIF (MSVC)
-ENDIF(VERSION_OPTION)
+target_include_directories(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+target_include_directories(helics_common SYSTEM PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
+target_compile_definitions(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
 
-target_include_directories(helics_common SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (helics_common PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif(HELICS_HAVE_ZEROMQ)
+target_compile_options(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
 
 if (APPLE)
 	target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")

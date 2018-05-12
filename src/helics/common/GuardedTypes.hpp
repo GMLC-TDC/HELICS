@@ -6,12 +6,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
+#include "helics/compiler-config.h"
+#ifndef HAVE_SHARED_TIMED_MUTEX
+#ifndef HAVE_SHARED_MUTEX
+    #define LIBGUARDED_NO_DEFAULT 1
+#endif
+#endif
 #include <libguarded/atomic_guarded.hpp>
 #include <libguarded/guarded.hpp>
 #include <libguarded/ordered_guarded.hpp>
 #include <libguarded/shared_guarded.hpp>
 
-#include "helics/compiler-config.h"
+
 
 template <class T>
 using guarded = libguarded::guarded<T>;

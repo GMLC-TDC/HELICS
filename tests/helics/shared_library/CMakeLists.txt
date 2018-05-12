@@ -40,20 +40,6 @@ add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtur
 
 add_executable(shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp)
 
-target_include_directories(shared-library-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
-
-target_include_directories(shared-library-tests-cpp PRIVATE ${PROJECT_SOURCE_DIR}/src)
-
-IF (VERSION_OPTION)
-	IF (MSVC)
-		target_compile_options(shared-library-tests PUBLIC ${VERSION_OPTION})
-		target_compile_options(shared-library-tests-cpp PUBLIC ${VERSION_OPTION})
-	ELSE()
-		target_compile_options(shared-library-tests PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-		target_compile_options(shared-library-tests-cpp PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-	ENDIF (MSVC)
-ENDIF(VERSION_OPTION)
-
 target_link_libraries(shared-library-tests helicsSharedLib ${Boost_LIBRARIES_core} helics_test_base)
 target_link_libraries(shared-library-tests-cpp helicsSharedLib ${Boost_LIBRARIES_core} helics_test_base)
 

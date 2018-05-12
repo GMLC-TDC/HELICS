@@ -166,13 +166,10 @@ endif (HELICS_HAVE_MPI)
 
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
-IF (VERSION_OPTION)
-	IF (MSVC)
-		target_compile_options(helics_core PUBLIC ${VERSION_OPTION})
-	ELSE()
-		target_compile_options(helics_core PUBLIC $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
-	ENDIF (MSVC)
-ENDIF(VERSION_OPTION)
+target_include_directories(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
+target_compile_definitions(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
+target_compile_options(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
 
 if (APPLE)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
@@ -193,13 +190,6 @@ source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
 if (NOT DISABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 endif()
-
-target_include_directories(helics_core SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-target_include_directories(helics_core SYSTEM PRIVATE ${PROJECT_SOURCE_DIR}/ThirdParty)
-
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (helics_core PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif (HELICS_HAVE_ZEROMQ)
 
 if (HELICS_HAVE_MPI)
    target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}"  "${MPI_C_ADDITIONAL_INCLUDE_DIRS}")
