@@ -41,6 +41,7 @@ target_include_directories(helicsSharedLib PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
+set_target_properties(helicsSharedLib PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
 if (UNIX OR MINGW)
 	if (NOT APPLE)
