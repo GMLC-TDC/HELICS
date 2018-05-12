@@ -181,6 +181,7 @@ endif (HELICS_HAVE_MPI)
 
 if (HELICS_HAVE_ZERMQ)
 	target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
+	target_include_directories(helics_common SYSTEM PRIVATE ${ZeroMQ_INCLUDE_DIR})
 	source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(HELICS_HAVE_ZERMQ)
 
