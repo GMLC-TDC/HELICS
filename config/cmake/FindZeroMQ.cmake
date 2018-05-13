@@ -50,7 +50,7 @@ if (MSVC)
   #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
   if (${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
-    set(_ZeroMQ_VERSIONS "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
+    set(_ZeroMQ_VERSIONS "4_2_5" "4_2_4" "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
     set(ZeroMQ_LIBRARY_NAME)
 
 		foreach(ver ${_ZeroMQ_VERSIONS})
@@ -84,6 +84,10 @@ if (ZeroMQ_INCLUDE_DIR AND ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
   set(ZeroMQ_FOUND 1)
   message(STATUS "Found ZeroMQ library: ${ZeroMQ_LIBRARY}")
   message(STATUS "Found ZeroMQ headers: ${ZeroMQ_INCLUDE_DIR}")
+  #this is static because we are pointing to the library for the linker, not the shared object
+  add_library(libzmq STATIC IMPORTED)
+	set_target_properties(libzmq PROPERTIES IMPORTED_LOCATION "${ZeroMQ_LIBRARY}")
+	set_target_properties(libzmq PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZeroMQ_INCLUDE_DIR}")
 else()
 IF(NOT ZeroMQ_FIND_QUIETLY)
   message(SEND_ERROR "Could not find ZeroMQ libraries/headers! Please install ZeroMQ with libraries and headers")
@@ -91,4 +95,5 @@ IF(NOT ZeroMQ_FIND_QUIETLY)
 endif()
 # show the ZeroMQ_INCLUDE_DIR and ZeroMQ_LIBRARY variables only in the advanced view
 mark_as_advanced(ZeroMQ_ROOT_DIR ZeroMQ_INCLUDE_DIR ZeroMQ_LIBRARY ZeroMQ_FOUND)
+
 

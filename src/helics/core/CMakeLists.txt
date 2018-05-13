@@ -179,9 +179,10 @@ if (HELICS_HAVE_MPI)
 	source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
 endif (HELICS_HAVE_MPI)
 
-if (HELICS_HAVE_ZMQ)
+if (HELICS_HAVE_ZEROMQ)
+	target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
 	source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
-endif(HELICS_HAVE_ZMQ)
+endif(HELICS_HAVE_ZEROMQ)
 
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
 source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
@@ -190,10 +191,6 @@ source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
 if (NOT DISABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 endif()
-
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (helics_core PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif (HELICS_HAVE_ZEROMQ)
 
 if (HELICS_HAVE_MPI)
    target_include_directories(helics_core PRIVATE "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}"  "${MPI_C_ADDITIONAL_INCLUDE_DIRS}")

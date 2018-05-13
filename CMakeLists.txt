@@ -253,10 +253,10 @@ ENDIF(MSYS)
 
 if (HELICS_HAVE_ZEROMQ)
 	if (ZMQ_USE_STATIC_LIBRARY)
-		set(ZeroMQ_DEPENDENCY ${ZeroMQ_STATIC_LIBRARY})
+		set(ZeroMQ_DEPENDENCY libzmq-static)
 		target_add_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
 	else()
-		set(ZeroMQ_DEPENDENCY ${ZeroMQ_LIBRARY})
+		set(ZeroMQ_DEPENDENCY libzmq)
 	endif()
 	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 	target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
@@ -360,12 +360,12 @@ IF(BUILD_CXX_SHARED_LIB)
 	target_link_libraries(helics-shared PRIVATE helics_base)
 
 	if (WIN32)
-		set_target_properties(helics-shared PROPERTIES 
+			set_target_properties(helics-shared PROPERTIES
 		WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-		
+
 	#	IF(MINGW)
-	#		set_target_properties(helics-shared PROPERTIES
-	#		LINK_FLAGS "-Wl,--whole-archive")
+	#	set_target_properties(helics-shared PROPERTIES
+  #      LINK_FLAGS "-Wl,--whole-archive")
 	#	ELSE(MINGW)
 	#		set_target_properties(helics-shared PROPERTIES
 	#		LINK_FLAGS "/WHOLEARCHIVE")

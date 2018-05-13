@@ -49,10 +49,6 @@ if (UNIX OR MINGW)
 	endif(NOT APPLE)
 endif()
 
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif(HELICS_HAVE_ZEROMQ)
-
 set_target_properties (helicsSharedLib PROPERTIES FOLDER interfaces)
 
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
