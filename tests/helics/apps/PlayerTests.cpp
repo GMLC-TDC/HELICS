@@ -252,7 +252,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
 {
     exeTestRunner playerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_player");
 
-    exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/core/", "helics_broker");
+    exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_broker");
 
     BOOST_REQUIRE (playerExe.isActive ());
     BOOST_REQUIRE (brokerExe.isActive ());
@@ -558,7 +558,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 {
     static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 
-    static exeTestRunner brokerExe (HELICS_BIN_LOC "core/", "helics_broker");
+    static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "helics_broker");
 
     auto res = brokerExe.runAsync ("1 --type=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/example1.Player";
