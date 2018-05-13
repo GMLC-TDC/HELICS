@@ -1,9 +1,9 @@
 #include "helics/helics-config.h"
 
 #include "../common/argParser.h"
-#include "BrokerFactory.hpp"
-#include "CoreBroker.hpp"
-#include "helicsVersion.hpp"
+#include "../core/BrokerFactory.hpp"
+#include "../core/CoreBroker.hpp"
+#include "../core/helicsVersion.hpp"
 #include <fstream>
 #include <iostream>
 

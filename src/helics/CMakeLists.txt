@@ -10,9 +10,7 @@ add_subdirectory(application_api)
 
 install(FILES flag-definitions.h helics.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics COMPONENT headers)
 
-IF(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
 add_subdirectory(apps)
-ENDIF()
 
 if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
 add_subdirectory(shared_api_library)

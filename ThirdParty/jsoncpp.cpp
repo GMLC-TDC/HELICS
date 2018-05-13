@@ -247,7 +247,7 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 #include <set>
 #include <limits>
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
   #include <cstdio>
 
   #if !defined(snprintf)
@@ -261,6 +261,9 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
   #include <stdio.h>
 
   #if defined(_MSC_VER)
+#ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#endif
     #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
     #if !defined(snprintf)
       #define snprintf _snprintf
@@ -4196,7 +4199,7 @@ Value& Path::make(Value& root) const {
 #include <cassert>
 #include <cstring>
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
   #include <cmath>
   #include <cstdio>
 

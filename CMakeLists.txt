@@ -324,13 +324,10 @@ if (NOT Boost_USE_STATIC_LIBS)
 	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
-
+OPTION(BUILD_BROKER "Build a helics Broker executable" ON)
 OPTION(BUILD_PLAYER "Build a helics player standalone executable" ON)
 OPTION(BUILD_RECORDER "Build a helics recorder standalone executable" ON)
-OPTION(BUILD_APPS "Build helics applications" ON)
-
-
-
+OPTION(BUILD_APPS "Build helics application to run various apps" ON)
 
 # -------------------------------------------------------------
 # Add the main HELICS library
