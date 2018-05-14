@@ -115,7 +115,7 @@ int main (int argc, char *argv[])
     }
 
     helics::cleanupHelicsLibrary();
-    return 0;
+    return ret;
 
 }
 

@@ -233,14 +233,13 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
         template<typename I> message_t(I first, I last):
             msg()
         {
+            typedef typename std::iterator_traits<I>::value_type value_t;
 #ifdef ZMQ_CPP11
 			auto size_ = std::distance(first, last) * sizeof(value_t);
 #else
             typedef typename std::iterator_traits<I>::difference_type size_type;
 			size_type const size_ = std::distance(first, last) * sizeof(value_t);
 #endif
-            typedef typename std::iterator_traits<I>::value_type value_t;
-
             
             int const rc = zmq_msg_init_size (&msg, size_);
             if (rc != 0)
@@ -600,15 +599,15 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
             ptr = 0 ;
         }
 
+        inline void setsockopt(int option_, const std::string &optval)
+        {
+            setsockopt(option_, optval.c_str(), optval.length());
+        }
+
     template<typename T> inline void setsockopt(int option_, T const &optval)
         {
             setsockopt(option_, &optval, sizeof(T) );
         }
-
-		template<> inline void setsockopt(int option_, const std::string &optval)
-		{
-			setsockopt(option_, optval.c_str(), optval.length());
-		}
 
         inline void setsockopt (int option_, const void *optval_,
             size_t optvallen_)
