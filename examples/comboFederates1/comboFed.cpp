@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/CombinationFederate.hpp"
 #include <iostream>
 #include <thread>
-#include "helics/core/BrokerFactory.hpp"
+#include "helics/apps/BrokerApp.hpp"
 #include "helics/common/argParser.h"
 
 static const helics::ArgDescriptors InfoArgs{
@@ -57,10 +57,10 @@ int main (int argc, char *argv[])
     }
 
     fi.logLevel = 5;
-    std::shared_ptr<helics::Broker> brk;
+    helics::apps::BrokerApp brk;
     if (vm.count("startbroker") > 0)
     {
-        brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
+        brk = helics::apps::BrokerApp(fi.coreType, vm["startbroker"].as<std::string>());
     }
 
     auto cFed = std::make_unique<helics::CombinationFederate> (fi);
@@ -99,14 +99,6 @@ int main (int argc, char *argv[])
 
     }
     cFed->finalize ();
-    if (brk)
-    {
-        while (brk->isConnected())
-        {
-            std::this_thread::yield();
-        }
-        brk = nullptr;
-    }
     return 0;
 }
 

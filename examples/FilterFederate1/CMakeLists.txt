@@ -1,9 +1,5 @@
 add_executable(filterFed FilterFed.cpp)
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
 target_link_libraries(filterFed helics-static)
 
 set_target_properties (filterFed PROPERTIES

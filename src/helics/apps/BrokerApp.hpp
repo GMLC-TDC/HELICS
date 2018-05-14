@@ -28,10 +28,20 @@ public:
     @param argv the strings in the input
     */
     BrokerApp(int argc, char *argv[]);
+    /** construct from command line arguments
+    @param argc the number of arguments
+    @param argv the strings in the input
+    */
+    BrokerApp(core_type ctype, int argc, char *argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
     BrokerApp(const std::string &argString);
+    /** construct from command line arguments parsed as a single string
+    @param ctype the type of broker to create
+    @param argString a merged string with all the arguments
+    */
+    BrokerApp(core_type ctype, const std::string &argString);
     /** move construction*/
     BrokerApp(BrokerApp &&other_echo) = default;
     /** move assignment*/
