@@ -48,5 +48,3 @@ if (NOT ZeroMQ_FOUND)
 		endif()
 	endif()
 endif()
-
-message(STATUS "includes $<TARGET_PROPERTY:libzmq,INTERFACE_INCLUDE_DIRECTORIES>")

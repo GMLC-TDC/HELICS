@@ -5,10 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+ - BrokerApp as a slightly more convenient runner to Brokers
+
 ### Changed
  - upgrade autobuild ZMQ version to 4.2.5 and change CMake scripts to use zmq target
  - update cereal library with latest bug fixes
  - update jsoncpp with latest version
+ - moved helics_broker executable code to the apps repository
  - the CXX shared library can now be built alongside the C shared library and can be built on Windows.
 
 ### Fixed

@@ -10,6 +10,7 @@ set(helics_apps_public_headers
 	Source.hpp
 	Tracer.hpp
 	helicsApp.hpp
+	BrokerApp.hpp
 	)
 
 set(helics_apps_private_headers
@@ -26,6 +27,7 @@ set(helics_apps_library_files
 	Source.cpp
 	Tracer.cpp
 	helicsApp.cpp
+	BrokerApp.cpp
 )
 
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_public_headers} ${helics_apps_private_headers})
@@ -49,7 +51,7 @@ endif()
 
 if (BUILD_BROKER)
 add_executable(helics_broker helics-broker.cpp)
-   target_link_libraries(helics_broker helics-static)
+   target_link_libraries(helics_broker helics_apps-static)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    INSTALL(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)

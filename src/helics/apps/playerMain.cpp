@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 int main (int argc, char *argv[])
 {
+    int ret = 0;
     try
     {
         helics::apps::Player Player(argc, argv);
@@ -22,18 +23,16 @@ int main (int argc, char *argv[])
     catch (const std::invalid_argument &ia)
     {
         std::cerr << ia.what() << std::endl;
-        helics::cleanupHelicsLibrary();
-        return (-2);
+        ret = -2;
     }
     catch (const helics::HelicsException &he)
     {
         std::cerr << he.what() << std::endl;
-        helics::cleanupHelicsLibrary();
-        return (-4);
+        ret = -4;
     }
 
     helics::cleanupHelicsLibrary();
-    return 0;
+    return ret;
 
 }
 
