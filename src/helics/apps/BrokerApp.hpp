@@ -3,8 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#pragma once
+
+#include "../core/core-types.hpp"
 
 #include <memory>
+#include <string>
 
 namespace helics
 {
@@ -24,8 +28,10 @@ public:
     @param argv the strings in the input
     */
     BrokerApp(int argc, char *argv[]);
-   
-
+    /** construct from command line arguments parsed as a single string
+    @param argString a merged string with all the arguments
+    */
+    BrokerApp(const std::string &argString);
     /** move construction*/
     BrokerApp(BrokerApp &&other_echo) = default;
     /** move assignment*/
@@ -47,6 +53,8 @@ public:
     auto *operator->() const { return broker.operator->(); }
 
 private:
+    void loadFromArguments(int argc, char *argv[]);
+    core_type type = core_type::ZMQ;
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
 };
 }

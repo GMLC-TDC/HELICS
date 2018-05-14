@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "helics/helics-config.h"
 #include "BrokerApp.hpp"
+#include "../common/stringToCmdLine.h"
 #include "../common/argParser.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreBroker.hpp"
@@ -23,40 +24,13 @@ namespace apps
 {
 BrokerApp::BrokerApp(int argc, char *argv[])
 {
-    helics::variable_map vm;
-    auto exit_early = helics::argumentParser(argc, argv, vm, InfoArgs);
+    loadFromArguments(argc, argv);
+}
 
-    if (exit_early != 0)
-    {
-        if (exit_early == helics::helpReturn)
-        {
-            helics::BrokerFactory::displayHelp();
-        }
-        else if (exit_early == helics::versionReturn)
-        {
-            std::cout << helics::versionString << '\n';
-        }
-        return;
-    }
-
-    std::string name = (vm.count("name") > 0) ? vm["name"].as<std::string>() : "";
-    std::string btype = (vm.count("type") > 0) ? vm["type"].as<std::string>() : "zmq";
-
-    helics::core_type type;
-    try
-    {
-        type = coreTypeFromString(btype);
-    }
-    catch (std::invalid_argument &ie)
-    {
-        std::cerr << "Unable to generate broker from specified type: " << ie.what() << '\n';
-        throw;
-    }
-    broker = BrokerFactory::create(type, name, argc, argv);
-    if (!broker->isConnected())
-    {
-        throw(ConnectionFailure("Broker is unable to connect\n"));
-    }
+BrokerApp::BrokerApp(const std::string &argString)
+{
+    StringToCmdLine cmdargs(argString);
+    loadFromArguments(cmdargs.getArgCount(), cmdargs.getArgV());
 }
 
 BrokerApp::~BrokerApp()
@@ -75,6 +49,46 @@ BrokerApp::~BrokerApp()
     }
     broker = nullptr;
     helics::BrokerFactory::cleanUpBrokers(500);
+}
+
+
+void BrokerApp::loadFromArguments(int argc, char *argv[])
+{
+    helics::variable_map vm;
+    auto exit_early = helics::argumentParser(argc, argv, vm, InfoArgs);
+
+    if (exit_early != 0)
+    {
+        if (exit_early == helics::helpReturn)
+        {
+            helics::BrokerFactory::displayHelp();
+        }
+        else if (exit_early == helics::versionReturn)
+        {
+            std::cout << helics::versionString << '\n';
+        }
+        return;
+    }
+
+    std::string name = (vm.count("name") > 0) ? vm["name"].as<std::string>() : "";
+    if (vm.count("type") > 0)
+    {
+        try
+        {
+            type = coreTypeFromString(vm["type"].as<std::string>());
+        }
+        catch (std::invalid_argument &ie)
+        {
+            std::cerr << "Unable to generate broker from specified type: " << ie.what() << '\n';
+            throw;
+        }
+    }
+    
+    broker = BrokerFactory::create(type, name, argc, argv);
+    if (!broker->isConnected())
+    {
+        throw(ConnectionFailure("Broker is unable to connect\n"));
+    }
 }
 
 /** run the Echo federate until the specified time

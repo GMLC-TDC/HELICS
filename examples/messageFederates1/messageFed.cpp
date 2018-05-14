@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const helics::ArgDescriptors InfoArgs{
     {"startbroker","start a broker with the specified arguments"},
+    {"brokerargs","arguments to pass to the broker e.g. \"2 --type=zmq --ipv4\""},
     {"target,t", "name of the target federate"},
     { "messagetarget", "name of the target federate, same as target" },
     {"endpoint,e", "name of the target endpoint"},
