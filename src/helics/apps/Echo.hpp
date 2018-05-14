@@ -42,7 +42,7 @@ class Echo:public App
     /**constructor taking a file with the required information
     @param[in] jsonString file or json string defining the federate information and other configuration
     */
-    explicit Echo (const std::string &jsonString);
+    Echo (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
     Echo (Echo &&other_echo) = default;

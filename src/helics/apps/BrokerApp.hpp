@@ -36,7 +36,7 @@ public:
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
-    BrokerApp(const std::string &argString);
+    explicit BrokerApp(const std::string &argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments

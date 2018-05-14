@@ -39,7 +39,7 @@ Echo::Echo (const FederateInfo &fi) : App (fi) {}
 
 Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi) {}
 
-Echo::Echo (const std::string &jsonString) : App (jsonString) { loadJsonFile (jsonString); }
+Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString) { loadJsonFile (jsonString); }
 
 void Echo::runTo (Time stopTime_input)
 {

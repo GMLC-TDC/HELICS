@@ -68,7 +68,7 @@ Tracer::Tracer(const std::shared_ptr<Core> &core, const FederateInfo &fi):App(co
     fed->setFlag(OBSERVER_FLAG);
 }
 
-Tracer::Tracer(const std::string &jsonString) : App(jsonString)
+Tracer::Tracer(const std::string &name, const std::string &jsonString) : App(name,jsonString)
 {
     fed->setFlag(OBSERVER_FLAG);
     loadJsonFile(jsonString);

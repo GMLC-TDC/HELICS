@@ -74,7 +74,7 @@ Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(c
     fed->setFlag (SOURCE_ONLY_FLAG);
 }
 
-Player::Player (const std::string &jsonString) : App (jsonString)
+Player::Player (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
     fed->setFlag (SOURCE_ONLY_FLAG);
     Player::loadJsonFile(jsonString);

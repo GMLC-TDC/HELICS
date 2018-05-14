@@ -46,7 +46,7 @@ class App
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
-    explicit App (const std::string &appName, const std::string &jsonString);
+    App (const std::string &appName, const std::string &jsonString);
 
     /** move construction*/
     App (App &&other_app) = default;
