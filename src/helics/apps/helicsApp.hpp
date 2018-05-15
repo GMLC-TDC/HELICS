@@ -6,18 +6,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../application_api/CombinationFederate.hpp"
-
+#include "json/json-forwards.h"
 namespace boost
 {
 namespace program_options
 {
 class variables_map;
 }
-}
-
-namespace Json_helics
-{
-class Value;
 }
 
 namespace helics
@@ -51,7 +46,7 @@ class App
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
-    explicit App (const std::string &appName, const std::string &jsonString);
+    App (const std::string &appName, const std::string &jsonString);
 
     /** move construction*/
     App (App &&other_app) = default;

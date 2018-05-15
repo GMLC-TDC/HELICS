@@ -72,9 +72,9 @@ license you like.
 
 
 
-#ifndef JSON_AMALGATED_H_INCLUDED
-# define JSON_AMALGATED_H_INCLUDED
-/// If defined, indicates that the source file is amalgated
+#ifndef JSON_AMALGAMATED_H_INCLUDED
+# define JSON_AMALGAMATED_H_INCLUDED
+/// If defined, indicates that the source file is amalgamated
 /// to prevent private header inclusion.
 #define JSON_IS_AMALGAMATION
 
@@ -87,10 +87,10 @@ license you like.
 #ifndef JSON_VERSION_H_INCLUDED
 # define JSON_VERSION_H_INCLUDED
 
-# define JSONCPP_VERSION_STRING "1.8.3"
+# define JSONCPP_VERSION_STRING "1.8.4"
 # define JSONCPP_VERSION_MAJOR 1
 # define JSONCPP_VERSION_MINOR 8
-# define JSONCPP_VERSION_PATCH 3
+# define JSONCPP_VERSION_PATCH 4
 # define JSONCPP_VERSION_QUALIFIER
 # define JSONCPP_VERSION_HEXA ((JSONCPP_VERSION_MAJOR << 24) | (JSONCPP_VERSION_MINOR << 16) | (JSONCPP_VERSION_PATCH << 8))
 
@@ -143,9 +143,9 @@ license you like.
 #define JSON_USE_EXCEPTION 1
 #endif
 
-/// If defined, indicates that the source file is amalgated
+/// If defined, indicates that the source file is amalgamated
 /// to prevent private header inclusion.
-/// Remarks: it is automatically defined in the generated amalgated header.
+/// Remarks: it is automatically defined in the generated amalgamated header.
 // #define JSON_IS_AMALGAMATION
 
 #ifdef JSON_IN_CPPTL
@@ -196,21 +196,29 @@ license you like.
 
 #endif // defined(_MSC_VER)
 
-// In c++11 the override keyword allows you to explicity define that a function
+// In c++11 the override keyword allows you to explicitly define that a function
 // is intended to override the base-class version.  This makes the code more
-// managable and fixes a set of common hard-to-find bugs.
+// manageable and fixes a set of common hard-to-find bugs.
 #if __cplusplus >= 201103L
 # define JSONCPP_OVERRIDE override
 # define JSONCPP_NOEXCEPT noexcept
+# define JSONCPP_OP_EXPLICIT explicit
 #elif defined(_MSC_VER) && _MSC_VER > 1600 && _MSC_VER < 1900
 # define JSONCPP_OVERRIDE override
 # define JSONCPP_NOEXCEPT throw()
+# if _MSC_VER >= 1800 // MSVC 2013
+#   define JSONCPP_OP_EXPLICIT explicit
+# else
+#   define JSONCPP_OP_EXPLICIT
+# endif
 #elif defined(_MSC_VER) && _MSC_VER >= 1900
 # define JSONCPP_OVERRIDE override
 # define JSONCPP_NOEXCEPT noexcept
+# define JSONCPP_OP_EXPLICIT explicit
 #else
 # define JSONCPP_OVERRIDE
 # define JSONCPP_NOEXCEPT throw()
+# define JSONCPP_OP_EXPLICIT
 #endif
 
 #ifndef JSON_HAS_RVALUE_REFERENCES
@@ -554,6 +562,13 @@ enum CommentPlacement {
   numberOfCommentPlacement
 };
 
+/** \brief Type of precision for formatting of real values.
+ */
+enum PrecisionType {
+  significantDigits = 0, ///< we set max number of significant digits in string
+  decimalPlaces          ///< we set max number of digits after "." in string
+};
+
 //# ifdef JSON_USE_CPPTL
 //   typedef CppTL::AnyEnumerator<const char *> EnumMemberNames;
 //   typedef CppTL::AnyEnumerator<const Value &> EnumValues;
@@ -561,7 +576,7 @@ enum CommentPlacement {
 
 /** \brief Lightweight wrapper to tag static string.
  *
- * Value constructor and objectValue member assignement takes advantage of the
+ * Value constructor and objectValue member assignment takes advantage of the
  * StaticString and avoid the cost of string duplication when storing the
  * string or the member name.
  *
@@ -665,7 +680,17 @@ public:
   static const UInt64 maxUInt64;
 #endif // defined(JSON_HAS_INT64)
 
+  /// Default precision for real value for string representation.
+  static const UInt defaultRealPrecision;
+
+// Workaround for bug in the NVIDIAs CUDA 9.1 nvcc compiler
+// when using gcc and clang backend compilers.  CZString
+// cannot be defined as private.  See issue #486
+#ifdef __NVCC__
+public:
+#else
 private:
+#endif
 #ifndef JSONCPP_DOC_EXCLUDE_IMPLEMENTATION
   class CZString {
   public:
@@ -845,8 +870,8 @@ Json_helics::Value obj_value(Json_helics::objectValue); // {}
   /// otherwise, false.
   bool empty() const;
 
-  /// Return isNull()
-  bool operator!() const;
+  /// Return !isNull()
+  JSONCPP_OP_EXPLICIT operator bool() const;
 
   /// Remove all object members and array elements.
   /// \pre type() is arrayValue, objectValue, or nullValue
@@ -1044,6 +1069,9 @@ Json_helics::Value obj_value(Json_helics::objectValue); // {}
 
 private:
   void initBasic(ValueType type, bool allocated = false);
+  void dupPayload(const Value& other);
+  void releasePayload();
+  void dupMeta(const Value& other);
 
   Value& resolveReference(const char* key);
   Value& resolveReference(const char* key, const char* end);
@@ -1315,14 +1343,9 @@ public:
   pointer operator->() const { return &deref(); }
 };
 
+inline void swap(Value& a, Value& b) { a.swap(b); }
+
 } // namespace Json_helics
-
-
-namespace std {
-/// Specialize std::swap() for Json_helics::Value.
-template<>
-inline void swap(Json_helics::Value& a, Json_helics::Value& b) { a.swap(b); }
-}
 
 #pragma pack(pop)
 
@@ -1379,7 +1402,7 @@ namespace Json_helics {
  *
  * \deprecated Use CharReader and CharReaderBuilder.
  */
-class JSONCPP_DEPRECATED("Use CharReader and CharReaderBuilder instead") JSON_API Reader {
+class JSON_API Reader {
 public:
   typedef char Char;
   typedef const Char* Location;
@@ -1399,11 +1422,13 @@ public:
   /** \brief Constructs a Reader allowing all features
    * for parsing.
    */
+  JSONCPP_DEPRECATED("Use CharReader and CharReaderBuilder instead") 
   Reader();
 
   /** \brief Constructs a Reader allowing the specified feature set
    * for parsing.
    */
+  JSONCPP_DEPRECATED("Use CharReader and CharReaderBuilder instead") 
   Reader(const Features& features);
 
   /** \brief Read a Value from a <a HREF="http://www.json.org">JSON</a>
@@ -1865,18 +1890,23 @@ public:
   /** Configuration of this builder.
     Available settings (case-sensitive):
     - "commentStyle": "None" or "All"
-    - "indentation":  "<anything>"
+    - "indentation":  "<anything>".
+      - Setting this to an empty string also omits newline characters.
     - "enableYAMLCompatibility": false or true
       - slightly change the whitespace around colons
     - "dropNullPlaceholders": false or true
       - Drop the "null" string from the writer's output for nullValues.
         Strictly speaking, this is not valid JSON. But when the output is being
-        fed to a browser's Javascript, it makes for smaller output and the
+        fed to a browser's JavaScript, it makes for smaller output and the
         browser can handle the output just fine.
     - "useSpecialFloats": false or true
       - If true, outputs non-finite floating point values in the following way:
         NaN values as "NaN", positive infinity as "Infinity", and negative infinity
         as "-Infinity".
+    - "precision": int
+      - Number of precision digits for formatting of real values.
+    - "precisionType": "significant"(default) or "decimal"
+      - Type of precision for formatting of real values.
 
     You can examine 'settings_` yourself
     to see the defaults. You can also write and read them just like any
@@ -1924,7 +1954,7 @@ public:
  *
  * The JSON document is written in a single line. It is not intended for 'human'
  *consumption,
- * but may be usefull to support feature such as RPC where bandwith is limited.
+ * but may be useful to support feature such as RPC where bandwidth is limited.
  * \sa Reader, Value
  * \deprecated Use StreamWriterBuilder.
  */
@@ -1941,7 +1971,7 @@ public:
 
   /** \brief Drop the "null" string from the writer's output for nullValues.
    * Strictly speaking, this is not valid JSON. But when the output is being
-   * fed to a browser's Javascript, it makes for smaller output and the
+   * fed to a browser's JavaScript, it makes for smaller output and the
    * browser can handle the output just fine.
    */
   void dropNullPlaceholders();
@@ -1955,7 +1985,7 @@ private:
   void writeValue(const Value& value);
 
   JSONCPP_STRING document_;
-  bool yamlCompatiblityEnabled_;
+  bool yamlCompatibilityEnabled_;
   bool dropNullPlaceholders_;
   bool omitEndingLineFeed_;
 };
@@ -2006,7 +2036,7 @@ public: // overridden from Writer
 private:
   void writeValue(const Value& value);
   void writeArrayValue(const Value& value);
-  bool isMultineArray(const Value& value);
+  bool isMultilineArray(const Value& value);
   void pushValue(const JSONCPP_STRING& value);
   void writeIndent();
   void writeWithIndent(const JSONCPP_STRING& value);
@@ -2079,7 +2109,7 @@ public:
 private:
   void writeValue(const Value& value);
   void writeArrayValue(const Value& value);
-  bool isMultineArray(const Value& value);
+  bool isMultilineArray(const Value& value);
   void pushValue(const JSONCPP_STRING& value);
   void writeIndent();
   void writeWithIndent(const JSONCPP_STRING& value);
@@ -2110,7 +2140,8 @@ JSONCPP_STRING JSON_API valueToString(UInt value);
 #endif // if defined(JSON_HAS_INT64)
 JSONCPP_STRING JSON_API valueToString(LargestInt value);
 JSONCPP_STRING JSON_API valueToString(LargestUInt value);
-JSONCPP_STRING JSON_API valueToString(double value);
+JSONCPP_STRING JSON_API valueToString(double value, unsigned int precision = Value::defaultRealPrecision,
+                                      PrecisionType precisionType = PrecisionType::significantDigits);
 JSONCPP_STRING JSON_API valueToString(bool value);
 JSONCPP_STRING JSON_API valueToQuotedString(const char* value);
 
@@ -2204,4 +2235,4 @@ JSON_API JSONCPP_OSTREAM& operator<<(JSONCPP_OSTREAM&, const Value& root);
 
 
 
-#endif //ifndef JSON_AMALGATED_H_INCLUDED
+#endif //ifndef JSON_AMALGAMATED_H_INCLUDED

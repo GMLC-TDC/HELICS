@@ -68,7 +68,7 @@ Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi):A
     fed->setFlag (OBSERVER_FLAG);
 }
 
-Recorder::Recorder (const std::string &jsonString) : App(jsonString)
+Recorder::Recorder (const std::string &name, const std::string &jsonString) : App(name, jsonString)
 {
     fed->setFlag (OBSERVER_FLAG);
     Recorder::loadJsonFile(jsonString);

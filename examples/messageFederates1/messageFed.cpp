@@ -6,11 +6,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/MessageFederate.hpp"
 #include <iostream>
 #include <thread>
-#include "helics/core/BrokerFactory.hpp"
+#include "helics/apps/BrokerApp.hpp"
 #include "helics/common/argParser.h"
 
 static const helics::ArgDescriptors InfoArgs{
-    {"startbroker","start a broker with the specified arguments"},
+    {"startbroker", "start a broker with the specified arguments"},
     {"target,t", "name of the target federate"},
     { "messagetarget", "name of the target federate, same as target" },
     {"endpoint,e", "name of the target endpoint"},
@@ -50,10 +50,10 @@ int main (int argc, char *argv[])
     }
 
     fi.logLevel = 5;
-    std::shared_ptr<helics::Broker> brk;
+    helics::apps::BrokerApp brk;
     if (vm.count("startbroker") > 0)
     {
-        brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
+        brk = helics::apps::BrokerApp(fi.coreType, vm["startbroker"].as<std::string>());
     }
 
     auto mFed = std::make_unique<helics::MessageFederate> (fi);
@@ -82,14 +82,6 @@ int main (int argc, char *argv[])
 
     }
     mFed->finalize ();
-    if (brk)
-    {
-        while (brk->isConnected())
-        {
-            std::this_thread::yield();
-        }
-        brk = nullptr;
-    }
     return 0;
 }
 
