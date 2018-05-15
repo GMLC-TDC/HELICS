@@ -65,28 +65,37 @@ int main (int argc, char *argv[])
         else if (arg == "--prefix")
         {
             path bpath = base_path(argv[0]);
+#if BOOST_VERSION_LEVEL>0
             bpath.lexically_normal();
+#endif
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--includes") || (arg == "-I")||(arg=="--include"))
         {
             path bpath = base_path(argv[0]);
             bpath /= HELICS_INCLUDE_SUFFIX;
+
+#if BOOST_VERSION_LEVEL>0
             bpath.lexically_normal();
+#endif
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--libs")||(arg=="-L")||(arg=="--lib"))
         {
             path bpath = base_path(argv[0]);
             bpath /= HELICS_LIB_SUFFIX;
+#if BOOST_VERSION_LEVEL>0
             bpath.lexically_normal();
+#endif
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--bin")||(arg=="--binaries"))
         {
             path bpath = base_path(argv[0]);
             bpath /= HELICS_BIN_SUFFIX;
+#if BOOST_VERSION_LEVEL>0
             bpath.lexically_normal();
+#endif
             std::cout << bpath.make_preferred() << '\n';
         }
         else if (arg == "--flags")
