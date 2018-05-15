@@ -18,6 +18,7 @@ static void show_usage (std::string const &name)
     std::cout << "--includes, -I returns the helics include location\n";
     std::cout << "--libs, -L returns the helics library location\n";
     std::cout << "--flags returns the C++ flags used for compilation\n";
+    std::cout << "--install returns the install location\n";
     std::cout << "--bin return the location of the binaries\n";
     std::cout << "--version returns the helics version\n";
     std::cout << "--std returns the C++ standard flag used\n";
@@ -25,24 +26,68 @@ static void show_usage (std::string const &name)
         
 }
 
-path base_path( const char *filename)
+path dir_path(const char *filename, const char *tail)
 {
-    path cfile(filename);
-    path bin_dir = cfile.parent_path();
+    path cfile = system_complete(path(filename));
+    path bin_dir = (cfile.has_parent_path()) ? cfile.parent_path() : current_path();
     path base_dir = bin_dir.parent_path();
-    if (exists(base_dir / HELICS_INCLUDE_SUFFIX))
+    path dpath;
+    if (is_directory(base_dir / tail))
     {
-        return base_dir;
+        dpath = base_dir / tail;
     }
-    if (base_dir.has_parent_path())
+    else if (base_dir.has_parent_path())
     {
-        if (exists(base_dir.parent_path() / HELICS_INCLUDE_SUFFIX))
+        if (is_directory(base_dir.parent_path() / tail))
         {
-            return base_dir.parent_path();
+            dpath=base_dir.parent_path()/tail;
+        }
+        else
+        {
+            dpath = path(HELICS_INSTALL_PREFIX) /tail;
         }
     }
-    return path(HELICS_INSTALL_PREFIX);
+    else
+    {
+        dpath = path(HELICS_INSTALL_PREFIX) / tail;
+    }
+#if BOOST_VERSION_LEVEL>0
+    dpath = dpath.lexically_normal();
+#endif
+    return dpath.make_preferred();
 }
+
+path base_path( const char *filename)
+{
+    path cfile = system_complete(path(filename));
+    path bin_dir = (cfile.has_parent_path()) ? cfile.parent_path() : current_path();
+    path base_dir = bin_dir.parent_path();
+    path dpath;
+    if (is_directory(base_dir / HELICS_INCLUDE_SUFFIX))
+    {
+        dpath=base_dir;
+    }
+    else if (base_dir.has_parent_path())
+    {
+        if (is_directory(base_dir.parent_path() / HELICS_INCLUDE_SUFFIX))
+        {
+            dpath=base_dir.parent_path();
+        }
+        else
+        {
+            dpath= path(HELICS_INSTALL_PREFIX);
+        }
+    }
+    else
+    {
+        dpath = path(HELICS_INSTALL_PREFIX);
+    }
+#if BOOST_VERSION_LEVEL>0
+    dpath = dpath.lexically_normal();
+#endif
+    return dpath.make_preferred();
+}
+
 int main (int argc, char *argv[])
 {
     if (argc < 2)
@@ -72,43 +117,31 @@ int main (int argc, char *argv[])
         }
         else if ((arg == "--includes") || (arg == "-I")||(arg=="--include"))
         {
-            path bpath = base_path(argv[0]);
-            bpath /= HELICS_INCLUDE_SUFFIX;
-
-#if BOOST_VERSION_LEVEL>0
-            bpath=bpath.lexically_normal();
-#endif
-            std::cout << bpath.make_preferred() << '\n';
+            std::cout << dir_path(argv[0], HELICS_INCLUDE_SUFFIX) << '\n';
         }
         else if ((arg == "--libs")||(arg=="-L")||(arg=="--lib"))
         {
-            path bpath = base_path(argv[0]);
-            bpath /= HELICS_LIB_SUFFIX;
-#if BOOST_VERSION_LEVEL>0
-            bpath=bpath.lexically_normal();
-#endif
-            std::cout << bpath.make_preferred() << '\n';
+            std::cout << dir_path(argv[0], HELICS_LIB_SUFFIX) << '\n';
         }
         else if ((arg == "--bin")||(arg=="--binaries"))
         {
-            path bpath = base_path(argv[0]);
-            bpath /= HELICS_BIN_SUFFIX;
-#if BOOST_VERSION_LEVEL>0
-            bpath=bpath.lexically_normal();
-#endif
-            std::cout << bpath.make_preferred() << '\n';
+            std::cout << dir_path(argv[0], HELICS_BIN_SUFFIX) << '\n';
+        }
+        else if (arg == "--install")
+        {
+            std::cout << base_path(argv[0]) << '\n';
         }
         else if (arg == "--flags")
         {
             std::cout << HELICS_CXX_VERSION << " " << HELICS_CXX_FLAGS << '\n';
         }
-        else if (arg == "--std")
+        else if ((arg == "--std")||(arg=="--standard"))
         {
             std::cout << HELICS_CXX_VERSION <<'\n';
         }
         else
         {
-            std::cerr << "Received unknown argument: " << arg << std::endl;
+            std::cerr << "Received unknown argument: " << arg << '\n';
             show_usage (argv[0]);
         }
     }
