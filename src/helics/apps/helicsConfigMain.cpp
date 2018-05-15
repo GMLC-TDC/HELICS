@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
         {
             path bpath = base_path(argv[0]);
 #if BOOST_VERSION_LEVEL>0
-            bpath.lexically_normal();
+            bpath=bpath.lexically_normal();
 #endif
             std::cout << bpath.make_preferred() << '\n';
         }
@@ -76,7 +76,7 @@ int main (int argc, char *argv[])
             bpath /= HELICS_INCLUDE_SUFFIX;
 
 #if BOOST_VERSION_LEVEL>0
-            bpath.lexically_normal();
+            bpath=bpath.lexically_normal();
 #endif
             std::cout << bpath.make_preferred() << '\n';
         }
@@ -85,7 +85,7 @@ int main (int argc, char *argv[])
             path bpath = base_path(argv[0]);
             bpath /= HELICS_LIB_SUFFIX;
 #if BOOST_VERSION_LEVEL>0
-            bpath.lexically_normal();
+            bpath=bpath.lexically_normal();
 #endif
             std::cout << bpath.make_preferred() << '\n';
         }
@@ -94,7 +94,7 @@ int main (int argc, char *argv[])
             path bpath = base_path(argv[0]);
             bpath /= HELICS_BIN_SUFFIX;
 #if BOOST_VERSION_LEVEL>0
-            bpath.lexically_normal();
+            bpath=bpath.lexically_normal();
 #endif
             std::cout << bpath.make_preferred() << '\n';
         }
