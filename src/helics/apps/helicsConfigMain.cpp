@@ -25,7 +25,7 @@ static void show_usage (std::string const &name)
         
 }
 
-auto base_path( const char *filename)
+path base_path( const char *filename)
 {
     path cfile(filename);
     path bin_dir = cfile.parent_path();
@@ -64,27 +64,27 @@ int main (int argc, char *argv[])
         }
         else if (arg == "--prefix")
         {
-            auto bpath = base_path(argv[0]);
+            path bpath = base_path(argv[0]);
             bpath.lexically_normal();
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--includes") || (arg == "-I")||(arg=="--include"))
         {
-            auto bpath = base_path(argv[0]);
+            path bpath = base_path(argv[0]);
             bpath /= HELICS_INCLUDE_SUFFIX;
             bpath.lexically_normal();
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--libs")||(arg=="-L")||(arg=="--lib"))
         {
-            auto bpath = base_path(argv[0]);
+            path bpath = base_path(argv[0]);
             bpath /= HELICS_LIB_SUFFIX;
             bpath.lexically_normal();
             std::cout << bpath.make_preferred() << '\n';
         }
         else if ((arg == "--bin")||(arg=="--binaries"))
         {
-            auto bpath = base_path(argv[0]);
+            path bpath = base_path(argv[0]);
             bpath /= HELICS_BIN_SUFFIX;
             bpath.lexically_normal();
             std::cout << bpath.make_preferred() << '\n';
