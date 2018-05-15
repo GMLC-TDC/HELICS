@@ -168,7 +168,7 @@ defV PhasorGenerator::generate(Time signalTime)
 
     frequency += dfdt * dt;
     Amplitude += dAdt * dt;
-    rotation = std::polar(1.0, frequency*dt * (2 * pi));
+    rotation = std::polar(1.0, frequency*dt * (2.0 * pi));
     state *= rotation;
     lastTime = signalTime;
     return Amplitude*state+std::complex<double>(bias_real,bias_imag);
