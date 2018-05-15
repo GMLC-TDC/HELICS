@@ -61,7 +61,7 @@ class multipart_t
     multipart_t(socket_t &socket) { recv(socket); }
 
     // Construct from memory block
-    multipart_t(const void *src, size_t size) { addmem(src, size); }
+    multipart_t(const void *src, size_t message_size) { addmem(src, message_size); }
 
     // Construct from string
     multipart_t(const std::string &string) { addstr(string); }

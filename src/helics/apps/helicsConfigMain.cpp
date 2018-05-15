@@ -53,7 +53,7 @@ int main (int argc, char *argv[])
 
     for (int ii = 1; ii < argc; ++ii)
     {
-        std::string arg{ argv[ii] };
+        std::string arg(argv[ii]);
         if ((arg == "-h") || (arg == "--help") || (arg == "-?"))
         {
             show_usage (argv[0]);
