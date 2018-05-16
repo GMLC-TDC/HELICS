@@ -111,27 +111,6 @@ IF (VERSION_OPTION)
 	ENDIF (MSVC)
 ENDIF(VERSION_OPTION)
 
-IF(UNIX)
-  # Since default builds of boost library under Unix don't use
-  # CMake, turn off using CMake build and find include/libs the
-  # regular way.
-  set(Boost_NO_BOOST_CMAKE ON)
-  set(Boost_USE_MULTITHREADED OFF)   # Needed if MT libraries not built
-   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-ELSE(UNIX)
-  IF(MSYS)
-	option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  ELSE(MSYS)
-  #this will be MSYS or stand alone Mingw
-   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-  ENDIF(MSYS)
-ENDIF(UNIX)
-
-IF (USE_BOOST_STATIC_LIBS)
-  set(Boost_USE_STATIC_LIBS ON)
-  set(BOOST_STATIC ON)
-ENDIF ()
-
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
@@ -182,8 +161,8 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
+set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)
 include(addBoost)
-
 
 # -------------------------------------------------------------
 # finding MPI
@@ -257,6 +236,9 @@ IF (ZeroMQ_ENABLE)
 		endif()
 		#message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 		target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
+		#get_target_properties(ZMQ_LOC ${ZeroMQ_DEPENDENCY} INTERFACE_INCLUDE_DIRECTORIES)
+		#get_filename_component(ZMQ_LOC_BASE ${ZMQ_LOC} DIRECTORY)
+
 	else(ZeroMQ_FOUND)
 		set(HELICS_HAVE_ZEROMQ FALSE)
 	endif(ZeroMQ_FOUND)
@@ -267,7 +249,7 @@ IF (ZeroMQ_ENABLE)
    endif()
 ENDIF(ZeroMQ_ENABLE)
 
-target_link_libraries(helics_base INTERFACE ${Boost_LIBRARIES_core})
+target_link_libraries(helics_base INTERFACE Boostlibs::core)
 
 # -------------------------------------------------------------
 # global include directories
