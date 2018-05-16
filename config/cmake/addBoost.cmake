@@ -186,7 +186,11 @@ endif()
 set_target_properties(Boostlibs::core Boostlibs::test PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 set_target_properties(Boostlibs::core PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}")
 
-set_target_properties(Boostlibs::test PROPERTIES IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}" IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}")
+if (Boost_LIBRARIES_test_debug)
+	set_target_properties(Boostlibs::test PROPERTIES IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}" IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}")
+else()
+	set_target_properties(Boostlibs::test PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}")
+endif()
 
 message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}")
 message(STATUS "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")
