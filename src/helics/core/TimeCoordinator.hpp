@@ -41,13 +41,13 @@ class TimeCoordinator
                                             //!< time(usually time granted unless values are changing)
     Time time_block = Time::maxVal ();  //!< a blocking time to not grant time >= the specified time
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
+    std::vector<federate_id> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
     CoreFederateInfo info;  //!< basic federate info the core uses
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    Core::federate_id_t
+    federate_id
       source_id;  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
@@ -80,9 +80,9 @@ class TimeCoordinator
     /** get the current granted time*/
     Time allowedSendTime () const { return time_granted + info.outputDelay; }
     /** get a list of actual dependencies*/
-    std::vector<Core::federate_id_t> getDependencies () const;
+    std::vector<federate_id> getDependencies () const;
     /** get a reference to the dependents vector*/
-    const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
+    const std::vector<federate_id> &getDependents () const { return dependents; }
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
@@ -101,9 +101,9 @@ class TimeCoordinator
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
     */
-    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
+    DependencyInfo *getDependencyInfo (federate_id ofed);
     /** check whether a federate is a dependency*/
-    bool isDependency (Core::federate_id_t ofed) const;
+    bool isDependency (federate_id ofed) const;
 
   private:
     /** helper function for computing the next event time*/
@@ -137,17 +137,17 @@ class TimeCoordinator
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency (Core::federate_id_t fedID);
+    bool addDependency (federate_id fedID);
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent (Core::federate_id_t fedID);
+    bool addDependent (federate_id fedID);
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency (Core::federate_id_t fedID);
+    void removeDependency (federate_id fedID);
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent (Core::federate_id_t fedID);
+    void removeDependent (federate_id fedID);
 
     /** check if entry to the executing state can be granted*/
     iteration_state checkExecEntry ();

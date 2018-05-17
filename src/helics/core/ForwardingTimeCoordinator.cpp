@@ -23,14 +23,14 @@ void ForwardingTimeCoordinator::enteringExecMode ()
     transmitTimingMessage (execreq);
 }
 
-static inline bool isBroker (Core::federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
+static inline bool isBroker (federate_id id) { return ((id == 1) || (id >= 0x7000'0000)); }
 
 void ForwardingTimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
     Time minDe = minminDe;
-    Core::federate_id_t minFed = invalid_fed_id;
+    federate_id minFed = invalid_fed_id;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
     for (auto &dep : dependencies)
     {
@@ -219,17 +219,17 @@ std::string ForwardingTimeCoordinator::printTimeStatus () const
       .str ();
 }
 
-bool ForwardingTimeCoordinator::isDependency (Core::federate_id_t ofed) const
+bool ForwardingTimeCoordinator::isDependency (federate_id ofed) const
 {
     return dependencies.isDependency (ofed);
 }
 
-bool ForwardingTimeCoordinator::addDependency (Core::federate_id_t fedID)
+bool ForwardingTimeCoordinator::addDependency (federate_id fedID)
 {
     return dependencies.addDependency (fedID);
 }
 
-bool ForwardingTimeCoordinator::addDependent (Core::federate_id_t fedID)
+bool ForwardingTimeCoordinator::addDependent (federate_id fedID)
 {
     if (dependents.empty ())
     {
@@ -252,12 +252,12 @@ bool ForwardingTimeCoordinator::addDependent (Core::federate_id_t fedID)
     return true;
 }
 
-void ForwardingTimeCoordinator::removeDependency (Core::federate_id_t fedID)
+void ForwardingTimeCoordinator::removeDependency (federate_id fedID)
 {
     dependencies.removeDependency (fedID);
 }
 
-void ForwardingTimeCoordinator::removeDependent (Core::federate_id_t fedID)
+void ForwardingTimeCoordinator::removeDependent (federate_id fedID)
 {
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep != dependents.end ())
@@ -269,14 +269,14 @@ void ForwardingTimeCoordinator::removeDependent (Core::federate_id_t fedID)
     }
 }
 
-const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (Core::federate_id_t ofed) const
+const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (federate_id ofed) const
 {
     return dependencies.getDependencyInfo (ofed);
 }
 
-std::vector<Core::federate_id_t> ForwardingTimeCoordinator::getDependencies () const
+std::vector<federate_id> ForwardingTimeCoordinator::getDependencies () const
 {
-    std::vector<Core::federate_id_t> deps;
+    std::vector<federate_id> deps;
     for (auto &dep : dependencies)
     {
         deps.push_back (dep.fedID);
@@ -313,7 +313,7 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
 }
 
 ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (const ActionMessage &msg,
-                                                                              Core::federate_id_t iFed) const
+                                                                              federate_id iFed) const
 {
     ActionMessage nTime (msg);
     Time minNext = Time::maxVal ();

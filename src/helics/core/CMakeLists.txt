@@ -78,6 +78,7 @@ core-data.hpp
 helics-time.hpp
 CoreFederateInfo.hpp
 helicsVersion.hpp
+federate_id.hpp
 ../flag-definitions.h
 )
 

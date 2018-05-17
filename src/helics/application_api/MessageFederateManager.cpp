@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-MessageFederateManager::MessageFederateManager (Core *coreOb, Core::federate_id_t id)
+MessageFederateManager::MessageFederateManager (Core *coreOb, federate_id id)
     : coreObject (coreOb), fedID (id)
 {
 }

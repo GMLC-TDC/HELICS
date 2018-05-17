@@ -443,11 +443,11 @@ std::string TimeCoordinator::printTimeStatus () const
       .str ();
 }
 
-bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
+bool TimeCoordinator::isDependency (federate_id ofed) const { return dependencies.isDependency (ofed); }
 
-bool TimeCoordinator::addDependency (Core::federate_id_t fedID) { return dependencies.addDependency (fedID); }
+bool TimeCoordinator::addDependency (federate_id fedID) { return dependencies.addDependency (fedID); }
 
-bool TimeCoordinator::addDependent (Core::federate_id_t fedID)
+bool TimeCoordinator::addDependent (federate_id fedID)
 {
     if (dependents.empty ())
     {
@@ -470,9 +470,9 @@ bool TimeCoordinator::addDependent (Core::federate_id_t fedID)
     return true;
 }
 
-void TimeCoordinator::removeDependency (Core::federate_id_t fedID) { dependencies.removeDependency (fedID); }
+void TimeCoordinator::removeDependency (federate_id fedID) { dependencies.removeDependency (fedID); }
 
-void TimeCoordinator::removeDependent (Core::federate_id_t fedID)
+void TimeCoordinator::removeDependent (federate_id fedID)
 {
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep != dependents.end ())
@@ -484,14 +484,14 @@ void TimeCoordinator::removeDependent (Core::federate_id_t fedID)
     }
 }
 
-DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
+DependencyInfo *TimeCoordinator::getDependencyInfo (federate_id ofed)
 {
     return dependencies.getDependencyInfo (ofed);
 }
 
-std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
+std::vector<federate_id> TimeCoordinator::getDependencies () const
 {
-    std::vector<Core::federate_id_t> deps;
+    std::vector<federate_id> deps;
     deps.reserve (dependencies.size ());
     for (auto &dep : dependencies)
     {
@@ -568,7 +568,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     return ret;
 }
 
-static bool isDelayableMessage (const ActionMessage &cmd, Core::federate_id_t localId)
+static bool isDelayableMessage (const ActionMessage &cmd, federate_id localId)
 {
     return (((cmd.action () == CMD_TIME_GRANT) || (cmd.action () == CMD_EXEC_GRANT)) &&
             (cmd.source_id != localId));

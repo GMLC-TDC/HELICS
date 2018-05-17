@@ -114,7 +114,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
 // comparison helper lambda for comparing dependencies
 static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
 
-bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
+bool TimeDependencies::isDependency (federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if (res == dependencies.end ())
@@ -124,7 +124,7 @@ bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
     return (res->fedID == ofed);
 }
 
-const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed) const
+const DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
     if ((res == dependencies.cend ()) || (res->fedID != ofed))
@@ -135,7 +135,7 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t o
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed)
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if ((res == dependencies.end ()) || (res->fedID != ofed))
@@ -146,7 +146,7 @@ DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
     return &(*res);
 }
 
-bool TimeDependencies::addDependency (Core::federate_id_t id)
+bool TimeDependencies::addDependency (federate_id id)
 
 {
     if (dependencies.empty ())
@@ -171,7 +171,7 @@ bool TimeDependencies::addDependency (Core::federate_id_t id)
     return true;
 }
 
-void TimeDependencies::removeDependency (Core::federate_id_t id)
+void TimeDependencies::removeDependency (federate_id id)
 {
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);
     if (dep != dependencies.end ())
@@ -208,9 +208,9 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     });
 }
 
-constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
+constexpr federate_id global_federate_id_shift = 0x0001'0000;
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
+constexpr federate_id global_broker_id_shift = 0x7000'0000;
 
 bool TimeDependencies::hasActiveTimeDependencies () const
 {

@@ -49,7 +49,7 @@ void CoreBroker::setIdentifier (const std::string &name)
         identifier = name;
     }
 }
-int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
+int32_t CoreBroker::getRoute (federate_id fedid) const
 {
     if ((fedid == 0) || (fedid == higher_broker_id))
     {
@@ -59,7 +59,7 @@ int32_t CoreBroker::getRoute (Core::federate_id_t fedid) const
     return (fnd != routing_table.end ()) ? fnd->second : 0;  // zero is the default route
 }
 
-BasicBrokerInfo *CoreBroker::getBrokerById (Core::federate_id_t fedid)
+BasicBrokerInfo *CoreBroker::getBrokerById (federate_id fedid)
 {
     if (_isRoot)
     {
@@ -71,7 +71,7 @@ BasicBrokerInfo *CoreBroker::getBrokerById (Core::federate_id_t fedid)
     return (fnd != _brokers.end ()) ? &(*fnd) : nullptr;
 }
 
-const BasicBrokerInfo *CoreBroker::getBrokerById (Core::federate_id_t fedid) const
+const BasicBrokerInfo *CoreBroker::getBrokerById (federate_id fedid) const
 {
     if (_isRoot)
     {
@@ -210,7 +210,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (getRoute (command.source_id), badInit);
             return;
         }
-        if (!_federates.insert (command.name, static_cast<Core::federate_id_t> (_federates.size ()), command.name))
+        if (!_federates.insert (command.name, static_cast<federate_id> (_federates.size ()), command.name))
         {
             ActionMessage badName (CMD_FED_ACK);
             setActionFlag (badName, error_flag);
@@ -237,7 +237,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else
         {
             _federates.back ().global_id =
-              static_cast<Core::federate_id_t> (_federates.size ()) - 1 + global_federate_id_shift;
+              static_cast<federate_id> (_federates.size ()) - 1 + global_federate_id_shift;
             auto route_id = _federates.back ().route_id;
             auto global_id = _federates.back ().global_id;
             routing_table.emplace (global_id, route_id);
@@ -269,7 +269,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (command.source_id, badInit);
             return;
         }
-        _brokers.insert (command.name, static_cast<Core::federate_id_t> (_brokers.size ()), command.name);
+        _brokers.insert (command.name, static_cast<federate_id> (_brokers.size ()), command.name);
         if (command.source_id == 0)
         {
             _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
@@ -297,7 +297,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else
         {
             _brokers.back ().global_id =
-              static_cast<Core::federate_id_t> (_brokers.size ()) - 1 + global_broker_id_shift;
+              static_cast<federate_id> (_brokers.size ()) - 1 + global_broker_id_shift;
             auto global_id = _brokers.back ().global_id;
             auto route_id = _brokers.back ().route_id;
             routing_table.emplace (global_id, route_id);
@@ -1033,7 +1033,7 @@ void CoreBroker::unregister ()
 
 void CoreBroker::disconnect () { processDisconnect (); }
 
-void CoreBroker::routeMessage (ActionMessage &cmd, Core::federate_id_t dest)
+void CoreBroker::routeMessage (ActionMessage &cmd, federate_id dest)
 {
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))

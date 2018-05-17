@@ -30,7 +30,7 @@ class BasicHandleInfo
     BasicHandleInfo () noexcept : type_in (type), type_out (units){};
     /** construct from the data*/
     BasicHandleInfo (Core::handle_id_t handle_id,
-                     Core::federate_id_t federate_id,
+                     federate_id federate_id,
                      handle_type_t type_of_handle,
                      const std::string &key_name,
                      const std::string &type_name,
@@ -42,7 +42,7 @@ class BasicHandleInfo
     }
     /** construct from the data for filters*/
     BasicHandleInfo (Core::handle_id_t handle_id,
-                     Core::federate_id_t federate_id,
+                     federate_id federate_id,
                      handle_type_t type_of_handle,
                      const std::string &key_name,
                      const std::string &target_name,
@@ -55,8 +55,8 @@ class BasicHandleInfo
     }
 
     const Core::handle_id_t handle = invalid_handle;  //!< the identification number for the handle
-    const Core::federate_id_t fed_id = invalid_fed_id;  //!< the global federate id for the creator of the handle
-    Core::federate_id_t local_fed_id = invalid_fed_id;  //!< the local federate id of the handle
+    const federate_id fed_id = invalid_fed_id;  //!< the global federate id for the creator of the handle
+    federate_id local_fed_id = invalid_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
     bool flag = false;  //!< indicator flag
     bool processed = false;  //!< indicator if the handle has been processed (subscription or endpoint found)

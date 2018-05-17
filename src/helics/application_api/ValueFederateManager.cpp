@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-ValueFederateManager::ValueFederateManager (Core *coreOb, Core::federate_id_t id) : coreObject (coreOb), fedID (id)
+ValueFederateManager::ValueFederateManager (Core *coreOb, federate_id id) : coreObject (coreOb), fedID (id)
 {
 }
 ValueFederateManager::~ValueFederateManager () = default;

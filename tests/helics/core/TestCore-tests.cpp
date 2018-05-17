@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
 
-    Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
+    federate_id id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     BOOST_CHECK_EQUAL (core->getFederationSize (), 1);
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     BOOST_CHECK_EQUAL (core->getFederationSize (), 0);
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
-    Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
+    federate_id id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
     BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_CHECK (core->isInitialized ());
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
-    Core::federate_id_t id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
+    federate_id id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     Core::handle_id_t end1 = core->registerEndpoint (id, "end1", "type");
     Core::handle_id_t end2 = core->registerEndpoint (id, "end2", "type");

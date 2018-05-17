@@ -13,7 +13,7 @@ and some common methods used cores and brokers
 #pragma once
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
-#include "Core.hpp"
+#include "federate_id.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
@@ -28,9 +28,9 @@ class ForwardingTimeCoordinator;
 class BrokerBase
 {
   protected:
-    std::atomic<Core::federate_id_t> global_broker_id{
-      0};  //!< the unique identifier for the broker(core or broker)
-    Core::federate_id_t higher_broker_id = 0;  //!< the id code of the broker 1 level about this broker
+    std::atomic<federate_id> global_broker_id{
+      federate_id(0)};  //!< the unique identifier for the broker(core or broker)
+    federate_id higher_broker_id = federate_id(0);  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
@@ -137,7 +137,7 @@ class BrokerBase
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger (Core::federate_id_t federateID,
+    virtual bool sendToLogger (federate_id federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const;

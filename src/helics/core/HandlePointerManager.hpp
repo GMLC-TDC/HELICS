@@ -30,13 +30,13 @@ class HandlePointerManager
     /** default constructor*/
     HandlePointerManager () = default;
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo *addHandle (federate_id fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo *addHandle (federate_id fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,

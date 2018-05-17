@@ -689,7 +689,7 @@ iteration_state FederateState::processDelayQueue ()
     return ret_code;
 }
 
-void FederateState::addFederateToDelay (Core::federate_id_t id)
+void FederateState::addFederateToDelay (federate_id id)
 {
     if ((delayedFederates.empty ()) || (id > delayedFederates.back ()))
     {
@@ -1079,14 +1079,14 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         break;
     }
 }
-const std::vector<Core::federate_id_t> &FederateState::getDependents () const
+const std::vector<federate_id> &FederateState::getDependents () const
 {
     return timeCoord->getDependents ();
 }
 
-void FederateState::addDependency (Core::federate_id_t fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
+void FederateState::addDependency (federate_id fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
 
-void FederateState::addDependent (Core::federate_id_t fedThatDependsOnThis)
+void FederateState::addDependent (federate_id fedThatDependsOnThis)
 {
     timeCoord->addDependent (fedThatDependsOnThis);
 }

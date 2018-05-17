@@ -32,27 +32,27 @@ class HandleManager
     /** default constructor*/
     HandleManager () = default;
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo &addHandle (federate_id fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo &addHandle (federate_id fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
                                 const std::string &type_in,
                                 const std::string &type_out);
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo &addHandle (federate_id fed_id,
                                 Core::handle_id_t local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (Core::federate_id_t fed_id,
+    BasicHandleInfo &addHandle (federate_id fed_id,
                                 Core::handle_id_t local_id,
                                 handle_type_t what,
                                 const std::string &key,
@@ -62,7 +62,7 @@ class HandleManager
     /** get a handle by index*/
     BasicHandleInfo *getHandleInfo (int32_t index);
     /** find a handle from both the federate and local id*/
-    BasicHandleInfo *findHandle (Core::federate_id_t fed_id, Core::handle_id_t id);
+    BasicHandleInfo *findHandle (federate_id fed_id, Core::handle_id_t id);
 
     BasicHandleInfo *getEndpoint (const std::string &name);
     auto getFilters (const std::string &name) { return filters.equal_range (name); }

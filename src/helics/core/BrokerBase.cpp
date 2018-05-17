@@ -164,7 +164,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     _queue_processing_thread = std::thread (&BrokerBase::queueProcessingLoop, this);
 }
 
-bool BrokerBase::sendToLogger (Core::federate_id_t federateID,
+bool BrokerBase::sendToLogger (federate_id federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const

@@ -53,9 +53,9 @@ constexpr interface_availability OPTIONAL = interface_availability::optional;
 constexpr interface_availability REQUIRED = interface_availability::required;
 
 /** class defining an  identifier type
-@details  the intent of this class is to limit the operations available on a publication identifier
+@details  the intent of this class is to limit the operations available on an identifier
 to those that are a actually required and make sense, and make it as low impact as possible.
-it also acts to limit any mistakes of a publication_id for a subscription_id or other types of interfaces
+it also acts to limit any mistakes of on type of identifier for another
 */
 template <class BaseType, identifiers ID, BaseType invalidValue = (BaseType (-1))>
 class identifier_id_t

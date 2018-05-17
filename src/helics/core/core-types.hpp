@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-
+#include "federate_id.hpp"
 #include <string>
 
 /** @file
@@ -36,7 +36,8 @@ enum class core_type : int
     IPC = 5,  //!< same as INTERPROCESS
     TCP = 6,  //!< use a generic TCP protocol message stream to send messages
     UDP = 7,  //!< use UDP packets to send the data
-    UNRECOGNIZED = 8,  //!< unknown
+    NNG = 9, //!< reserved for future Nanomsg implementation 
+    UNRECOGNIZED = 22,  //!< unknown
 
 };
 
@@ -95,6 +96,7 @@ core_type coreTypeFromString (std::string type);
  * Returns true if core/broker type specified is available in current compilation.
  */
 bool isCoreTypeAvailable (core_type type) noexcept;
+
 }  // namespace helics
 
 #define PUBLICATION_REQUIRED helics::handle_check_mode::required

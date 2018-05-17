@@ -19,7 +19,7 @@ class FilterInfo
 {
   public:
     /** constructor from all fields*/
-    FilterInfo (Core::federate_id_t fed_id_,
+    FilterInfo (federate_id fed_id_,
                 Core::handle_id_t handle_,
                 const std::string &key_,
                 const std::string &target_,
@@ -30,7 +30,7 @@ class FilterInfo
           outputType (type_out_), dest_filter (destFilter_)
     {
     }
-    const Core::federate_id_t fed_id = invalid_fed_id;  //!< id of the core that manages the filter
+    const federate_id fed_id = invalid_fed_id;  //!< id of the core that manages the filter
     const Core::handle_id_t handle = invalid_handle;  //!< id handle of the filter
 
     const std::string key;  //!< the identifier of the filter
@@ -42,7 +42,7 @@ class FilterInfo
     // there is a 6 byte gap here
     std::shared_ptr<FilterOperator> filterOp;  //!< the callback operation of the filter
 
-    std::pair<Core::federate_id_t, Core::handle_id_t> target{
+    std::pair<federate_id, Core::handle_id_t> target{
       invalid_fed_id, invalid_handle};  //!< the actual target information for the filter
 };
 }  // namespace helics
