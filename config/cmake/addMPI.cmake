@@ -15,19 +15,29 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 find_package(MPI)
-if(MSVC)
+if (NOT MPI_C_FOUND)
+if(MSVC) #the cmake find MPI doesn't completely work for visual studio 2017
 
 	if (NOT MPI_CXX_COMPILER)
 		message(STATUS "not mpi cxx compiler")
 		# For building MPI programs the selected Visual Studio compiler is used,
 		#namely cl.exe.
 		# So there is no need to set a specific MPI compiler.
-		set(MPI_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE FILEPATH "Mpi cxx compiler" FORCE)
-		set(MPI_C_COMPILER "${CMAKE_C_COMPILER}" CACHE FILEPATH "Mpi c compiler" FORCE)
+		set(MPI_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE FILEPATH "Mpi CXX compiler" FORCE)
+		set(MPI_C_COMPILER "${CMAKE_C_COMPILER}" CACHE FILEPATH "Mpi C compiler" FORCE)
 	endif(NOT MPI_CXX_COMPILER)
-	
+	if (MPIEXEC_EXECUTABLE) #if we found this then the target was found
+		if (NOT MPI_C_LIBRARIES)
+			if (MPI_msmpi_LIBRARY)
+				set(MPI_C_LIBRARIES ${MPI_msmpi_LIBRARY} CACHE STRING "MPI C libraries" FORCE)
+			else()
+				#TODO not sure how MPICH libraries are laid out on Windows
+			endif()
+		endif()
+		set(MPI_C_FOUND TRUE CACHE BOOL "MPI C FOUND" FORCE)
+	endif()
 endif()
-
+endif()
 ############################################################
 # Add targets to use
 ############################################################
