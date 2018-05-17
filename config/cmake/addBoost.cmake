@@ -136,12 +136,16 @@ foreach(loop_var ${Boost_LIBRARIES})
 	endif()
 endforeach(loop_var)
 
+############################################################
+# Add boost targets to use
+#####################################################
+
 if (${Boost_USE_STATIC_LIBS})
-add_library(Boostlibs::core STATIC IMPORTED)
-add_library(Boostlibs::test STATIC IMPORTED)
+	add_library(Boostlibs::core STATIC IMPORTED)
+	add_library(Boostlibs::test STATIC IMPORTED)
 else()
-add_library(Boostlibs::core UNKNOWN IMPORTED)
-add_library(Boostlibs::test UNKNOWN IMPORTED)
+	add_library(Boostlibs::core UNKNOWN IMPORTED)
+	add_library(Boostlibs::test UNKNOWN IMPORTED)
 endif()
 
 list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)
