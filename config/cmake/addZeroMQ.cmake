@@ -1,5 +1,8 @@
 #file to include ZMQ
-
+OPTION(USE_SYSTEM_ZEROMQ_ONLY "only search for system zeromq libraries, bypass autobuild option" OFF)
+if (USE_SYSTEM_ZEROMQ_ONLY)
+	find_package(ZeroMQ)
+else()
 OPTION(ZMQ_USE_STATIC_LIBRARY
   "use the ZMQ static library" OFF)
 
@@ -48,3 +51,5 @@ if (NOT ZeroMQ_FOUND)
 		endif()
 	endif()
 endif()
+
+endif() # USE_SYSTEM_ZEROMQ_ONLY
