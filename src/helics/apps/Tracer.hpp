@@ -41,9 +41,10 @@ class Tracer: public App
     */
     Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
+    @param[in] name the name of the app
     @param[in] file a file defining the federate information
     */
-    explicit Tracer (const std::string &jsonString);
+    Tracer (const std::string &name, const std::string &jsonString);
     /** move construction*/
     Tracer (Tracer &&other_tracer) = default;
     /** move assignment*/

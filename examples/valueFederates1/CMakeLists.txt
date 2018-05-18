@@ -1,10 +1,6 @@
 add_executable(valueFed valueFed.cpp)
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
-target_link_libraries(valueFed helics-static)
+target_link_libraries(valueFed helics_apps-static)
 
 set_target_properties (valueFed PROPERTIES
     FOLDER examples

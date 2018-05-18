@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/ValueFederate.hpp"
 #include <thread>
 #include <iostream>
-#include "helics/core/BrokerFactory.hpp"
+#include "helics/apps/BrokerApp.hpp"
 #include "helics/common/argParser.h"
 
 static const helics::ArgDescriptors InfoArgs{
@@ -27,10 +27,10 @@ int main (int argc, const char * const *argv)
     }
 
 	fi.logLevel = 5;
-    std::shared_ptr<helics::Broker> brk;
+    helics::apps::BrokerApp brk;
     if (vm.count("startbroker") > 0)
     {
-        brk = helics::BrokerFactory::create(fi.coreType, vm["startbroker"].as<std::string>());
+        brk = helics::apps::BrokerApp(fi.coreType, vm["startbroker"].as<std::string>());
     }
 
     std::string target = "fed";
@@ -64,14 +64,6 @@ int main (int argc, const char * const *argv)
         std::cout << "processed time " << static_cast<double> (newTime) << "\n";
     }
     vFed->finalize ();
-    if (brk)
-    {
-        while (brk->isConnected())
-        {
-            std::this_thread::yield();
-        }
-        brk = nullptr;
-    }
     return 0;
 }
 

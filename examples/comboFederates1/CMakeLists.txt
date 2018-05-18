@@ -1,12 +1,8 @@
 
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
-#include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
 add_executable(comboFed comboFed.cpp)
 
-target_link_libraries(comboFed helics-static)
+target_link_libraries(comboFed helics_apps-static)
 
 
 set_target_properties (comboFed PROPERTIES

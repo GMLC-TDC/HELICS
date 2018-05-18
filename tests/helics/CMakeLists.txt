@@ -19,7 +19,5 @@ if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
     add_subdirectory(shared_library)
 endif()
 
-if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS)
-    add_subdirectory(apps)
-endif()
+add_subdirectory(apps)
 

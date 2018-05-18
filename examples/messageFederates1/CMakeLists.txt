@@ -1,18 +1,10 @@
 add_executable(messageFed messageFed.cpp)
 add_executable(messageFedObj messageFedObj.cpp)
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(messageFed helics_apps-static)
+target_link_libraries(messageFedObj helics_apps-static)
 
-target_link_libraries(messageFed helics-static)
-target_link_libraries(messageFedObj helics-static)
-
-set_target_properties (messageFed PROPERTIES
-    FOLDER examples
-)
-
-set_target_properties (messageFedObj PROPERTIES
+set_target_properties (messageFed messageFedObj PROPERTIES
     FOLDER examples
 )
 

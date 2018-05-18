@@ -49,5 +49,10 @@ find_program(HELICS_BROKER helics_broker
 	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
 	NO_DEFAULT_PATH)
 	
+	
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
+
 check_required_components(${PN})
 

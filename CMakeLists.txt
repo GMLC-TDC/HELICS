@@ -184,24 +184,6 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 # -------------------------------------------------------------
 include(addBoost)
 
-# -------------------------------------------------------------
-# Enable ZeroMQ
-# -------------------------------------------------------------
-
-OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
-# If ZeroMQ library is enabled try to locate it and link against it
-
-IF (ZeroMQ_ENABLE)
-	include(addZeroMQ)
-
-	if (ZeroMQ_FOUND)
-		set(HELICS_HAVE_ZEROMQ TRUE)
-	else(ZeroMQ_FOUND)
-		set(HELICS_HAVE_ZEROMQ FALSE)
-	endif(ZeroMQ_FOUND)
- ELSE(ZeroMQ_ENABLE)
-	set(HELICS_HAVE_ZEROMQ FALSE)
-ENDIF(ZeroMQ_ENABLE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -212,6 +194,7 @@ IF (MPI_ENABLE)
 	include(addMPI)
 	if (MPI_C_FOUND)
 		set(HELICS_HAVE_MPI TRUE)
+		target_link_libraries(helics_base INTERFACE ${MPI_C_LIBRARIES})
 	else()
 		set(HELICS_HAVE_MPI FALSE)
 	endif (MPI_C_FOUND)
@@ -222,9 +205,9 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
-if (NOT MSVC)
+if (NOT WIN32)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
-endif(NOT MSVC)
+endif(NOT WIN32)
 find_package(Threads REQUIRED)
 
 target_link_libraries(helics_base INTERFACE Threads::Threads)
@@ -233,6 +216,9 @@ IF (UNIX AND NOT APPLE)
 	target_link_libraries(helics_base INTERFACE rt)
 ENDIF()
 
+# -------------------------------------------------------------
+# check for some things with TCP core
+# -------------------------------------------------------------
 IF(MSYS)
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		if (BOOST_VERSION_LEVEL GREATER 1)
@@ -251,25 +237,35 @@ IF(MSYS)
 
 ENDIF(MSYS)
 
-if (HELICS_HAVE_ZEROMQ)
-	if (ZMQ_USE_STATIC_LIBRARY)
-		set(ZeroMQ_DEPENDENCY libzmq-static)
-		target_add_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
-	else()
-		set(ZeroMQ_DEPENDENCY libzmq)
-	endif()
-	message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-	target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
-else(HELICS_HAVE_ZEROMQ)
-   if (ZeroMQ_ENABLE)
+# -------------------------------------------------------------
+# Enable ZeroMQ
+# -------------------------------------------------------------
+
+OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
+# If ZeroMQ library is enabled try to locate it and link against it
+
+IF (ZeroMQ_ENABLE)
+	include(addZeroMQ)
+
+	if (ZeroMQ_FOUND)
+		set(HELICS_HAVE_ZEROMQ TRUE)
+		if (ZMQ_USE_STATIC_LIBRARY)
+			set(ZeroMQ_DEPENDENCY libzmq-static)
+			target_add_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
+		else()
+			set(ZeroMQ_DEPENDENCY libzmq)
+		endif()
+		#message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
+		target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
+	else(ZeroMQ_FOUND)
+		set(HELICS_HAVE_ZEROMQ FALSE)
+	endif(ZeroMQ_FOUND)
+ ELSE(ZeroMQ_ENABLE)
+	set(HELICS_HAVE_ZEROMQ FALSE)
+	if (ZeroMQ_ENABLE)
 	  message(WARNING "ZeroMQ not found")
    endif()
-endif (HELICS_HAVE_ZEROMQ)
-
-if (MPI_C_FOUND)
-   target_link_libraries(helics_base INTERFACE ${MPI_C_LIBRARIES})
-endif (MPI_C_FOUND)
-
+ENDIF(ZeroMQ_ENABLE)
 
 target_link_libraries(helics_base INTERFACE ${Boost_LIBRARIES_core})
 
@@ -324,62 +320,11 @@ if (NOT Boost_USE_STATIC_LIBS)
 	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
-
+OPTION(BUILD_BROKER "Build a helics Broker executable" ON)
 OPTION(BUILD_PLAYER "Build a helics player standalone executable" ON)
 OPTION(BUILD_RECORDER "Build a helics recorder standalone executable" ON)
-OPTION(BUILD_APPS "Build helics applications" ON)
+OPTION(BUILD_APPS "Build helics application to run various apps" ON)
 
-
-
-
-# -------------------------------------------------------------
-# Add the main HELICS library
-# -------------------------------------------------------------
-
-add_library(helics-static STATIC
-    $<TARGET_OBJECTS:application_api>
-    $<TARGET_OBJECTS:helics_core>
-    $<TARGET_OBJECTS:helics_common>
-)
-
-
-target_link_libraries(helics-static PUBLIC helics_base)
-
-IF(BUILD_CXX_SHARED_LIB)
-	#if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
-	#	message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
-	#endif()
-
-	add_library(helics-shared SHARED
-	src/empty.cpp
-    $<TARGET_OBJECTS:application_api>
-    $<TARGET_OBJECTS:helics_core>
-    $<TARGET_OBJECTS:helics_common>
-)
-
-	target_link_libraries(helics-shared PRIVATE helics_base)
-
-	if (WIN32)
-			set_target_properties(helics-shared PROPERTIES
-		WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-
-	#	IF(MINGW)
-	#	set_target_properties(helics-shared PROPERTIES
-  #      LINK_FLAGS "-Wl,--whole-archive")
-	#	ELSE(MINGW)
-	#		set_target_properties(helics-shared PROPERTIES
-	#		LINK_FLAGS "/WHOLEARCHIVE")
-	#	endif()
-	#
-	#elseif (APPLE)
-	#	set_target_properties(helics-shared PROPERTIES
-    #    LINK_FLAGS "-Wl,-all_load")
-	#else ()
-	#	set_target_properties(helics-shared PROPERTIES
-  #      LINK_FLAGS "-Wl,--whole-archive")
-	endif ()
-
-endif()
 
 FILE(GLOB KEY_LIBRARY_FILES  ${PROJECT_BINARY_DIR}/libs/bin/*)
 message(STATUS "key files ${KEY_LIBRARY_FILES}")
@@ -433,26 +378,13 @@ endif()
 
 add_subdirectory(docs)
 
-set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (TARGETS helics_base EXPORT helics-targets)
 install (TARGETS helics_base_includes EXPORT helics-targets)
 
-install (TARGETS helics-static EXPORT helics-targets
-	DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
-
-	#install(FILES $<TARGET_PDB_FILE:helics-static> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs OPTIONAL)
-	set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
-	set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(helics_static_file "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(helics_static_file_debug "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 IF(BUILD_CXX_SHARED_LIB)
-	install (TARGETS helics-shared EXPORT helics-targets
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-	INSTALL(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
-	INSTALL(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs)
-
 	set(helics_cxx_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	set(helics_cxx_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE (BUILD_CXX_SHARED_LIB)
@@ -468,6 +400,7 @@ ELSE()
 	set(helics_c_shared_file_debug )
 ENDIF()
 
+set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (EXPORT helics-targets
 	NAMESPACE Helics::
@@ -522,12 +455,8 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Conf
                                  VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}
                                  COMPATIBILITY SameMajorVersion)
 
-configure_file(config/${PROJECT_NAME}Import.cmake.in
-                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake" @ONLY)
-
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-			   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Import.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 			  COMPONENT libs)
 
