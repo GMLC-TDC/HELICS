@@ -19,19 +19,19 @@ class FilterInfo
 {
   public:
     /** constructor from all fields*/
-    FilterInfo (federate_id fed_id_,
+    FilterInfo (global_broker_id_t core_id_,
                 Core::handle_id_t handle_,
                 const std::string &key_,
                 const std::string &target_,
                 const std::string &type_in_,
                 const std::string &type_out_,
                 bool destFilter_)
-        : fed_id (fed_id_), handle (handle_), key (key_), filterTarget (target_), inputType (type_in_),
+        : core_id (core_id_), handle (handle_), key (key_), filterTarget (target_), inputType (type_in_),
           outputType (type_out_), dest_filter (destFilter_)
     {
     }
-    const federate_id fed_id = invalid_fed_id;  //!< id of the core that manages the filter
-    const Core::handle_id_t handle = invalid_handle;  //!< id handle of the filter
+    const global_broker_id_t core_id;  //!< id of the core that manages the filter
+    const Core::handle_id_t handle;  //!< id handle of the filter
 
     const std::string key;  //!< the identifier of the filter
     const std::string filterTarget;  //!< the target endpoint name of the filter
@@ -42,7 +42,7 @@ class FilterInfo
     // there is a 6 byte gap here
     std::shared_ptr<FilterOperator> filterOp;  //!< the callback operation of the filter
 
-    std::pair<federate_id, Core::handle_id_t> target{
-      invalid_fed_id, invalid_handle};  //!< the actual target information for the filter
+    std::pair<global_federate_id_t, Core::handle_id_t> target{
+      global_federate_id_t(), invalid_handle};  //!< the actual target information for the filter
 };
 }  // namespace helics

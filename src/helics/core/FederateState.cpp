@@ -113,8 +113,8 @@ void FederateState::setState (federate_state_t newState)
 
 void FederateState::reset ()
 {
-    global_id = invalid_fed_id;
-    local_id = invalid_fed_id;
+    global_id = global_federate_id_t();
+    local_id = federate_id_t();
     state = HELICS_CREATED;
     queue.clear ();
     delayQueue.clear ();
@@ -422,7 +422,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
     {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec (CMD_EXEC_REQUEST);
-        exec.source_id = global_id;
+        exec.source_id = global_id.load();
         switch (iterate)
         {
         case iteration_request::force_iteration:
@@ -504,7 +504,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
         ActionMessage treq (CMD_TIME_REQUEST);
-        treq.source_id = global_id;
+        treq.source_id = global_id.load();
         treq.actionTime = nextTime;
         switch (iterate)
         {
@@ -689,7 +689,7 @@ iteration_state FederateState::processDelayQueue ()
     return ret_code;
 }
 
-void FederateState::addFederateToDelay (federate_id id)
+void FederateState::addFederateToDelay (global_federate_id_t id)
 {
     if ((delayedFederates.empty ()) || (id > delayedFederates.back ()))
     {
@@ -785,7 +785,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         break;
     case CMD_EXEC_REQUEST:
-        if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
+        if ((cmd.source_id == global_id.load()) && (cmd.dest_id == 0))
         {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
             if (checkActionFlag (cmd, iteration_requested_flag))
@@ -809,7 +809,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         switch (timeCoord->processTimeMessage (cmd))
         {
         case message_process_result::delay_processing:
-            addFederateToDelay (cmd.source_id);
+            addFederateToDelay (global_federate_id_t(cmd.source_id));
             delayQueue.push_back (std::move (cmd));
             return iteration_state::continue_processing;
         case message_process_result::no_effect:
@@ -856,7 +856,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         LOG_DEBUG ("Terminating");
         return iteration_state::halted;
     case CMD_DISCONNECT:
-        if (cmd.source_id == global_id)
+        if (cmd.source_id == global_id.load())
         {
             setState (HELICS_FINISHED);
             timeCoord->disconnect ();
@@ -872,7 +872,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             switch (timeCoord->processTimeMessage (cmd))
             {
             case message_process_result::delay_processing:
-                addFederateToDelay (cmd.source_id);
+                addFederateToDelay (global_federate_id_t(cmd.source_id));
                 delayQueue.push_back (std::move (cmd));
                 return iteration_state::continue_processing;
             case message_process_result::no_effect:
@@ -898,7 +898,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
         break;
     case CMD_TIME_REQUEST:
-        if ((cmd.source_id == global_id) && (cmd.dest_id == 0))
+        if ((cmd.source_id == global_id.load()) && (cmd.dest_id == 0))
         {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
             if (checkActionFlag (cmd, iteration_requested_flag))
@@ -922,7 +922,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         switch (timeCoord->processTimeMessage (cmd))
         {
         case message_process_result::delay_processing:
-            addFederateToDelay (cmd.source_id);
+            addFederateToDelay (global_federate_id_t(cmd.source_id));
             delayQueue.push_back (std::move (cmd));
             return iteration_state::continue_processing;
         case message_process_result::no_effect:
@@ -989,9 +989,9 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         auto subI = getSubscription (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->target = {cmd.source_id, cmd.source_handle};
+            subI->target = {global_federate_id_t(cmd.source_id), cmd.source_handle};
             subI->pubType = cmd.info ().type;
-            addDependency (cmd.source_id);
+            addDependency (global_federate_id_t(cmd.source_id));
         }
     }
     break;
@@ -1000,9 +1000,9 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         auto subI = getSubscription (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->target = {cmd.source_id, cmd.source_handle};
+            subI->target = {global_federate_id_t(cmd.source_id), cmd.source_handle};
             subI->pubType = cmd.payload;
-            addDependency (cmd.source_id);
+            addDependency (global_federate_id_t(cmd.source_id));
         }
     }
     break;
@@ -1013,7 +1013,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         if (pubI != nullptr)
         {
             pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);
-            addDependent (cmd.source_id);
+            addDependent (global_federate_id_t(cmd.source_id));
         }
     }
     break;
@@ -1023,7 +1023,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     case CMD_REMOVE_DEPENDENT:
     case CMD_ADD_INTERDEPENDENCY:
     case CMD_REMOVE_INTERDEPENDENCY:
-        if (cmd.dest_id == global_id)
+        if (cmd.dest_id == global_id.load())
         {
             timeCoord->processDependencyUpdateMessage (cmd);
         }
@@ -1043,8 +1043,8 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
                 errorString = commandErrorString(cmd.index);
                 return iteration_state::error;
             }
-            global_id = cmd.dest_id;
-            timeCoord->source_id = global_id;
+            global_id = global_federate_id_t(cmd.dest_id);
+            timeCoord->source_id = global_federate_id_t(cmd.dest_id);
             return iteration_state::next_step;
         }
         break;
@@ -1079,14 +1079,14 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         break;
     }
 }
-const std::vector<federate_id> &FederateState::getDependents () const
+const std::vector<global_federate_id_t> &FederateState::getDependents () const
 {
     return timeCoord->getDependents ();
 }
 
-void FederateState::addDependency (federate_id fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
+void FederateState::addDependency (global_federate_id_t fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
 
-void FederateState::addDependent (federate_id fedThatDependsOnThis)
+void FederateState::addDependent (global_federate_id_t fedThatDependsOnThis)
 {
     timeCoord->addDependent (fedThatDependsOnThis);
 }
@@ -1139,7 +1139,7 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     if ((loggerFunction) && (level <= logLevel))
     {
         loggerFunction (level,
-                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id) + ')' :
+                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id.load()) + ')' :
                                                       logMessageSource,
                         message);
     }

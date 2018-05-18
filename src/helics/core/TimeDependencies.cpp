@@ -50,7 +50,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             Tdemin = Te;
         }
         forwardEvent = Time::maxVal ();
-        minFed = m.source_handle;
+        minFed = global_federate_id_t(m.source_handle);
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -59,7 +59,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
-        minFed = m.source_handle;
+        minFed = global_federate_id_t(m.source_handle);
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -68,7 +68,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
-        minFed = invalid_fed_id;
+        minFed = global_federate_id_t();
         break;
     case CMD_SEND_MESSAGE:
         if (time_state == time_state_t::time_granted)
@@ -114,7 +114,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
 // comparison helper lambda for comparing dependencies
 static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
 
-bool TimeDependencies::isDependency (federate_id ofed) const
+bool TimeDependencies::isDependency (global_federate_id_t ofed) const
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if (res == dependencies.end ())
@@ -124,7 +124,7 @@ bool TimeDependencies::isDependency (federate_id ofed) const
     return (res->fedID == ofed);
 }
 
-const DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed) const
+const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t ofed) const
 {
     auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
     if ((res == dependencies.cend ()) || (res->fedID != ofed))
@@ -135,7 +135,7 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed) con
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t ofed)
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if ((res == dependencies.end ()) || (res->fedID != ofed))
@@ -146,7 +146,7 @@ DependencyInfo *TimeDependencies::getDependencyInfo (federate_id ofed)
     return &(*res);
 }
 
-bool TimeDependencies::addDependency (federate_id id)
+bool TimeDependencies::addDependency (global_federate_id_t id)
 
 {
     if (dependencies.empty ())
@@ -171,7 +171,7 @@ bool TimeDependencies::addDependency (federate_id id)
     return true;
 }
 
-void TimeDependencies::removeDependency (federate_id id)
+void TimeDependencies::removeDependency (global_federate_id_t id)
 {
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);
     if (dep != dependencies.end ())
@@ -187,7 +187,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
 {
     auto dependency_id = (m.action () != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-    auto depInfo = getDependencyInfo (dependency_id);
+    auto depInfo = getDependencyInfo (global_federate_id_t(dependency_id));
     if (depInfo == nullptr)
     {
         return false;
@@ -208,15 +208,10 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     });
 }
 
-constexpr federate_id global_federate_id_shift = 0x0001'0000;
-/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr federate_id global_broker_id_shift = 0x7000'0000;
-
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
     return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
-        return (((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift)) &&
-                (dep.Tnext < Time::maxVal ()));
+        return ((dep.fedID.isFederate()) &&(dep.Tnext < Time::maxVal ()));
     });
 }
 

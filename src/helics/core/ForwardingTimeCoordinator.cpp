@@ -23,14 +23,14 @@ void ForwardingTimeCoordinator::enteringExecMode ()
     transmitTimingMessage (execreq);
 }
 
-static inline bool isBroker (federate_id id) { return ((id == 1) || (id >= 0x7000'0000)); }
+static inline bool isBroker (global_federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
 
 void ForwardingTimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
     Time minDe = minminDe;
-    federate_id minFed = invalid_fed_id;
+    global_federate_id_t minFed;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
     for (auto &dep : dependencies)
     {
@@ -59,7 +59,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
             }
             else if (dep.Tdemin == minminDe)
             {
-                minFed = invalid_fed_id;
+                minFed = global_federate_id_t();
             }
         }
         else
@@ -219,17 +219,17 @@ std::string ForwardingTimeCoordinator::printTimeStatus () const
       .str ();
 }
 
-bool ForwardingTimeCoordinator::isDependency (federate_id ofed) const
+bool ForwardingTimeCoordinator::isDependency (global_federate_id_t ofed) const
 {
     return dependencies.isDependency (ofed);
 }
 
-bool ForwardingTimeCoordinator::addDependency (federate_id fedID)
+bool ForwardingTimeCoordinator::addDependency (global_federate_id_t fedID)
 {
     return dependencies.addDependency (fedID);
 }
 
-bool ForwardingTimeCoordinator::addDependent (federate_id fedID)
+bool ForwardingTimeCoordinator::addDependent (global_federate_id_t fedID)
 {
     if (dependents.empty ())
     {
@@ -252,12 +252,12 @@ bool ForwardingTimeCoordinator::addDependent (federate_id fedID)
     return true;
 }
 
-void ForwardingTimeCoordinator::removeDependency (federate_id fedID)
+void ForwardingTimeCoordinator::removeDependency (global_federate_id_t fedID)
 {
     dependencies.removeDependency (fedID);
 }
 
-void ForwardingTimeCoordinator::removeDependent (federate_id fedID)
+void ForwardingTimeCoordinator::removeDependent (global_federate_id_t fedID)
 {
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep != dependents.end ())
@@ -269,14 +269,14 @@ void ForwardingTimeCoordinator::removeDependent (federate_id fedID)
     }
 }
 
-const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (federate_id ofed) const
+const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (global_federate_id_t ofed) const
 {
     return dependencies.getDependencyInfo (ofed);
 }
 
-std::vector<federate_id> ForwardingTimeCoordinator::getDependencies () const
+std::vector<global_federate_id_t> ForwardingTimeCoordinator::getDependencies () const
 {
-    std::vector<federate_id> deps;
+    std::vector<global_federate_id_t> deps;
     for (auto &dep : dependencies)
     {
         deps.push_back (dep.fedID);
@@ -313,7 +313,7 @@ iteration_state ForwardingTimeCoordinator::checkExecEntry ()
 }
 
 ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (const ActionMessage &msg,
-                                                                              federate_id iFed) const
+                                                                              global_federate_id_t iFed) const
 {
     ActionMessage nTime (msg);
     Time minNext = Time::maxVal ();
@@ -411,24 +411,24 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage (const ActionMess
     switch (cmd.action ())
     {
     case CMD_ADD_DEPENDENCY:
-        addDependency (cmd.source_id);
+        addDependency (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENCY:
-        removeDependency (cmd.source_id);
+        removeDependency (global_federate_id_t(cmd.source_id));
         break;
     case CMD_ADD_DEPENDENT:
-        addDependent (cmd.source_id);
+        addDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENT:
-        removeDependent (cmd.source_id);
+        removeDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_ADD_INTERDEPENDENCY:
-        addDependency (cmd.source_id);
-        addDependent (cmd.source_id);
+        addDependency (global_federate_id_t(cmd.source_id));
+        addDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_INTERDEPENDENCY:
-        removeDependency (cmd.source_id);
-        removeDependent (cmd.source_id);
+        removeDependency (global_federate_id_t(cmd.source_id));
+        removeDependent (global_federate_id_t(cmd.source_id));
         break;
     default:
         break;

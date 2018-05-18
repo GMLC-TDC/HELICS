@@ -47,8 +47,8 @@ class FederateState
     const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
-    federate_id local_id = invalid_fed_id;  //!< id code, default to something invalid
-    std::atomic<federate_id> global_id{invalid_fed_id};  //!< global id code, default to invalid
+    federate_id_t local_id;  //!< id code for the local federate descriptor
+    std::atomic<global_federate_id_t> global_id;  //!< global id code, default to invalid
 
   private:
     shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
@@ -85,7 +85,7 @@ class FederateState
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
-    std::vector<federate_id> delayedFederates;  //!< list of federates to delay messages from
+    std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
     std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
@@ -112,7 +112,7 @@ class FederateState
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay (federate_id id);
+    void addFederateToDelay (global_federate_id_t id);
 
   public:
     /** reset the federate to created state*/
@@ -204,9 +204,9 @@ class FederateState
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
-    void addDependency (federate_id fedToDependOn);
+    void addDependency (global_federate_id_t fedToDependOn);
     /** add a dependent federate*/
-    void addDependent (federate_id fedThatDependsOnThis);
+    void addDependent (global_federate_id_t fedThatDependsOnThis);
     /** specify the core object that manages this federate*/
   public:
     /** get the info structure for the federate
@@ -226,7 +226,7 @@ class FederateState
     const std::vector<Core::handle_id_t> &getEvents () const;
     /** get a reference to the global ids of dependent federates
      */
-    const std::vector<federate_id> &getDependents () const;
+    const std::vector<global_federate_id_t> &getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString() const { return errorString; }
     void setCoreObject (CommonCore *parent);

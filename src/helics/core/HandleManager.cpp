@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
+BasicHandleInfo &HandleManager::addHandle (federate_id_t fed_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &type,
@@ -20,7 +20,7 @@ BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
     return handles.back ();
 }
 
-BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
+BasicHandleInfo &HandleManager::addHandle (federate_id_t fed_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &target,
@@ -34,7 +34,7 @@ BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
     return handles.back ();
 }
 
-BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
+BasicHandleInfo &HandleManager::addHandle (federate_id_t fed_id,
                                            Core::handle_id_t local_id,
                                            handle_type_t what,
                                            const std::string &key,
@@ -48,7 +48,7 @@ BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
     return handles.back ();
 }
 
-BasicHandleInfo &HandleManager::addHandle (federate_id fed_id,
+BasicHandleInfo &HandleManager::addHandle (federate_id_t fed_id,
                                            Core::handle_id_t local_id,
                                            handle_type_t what,
                                            const std::string &key,
@@ -72,14 +72,14 @@ BasicHandleInfo *HandleManager::getHandleInfo (int32_t index)
 
     return nullptr;
 }
-static uint64_t generateSearchKey (federate_id fed_id, Core::handle_id_t id)
+static uint64_t generateSearchKey (federate_id_t fed_id, Core::handle_id_t id)
 {
     auto searchKey = static_cast<uint64_t> (fed_id) << 32;
     searchKey += static_cast<uint64_t> (id) & (0x0000'0000'FFFF'FFFF);
     return searchKey;
 }
 
-BasicHandleInfo *HandleManager::findHandle (federate_id fed_id, Core::handle_id_t id)
+BasicHandleInfo *HandleManager::findHandle (federate_id_t fed_id, Core::handle_id_t id)
 {
     auto key = generateSearchKey (fed_id, id);
     auto fnd = unique_ids.find (key);
@@ -110,10 +110,10 @@ BasicHandleInfo *HandleManager::getPublication (const std::string &name)
     return nullptr;
 }
 
-int32_t HandleManager::getLocalFedID (Core::handle_id_t id_) const
+federate_id_t HandleManager::getLocalFedID (Core::handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (id_, handles)) ? handles[id_].local_fed_id : invalid_fed_id;
+    return (isValidIndex (id_, handles)) ? handles[id_].local_fed_id : federate_id_t();
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)

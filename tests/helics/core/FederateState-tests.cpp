@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
-    BOOST_CHECK_EQUAL (fs->local_id, helics::invalid_fed_id);
-    BOOST_CHECK_EQUAL (fs->global_id, helics::invalid_fed_id);
+    BOOST_CHECK_EQUAL (fs->local_id, helics::federate_id_t());
+    BOOST_CHECK_EQUAL (fs->global_id, helics::global_federate_id_t());
     BOOST_CHECK_EQUAL (fs->init_requested, false);
     // BOOST_CHECK_EQUAL(fs->processing, false);
     BOOST_CHECK_EQUAL (fs->iterating, false);
@@ -189,9 +189,9 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     auto fs_process2 = std::async (std::launch::async,
                                    [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
     
-    fs->global_id = 0;  // if it doesn't match the id in the command, this will hang
+    fs->global_id = global_federate_id_t(0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait ();
-    fs->global_id = helics::invalid_fed_id;
+    fs->global_id = helics::global_federate_id_t();
     auto state = fs_process2.get();
    
     BOOST_CHECK (state == iteration_result::halted);

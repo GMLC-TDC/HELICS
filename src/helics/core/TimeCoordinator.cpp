@@ -443,11 +443,11 @@ std::string TimeCoordinator::printTimeStatus () const
       .str ();
 }
 
-bool TimeCoordinator::isDependency (federate_id ofed) const { return dependencies.isDependency (ofed); }
+bool TimeCoordinator::isDependency (global_federate_id_t ofed) const { return dependencies.isDependency (ofed); }
 
-bool TimeCoordinator::addDependency (federate_id fedID) { return dependencies.addDependency (fedID); }
+bool TimeCoordinator::addDependency (global_federate_id_t fedID) { return dependencies.addDependency (fedID); }
 
-bool TimeCoordinator::addDependent (federate_id fedID)
+bool TimeCoordinator::addDependent (global_federate_id_t fedID)
 {
     if (dependents.empty ())
     {
@@ -470,9 +470,9 @@ bool TimeCoordinator::addDependent (federate_id fedID)
     return true;
 }
 
-void TimeCoordinator::removeDependency (federate_id fedID) { dependencies.removeDependency (fedID); }
+void TimeCoordinator::removeDependency (global_federate_id_t fedID) { dependencies.removeDependency (fedID); }
 
-void TimeCoordinator::removeDependent (federate_id fedID)
+void TimeCoordinator::removeDependent (global_federate_id_t fedID)
 {
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep != dependents.end ())
@@ -484,14 +484,14 @@ void TimeCoordinator::removeDependent (federate_id fedID)
     }
 }
 
-DependencyInfo *TimeCoordinator::getDependencyInfo (federate_id ofed)
+DependencyInfo *TimeCoordinator::getDependencyInfo (global_federate_id_t ofed)
 {
     return dependencies.getDependencyInfo (ofed);
 }
 
-std::vector<federate_id> TimeCoordinator::getDependencies () const
+std::vector<global_federate_id_t> TimeCoordinator::getDependencies () const
 {
-    std::vector<federate_id> deps;
+    std::vector<global_federate_id_t> deps;
     deps.reserve (dependencies.size ());
     for (auto &dep : dependencies)
     {
@@ -568,7 +568,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
     return ret;
 }
 
-static bool isDelayableMessage (const ActionMessage &cmd, federate_id localId)
+static bool isDelayableMessage (const ActionMessage &cmd, global_federate_id_t localId)
 {
     return (((cmd.action () == CMD_TIME_GRANT) || (cmd.action () == CMD_EXEC_GRANT)) &&
             (cmd.source_id != localId));
@@ -582,7 +582,7 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
     }
     if (isDelayableMessage (cmd, source_id))
     {
-        auto dep = dependencies.getDependencyInfo (cmd.source_id);
+        auto dep = dependencies.getDependencyInfo (global_federate_id_t(cmd.source_id));
         if (dep == nullptr)
         {
             return message_process_result::no_effect;
@@ -674,24 +674,24 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     switch (cmd.action ())
     {
     case CMD_ADD_DEPENDENCY:
-        addDependency (cmd.source_id);
+        addDependency (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENCY:
-        removeDependency (cmd.source_id);
+        removeDependency (global_federate_id_t(cmd.source_id));
         break;
     case CMD_ADD_DEPENDENT:
-        addDependent (cmd.source_id);
+        addDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENT:
-        removeDependent (cmd.source_id);
+        removeDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_ADD_INTERDEPENDENCY:
-        addDependency (cmd.source_id);
-        addDependent (cmd.source_id);
+        addDependency (global_federate_id_t(cmd.source_id));
+        addDependent (global_federate_id_t(cmd.source_id));
         break;
     case CMD_REMOVE_INTERDEPENDENCY:
-        removeDependency (cmd.source_id);
-        removeDependent (cmd.source_id);
+        removeDependency (global_federate_id_t(cmd.source_id));
+        removeDependent (global_federate_id_t(cmd.source_id));
         break;
     default:
         break;

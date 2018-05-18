@@ -25,7 +25,7 @@ class PublicationInfo
   public:
     /** constructor from the basic information*/
     PublicationInfo (Core::handle_id_t id_,
-                     federate_id fed_id_,
+                     federate_id_t fed_id_,
                      const std::string &key_,
                      const std::string &type_,
                      const std::string &units_)
@@ -34,8 +34,8 @@ class PublicationInfo
     }
 
     const Core::handle_id_t id;  //!< the handle id
-    const federate_id fed_id;  //!< the identifier for the containing federate
-    std::vector<std::pair<federate_id, Core::handle_id_t>>
+    const federate_id_t fed_id;  //!< the identifier for the containing federate
+    std::vector<std::pair<federate_id_t, Core::handle_id_t>>
       subscribers;  //!< container for all the subscribers of a publication
     const std::string key;  //!< the key identifier for the publication
     const std::string type;  //!< the type of the publication data

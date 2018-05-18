@@ -42,7 +42,7 @@ class MessageFederateManager
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    MessageFederateManager (Core *coreOb, federate_id id);
+    MessageFederateManager (Core *coreOb, federate_id_t id);
     ~MessageFederateManager ();
     /** register an endpoint
     @details call is only valid in startup mode
@@ -144,7 +144,7 @@ class MessageFederateManager
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     std::atomic<endpoint_id_t::underlyingType> endpointCount{0};  //!< the count of actual endpoints
-    const federate_id fedID;  //!< storage for the federate ID
+    const federate_id_t fedID;  //!< storage for the federate ID
     mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
     std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
     guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages

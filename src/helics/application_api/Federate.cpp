@@ -103,7 +103,7 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) :
         coreObject->connect ();
     }
     fedID = coreObject->registerFederate (fi.name, fi);
-    if (fedID == helics::invalid_fed_id)
+    if (!fedID.isValid())
     {
         state = op_states::error;
         return;

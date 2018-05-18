@@ -52,7 +52,7 @@ struct subscription_info
 class ValueFederateManager
 {
   public:
-    ValueFederateManager (Core *coreOb, federate_id id);
+    ValueFederateManager (Core *coreOb, federate_id_t id);
     ~ValueFederateManager ();
 
     publication_id_t
@@ -186,7 +186,7 @@ class ValueFederateManager
     std::vector<data_view> lastData;  //!< the last data to arrive
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
-    federate_id fedID;  //!< the federation ID from the core API
+    federate_id_t fedID;  //!< the federation ID from the core API
     std::atomic<subscription_id_t::underlyingType> subscriptionCount{0};  //!< the count of actual endpoints
     int allCallbackIndex = -1;  //!< index of the allCallback function
 

@@ -26,16 +26,16 @@ class ForwardingTimeCoordinator
 
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
-    federate_id lastMinFed = invalid_fed_id;  //!< the latest minimum fed
+   global_federate_id_t lastMinFed;  //!< the latest minimum fed
     // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a
     // ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<federate_id> dependents;  //!< federates which temporally depend on this federate
+    std::vector<global_federate_id_t> dependents;  //!< federates which temporally depend on this federate
 
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    federate_id
+    global_federate_id_t
       source_id;  //!< the identifier for inserting into the source id field of any generated messages;
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
@@ -50,9 +50,9 @@ class ForwardingTimeCoordinator
     }
 
     /** get a list of actual dependencies*/
-    std::vector<federate_id> getDependencies () const;
+    std::vector<global_federate_id_t> getDependencies () const;
     /** get a reference to the dependents vector*/
-    const std::vector<federate_id> &getDependents () const { return dependents; }
+    const std::vector<global_federate_id_t> &getDependents () const { return dependents; }
 
     /** compute updates to time values
     and send an update if needed
@@ -62,9 +62,9 @@ class ForwardingTimeCoordinator
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
     */
-    const DependencyInfo *getDependencyInfo (federate_id ofed) const;
+    const DependencyInfo *getDependencyInfo (global_federate_id_t ofed) const;
     /** check whether a federate is a dependency*/
-    bool isDependency (federate_id ofed) const;
+    bool isDependency (global_federate_id_t ofed) const;
 
   private:
     /**send out the latest time request command*/
@@ -72,7 +72,7 @@ class ForwardingTimeCoordinator
     void transmitTimingMessage (ActionMessage &msg) const;
     /** generate a new timing request message by recalculating the times ignoring a particular brokers input
      */
-    ActionMessage generateTimeRequestIgnoreDependency (const ActionMessage &msg, federate_id iFed) const;
+    ActionMessage generateTimeRequestIgnoreDependency (const ActionMessage &msg, global_federate_id_t iFed) const;
 
   public:
     /** process a message related to time
@@ -85,17 +85,17 @@ class ForwardingTimeCoordinator
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency (federate_id fedID);
+    bool addDependency (global_federate_id_t fedID);
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent (federate_id fedID);
+    bool addDependent (global_federate_id_t fedID);
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency (federate_id fedID);
+    void removeDependency (global_federate_id_t fedID);
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent (federate_id fedID);
+    void removeDependent (global_federate_id_t fedID);
 
     /** check if entry to the executing state can be granted*/
     iteration_state checkExecEntry ();

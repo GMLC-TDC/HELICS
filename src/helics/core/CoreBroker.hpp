@@ -31,8 +31,8 @@ class BasicFedInfo
 {
   public:
     std::string name;  //!< name of the federate
-    federate_id global_id;  //!< the identification code for the federate
-    int32_t route_id = invalid_fed_id;  //!< the routing information for data to be sent to the federate
+    global_federate_id_t global_id;  //!< the identification code for the federate
+    int32_t route_id = -10;  //!< the routing information for data to be sent to the federate
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -42,8 +42,8 @@ class BasicBrokerInfo
   public:
     std::string name;  //!< the name of the broker
 
-    federate_id global_id;  //!< the global identifier for the broker
-    int32_t route_id = invalid_fed_id;  //!< the identifier for the route to take to the broker
+    global_broker_id_t global_id;  //!< the global identifier for the broker
+    int32_t route_id = -10;  //!< the identifier for the route to take to the broker
 
     bool _initRequested = false;  //!< flag indicating the broker has requesting initialization
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
@@ -75,8 +75,8 @@ class CoreBroker : public Broker, public BrokerBase
     bool _gateway = false;  //!< set to true if this broker should act as a gateway.
   private:
     bool _isRoot = false;  //!< set to true if this object is a root broker
-    DualMappedVector<BasicFedInfo, std::string, federate_id> _federates;  //!< container for all federates
-    DualMappedVector<BasicBrokerInfo, std::string, federate_id>
+    DualMappedVector<BasicFedInfo, std::string, global_federate_id_t> _federates;  //!< container for all federates
+    DualMappedVector<BasicBrokerInfo, std::string, global_broker_id_t>
       _brokers;  //!< container for all the broker information
     std::string previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
@@ -84,8 +84,8 @@ class CoreBroker : public Broker, public BrokerBase
 
     std::vector<std::pair<std::string, int32_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::map<federate_id, int32_t> global_id_translation;  //!< map to translate global ids to local ones
-    std::map<federate_id, int32_t>
+    std::map<global_federate_id_t, int32_t> global_id_translation;  //!< map to translate global ids to local ones
+    std::map<global_federate_id_t, int32_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, int32_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
@@ -108,7 +108,7 @@ class CoreBroker : public Broker, public BrokerBase
     void transmitDelayedMessages ();
     /**function for routing a message,  it will override the destination id with the specified argument
      */
-    void routeMessage (ActionMessage &cmd, federate_id dest);
+    void routeMessage (ActionMessage &cmd, global_federate_id_t dest);
     /** function for routing a message from based on the destination specified in the ActionMessage*/
     void routeMessage (const ActionMessage &cmd);
 
@@ -218,10 +218,10 @@ class CoreBroker : public Broker, public BrokerBase
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer (const std::string &query) const;
     /** locate the route to take to a particular federate*/
-    int32_t getRoute (federate_id fedid) const;
-    const BasicBrokerInfo *getBrokerById (federate_id fedid) const;
+    int32_t getRoute (global_federate_id_t fedid) const;
+    const BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid) const;
 
-    BasicBrokerInfo *getBrokerById (federate_id fedid);
+    BasicBrokerInfo *getBrokerById (global_broker_id_t fedid);
 
     void addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m);
     void addPublication (ActionMessage &m);

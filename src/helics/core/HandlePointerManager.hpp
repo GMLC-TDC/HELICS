@@ -30,13 +30,13 @@ class HandlePointerManager
     /** default constructor*/
     HandlePointerManager () = default;
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (federate_id fed_id,
+    BasicHandleInfo *addHandle (federate_id_t fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo *addHandle (federate_id fed_id,
+    BasicHandleInfo *addHandle (federate_id_t fed_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
@@ -48,7 +48,7 @@ class HandlePointerManager
     BasicHandleInfo *getSubscription (const std::string &name) const;
     BasicHandleInfo *getPublication (const std::string &name) const;
 
-    int32_t getLocalFedID (Core::handle_id_t id_) const;
+    federate_id_t getLocalFedID (Core::handle_id_t id_) const;
     auto begin () { return handles.begin (); }
     auto end () { return handles.end (); }
     auto begin () const { return handles.begin (); }

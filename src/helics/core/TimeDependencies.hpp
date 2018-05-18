@@ -28,8 +28,8 @@ class DependencyInfo
         time_requested = 5,
     };
 
-    federate_id fedID = invalid_fed_id;  //!< identifier for the dependency
-    federate_id minFed = invalid_fed_id;  //!< identifier for the min dependency
+    global_federate_id_t fedID;  //!< identifier for the dependency
+    global_federate_id_t minFed;  //!< identifier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
 
     Time Tnext = negEpsilon;  //!< next possible message or value
@@ -39,7 +39,7 @@ class DependencyInfo
     /** default constructor*/
     DependencyInfo () = default;
     /** construct from a federate id*/
-    explicit DependencyInfo (federate_id id) : fedID (id){};
+    explicit DependencyInfo (global_federate_id_t id) : fedID (id){};
 
     /** process a dependency related message
     @param m  a reference to an action message that contains some instructions for modifying dependencies
@@ -56,13 +56,13 @@ class TimeDependencies
     /** default constructor*/
     TimeDependencies () = default;
     /** return true if the given federate is already a member*/
-    bool isDependency (federate_id ofed) const;
+    bool isDependency (global_federate_id_t ofed) const;
     /** insert a dependency into the structure
     @return true if the dependency was added, false if it existed already
     */
-    bool addDependency (federate_id id);
+    bool addDependency (global_federate_id_t id);
     /** remove  dependency from consideration*/
-    void removeDependency (federate_id id);
+    void removeDependency (global_federate_id_t id);
     /** update the info about a dependency based on a message*/
     bool updateTime (const ActionMessage &m);
     /** get the number of dependencies*/
@@ -81,10 +81,10 @@ class TimeDependencies
     auto cend () const { return dependencies.cend (); }
 
     /** get a pointer to the dependency information for a particular object*/
-    const DependencyInfo *getDependencyInfo (federate_id id) const;
+    const DependencyInfo *getDependencyInfo (global_federate_id_t id) const;
 
     /** get a pointer to the dependency information for a particular object*/
-    DependencyInfo *getDependencyInfo (federate_id id);
+    DependencyInfo *getDependencyInfo (global_federate_id_t id);
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry (bool iterating) const;

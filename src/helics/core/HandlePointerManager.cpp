@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-BasicHandleInfo *HandlePointerManager::addHandle (federate_id fed_id,
+BasicHandleInfo *HandlePointerManager::addHandle (federate_id_t fed_id,
                                                   handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &type,
@@ -21,7 +21,7 @@ BasicHandleInfo *HandlePointerManager::addHandle (federate_id fed_id,
     return hpointer;
 }
 
-BasicHandleInfo *HandlePointerManager::addHandle (federate_id fed_id,
+BasicHandleInfo *HandlePointerManager::addHandle (federate_id_t fed_id,
                                                   handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &target,
@@ -86,10 +86,10 @@ BasicHandleInfo *HandlePointerManager::getPublication (const std::string &name) 
     return nullptr;
 }
 
-int32_t HandlePointerManager::getLocalFedID (Core::handle_id_t id_) const
+federate_id_t HandlePointerManager::getLocalFedID (Core::handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (id_, handles)) ? handles[id_]->local_fed_id : invalid_fed_id;
+    return (isValidIndex (id_, handles)) ? handles[id_]->local_fed_id : federate_id_t();
 }
 
 void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)

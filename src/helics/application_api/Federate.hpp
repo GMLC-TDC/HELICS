@@ -103,8 +103,7 @@ class Federate
     std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
-    int32_t fedID = -2'000'000'000;  //!< the federate ID of the object for use in the core
-
+    federate_id_t fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime;  //!< the current simulation time
