@@ -1,6 +1,6 @@
 /*
     Copyright (c) 2016-2017 ZeroMQ community
-    Copyright (c) 2016 VOCA AS / Harald Nøkland
+    Copyright (c) 2016 VOCA AS / Harald NÃ¸kland
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to
@@ -38,7 +38,7 @@ namespace zmq
 /*
     This class handles multipart messaging. It is the C++ equivalent of zmsg.h,
     which is part of CZMQ (the high-level C binding). Furthermore, it is a major
-    improvement compared to zmsg.hpp, which is part of the examples in the ØMQ
+    improvement compared to zmsg.hpp, which is part of the examples in the Ã˜MQ
     Guide. Unnecessary copying is avoided by using move semantics to efficiently
     add/remove parts.
 */
@@ -308,6 +308,7 @@ class multipart_t
                 continue;
             }
             for (size_t j = 0; j < message_size; j++) {
+
                 if (isText)
                     ss << static_cast<char>(data[j]);
                 else
