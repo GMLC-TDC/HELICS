@@ -1879,7 +1879,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
     LOG_TRACE (
-      global_broker_id, getIdentifier (),
+      global_broker_id_local, getIdentifier (),
       (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
     switch (command.action ())
     {
@@ -1889,10 +1889,10 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         auto fed = getFederate (command.name);
         loopFederates.insert (command.name, nullptr, fed);
     }
-        if (global_broker_id != 0)
+        if (global_broker_id_local != parent_broker_id)
         {
             // forward on to Broker
-            command.source_id = global_broker_id;
+            command.source_id = global_broker_id_local;
             transmit (0, command);
         }
         else
@@ -1904,7 +1904,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
-        LOG_WARNING (0, identifier, "Core received reg broker message, likely improper federation setup\n");
+        LOG_WARNING (parent_broker_id, identifier, "Core received reg broker message, likely improper federation setup\n");
         transmit (0, command);
         break;
     case CMD_BROKER_ACK:
@@ -1912,13 +1912,14 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         {
             if (checkActionFlag (command, error_flag))
             {
-                LOG_ERROR (0, identifier, "broker responded with error\n");
+                LOG_ERROR (parent_broker_id, identifier, "broker responded with error\n");
                 // TODO:generate error messages in response to all the delayed messages
                 break;
             }
-            global_broker_id = command.dest_id;
-            timeCoord->source_id = global_broker_id;
-            higher_broker_id = command.source_id;
+            global_broker_id = global_broker_id_t(command.dest_id);
+            global_broker_id_local = global_broker_id_t(command.dest_id);
+            timeCoord->source_id = global_broker_id_local;
+            higher_broker_id = global_broker_id_t(command.source_id);
             transmitDelayedMessages ();
         }
         break;

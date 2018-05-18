@@ -322,13 +322,14 @@ void BrokerBase::queueProcessingLoop ()
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
     active = std::make_pair(true, true);
     ticktimer.async_wait (timerCallback);
+    global_broker_id_local = global_broker_id.load();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
         if (dumplog)
         {
             for (auto &act : dumpMessages)
             {
-                sendToLogger (0, -10, identifier,
+                sendToLogger (parent_broker_id, -10, identifier,
                               (boost::format ("|| dl cmd:%s from %d to %d") % prettyPrintString (act) %
                                act.source_id % act.dest_id)
                                 .str ());
