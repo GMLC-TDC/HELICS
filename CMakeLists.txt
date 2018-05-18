@@ -390,24 +390,6 @@ install (EXPORT helics-targets
 	COMPONENT libs
 	)
 
-set(helics_dependencies ${Boost_LIBRARIES_core})
-
-IF (UNIX AND NOT APPLE)
-	list(APPEND helics_dependencies rt)
-ENDIF()
-
-IF(MSYS)
-	list(APPEND helics_dependencies wsock32 ws2_32)
-ENDIF(MSYS)
-
-if (HELICS_HAVE_ZEROMQ)
-	list(APPEND helics_dependencies ${ZeroMQ_DEPENDENCY})
-endif(HELICS_HAVE_ZEROMQ)
-
-if (HELICS_HAVE_MPI)
-	list(APPEND helics_dependencies ${MPI_C_LIBRARIES})
-endif(HELICS_HAVE_MPI)
-
 #-----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 #-----------------------------------------------------------------------------
@@ -420,7 +402,7 @@ configure_file (
   install(FILES ${PROJECT_BINARY_DIR}/libs/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
 		COMPONENT headers)
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-		COMPONENT headers)
+		COMPONENT headers) 
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 		COMPONENT headers)
@@ -440,6 +422,12 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Conf
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
               DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
+			  COMPONENT libs)
+#install required additional cmake files
+install(FILES config/cmake/addZeroMQ.cmake 
+			  config/cmake/addMPI.cmake
+			  config/cmake/FindZeroMQ.cmake 
+			  DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 			  COMPONENT libs)
 
 if (CMAKE_INSTALL_PREFIX)

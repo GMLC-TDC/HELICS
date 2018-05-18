@@ -31,8 +31,6 @@ endif()
 set(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
 set(${PN}_STATIC_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file_debug@")
 
-set(${PN}_DEPENDENCIES "@helics_dependencies@")
-
 find_program(HELICS_PLAYER helics_player 
 	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
 	NO_DEFAULT_PATH)
@@ -49,6 +47,16 @@ find_program(HELICS_BROKER helics_broker
 	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
 	NO_DEFAULT_PATH)
 	
+set(HELICS_HAVE_ZEROMQ @HELICS_HAVE_ZEROMQ)
+set(HELICS_HAVE_MPI @HELICS_HAVE_MPI)
+
+if (HELICS_HAVE_ZEROMQ)
+	include(addZeroMQ)
+endif()
+
+if (HELICS_HAVE_MPI)
+	include(addMPI)
+endif()
 include(CMakeFindDependencyMacro)
 #find_dependency(ZeroMQ)
 
