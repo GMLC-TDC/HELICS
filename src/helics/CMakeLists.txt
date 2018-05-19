@@ -26,7 +26,7 @@ IF(BUILD_CXX_SHARED_LIB)
 	#endif()
 
 	add_library(helics-shared SHARED
-	src/empty.cpp
+	../empty.cpp
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
