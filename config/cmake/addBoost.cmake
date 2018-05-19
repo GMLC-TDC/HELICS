@@ -196,6 +196,6 @@ else()
 	set_target_properties(Boostlibs::test PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}")
 endif()
 
-message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}")
-message(STATUS "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")
+#message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}")
+#message(STATUS "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")
 

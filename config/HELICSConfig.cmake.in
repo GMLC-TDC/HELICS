@@ -50,18 +50,37 @@ find_program(HELICS_BROKER helics_broker
 set(HELICS_HAVE_ZEROMQ @HELICS_HAVE_ZEROMQ)
 set(HELICS_HAVE_MPI @HELICS_HAVE_MPI)
 
+set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
+
+include(CMakeFindDependencyMacro)
+
+if (NOT Boostlibs::core)
+	include(addBoost)
+endif()
+
 if (HELICS_HAVE_ZEROMQ)
-	include(addZeroMQ)
+	if (NOT libzmq)
+		set(ZeroMQ_LIBRARY_ONLY ON)
+		set(ZeroMQ_INSTALL_PATH ${PACKAGE_PREFIX_DIR})
+		find_dependency(ZeroMQ)
+	endif()
 endif()
 
 if (HELICS_HAVE_MPI)
-	include(addMPI)
+	if (NOT MPI::MPI_C)
+		include(addMPI)
+	endif()
 endif()
-include(CMakeFindDependencyMacro)
+
 #find_dependency(ZeroMQ)
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+if (NOT Threads::Threads)
+	if (NOT WIN32)
+		set(THREADS_PREFER_PTHREAD_FLAG ON)
+	endif(NOT WIN32)
+	find_dependency(Threads REQUIRED)
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
 
 check_required_components(${PN})
