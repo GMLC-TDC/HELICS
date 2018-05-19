@@ -61,7 +61,6 @@ add_executable(helics_broker helics-broker.cpp)
 
 endif()
 
-
 	add_executable(helics_app appMain.cpp)
 	target_link_libraries(helics_app helics_apps-static)
 	set_target_properties (helics_app PROPERTIES FOLDER apps)
@@ -73,6 +72,7 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_app>/")                 # <--this is out-file path
 endforeach(keyfile)
+
 endif()
 
 
@@ -98,6 +98,4 @@ target_include_directories(helics-config SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 install(TARGETS helics-config
 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
 )
-
-
 
