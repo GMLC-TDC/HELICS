@@ -160,6 +160,8 @@ std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
+/**centralized error handler for the C interface*/
+helics_status helicsErrorHandler() noexcept;
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder

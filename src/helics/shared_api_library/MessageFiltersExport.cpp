@@ -251,15 +251,22 @@ helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int
     {
         return helics_invalid_object;
     }
-    auto target = filter->getTarget ();
-    if (static_cast<int> (target.size ()) > maxlen)
+    try
     {
-        strncpy (outputString, target.c_str (), maxlen);
-        outputString[maxlen - 1] = 0;
-        return helics_warning;
+        auto target = filter->getTarget ();
+        if (static_cast<int> (target.size ()) > maxlen)
+        {
+            strncpy (outputString, target.c_str (), maxlen);
+            outputString[maxlen - 1] = 0;
+            return helics_warning;
+        }
+        strcpy (outputString, target.c_str ());
+        return helics_ok;
     }
-    strcpy (outputString, target.c_str ());
-    return helics_ok;
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 /** get the name of the filter*/
@@ -270,15 +277,22 @@ helics_status helicsFilterGetName (helics_filter filt, char *outputString, int m
     {
         return helics_invalid_object;
     }
-    auto name = filter->getTarget ();
-    if (static_cast<int> (name.size ()) > maxlen)
+    try
     {
-        strncpy (outputString, name.c_str (), maxlen);
-        outputString[maxlen - 1] = 0;
-        return helics_warning;
+        auto name = filter->getTarget ();
+        if (static_cast<int> (name.size ()) > maxlen)
+        {
+            strncpy (outputString, name.c_str (), maxlen);
+            outputString[maxlen - 1] = 0;
+            return helics_warning;
+        }
+        strcpy (outputString, name.c_str ());
+        return helics_ok;
     }
-    strcpy (outputString, name.c_str ());
-    return helics_ok;
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterSet (helics_filter filt, const char *property, double val)
@@ -292,8 +306,15 @@ helics_status helicsFilterSet (helics_filter filt, const char *property, double 
     {
         return helics_invalid_argument;
     }
-    filter->set (property, val);
-    return helics_ok;
+    try
+    {
+        filter->set (property, val);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val)
@@ -307,8 +328,15 @@ helics_status helicsFilterSetString (helics_filter filt, const char *property, c
     {
         return helics_invalid_argument;
     }
-    filter->setString (property, val);
-    return helics_ok;
+    try
+    {
+        filter->setString (property, val);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest)
@@ -327,9 +355,9 @@ helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *
         cfilt->addDestinationTarget (dest);
         return helics_ok;
     }
-    catch (const helics::InvalidFunctionCall &ifc)
+    catch (...)
     {
-        return helics_invalid_function_call;
+        return helicsErrorHandler ();
     }
 }
 
@@ -349,9 +377,9 @@ helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *src)
         cfilt->addSourceTarget (src);
         return helics_ok;
     }
-    catch (const helics::InvalidFunctionCall &ifc)
+    catch (...)
     {
-        return helics_invalid_function_call;
+        return helicsErrorHandler ();
     }
 }
 
@@ -366,8 +394,15 @@ helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *d
     {
         return helics_invalid_argument;
     }
-    cfilt->addDeliveryEndpoint (delivery);
-    return helics_ok;
+    try
+    {
+        cfilt->addDeliveryEndpoint (delivery);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest)
@@ -381,8 +416,15 @@ helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const cha
     {
         return helics_invalid_argument;
     }
-    cfilt->removeDestinationTarget (dest);
-    return helics_ok;
+    try
+    {
+        cfilt->removeDestinationTarget (dest);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source)
@@ -396,8 +438,15 @@ helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *so
     {
         return helics_invalid_argument;
     }
-    cfilt->removeSourceTarget (source);
-    return helics_ok;
+    try
+    {
+        cfilt->removeSourceTarget (source);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *delivery)
@@ -411,6 +460,13 @@ helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char
     {
         return helics_invalid_argument;
     }
-    cfilt->removeDeliveryEndpoint (delivery);
-    return helics_ok;
+    try
+    {
+        cfilt->removeDeliveryEndpoint (delivery);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }

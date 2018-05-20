@@ -76,9 +76,16 @@ helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, con
     {
         return helics_invalid_object;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    endObj->endptr->setTargetDestination (dest);
-    return helics_ok;
+    try
+    {
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        endObj->endptr->setTargetDestination (dest);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength)
@@ -87,31 +94,38 @@ helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char
     {
         return helics_invalid_object;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((data == nullptr) || (inputDataLength <= 0))
+    try
     {
-        if ((dest == nullptr) || (std::string (dest).empty ()))
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        if ((data == nullptr) || (inputDataLength <= 0))
         {
-            endObj->endptr->send (std::string ());
+            if ((dest == nullptr) || (std::string (dest).empty ()))
+            {
+                endObj->endptr->send (std::string ());
+            }
+            else
+            {
+                endObj->endptr->send (dest, std::string ());
+            }
         }
         else
         {
-            endObj->endptr->send (dest, std::string ());
+            if ((dest == nullptr) || (std::string (dest).empty ()))
+            {
+                endObj->endptr->send ((const char *)data, inputDataLength);
+            }
+            else
+            {
+                endObj->endptr->send (dest, (const char *)data, inputDataLength);
+            }
         }
-    }
-    else
-    {
-        if ((dest == nullptr) || (std::string (dest).empty ()))
-        {
-            endObj->endptr->send ((const char *)data, inputDataLength);
-        }
-        else
-        {
-            endObj->endptr->send (dest, (const char *)data, inputDataLength);
-        }
-    }
 
-    return helics_ok;
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status
@@ -121,31 +135,38 @@ helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const vo
     {
         return helics_invalid_object;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    if ((data == nullptr) || (inputDataLength <= 0))
+    try
     {
-        if ((dest == nullptr) || (std::string (dest).empty ()))
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        if ((data == nullptr) || (inputDataLength <= 0))
         {
-            endObj->endptr->send (std::string (), time);
+            if ((dest == nullptr) || (std::string (dest).empty ()))
+            {
+                endObj->endptr->send (std::string (), time);
+            }
+            else
+            {
+                endObj->endptr->send (dest, std::string (), time);
+            }
         }
         else
         {
-            endObj->endptr->send (dest, std::string (), time);
+            if ((dest == nullptr) || (std::string (dest).empty ()))
+            {
+                endObj->endptr->send ((const char *)data, inputDataLength, time);
+            }
+            else
+            {
+                endObj->endptr->send (dest, (const char *)data, inputDataLength, time);
+            }
         }
-    }
-    else
-    {
-        if ((dest == nullptr) || (std::string (dest).empty ()))
-        {
-            endObj->endptr->send ((const char *)data, inputDataLength, time);
-        }
-        else
-        {
-            endObj->endptr->send (dest, (const char *)data, inputDataLength, time);
-        }
-    }
 
-    return helics_ok;
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message)
@@ -158,18 +179,24 @@ helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *me
     {
         return helics_invalid_object;
     }
-
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    // TODO this isn't correct yet (need to translate to a Message_view if origSrc is not this name
-    if (message->dest == nullptr)
+    try
     {
-        endObj->endptr->send (message->data, message->length, message->time);
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        // TODO this isn't correct yet (need to translate to a Message_view if origSrc is not this name
+        if (message->dest == nullptr)
+        {
+            endObj->endptr->send (message->data, message->length, message->time);
+        }
+        else
+        {
+            endObj->endptr->send (message->dest, message->data, message->length, message->time);
+        }
+        return helics_ok;
     }
-    else
+    catch (...)
     {
-        endObj->endptr->send (message->dest, message->data, message->length, message->time);
+        return helicsErrorHandler ();
     }
-    return helics_ok;
 }
 
 helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, const char *type)
@@ -178,10 +205,17 @@ helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key
     {
         return helics_error;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+    try
+    {
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
 
-    endObj->endptr->subscribe (key, (type == nullptr) ? nullStr : std::string (type));
-    return helics_ok;
+        endObj->endptr->subscribe (key, (type == nullptr) ? nullStr : std::string (type));
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
 }
 
 helics_bool_t helicsFederateHasMessage (helics_federate fed)
@@ -311,18 +345,25 @@ helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputStrin
     {
         return helics_invalid_argument;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    auto type = endObj->endptr->getType ();
-    if (static_cast<int> (type.size ()) > maxlen)
+    try
     {
-        strncpy (outputString, type.c_str (), maxlen);
-        outputString[maxlen - 1] = 0;
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        auto type = endObj->endptr->getType ();
+        if (static_cast<int> (type.size ()) > maxlen)
+        {
+            strncpy (outputString, type.c_str (), maxlen);
+            outputString[maxlen - 1] = 0;
+        }
+        else
+        {
+            strcpy (outputString, type.c_str ());
+        }
+        return helics_ok;
     }
-    else
+    catch (...)
     {
-        strcpy (outputString, type.c_str ());
+        return helicsErrorHandler ();
     }
-    return helics_ok;
 }
 
 helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen)
@@ -335,18 +376,25 @@ helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputStrin
     {
         return helics_invalid_argument;
     }
-    auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    auto type = endObj->endptr->getName ();
-    if (static_cast<int> (type.size ()) > maxlen)
+    try
     {
-        strncpy (outputString, type.c_str (), maxlen);
-        outputString[maxlen - 1] = 0;
+        auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
+        auto type = endObj->endptr->getName ();
+        if (static_cast<int> (type.size ()) > maxlen)
+        {
+            strncpy (outputString, type.c_str (), maxlen);
+            outputString[maxlen - 1] = 0;
+        }
+        else
+        {
+            strcpy (outputString, type.c_str ());
+        }
+        return helics_ok;
     }
-    else
+    catch (...)
     {
-        strcpy (outputString, type.c_str ());
+        return helicsErrorHandler ();
     }
-    return helics_ok;
 }
 
 int helicsFederateGetEndpointCount (helics_federate fed)
