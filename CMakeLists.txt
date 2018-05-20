@@ -16,7 +16,7 @@ set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD )
 set (HELICS_DATE "05-09-18")
 
-if (HELICS_VERSION_BUILD)
+if (NOT HELICS_VERSION_BUILD)
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 	set (HELICS_VERSION_UNDERSCORE "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}")
 else()
@@ -48,6 +48,8 @@ endif()
 SHOW_VARIABLE(AUTOBUILD_INSTALL_PATH PATH
   "location to install the autobuild libraries and Headers" "${PROJECT_BINARY_DIR}/libs")
 
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
+
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
@@ -74,11 +76,8 @@ else()
 	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
-
-#IF(NOT MSVC)
-	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
-	mark_as_advanced(BUILD_CXX_SHARED_LIB)
-#ENDIF()
+OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+mark_as_advanced(BUILD_CXX_SHARED_LIB)
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 	set(BUILD_SHARED_LIBS ON)
@@ -162,9 +161,6 @@ if (GENERATE_DOXYGEN_DOC)
 	endif(DOXYGEN_FOUND)
 endif (GENERATE_DOXYGEN_DOC)
 
-FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-
-
 
 
 # -------------------------------------------------------------
@@ -196,7 +192,9 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 if (NOT WIN32)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
-endif(NOT WIN32)
+elseif (MSYS)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif()
 find_package(Threads REQUIRED)
 
 target_link_libraries(helics_base INTERFACE Threads::Threads)
