@@ -727,10 +727,7 @@ helics::FedObject::~FedObject ()
     {
         delete pub;
     }
-    for (auto ept : epts)
-    {
-        delete ept;
-    }
+    epts.clear();
     for (auto filt : filters)
     {
         delete filt;

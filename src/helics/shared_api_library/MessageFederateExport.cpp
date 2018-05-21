@@ -13,10 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-static inline void addEndpoint (helics_federate fed, helics::EndpointObject *ept)
+static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    fedObj->epts.push_back (ept);
+    fedObj->epts.push_back (std::move(ept));
 }
 
 static const std::string nullStr;
@@ -28,19 +28,19 @@ helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed, const char 
     {
         return nullptr;
     }
-    helics::EndpointObject *end = nullptr;
     try
     {
-        end = new helics::EndpointObject ();
+        auto end = std::make_unique<helics::EndpointObject> ();
         end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
                                                           (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
-        addEndpoint (fed, end);
-        return reinterpret_cast<helics_endpoint> (end);
+        auto ret = reinterpret_cast<helics_endpoint> (end.get());
+        addEndpoint (fed, std::move(end));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete end;
+        return nullptr;
     }
     return nullptr;
 }
@@ -53,19 +53,19 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const
     {
         return nullptr;
     }
-    helics::EndpointObject *end = nullptr;
     try
     {
-        end = new helics::EndpointObject ();
+        auto end = std::make_unique<helics::EndpointObject>();
         end->endptr = std::make_unique<helics::Endpoint> (helics::GLOBAL, fedObj.get (), (name != nullptr) ? std::string (name) : nullStr,
                                                           (type == nullptr) ? nullStr : std::string (type));
         end->fedptr = std::move (fedObj);
-        addEndpoint (fed, end);
-        return reinterpret_cast<helics_endpoint> (end);
+        auto ret = reinterpret_cast<helics_endpoint> (end.get());
+        addEndpoint(fed, std::move(end));
+        return ret;
     }
-    catch (const helics::InvalidFunctionCall &)
+    catch (...)
     {
-        delete end;
+        return nullptr;
     }
     return nullptr;
 }

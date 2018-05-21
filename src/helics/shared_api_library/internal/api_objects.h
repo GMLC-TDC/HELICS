@@ -80,7 +80,7 @@ namespace helics
 		std::unique_ptr<Message> lastMessage;
         std::vector<SubscriptionObject *> subs;
         std::vector<PublicationObject *> pubs;
-        std::vector<EndpointObject *> epts;
+        std::vector<std::unique_ptr<EndpointObject>> epts;
         std::vector<FilterObject *> filters;
         FedObject() = default;
         ~FedObject();
