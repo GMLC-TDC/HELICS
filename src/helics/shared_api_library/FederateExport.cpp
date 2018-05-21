@@ -110,7 +110,7 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
     }
     FedI->type = helics::vtype::valueFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -128,7 +128,7 @@ helics_federate helicsCreateValueFederateFromJson (const char *json)
     }
     FedI->type = helics::vtype::valueFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -154,7 +154,7 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
     }
     FedI->type = helics::vtype::messageFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -173,7 +173,7 @@ helics_federate helicsCreateMessageFederateFromJson (const char *json)
     }
     FedI->type = helics::vtype::messageFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -199,7 +199,7 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
     }
     FedI->type = helics::vtype::combinationFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -218,7 +218,7 @@ helics_federate helicsCreateCombinationFederateFromJson (const char *json)
 
     FedI->type = helics::vtype::combinationFed;
     FedI->valid = fedValidationIdentifier;
-    auto fed = reinterpret_cast<void *> (FedI.get ());
+    auto fed = reinterpret_cast<helics_federate> (FedI.get ());
     getMasterHolder ()->addFed (std::move (FedI));
     return (fed);
 }
@@ -235,7 +235,7 @@ helics_federate helicsFederateClone (helics_federate fed)
 
     fedClone->type = fedObj->type;
     fedClone->valid = fedObj->valid;
-    auto fedB = reinterpret_cast<void *> (fedClone.get ());
+    auto fedB = reinterpret_cast<helics_federate> (fedClone.get ());
     getMasterHolder ()->addFed (std::move (fedClone));
     return (fedB);
 }

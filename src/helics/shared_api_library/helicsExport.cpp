@@ -719,28 +719,18 @@ void helicsFederateFree (helics_federate fed)
 
 helics::FedObject::~FedObject ()
 {
-    for (auto sub : subs)
-    {
-        delete sub;
-    }
-    for (auto pub : pubs)
-    {
-        delete pub;
-    }
+    //we want to remove the values in the arrays before deleting the fedptr
+    // and we want to do it inside this function to ensure it does so in a consistent manner
+    subs.clear();
+    pubs.clear();
     epts.clear();
-    for (auto filt : filters)
-    {
-        delete filt;
-    }
+    filters.clear();
     fedptr = nullptr;
 }
 
 helics::CoreObject::~CoreObject ()
 {
-    for (auto filt : filters)
-    {
-        delete filt;
-    }
+    filters.clear();
     coreptr = nullptr;
 }
 
@@ -768,20 +758,22 @@ helics_query helicsCreateQuery (const char *target, const char *query)
     return reinterpret_cast<void *> (queryObj);
 }
 
+constexpr auto invalidStringConst = "#invalid";
+
 const char *helicsQueryExecute (helics_query query, helics_federate fed)
 {
     if (fed == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     if (query == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);

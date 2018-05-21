@@ -12,16 +12,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-static inline void addSubscription (helics_federate fed, helics::SubscriptionObject *sub)
+static inline void addSubscription (helics_federate fed, std::unique_ptr<helics::SubscriptionObject> sub)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    fedObj->subs.push_back (sub);
+    fedObj->subs.push_back (std::move (sub));
 }
 
-static inline void addPublication (helics_federate fed, helics::PublicationObject *pub)
+static inline void addPublication (helics_federate fed, std::unique_ptr<helics::PublicationObject> pub)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
-    fedObj->pubs.push_back (pub);
+    fedObj->pubs.push_back (std::move (pub));
 }
 
 const std::string nullStr;
@@ -36,11 +36,19 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
         {
             return nullptr;
         }
-        auto *sub = new helics::SubscriptionObject ();
-        sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
-        sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        try
+        {
+            auto sub = std::make_unique<helics::SubscriptionObject> ();
+            sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
+            sub->fedptr = std::move (fedObj);
+            auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+            addSubscription (fed, std::move (sub));
+            return ret;
+        }
+        catch (const helics::InvalidFunctionCall &)
+        {
+        }
+        return nullptr;
     }
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helics_type_t::helicsInvalid)
@@ -53,19 +61,18 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
     {
         return nullptr;
     }
-    helics::SubscriptionObject *sub = nullptr;
     try
     {
-        sub = new helics::SubscriptionObject ();
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
         sub->id = fedObj->registerRequiredSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete sub;
     }
     return nullptr;
 }
@@ -85,19 +92,18 @@ helics_subscription helicsFederateRegisterTypeSubscription (helics_federate fed,
         return nullptr;
     }
 
-    helics::SubscriptionObject *sub = nullptr;
     try
     {
-        sub = new helics::SubscriptionObject ();
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
         sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete sub;
     }
     return nullptr;
 }
@@ -112,12 +118,20 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
         {
             return nullptr;
         }
-        auto *sub = new helics::SubscriptionObject ();
-        sub->subptr =
-          std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj.get (), key, (units == nullptr) ? nullStr : std::string (units));
-        sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        try
+        {
+            auto sub = std::make_unique<helics::SubscriptionObject> ();
+            sub->subptr = std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj.get (), key,
+                                                                  (units == nullptr) ? nullStr : std::string (units));
+            sub->fedptr = std::move (fedObj);
+            auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+            addSubscription (fed, std::move (sub));
+            return ret;
+        }
+        catch (const helics::InvalidFunctionCall &)
+        {
+        }
+        return nullptr;
     }
     auto htype = helics::getTypeFromString (type);
     if (htype != helics::helics_type_t::helicsInvalid)
@@ -130,19 +144,18 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
     {
         return nullptr;
     }
-    helics::SubscriptionObject *sub = nullptr;
     try
     {
-        sub = new helics::SubscriptionObject ();
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
         sub->id = fedObj->registerOptionalSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete sub;
     }
     return nullptr;
 }
@@ -163,19 +176,18 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
         return nullptr;
     }
 
-    helics::SubscriptionObject *sub = nullptr;
     try
     {
-        sub = new helics::SubscriptionObject ();
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
         sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
-        addSubscription (fed, sub);
-        return reinterpret_cast<helics_subscription> (sub);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete sub;
     }
     return nullptr;
 }
@@ -193,20 +205,19 @@ helics_publication helicsFederateRegisterPublication (helics_federate fed, const
     {
         return nullptr;
     }
-    helics::PublicationObject *pub = nullptr;
     try
     {
-        pub = new helics::PublicationObject ();
+        auto pub = std::make_unique<helics::PublicationObject> ();
         pub->id = fedObj->registerPublication (key, (type == nullptr) ? nullStr : std::string (type),
                                                (units == nullptr) ? nullStr : std::string (units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
-        addPublication (fed, pub);
-        return reinterpret_cast<helics_publication> (pub);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete pub;
     }
     return nullptr;
 }
@@ -225,19 +236,18 @@ helics_publication helicsFederateRegisterTypePublication (helics_federate fed, c
     {
         return nullptr;
     }
-    helics::PublicationObject *pub = nullptr;
     try
     {
-        pub = new helics::PublicationObject ();
+        auto pub = std::make_unique<helics::PublicationObject> ();
         pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                              (units == nullptr) ? nullStr : std::string (units));
         pub->fedptr = std::move (fedObj);
-        addPublication (fed, pub);
-        return reinterpret_cast<helics_publication> (pub);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete pub;
     }
     return nullptr;
 }
@@ -255,20 +265,19 @@ helics_publication helicsFederateRegisterGlobalPublication (helics_federate fed,
     {
         return nullptr;
     }
-    helics::PublicationObject *pub = nullptr;
     try
     {
-        pub = new helics::PublicationObject ();
+        auto pub = std::make_unique<helics::PublicationObject> ();
         pub->id = fedObj->registerGlobalPublication (key, (type == nullptr) ? nullStr : std::string (type),
                                                      (units == nullptr) ? nullStr : std::string (units));
         pub->rawOnly = true;
         pub->fedptr = std::move (fedObj);
-        addPublication (fed, pub);
-        return reinterpret_cast<helics_publication> (pub);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete pub;
     }
     return nullptr;
 }
@@ -288,19 +297,18 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     {
         return nullptr;
     }
-    helics::PublicationObject *pub = nullptr;
     try
     {
-        pub = new helics::PublicationObject ();
+        auto pub = std::make_unique<helics::PublicationObject> ();
         pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                              (units == nullptr) ? nullStr : std::string (units));
         pub->fedptr = std::move (fedObj);
-        addPublication (fed, pub);
-        return reinterpret_cast<helics_publication> (pub);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
     }
     catch (const helics::InvalidFunctionCall &)
     {
-        delete pub;
     }
     return nullptr;
 }
