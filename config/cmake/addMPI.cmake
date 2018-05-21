@@ -51,7 +51,7 @@ if (NOT MPI::MPI_C)
 			if(MPI_C_LINK_FLAGS)
 				set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
 			endif()
-			set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION ${MPI_C_LIBRARIES})
+			set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION "${MPI_C_LIBRARIES}")
 		else()
 			add_library(MPI::MPI_C INTERFACE IMPORTED)
 		

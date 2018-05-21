@@ -54,6 +54,8 @@ set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
 
 include(CMakeFindDependencyMacro)
 
+include(extraMacros)
+
 if (NOT Boostlibs::core)
 	include(addBoost)
 endif()
