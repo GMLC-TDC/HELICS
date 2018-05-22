@@ -280,6 +280,13 @@ class Subscription : public SubscriptionBase
         return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid),
                                                     std::true_type, std::false_type> ());
     }
+    /** get the size of the raw data*/
+    size_t getRawSize();
+    /** get the size of the data if it were a string*/
+    size_t getStringSize();
+    /** get the number of elements in the data if it were a vector*/
+    size_t getVectorSize();
+
 };
 
 /** class to handle a subscription

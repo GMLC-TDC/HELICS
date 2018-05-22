@@ -83,6 +83,7 @@ bool Subscription::isUpdated () const
 {
     if (changeDetectionEnabled)
     {
+        //TODO actually get the updated value and check for a change
         return SubscriptionBase::isUpdated ();
     }
     else
@@ -90,4 +91,20 @@ bool Subscription::isUpdated () const
         return SubscriptionBase::isUpdated ();
     }
 }
+
+size_t Subscription::getRawSize()
+{
+
+}
+
+size_t Subscription::getStringSize()
+{
+
+}
+
+size_t Subscription::getVectorSize()
+{
+
+}
+
 }  // namespace helics
