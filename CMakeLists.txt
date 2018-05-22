@@ -264,7 +264,7 @@ ENDIF(ZeroMQ_ENABLE)
 target_include_directories(helics_base_includes INTERFACE
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 	$<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
-	$<INSTALL_INTERFACE:include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_include_directories(helics_base_includes SYSTEM INTERFACE
