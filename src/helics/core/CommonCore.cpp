@@ -1884,7 +1884,7 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
         {
             repStr.append(std::to_string(dep));
             repStr.push_back(';');
-    }
+        }
     }
     else if (queryStr == "dependents")
     {
@@ -1902,54 +1902,11 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     }
     else if (queryStr == "address")
     {
-        repStr= getAddress();
+        repStr = getAddress();
         listV = false;
-}
-
-std::string CommonCore::query (const std::string &target, const std::string &queryStr)
-{
-    if ((target == "core") || (target == getIdentifier()))
-    {
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id;
-        querycmd.dest_id = global_broker_id;
-        auto index = ++queryCounter;
-        querycmd.index = index;
-        querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(index);
-        addActionMessage(std::move(querycmd));
-        auto ret = fut.get();
-        ActiveQueries.finishedWithValue(index);
-        return ret;
     }
-    else if ((target == "parent") || (target == "broker"))
+    else
     {
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id;
-        querycmd.dest_id = higher_broker_id;
-        querycmd.index = ++queryCounter;
-        querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.index);
-        addActionMessage(querycmd);
-        auto ret = fut.get();
-        ActiveQueries.finishedWithValue(querycmd.index);
-        return ret;
-    }
-    else if ((target == "root") || (target == "rootbroker"))
-    {
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id;
-        querycmd.dest_id = 0;
-        auto index = ++queryCounter;
-        querycmd.index = index;
-        querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.index);
-        if (global_broker_id == invalid_fed_id)
-        {
-            delayTransmitQueue.push(std::move(querycmd));
-        }
-        else
-        {
         return "#invalid";
         listV = false;
     }
