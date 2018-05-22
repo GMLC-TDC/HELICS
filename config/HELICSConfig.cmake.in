@@ -87,5 +87,15 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
 
+if (HELICS::helicsSharedLib)
+add_library(HELICS::helicsCpp98 INTERFACE)
+target_include_directories(HELICS::helicsCpp98 INTERFACE "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/cpp98")
+target_link_libraries(HELICS::helicsCpp98 INTERFACE HELICS::helicsSharedLib)
+
+set_target_properties(Helics::helicsSharedLib PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/helics/shared_api_library"
+)
+endif()
+
 check_required_components(${PN})
 

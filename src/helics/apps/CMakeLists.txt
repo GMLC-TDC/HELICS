@@ -36,6 +36,8 @@ set(helics_apps_library_files
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_public_headers} ${helics_apps_private_headers})
 
 target_link_libraries(helics_apps-static PUBLIC helics-static)
+#add and alias library to match the find_package
+add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 
 if (BUILD_PLAYER)
 	add_executable(helics_player playerMain.cpp)
