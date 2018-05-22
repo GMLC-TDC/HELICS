@@ -22,7 +22,7 @@ add_library(helicsCpp98 INTERFACE)
 target_include_directories(helicsCpp98 INTERFACE "${PROJECT_SOURCE_DIR}/src/helics")
 target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
 
-add_library(helics::helicsCpp98 ALIAS HELICS::helicsCpp98)
+add_library(helics::helicsCpp98 ALIAS helicsCpp98)
 
 #this is purely so the files show up nicely in an IDE, other ides might use it as well but that can be added when/if the need arises
 IF (MSVC)
