@@ -301,4 +301,48 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
 
+BOOST_AUTO_TEST_CASE(subscriptionChangedDetection_tests)
+{
+    helics::FederateInfo fi("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    // register the publications
+    auto pubObj = helics::make_publication<double>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+
+    auto subObj1 = helics::Subscription(vFed.get(), "pub1");
+    auto subObj2 = helics::Subscription(vFed.get(), "pub1");
+    subObj2.setMinimumChange(0.1);
+    vFed->setTimeDelta(1.0);
+    vFed->enterExecutionState();
+    // publish string1 at time=0.0;
+    pubObj->publish(23.7);
+    auto gtime = vFed->requestTime(1.0);
+
+    BOOST_CHECK_EQUAL(gtime, 1.0);
+    BOOST_CHECK(subObj1.isUpdated());
+    BOOST_CHECK(subObj2.isUpdated());
+    //check a second time
+    BOOST_CHECK(subObj1.isUpdated());
+    BOOST_CHECK(subObj2.isUpdated());
+    auto val1 = subObj1.getValue<double>();
+    auto val2 = subObj2.getValue<double>();
+    //now that we got the value it should not be updated
+    BOOST_CHECK(!subObj1.isUpdated());
+    BOOST_CHECK(!subObj2.isUpdated());
+    BOOST_CHECK_EQUAL(val1, val2);
+    BOOST_CHECK_EQUAL(val1, 23.7);
+    // publish a second string
+    pubObj->publish(23.61);
+    // advance time
+    gtime = vFed->requestTime(2.0);
+
+    BOOST_CHECK(subObj1.isUpdated());
+    BOOST_CHECK(!subObj2.isUpdated());
+
+    vFed->finalize();
+}
+
+
 BOOST_AUTO_TEST_SUITE_END ()

@@ -81,10 +81,27 @@ void Subscription::handleCallback (Time time)
 
 bool Subscription::isUpdated () const
 {
+    if (hasUpdate)
+    {
+        return true;
+    }
     if (changeDetectionEnabled)
     {
-        //TODO actually get the updated value and check for a change
-        return SubscriptionBase::isUpdated ();
+        if (SubscriptionBase::isUpdated ())
+        {
+            if (type == helics_type_t::helicsInvalid)
+            {
+                return true;
+            }
+            auto dv = fed->getValueRaw(id);
+            auto visitor = [&](auto &&arg) -> bool {
+                std::remove_const_t<std::remove_reference_t<decltype (arg)>> newVal;
+                valueExtract (dv, type, newVal);
+                return (changeDetected(lastValue, newVal, delta));
+            };
+            return mpark::visit (visitor, lastValue);
+        }
+        return false;
     }
     else
     {
@@ -92,19 +109,63 @@ bool Subscription::isUpdated () const
     }
 }
 
-size_t Subscription::getRawSize()
+bool Subscription::getAndCheckForUpdate ()
 {
+    if (hasUpdate)
+    {
+        return true;
+    }
+    if (changeDetectionEnabled)
+    {
+        if (SubscriptionBase::isUpdated ())
+        {
+            auto dv = fed->getValueRaw (id);
+            if (type == helics_type_t::helicsInvalid)
+            {
+                type = getTypeFromString (fed->getPublicationType (id));
+            }
+            if (type != helics_type_t::helicsInvalid)
+            {
+                auto visitor = [&](auto &&arg) {
+                    std::remove_reference_t<decltype (arg)> newVal;
+                    valueExtract (dv, type, newVal);
+                    if (changeDetected (lastValue, newVal, delta))
+                    {
+                        lastValue = newVal;
+                        hasUpdate = true;
+                    }
+                };
+                mpark::visit (visitor, lastValue);
+            }
+        }
+    }
+    else
+    {
+        hasUpdate = SubscriptionBase::isUpdated ();
+    }
 
+    return hasUpdate;
 }
 
-size_t Subscription::getStringSize()
-{
-
+size_t Subscription::getRawSize () 
+{ 
+    getAndCheckForUpdate();
+    auto dv=fed->getValueRaw(id);
+    return dv.size();
 }
 
-size_t Subscription::getVectorSize()
-{
+size_t Subscription::getStringSize () 
+{ 
+    getAndCheckForUpdate();
+    auto dv = fed->getValueRaw(id);
+    return dv.size()+1;
+}
 
+size_t Subscription::getVectorSize () 
+{ 
+    getAndCheckForUpdate();
+    auto dv = fed->getValueRaw(id);
+    return (dv.size()>9)?(dv.size()-9)/sizeof(double):0;
 }
 
 }  // namespace helics

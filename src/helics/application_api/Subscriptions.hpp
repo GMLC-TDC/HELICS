@@ -104,7 +104,7 @@ class Subscription : public SubscriptionBase
 
     mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
-    // bool hasUpdate = false;  //!< the value has been updated
+    bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
@@ -148,6 +148,8 @@ class Subscription : public SubscriptionBase
     Subscription (ValueFederate *valueFed, int subIndex) : SubscriptionBase (valueFed, subIndex) {}
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
+    /** check if the value has been updated and load the value into buffer*/
+    bool getAndCheckForUpdate();
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -201,6 +203,7 @@ class Subscription : public SubscriptionBase
     template <class X>
     void getValue_impl (std::true_type /*V*/, X &out)
     {
+        hasUpdate = false;
         if (fed->isUpdated (id))
         {
             auto dv = fed->getValueRaw (id);
