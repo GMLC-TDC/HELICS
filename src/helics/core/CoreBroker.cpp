@@ -1288,6 +1288,85 @@ void CoreBroker::checkSubscriptions ()
     }
 }
 
+std::string CoreBroker::query(const std::string &target, const std::string &queryStr)
+{
+    if ((target == "broker") || (target == getIdentifier()))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = global_broker_id;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(index);
+        addActionMessage(std::move(querycmd));
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
+    }
+    else if(target == "parent")
+    {
+        if (isRoot())
+        {
+            return "#invalid";
+        }
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = higher_broker_id;
+        querycmd.index = ++queryCounter;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        addActionMessage(querycmd);
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(querycmd.index);
+        return ret;
+    }
+    else if ((target == "root") || (target == "rootbroker"))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = 0;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        if (global_broker_id == invalid_fed_id)
+        {
+            delayTransmitQueue.push(std::move(querycmd));
+        }
+        else
+        {
+            transmit(0, querycmd);
+        }
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
+    }
+    else
+    {
+        ActionMessage querycmd(CMD_QUERY);
+        querycmd.source_id = global_broker_id;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        querycmd.info().target = target;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        if (global_broker_id == invalid_fed_id)
+        {
+            delayTransmitQueue.push(std::move(querycmd));
+        }
+        else
+        {
+            transmit(0, querycmd);
+        }
+
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
+    }
+    return "#invalid";
+}
+
 std::string CoreBroker::generateQueryAnswer (const std::string &query) const
 {
     if (query == "isinit")

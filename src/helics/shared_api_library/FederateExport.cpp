@@ -679,11 +679,18 @@ helics_status helicsFederateSetMaxIterations (helics_federate fed, int maxIterat
     return helics_ok;
 }
 
-/** get the current time of the federate
-@param fed the federate object to query
-@param[out] time storage location for the time variable
-@return helics_status object indicating success or error
-*/
+helics_status helicsFederateSetSeparator(helics_federate fed, char separator)
+{
+    auto fedObj = getFed(fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    fedObj->setSeparator(separator);
+    return helics_ok;
+}
+
+
 helics_status helicsFederateGetCurrentTime (helics_federate fed, helics_time_t *time)
 {
     auto fedObj = getFed (fed);

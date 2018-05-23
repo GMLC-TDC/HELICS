@@ -119,13 +119,16 @@ public:
 
     void transition ()
     {
-        if (!constant)
+        if (!constant.load(std::memory_order_acquire)
         {
             //acquire the lock then alter the 
             std::lock_guard<M> lock(m_mutex);
-            constant = true;
+            if (!constant.load(std::memory_order_relaxed))
+            {
+                m_objConst = std::move(m_obj);
+                constant.store(true, std::memory_order_release);
+            }
         }
-       
     }
 
   private:
@@ -169,6 +172,7 @@ public:
     };
 
     T m_obj;
+    T m_objConst;
     M m_mutex;
     std::atomic<bool> constant{false};
 };
@@ -182,31 +186,43 @@ staged_guarded<T, M>::guarded (Us &&... data) : m_obj (std::forward<Us> (data)..
 template <typename T, typename M>
 auto staged_guarded<T, M>::lock () -> handle
 {
-    std::unique_lock<M> lock =
-      (constant) ? std::unique_lock<M> (m_mutex, std::defer_lock) : std::unique_lock<M> (m_mutex);
-    return handle (&m_obj, deleter (std::move (lock)));
+    if (constant.load(std::memory_order_acquire))
+    {
+        throw(std::exception("data has transitioned"));
+    }
+    else
+    {
+        auto lock = std::unique_lock<M>(m_mutex);
+        return handle(&m_obj, deleter(std::move(lock)));
+    }
+   
+   
 }
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::lock() const -> shared_handle
 {
-    std::unique_lock<M> lock =
-        (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) : std::unique_lock<M>(m_mutex);
-    return shared_handle(&m_obj, deleter(std::move(lock)));
+    return lock_shared();
+   
 }
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::lock_shared() const -> shared_handle
 {
-    std::unique_lock<M> lock =
-        (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) : std::unique_lock<M>(m_mutex);
-    return shared_handle(&m_obj, deleter(std::move(lock)));
+    if (constant.load(std::memory_order_acquire))
+    {
+        return shared_handle(&m_objConst, deleter(std::unique_lock<M>(m_mutex, std::defer_lock)));
+    }
+    else
+    {
+        return shared_handle(&m_obj, deleter(std::unique_lock<M>(m_mutex)));
+    }
 }
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::try_lock () -> handle
 {
-    if (!constant)
+    if (!constant.load(std::memory_order_acquire))
     {
         std::unique_lock<M> lock (m_mutex, std::try_to_lock);
 
@@ -221,7 +237,7 @@ auto staged_guarded<T, M>::try_lock () -> handle
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_objConst, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
     }
 }
 
@@ -229,7 +245,7 @@ auto staged_guarded<T, M>::try_lock () -> handle
 template <typename T, typename M>
 auto staged_guarded<T, M>::try_lock_shared() -> shared_handle
 {
-    if (!constant)
+    if (!constant.load(std::memory_order_acquire))
     {
         std::unique_lock<M> lock(m_mutex, std::try_to_lock);
 
@@ -244,7 +260,7 @@ auto staged_guarded<T, M>::try_lock_shared() -> shared_handle
     }
     else
     {
-        return handle(&m_obj, deleter(std::unique_lock<M>(m_mutex, std::defer_lock)));
+        return handle(&m_objConst, deleter(std::unique_lock<M>(m_mutex, std::defer_lock)));
     }
 }
 
@@ -252,7 +268,7 @@ template <typename T, typename M>
 template <typename Duration>
 auto staged_guarded<T, M>::try_lock_for (const Duration &d) -> handle
 {
-    if (!constant)
+    if (!constant.load(std::memory_order_acquire))
     {
         std::unique_lock<M> lock (m_mutex, d);
 
@@ -267,7 +283,7 @@ auto staged_guarded<T, M>::try_lock_for (const Duration &d) -> handle
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_objConst, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
     }
 }
 
@@ -275,7 +291,7 @@ template <typename T, typename M>
 template <typename TimePoint>
 auto staged_guarded<T, M>::try_lock_until (const TimePoint &tp) -> handle
 {
-    if (!constant)
+    if (!constant.load(std::memory_order_acquire))
     {
         std::unique_lock<M> lock (m_mutex, tp);
 
@@ -290,7 +306,7 @@ auto staged_guarded<T, M>::try_lock_until (const TimePoint &tp) -> handle
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_objConst, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
     }
 }
 }

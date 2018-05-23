@@ -36,9 +36,6 @@ namespace helics
 using federate_id_t = Core::federate_id_t;
 using handle_id_t = Core::handle_id_t;
 
-// file local declarator for active queries
-static DelayedObjects<std::string> ActiveQueries;
-
 CommonCore::CommonCore () noexcept {}
 
 CommonCore::CommonCore (bool /*arg*/) noexcept {}
