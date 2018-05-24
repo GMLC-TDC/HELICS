@@ -23,7 +23,6 @@ else()
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
 	set (HELICS_VERSION_UNDERSCORE "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}")
 endif()
-
 set (HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 
 #-----------------------------------------------------------------------------
@@ -289,6 +288,7 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 
 SET(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
 
+
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -420,7 +420,7 @@ configure_file (
   install(FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
 		COMPONENT headers)
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-		COMPONENT headers)
+		COMPONENT headers) 
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 		COMPONENT headers)

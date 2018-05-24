@@ -55,7 +55,7 @@ namespace helics
 	{
 	public:
 		std::shared_ptr<Core> coreptr;
-        std::vector<FilterObject *> filters; //!< list of filters created directly through the core
+        std::vector<std::unique_ptr<FilterObject>> filters; //!< list of filters created directly through the core
         int index;
         int valid;
         CoreObject() = default;
@@ -78,10 +78,10 @@ namespace helics
         int index;
 		std::shared_ptr<Federate> fedptr;
 		std::unique_ptr<Message> lastMessage;
-        std::vector<SubscriptionObject *> subs;
-        std::vector<PublicationObject *> pubs;
-        std::vector<EndpointObject *> epts;
-        std::vector<FilterObject *> filters;
+        std::vector<std::unique_ptr<SubscriptionObject>> subs;
+        std::vector<std::unique_ptr<PublicationObject>> pubs;
+        std::vector<std::unique_ptr<EndpointObject>> epts;
+        std::vector<std::unique_ptr<FilterObject>> filters;
         FedObject() = default;
         ~FedObject();
 	};
@@ -160,6 +160,8 @@ std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(helics_federate fed);
 std::shared_ptr<helics::Core> getCoreSharedPtr(helics_core core);
+/**centralized error handler for the C interface*/
+helics_status helicsErrorHandler() noexcept;
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder
