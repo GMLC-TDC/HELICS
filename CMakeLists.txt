@@ -16,7 +16,7 @@ set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD )
 set (HELICS_DATE "05-09-18")
 
-if (HELICS_VERSION_BUILD)
+if (NOT HELICS_VERSION_BUILD)
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
 	set (HELICS_VERSION_UNDERSCORE "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}")
 else()
@@ -48,6 +48,8 @@ endif()
 SHOW_VARIABLE(AUTOBUILD_INSTALL_PATH PATH
   "location to install the autobuild libraries and Headers" "${PROJECT_BINARY_DIR}/libs")
 
+FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
+
 OPTION(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
@@ -74,11 +76,8 @@ else()
 	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
-
-#IF(NOT MSVC)
-	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
-	mark_as_advanced(BUILD_CXX_SHARED_LIB)
-#ENDIF()
+OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+mark_as_advanced(BUILD_CXX_SHARED_LIB)
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 	set(BUILD_SHARED_LIBS ON)
@@ -162,9 +161,6 @@ if (GENERATE_DOXYGEN_DOC)
 	endif(DOXYGEN_FOUND)
 endif (GENERATE_DOXYGEN_DOC)
 
-FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-
-
 
 
 # -------------------------------------------------------------
@@ -196,7 +192,9 @@ ENDIF(MPI_ENABLE)
 # -------------------------------------------------------------
 if (NOT WIN32)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
-endif(NOT WIN32)
+elseif (MSYS)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+endif()
 find_package(Threads REQUIRED)
 
 target_link_libraries(helics_base INTERFACE Threads::Threads)
@@ -266,7 +264,7 @@ ENDIF(ZeroMQ_ENABLE)
 target_include_directories(helics_base_includes INTERFACE
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 	$<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
-	$<INSTALL_INTERFACE:include>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_include_directories(helics_base_includes SYSTEM INTERFACE
@@ -288,7 +286,8 @@ SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 
-SET(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib")
+SET(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
+
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
@@ -353,10 +352,13 @@ INSTALL(FILES ${KEY_LIBRARY_FILES}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
 	COMPONENT runtime)
 
-install(DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/)
+install(DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/ OPTIONAL)
+install(DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib64/ DESTINATION ${CMAKE_INSTALL_LIBDIR}/ OPTIONAL)
 
 if (HELICS_HAVE_ZEROMQ)
-	install(FILES $<TARGET_LINKER_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+	if (WIN32 AND NOT MSYS)
+		install(FILES $<TARGET_LINKER_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+	endif()
 endif()
 
 # -------------------------------------------------------------
@@ -401,7 +403,7 @@ ENDIF()
 set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
 
 install (EXPORT helics-targets
-	NAMESPACE Helics::
+	NAMESPACE HELICS::
 	DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 	COMPONENT libs
 	)
@@ -443,6 +445,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 install(FILES config/cmake/addMPI.cmake
 			  config/cmake/FindZeroMQ.cmake
 			  config/cmake/addBoost.cmake
+			  config/cmake/extraMacros.cmake
 			  DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
 			  COMPONENT libs)
 
@@ -459,6 +462,7 @@ set(CPACK_PACKAGE_VERSION "${HELICS_VERSION}")
 set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
+set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
 
 set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave)
 if (WIN32)
@@ -488,12 +492,13 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
  set(CPACK_COMPONENT_LIBS_DEPENDS headers)
  set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
 
- set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable")
+ set(CPACK_PACKAGE_EXECUTABLES "helics_broker" "Helics Broker" "helics_app" "Helics app executable" "helics_recorder" "Helics recorder" "helics_player" "Helics Player")
  if (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
+	set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
 set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"

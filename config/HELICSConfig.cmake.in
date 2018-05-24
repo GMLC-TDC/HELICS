@@ -53,6 +53,7 @@ set(HELICS_HAVE_MPI @HELICS_HAVE_MPI)
 set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
 
 include(CMakeFindDependencyMacro)
+include(extraMacros)
 
 if (NOT Boostlibs::core)
 	include(addBoost)
@@ -77,11 +78,23 @@ endif()
 if (NOT Threads::Threads)
 	if (NOT WIN32)
 		set(THREADS_PREFER_PTHREAD_FLAG ON)
-	endif(NOT WIN32)
+	elseif (MSYS)
+		set(THREADS_PREFER_PTHREAD_FLAG ON)
+	endif()
 	find_dependency(Threads REQUIRED)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
+
+if (HELICS::helicsSharedLib)
+add_library(HELICS::helicsCpp98 INTERFACE)
+target_include_directories(HELICS::helicsCpp98 INTERFACE "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/cpp98")
+target_link_libraries(HELICS::helicsCpp98 INTERFACE HELICS::helicsSharedLib)
+
+set_target_properties(Helics::helicsSharedLib PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/helics/shared_api_library"
+)
+endif()
 
 check_required_components(${PN})
 

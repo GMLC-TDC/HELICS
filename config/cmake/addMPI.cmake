@@ -10,7 +10,7 @@
 
 
 ##############################################################################
-# Copyright © 2017-2018,
+# Copyright Â© 2017-2018,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -51,7 +51,7 @@ if (NOT MPI::MPI_C)
 			if(MPI_C_LINK_FLAGS)
 				set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
 			endif()
-			set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION ${MPI_C_LIBRARIES})
+			set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION "${MPI_C_LIBRARIES}")
 		else()
 			add_library(MPI::MPI_C INTERFACE IMPORTED)
 		
@@ -74,3 +74,4 @@ if (NOT MPI::MPI_C)
 	set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${MPI_C_COMPILE_DEFINITIONS}")
 
 endif()
+
