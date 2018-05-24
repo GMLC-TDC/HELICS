@@ -27,6 +27,7 @@ include(GenerateExportHeader)
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
+add_library(HELICS::helicsSharedLib ALIAS helicsSharedLib)
 generate_export_header(helicsSharedLib
 	BASE_NAME helics)
 	
