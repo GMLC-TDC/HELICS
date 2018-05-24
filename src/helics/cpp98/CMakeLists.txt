@@ -22,10 +22,13 @@ add_library(helicsCpp98 INTERFACE)
 target_include_directories(helicsCpp98 INTERFACE "${PROJECT_SOURCE_DIR}/src/helics")
 target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
 
+add_library(HELICS::helicsCpp98 ALIAS helicsCpp98)
+
+#this is purely so the files show up nicely in an IDE, other ides might use it as well but that can be added when/if the need arises
 IF (MSVC)
-add_library(helicsCpp98_ide STATIC ${helicsCpp98_headers} ../../empty.cpp)
-target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/helics")
-set_target_properties (helicsCpp98_ide PROPERTIES FOLDER interfaces)
+	add_library(helicsCpp98_ide STATIC ${helicsCpp98_headers} ../../empty.cpp)
+	target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/helics")
+	set_target_properties (helicsCpp98_ide PROPERTIES FOLDER interfaces)
 ENDIF(MSVC)
 
 install(FILES ${helicsCpp98_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpp98 COMPONENT headers)

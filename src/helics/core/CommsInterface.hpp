@@ -7,12 +7,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/BlockingPriorityQueue.hpp"
 #include "../common/TripWire.hpp"
+#include "NetworkBrokerData.hpp"
 #include "ActionMessage.hpp"
 #include <functional>
 #include <thread>
 namespace helics
 {
-class NetworkBrokerData;
+enum class interface_networks :char;
 
 /** implementation of a generic communications interface
  */
@@ -25,7 +26,7 @@ class CommsInterface
     @param localTarget the interface or specification that should be set to receive incoming connections
     @param brokerTarget the target of the broker Interface to link to
     */
-    CommsInterface (const std::string &localTarget, const std::string &brokerTarget);
+    CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork = interface_networks::local);
     /** construct from a NetworkBrokerData structure*/
     explicit CommsInterface (const NetworkBrokerData &netInfo);
     /** destructor*/
@@ -85,12 +86,14 @@ class CommsInterface
     int connectionTimeout = 4000;  // timeout for the initial connection to a broker
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
+    
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
       false};  //!< flag indicating that the comm system is in the process of disconnecting
+    interface_networks interfaceNetwork;
   private:
     std::thread queue_transmitter;  //!< single thread for sending data
     std::thread queue_watcher;  //!< thread monitoring the receive queue

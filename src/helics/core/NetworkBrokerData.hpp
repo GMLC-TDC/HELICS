@@ -3,31 +3,42 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include <string>
 
 namespace helics
 {
+/** define the network access*/
+enum class interface_networks :char
+{
+    local,  //!< just open local ports
+    ipv4,  //!< use external ipv4 ports
+    ipv6,  //!< use external ipv6 ports
+    all, //!< use all external ports
+};
+
 /** helper class designed to contain the common elements between networking brokers and cores
  */
 class NetworkBrokerData
 {
   public:
     /** define keys for particular interfaces*/
-    enum class interface_type
+    enum class interface_type:char
     {
         tcp,  //!< using tcp ports for communication
         udp,  //!< using udp ports for communication
         both,  //!< using both types of ports for communication
     };
+   
+    
     std::string brokerName;  //!< the identifier for the broker
     std::string brokerAddress;  //!< the address or domain name of the broker
     std::string localInterface;  //!< the interface to use for the local receive ports
     int portNumber = -1;  //!< the port number for the local interface
     int brokerPort = -1;  //!< the port number to use for the main broker interface
     int portStart = -1;  //!< the starting port for automatic port definitions
+    interface_networks interfaceNetwork = interface_networks::local;
   public:
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/
@@ -49,6 +60,7 @@ class NetworkBrokerData
     /** do some checking on the brokerAddress*/
     void checkAndUpdateBrokerAddress (const std::string &localAddress);
     interface_type allowedType = interface_type::both;
+    
 };
 
 /** generate a string with a full address based on an interface string and port number
@@ -78,10 +90,29 @@ or the interface doesn't use port numbers
 */
 std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address);
 
+/** check if a specfied address is v6 or v4
+@return true if the address is a v6 address
+*/
+bool isipv6(const std::string &address);
+
 /** get the external ipv4 address of the current computer
  */
 std::string getLocalExternalAddressV4 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+std::string getLocalExternalAddress(const std::string &server);
+
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
 std::string getLocalExternalAddressV4 (const std::string &server);
+
+/** get the external ipv4 address of the current computer
+*/
+std::string getLocalExternalAddressV6();
+
+/** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
+std::string getLocalExternalAddressV6(const std::string &server);
+
+/** generate an interface that matches a defined server or network specification
+*/
+std::string generateMatchingInterfaceAddress(const std::string &server, interface_networks network=interface_networks::local);
 }  // namespace helics

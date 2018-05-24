@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ForwardingTimeCoordinator.hpp"
 #include "loggingHelper.hpp"
 #include <fstream>
-#include <json/json.h>
+#include <json/jsoncpp.h>
 
 namespace helics
 {

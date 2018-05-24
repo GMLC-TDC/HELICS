@@ -57,7 +57,7 @@ private:
     double Amplitude = 0.0;
     double dAdt = 0.0;
     double dfdt = 0.0;
-    Time lastCycle = timeZero;
+    //Time lastCycle = timeZero;
     std::complex<double> state{ 1.0, 0 };
     std::complex<double> rotation{ 1.0,0 };
 public:

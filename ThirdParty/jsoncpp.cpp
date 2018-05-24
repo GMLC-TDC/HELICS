@@ -1,4 +1,4 @@
-/// Json-cpp amalgated source (http://jsoncpp.sourceforge.net/).
+/// Json-cpp amalgamated source (http://jsoncpp.sourceforge.net/).
 /// It is intended to be used with #include "json/json.h"
 
 // //////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ license you like.
 
 
 
-#include "json/json.h"
+#include "json/jsoncpp.h"
 
 #ifndef JSON_IS_AMALGAMATION
 #error "Compile with -I PATH_TO_JSON_DIRECTORY"
@@ -157,7 +157,7 @@ enum {
 typedef char UIntToStringBuffer[uintToStringBufferSize];
 
 /** Converts an unsigned integer to string.
- * @param value Unsigned interger to convert to string
+ * @param value Unsigned integer to convert to string
  * @param current Input/Output string buffer.
  *        Must have at least uintToStringBufferSize chars free.
  */
@@ -195,6 +195,20 @@ static inline void fixNumericLocaleInput(char* begin, char* end) {
   }
 }
 
+/**
+ * Delete zeros in the end of string, if it isn't last zero before '.' character.
+ */
+static inline void fixZerosInTheEnd(char* begin, char* end) {
+  end--;
+  while ((begin < end) && (*end == '0')) {
+    // don't delete last zero before point.
+    if (*(end - 1) != '.') {
+      *end = '\0';
+    }
+    end--;
+  }
+}
+
 } // namespace Json_helics {
 
 #endif // LIB_JSONCPP_JSON_TOOL_H_INCLUDED
@@ -225,7 +239,6 @@ static inline void fixNumericLocaleInput(char* begin, char* end) {
 #include "json_tool.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
 #include <utility>
-#include <cstdio>
 #include <cassert>
 #include <cstring>
 #include <istream>
@@ -234,24 +247,28 @@ static inline void fixNumericLocaleInput(char* begin, char* end) {
 #include <set>
 #include <limits>
 
-#if defined(_MSC_VER)
-#if !defined(WINCE) && defined(__STDC_SECURE_LIB__) && _MSC_VER >= 1500 // VC++ 9.0 and above 
-#define snprintf sprintf_s
-#elif _MSC_VER >= 1900 // VC++ 14.0 and above
-#define snprintf std::snprintf
-#else
-#define snprintf _snprintf
-#endif
-#elif defined(__ANDROID__) || defined(__QNXNTO__)
-#define snprintf snprintf
-#elif __cplusplus >= 201103L
-#if !defined(__MINGW32__) && !defined(__CYGWIN__)
-#define snprintf std::snprintf
-#endif
-#endif
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+  #include <cstdio>
 
-#if defined(__QNXNTO__)
-#define sscanf std::sscanf
+  #if !defined(snprintf)
+    #define snprintf std::snprintf
+  #endif
+
+  #if !defined(sscanf)
+    #define sscanf std::sscanf
+  #endif
+#else
+  #include <stdio.h>
+
+  #if defined(_MSC_VER)
+#ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#endif
+    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+    #if !defined(snprintf)
+      #define snprintf _snprintf
+    #endif
+  #endif
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0
@@ -2488,6 +2505,11 @@ ValueIterator& ValueIterator::operator=(const SelfType& other) {
 #include <cstddef> // size_t
 #include <algorithm> // min()
 
+// Disable warning C4702 : unreachable code
+#if defined(_MSC_VER) && _MSC_VER >= 1800 // VC++ 12.0 and above
+#pragma warning(disable:4702)
+#endif
+
 #define JSON_ASSERT_UNREACHABLE assert(false)
 
 namespace Json_helics {
@@ -2532,6 +2554,8 @@ static const double maxUInt64AsDouble = 18446744073709551615.0;
 const LargestInt Value::minLargestInt = LargestInt(~(LargestUInt(-1) / 2));
 const LargestInt Value::maxLargestInt = LargestInt(LargestUInt(-1) / 2);
 const LargestUInt Value::maxLargestUInt = LargestUInt(-1);
+
+const UInt Value::defaultRealPrecision = 17;
 
 #if !defined(JSON_USE_INT64_DOUBLE_CONVERSION)
 template <typename T, typename U>
@@ -2910,48 +2934,9 @@ Value::Value(bool value) {
   value_.bool_ = value;
 }
 
-Value::Value(Value const& other)
-    : type_(other.type_), allocated_(false)
-      ,
-      comments_(0), start_(other.start_), limit_(other.limit_)
-{
-  switch (type_) {
-  case nullValue:
-  case intValue:
-  case uintValue:
-  case realValue:
-  case booleanValue:
-    value_ = other.value_;
-    break;
-  case stringValue:
-    if (other.value_.string_ && other.allocated_) {
-      unsigned len;
-      char const* str;
-      decodePrefixedString(other.allocated_, other.value_.string_,
-          &len, &str);
-      value_.string_ = duplicateAndPrefixStringValue(str, len);
-      allocated_ = true;
-    } else {
-      value_.string_ = other.value_.string_;
-      allocated_ = false;
-    }
-    break;
-  case arrayValue:
-  case objectValue:
-    value_.map_ = new ObjectValues(*other.value_.map_);
-    break;
-  default:
-    JSON_ASSERT_UNREACHABLE;
-  }
-  if (other.comments_) {
-    comments_ = new CommentInfo[numberOfCommentPlacement];
-    for (int comment = 0; comment < numberOfCommentPlacement; ++comment) {
-      const CommentInfo& otherComment = other.comments_[comment];
-      if (otherComment.comment_)
-        comments_[comment].setComment(
-            otherComment.comment_, strlen(otherComment.comment_));
-    }
-  }
+Value::Value(const Value& other) {
+  dupPayload(other);
+  dupMeta(other);
 }
 
 #if JSON_HAS_RVALUE_REFERENCES
@@ -2963,24 +2948,7 @@ Value::Value(Value&& other) {
 #endif
 
 Value::~Value() {
-  switch (type_) {
-  case nullValue:
-  case intValue:
-  case uintValue:
-  case realValue:
-  case booleanValue:
-    break;
-  case stringValue:
-    if (allocated_)
-      releasePrefixedStringValue(value_.string_);
-    break;
-  case arrayValue:
-  case objectValue:
-    delete value_.map_;
-    break;
-  default:
-    JSON_ASSERT_UNREACHABLE;
-  }
+  releasePayload();
 
   delete[] comments_;
 
@@ -3003,9 +2971,8 @@ void Value::swapPayload(Value& other) {
 }
 
 void Value::copyPayload(const Value& other) {
-  type_ = other.type_;
-  value_ = other.value_;
-  allocated_ = other.allocated_;
+  releasePayload();
+  dupPayload(other);
 }
 
 void Value::swap(Value& other) {
@@ -3017,9 +2984,8 @@ void Value::swap(Value& other) {
 
 void Value::copy(const Value& other) {
   copyPayload(other);
-  comments_ = other.comments_;
-  start_ = other.start_;
-  limit_ = other.limit_;
+  delete[] comments_;
+  dupMeta(other);
 }
 
 ValueType Value::type() const { return type_; }
@@ -3431,7 +3397,7 @@ bool Value::empty() const {
     return false;
 }
 
-bool Value::operator!() const { return isNull(); }
+Value::operator bool() const { return ! isNull(); }
 
 void Value::clear() {
   JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue ||
@@ -3458,7 +3424,7 @@ void Value::resize(ArrayIndex newSize) {
   if (newSize == 0)
     clear();
   else if (newSize > oldSize)
-    (*this)[newSize - 1];
+    this->operator[](newSize - 1);
   else {
     for (ArrayIndex index = newSize; index < oldSize; ++index) {
       value_.map_->erase(index);
@@ -3516,6 +3482,75 @@ void Value::initBasic(ValueType vtype, bool allocated) {
   comments_ = 0;
   start_ = 0;
   limit_ = 0;
+}
+
+void Value::dupPayload(const Value& other) {
+  type_ = other.type_;
+  allocated_ = false;
+  switch (type_) {
+  case nullValue:
+  case intValue:
+  case uintValue:
+  case realValue:
+  case booleanValue:
+    value_ = other.value_;
+    break;
+  case stringValue:
+    if (other.value_.string_ && other.allocated_) {
+      unsigned len;
+      char const* str;
+      decodePrefixedString(other.allocated_, other.value_.string_,
+          &len, &str);
+      value_.string_ = duplicateAndPrefixStringValue(str, len);
+      allocated_ = true;
+    } else {
+      value_.string_ = other.value_.string_;
+    }
+    break;
+  case arrayValue:
+  case objectValue:
+    value_.map_ = new ObjectValues(*other.value_.map_);
+    break;
+  default:
+    JSON_ASSERT_UNREACHABLE;
+  }
+}
+
+void Value::releasePayload() {
+  switch (type_) {
+  case nullValue:
+  case intValue:
+  case uintValue:
+  case realValue:
+  case booleanValue:
+    break;
+  case stringValue:
+    if (allocated_)
+      releasePrefixedStringValue(value_.string_);
+    break;
+  case arrayValue:
+  case objectValue:
+    delete value_.map_;
+    break;
+  default:
+    JSON_ASSERT_UNREACHABLE;
+  }
+}
+
+void Value::dupMeta(const Value& other) {
+  if (other.comments_) {
+    comments_ = new CommentInfo[numberOfCommentPlacement];
+    for (int comment = 0; comment < numberOfCommentPlacement; ++comment) {
+      const CommentInfo& otherComment = other.comments_[comment];
+      if (otherComment.comment_)
+        comments_[comment].setComment(
+            otherComment.comment_, strlen(otherComment.comment_));
+    }
+  } else {
+    comments_ = 0;
+  }
+  start_ = other.start_;
+  limit_ = other.limit_;
 }
 
 // Access an object value by name, create a null member if it does not exist.
@@ -3644,7 +3679,12 @@ bool Value::removeMember(const char* key, const char* cend, Value* removed)
   ObjectValues::iterator it = value_.map_->find(actualKey);
   if (it == value_.map_->end())
     return false;
-  *removed = it->second;
+  if (removed)
+#if JSON_HAS_RVALUE_REFERENCES
+    *removed = std::move(it->second);
+#else
+    *removed = it->second;
+#endif
   value_.map_->erase(it);
   return true;
 }
@@ -4158,58 +4198,66 @@ Value& Path::make(Value& root) const {
 #include <set>
 #include <cassert>
 #include <cstring>
-#include <cstdio>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1200 && _MSC_VER < 1800 // Between VC++ 6.0 and VC++ 11.0
-#include <float.h>
-#define isfinite _finite
-#elif defined(__sun) && defined(__SVR4) //Solaris
-#if !defined(isfinite)
-#include <ieeefp.h>
-#define isfinite finite
-#endif
-#elif defined(_AIX)
-#if !defined(isfinite)
-#include <math.h>
-#define isfinite finite
-#endif
-#elif defined(__hpux)
-#if !defined(isfinite)
-#if defined(__ia64) && !defined(finite)
-#define isfinite(x) ((sizeof(x) == sizeof(float) ? \
-                     _Isfinitef(x) : _IsFinite(x)))
-#else
-#include <math.h>
-#define isfinite finite
-#endif
-#endif
-#else
-#include <cmath>
-#if !(defined(__QNXNTO__)) // QNX already defines isfinite
-#define isfinite std::isfinite
-#endif
-#endif
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+  #include <cmath>
+  #include <cstdio>
 
-#if defined(_MSC_VER)
-#if !defined(WINCE) && defined(__STDC_SECURE_LIB__) && _MSC_VER >= 1500 // VC++ 9.0 and above
-#define snprintf sprintf_s
-#elif _MSC_VER >= 1900 // VC++ 14.0 and above
-#define snprintf std::snprintf
-#else
-#define snprintf _snprintf
-#endif
-#elif defined(__ANDROID__) || defined(__QNXNTO__)
-#define snprintf snprintf
-#elif __cplusplus >= 201103L
-#if !defined(__MINGW32__) && !defined(__CYGWIN__)
-#define snprintf std::snprintf
-#endif
-#endif
+  #if !defined(isnan)
+    #define isnan std::isnan
+  #endif
 
-#if defined(__BORLANDC__)  
-#include <float.h>
-#define isfinite _finite
-#define snprintf _snprintf
+  #if !defined(isfinite)
+    #define isfinite std::isfinite
+  #endif
+
+  #if !defined(snprintf)
+    #define snprintf std::snprintf
+  #endif
+#else
+  #include <math.h>
+  #include <stdio.h>
+
+  #if defined(_MSC_VER)
+    #if !defined(isnan)
+      #include <float.h>
+      #define isnan _isnan
+    #endif
+
+    #if !defined(isfinite)
+      #include <float.h>
+      #define isfinite _finite
+    #endif
+
+    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+    #if !defined(snprintf)
+      #define snprintf _snprintf
+    #endif
+  #endif
+
+  #if defined(__sun) && defined(__SVR4) //Solaris
+    #if !defined(isfinite)
+      #include <ieeefp.h>
+      #define isfinite finite
+    #endif
+  #endif
+
+  #if defined(__hpux)
+    #if !defined(isfinite)
+      #if defined(__ia64) && !defined(finite)
+        #define isfinite(x) ((sizeof(x) == sizeof(float) ? _Isfinitef(x) : _IsFinite(x)))
+      #endif
+    #endif
+  #endif
+
+  #if !defined(isnan)
+    // IEEE standard states that NaN values will not compare to themselves
+    #define isnan(x) (x!=x)
+  #endif
+
+  #if !defined(isfinite)
+    #define isfinite finite
+  #endif
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0
@@ -4262,21 +4310,29 @@ JSONCPP_STRING valueToString(UInt value) {
 #endif // # if defined(JSON_HAS_INT64)
 
 namespace {
-JSONCPP_STRING valueToString(double value, bool useSpecialFloats, unsigned int precision) {
+JSONCPP_STRING valueToString(double value, bool useSpecialFloats, unsigned int precision, PrecisionType precisionType) {
   // Allocate a buffer that is more than large enough to store the 16 digits of
   // precision requested below.
   char buffer[36];
   int len = -1;
 
   char formatString[15];
-  snprintf(formatString, sizeof(formatString), "%%.%dg", precision);
+  if (precisionType == PrecisionType::significantDigits) {
+    snprintf(formatString, sizeof(formatString), "%%.%ug", precision);
+  } else {
+    snprintf(formatString, sizeof(formatString), "%%.%uf", precision);
+  }
 
   // Print into the buffer. We need not request the alternative representation
-  // that always has a decimal point because JSON doesn't distingish the
+  // that always has a decimal point because JSON doesn't distinguish the
   // concepts of reals and integers.
   if (isfinite(value)) {
     len = snprintf(buffer, sizeof(buffer), formatString, value);
     fixNumericLocale(buffer, buffer + len);
+    // to delete use-less too much zeros in the end of string
+    if (precisionType == PrecisionType::decimalPlaces) {
+      fixZerosInTheEnd(buffer, buffer + len);
+    }
 
     // try to ensure we preserve the fact that this was given to us as a double on input
     if (!strchr(buffer, '.') && !strchr(buffer, 'e')) {
@@ -4284,8 +4340,8 @@ JSONCPP_STRING valueToString(double value, bool useSpecialFloats, unsigned int p
     }
 
   } else {
-    // IEEE standard states that NaN values will not compare to themselves
-    if (value != value) {
+
+    if (isnan(value)) {
       len = snprintf(buffer, sizeof(buffer), useSpecialFloats ? "NaN" : "null");
     } else if (value < 0) {
       len = snprintf(buffer, sizeof(buffer), useSpecialFloats ? "-Infinity" : "-1e+9999");
@@ -4298,7 +4354,9 @@ JSONCPP_STRING valueToString(double value, bool useSpecialFloats, unsigned int p
 }
 }
 
-JSONCPP_STRING valueToString(double value) { return valueToString(value, false, 17); }
+JSONCPP_STRING valueToString(double value, unsigned int precision, PrecisionType precisionType) {
+  return valueToString(value, false, precision, precisionType);
+}
 
 JSONCPP_STRING valueToString(bool value) { return value ? "true" : "false"; }
 
@@ -4343,7 +4401,7 @@ static unsigned int utf8ToCodepoint(const char*& s, const char* e) {
     s += 2;
     // surrogates aren't valid codepoints itself
     // shouldn't be UTF-8 encoded
-    if (calculated >= 0xD800 && calculated >= 0xDFFF)
+    if (calculated >= 0xD800 && calculated <= 0xDFFF)
       return REPLACEMENT_CHARACTER;
     // oversized encoded characters are invalid
     return calculated < 0x800 ? REPLACEMENT_CHARACTER : calculated;
@@ -4353,7 +4411,7 @@ static unsigned int utf8ToCodepoint(const char*& s, const char* e) {
     if (e - s < 4)
       return REPLACEMENT_CHARACTER;
 
-    unsigned int calculated = ((firstByte & 0x07) << 24)
+    unsigned int calculated = ((firstByte & 0x07) << 18)
       | ((static_cast<unsigned int>(s[1]) & 0x3F) << 12)
       | ((static_cast<unsigned int>(s[2]) & 0x3F) << 6)
       |  (static_cast<unsigned int>(s[3]) & 0x3F);
@@ -4478,10 +4536,10 @@ Writer::~Writer() {}
 // //////////////////////////////////////////////////////////////////
 
 FastWriter::FastWriter()
-    : yamlCompatiblityEnabled_(false), dropNullPlaceholders_(false),
+    : yamlCompatibilityEnabled_(false), dropNullPlaceholders_(false),
       omitEndingLineFeed_(false) {}
 
-void FastWriter::enableYAMLCompatibility() { yamlCompatiblityEnabled_ = true; }
+void FastWriter::enableYAMLCompatibility() { yamlCompatibilityEnabled_ = true; }
 
 void FastWriter::dropNullPlaceholders() { dropNullPlaceholders_ = true; }
 
@@ -4541,7 +4599,7 @@ void FastWriter::writeValue(const Value& value) {
       if (it != members.begin())
         document_ += ',';
       document_ += valueToQuotedStringN(name.data(), static_cast<unsigned>(name.length()));
-      document_ += yamlCompatiblityEnabled_ ? ": " : ":";
+      document_ += yamlCompatibilityEnabled_ ? ": " : ":";
       writeValue(value[name]);
     }
     document_ += '}';
@@ -4630,7 +4688,7 @@ void StyledWriter::writeArrayValue(const Value& value) {
   if (size == 0)
     pushValue("[]");
   else {
-    bool isArrayMultiLine = isMultineArray(value);
+    bool isArrayMultiLine = isMultilineArray(value);
     if (isArrayMultiLine) {
       writeWithIndent("[");
       indent();
@@ -4668,7 +4726,7 @@ void StyledWriter::writeArrayValue(const Value& value) {
   }
 }
 
-bool StyledWriter::isMultineArray(const Value& value) {
+bool StyledWriter::isMultilineArray(const Value& value) {
   ArrayIndex const size = value.size();
   bool isMultiLine = size * 3 >= rightMargin_;
   childValues_.clear();
@@ -4767,7 +4825,8 @@ bool StyledWriter::hasCommentForValue(const Value& value) {
 
 StyledStreamWriter::StyledStreamWriter(JSONCPP_STRING indentation)
     : document_(NULL), rightMargin_(74), indentation_(indentation),
-      addChildValues_() {}
+      addChildValues_(), indented_(false)
+{}
 
 void StyledStreamWriter::write(JSONCPP_OSTREAM& out, const Value& root) {
   document_ = &out;
@@ -4847,7 +4906,7 @@ void StyledStreamWriter::writeArrayValue(const Value& value) {
   if (size == 0)
     pushValue("[]");
   else {
-    bool isArrayMultiLine = isMultineArray(value);
+    bool isArrayMultiLine = isMultilineArray(value);
     if (isArrayMultiLine) {
       writeWithIndent("[");
       indent();
@@ -4887,7 +4946,7 @@ void StyledStreamWriter::writeArrayValue(const Value& value) {
   }
 }
 
-bool StyledStreamWriter::isMultineArray(const Value& value) {
+bool StyledStreamWriter::isMultilineArray(const Value& value) {
   ArrayIndex const size = value.size();
   bool isMultiLine = size * 3 >= rightMargin_;
   childValues_.clear();
@@ -4999,12 +5058,13 @@ struct BuiltStyledStreamWriter : public StreamWriter
       JSONCPP_STRING const& nullSymbol,
       JSONCPP_STRING const& endingLineFeedSymbol,
       bool useSpecialFloats,
-      unsigned int precision);
+      unsigned int precision,
+      PrecisionType precisionType);
   int write(Value const& root, JSONCPP_OSTREAM* sout) JSONCPP_OVERRIDE;
 private:
   void writeValue(Value const& value);
   void writeArrayValue(Value const& value);
-  bool isMultineArray(Value const& value);
+  bool isMultilineArray(Value const& value);
   void pushValue(JSONCPP_STRING const& value);
   void writeIndent();
   void writeWithIndent(JSONCPP_STRING const& value);
@@ -5028,6 +5088,7 @@ private:
   bool indented_ : 1;
   bool useSpecialFloats_ : 1;
   unsigned int precision_;
+  PrecisionType precisionType_;
 };
 BuiltStyledStreamWriter::BuiltStyledStreamWriter(
       JSONCPP_STRING const& indentation,
@@ -5036,7 +5097,8 @@ BuiltStyledStreamWriter::BuiltStyledStreamWriter(
       JSONCPP_STRING const& nullSymbol,
       JSONCPP_STRING const& endingLineFeedSymbol,
       bool useSpecialFloats,
-      unsigned int precision)
+      unsigned int precision,
+      PrecisionType precisionType)
   : rightMargin_(74)
   , indentation_(indentation)
   , cs_(cs)
@@ -5047,6 +5109,7 @@ BuiltStyledStreamWriter::BuiltStyledStreamWriter(
   , indented_(false)
   , useSpecialFloats_(useSpecialFloats)
   , precision_(precision)
+  , precisionType_(precisionType)
 {
 }
 int BuiltStyledStreamWriter::write(Value const& root, JSONCPP_OSTREAM* sout)
@@ -5076,7 +5139,7 @@ void BuiltStyledStreamWriter::writeValue(Value const& value) {
     pushValue(valueToString(value.asLargestUInt()));
     break;
   case realValue:
-    pushValue(valueToString(value.asDouble(), useSpecialFloats_, precision_));
+    pushValue(valueToString(value.asDouble(), useSpecialFloats_, precision_, precisionType_));
     break;
   case stringValue:
   {
@@ -5128,7 +5191,7 @@ void BuiltStyledStreamWriter::writeArrayValue(Value const& value) {
   if (size == 0)
     pushValue("[]");
   else {
-    bool isMultiLine = (cs_ == CommentStyle::All) || isMultineArray(value);
+    bool isMultiLine = (cs_ == CommentStyle::All) || isMultilineArray(value);
     if (isMultiLine) {
       writeWithIndent("[");
       indent();
@@ -5170,7 +5233,7 @@ void BuiltStyledStreamWriter::writeArrayValue(Value const& value) {
   }
 }
 
-bool BuiltStyledStreamWriter::isMultineArray(Value const& value) {
+bool BuiltStyledStreamWriter::isMultilineArray(Value const& value) {
   ArrayIndex const size = value.size();
   bool isMultiLine = size * 3 >= rightMargin_;
   childValues_.clear();
@@ -5288,6 +5351,7 @@ StreamWriter* StreamWriterBuilder::newStreamWriter() const
 {
   JSONCPP_STRING indentation = settings_["indentation"].asString();
   JSONCPP_STRING cs_str = settings_["commentStyle"].asString();
+  JSONCPP_STRING pt_str = settings_["precisionType"].asString();
   bool eyc = settings_["enableYAMLCompatibility"].asBool();
   bool dnp = settings_["dropNullPlaceholders"].asBool();
   bool usf = settings_["useSpecialFloats"].asBool(); 
@@ -5299,6 +5363,14 @@ StreamWriter* StreamWriterBuilder::newStreamWriter() const
     cs = CommentStyle::None;
   } else {
     throwRuntimeError("commentStyle must be 'All' or 'None'");
+  }
+  PrecisionType precisionType(significantDigits);
+  if (pt_str == "significant") {
+    precisionType = PrecisionType::significantDigits;
+  } else if (pt_str == "decimal") {
+    precisionType = PrecisionType::decimalPlaces;
+  } else {
+    throwRuntimeError("precisionType must be 'significant' or 'decimal'");
   }
   JSONCPP_STRING colonSymbol = " : ";
   if (eyc) {
@@ -5314,7 +5386,7 @@ StreamWriter* StreamWriterBuilder::newStreamWriter() const
   JSONCPP_STRING endingLineFeedSymbol;
   return new BuiltStyledStreamWriter(
       indentation, cs,
-      colonSymbol, nullSymbol, endingLineFeedSymbol, usf, pre);
+      colonSymbol, nullSymbol, endingLineFeedSymbol, usf, pre, precisionType);
 }
 static void getValidWriterKeys(std::set<JSONCPP_STRING>* valid_keys)
 {
@@ -5325,6 +5397,7 @@ static void getValidWriterKeys(std::set<JSONCPP_STRING>* valid_keys)
   valid_keys->insert("dropNullPlaceholders");
   valid_keys->insert("useSpecialFloats");
   valid_keys->insert("precision");
+  valid_keys->insert("precisionType");
 }
 bool StreamWriterBuilder::validate(Json_helics::Value* invalid) const
 {
@@ -5357,6 +5430,7 @@ void StreamWriterBuilder::setDefaults(Json_helics::Value* settings)
   (*settings)["dropNullPlaceholders"] = false;
   (*settings)["useSpecialFloats"] = false;
   (*settings)["precision"] = 17;
+  (*settings)["precisionType"] = "significant";
   //! [StreamWriterBuilderDefaults]
 }
 

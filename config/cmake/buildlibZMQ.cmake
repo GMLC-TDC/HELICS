@@ -3,7 +3,7 @@
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
-# This function is used to force a build on a dependant project at cmake configuration phase.
+# This function is used to force a build on a dependent project at CMAKE configuration phase.
 #
 function (build_libzmq)
 
@@ -30,7 +30,7 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 	if (ZMQ_USE_STATIC_LIBRARY)
 	   set(zmq_static_build ON)
 	   set(zmq_shared_build ON)
-	   set(extra_cxx_flags "${extra_cxx_flags} -fPIC")
+	   set(extra_cxx_flags "${extra_cxx_flags} -fPIC") 
 	else()
         set(zmq_static_build ON)
 	   set(zmq_shared_build ON)
@@ -53,7 +53,7 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 ExternalProject_Add(libzmq
 	SOURCE_DIR ${PROJECT_BINARY_DIR}/Download/libzmq
     GIT_REPOSITORY  https://github.com/zeromq/libzmq.git
-	GIT_TAG v4.2.3
+	GIT_TAG v4.2.5
     DOWNLOAD_COMMAND " "
     UPDATE_COMMAND " "
 	BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/libzmq
@@ -61,7 +61,7 @@ ExternalProject_Add(libzmq
     CMAKE_ARGS
         -DCMAKE_CXX_COMPILER=${cxx_compiler_string}
         -DCMAKE_C_COMPILER=${c_compiler_string}
-        -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}/libs
+        -DCMAKE_INSTALL_PREFIX=${AUTOBUILD_INSTALL_PATH}
         -DCMAKE_BUILD_TYPE=\$\{CMAKE_BUILD_TYPE\}
 		-DZMQ_BUILD_TESTS=OFF
 		-DENABLE_CURVE=OFF
@@ -73,7 +73,7 @@ ExternalProject_Add(libzmq
 		-DENABLE_CPACK=OFF
 		-DLIBZMQ_PEDANTIC=OFF
 		-DWITH_PERF_TOOL=OFF
-		-DZEROMQ_CMAKECONFIG_INSTALL_DIR=${PROJECT_BINARY_DIR}/libs/cmake/ZeroMQ
+		-DZEROMQ_CMAKECONFIG_INSTALL_DIR=${AUTOBUILD_INSTALL_PATH}/cmake/ZeroMQ
 
 	INSTALL_DIR ${PROJECT_BINARY_DIR}/libs
 	)")

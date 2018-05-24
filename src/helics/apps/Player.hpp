@@ -62,9 +62,10 @@ class Player:public App
     */
     Player (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
+    @param[in] name the name of the app
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
-    explicit Player (const std::string &jsonString);
+    Player (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
     Player (Player &&other_player) = default;

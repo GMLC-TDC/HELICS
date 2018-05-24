@@ -59,9 +59,10 @@ namespace apps
         */
         Recorder(const std::shared_ptr<Core> &core, const FederateInfo &fi);
         /**constructor taking a file with the required information
+        @param[in] name the name of the app
         @param[in] file a file defining the federate information
         */
-        explicit Recorder(const std::string &jsonString);
+        Recorder(const std::string &name, const std::string &jsonString);
         /** move construction*/
         Recorder(Recorder &&other_recorder) = default;
         /** move assignment*/
