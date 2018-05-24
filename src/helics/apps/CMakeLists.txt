@@ -3,6 +3,9 @@
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
+
+if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS OR BUILD_BROKER)
+
 set(helics_apps_public_headers
 	Player.hpp
 	Recorder.hpp
@@ -58,7 +61,6 @@ add_executable(helics_broker helics-broker.cpp)
 
 endif()
 
-if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS OR BUILD_BROKER)
 	add_executable(helics_app appMain.cpp)
 	target_link_libraries(helics_app helics_apps-static)
 	set_target_properties (helics_app PROPERTIES FOLDER apps)
@@ -70,8 +72,10 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_app>/")                 # <--this is out-file path
 endforeach(keyfile)
+
 endif()
-endif()
+
+
 
 INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -79,4 +83,19 @@ INSTALL(TARGETS helics_apps-static EXPORT helics-targets
 
 INSTALL(FILES ${helics_apps_public_headers} 
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
+
+endif()  #if build any app
+
+#configure executable app
+
+configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
+add_executable(helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
+
+target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+set_target_properties (helics-config PROPERTIES FOLDER apps)
+target_link_libraries(helics-config PRIVATE ${Boost_LIBRARIES_core})
+target_include_directories(helics-config SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+install(TARGETS helics-config
+RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
+)
 

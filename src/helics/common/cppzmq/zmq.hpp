@@ -412,21 +412,22 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
          */
     inline std::string str() const
     {
-        // Partly mutuated from the same method in zmq::multipart_t
+        // Partly mutated from the same method in zmq::multipart_t
         std::stringstream os;
 
         const unsigned char *msg_data = this->data<unsigned char>();
         unsigned char byte;
-        size_t size = this->size();
+
+        size_t message_size = this->size();
         int is_ascii[2] = {0, 0};
 
         os << "zmq::message_t [size " << std::dec << std::setw(3)
-           << std::setfill('0') << size << "] (";
+           << std::setfill('0') << message_size << "] (";
         // Totally arbitrary
-        if (size >= 1000) {
+        if (message_size >= 1000) {
             os << "... too big to print)";
         } else {
-            while (size--) {
+            while (message_size--) {
                 byte = *msg_data++;
 
                 is_ascii[1] = (byte >= 33 && byte < 127);

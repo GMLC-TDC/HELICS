@@ -1,6 +1,6 @@
 /*
     Copyright (c) 2016-2017 ZeroMQ community
-    Copyright (c) 2016 VOCA AS / Harald Nøkland
+    Copyright (c) 2016 VOCA AS / Harald NÃ¸kland
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to
@@ -38,7 +38,7 @@ namespace zmq
 /*
     This class handles multipart messaging. It is the C++ equivalent of zmsg.h,
     which is part of CZMQ (the high-level C binding). Furthermore, it is a major
-    improvement compared to zmsg.hpp, which is part of the examples in the ØMQ
+    improvement compared to zmsg.hpp, which is part of the examples in the Ã˜MQ
     Guide. Unnecessary copying is avoided by using move semantics to efficiently
     add/remove parts.
 */
@@ -61,7 +61,7 @@ class multipart_t
     multipart_t(socket_t &socket) { recv(socket); }
 
     // Construct from memory block
-    multipart_t(const void *src, size_t size) { addmem(src, size); }
+    multipart_t(const void *src, size_t message_size) { addmem(src, message_size); }
 
     // Construct from string
     multipart_t(const std::string &string) { addstr(string); }
@@ -164,15 +164,15 @@ class multipart_t
     }
 
     // Push memory block to front
-    void pushmem(const void *src, size_t size)
+    void pushmem(const void *src, size_t memsize)
     {
-        m_parts.push_front(message_t(src, size));
+        m_parts.push_front(message_t(src, memsize));
     }
 
     // Push memory block to back
-    void addmem(const void *src, size_t size)
+    void addmem(const void *src, size_t memsize)
     {
-        m_parts.push_back(message_t(src, size));
+        m_parts.push_back(message_t(src, memsize));
     }
 
     // Push string to front
@@ -291,23 +291,24 @@ class multipart_t
         std::stringstream ss;
         for (size_t i = 0; i < m_parts.size(); i++) {
             const unsigned char *data = m_parts[i].data<unsigned char>();
-            size_t size = m_parts[i].size();
+            size_t message_size = m_parts[i].size();
 
             // Dump the message as text or binary
             bool isText = true;
-            for (size_t j = 0; j < size; j++) {
+            for (size_t j = 0; j < message_size; j++) {
                 if (data[j] < 32 || data[j] > 127) {
                     isText = false;
                     break;
                 }
             }
-            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << size
+            ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << message_size
                << "] ";
-            if (size >= 1000) {
+            if (message_size >= 1000) {
                 ss << "... (to big to print)";
                 continue;
             }
-            for (size_t j = 0; j < size; j++) {
+            for (size_t j = 0; j < message_size; j++) {
+
                 if (isText)
                     ss << static_cast<char>(data[j]);
                 else

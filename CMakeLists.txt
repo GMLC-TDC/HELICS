@@ -17,7 +17,7 @@ set (HELICS_VERSION_BUILD 0)
 set (HELICS_DATE "05-09-18")
 
 set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
-set (HELICS_VERSION_STRING "${HELICS_VERSION} ${HELICS_DATE}")
+set (HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 
 #-----------------------------------------------------------------------------
 # set the module path and include some common macros
