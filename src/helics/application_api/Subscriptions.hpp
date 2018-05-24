@@ -203,8 +203,7 @@ class Subscription : public SubscriptionBase
     template <class X>
     void getValue_impl (std::true_type /*V*/, X &out)
     {
-        hasUpdate = false;
-        if (fed->isUpdated (id))
+        if (fed->isUpdated (id)||(hasUpdate && !changeDetectionEnabled))
         {
             auto dv = fed->getValueRaw (id);
             if (type == helics_type_t::helicsInvalid)
@@ -239,6 +238,7 @@ class Subscription : public SubscriptionBase
         {
             valueExtract (lastValue, out);
         }
+        hasUpdate = false;
     }
     template <class X>
     void getValue_impl (std::false_type /*V*/, X &out)

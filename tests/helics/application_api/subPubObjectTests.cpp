@@ -345,4 +345,65 @@ BOOST_AUTO_TEST_CASE(subscriptionChangedDetection_tests)
 }
 
 
+BOOST_AUTO_TEST_CASE(subscriptionstringSize_tests)
+{
+    helics::FederateInfo fi("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    // register the publications
+    auto pubObj = helics::make_publication < std::string > (helics::GLOBAL, vFed.get(), std::string("pub1"));
+
+    auto subObj = helics::Subscription(vFed.get(), "pub1");
+
+    vFed->setTimeDelta(1.0);
+    vFed->enterExecutionState();
+    // publish string1 at time=0.0;
+    std::string str("this is a string test");
+    pubObj->publish(str);
+    auto gtime = vFed->requestTime(1.0);
+
+    BOOST_CHECK_EQUAL(gtime, 1.0);
+    BOOST_CHECK(subObj.isUpdated());
+    BOOST_CHECK_EQUAL(subObj.getStringSize(), str.size()+1);
+    BOOST_CHECK_EQUAL(subObj.getRawSize(), str.size());
+    auto val1 = subObj.getValue<std::string>();
+    //now that we got the value it should not be updated
+    BOOST_CHECK(!subObj.isUpdated());
+    BOOST_CHECK_EQUAL(val1, str);
+    vFed->finalize();
+}
+
+
+
+BOOST_AUTO_TEST_CASE(subscriptionVectorSize_tests)
+{
+    helics::FederateInfo fi("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    // register the publications
+    auto pubObj = helics::make_publication < std::vector<double> >(helics::GLOBAL, vFed.get(), std::string("pub1"));
+
+    auto subObj = helics::Subscription(vFed.get(), "pub1");
+
+    vFed->setTimeDelta(1.0);
+    vFed->enterExecutionState();
+    // publish string1 at time=0.0;
+    std::vector<double> tvec{ 5,7,234.23,99.1,1e7,0.0 };
+    pubObj->publish(tvec);
+    auto gtime = vFed->requestTime(1.0);
+
+    BOOST_CHECK_EQUAL(gtime, 1.0);
+    BOOST_CHECK(subObj.isUpdated());
+    BOOST_CHECK_EQUAL(subObj.getVectorSize(), tvec.size());
+
+    auto val1 = subObj.getValue<std::vector<double>>();
+    //now that we got the value it should not be updated
+    BOOST_CHECK(!subObj.isUpdated());
+    BOOST_CHECK(val1==tvec);
+    vFed->finalize();
+}
 BOOST_AUTO_TEST_SUITE_END ()

@@ -138,7 +138,8 @@ class DualMappedVector
             lookup2.emplace (searchValue2, index);
         }
     }
-    /** add an additional index term for searching*/
+    /** add an additional index term for searching
+    this function does not override existing values*/
     bool addSearchTermForIndex (const searchType1 &searchValue, size_t index)
     {
         if (index < dataStorage.size ())

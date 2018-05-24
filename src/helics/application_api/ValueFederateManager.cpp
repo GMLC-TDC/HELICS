@@ -37,13 +37,13 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &k
     auto sz = getTypeSize (type);
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
-    std::lock_guard<std::mutex> publock (publication_mutex);
-    publication_id_t id = static_cast<identifier_type> (publications.size ());
+    auto pubHandle = publications.lock();
+    publication_id_t id = static_cast<identifier_type> (pubHandle->size ());
     ++publicationCount;
-    publications.insert (key, key, type, units);
-    publications.back ().id = id;
-    publications.back ().size = sz;
-    publications.back ().coreID = coreID;
+    pubHandle->insert (key, key, type, units);
+    pubHandle->back ().id = id;
+    pubHandle->back ().size = sz;
+    pubHandle->back ().coreID = coreID;
     return id;
 }
 
@@ -52,12 +52,12 @@ subscription_id_t ValueFederateManager::registerRequiredSubscription (const std:
                                                                       const std::string &units)
 {
     auto coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::required);
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    subscription_id_t id = static_cast<identifier_type> (subscriptions.size ());
+    auto subHandle = subscriptions.lock();
+    subscription_id_t id = static_cast<identifier_type> (subHandle->size ());
     ++subscriptionCount;
-    subscriptions.insert (key, coreID, key, type, units);
-    subscriptions.back ().id = id;
-    subscriptions.back ().coreID = coreID;
+    subHandle->insert (key, coreID, key, type, units);
+    subHandle->back ().id = id;
+    subHandle->back ().coreID = coreID;
     lastData.resize (id.value () + 1);
     return id;
 }
@@ -67,12 +67,12 @@ subscription_id_t ValueFederateManager::registerOptionalSubscription (const std:
                                                                       const std::string &units)
 {
     auto coreID = coreObject->registerSubscription (fedID, key, type, units, handle_check_mode::optional);
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    subscription_id_t id = static_cast<identifier_type> (subscriptions.size ());
+    auto subHandle = subscriptions.lock();
+    subscription_id_t id = static_cast<identifier_type> (subHandle->size ());
     ++subscriptionCount;
-    subscriptions.insert (key, coreID, key, type, units);
-    subscriptions.back ().id = id;
-    subscriptions.back ().coreID = coreID;
+    subHandle->insert (key, coreID, key, type, units);
+    subHandle->back ().id = id;
+    subHandle->back ().coreID = coreID;
     lastData.resize (id.value () + 1);
     return id;
 }
@@ -81,8 +81,8 @@ void ValueFederateManager::addSubscriptionShortcut (subscription_id_t subid, con
 {
     if (subid.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
-        subscriptions.addSearchTermForIndex (shortcutName, subid.value ());
+        auto subHandle = subscriptions.lock();
+        subHandle->addSearchTermForIndex (shortcutName, subid.value ());
     }
     else
     {
@@ -94,10 +94,10 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, const data_vie
 {
     if (id.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
+        auto subHandle = subscriptions.lock();
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
         lastData[id.value ()] = data_view (std::make_shared<data_block> (block.data (), block.size ()));
-        subscriptions[id.value ()].lastUpdate = CurrentTime;
+        (*subHandle)[id.value ()].lastUpdate = CurrentTime;
     }
     else
     {
@@ -109,12 +109,12 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, const data_vie
 void ValueFederateManager::getUpdateFromCore (Core::handle_id_t updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
-
+    auto subHandle = subscriptions.lock();
     /** find the id*/
-    auto fid = subscriptions.find (updatedHandle);
-    if (fid != subscriptions.end ())
+    auto fid = subHandle->find (updatedHandle);
+    if (fid != subHandle->end ())
     {  // assign the data
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
+        
         lastData[fid->id.value ()] = data_view (std::move (data));
         fid->lastUpdate = CurrentTime;
     }
@@ -124,9 +124,9 @@ data_view ValueFederateManager::getValue (subscription_id_t id)
 {
     if (id.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
-        subscriptions[id.value ()].lastQuery = CurrentTime;
-        subscriptions[id.value ()].hasUpdate = false;
+        auto subHandle = subscriptions.lock();
+        (*subHandle)[id.value ()].lastQuery = CurrentTime;
+        (*subHandle)[id.value ()].hasUpdate = false;
         return lastData[id.value ()];
     }
     else
@@ -145,9 +145,10 @@ void ValueFederateManager::publish (publication_id_t id, const data_view &block)
 {
     if (id.value () < publicationCount)
     {  // send directly to the core
-        if (isBlockSizeValid (static_cast<int> (block.size ()), publications[id.value ()]))
+        auto pubHandle = publications.lock();
+        if (isBlockSizeValid (static_cast<int> (block.size ()), (*pubHandle)[id.value ()]))
         {
-            coreObject->setValue (publications[id.value ()].coreID, block.data (), block.size ());
+            coreObject->setValue ((*pubHandle)[id.value ()].coreID, block.data (), block.size ());
         }
         else
         {
@@ -164,8 +165,8 @@ bool ValueFederateManager::queryUpdate (subscription_id_t sub_id) const
 {
     if (sub_id.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
-        return subscriptions[sub_id.value ()].hasUpdate;
+        auto subHandle = subscriptions.lock_shared();
+        return (*subHandle)[sub_id.value ()].hasUpdate;
     }
     return false;
 }
@@ -174,8 +175,8 @@ Time ValueFederateManager::queryLastUpdate (subscription_id_t sub_id) const
 {
     if (sub_id.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
-        return subscriptions[sub_id.value ()].lastUpdate;
+        auto subHandle = subscriptions.lock_shared();
+        return (*subHandle)[sub_id.value ()].lastUpdate;
     }
     return false;
 }
@@ -185,12 +186,12 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
     // lock the data updates
-    std::unique_lock<std::mutex> sublock (subscription_mutex);
+    auto subHandle = subscriptions.lock();
     for (auto handle : handles)
     {
         /** find the id*/
-        auto fid = subscriptions.find (handle);
-        if (fid != subscriptions.end ())
+        auto fid = subHandle->find (handle);
+        if (fid != subHandle->end ())
         {  // assign the data
             auto data = coreObject->getValue (handle);
 
@@ -203,19 +204,19 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             {
                 // first copy the callback in case it gets changed via another operation
                 auto callbackFunction = callbacks[fid->callbackIndex];
-                sublock.unlock ();
+                subHandle = nullptr;  //need to free the lock
                 // callbacks can do all sorts of things, best not to have it locked during the callback
                 callbackFunction (fid->id, CurrentTime);
-                sublock.lock ();
+                subHandle = subscriptions.lock();
             }
             else if (allCallbackIndex >= 0)
             {
                 // first copy the callback in case it gets changed via another operation
                 auto allCallBackFunction = callbacks[allCallbackIndex];
-                sublock.unlock ();
+                subHandle = nullptr;  //need to free the lock
                 // callbacks can do all sorts of strange things, best not to have it locked during the callback
                 allCallBackFunction (fid->id, CurrentTime);
-                sublock.lock ();
+                subHandle = subscriptions.lock();
             }
         }
     }
@@ -225,7 +226,8 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     lastData.resize (subscriptionCount);
     // get the actual publication types
-    subscriptions.apply ([this](auto &sub) { sub.pubtype = coreObject->getType (sub.coreID); });
+    auto subHandle = subscriptions.lock();
+    subHandle->apply ([this](auto &sub) { sub.pubtype = coreObject->getType (sub.coreID); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -233,8 +235,8 @@ void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0
 std::vector<subscription_id_t> ValueFederateManager::queryUpdates ()
 {
     std::vector<subscription_id_t> updates;
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    for (auto &sub : subscriptions)
+    auto subHandle = subscriptions.lock_shared();
+    for (auto &sub : *subHandle)
     {
         if (sub.hasUpdate)
         {
@@ -248,15 +250,15 @@ static const std::string nullStr;
 
 std::string ValueFederateManager::getSubscriptionKey (subscription_id_t sub_id) const
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    return (sub_id.value () < subscriptions.size ()) ? subscriptions[sub_id.value ()].name : nullStr;
+    auto subHandle = subscriptions.lock_shared();
+    return (sub_id.value () < subHandle->size ()) ? (*subHandle)[sub_id.value ()].name : nullStr;
 }
 
 subscription_id_t ValueFederateManager::getSubscriptionId (const std::string &key) const
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    auto sub = subscriptions.find (key);
-    if (sub != subscriptions.end ())
+    auto subHandle = subscriptions.lock_shared();
+    auto sub = subHandle->find (key);
+    if (sub != subHandle->end ())
     {
         return sub->id;
     }
@@ -265,15 +267,15 @@ subscription_id_t ValueFederateManager::getSubscriptionId (const std::string &ke
 
 std::string ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {
-    std::lock_guard<std::mutex> publock (publication_mutex);
-    return (pub_id.value () < publications.size ()) ? publications[pub_id.value ()].name : nullStr;
+    auto pubHandle = publications.lock_shared();
+    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].name : nullStr;
 }
 
 publication_id_t ValueFederateManager::getPublicationId (const std::string &key) const
 {
-    std::lock_guard<std::mutex> publock (publication_mutex);
-    auto pub = publications.find (key);
-    if (pub != publications.end ())
+    auto pubHandle = publications.lock_shared();
+    auto pub = pubHandle->find (key);
+    if (pub != pubHandle->end ())
     {
         return pub->id;
     }
@@ -283,32 +285,32 @@ publication_id_t ValueFederateManager::getPublicationId (const std::string &key)
 
 std::string ValueFederateManager::getSubscriptionUnits (subscription_id_t sub_id) const
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    return (sub_id.value () < subscriptions.size ()) ? subscriptions[sub_id.value ()].units : nullStr;
+    auto subHandle = subscriptions.lock_shared();
+    return (sub_id.value () < subHandle->size ()) ? (*subHandle)[sub_id.value ()].units : nullStr;
 }
 
 std::string ValueFederateManager::getPublicationUnits (publication_id_t pub_id) const
 {
-    std::lock_guard<std::mutex> publock (publication_mutex);
-    return (pub_id.value () < publications.size ()) ? publications[pub_id.value ()].units : nullStr;
+    auto pubHandle = publications.lock_shared();
+    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].units : nullStr;
 }
 
 std::string ValueFederateManager::getSubscriptionType (subscription_id_t sub_id) const
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    return (sub_id.value () < subscriptions.size ()) ? subscriptions[sub_id.value ()].type : nullStr;
+    auto subHandle = subscriptions.lock_shared();
+    return (sub_id.value () < subHandle->size ()) ? (*subHandle)[sub_id.value ()].type : nullStr;
 }
 
 std::string ValueFederateManager::getPublicationType (subscription_id_t sub_id) const
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
-    return (sub_id.value () < subscriptions.size ()) ? subscriptions[sub_id.value ()].pubtype : nullStr;
+    auto subHandle = subscriptions.lock_shared();
+    return (sub_id.value () < subHandle->size ()) ? (*subHandle)[sub_id.value ()].pubtype : nullStr;
 }
 
 std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) const
 {
-    std::lock_guard<std::mutex> publock (publication_mutex);
-    return (pub_id.value () < publications.size ()) ? publications[pub_id.value ()].type : nullStr;
+    auto pubHandle = publications.lock_shared();
+    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].type : nullStr;
 }
 
 /** get a count of the number publications registered*/
@@ -318,7 +320,7 @@ int ValueFederateManager::getSubscriptionCount () const { return static_cast<int
 
 void ValueFederateManager::registerCallback (std::function<void(subscription_id_t, Time)> callback)
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
+    auto subHandle = subscriptions.lock();
     if (allCallbackIndex >= 0)
     {
         callbacks[allCallbackIndex] = std::move (callback);
@@ -335,8 +337,8 @@ void ValueFederateManager::registerCallback (subscription_id_t id,
 {
     if (id.value () < subscriptionCount)
     {
-        std::lock_guard<std::mutex> sublock (subscription_mutex);
-        subscriptions[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
+        auto subHandle = subscriptions.lock();
+        (*subHandle)[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
         callbacks.emplace_back (std::move (callback));
     }
     else
@@ -348,14 +350,14 @@ void ValueFederateManager::registerCallback (subscription_id_t id,
 void ValueFederateManager::registerCallback (const std::vector<subscription_id_t> &ids,
                                              std::function<void(subscription_id_t, Time)> callback)
 {
-    std::lock_guard<std::mutex> sublock (subscription_mutex);
+    auto subHandle = subscriptions.lock();
     int ind = static_cast<int> (callbacks.size ());
     callbacks.emplace_back (std::move (callback));
     for (auto id : ids)
     {
-        if (id.value () < subscriptions.size ())
+        if (id.value () < subHandle->size ())
         {
-            subscriptions[id.value ()].callbackIndex = ind;
+            (*subHandle)[id.value ()].callbackIndex = ind;
         }
     }
 }
