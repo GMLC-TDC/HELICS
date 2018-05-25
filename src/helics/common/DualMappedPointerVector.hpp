@@ -34,13 +34,17 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            return stx::nullopt;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                return stx::nullopt;
+            }
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::move (ptr));
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::move (ptr));
+        lookup1.emplace (searchValue1, index);
+        lookup2.emplace (searchValue2, index);
+        return index;
     }
     /** insert a new element into the vector*/
     template <typename... Us>
@@ -49,13 +53,17 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            return stx::nullopt;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                return stx::nullopt;
+            }
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup1.emplace (searchValue1, index);
+        lookup2.emplace (searchValue2, index);
+        return index;
     }
 
     /** insert a new element into the vector*/
@@ -67,10 +75,10 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup1.emplace (searchValue1, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup1.emplace (searchValue1, index);
+        return index;
     }
 
     /** insert a new element into the vector*/
@@ -82,10 +90,10 @@ class DualMappedPointerVector
         {
             return stx::nullopt;
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup2.emplace (searchValue2, index);
+        return index;
     }
 
     /** insert a new element into the vector directly from an existing unique ptr*/
@@ -96,15 +104,21 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            dataStorage[fnd->second] = std::move (ptr);
-            lookup2[searchValue2] = fnd->second;
-            return fnd->second;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                if (fnd2->second == fnd->second)
+                {
+                    dataStorage[fnd->second] = std::move(ptr);
+                    return fnd->second;
+                }
+            }
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::move (ptr));
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::move (ptr));
+        lookup1[searchValue1] = index;
+        lookup2[searchValue2] = index;
+        return index;
     }
     /** insert a new element into the vector*/
     template <typename... Us>
@@ -113,15 +127,21 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
-            lookup2[searchValue2] = fnd->second;
-            return fnd->second;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                if (fnd2->second == fnd->second)
+                {
+                    dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+                    return fnd->second;
+                }
+            }
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup1[searchValue1] = index;
+        lookup2[searchValue2] = index;
+        return index;
     }
 
     /** insert a new element into the vector*/
@@ -134,10 +154,10 @@ class DualMappedPointerVector
             dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
             return fnd->second;
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup1.emplace (searchValue1, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup1.emplace (searchValue1, index);
+        return index;
     }
 
     /** insert a new element into the vector*/
@@ -150,10 +170,10 @@ class DualMappedPointerVector
             dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
             return fnd->second;
         }
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
-            lookup2.emplace (searchValue2, index);
-            return index;
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::make_unique<VType> (std::forward<Us> (data)...));
+        lookup2.emplace (searchValue2, index);
+        return index;
     }
 
     /** find an element based on the search value

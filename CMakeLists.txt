@@ -12,9 +12,9 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 1)
-set (HELICS_VERSION_PATCH 0)
+set (HELICS_VERSION_PATCH 1)
 set (HELICS_VERSION_BUILD )
-set (HELICS_DATE "05-09-18")
+set (HELICS_DATE "05-25-18")
 
 if (NOT HELICS_VERSION_BUILD)
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
@@ -37,11 +37,10 @@ include(extraMacros)
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	 if (WIN32)
 		if (MSYS)
-				set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/" CACHE PATH "default install path" FORCE )
+			set (CMAKE_INSTALL_PREFIX "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/" CACHE PATH "default install path" FORCE )
 		else(MSYS)
 			set (CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/" CACHE PATH "default install path" FORCE )
 		endif(MSYS)
-
 	endif(WIN32)
 endif()
 
@@ -76,15 +75,14 @@ else()
 	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
-OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
-mark_as_advanced(BUILD_CXX_SHARED_LIB)
+	OPTION(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+	mark_as_advanced(BUILD_CXX_SHARED_LIB)
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 	set(BUILD_SHARED_LIBS ON)
 else()
 	OPTION(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
-
 
 IF(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -106,7 +104,7 @@ add_library(helics_base_includes INTERFACE)
 target_link_libraries(helics_base INTERFACE helics_base_includes)
 # Prohibit in-source build
 IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-  message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
+	message(FATAL_ERROR "In-source build is not supported. Please, use an empty directory for building the project.")
 ENDIF()
 
 include(compiler_flags)
@@ -231,7 +229,7 @@ ENDIF(MSYS)
 OPTION(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
 # If ZeroMQ library is enabled try to locate it and link against it
 
-IF (ZeroMQ_ENABLE)
+if (ZeroMQ_ENABLE)
 	include(addZeroMQ)
 
 	if (ZeroMQ_FOUND)
@@ -244,18 +242,15 @@ IF (ZeroMQ_ENABLE)
 		endif()
 		#message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
 		target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
-		#get_target_properties(ZMQ_LOC ${ZeroMQ_DEPENDENCY} INTERFACE_INCLUDE_DIRECTORIES)
-		#get_filename_component(ZMQ_LOC_BASE ${ZMQ_LOC} DIRECTORY)
-
 	else(ZeroMQ_FOUND)
 		set(HELICS_HAVE_ZEROMQ FALSE)
 	endif(ZeroMQ_FOUND)
- ELSE(ZeroMQ_ENABLE)
+ else(ZeroMQ_ENABLE)
 	set(HELICS_HAVE_ZEROMQ FALSE)
 	if (ZeroMQ_ENABLE)
-	  message(WARNING "ZeroMQ not found")
+		message(WARNING "ZeroMQ not found")
    endif()
-ENDIF(ZeroMQ_ENABLE)
+endif(ZeroMQ_ENABLE)
 
 
 # -------------------------------------------------------------
@@ -392,7 +387,7 @@ ELSE (BUILD_CXX_SHARED_LIB)
 	set(helics_cxx_shared_file_debug )
 ENDIF(BUILD_CXX_SHARED_LIB)
 
-IF(BUILD_C_SHARED_LIB OR BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
+IF(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
 	set(helics_c_shared_file "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
 	set(helics_c_shared_file_debug "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ELSE()
@@ -434,7 +429,7 @@ configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}-${HELICS_VERSION_BUILD}
+                                 VERSION ${HELICS_VERSION}
                                  COMPATIBILITY SameMajorVersion)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake

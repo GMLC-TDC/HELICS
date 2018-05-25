@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <atomic>
-#include <mutex>
+#include "../common/GuardedTypes.hpp"
 
 namespace helics
 {
@@ -179,8 +179,8 @@ class ValueFederateManager
     int getSubscriptionCount () const;
 
   private:
-    DualMappedVector<subscription_info, std::string, Core::handle_id_t> subscriptions;
-    MappedVector<publication_info> publications;
+    shared_guarded_m<DualMappedVector<subscription_info, std::string, Core::handle_id_t>> subscriptions;
+    shared_guarded_m<MappedVector<publication_info>> publications;
     std::atomic<publication_id_t::underlyingType> publicationCount{0};  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
     std::vector<data_view> lastData;  //!< the last data to arrive
@@ -189,9 +189,6 @@ class ValueFederateManager
     Core::federate_id_t fedID;  //!< the federation ID from the core API
     std::atomic<subscription_id_t::underlyingType> subscriptionCount{0};  //!< the count of actual endpoints
     int allCallbackIndex = -1;  //!< index of the allCallback function
-
-    mutable std::mutex subscription_mutex;  //!< mutex protecting the subscription information
-    mutable std::mutex publication_mutex;  //!< mutex protecting the publication information
   private:
     void getUpdateFromCore (Core::handle_id_t handle);
 };

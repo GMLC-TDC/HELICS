@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "helics/compiler-config.h"
@@ -16,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <libguarded/ordered_guarded.hpp>
 #include <libguarded/shared_guarded.hpp>
-
+//#include <libguarded/staged_guarded.hpp>
 
 
 template <class T>

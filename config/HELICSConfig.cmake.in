@@ -47,20 +47,22 @@ find_program(HELICS_BROKER helics_broker
 	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
 	NO_DEFAULT_PATH)
 	
-set(HELICS_HAVE_ZEROMQ @HELICS_HAVE_ZEROMQ)
-set(HELICS_HAVE_MPI @HELICS_HAVE_MPI)
+set(HELICS_HAVE_ZEROMQ @HELICS_HAVE_ZEROMQ@)
+set(HELICS_HAVE_MPI @HELICS_HAVE_MPI@)
 
 set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
 
 include(CMakeFindDependencyMacro)
 include(extraMacros)
 
-if (NOT Boostlibs::core)
+if (TARGET Boostlibs::core)
+else()
 	include(addBoost)
 endif()
 
 if (HELICS_HAVE_ZEROMQ)
-	if (NOT libzmq)
+	if (TARGET libzmq)
+	else()
 		set(ZeroMQ_LIBRARY_ONLY ON)
 		set(ZeroMQ_INSTALL_PATH ${PACKAGE_PREFIX_DIR})
 		find_dependency(ZeroMQ)
@@ -68,14 +70,16 @@ if (HELICS_HAVE_ZEROMQ)
 endif()
 
 if (HELICS_HAVE_MPI)
-	if (NOT MPI::MPI_C)
+	if (TARGET MPI::MPI_C)
+	else()
 		include(addMPI)
 	endif()
 endif()
 
 #find_dependency(ZeroMQ)
 
-if (NOT Threads::Threads)
+if (TARGET Threads::Threads)
+else()
 	if (NOT WIN32)
 		set(THREADS_PREFER_PTHREAD_FLAG ON)
 	elseif (MSYS)
@@ -86,14 +90,15 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
 
-if (HELICS::helicsSharedLib)
-add_library(HELICS::helicsCpp98 INTERFACE)
-target_include_directories(HELICS::helicsCpp98 INTERFACE "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/cpp98")
-target_link_libraries(HELICS::helicsCpp98 INTERFACE HELICS::helicsSharedLib)
+if (TARGET HELICS::helicsSharedLib)
+	add_library(HELICS::helicsCpp98 INTERFACE IMPORTED)
+	set_property(TARGET HELICS::helicsCpp98 PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include/cpp98")
 
-set_target_properties(Helics::helicsSharedLib PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@/helics/shared_api_library"
-)
+	set_property(TARGET HELICS::helicsCpp98 PROPERTY INTERFACE_LINK_LIBRARIES HELICS::helicsSharedLib)
+
+	set_target_properties(HELICS::helicsSharedLib PROPERTIES
+		INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include/helics/shared_api_library"
+	)
 endif()
 
 check_required_components(${PN})

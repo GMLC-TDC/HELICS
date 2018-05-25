@@ -92,19 +92,19 @@ class shared_guarded
       public:
         using pointer = T *;
 
-        deleter(M & mutex) : m_deleter_mutex(mutex)
+        deleter(M & mutex) : m_deleter_mutex(&mutex)
         {
         }
 
         void operator()(T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock();
+                m_deleter_mutex->unlock();
             }
         }
 
       private:
-        M & m_deleter_mutex;
+        M * m_deleter_mutex;
     };
 
     class shared_deleter
@@ -112,19 +112,19 @@ class shared_guarded
       public:
         using pointer = const T *;
 
-        shared_deleter(M & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(M & mutex) : m_deleter_mutex(&mutex)
         {
         }
 
         void operator()(const T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock_shared();
+                m_deleter_mutex->unlock_shared();
             }
         }
 
       private:
-        M & m_deleter_mutex;
+        M * m_deleter_mutex;
     };
 
     T         m_obj;
@@ -253,19 +253,18 @@ private:
     public:
         using pointer = T *;
 
-        deleter(std::mutex & mutex) : m_deleter_mutex(mutex)
+        deleter(std::mutex & mutex) : m_deleter_mutex(&mutex)
         {
         }
-
         void operator()(T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock();
+                m_deleter_mutex->unlock();
             }
         }
 
     private:
-       std::mutex & m_deleter_mutex;
+       std::mutex * m_deleter_mutex;
     };
 
     class shared_deleter
@@ -273,19 +272,19 @@ private:
     public:
         using pointer = const T *;
 
-        shared_deleter(std::mutex & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(std::mutex & mutex) : m_deleter_mutex(&mutex)
         {
         }
 
         void operator()(const T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock();
+                m_deleter_mutex->unlock();
             }
         }
 
     private:
-        std::mutex & m_deleter_mutex;
+        std::mutex * m_deleter_mutex;
     };
 
     T         m_obj;
@@ -386,19 +385,19 @@ private:
     public:
         using pointer = T *;
 
-        deleter(std::timed_mutex & mutex) : m_deleter_mutex(mutex)
+        deleter(std::timed_mutex & mutex) : m_deleter_mutex(&mutex)
         {
         }
 
         void operator()(T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock();
+                m_deleter_mutex->unlock();
             }
         }
 
     private:
-        std::timed_mutex & m_deleter_mutex;
+        std::timed_mutex * m_deleter_mutex;
     };
 
     class shared_deleter
@@ -406,19 +405,19 @@ private:
     public:
         using pointer = const T *;
 
-        shared_deleter(std::timed_mutex & mutex) : m_deleter_mutex(mutex)
+        shared_deleter(std::timed_mutex & mutex) : m_deleter_mutex(&mutex)
         {
         }
 
         void operator()(const T * ptr)
         {
             if (ptr) {
-                m_deleter_mutex.unlock();
+                m_deleter_mutex->unlock();
             }
         }
 
     private:
-        std::timed_mutex & m_deleter_mutex;
+        std::timed_mutex * m_deleter_mutex;
     };
 
     T         m_obj;
