@@ -151,21 +151,25 @@ size_t Subscription::getRawSize ()
 { 
     getAndCheckForUpdate();
     auto dv=fed->getValueRaw(id);
+    if (dv.empty())
+    {
+
+    }
     return dv.size();
 }
 
 size_t Subscription::getStringSize () 
 { 
     getAndCheckForUpdate();
-    auto dv = fed->getValueRaw(id);
-    return dv.size()+1;
+    auto out = getValue<std::string>();
+    auto dv = out.size()+1;
 }
 
 size_t Subscription::getVectorSize () 
 { 
     getAndCheckForUpdate();
-    auto dv = fed->getValueRaw(id);
-    return (dv.size()>9)?(dv.size()-9)/sizeof(double):0;
+    auto out = getValue<std::vector<double>>();
+    auto dv = out.size();
 }
 
 }  // namespace helics
