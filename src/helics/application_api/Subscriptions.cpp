@@ -96,6 +96,7 @@ bool Subscription::isUpdated () const
             auto dv = fed->getValueRaw(id);
             auto visitor = [&](auto &&arg) -> bool {
                 std::remove_const_t<std::remove_reference_t<decltype (arg)>> newVal;
+                (void)arg;  //suppress VS2015 warning
                 valueExtract (dv, type, newVal);
                 return (changeDetected(lastValue, newVal, delta));
             };
@@ -128,6 +129,7 @@ bool Subscription::getAndCheckForUpdate ()
             {
                 auto visitor = [&](auto &&arg) {
                     std::remove_reference_t<decltype (arg)> newVal;
+                    (void)arg;  //suppress VS2015 warning
                     valueExtract (dv, type, newVal);
                     if (changeDetected (lastValue, newVal, delta))
                     {

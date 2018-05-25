@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
 
     SKIPTEST runPubSubTypeTests<c, v> (c{0.0, 2}, v{0, 2});
 
-    SKIPTEST runPubSubTypeTests<v, double> (tvec1, 12.4);
+    SKIPTEST runPubSubTypeTests<v, double> (tvec1, sqrt(12.4*12.4+0.3*0.3+0.7*0.7));
 
     SKIPTEST runPubSubTypeTests<double, v> (0.34, v{0.34});
 
@@ -292,11 +292,11 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 
     SKIPTEST runPubSubTypeTests<c, vc> (c{0.0, 2}, vc{c{0, 2}});
 
-    SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, 5.0);
+    SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, helics::vectorNorm(tcvec2));
 
     SKIPTEST runPubSubTypeTests<double, vc> (0.34, vc{c{0.34}});
 
-    SKIPTEST runPubSubTypeTests<vc, int64_t> (tcvec2, 5);
+    SKIPTEST runPubSubTypeTests<vc, int64_t> (tcvec2, 51);
 
     SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
