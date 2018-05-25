@@ -4,19 +4,31 @@ All notable changes to this project after the 1.0.0 release will be documented i
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.1] - 2018-05-25
 ### Added
  - BrokerApp as a slightly more convenient runner to Brokers
+ - getXXSize functions directly in the Subscription object instead of a roundabout call in the C api
+ - more complete error catching for the C library
+ - added helics-config executable for getting paths and links and used flags
+ - added a broker app that can start up a broker easily
 
 ### Changed
  - upgrade autobuild ZMQ version to 4.2.5 and change CMake scripts to use zmq target
+ - updated HELICSConfig.cmake install file to link properly to external libraries and find them if necessary, also included some find functions.  The find_package(HELICS) should work properly now
+ - changed boost inclusion to use targets instead of files directly
+ - changed MPI inclusion to work better on windows and use targets instead of direct links
  - update cereal library with latest bug fixes
  - update jsoncpp with latest version
+ - update cppzmq with the latest version
  - moved helics_broker executable code to the apps repository
  - the CXX shared library can now be built alongside the C shared library and can be built on Windows.
 
 ### Fixed
  - compilation issue with Xcode 8.0
+ - inconsistent numerical conversion from vectors to doubles in subscriptions
+
+### Removed
+ - installation of HELICSImport.cmake  this is now redundant with updated HELICSConfig.cmake
 
 ## [1.1.0] - 2018-05-09
 ### Added
