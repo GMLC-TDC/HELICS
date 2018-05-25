@@ -870,11 +870,13 @@ const std::string &CommonCore::getType (handle_id_t handle) const
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
             auto subInfo = fed->getSubscription (handleInfo->handle);
-            if (subInfo->pubType.empty ())
+            if (subInfo != nullptr)
             {
-                return handleInfo->type;
+                if (!subInfo->pubType.empty())
+                {
+                    return subInfo->pubType;
+                }
             }
-            return subInfo->pubType;
         }
         return handleInfo->type;
     }

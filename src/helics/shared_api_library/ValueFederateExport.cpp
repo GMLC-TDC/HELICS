@@ -554,9 +554,7 @@ int helicsSubscriptionGetValueSize (helics_subscription sub)
         auto dv = subObj->fedptr->getValueRaw (subObj->id);
         return static_cast<int> (dv.size ());
     }
-
-    auto str = subObj->subptr->getValue<std::string> ();
-    return static_cast<int> (str.size ());
+    return static_cast<int> (subObj->subptr->getRawSize());
 }
 
 helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data, int maxDatalen, int *actualSize)
@@ -787,8 +785,7 @@ int helicsSubscriptionGetVectorSize (helics_subscription sub)
         return static_cast<int> (V.size ());
     }
 
-    auto V = subObj->subptr->getValue<std::vector<double>> ();
-    return static_cast<int> (V.size ());
+    return static_cast<int> (subObj->subptr->getVectorSize());
 }
 
 helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[], int maxlen, int *actualSize)

@@ -44,7 +44,7 @@ namespace libguarded
    copyable.
 */
 template <typename T, typename M = std::mutex>
-class guarded
+class staged_guarded
 {
 private:
     class deleter;
@@ -179,7 +179,7 @@ public:
 
 template <typename T, typename M>
 template <typename... Us>
-staged_guarded<T, M>::guarded (Us &&... data) : m_obj (std::forward<Us> (data)...)
+staged_guarded<T, M>::staged_guarded (Us &&... data) : m_obj (std::forward<Us> (data)...)
 {
 }
 
@@ -243,7 +243,7 @@ auto staged_guarded<T, M>::try_lock () -> handle
 
 
 template <typename T, typename M>
-auto staged_guarded<T, M>::try_lock_shared() -> shared_handle
+auto staged_guarded<T, M>::try_lock_shared() const -> shared_handle
 {
     if (!constant.load(std::memory_order_acquire))
     {
