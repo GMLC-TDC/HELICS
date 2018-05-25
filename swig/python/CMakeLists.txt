@@ -84,7 +84,7 @@ add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
-		
+
 ENDIF ()
 
 
