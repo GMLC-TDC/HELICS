@@ -9,14 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Federate.hpp"
 #include <thread>
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include "json/json.h"
-#pragma warning(pop)
-#else
-#include "json/json.h"
-#endif
+#include "json/jsoncpp.h"
 
 #include <boost/algorithm/string.hpp>
 

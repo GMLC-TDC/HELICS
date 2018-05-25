@@ -40,6 +40,7 @@ enum class core_type : int
 
 };
 
+
 /** enumeration of the possible states of convergence*/
 enum class iteration_state : signed char
 {

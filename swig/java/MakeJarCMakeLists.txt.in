@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.4)
-project (HELICSJAR)
+project (HELICSJAR LANGUAGES NONE)
 
 FIND_PACKAGE(Java REQUIRED)
 INCLUDE(UseJava)

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Echo.hpp"
 #include "Tracer.hpp"
 #include "Source.hpp"
+#include "BrokerApp.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
@@ -31,6 +32,7 @@ int main (int argc, char *argv[])
         return 0;
     }
     std::string arg1(argv[1]);
+    int ret = 0;
     //now redo the arguments remove the second argument which is the app name
     argc -= 1;
     for (int ii = 2; ii <= argc; ++ii)
@@ -41,19 +43,19 @@ int main (int argc, char *argv[])
     {
         if (boost::iequals(arg1,"player"))
         {
-            helics::apps::Player Player(argc, argv);
-            if (Player.isActive())
+            helics::apps::Player player(argc, argv);
+            if (player.isActive())
             {
-                Player.run();
+                player.run();
             }
 
         }
         else if (boost::iequals(arg1, "recorder"))
         {
-            helics::apps::Recorder Recorder(argc, argv);
-            if (Recorder.isActive())
+            helics::apps::Recorder recorder(argc, argv);
+            if (recorder.isActive())
             {
-                Recorder.run();
+                recorder.run();
             }
 
         }
@@ -67,23 +69,24 @@ int main (int argc, char *argv[])
         }
         else if (boost::iequals(arg1, "echo"))
         {
-            helics::apps::Echo Echo(argc, argv);
-            if (Echo.isActive())
+            helics::apps::Echo echo(argc, argv);
+            if (echo.isActive())
             {
-                Echo.run();
+                echo.run();
             }
         }
         else if (boost::iequals(arg1, "source"))
         {
-            helics::apps::Source Source(argc, argv);
-            if (Source.isActive())
+            helics::apps::Source source(argc, argv);
+            if (source.isActive())
             {
-                Source.run();
+                source.run();
             }
         }
         else if (boost::iequals(arg1, "broker"))
         {
-
+            helics::apps::BrokerApp broker(argc, argv);
+            //broker just waits on the destructor if it was active so this is all we do
         }
         else if (boost::iequals(arg1, "tracer"))
         {
@@ -103,19 +106,16 @@ int main (int argc, char *argv[])
     catch (const std::invalid_argument &ia)
     {
         std::cerr << ia.what() << std::endl;
-        helics::cleanupHelicsLibrary();
-        return (-2);
+        ret = -2;
     }
     catch (const helics::HelicsException &he)
     {
         std::cerr << he.what() << std::endl;
-        helics::cleanupHelicsLibrary();
-        return (-4);
+        ret = -4;
     }
 
-
     helics::cleanupHelicsLibrary();
-    return 0;
+    return ret;
 
 }
 

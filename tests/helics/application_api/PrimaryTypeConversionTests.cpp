@@ -36,12 +36,13 @@ BOOST_AUTO_TEST_CASE (vectorNorm_tests)
 {
     using c = std::complex<double>;
     using cv = std::vector<c>;
-
+    BOOST_CHECK_EQUAL(vectorNorm(std::vector<double>()), 0.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{4.0}), 4.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{3.0, 4.0}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{-3.0, -4.0}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{-3.0, -3.0, -3.0, -3.0, -3.0}), std::sqrt (9.0 * 5.0));
 
+    BOOST_CHECK_EQUAL(vectorNorm(cv()), 0.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (4.0, 0)}), 4.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (3.0, 4.0)}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (-3.0, -4.0)}), 5.0);

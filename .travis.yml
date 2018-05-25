@@ -26,6 +26,10 @@ _basic_env:
       packages:
         - g++-6
         - valgrind
+- &daily_osx
+  if: type = cron
+  os: osx
+  compiler: clang
 - &linux_base
   if: type != cron
   os: linux
@@ -146,6 +150,13 @@ jobs:
         - SHARED_LIB_EXT=so
         - USE_SWIG=true
         - CXX_STANDARD=17
+    # XCode 8gm, OS X 10.11
+    - <<: *daily_osx
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
+        - HOMEBREW_NO_AUTO_UPDATE=1
+        - SHARED_LIB_EXT=dylib
+      osx_image: xcode8
 
 branches:
   except:
