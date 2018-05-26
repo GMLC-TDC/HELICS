@@ -89,7 +89,7 @@ BasicHandleInfo *HandlePointerManager::getPublication (const std::string &name) 
 federate_id_t HandlePointerManager::getLocalFedID (handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (id_, handles)) ? handles[id_]->local_fed_id : federate_id_t();
+    return (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles)) ? handles[id_]->local_fed_id : federate_id_t();
 }
 
 void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)

@@ -351,7 +351,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             global_broker_id = global_broker_id_t(command.dest_id);
             global_broker_id_local = global_broker_id.load();
             higher_broker_id = global_broker_id_t(command.source_id);
-            timeCoord->source_id = global_broker_id_local;
+            timeCoord->source_id = global_federate_id_t(global_broker_id_local);
             transmitDelayedMessages ();
 
             return;

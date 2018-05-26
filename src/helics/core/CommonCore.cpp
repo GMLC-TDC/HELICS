@@ -1343,13 +1343,13 @@ FilterInfo *CommonCore::createSourceFilter (global_broker_id_t dest,
     std::lock_guard<std::mutex> lock (_handlemutex);
     if (filt->core_id == global_broker_id.load ())
     {
-        filters.insert (actualKey, {filt->core_id, filt->handle}, std::move (filt));
+        filters.insert (actualKey, {global_federate_id_t(filt->core_id), filt->handle}, std::move (filt));
     }
     else
     {
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->core_id));
-        filters.insert (actualKey, {filt->core_id, filt->handle}, std::move (filt));
+        filters.insert (actualKey, { global_federate_id_t(filt->core_id), filt->handle}, std::move (filt));
     }
 
     return retTarget;
