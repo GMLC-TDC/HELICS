@@ -48,7 +48,7 @@ class TimeCoordinator
 
   public:
       global_federate_id_t
-      source_id;  //!< the identifier for inserting into the source id field of any generated messages;
+      source_id=global_federate_id_t(0);  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
