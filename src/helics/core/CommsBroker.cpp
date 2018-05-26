@@ -12,7 +12,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CoreBroker.hpp"
 #include "ipc/IpcComms.h"
 #include "udp/UdpComms.h"
+#ifdef HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqComms.h"
+#endif
 
 #ifndef DISABLE_TCP_CORE
 #include "tcp/TcpComms.h"
@@ -26,8 +28,10 @@ namespace helics
 {
 template class CommsBroker<ipc::IpcComms, CoreBroker>;
 template class CommsBroker<ipc::IpcComms, CommonCore>;
+#ifdef HELICS_HAVE_ZEROMQ
 template class CommsBroker<zeromq::ZmqComms, CoreBroker>;
 template class CommsBroker<zeromq::ZmqComms, CommonCore>;
+#endif
 template class CommsBroker<udp::UdpComms, CoreBroker>;
 template class CommsBroker<udp::UdpComms, CommonCore>;
 

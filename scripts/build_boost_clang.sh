@@ -1,4 +1,4 @@
-
+#!/usr/bin/env bash
 
 localdir=$(pwd)
 #change to wherever boost was downloaded

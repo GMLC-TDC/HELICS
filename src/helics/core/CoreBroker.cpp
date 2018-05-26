@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ForwardingTimeCoordinator.hpp"
 #include "loggingHelper.hpp"
 #include <fstream>
-#include <json/json.h>
+#include <json/jsoncpp.h>
 
 namespace helics
 {
@@ -228,7 +228,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (getRoute (command.source_id), badInit);
             return;
         }
-        if (!_federates.insert (command.name, static_cast<Core::federate_id_t> (_federates.size ()), command.name))
+        if (_federates.find(command.name)!=_federates.end())
         {
             ActionMessage badName (CMD_FED_ACK);
             setActionFlag (badName, error_flag);
@@ -238,6 +238,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (getRoute (command.source_id), badName);
             return;
         }
+        _federates.insert(command.name, static_cast<Core::federate_id_t> (_federates.size()), command.name);
         _federates.back ().route_id = getRoute (command.source_id);
         if (!_isRoot)
         {

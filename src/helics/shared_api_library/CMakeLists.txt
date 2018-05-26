@@ -3,13 +3,6 @@
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
-IF(UNIX)
-  add_compile_options(-fvisibility=hidden)
-ELSE(UNIX)
-  IF(MINGW)
- add_compile_options(-fvisibility=hidden)
-  ENDIF(MINGW)
-ENDIF(UNIX)
 
 set(helicsShared_headers
 helics.h
@@ -34,6 +27,7 @@ include(GenerateExportHeader)
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
+add_library(HELICS::helicsSharedLib ALIAS helicsSharedLib)
 generate_export_header(helicsSharedLib
 	BASE_NAME helics)
 	
@@ -41,6 +35,7 @@ target_include_directories(helicsSharedLib PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
+set_target_properties(helicsSharedLib PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden)
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
 if (UNIX OR MINGW)
 	if (NOT APPLE)
@@ -48,11 +43,28 @@ if (UNIX OR MINGW)
 	endif(NOT APPLE)
 endif()
 
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (helicsSharedLib PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif(HELICS_HAVE_ZEROMQ)
-
 set_target_properties (helicsSharedLib PROPERTIES FOLDER interfaces)
+
+OPTION(STATIC_STANDARD_LIB "Link against a static standard lib" OFF)
+
+if (STATIC_STANDARD_LIB)
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		if (USE_LIBCXX)
+			message("static linking against libc++ is not currently supported")
+		else(USE_LIBCXX)
+			target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
+		endif(USE_LIBCXX)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+		# using Visual Studio C++
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	endif()
+
+endif(STATIC_STANDARD_LIB)
 
 INSTALL(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

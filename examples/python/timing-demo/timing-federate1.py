@@ -90,7 +90,7 @@ def destroy_value_federate(fed, broker):
     h.helicsCloseLibrary()
 
 
-def main():
+def main(delay=None):
 
     broker = create_broker()
     fed = create_value_federate(broker)
@@ -98,14 +98,17 @@ def main():
     pubid = h.helicsFederateRegisterGlobalTypePublication(fed, "federate1-to-federate2", h.HELICS_DATA_TYPE_STRING, "")
     subid = h.helicsFederateRegisterSubscription(fed, "federate2-to-federate1", "double", "")
     epid = h.helicsFederateRegisterGlobalEndpoint(fed, "endpoint1", "")
-    # fid = h.helicsFederateRegisterSourceFilter(fed, h.helics_delay_filter, "endpoint2", "filter-name")
+
+    if delay is not None:
+        fid = h.helicsFederateRegisterSourceFilter(fed, h.helics_delay_filter, "endpoint2", "filter-name")
 
     h.helicsSubscriptionSetDefaultDouble(subid, 0)
 
     print("Entering execution mode")
     h.helicsFederateEnterExecutionMode(fed)
 
-    # h.helicsFilterSet(fid, "delay", 2.0)
+    if delay is not None:
+        h.helicsFilterSet(fid, "delay", 2.0)
 
     grantedtime = -1
     while True:
@@ -137,6 +140,15 @@ def main():
 
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
 
-    main()
+    parser.add_argument("--delay", default=False, help="Delay messages")
+    args = parser.parse_args()
+    if args.delay is not False:
+        delay = args.delay
+    else:
+        delay = None
+
+    main(delay)
 

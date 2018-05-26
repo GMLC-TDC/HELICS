@@ -827,7 +827,7 @@ data_block typeConvert (helics_type_t type, const named_point &val)
     {
         return ValueConverter<named_point>::convert (val);
     }
-    if (isnan (val.value))
+    if (std::isnan (val.value))
     {
         // just convert the string
         return typeConvert (type, val.name);
@@ -846,7 +846,7 @@ data_block typeConvert (helics_type_t type, const named_point &val)
     default:
         return ValueConverter<named_point>::convert (val);
     case helics_type_t::helicsString:
-        return (isnan (val.value)) ? val.name : helicsNamedPointString (val);
+        return (std::isnan (val.value)) ? val.name : helicsNamedPointString (val);
     case helics_type_t::helicsComplexVector:
     {
         std::complex<double> v2 (val.value, 0.0);
@@ -863,7 +863,7 @@ data_block typeConvert (helics_type_t type, const char *str, double val)
     {
         return ValueConverter<named_point>::convert (named_point (str, val));
     }
-    if (isnan (val))
+    if (std::isnan (val))
     {
         // just convert the string
         return typeConvert (type, str);
