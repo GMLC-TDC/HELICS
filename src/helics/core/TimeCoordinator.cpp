@@ -754,6 +754,12 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
                 info.observer = checkActionFlag (cmd, indicator_flag);
             }
             break;
+        case REALTIME_FLAG:
+            if (initMode)
+            {
+                info.realtime = checkActionFlag(cmd, indicator_flag);
+            }
+            break;
         default:
             break;
         }

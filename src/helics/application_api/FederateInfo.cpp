@@ -145,6 +145,18 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
             {
                 uninterruptible = false;
             }
+            else if (flag == "forward_compute")
+            {
+                forwardCompute = true;
+            }
+            else if (flag == "realtime")
+            {
+                realtime = true;
+            }
+            else if (flag == "delayed_update")
+            {
+               wait_for_current_time_updates = true;
+            }
             else
             {
                 std::cerr << "unrecognized flag " << flag << std::endl;
@@ -208,6 +220,10 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     {
         fi.forwardCompute = doc["forward_compute"].asBool ();
     }
+    if (doc.isMember("realtime"))
+    {
+        fi.realtime= doc["realtime"].asBool();
+    }
     if (doc.isMember ("separator"))
     {
         auto sep = doc["separator"].asString ();
@@ -234,6 +250,10 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     if (doc.isMember ("coreInit"))
     {
         fi.coreInitString = doc["coreInit"].asString ();
+    }
+    if (doc.isMember("delayed_update"))
+    {
+        fi.wait_for_current_time_updates= doc["delayed_update"].asBool();
     }
     if (doc.isMember ("maxIterations"))
     {

@@ -21,7 +21,7 @@ class CoreFederateInfo
       timeZero;  //!< the time it takes values and messages to propagate to be accessible to the Federate
     Time period = timeZero;  //!< a period value,  all granted times must be on this period n*Period+offset
     Time offset = timeZero;  //!< offset to the time period
-
+    Time rtTolerance = 0.2; //!< real time tolerance - time tolerance band outside of which HELICS will adjust grants and times
     bool observer = false;  //!< flag indicating that the federate is an observer
     bool uninterruptible =
       false;  //!< flag indicating that the federate should never return a time other than requested
@@ -33,7 +33,7 @@ class CoreFederateInfo
       false;  //!< flag indicating values should be discarded if they are not changed from previous values
     bool wait_for_current_time_updates = false;  //!< flag indicating that the federate should only grant when no
                                                  //!< more messages can be received at the current time
-
+    bool realtime = false;  //!< flag indicating that the federate is required to operate in real time.  the federate must have a non-zero period
     int16_t maxIterations = 50;  //!< the maximum number of iterations allowed for the federate
     int32_t logLevel = 1;  //!< the logging level above which not to log to file
 };
