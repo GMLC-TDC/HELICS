@@ -36,6 +36,8 @@ set(helics_apps_library_files
 add_library(helics_apps-static STATIC ${helics_apps_library_files} ${helics_apps_public_headers} ${helics_apps_private_headers})
 
 target_link_libraries(helics_apps-static PUBLIC helics-static)
+#add and alias library to match the find_package
+add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 
 if (BUILD_PLAYER)
 	add_executable(helics_player playerMain.cpp)
@@ -61,7 +63,6 @@ add_executable(helics_broker helics-broker.cpp)
 
 endif()
 
-
 	add_executable(helics_app appMain.cpp)
 	target_link_libraries(helics_app helics_apps-static)
 	set_target_properties (helics_app PROPERTIES FOLDER apps)
@@ -73,6 +74,7 @@ add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:helics_app>/")                 # <--this is out-file path
 endforeach(keyfile)
+
 endif()
 
 
@@ -93,11 +95,11 @@ add_executable(helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/he
 
 target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 set_target_properties (helics-config PROPERTIES FOLDER apps)
-target_link_libraries(helics-config PRIVATE ${Boost_LIBRARIES_core})
-target_include_directories(helics-config SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+
+target_link_libraries(helics-config PUBLIC Boostlibs::core)
+target_include_directories(helics-config SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+
 install(TARGETS helics-config
 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
 )
-
-
 

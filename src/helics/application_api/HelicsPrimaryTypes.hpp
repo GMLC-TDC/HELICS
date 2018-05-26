@@ -117,34 +117,13 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &
     case vectorLoc:  // vector
     {
         auto &vec = mpark::get<std::vector<double>> (dv);
-        if (!vec.empty ())
-        {
-            if (vec.size () == 2)
-            {
-                val = static_cast<X> (std::hypot (vec[0], vec[1]));
-            }
-            else
-            {
-                val = static_cast<X> (vec.front ());
-            }
-        }
-        else
-        {
-            val = X (0);
-        }
+        val = static_cast<X> (vectorNorm(vec));
         break;
     }
     case complexVectorLoc:  // complex vector
     {
         auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
-        if (!vec.empty ())
-        {
-            val = static_cast<X> (std::abs (vec.front ()));
-        }
-        else
-        {
-            val = X (0);
-        }
+        val = static_cast<X> (vectorNorm(vec));
         break;
     }
     case namedPointLoc:
@@ -250,14 +229,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsVector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
-        if (V.size () == 2)
-        {
-            val = static_cast<X> (std::hypot (V[0], V[1]));
-        }
-        else
-        {
-            val = (V.empty ()) ? X (0) : static_cast<X> (V.front ());
-        }
+        val = static_cast<X>(vectorNorm(V));
         break;
     }
     case helics_type_t::helicsComplex:
@@ -269,7 +241,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsComplexVector:
     {
         auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
-        val = (!V.empty ()) ? static_cast<X> (std::abs (V.front ())) : 0.0;
+        val = static_cast<X>(vectorNorm(V));
         break;
     }
     case helics_type_t::helicsInvalid:

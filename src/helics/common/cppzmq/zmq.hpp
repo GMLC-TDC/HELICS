@@ -417,6 +417,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
 
         const unsigned char *msg_data = this->data<unsigned char>();
         unsigned char byte;
+
         size_t message_size = this->size();
         int is_ascii[2] = {0, 0};
 

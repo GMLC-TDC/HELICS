@@ -19,19 +19,21 @@ add_library(helics-static STATIC
 )
 
 target_link_libraries(helics-static PUBLIC helics_base)
-
+#add and alias library to match the find_package
+add_library(HELICS::helics-static ALIAS helics-static)
 IF(BUILD_CXX_SHARED_LIB)
 	#if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
 	#	message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
 	#endif()
 
 	add_library(helics-shared SHARED
-	src/empty.cpp
+	../empty.cpp
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 )
 
+	add_library(HELICS::helics-shared ALIAS helics-shared)
 	target_link_libraries(helics-shared PRIVATE helics_base)
 
 	if (WIN32)

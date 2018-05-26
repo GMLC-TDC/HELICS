@@ -17,7 +17,7 @@ namespace mpi
 MpiCore::MpiCore () noexcept {}
 
 // MpiCore::~MpiCore () = default;
-MpiCore::~MpiCore () { std::cout << "MpiCore destructor for " << getAddress () << std::endl; }
+MpiCore::~MpiCore () { std::cout << "MpiCore destructor for " << MpiCore::getAddress () << std::endl; }
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 using namespace std::string_literals;
@@ -70,7 +70,7 @@ bool MpiCore::brokerConnect ()
     return res;
 }
 
-std::string MpiCore::getAddress () const { return comms->getAddress (); }
+std::string MpiCore::getAddress () const { return (comms)?(comms->getAddress ()): brokerAddress; }
 
 }  // namespace mpi
 }  // namespace helics

@@ -27,6 +27,7 @@ include(GenerateExportHeader)
 
 add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
+add_library(HELICS::helicsSharedLib ALIAS helicsSharedLib)
 generate_export_header(helicsSharedLib
 	BASE_NAME helics)
 	
@@ -53,15 +54,15 @@ if (STATIC_STANDARD_LIB)
 		else(USE_LIBCXX)
 			target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
 		endif(USE_LIBCXX)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # using Visual Studio C++
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-endif()
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
+	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+		# using Visual Studio C++
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	endif()
 
 endif(STATIC_STANDARD_LIB)
 

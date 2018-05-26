@@ -11,7 +11,7 @@
 if ( MSVC )
     set(WERROR_FLAG "/W4 /WX")
 else( MSVC )
-set(WERROR_FLAG "-Werror")
+	set(WERROR_FLAG "-Werror")
 endif ( MSVC )
 
 
@@ -95,11 +95,11 @@ endif()
 
 
 if (NOT NO_CONFIG_GENERATION)
-if (CONFIGURE_TARGET_LOCATION)
-CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
-else()
-CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
-endif()
+	if (CONFIGURE_TARGET_LOCATION)
+		CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${CONFIGURE_TARGET_LOCATION}/compiler-config.h)
+	else()
+		CONFIGURE_FILE(${CMAKE_CURRENT_LIST_DIR}/compiler-config.h.in ${PROJECT_BINARY_DIR}/compiler-config.h)
+	endif()
 
 endif(NOT NO_CONFIG_GENERATION)
 
