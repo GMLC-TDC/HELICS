@@ -51,16 +51,16 @@ class FederateState
     std::atomic<global_federate_id_t> global_id;  //!< global id code, default to invalid
 
   private:
-    shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
+    shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, handle_id_t>>
       subscriptions;  //!< storage for all the subscriptions
     
     std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
     bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
-    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>>
+    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, handle_id_t>>
       publications;  //!< storage for all the publications
-    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>>
+    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, handle_id_t>>
       endpoints;  //!< storage for all the endpoints
 
   public:
@@ -84,9 +84,9 @@ class FederateState
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
 
-    std::vector<Core::handle_id_t> events;  //!< list of value events to process
+    std::vector<handle_id_t> events;  //!< list of value events to process
     std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
-    std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
+    std::map<handle_id_t, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
@@ -124,31 +124,31 @@ class FederateState
     federate_state_t getState () const;
 
     const SubscriptionInfo *getSubscription (const std::string &subName) const;
-    const SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
+    const SubscriptionInfo *getSubscription (handle_id_t handle_) const;
     SubscriptionInfo *getSubscription (const std::string &subName);
-    SubscriptionInfo *getSubscription (Core::handle_id_t handle_);
+    SubscriptionInfo *getSubscription (handle_id_t handle_);
     const PublicationInfo *getPublication (const std::string &pubName) const;
-    const PublicationInfo *getPublication (Core::handle_id_t handle_) const;
+    const PublicationInfo *getPublication (handle_id_t handle_) const;
     PublicationInfo *getPublication (const std::string &pubName);
-    PublicationInfo *getPublication (Core::handle_id_t handle_);
+    PublicationInfo *getPublication (handle_id_t handle_);
     const EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    const EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
+    const EndpointInfo *getEndpoint (handle_id_t handle_) const;
     EndpointInfo *getEndpoint (const std::string &endpointName);
-    EndpointInfo *getEndpoint (Core::handle_id_t handle_);
+    EndpointInfo *getEndpoint (handle_id_t handle_);
 
-    void createSubscription (Core::handle_id_t handle,
+    void createSubscription (handle_id_t handle,
                              const std::string &key,
                              const std::string &type,
                              const std::string &units,
                              handle_check_mode check_mode);
-    void createPublication (Core::handle_id_t handle,
+    void createPublication (handle_id_t handle,
                             const std::string &key,
                             const std::string &type,
                             const std::string &units);
-    void createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type);
+    void createEndpoint (handle_id_t handle, const std::string &key, const std::string &type);
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize (Core::handle_id_t id) const;
+    uint64_t getQueueSize (handle_id_t id) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
     /** get the current iteration counter for an iterative call
@@ -158,10 +158,10 @@ class FederateState
     /** get the next available message for an endpoint
     @param id the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transfered to the caller*/
-    std::unique_ptr<Message> receive (Core::handle_id_t id);
+    std::unique_ptr<Message> receive (handle_id_t id);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny (Core::handle_id_t &id);
+    std::unique_ptr<Message> receiveAny (handle_id_t &id);
     /** set the CommonCore object that is managing this Federate*/
     void setParent (CommonCore *coreObject) { parent_ = coreObject; };
 
@@ -223,7 +223,7 @@ class FederateState
     Time nextAllowedSendTime () const { return allowed_send_time; }
     /**get a reference to the handles of subscriptions with value updates
      */
-    const std::vector<Core::handle_id_t> &getEvents () const;
+    const std::vector<handle_id_t> &getEvents () const;
     /** get a reference to the global ids of dependent federates
      */
     const std::vector<global_federate_id_t> &getDependents () const;
@@ -288,7 +288,7 @@ class FederateState
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len);
+    bool checkAndSetValue (handle_id_t pub_id, const char *data, uint64_t len);
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);

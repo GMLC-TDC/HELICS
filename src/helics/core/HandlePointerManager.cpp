@@ -13,9 +13,9 @@ BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   const std::string &type,
                                                   const std::string &units)
 {
-    Core::handle_id_t local_id = static_cast<Core::handle_id_t> (handles.size ());
+    handle_id_t local_id(static_cast<handle_id_t::base_type> (handles.size ()));
     std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.push_back (std::make_unique<BasicHandleInfo> (local_id, fed_id, what, actKey, type, units));
+    handles.push_back (std::make_unique<BasicHandleInfo> (fed_id, local_id, what, actKey, type, units));
     auto hpointer = handles.back ().get ();
     addType (hpointer, local_id);
     return hpointer;
@@ -28,17 +28,17 @@ BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   const std::string &type_in,
                                                   const std::string &type_out)
 {
-    Core::handle_id_t local_id = static_cast<Core::handle_id_t> (handles.size ());
+    handle_id_t local_id(static_cast<handle_id_t::base_type> (handles.size ()));
     handles.emplace_back (
-      std::make_unique<BasicHandleInfo> (local_id, fed_id, what, key, target, type_in, type_out));
+      std::make_unique<BasicHandleInfo> ( fed_id, local_id, what, key, target, type_in, type_out));
     auto hpointer = handles.back ().get ();
     addType (hpointer, local_id);
     return hpointer;
 }
 
-BasicHandleInfo *HandlePointerManager::getHandleInfo (Core::handle_id_t id_) const
+BasicHandleInfo *HandlePointerManager::getHandleInfo (handle_id_t id_) const
 {
-    if (isValidIndex (id_, handles))
+    if (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles))
     {
         return handles[id_].get ();
     }
@@ -86,7 +86,7 @@ BasicHandleInfo *HandlePointerManager::getPublication (const std::string &name) 
     return nullptr;
 }
 
-federate_id_t HandlePointerManager::getLocalFedID (Core::handle_id_t id_) const
+federate_id_t HandlePointerManager::getLocalFedID (handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
     return (isValidIndex (id_, handles)) ? handles[id_]->local_fed_id : federate_id_t();

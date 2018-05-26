@@ -772,7 +772,7 @@ void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage 
 void CoreBroker::addPublication (ActionMessage &m)
 {
     auto &pub =
-      handles.addHandle (global_federate_id_t(m.source_id), m.source_handle, handle_type_t::publication, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle), handle_type_t::publication, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (pub, m);
     if (!_isRoot)
@@ -787,7 +787,7 @@ void CoreBroker::addPublication (ActionMessage &m)
 void CoreBroker::addSubscription (ActionMessage &m)
 {
     auto &sub =
-      handles.addHandle (global_federate_id_t(m.source_id), m.source_handle, handle_type_t::subscription, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle), handle_type_t::subscription, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (sub, m);
     sub.processed = checkActionFlag (m, processing_complete_flag);
@@ -810,7 +810,7 @@ void CoreBroker::addSubscription (ActionMessage &m)
 void CoreBroker::addEndpoint (ActionMessage &m)
 {
     auto &ept =
-      handles.addHandle (global_federate_id_t(m.source_id), m.source_handle, handle_type_t::endpoint, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle), handle_type_t::endpoint, m.name, m.info ().type, m.info ().units);
 
     addLocalInfo (ept, m);
 
@@ -837,7 +837,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), m.source_handle, handle_type_t::source_filter, m.name, m.info ().target,
+    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle), handle_type_t::source_filter, m.name, m.info ().target,
                                     m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))
@@ -867,7 +867,7 @@ void CoreBroker::addSourceFilter (ActionMessage &m)
 
 bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 {
-    auto filter = handles.findHandle (global_federate_id_t(m.source_id), m.source_handle);
+    auto filter = handles.findHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle));
     if (filter != nullptr)
     {
         filter->flag = true;
@@ -887,7 +887,7 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 
 void CoreBroker::addDestFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), m.source_handle, handle_type_t::destination_filter, m.name, m.info ().target,
+    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), handle_id_t(m.source_handle), handle_type_t::destination_filter, m.name, m.info ().target,
                                     m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))

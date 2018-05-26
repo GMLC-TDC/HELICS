@@ -34,18 +34,17 @@ class SubscriptionInfo
     };
 
     /** constructor with all the information*/
-    SubscriptionInfo (Core::handle_id_t id_,
-                      global_federate_id_t fed_id_,
+    SubscriptionInfo (global_federate_id_t fed_id_, 
+                        handle_id_t id_,
                       const std::string &key_,
                       const std::string &type_,
                       const std::string &units_,
                       bool required_ = false)
-        : id (id_), fed_id (fed_id_), key (key_), type (type_), units (units_), required (required_)
+        :  fed_id (fed_id_), id(id_), key (key_), type (type_), units (units_), required (required_)
     {
     }
-
-    const Core::handle_id_t id;  //!< identifier for the handle
     const global_federate_id_t fed_id;  //!< the federate that created the handle
+    const handle_id_t id;  //!< identifier for the handle
     const std::string key;  //!< the identifier for the subscription
     const std::string type;  //! the type of data for the subscription
     std::string pubType;  //!< the type of data that its matching publication uses
@@ -54,7 +53,7 @@ class SubscriptionInfo
     bool has_target = false;  //!< flag indicating that a target publication was found
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
     dataRecord current_data;  //!< the most recent published data
-    std::pair<global_federate_id_t, Core::handle_id_t> target;  //!< the publication information
+    std::pair<global_federate_id_t, handle_id_t> target;  //!< the publication information
   private:
     std::vector<dataRecord> data_queue;  //!< queue of the data
 

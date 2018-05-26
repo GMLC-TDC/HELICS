@@ -27,10 +27,10 @@ class endpoint_info
     std::string name;
     std::string type;
     endpoint_id_t id = invalid_id_value;
-    Core::handle_id_t handle = invalid_handle;
+    handle_id_t handle;
     int callbackIndex = -1;
     endpoint_info () = default;
-    endpoint_info (std::string n_name, std::string n_type, endpoint_id_t n_id, Core::handle_id_t n_handle)
+    endpoint_info (std::string n_name, std::string n_type, endpoint_id_t n_id, handle_id_t n_handle)
         : name (std::move (n_name)), type (std::move (n_type)), id (n_id), handle (n_handle){};
 };
 
@@ -136,11 +136,11 @@ class MessageFederateManager
     int getEndpointCount () const;
 
   private:
-    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, Core::handle_id_t>>
+    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, handle_id_t>>
       local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
 
-    std::map<Core::handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
+    std::map<handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     std::atomic<endpoint_id_t::underlyingType> endpointCount{0};  //!< the count of actual endpoints

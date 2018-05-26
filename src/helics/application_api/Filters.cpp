@@ -184,7 +184,7 @@ SourceFilter::SourceFilter (Federate *fed,
     if (fed != nullptr)
     {
         fid = fed->registerSourceFilter (name, target, input_type, output_type);
-        id = fid.value ();
+        id = handle_id_t(fid.value ());
     }
 }
 
@@ -212,7 +212,7 @@ DestinationFilter::DestinationFilter (Federate *fed,
     if (fed != nullptr)
     {
         fid = fed->registerDestinationFilter (name, target, input_type, output_type);
-        id = fid.value ();
+        id = handle_id_t(fid.value ());
     }
 }
 
@@ -240,7 +240,7 @@ CloningFilter::CloningFilter (Federate *fed) : Filter (fed)
 void CloningFilter::addSourceTarget (const std::string &sourceName)
 {
     auto filtid = corePtr->registerCloningSourceFilter (getName (), sourceName, std::string (), std::string ());
-    sourceFilters.push_back (filtid);
+    sourceFilters.push_back (static_cast<int32_t>(filtid));
     sourceEndpoints.push_back (sourceName);
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());
 }
@@ -249,7 +249,7 @@ void CloningFilter::addDestinationTarget (const std::string &destinationName)
 {
     auto filtid =
       corePtr->registerCloningDestinationFilter (getName (), destinationName, std::string (), std::string ());
-    destFilters.push_back (filtid);
+    destFilters.push_back (static_cast<int32_t>(filtid));
     destEndpoints.push_back (destinationName);
     corePtr->setFilterOperator (filtid, filtOp->getOperator ());
 }
@@ -265,7 +265,7 @@ void CloningFilter::removeSourceTarget (const std::string &sourceName)
     {
         if (sourceEndpoints[ii] == sourceName)
         {
-            corePtr->setFilterOperator (sourceFilters[ii].value (), nullptr);
+            corePtr->setFilterOperator (handle_id_t(sourceFilters[ii].value ()), nullptr);
         }
     }
 }
@@ -276,7 +276,7 @@ void CloningFilter::removeDestinationTarget (const std::string &destinationName)
     {
         if (destEndpoints[ii] == destinationName)
         {
-            corePtr->setFilterOperator (destFilters[ii].value (), nullptr);
+            corePtr->setFilterOperator (handle_id_t(destFilters[ii].value ()), nullptr);
         }
     }
 }

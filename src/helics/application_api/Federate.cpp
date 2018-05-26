@@ -880,7 +880,7 @@ filter_id_t Federate::registerSourceFilter (const std::string &filterName,
                                             const std::string &inputType,
                                             const std::string &outputType)
 {
-    return coreObject->registerSourceFilter (filterName, sourceEndpoint, inputType, outputType);
+    return filter_id_t(coreObject->registerSourceFilter (filterName, sourceEndpoint, inputType, outputType));
 }
 
 filter_id_t Federate::registerDestinationFilter (const std::string &filterName,
@@ -888,7 +888,7 @@ filter_id_t Federate::registerDestinationFilter (const std::string &filterName,
                                                  const std::string &inputType,
                                                  const std::string &outputType)
 {
-    return coreObject->registerDestinationFilter (filterName, destEndpoint, inputType, outputType);
+    return filter_id_t(coreObject->registerDestinationFilter (filterName, destEndpoint, inputType, outputType));
 }
 
 filter_id_t Federate::registerCloningSourceFilter (const std::string &filterName,
@@ -896,7 +896,7 @@ filter_id_t Federate::registerCloningSourceFilter (const std::string &filterName
                                                    const std::string &inputType,
                                                    const std::string &outputType)
 {
-    return coreObject->registerCloningSourceFilter (filterName, sourceEndpoint, inputType, outputType);
+    return filter_id_t(coreObject->registerCloningSourceFilter (filterName, sourceEndpoint, inputType, outputType));
 }
 
 filter_id_t Federate::registerCloningDestinationFilter (const std::string &filterName,
@@ -904,48 +904,48 @@ filter_id_t Federate::registerCloningDestinationFilter (const std::string &filte
                                                         const std::string &inputType,
                                                         const std::string &outputType)
 {
-    return coreObject->registerCloningDestinationFilter (filterName, destEndpoint, inputType, outputType);
+    return filter_id_t(coreObject->registerCloningDestinationFilter (filterName, destEndpoint, inputType, outputType));
 }
 
-std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (id.value ()); }
-std::string Federate::getFilterEndpoint (filter_id_t id) const { return coreObject->getTarget (id.value ()); }
+std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (handle_id_t(id.value ())); }
+std::string Federate::getFilterEndpoint (filter_id_t id) const { return coreObject->getTarget (handle_id_t(id.value ())); }
 
-std::string Federate::getFilterInputType (filter_id_t id) const { return coreObject->getType (id.value ()); }
+std::string Federate::getFilterInputType (filter_id_t id) const { return coreObject->getType (handle_id_t(id.value ())); }
 
-std::string Federate::getFilterOutputType (filter_id_t id) const { return coreObject->getType (id.value ()); }
+std::string Federate::getFilterOutputType (filter_id_t id) const { return coreObject->getType (handle_id_t(id.value ())); }
 
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    if (id == invalid_handle)
+    if (!id.isValid())
     {
         id = coreObject->getDestinationFilter (filterName);
     }
-    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
+    return (id.isValid()) ? filter_id_t(id):invalid_id_value ;
 }
 
 filter_id_t Federate::getSourceFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getSourceFilter (filterName);
-    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
+    return (id.isValid()) ? filter_id_t(id) : invalid_id_value;
 }
 
 filter_id_t Federate::getDestFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getDestinationFilter (filterName);
-    return (id == invalid_handle) ? invalid_id_value : filter_id_t (id);
+    return (id.isValid()) ? filter_id_t(id) : invalid_id_value;
 }
 
 void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
 {
-    coreObject->setFilterOperator (id.value (), std::move (mo));
+    coreObject->setFilterOperator (handle_id_t(id.value ()), std::move (mo));
 }
 
 void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
 {
     for (auto id : filter_ids)
     {
-        coreObject->setFilterOperator (id.value (), mo);
+        coreObject->setFilterOperator (handle_id_t(id.value ()), mo);
     }
 }
 

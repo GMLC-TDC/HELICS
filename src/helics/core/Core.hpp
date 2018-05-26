@@ -42,11 +42,6 @@ class Core
     virtual ~Core () = default;
 
     /**
-     * HandleID uniquely identifies a handle.
-     */
-    using handle_id_t = int32_t;
-
-    /**
      * Simulator control.
      */
 
@@ -641,10 +636,5 @@ class Core
     virtual void setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> queryFunction) = 0;
 };
-
-// set at a large negative number but not the largest negative number
-constexpr Core::handle_id_t invalid_handle = -2'000'000'000;
-constexpr Core::handle_id_t direct_send_handle =
-  -1'745'234;  //!< this special handle can be used to directly send a message in a core
 
 }  // namespace helics

@@ -106,7 +106,7 @@ void ValueFederateManager::setDefaultValue (subscription_id_t id, const data_vie
 }
 
 /** we have a new message from the core*/
-void ValueFederateManager::getUpdateFromCore (Core::handle_id_t updatedHandle)
+void ValueFederateManager::getUpdateFromCore (handle_id_t updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
     auto subHandle = subscriptions.lock();

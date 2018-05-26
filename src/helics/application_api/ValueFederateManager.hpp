@@ -24,7 +24,7 @@ struct publication_info
     std::string name;  //!< publication name
     std::string type;  //!< publication type
     std::string units;  //!< publication units
-    Core::handle_id_t coreID;  //!< Handle from the core
+    handle_id_t coreID;  //!< Handle from the core
     publication_id_t id = 0;  //!< the id used as the identifier
     int size = -1;  //!< required size of a publication
     bool forward = true;
@@ -38,7 +38,7 @@ struct subscription_info
     std::string type;  //!< subscription type
     std::string units;  //!< subscription units
     std::string pubtype;  //!< the listed type of the corresponding publication
-    Core::handle_id_t coreID;  //!< Handle from the core
+    handle_id_t coreID;  //!< Handle from the core
     subscription_id_t id = 0;  //!< the id used as the identifier
     Time lastUpdate = Time (0.0);  //!< the time the subscription was last updated
     Time lastQuery = Time (0.0);  //!< the time the query was made
@@ -179,7 +179,7 @@ class ValueFederateManager
     int getSubscriptionCount () const;
 
   private:
-    shared_guarded_m<DualMappedVector<subscription_info, std::string, Core::handle_id_t>> subscriptions;
+    shared_guarded_m<DualMappedVector<subscription_info, std::string, handle_id_t>> subscriptions;
     shared_guarded_m<MappedVector<publication_info>> publications;
     std::atomic<publication_id_t::underlyingType> publicationCount{0};  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
@@ -190,7 +190,7 @@ class ValueFederateManager
     std::atomic<subscription_id_t::underlyingType> subscriptionCount{0};  //!< the count of actual endpoints
     int allCallbackIndex = -1;  //!< index of the allCallback function
   private:
-    void getUpdateFromCore (Core::handle_id_t handle);
+    void getUpdateFromCore (handle_id_t handle);
 };
 
 }  // namespace helics

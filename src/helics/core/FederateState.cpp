@@ -156,32 +156,32 @@ void FederateState::updateFederateInfo (const ActionMessage &cmd)
     }
 }
 
-void FederateState::createSubscription (Core::handle_id_t handle,
+void FederateState::createSubscription (handle_id_t handle,
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units,
                                         handle_check_mode check_mode)
 {
     auto subHandle = subscriptions.lock ();
-    subHandle->insert (key, handle, handle, global_id.load(), key, type, units,
+    subHandle->insert (key, handle, global_id.load(), handle, key, type, units,
                        (check_mode == handle_check_mode::required));
 
     subHandle->back ()->only_update_on_change = only_update_on_change;
 }
-void FederateState::createPublication (Core::handle_id_t handle,
+void FederateState::createPublication (handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
 {
-    publications.lock ()->insert (key, handle, handle, global_id.load(), key, type, units);
+    publications.lock ()->insert (key, handle,  global_id.load(), handle, key, type, units);
 }
 
-void FederateState::createEndpoint (Core::handle_id_t handle,
+void FederateState::createEndpoint (handle_id_t handle,
                                     const std::string &endpointName,
                                     const std::string &type)
 {
     auto endHandle = endpoints.lock ();
-    endHandle->insert (endpointName, handle, handle, global_id.load(), endpointName, type);
+    endHandle->insert (endpointName, handle,  global_id.load(), handle, endpointName, type);
     hasEndpoints = true;
 }
 
@@ -195,12 +195,12 @@ SubscriptionInfo *FederateState::getSubscription (const std::string &subName)
     return subscriptions.lock ()->find (subName);
 }
 
-const SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_) const
+const SubscriptionInfo *FederateState::getSubscription (handle_id_t handle_) const
 {
     return subscriptions.lock_shared ()->find (handle_);
 }
 
-SubscriptionInfo *FederateState::getSubscription (Core::handle_id_t handle_)
+SubscriptionInfo *FederateState::getSubscription (handle_id_t handle_)
 {
     return subscriptions.lock ()->find (handle_);
 }
@@ -210,7 +210,7 @@ const PublicationInfo *FederateState::getPublication (const std::string &pubName
     return publications.lock_shared ()->find (pubName);
 }
 
-const PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_) const
+const PublicationInfo *FederateState::getPublication (handle_id_t handle_) const
 {
     return publications.lock ()->find (handle_);
 }
@@ -220,7 +220,7 @@ PublicationInfo *FederateState::getPublication (const std::string &pubName)
     return publications.lock ()->find (pubName);
 }
 
-PublicationInfo *FederateState::getPublication (Core::handle_id_t handle_)
+PublicationInfo *FederateState::getPublication (handle_id_t handle_)
 {
     return publications.lock ()->find (handle_);
 }
@@ -230,7 +230,7 @@ const EndpointInfo *FederateState::getEndpoint (const std::string &endpointName)
     return endpoints.lock_shared ()->find (endpointName);
 }
 
-const EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) const
+const EndpointInfo *FederateState::getEndpoint (handle_id_t handle_) const
 {
     return endpoints.lock_shared ()->find (handle_);
 }
@@ -240,9 +240,9 @@ EndpointInfo *FederateState::getEndpoint (const std::string &endpointName)
     return endpoints.lock ()->find (endpointName);
 }
 
-EndpointInfo *FederateState::getEndpoint (Core::handle_id_t handle_) { return endpoints.lock ()->find (handle_); }
+EndpointInfo *FederateState::getEndpoint (handle_id_t handle_) { return endpoints.lock ()->find (handle_); }
 
-bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len)
+bool FederateState::checkAndSetValue (handle_id_t pub_id, const char *data, uint64_t len)
 {
     if (!only_transmit_on_change)
     {
@@ -254,7 +254,7 @@ bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data
     return pub->CheckSetValue (data, len);
 }
 
-uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
+uint64_t FederateState::getQueueSize (handle_id_t handle_) const
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
@@ -275,7 +275,7 @@ uint64_t FederateState::getQueueSize () const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive (Core::handle_id_t handle_)
+std::unique_ptr<Message> FederateState::receive (handle_id_t handle_)
 {
     auto epI = getEndpoint (handle_);
     if (epI != nullptr)
@@ -285,7 +285,7 @@ std::unique_ptr<Message> FederateState::receive (Core::handle_id_t handle_)
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
+std::unique_ptr<Message> FederateState::receiveAny (handle_id_t &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
@@ -311,7 +311,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
         id = endpointI->id;
         return result;
     }
-    id = invalid_handle;
+    id = handle_id_t();
     return nullptr;
 }
 
@@ -642,9 +642,9 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     return iteration_result::next_step;
 }
 
-const std::vector<Core::handle_id_t> emptyHandles;
+const std::vector<handle_id_t> emptyHandles;
 
-const std::vector<Core::handle_id_t> &FederateState::getEvents () const
+const std::vector<handle_id_t> &FederateState::getEvents () const
 {
     if (!processing)
     {  //!< if we are processing this vector is in an undefined state
@@ -954,7 +954,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_SEND_MESSAGE:
     {
-        auto epi = getEndpoint (cmd.dest_handle);
+        auto epi = getEndpoint (handle_id_t(cmd.dest_handle));
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
@@ -965,7 +965,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_PUB:
     {
-        auto subI = getSubscription (cmd.dest_handle);
+        auto subI = getSubscription (handle_id_t(cmd.dest_handle));
         if (subI == nullptr)
         {
             break;
@@ -986,10 +986,10 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         return iteration_state::error;
     case CMD_REG_PUB:
     {
-        auto subI = getSubscription (cmd.dest_handle);
+        auto subI = getSubscription (handle_id_t(cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->target = {global_federate_id_t(cmd.source_id), cmd.source_handle};
+            subI->target = {global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle)};
             subI->pubType = cmd.info ().type;
             addDependency (global_federate_id_t(cmd.source_id));
         }
@@ -997,10 +997,10 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_NOTIFY_PUB:
     {
-        auto subI = getSubscription (cmd.dest_handle);
+        auto subI = getSubscription (handle_id_t(cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->target = {global_federate_id_t(cmd.source_id), cmd.source_handle};
+            subI->target = {global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle)};
             subI->pubType = cmd.payload;
             addDependency (global_federate_id_t(cmd.source_id));
         }
@@ -1009,7 +1009,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     case CMD_REG_SUB:
     case CMD_NOTIFY_SUB:
     {
-        auto pubI = getPublication (cmd.dest_handle);
+        auto pubI = getPublication (handle_id_t(cmd.dest_handle));
         if (pubI != nullptr)
         {
             pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);

@@ -257,7 +257,7 @@ class CommonCore : public Core, public BrokerBase
     void processDestFilterReturn (ActionMessage &command);
     /** create a source filter */
     FilterInfo *createSourceFilter (global_broker_id_t dest,
-                                    Core::handle_id_t handle,
+                                    handle_id_t handle,
                                     const std::string &key,
                                     const std::string &target,
                                     const std::string &type_in,
@@ -265,7 +265,7 @@ class CommonCore : public Core, public BrokerBase
 
     /** create a destination filter */
     FilterInfo *createDestFilter (global_broker_id_t dest,
-                                  Core::handle_id_t handle,
+                                  handle_id_t handle,
                                   const std::string &key,
                                   const std::string &target,
                                   const std::string &type_in,

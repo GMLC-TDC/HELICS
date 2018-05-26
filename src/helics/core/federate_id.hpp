@@ -41,11 +41,42 @@ private:
 
 };
 
+/** class defining a federate_id_t
+@details  the intent of this class is to limit the operations available on a federate identifier
+to those that are a actually required and make sense, and make it as low impact as possible.
+it also acts to limit any mistakes of a federate_id_t
+*/
+class handle_id_t
+{
+
+public:
+    using base_type = identififier_base_type;
+    /** default constructor*/
+    constexpr handle_id_t() = default;
+
+    constexpr explicit handle_id_t(base_type val) noexcept : _id(val) {};
+
+    constexpr operator base_type() const { return _id; }
+    /** equality operator*/
+    bool operator== (handle_id_t id) const noexcept { return (_id == id._id); };
+    /** inequality operator*/
+    bool operator!= (handle_id_t id) const noexcept { return (_id != id._id); };
+    /** less than operator for sorting*/
+    bool operator< (handle_id_t id) const noexcept { return (_id < id._id); };
+    bool isValid() const {
+        return (_id != -1'700'000'000);
+    }
+private:
+    base_type _id = -1'700'000'000;  //!< the underlying index value
+
+};
+
+constexpr handle_id_t direct_send_handle =handle_id_t(-1'745'234);  //!< this special handle can be used to directly send a message in a core
 
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 131072 federates to be available in each core
 1,878,917,120 allowable federates in the system and
-268,435,455 brokers allowed  if we need more than that this program has been phenomenally successful beyond
+268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
 all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
 */
 constexpr identififier_base_type global_federate_id_shift = 0x0002'0000;
@@ -83,7 +114,7 @@ public:
     }
     constexpr base_type localIndex() const { return _id - global_federate_id_shift; }
 private:
-    base_type _id = -2'000'000'000;  //!< the underlying index value
+    base_type _id = -2'010'000'000;  //!< the underlying index value
     friend class global_broker_id_t;
 };
 
@@ -123,7 +154,7 @@ public:
     }
     base_type localIndex() const { return _id - global_broker_id_shift; }
 private:
-    base_type _id = -2'000'000'000;  //!< the underlying index value
+    base_type _id = -2'020'000'000;  //!< the underlying index value
     friend class global_federate_id_t;
 
 };

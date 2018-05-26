@@ -23,10 +23,10 @@ class HandleManager
 {
   private:
     std::vector<BasicHandleInfo> handles;  //!< local handle information
-    std::unordered_map<std::string, Core::handle_id_t> publications;  //!< map of all local publications
-    std::unordered_map<std::string, Core::handle_id_t> endpoints;  //!< map of all local endpoints
-    std::unordered_multimap<std::string, Core::handle_id_t> subscriptions;  //!< multimap of subscriptions
-    std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
+    std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
+    std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
+    std::unordered_multimap<std::string, handle_id_t> subscriptions;  //!< multimap of subscriptions
+    std::unordered_multimap<std::string, handle_id_t> filters;  //!< multimap for all the filters
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
@@ -46,14 +46,14 @@ class HandleManager
                                 const std::string &type_out);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                Core::handle_id_t local_id,
+                                handle_id_t local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                Core::handle_id_t local_id,
+                                handle_id_t local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
@@ -62,14 +62,14 @@ class HandleManager
     /** get a handle by index*/
     BasicHandleInfo *getHandleInfo (int32_t index);
     /** find a handle from both the federate and local id*/
-    BasicHandleInfo *findHandle (global_federate_id_t fed_id, Core::handle_id_t id);
+    BasicHandleInfo *findHandle (global_federate_id_t fed_id, handle_id_t id);
 
     BasicHandleInfo *getEndpoint (const std::string &name);
     auto getFilters (const std::string &name) { return filters.equal_range (name); }
     auto getSubscribers (const std::string &name) { return subscriptions.equal_range (name); }
     BasicHandleInfo *getPublication (const std::string &name);
 
-    federate_id_t getLocalFedID (Core::handle_id_t id_) const;
+    federate_id_t getLocalFedID (handle_id_t id_) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }
     const BasicHandleInfo &operator[] (size_t index) const { return handles[index]; }

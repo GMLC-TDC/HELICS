@@ -13,9 +13,9 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            const std::string &type,
                                            const std::string &units)
 {
-    Core::handle_id_t local_id = static_cast<Core::handle_id_t> (handles.size ());
+    handle_id_t local_id = static_cast<handle_id_t> (handles.size ());
     std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back (local_id, fed_id, what, actKey, type, units);
+    handles.emplace_back ( fed_id, local_id, what, actKey, type, units);
     addSearchFields (handles.back (), local_id);
     return handles.back ();
 }
@@ -27,15 +27,15 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            const std::string &type_in,
                                            const std::string &type_out)
 {
-    Core::handle_id_t local_id = static_cast<Core::handle_id_t> (handles.size ());
+    handle_id_t local_id = static_cast<handle_id_t> (handles.size ());
     std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back (local_id, fed_id, what, actKey, target, type_in, type_out);
+    handles.emplace_back ( fed_id, local_id, what, actKey, target, type_in, type_out);
     addSearchFields (handles.back (), local_id);
     return handles.back ();
 }
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           Core::handle_id_t local_id,
+                                           handle_id_t local_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &type,
@@ -43,13 +43,13 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 {
     auto index = static_cast<int32_t> (handles.size ());
     std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back (local_id, fed_id, what, actKey, type, units);
+    handles.emplace_back ( fed_id, local_id, what, actKey, type, units);
     addSearchFields (handles.back (), index);
     return handles.back ();
 }
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           Core::handle_id_t local_id,
+                                           handle_id_t local_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &target,
@@ -58,7 +58,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 {
     auto index = static_cast<int32_t> (handles.size ());
     std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back (local_id, fed_id, what, actKey, target, type_in, type_out);
+    handles.emplace_back ( fed_id, local_id, what, actKey, target, type_in, type_out);
     addSearchFields (handles.back (), index);
     return handles.back ();
 }
@@ -72,14 +72,14 @@ BasicHandleInfo *HandleManager::getHandleInfo (int32_t index)
 
     return nullptr;
 }
-static uint64_t generateSearchKey (global_federate_id_t fed_id, Core::handle_id_t id)
+static uint64_t generateSearchKey (global_federate_id_t fed_id, handle_id_t id)
 {
     auto searchKey = static_cast<uint64_t> (fed_id) << 32;
     searchKey += static_cast<uint64_t> (id) & (0x0000'0000'FFFF'FFFF);
     return searchKey;
 }
 
-BasicHandleInfo *HandleManager::findHandle (global_federate_id_t fed_id, Core::handle_id_t id)
+BasicHandleInfo *HandleManager::findHandle (global_federate_id_t fed_id, handle_id_t id)
 {
     auto key = generateSearchKey (fed_id, id);
     auto fnd = unique_ids.find (key);
@@ -110,7 +110,7 @@ BasicHandleInfo *HandleManager::getPublication (const std::string &name)
     return nullptr;
 }
 
-federate_id_t HandleManager::getLocalFedID (Core::handle_id_t id_) const
+federate_id_t HandleManager::getLocalFedID (handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
     return (isValidIndex (id_, handles)) ? handles[id_].local_fed_id : federate_id_t();
