@@ -1,11 +1,9 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef CORE_BROKER_H_
-#define CORE_BROKER_H_
+
 #pragma once
 
 #include <atomic>
@@ -18,6 +16,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
+#include "../common/DelayedObjects.hpp"
+
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
@@ -91,6 +91,8 @@ class CoreBroker : public Broker, public BrokerBase
     std::unordered_map<std::string, int32_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
     std::mutex name_mutex_;  // mutex lock for name and identifier
+    std::atomic<int> queryCounter{ 0 };
+    DelayedObjects<std::string> ActiveQueries;
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -197,7 +199,7 @@ class CoreBroker : public Broker, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
-
+    virtual std::string query(const std::string &target, const std::string &queryStr) override final;
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -237,4 +239,3 @@ class CoreBroker : public Broker, public BrokerBase
 
 }  // namespace helics
 
-#endif

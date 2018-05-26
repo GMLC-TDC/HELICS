@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
 #include "../common/AirLock.hpp"
+#include "../common/DelayedObjects.hpp"
 #include "helics_includes/any.hpp"
 #include "HandlePointerManager.hpp"
 #include <atomic>
@@ -306,6 +307,8 @@ class CommonCore : public Core, public BrokerBase
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{0};
+    DelayedObjects<std::string> ActiveQueries;
+
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
     DualMappedPointerVector<FilterInfo, std::string,

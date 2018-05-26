@@ -174,6 +174,17 @@ helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helic
     return helics_ok;
 }
 
+helics_status helicsFederateInfoSetSeparator(helics_federate_info_t fi, char separator)
+{
+    if (fi == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
+    hfi->separator=separator;
+    return helics_ok;
+}
+
 helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
 {
     if (fi == nullptr)
@@ -663,6 +674,50 @@ const char *helicsQueryExecute (helics_query query, helics_federate fed)
     }
 
     return queryObj->response.c_str ();
+}
+
+const char *helicsQueryCoreExecute(helics_query query, helics_core core)
+{
+    if (core == nullptr)
+    {
+        return nullptr;
+    }
+    if (core == nullptr)
+    {
+        return nullptr;
+    }
+    auto coreObj = getCore(core);
+    if (coreObj == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    queryObj->response = coreObj->query(queryObj->target,queryObj->query);
+
+    return queryObj->response.c_str();
+}
+
+const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
+{
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
+    auto brokerObj = getCore(broker);
+    if (brokerObj == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
+
+    return queryObj->response.c_str();
 }
 
 helics_status helicsQueryExecuteAsync (helics_query query, helics_federate fed)

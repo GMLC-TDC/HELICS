@@ -36,9 +36,6 @@ namespace helics
 using federate_id_t = Core::federate_id_t;
 using handle_id_t = Core::handle_id_t;
 
-// file local declarator for active queries
-static DelayedObjects<std::string> ActiveQueries;
-
 CommonCore::CommonCore () noexcept {}
 
 CommonCore::CommonCore (bool /*arg*/) noexcept {}
@@ -1704,9 +1701,9 @@ void CommonCore::setLoggingCallback (
             auto ii = getNextAirlockIndex();
             dataAirlocks[ii].load(std::move(logFunction));
             loggerUpdate.counter = ii;
-        }
-        else
-        {
+    }
+    else
+    {
             setActionFlag(loggerUpdate, empty_flag);
         }
 
@@ -1849,7 +1846,7 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
         {
             repStr.append(fed->getIdentifier());
             repStr.push_back(';');
-        }
+    }
     }
     else if (queryStr == "publications")
     {
@@ -1902,7 +1899,7 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     }
     else if (queryStr == "address")
     {
-        repStr= getAddress();
+        repStr = getAddress();
         listV = false;
     }
     else
