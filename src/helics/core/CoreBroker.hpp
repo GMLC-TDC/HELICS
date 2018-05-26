@@ -53,15 +53,7 @@ class BasicBrokerInfo
 
 class TimeCoordinator;
 class Logger;
-/** a shift in the global federate id numbers to allow discrimination between local ids and global ones
-this value allows 65535 federates to be available in each core
-1,878,982,656 allowable federates in the system and
-268,435,455 brokers allowed  if we need more than that this program has been phenomenally successful beyond
-all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
-*/
-constexpr int32_t global_federate_id_shift = 0x0001'0000;
-/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr int32_t global_broker_id_shift = 0x7000'0000;
+
 
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
@@ -82,7 +74,7 @@ class CoreBroker : public Broker, public BrokerBase
 
     std::vector<std::pair<std::string, int32_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::map<global_federate_id_t, int32_t> global_id_translation;  //!< map to translate global ids to local ones
+    std::map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
     std::map<global_federate_id_t, int32_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, int32_t>

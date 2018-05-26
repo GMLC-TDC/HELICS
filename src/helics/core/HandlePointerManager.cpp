@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-BasicHandleInfo *HandlePointerManager::addHandle (federate_id_t fed_id,
+BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &type,
@@ -21,7 +21,7 @@ BasicHandleInfo *HandlePointerManager::addHandle (federate_id_t fed_id,
     return hpointer;
 }
 
-BasicHandleInfo *HandlePointerManager::addHandle (federate_id_t fed_id,
+BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   handle_type_t what,
                                                   const std::string &key,
                                                   const std::string &target,

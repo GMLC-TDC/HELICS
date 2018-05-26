@@ -15,25 +15,25 @@ using namespace helics;
 BOOST_AUTO_TEST_CASE (dependency_tests)
 {
     TimeCoordinator ftc;
-    ftc.addDependency (2);
-    ftc.addDependency (3);
+    ftc.addDependency (helics::global_federate_id_t(2));
+    ftc.addDependency (helics::global_federate_id_t(3));
     auto deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
     // test repeated inputs are dealt with correctly
-    ftc.addDependency (3);
+    ftc.addDependency (helics::global_federate_id_t(3));
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
 
-    ftc.removeDependency (2);
+    ftc.removeDependency (helics::global_federate_id_t(2));
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == 3);
     // remove same one
-    ftc.removeDependency (2);
+    ftc.removeDependency (helics::global_federate_id_t(2));
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == 3);
@@ -77,24 +77,24 @@ BOOST_AUTO_TEST_CASE (dependency_test_message)
 BOOST_AUTO_TEST_CASE (dependent_tests)
 {
     TimeCoordinator ftc;
-    ftc.addDependent (2);
-    ftc.addDependent (3);
+    ftc.addDependent (global_federate_id_t(2));
+    ftc.addDependent (global_federate_id_t(3));
     auto &deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
     // test repeated inputs are dealt with correctly
-    ftc.addDependent (3);
+    ftc.addDependent (global_federate_id_t(3));
     // deps is a reference so it should change automatically
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
 
-    ftc.removeDependent (2);
+    ftc.removeDependent (global_federate_id_t(2));
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == 3);
     // remove same one
-    ftc.removeDependent (2);
+    ftc.removeDependent (global_federate_id_t(2));
 
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == 3);

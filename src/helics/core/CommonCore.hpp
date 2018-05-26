@@ -151,7 +151,7 @@ class CommonCore : public Core, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identifier for the core*/
     const std::string &getIdentifier () const override final { return identifier; }
-    const std::string &getFederateNameNoThrow (federate_id_t federateID) const noexcept;
+    const std::string &getFederateNameNoThrow (global_federate_id_t federateID) const noexcept;
     virtual void setLoggingCallback (
       federate_id_t federateID,
       std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
@@ -363,7 +363,7 @@ class CommonCore : public Core, public BrokerBase
     @param federateID the identifier for the federate to query
     @param queryStr  the string containing the actual query
     */
-    std::string federateQuery (global_federate_id_t federateID, const std::string &queryStr) const;
+    std::string federateQuery (federate_id_t federateID, const std::string &queryStr) const;
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);

@@ -169,7 +169,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
                                const std::string &name,
                                const std::string &message) const
 {
-    if ((federateID == 0) || (federateID == global_broker_id.load()))
+    if ((federateID == parent_broker_id) || (federateID == global_broker_id.load()))
     {
         if (logLevel > maxLogLevel)
         {

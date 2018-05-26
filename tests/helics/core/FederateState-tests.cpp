@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
-    BOOST_CHECK_EQUAL (fs->local_id, helics::federate_id_t());
-    BOOST_CHECK_EQUAL (fs->global_id, helics::global_federate_id_t());
+    BOOST_CHECK (fs->local_id==helics::federate_id_t());
+    BOOST_CHECK(fs->global_id.load()==helics::global_federate_id_t());
     BOOST_CHECK_EQUAL (fs->init_requested, false);
     // BOOST_CHECK_EQUAL(fs->processing, false);
     BOOST_CHECK_EQUAL (fs->iterating, false);
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs->addAction (cmd);
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::next_step);
-    BOOST_CHECK_EQUAL (fs->global_id, 22);
+    BOOST_CHECK_EQUAL (fs->global_id.load(), 22);
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs->addAction (cmd);
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::error);
-    BOOST_CHECK_EQUAL (fs->global_id, 22);
+    BOOST_CHECK_EQUAL (fs->global_id.load(), 22);
     BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_ERROR);
 
     // Return to initializing state

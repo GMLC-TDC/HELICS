@@ -14,8 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
-
 helics_status helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *))
 {
     if (broker == nullptr)
@@ -53,7 +51,7 @@ helics_status helicsCoreAddLoggingCallback (helics_core core, void (*logger) (in
         {
             return helics_invalid_object;
         }
-        cr->setLoggingCallback (0, [logger](int loglevel, const std::string &ident, const std::string &message) {
+        cr->setLoggingCallback (helics::local_core_id, [logger](int loglevel, const std::string &ident, const std::string &message) {
             logger (loglevel, ident.c_str (), message.c_str ());
         });
         return helics_ok;

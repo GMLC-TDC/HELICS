@@ -163,7 +163,7 @@ void FederateState::createSubscription (Core::handle_id_t handle,
                                         handle_check_mode check_mode)
 {
     auto subHandle = subscriptions.lock ();
-    subHandle->insert (key, handle, handle, global_id, key, type, units,
+    subHandle->insert (key, handle, handle, global_id.load(), key, type, units,
                        (check_mode == handle_check_mode::required));
 
     subHandle->back ()->only_update_on_change = only_update_on_change;
@@ -173,7 +173,7 @@ void FederateState::createPublication (Core::handle_id_t handle,
                                        const std::string &type,
                                        const std::string &units)
 {
-    publications.lock ()->insert (key, handle, handle, global_id, key, type, units);
+    publications.lock ()->insert (key, handle, handle, global_id.load(), key, type, units);
 }
 
 void FederateState::createEndpoint (Core::handle_id_t handle,
@@ -181,7 +181,7 @@ void FederateState::createEndpoint (Core::handle_id_t handle,
                                     const std::string &type)
 {
     auto endHandle = endpoints.lock ();
-    endHandle->insert (endpointName, handle, handle, global_id, endpointName, type);
+    endHandle->insert (endpointName, handle, handle, global_id.load(), endpointName, type);
     hasEndpoints = true;
 }
 
