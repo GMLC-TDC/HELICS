@@ -33,8 +33,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-using federate_id_t = federate_id_t;
-using handle_id_t = handle_id_t;
 
 // file local declarator for active queries
 static DelayedObjects<std::string> ActiveQueries;
@@ -2591,7 +2589,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 }
             }
             std::unique_lock<std::mutex> hlock (_handlemutex);
-            auto filter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
+            auto filter = filters.find (fed_handle_pair (global_federate_id_t(command.source_id), handle_id_t(command.source_handle)));
             hlock.unlock ();
             if (filter == nullptr)
             {
@@ -2631,7 +2629,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         if (!FilterAlreadyPresent)
         {
             std::unique_lock<std::mutex> hlock (_handlemutex);
-            auto newFilter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
+            auto newFilter = filters.find (fed_handle_pair (global_federate_id_t(command.source_id), handle_id_t(command.source_handle)));
             hlock.unlock ();
             if (newFilter == nullptr)
             {
