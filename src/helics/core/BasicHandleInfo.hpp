@@ -27,7 +27,7 @@ class BasicHandleInfo
 {
   public:
     /** default constructor*/
-    BasicHandleInfo () noexcept : type_in (type), type_out (units){};
+    BasicHandleInfo () noexcept : fed_id(global_federate_id_t()),handle(handle_id_t()),type_in (type), type_out (units){};
     /** construct from the data*/
     BasicHandleInfo (global_federate_id_t federate_id_t,
                      handle_id_t handle_id,

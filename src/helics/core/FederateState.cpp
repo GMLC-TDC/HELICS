@@ -1012,7 +1012,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         auto pubI = getPublication (handle_id_t(cmd.dest_handle));
         if (pubI != nullptr)
         {
-            pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);
+            pubI->subscribers.emplace_back (global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle));
             addDependent (global_federate_id_t(cmd.source_id));
         }
     }
