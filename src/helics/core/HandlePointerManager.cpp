@@ -97,21 +97,21 @@ void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)
     switch (handle->handle_type)
     {
     case handle_type_t::endpoint:
-        endpoints.emplace (handle->key, index);
+        endpoints.emplace (handle->key, handle_id_t(index));
         break;
     case handle_type_t::publication:
-        publications.emplace (handle->key, index);
+        publications.emplace (handle->key, handle_id_t(index));
         break;
     case handle_type_t::cloning_filter:
     case handle_type_t::destination_filter:
     case handle_type_t::source_filter:
         if (!handle->key.empty ())
         {
-            filters.emplace (handle->key, index);
+            filters.emplace (handle->key, handle_id_t(index));
         }
         break;
     case handle_type_t::subscription:
-        subscriptions.emplace (handle->key, index);
+        subscriptions.emplace (handle->key, handle_id_t(index));
         break;
     default:
         break;
