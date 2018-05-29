@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright (c) 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -35,7 +35,7 @@ ELSE(DISABLE_SWIG)
 	SWIG_LINK_LIBRARIES(JNIhelics helicsSharedLib)
 	SWIG_LINK_LIBRARIES(JNIhelics ${JAVA_LIBRARIES})
 
-	
+
 	set_target_properties (JNIhelics PROPERTIES FOLDER interfaces)
 
 	if (APPLE)
