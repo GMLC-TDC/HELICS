@@ -35,7 +35,6 @@ find_package(ZeroMQ QUIET
 	)
 endif()
 
-
 if (NOT ZeroMQ_FOUND)
 	#message(STATUS "initialZMQ not found")
 	if (ZMQ_USE_STATIC_LIBRARY OR AUTOBUILD_ZMQ)

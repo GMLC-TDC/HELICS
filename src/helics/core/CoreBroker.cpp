@@ -1288,7 +1288,7 @@ void CoreBroker::checkSubscriptions ()
         }
     }
 }
-
+//public query function
 std::string CoreBroker::query(const std::string &target, const std::string &queryStr)
 {
     if ((target == "broker") || (target == getIdentifier()))
@@ -1420,7 +1420,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     if (query == "dependency_graph")
     {
         // TOOD:  create this information
-        return "#invalid";
+        return generateDependencyGraph();
     }
     if (query == "dependencies")
     {
@@ -1486,6 +1486,39 @@ std::string CoreBroker::generateFederateMap () const
     std::stringstream sstr;
     writer->write (base, &sstr);
     return sstr.str ();
+}
+
+
+std::string CoreBroker::generateDependencyGraph() const
+{
+    Json_helics::Value base;
+    base["name"] = getIdentifier();
+    base["id"] = static_cast<int> (global_broker_id);
+    if (!isRoot())
+    {
+        base["parent"] = static_cast<int> (global_broker_id);
+    }
+    base["brokers"] = Json_helics::arrayValue;
+    //  int index = 0;
+    //  for (auto &dep : timeCoord->getDependents())
+    // {
+    // base["brokers"][index] = dep;
+    //     ++index;
+    //  }
+    base["cores"] = Json_helics::arrayValue;
+    //  index = 0;
+    //  for (auto &dep : timeCoord->getDependencies())
+    //  {
+    //  base["cores"][index] = dep;
+    //      ++index;
+    //  }
+    Json_helics::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "   ";  // or whatever you like
+    auto writer(builder.newStreamWriter());
+    std::stringstream sstr;
+    writer->write(base, &sstr);
+    return sstr.str();
 }
 
 void CoreBroker::processLocalQuery (const ActionMessage &m)

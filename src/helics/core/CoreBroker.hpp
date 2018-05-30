@@ -235,6 +235,8 @@ class CoreBroker : public Broker, public BrokerBase
     bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a json string containing the federate/broker/Core Map*/
     std::string generateFederateMap () const;
+    /** generate a json string containing the dependency information for all federation object*/
+    std::string generateDependencyGraph() const;
 };
 
 }  // namespace helics
