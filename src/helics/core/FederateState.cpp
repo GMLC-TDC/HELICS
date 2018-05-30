@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PublicationInfo.hpp"
 #include "SubscriptionInfo.hpp"
 #include "TimeCoordinator.hpp"
-
+#include "queryHelpers.hpp"
 #include <algorithm>
 #include <chrono>
 #include <thread>
@@ -1149,47 +1149,11 @@ std::string FederateState::processQuery (const std::string &query) const
 {
     if (query == "publications")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            auto pubHandle = publications.lock_shared ();
-            for (auto &pub : *pubHandle)
-            {
-                ret.append (pub->key);
-                ret.push_back (';');
-            }
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
+        return generateStringVector(*publications.lock_shared(), [](auto &pub) {return pub->key; });
     }
     if (query == "endpoints")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            auto endHandle = endpoints.lock_shared ();
-            for (auto &ept : *endHandle)
-            {
-                ret.append (ept->key);
-                ret.push_back (';');
-            }
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
+        return generateStringVector(*endpoints.lock_shared(), [](auto &pub) {return pub->key; });
     }
     if (queryCallback)
     {

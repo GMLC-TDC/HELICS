@@ -27,6 +27,7 @@ static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to con
                                      {"offset"s, "the offset of the time steps"s},
                                      {"period"s, "the period of the federate"s},
                                      {"timedelta"s, "the time delta of the federate"s},
+                                     { "rttolerance"s, "the time tolerance of the real time mode"s },
                                      {"coreinit,i"s, "the core initialization string"s},
                                      {"separator"s, "separator character for local federates"s},
                                      {"inputdelay"s, "the input delay on incoming communication of the federate"s},
@@ -84,6 +85,10 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     if (vm.count ("inputdelay") > 0)
     {
         timeDelta = loadTimeFromString (vm["inputdelay"].as<std::string> ());
+    }
+    if (vm.count("rttolerance") > 0)
+    {
+        rtTolerance = loadTimeFromString(vm["rttolerance"].as<std::string>());
     }
 
     if (vm.count ("outputdelay") > 0)
@@ -223,6 +228,10 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     if (doc.isMember("realtime"))
     {
         fi.realtime= doc["realtime"].asBool();
+    }
+    if (doc.isMember("rttolerance"))
+    {
+        fi.rtTolerance = loadJsonTime(doc["rttolerance"]);
     }
     if (doc.isMember ("separator"))
     {
