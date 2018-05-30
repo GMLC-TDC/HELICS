@@ -17,6 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "loggingHelper.hpp"
 #include <fstream>
 #include <json/jsoncpp.h>
+#include "queryHelpers.hpp"
 
 namespace helics
 {
@@ -1376,46 +1377,23 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
     if (query == "federates")
     {
-        std::string ret;
-        ret.push_back ('[');
-        for (auto &fed : _federates)
-        {
-            ret.append (fed.name);
-            ret.push_back (';');
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-
-        return ret;
+        return generateStringVector(_federates, [](auto &fed) {return fed.name; });
     }
     if (query == "brokers")
     {
-        std::string ret;
-        ret.push_back ('[');
-        for (auto &brk : _brokers)
-        {
-            ret.append (brk.name);
-            ret.push_back (';');
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
+        return generateStringVector(_brokers, [](auto &brk) {return brk.name; });
+    }
+    if (query == "publications")
+    {
+       return generateStringVector_if(handles, [](auto &handle) {return handle.key; }, [](auto &handle) {return (handle.handle_type == handle_type_t::publication); });
+    }
+    if (query == "endpoints")
+    {
+        return generateStringVector_if(handles, [](auto &handle) {return handle.key; }, [](auto &handle) {return (handle.handle_type == handle_type_t::endpoint); });
     }
     if (query == "federate_map")
     {
-        return generateFederateMap ();
+        return generateFederateMap();
     }
     if (query == "dependency_graph")
     {
@@ -1425,22 +1403,22 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     if (query == "dependencies")
     {
         Json_helics::Value base;
-        base["name"] = getIdentifier ();
+        base["name"] = getIdentifier();
         base["id"] = static_cast<int> (global_broker_id);
-        if (!isRoot ())
+        if (!isRoot())
         {
             base["parent"] = static_cast<int> (global_broker_id);
         }
         base["dependents"] = Json_helics::arrayValue;
         int index = 0;
-        for (auto &dep : timeCoord->getDependents ())
+        for (auto &dep : timeCoord->getDependents())
         {
             base["dependents"][index] = dep;
             ++index;
         }
         base["dependencies"] = Json_helics::arrayValue;
         index = 0;
-        for (auto &dep : timeCoord->getDependencies ())
+        for (auto &dep : timeCoord->getDependencies())
         {
             base["dependencies"][index] = dep;
             ++index;
@@ -1448,11 +1426,11 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
         Json_helics::StreamWriterBuilder builder;
         builder["commentStyle"] = "None";
         builder["indentation"] = "   ";  // or whatever you like
-        auto writer (builder.newStreamWriter ());
+        auto writer(builder.newStreamWriter());
         std::stringstream sstr;
-        writer->write (base, &sstr);
-        return sstr.str ();
-    }
+        writer->write(base, &sstr);
+        return sstr.str();
+    } 
     return "#invalid";
 }
 

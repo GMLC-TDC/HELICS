@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include <boost/filesystem.hpp>
+#include "queryHelpers.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -1839,88 +1840,37 @@ std::string CommonCore::federateQuery (const FederateState *fed, const std::stri
 
 std::string  CommonCore::coreQuery(const std::string &queryStr) const
 {
-    std::string repStr;
-    bool listV = true;
     if (queryStr == "federates")
     {
-        repStr.push_back('[');
-        for (const auto &fed : loopFederates)
-        {
-            repStr.append(fed->getIdentifier());
-            repStr.push_back(';');
+        return generateStringVector(loopFederates, [](auto &fed) {return fed->getIdentifier(); });
     }
-    }
-    else if (queryStr == "publications")
+    if (queryStr == "publications")
     {
         std::lock_guard<std::mutex> lock(_handlemutex);
-        repStr.push_back('[');
-        for (const auto &handle : handles)
-        {
-            if (handle->handle_type == handle_type_t::publication)
-            {
-                repStr.append(handle->key);
-                repStr.push_back(';');
-            }
-        }
+        return generateStringVector_if(handles, [](auto &handle) {return handle->key; }, [](auto &handle) {return (handle->handle_type == handle_type_t::publication); });
     }
-    else if (queryStr == "endpoints")
+    if (queryStr == "endpoints")
     {
         std::lock_guard<std::mutex> lock(_handlemutex);
-        repStr.push_back('[');
-        for (const auto &handle : handles)
-        {
-            if (handle->handle_type == handle_type_t::endpoint)
-            {
-                repStr.append(handle->key);
-                repStr.push_back(';');
-            }
-        }
+        return generateStringVector_if(handles, [](auto &handle) {return handle->key; }, [](auto &handle) {return (handle->handle_type == handle_type_t::endpoint); });
     }
-    else if (queryStr == "dependencies")
+    if (queryStr == "dependencies")
     {
-        repStr.push_back('[');
-        for (const auto &dep : timeCoord->getDependencies())
-        {
-            repStr.append(std::to_string(dep));
-            repStr.push_back(';');
-        }
+        return generateStringVector(timeCoord->getDependencies(), [](auto &dep) {return std::to_string(dep); });
     }
-    else if (queryStr == "dependents")
+    if (queryStr == "dependents")
     {
-        repStr.push_back('[');
-        for (const auto &dep : timeCoord->getDependents())
-        {
-            repStr.append(std::to_string(dep));
-            repStr.push_back(';');
-        }
+        return generateStringVector(timeCoord->getDependents(), [](auto &dep) {return std::to_string(dep); });
     }
-    else if (queryStr == "isinit")
+    if (queryStr == "isinit")
     {
-        repStr=(allInitReady()) ? "true" : "false";
-        listV = false;
+        return (allInitReady()) ? "true" : "false";
     }
-    else if (queryStr == "address")
+    if (queryStr == "address")
     {
-        repStr = getAddress();
-        listV = false;
+        return getAddress();
     }
-    else
-    {
-        return "#invalid";
-        listV = false;
-    }
-    if (listV)
-    {
-        if (repStr.size() > 1)
-        {
-            repStr.back() = ']';
-        }
-        else
-        {
-            repStr.push_back(']');
-        }
-    }
-    return repStr;
+    return "#invalid";
 }
 
 std::string CommonCore::query (const std::string &target, const std::string &queryStr)
