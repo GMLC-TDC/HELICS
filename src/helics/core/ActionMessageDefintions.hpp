@@ -238,6 +238,7 @@ enum class action_t : int32_t
 
 //definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
+#define UPDATE_LOGGER_FUNCTION 589
 
 /** check if the action has an info structure associated with it*/
 inline bool hasInfo (action_message_def::action_t action)
