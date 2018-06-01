@@ -1,0 +1,16 @@
+/*
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
+*/
+#pragma once
+
+#define HELICS_INCLUDE_SUFFIX "${CMAKE_INSTALL_INCLUDEDIR}"
+#define HELICS_BIN_SUFFIX "${CMAKE_INSTALL_BINDIR}"
+#define HELICS_LIB_SUFFIX "${CMAKE_INSTALL_LIBDIR}"
+
+#define HELICS_VERSION "${HELICS_VERSION_STRING}"
+#define HELICS_CXX_VERSION "${VERSION_OPTION}"
+#define HELICS_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
+#define HELICS_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
+#define BOOST_VERSION_LEVEL ${BOOST_VERSION_LEVEL}

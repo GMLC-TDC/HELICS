@@ -58,7 +58,7 @@ display('PI SENDER: Entering execution mode');
 
 % This federate will be publishing deltat*pi for numsteps steps
 this_time = 0.0;
-value = 22.0 / 7.0;
+value = pi;
 
 for i = 1:20
     val = value;

@@ -14,10 +14,11 @@ namespace helics
 {
 namespace apps
 {
-/** class implementing a Echo object, which will generate endpoint interfaces and send a data message back to the
+/** class implementing an Echo object, which will generate endpoint interfaces and send a data message back to the
 source at the with a specified delay
 @details  the Echo class is NOT threadsafe in general,  don't try to use it from multiple threads without external protection,
-that will result in undefined behavior.  the exception is the setEchoDelay function is threadsafe
+that will result in undefined behavior.  One exception is the setEchoDelay function is threadsafe, and const methods will not cause problems but may not give consistent answers
+if used from multiple threads unless protected.
 */
 class Echo:public App
 {
@@ -41,7 +42,7 @@ class Echo:public App
     /**constructor taking a file with the required information
     @param[in] jsonString file or json string defining the federate information and other configuration
     */
-    explicit Echo (const std::string &jsonString);
+    Echo (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
     Echo (Echo &&other_echo) = default;
@@ -62,6 +63,7 @@ class Echo:public App
     /** get the number of points loaded*/
     auto echoCount () const { return echoCounter; }
     /** set the delay time
+    Function is threadsafe
      */
     void setEchoDelay (Time delay);
 

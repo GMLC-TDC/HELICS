@@ -15,19 +15,19 @@ so arithmetic types, pointers, and strings others may be added if needed
 template <typename X>
 struct is_easily_hashable
 {
-    static const bool value = std::is_scalar<X>::value;
+    static constexpr bool value = std::is_scalar<X>::value;
 };
 
 /** type overload for std::string*/
 template <>
 struct is_easily_hashable<std::string>
 {
-    static const bool value = true;
+    static constexpr bool value = true;
 };
 
 /** type overload for std::wstring*/
 template <>
 struct is_easily_hashable<std::wstring>
 {
-    static const bool value = true;
+    static constexpr bool value = true;
 };

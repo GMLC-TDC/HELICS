@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -44,6 +44,7 @@ SET(CMAKE_SWIG_FLAGS "-py3")
 
 set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 SET_PROPERTY(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
@@ -83,7 +84,7 @@ add_custom_command(TARGET _helics POST_BUILD        # Adds a post-build event to
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:_helics>/")                 # <--this is out-file path
-		
+
 ENDIF ()
 
 

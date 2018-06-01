@@ -29,17 +29,18 @@ class DualMappedVector
     bool insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
-        if (fnd != lookup1.end ())
+        if (fnd != lookup1.end())
         {
-            return false;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                return false;
+            }
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-        }
+        auto index = dataStorage.size();
+        dataStorage.emplace_back(std::forward<Us>(data)...);
+        lookup1[searchValue1] = index;
+        lookup2[searchValue2] = index;
         return true;
     }
 
@@ -54,12 +55,9 @@ class DualMappedVector
         {
             return false;
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup1.emplace (searchValue1, index);
-        }
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup1.emplace (searchValue1, index);
         return true;
     }
 
@@ -74,12 +72,9 @@ class DualMappedVector
         {
             return false;
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup2.emplace (searchValue2, index);
-        }
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup2.emplace (searchValue2, index);
         return true;
     }
 
@@ -92,16 +87,18 @@ class DualMappedVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
-            lookup2[searchValue2] = fnd->second;
+            auto fnd2 = lookup2.find(searchValue2);
+            if (fnd2 != lookup2.end())
+            {
+                dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+                lookup2[searchValue2] = fnd->second;
+                return;
+            }
         }
-        else
-        {
-            auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
-            lookup1.emplace (searchValue1, index);
-            lookup2.emplace (searchValue2, index);
-        }
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup1[searchValue1] = index;
+        lookup2[searchValue2] = index;
     }
 
     /** insert a new element into the vector
@@ -141,7 +138,8 @@ class DualMappedVector
             lookup2.emplace (searchValue2, index);
         }
     }
-    /** add an additional index term for searching*/
+    /** add an additional index term for searching
+    this function does not override existing values*/
     bool addSearchTermForIndex (const searchType1 &searchValue, size_t index)
     {
         if (index < dataStorage.size ())

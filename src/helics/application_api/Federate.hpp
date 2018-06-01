@@ -54,7 +54,7 @@ class FederateInfo : public CoreFederateInfo
     /** default constructor*/
     FederateInfo () = default;
     /** construct from the federate name*/
-    FederateInfo (std::string fedname) : name (fedname){};
+    explicit FederateInfo (std::string fedname) : name (std::move(fedname)){};
     /** construct from the name and type*/
     FederateInfo (std::string fedname, core_type cType) : name (std::move (fedname)), coreType (cType){};
     /** load a federateInfo object from command line arguments

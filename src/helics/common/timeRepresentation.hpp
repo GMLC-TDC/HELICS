@@ -308,7 +308,7 @@ class TimeRepresentation
 #endif
   public:
     /** default constructor*/
-    TimeRepresentation () noexcept {};
+    TimeRepresentation ()=default;
 
   private:
 /** explicit means to generate a constexpr TimeRepresentation at time 0, negTime and maxTime and min time delta*/

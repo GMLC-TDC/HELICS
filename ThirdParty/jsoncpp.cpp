@@ -260,15 +260,15 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 #else
 #include <stdio.h>
 
-#if defined(_MSC_VER)
+  #if defined(_MSC_VER)
 #ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
 #undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
 #endif
-#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-#if !defined(snprintf)
-#define snprintf _snprintf
-#endif
-#endif
+    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+    #if !defined(snprintf)
+      #define snprintf _snprintf
+    #endif
+  #endif
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0
