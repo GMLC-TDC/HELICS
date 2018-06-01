@@ -53,6 +53,42 @@ private:
     std::unique_lock<M> m_handle_lock;
 };
 
+template <typename T, typename M>
+lock_handle<T, M> try_lock_handle(T *obj, M &gmutex)
+{
+    typename lock_handle<T, M>::lock_type glock(gmutex, std::try_to_lock);
+    if (glock.owns_lock()) {
+        return lock_handle<T, M>(obj, std::move(glock));
+    }
+    else {
+        return lock_handle<T, M>(nullptr, std::move(glock));
+    }
+}
+
+template <typename T, typename M, typename Duration>
+lock_handle<T, M> try_lock_handle_for(T *obj, M &gmutex,const Duration & d)
+{
+    typename lock_handle<T, M>::lock_type glock(gmutex, d);
+    if (glock.owns_lock()) {
+        return lock_handle<T,M>(obj, std::move(glock));
+    }
+    else {
+        return lock_handle<T, M>(nullptr, std::move(glock));
+    }
+}
+
+template <typename T, typename M, typename TimePoint>
+lock_handle<T, M> try_lock_handle_until(T *obj, M &gmutex, const TimePoint & tp)
+{
+    typename lock_handle<T, M>::lock_type glock(gmutex, tp);
+    if (glock.owns_lock()) {
+        return lock_handle<T,M>(obj, std::move(glock));
+    }
+    else {
+        return lock_handle<T,M>(nullptr, std::move(glock));
+    }
+}
+
 template <typename M>
 class shared_locker
 {
@@ -129,6 +165,42 @@ private:
     pointer data;
     lock_type m_handle_lock;
 };
+
+template <typename T, typename M>
+shared_lock_handle<T, M> try_lock_shared_handle(const T *obj, M &smutex)
+{
+    typename shared_lock_handle<T, M>::lock_type slock(smutex, std::try_to_lock);
+    if (slock.owns_lock()) {
+        return shared_lock_handle<T, M>(obj, std::move(slock));
+    }
+    else {
+        return shared_lock_handle<T, M>(nullptr, std::move(slock));
+    }
 }
 
-#endif // LIBGUARD_HANDLES_HPP
+template <typename T, typename M, typename Duration>
+shared_lock_handle<T, M> try_lock_shared_handle_for(const T *obj, M &smutex, const Duration & d)
+{
+    typename shared_lock_handle<T, M>::lock_type slock(smutex, d);
+    if (slock.owns_lock()) {
+        return shared_lock_handle<T, M>(obj, std::move(slock));
+    }
+    else {
+        return shared_lock_handle<T, M>(nullptr, std::move(slock));
+    }
+}
+
+template <typename T, typename M, typename TimePoint>
+shared_lock_handle<T, M> try_lock_shared_handle_until(const T *obj, M &smutex, const TimePoint & tp)
+{
+    typename shared_lock_handle<T, M>::lock_type slock(smutex, tp);
+    if (slock.owns_lock()) {
+        return shared_lock_handle<T,M>(obj, std::move(slock));
+    }
+    else {
+        return shared_lock_handle<T,M>(nullptr, std::move(slock));
+    }
+}
+}
+
+#endif // LIBGUARDED_HANDLES_HPP

@@ -247,25 +247,28 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 #include <set>
 #include <limits>
 
-#if __cplusplus >= 201103L
-  #include <cstdio>
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#include <cstdio>
 
-  #if !defined(snprintf)
-    #define snprintf std::snprintf
-  #endif
+#if !defined(snprintf)
+#define snprintf std::snprintf
+#endif
 
-  #if !defined(sscanf)
-    #define sscanf std::sscanf
-  #endif
+#if !defined(sscanf)
+#define sscanf std::sscanf
+#endif
 #else
-  #include <stdio.h>
+#include <stdio.h>
 
-  #if defined(_MSC_VER)
-    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-    #if !defined(snprintf)
-      #define snprintf _snprintf
-    #endif
-  #endif
+#if defined(_MSC_VER)
+#ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#endif
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+#if !defined(snprintf)
+#define snprintf _snprintf
+#endif
+#endif
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0

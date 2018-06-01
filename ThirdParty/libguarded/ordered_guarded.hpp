@@ -102,7 +102,7 @@ class ordered_guarded
 	*/
 	std::enable_if_t<std::is_copy_constructible<T>::value, T> load() const
 	{
-        auto handle = shared_lock();
+        auto handle = lock_shared();
         T newObj(*handle);
         return newObj;
 	}
@@ -162,7 +162,7 @@ typename std::enable_if<
     void>::type
 ordered_guarded<T, M>::read(Func &&func) const
 {
-    std::shared_lock<M> lock(m_mutex);
+    typename shared_handle::lock_type glock(m_mutex);
 
     func(m_obj);
 }
@@ -174,7 +174,7 @@ typename std::enable_if<
     decltype(std::declval<Func>()(std::declval<const T &>()))>::type
 ordered_guarded<T, M>::read(Func &&func) const
 {
-    std::shared_lock<M> lock(m_mutex);
+    typename shared_handle::lock_type glock(m_mutex);
 
     return func(m_obj);
 }
@@ -188,26 +188,14 @@ auto ordered_guarded<T, M>::lock_shared() const -> shared_handle
 template <typename T, typename M>
 auto ordered_guarded<T, M>::try_lock_shared() const -> shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, std::try_to_lock);
-    if (glock.owns_lock()) {
-        return shared_handle(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle(&m_obj, m_mutex);
 }
 
 template <typename T, typename M>
 template <typename Duration>
 auto ordered_guarded<T, M>::try_lock_shared_for(const Duration & duration) const -> shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, d);
-    if (glock.owns_lock()) {
-        return shared_handle<M>(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle<M>(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle_for(&m_obj, m_mutex, duration);
 }
 
 template <typename T, typename M>
@@ -215,13 +203,7 @@ template <typename TimePoint>
 auto ordered_guarded<T, M>::try_lock_shared_until(const TimePoint & timepoint) const
     -> shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, d);
-    if (glock.owns_lock()) {
-        return shared_handle(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle_until(&m_obj, m_mutex, timepoint);
 }
 
 }

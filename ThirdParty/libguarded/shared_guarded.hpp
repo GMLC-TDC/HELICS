@@ -106,39 +106,21 @@ auto shared_guarded<T, M>::lock() const ->shared_handle
 template <typename T, typename M>
 auto shared_guarded<T, M>::try_lock() ->handle
 {
-    std::unique_lock<M> glock(m_mutex, std::try_to_lock);
-    if (glock.owns_lock()) {
-        return handle(&m_obj, std::move(glock));
-    }
-    else {
-        return handle(nullptr, std::move(glock));
-    }
+    return try_lock_handle(&m_obj, m_mutex);
 }
 
 template <typename T, typename M>
 template <typename Duration>
 auto shared_guarded<T, M>::try_lock_for(const Duration & duration) ->handle
 {
-    std::unique_lock<M> glock(m_mutex, d);
-    if (glock.owns_lock()) {
-        return handle(&m_obj, std::move(glock));
-    }
-    else {
-        return handle(nullptr, std::move(glock));
-    }
+    return try_lock_handle_for(&m_obj, m_mutex, duration);
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
 auto shared_guarded<T, M>::try_lock_until(const TimePoint & timepoint) ->handle
 {
-    std::unique_lock<M> glock(m_mutex, tp);
-    if (glock.owns_lock()) {
-        return handle(&m_obj, std::move(glock));
-    }
-    else {
-        return handle(nullptr, std::move(glock));
-    }
+    return try_lock_handle_until(&m_obj, m_mutex, timepoint);
 }
 
 template <typename T, typename M>
@@ -150,39 +132,21 @@ auto shared_guarded<T, M>::lock_shared() const ->shared_handle
 template <typename T, typename M>
 auto shared_guarded<T, M>::try_lock_shared() const ->shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, std::try_to_lock);
-    if (glock.owns_lock()) {
-        return shared_handle(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle(&m_obj, m_mutex);
 }
 
 template <typename T, typename M>
 template <typename Duration>
 auto shared_guarded<T, M>::try_lock_shared_for(const Duration & d) const ->shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, d);
-    if (glock.owns_lock()) {
-        return shared_handle<M>(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle<M>(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle_for(&m_obj, m_mutex, d);
 }
 
 template <typename T, typename M>
 template <typename TimePoint>
 auto shared_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> shared_handle
 {
-    shared_handle::lock_type glock(m_mutex, d);
-    if (glock.owns_lock()) {
-        return shared_handle(&m_obj, std::move(glock));
-    }
-    else {
-        return shared_handle(nullptr, std::move(glock));
-    }
+    return try_lock_shared_handle_until(&m_obj, m_mutex, tp);
 }
 } //namespace libguarded
 #endif

@@ -293,9 +293,9 @@ class CommonCore : public Core, public BrokerBase
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent
-                                              //!< confustion
+                                              //!< confusion
 
-    HandlePointerManager handles;  //!< local handle information;
+    ordered_guarded<HandlePointerManager> handles;  //!< local handle information;
 
     std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;  //!< sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>>
