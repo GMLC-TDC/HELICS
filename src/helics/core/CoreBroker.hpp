@@ -1,11 +1,9 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef CORE_BROKER_H_
-#define CORE_BROKER_H_
+
 #pragma once
 
 #include <atomic>
@@ -236,5 +234,3 @@ class CoreBroker : public Broker, public BrokerBase
 };
 
 }  // namespace helics
-
-#endif
