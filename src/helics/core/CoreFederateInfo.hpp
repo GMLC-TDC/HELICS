@@ -21,7 +21,8 @@ class CoreFederateInfo
       timeZero;  //!< the time it takes values and messages to propagate to be accessible to the Federate
     Time period = timeZero;  //!< a period value,  all granted times must be on this period n*Period+offset
     Time offset = timeZero;  //!< offset to the time period
-    Time rtTolerance = 0.2; //!< real time tolerance - time tolerance band outside of which HELICS will adjust grants and times
+    Time rt_lag = 0.2; //!< real time tolerance - the maximum time grants can lag real time before HELICS automatically acts
+    Time rt_lead = 0.1; //!< real time tolerance - the maximum time grants can lead real time befor HELICS adjusts
     bool observer = false;  //!< flag indicating that the federate is an observer
     bool uninterruptible =
       false;  //!< flag indicating that the federate should never return a time other than requested

@@ -17,10 +17,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
+#include "../common/AsioServiceManager.h"
 #include <atomic>
 #include <map>
 #include <mutex>
 #include <vector>
+#include <chrono>
 
 namespace helics
 {
@@ -31,6 +33,7 @@ class FilterInfo;
 class CommonCore;
 
 class TimeCoordinator;
+
 
 constexpr Time startupTime = Time::minVal ();
 constexpr Time initialTime{-1000000.0};
@@ -58,6 +61,7 @@ class FederateState
     bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
+    bool realtime{ false }; //!< flag indicating that the federate runs in real time
     shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>>
       publications;  //!< storage for all the publications
     shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>>
@@ -68,6 +72,9 @@ class FederateState
   private:
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
     std::string errorString; //!< storage for an error string populated on an error
+    decltype(std::chrono::steady_clock::now()) start_clock_time; 
+    Time rt_lag=timeZero;  //!<max lag for the rt control
+    Time rt_lead=timeZero; //!< min lag for the realtime control
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 
@@ -91,7 +98,8 @@ class FederateState
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
-
+    std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
+    decltype(servicePtr->runServiceLoop()) loopHandle; //!< loop controller for async real time operations
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */

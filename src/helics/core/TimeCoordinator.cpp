@@ -580,6 +580,21 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
     {
         return processTimeBlockMessage (cmd);
     }
+    if (cmd.action() == CMD_FORCE_TIME_GRANT)
+    {
+        if (time_granted < cmd.actionTime)
+        {
+            time_granted = cmd.actionTime;
+            time_grantBase = time_granted;
+
+            ActionMessage treq(CMD_TIME_GRANT);
+            treq.source_id = source_id;
+            treq.actionTime = time_granted;
+            transmitTimingMessage(treq);
+            return message_process_result::processed;
+        }
+        return message_process_result::no_effect;
+    }
     if (isDelayableMessage (cmd, source_id))
     {
         auto dep = dependencies.getDependencyInfo (cmd.source_id);

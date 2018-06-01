@@ -88,9 +88,17 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
     if (vm.count("rttolerance") > 0)
     {
-        rtTolerance = loadTimeFromString(vm["rttolerance"].as<std::string>());
+        rt_lead = loadTimeFromString(vm["rttolerance"].as<std::string>());
+        rt_lag = rt_lead;
     }
-
+    if (vm.count("rtlag") > 0)
+    {
+        rt_lag = loadTimeFromString(vm["rtlag"].as<std::string>());
+    }
+    if (vm.count("rtlead") > 0)
+    {
+        rt_lead = loadTimeFromString(vm["rtlead"].as<std::string>());
+    }
     if (vm.count ("outputdelay") > 0)
     {
         timeDelta = loadTimeFromString (vm["outputdelay"].as<std::string> ());
@@ -231,7 +239,16 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     }
     if (doc.isMember("rttolerance"))
     {
-        fi.rtTolerance = loadJsonTime(doc["rttolerance"]);
+        fi.rt_lag = loadJsonTime(doc["rttolerance"]);
+        fi.rt_lead = fi.rt_lag;
+    }
+    if (doc.isMember("rtlag"))
+    {
+        fi.rt_lag = loadJsonTime(doc["rtlag"]);
+    }
+    if (doc.isMember("rtlead"))
+    {
+        fi.rt_lead = loadJsonTime(doc["rtlead"]);
     }
     if (doc.isMember ("separator"))
     {

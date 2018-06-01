@@ -19,6 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include <boost/foreach.hpp>
 
+
 static const std::string nullStr;
 #define LOG_ERROR(message) logMessage (0, nullStr, message)
 #define LOG_WARNING(message) logMessage (1, nullStr, message)
@@ -66,15 +67,17 @@ static const std::string nullStr;
 
 namespace helics
 {
-FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
+FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_),logLevel(info_.logLevel)
 {
     state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> (info_);
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { routeMessage (msg); });
-
-    logLevel = info_.logLevel;
+    rt_lag = info_.rt_lag;
+    rt_lead = info_.rt_lead;
+    realtime = info_.realtime;
     only_update_on_change = info_.only_update_on_change;
     only_transmit_on_change = info_.only_transmit_on_change;
+    
 }
 
 FederateState::~FederateState () = default;
@@ -465,6 +468,12 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
 
         processing = false;
+        if ((realtime)&&(ret == iteration_state::next_step))
+        {
+            servicePtr = AsioServiceManager::getServicePointer();
+            loopHandle = servicePtr->runServiceLoop();
+            start_clock_time = std::chrono::steady_clock::now();
+        }
         return static_cast<iteration_result> (ret);
     }
 
@@ -522,7 +531,23 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         addAction (treq);
         LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+        if (realtime)
+        {
+            auto current_clock_time = std::chrono::steady_clock::now();
+            auto timegap = current_clock_time - start_clock_time;
+            auto current_lead = (nextTime + rt_lag).to_ns()-timegap;
+            if (current_lead > std::chrono::nanoseconds(0))
+            {
 
+            }
+            else
+            {
+                ActionMessage tforce(CMD_FORCE_TIME_GRANT);
+                tforce.source_id = global_id;
+                tforce.actionTime = nextTime;
+                addAction(tforce);
+            }
+        }
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
@@ -558,6 +583,19 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
             break;
         }
         processing = false;
+        if ((realtime)&&(ret==iteration_state::next_step))
+        {
+            auto current_clock_time = std::chrono::steady_clock::now();
+            auto timegap = current_clock_time - start_clock_time;
+            if (time_granted-Time(timegap)>rt_lead)
+            {
+                auto current_lead = (time_granted - rt_lead).to_ns()-timegap;
+                if ( current_lead> std::chrono::milliseconds(5))
+                {
+                    std::this_thread::sleep_for(current_lead);
+                }
+            }
+        }
         return retTime;
     }
     // this would not be good practice to get into this part of the function
@@ -952,6 +990,19 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
     }
     break;
+    case CMD_FORCE_TIME_GRANT:
+    {
+        if (cmd.actionTime < time_granted)
+        {
+            break;
+        }
+        timeCoord->processTimeMessage(cmd);
+        time_granted = timeCoord->getGrantedTime();
+        allowed_send_time = timeCoord->allowedSendTime();
+        LOG_DEBUG(std::string("Granted Time=") + std::to_string(time_granted));
+        timeGranted_mode = true;
+        return iteration_state::next_step;
+    }
     case CMD_SEND_MESSAGE:
     {
         auto epi = getEndpoint (cmd.dest_handle);
@@ -1063,6 +1114,12 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
     case UPDATE_LOG_LEVEL:
         logLevel = static_cast<int> (m.dest_id);
         break;
+    case UPDATE_RTLAG:
+        rt_lag = m.actionTime;
+        break;
+    case UPDATE_RTLEAD:
+        rt_lead = m.actionTime;
+        break;
     case UPDATE_FLAG:
         switch (m.dest_id)
         {
@@ -1071,6 +1128,9 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
             only_update_on_change = checkActionFlag (m, indicator_flag);
+            break;
+        case REALTIME_FLAG:
+            realtime= checkActionFlag(m, indicator_flag);
             break;
         default:
             break;
@@ -1153,7 +1213,7 @@ std::string FederateState::processQuery (const std::string &query) const
     }
     if (query == "endpoints")
     {
-        return generateStringVector(*endpoints.lock_shared(), [](auto &pub) {return pub->key; });
+        return generateStringVector(*endpoints.lock_shared(), [](auto &ept) {return ept->key; });
     }
     if (queryCallback)
     {
