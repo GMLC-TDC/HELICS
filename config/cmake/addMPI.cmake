@@ -10,7 +10,7 @@
 
 
 ##############################################################################
-# Copyright Â© 2017-2018,
+# Copyright © 2017-2018,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -41,37 +41,22 @@ endif()
 ############################################################
 # Add targets to use
 ############################################################
-if (NOT MPI::MPI_C)
-	if (NOT TARGET MPI::MPI_C)
-		if(MPI_C_LIBRARIES)
-		
-			add_library(MPI::MPI_C STATIC IMPORTED)
-		
-			set_property(TARGET MPI::MPI_C PROPERTY INTERFACE_LINK_LIBRARIES "")
-			if(MPI_C_LINK_FLAGS)
-				set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
-			endif()
-			set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION "${MPI_C_LIBRARIES}")
-		else()
-			add_library(MPI::MPI_C INTERFACE IMPORTED)
-		
-			set_property(TARGET MPI::MPI_C PROPERTY INTERFACE_LINK_LIBRARIES "")
-			if(MPI_C_LINK_FLAGS)
-				set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
-			endif()
-		endif()
+if(MPI_C_FOUND)
+if (TARGET MPI::MPI_C)
+else()
+	if (MPI_C_LIBRARIES)
+		add_library(MPI::MPI_C STATIC IMPORTED)
+		set_target_properties(MPI::MPI_C PROPERTIES IMPORT_LOCATION "${MPI_C_LIBRARIES}")
 	else()
-		set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_LINK_LIBRARIES "")
-		if(MPI_C_LINK_FLAGS)
-			set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
-		endif()
-		if(MPI_C_LIBRARIES)
-			set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LIBRARIES}")
-		endif()
+		add_library(MPI::MPI_C INTERFACE IMPORTED)
 	endif()
-	set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPI_C_INCLUDE_DIR};${MPI_C_HEADER_DIR};${MPI_C_ADDITIONAL_INCLUDE_DIRS}")
+	set_property(TARGET MPI::MPI_C PROPERTY INTERFACE_LINK_LIBRARIES "")
+	if(MPI_C_LINK_FLAGS)
+		set_property(TARGET MPI::MPI_C APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_C_LINK_FLAGS}")
+	endif()
+	set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPI_C_INCLUDE_DIR};${MPI_C_HEADER_DIR};${MPI_C_ADDITIONAL_INCLUDE_DIRS};${MPI_C_INCLUDE_PATH}")
 	set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_COMPILE_OPTIONS "${MPI_C_COMPILE_OPTIONS}")
 	set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${MPI_C_COMPILE_DEFINITIONS}")
 
 endif()
-
+endif()

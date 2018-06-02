@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -23,7 +23,7 @@ static void show_usage (std::string const &name)
     std::cout << "--version returns the helics version\n";
     std::cout << "--std returns the C++ standard flag used\n";
     std::cout << "--help, -h, -? returns this help display\n";
-        
+
 }
 
 path dir_path(const char *filename, const char *tail)
