@@ -168,13 +168,13 @@ public:
     {
         return (data != nullptr);
     }
-    auto begin() const
+    const auto begin() const
     {
-        return std::cbegin(*data);
+        return std::begin(*data);
     }
-    auto end() const
+    const auto end() const
     {
-        return std::cend(*data);
+        return std::end(*data);
     }
 private:
     //this is a non owning pointer
