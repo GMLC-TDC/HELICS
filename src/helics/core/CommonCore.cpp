@@ -2854,6 +2854,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             FiltI->filterOp = std::move (M);
         }
     }
+    break;
     case UPDATE_LOGGER_FUNCTION:
     {
         int ii = cmd.counter;

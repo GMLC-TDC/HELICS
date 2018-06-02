@@ -84,7 +84,7 @@ namespace helics
         }
         void setChangeUpdateFlag(bool updateFlag);
     private:
-        std::atomic<Core::federate_id_t> global_id = invalid_fed_id;
+        std::atomic<Core::federate_id_t> global_id{ invalid_fed_id };
         bool only_update_on_change{ false };  //!< flag indicating that subscriptions values should only be updated on change
         shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
             subscriptions;  //!< storage for all the subscriptions
