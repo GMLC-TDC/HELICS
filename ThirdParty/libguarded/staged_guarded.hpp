@@ -1,12 +1,9 @@
 /*
-Copyright (C) 2017, Battelle Memorial Institute
-All rights reserved.
-
-This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 /***********************************************************************
  *
  * Copyright (c) 2015-2017 Ansel Sermersheim
@@ -26,6 +23,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 #include <mutex>
 #include <type_traits>
+#include "handles.hpp"
 
 namespace libguarded
 {
@@ -46,14 +44,7 @@ namespace libguarded
 template <typename T, typename M = std::mutex>
 class staged_guarded
 {
-private:
-    class deleter;
-    class shared_deleter;
-
 public:
-    using handle = std::unique_ptr<T, deleter>;
-    using shared_handle = std::unique_ptr<const T, shared_deleter>;
-
     /**
      Construct a guarded object. This constructor will accept any
      number of parameters, all of which are forwarded to the
@@ -117,11 +108,17 @@ public:
     shared_handle lock_shared() const;
     shared_handle try_lock_shared() const;
 
+    template <class Duration>
+    shared_handle try_lock_shared_for(const Duration & duration) const;
+
+    template <class TimePoint>
+    shared_handle try_lock_shared_until(const TimePoint & timepoint) const;
+
     void transition ()
     {
         if (!constant)
         {
-            //acquire the lock then alter the 
+            //acquire the lock then alter the constant variable
             std::lock_guard<M> lock(m_mutex);
             constant = true;
         }
@@ -129,45 +126,6 @@ public:
     }
 
   private:
-    class deleter
-    {
-      public:
-        using pointer = T *;
-
-        deleter (std::unique_lock<M> lock) : m_lock (std::move (lock)) {}
-
-        void operator() (T *ptr)
-        {
-            if (m_lock.owns_lock ())
-            {
-                m_lock.unlock ();
-            }
-        }
-
-      private:
-        std::unique_lock<M> m_lock;
-    };
-
-    class shared_deleter
-    {
-    public:
-        using pointer = const T *;
-
-        shared_deleter(M & mutex) : m_deleter_mutex(mutex)
-        {
-        }
-
-        void operator()(const T * ptr)
-        {
-            if (ptr) {
-                m_deleter_mutex.unlock_shared();
-            }
-        }
-
-    private:
-        M & m_deleter_mutex;
-    };
-
     T m_obj;
     M m_mutex;
     std::atomic<bool> constant{false};
@@ -184,7 +142,7 @@ auto staged_guarded<T, M>::lock () -> handle
 {
     std::unique_lock<M> lock =
       (constant) ? std::unique_lock<M> (m_mutex, std::defer_lock) : std::unique_lock<M> (m_mutex);
-    return handle (&m_obj, deleter (std::move (lock)));
+    return handle (&m_obj, std::move (lock));
 }
 
 template <typename T, typename M>
@@ -192,15 +150,15 @@ auto staged_guarded<T, M>::lock() const -> shared_handle
 {
     std::unique_lock<M> lock =
         (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) : std::unique_lock<M>(m_mutex);
-    return shared_handle(&m_obj, deleter(std::move(lock)));
+    return shared_handle(&m_obj, std::move(lock));
 }
 
 template <typename T, typename M>
 auto staged_guarded<T, M>::lock_shared() const -> shared_handle
 {
-    std::unique_lock<M> lock =
-        (constant) ? std::unique_lock<M>(m_mutex, std::defer_lock) : std::unique_lock<M>(m_mutex);
-    return shared_handle(&m_obj, deleter(std::move(lock)));
+    using locktype = typename shared_lock_handle<T, M>::locker_type;
+     auto lock =(constant) ? locktype(m_mutex, std::defer_lock) : locktype(m_mutex);
+    return shared_handle(&m_obj,std::move(lock));
 }
 
 template <typename T, typename M>
@@ -208,20 +166,11 @@ auto staged_guarded<T, M>::try_lock () -> handle
 {
     if (!constant)
     {
-        std::unique_lock<M> lock (m_mutex, std::try_to_lock);
-
-        if (lock.owns_lock ())
-        {
-            return handle (&m_obj, deleter (std::move (lock)));
-        }
-        else
-        {
-            return handle (nullptr, deleter (std::move (lock)));
-        }
+        try_lock_handle(&m_obj, m_mutex);
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_obj,std::unique_lock<M> (m_mutex, std::defer_lock));
     }
 }
 
@@ -231,20 +180,12 @@ auto staged_guarded<T, M>::try_lock_shared() const -> shared_handle
 {
     if (!constant)
     {
-        std::unique_lock<M> lock(m_mutex, std::try_to_lock);
-
-        if (lock.owns_lock())
-        {
-            return handle(&m_obj, deleter(std::move(lock)));
-        }
-        else
-        {
-            return handle(nullptr, deleter(std::move(lock)));
-        }
+        try_lock_handle_shared(&m_obj, m_mutex);
     }
     else
     {
-        return handle(&m_obj, deleter(std::unique_lock<M>(m_mutex, std::defer_lock)));
+        using locktype = typename shared_lock_handle<T, M>::locker_type;
+        return handle(&m_obj, locktype(m_mutex, std::defer_lock)));
     }
 }
 
@@ -254,20 +195,11 @@ auto staged_guarded<T, M>::try_lock_for (const Duration &d) -> handle
 {
     if (!constant)
     {
-        std::unique_lock<M> lock (m_mutex, d);
-
-        if (lock.owns_lock ())
-        {
-            return handle (&m_obj, deleter (std::move (lock)));
-        }
-        else
-        {
-            return handle (nullptr, deleter (std::move (lock)));
-        }
+        try_lock_handle_for(&m_obj, m_mutex, d);
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_obj, std::unique_lock<M> (m_mutex, std::defer_lock));
     }
 }
 
@@ -277,22 +209,44 @@ auto staged_guarded<T, M>::try_lock_until (const TimePoint &tp) -> handle
 {
     if (!constant)
     {
-        std::unique_lock<M> lock (m_mutex, tp);
-
-        if (lock.owns_lock ())
-        {
-            return handle (&m_obj, deleter (std::move (lock)));
-        }
-        else
-        {
-            return handle (nullptr, deleter (std::move (lock)));
-        }
+        try_lock_handle_until(&m_obj, m_mutex, tp);
     }
     else
     {
-        return handle (&m_obj, deleter (std::unique_lock<M> (m_mutex, std::defer_lock)));
+        return handle (&m_obj, std::unique_lock<M> (m_mutex, std::defer_lock));
     }
 }
+
+template <typename T, typename M>
+template <typename Duration>
+auto staged_guarded<T, M>::try_lock_shared_for(const Duration & d) const -> shared_handle
+{
+    if (!constant)
+    {
+        try_lock_shared_handle_for(&m_obj, m_mutex, d);
+    }
+    else
+    {
+        using locktype = typename shared_lock_handle<T, M>::locker_type;
+        return handle(&m_obj, locktype(m_mutex, std::defer_lock)));
+    }
+}
+
+template <typename T, typename M>
+template <typename TimePoint>
+auto staged_guarded<T, M>::try_lock_shared_until(const TimePoint & tp) const -> shared_handle
+{
+    if (!constant)
+    {
+        try_lock_shared_handle_until(&m_obj, m_mutex, tp);
+    }
+    else
+    {
+        using locktype = typename shared_lock_handle<T, M>::locker_type;
+        return handle(&m_obj, locktype(m_mutex, std::defer_lock)));
+    }
+}
+
 }
 
 #endif /*STAGED_GUARDED_HPP*/

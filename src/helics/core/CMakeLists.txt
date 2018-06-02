@@ -11,6 +11,7 @@ set(SRC_FILES
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	PublicationInfo.cpp
+	InterfaceInfo.cpp
 	#FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
@@ -91,6 +92,7 @@ set(INCLUDE_FILES
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
 	CoreBroker.hpp
+	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp
 	CommonCore.hpp

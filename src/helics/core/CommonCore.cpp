@@ -748,7 +748,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
 
     LOG_DEBUG (parent_broker_id, fed->getIdentifier (), (boost::format ("registering SUB %s") % key).str ());
     auto id = handle->handle;
-    fed->createSubscription (id, key, type, units, check_mode);
+    fed->interfaces().createSubscription (id, key, type, units, check_mode);
 
     ActionMessage m (CMD_REG_SUB);
     m.source_id = fed->global_id.load ();
@@ -770,7 +770,7 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
     auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
-        return fed->getSubscription (key)->id;
+        return fed->interfaces().getSubscription (key)->id;
     }
     return handle_id_t ();
 }
@@ -800,7 +800,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
 
     auto id = handle->handle;
 
-    fed->createPublication (id, key, type, units);
+    fed->interfaces().createPublication (id, key, type, units);
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id.load ();
@@ -815,16 +815,12 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
 
 handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::string &key) const
 {
-    auto fed = getFederateAt (federateID);
-    if (fed != nullptr)
+    auto pub = handles.read([&key](auto &hand) { return hand.getPublication(key); });
+    if (pub->local_fed_id != federateID)
     {
-        auto pub = fed->getPublication (key);
-        if (pub != nullptr)
-        {
-            return pub->id;
+        return handle_id_t ();
         }
-    }
-    return handle_id_t ();
+    return pub->handle;
 }
 
 const std::string nullStr;
@@ -857,7 +853,7 @@ const std::string &CommonCore::getType (handle_id_t handle) const
         if (handleInfo->handle_type == handle_type_t::subscription)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto subInfo = fed->getSubscription (handleInfo->handle);
+            auto subInfo = fed->interfaces().getSubscription (handleInfo->handle);
             if (subInfo != nullptr)
             {
                 if (!subInfo->pubType.empty ())
@@ -954,8 +950,8 @@ std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
     {
         throw (InvalidIdentifier ("Handle does not identify a subscription"));
     }
-
-    return getFederateAt (handleInfo->local_fed_id)->getSubscription (handle)->getData ();
+    //todo:: this is a long chain should be refactored
+    return getFederateAt (handleInfo->local_fed_id)->interfaces().getSubscription (handle)->getData ();
 }
 
 const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t federateID)
@@ -989,8 +985,8 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
       createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, "", false);
 
     auto id = handle->handle;
-    fed->createEndpoint (id, name, type);
-
+    fed->interfaces().createEndpoint (id, name, type);
+    fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_END);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
@@ -1004,16 +1000,12 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
 
 handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string &name) const
 {
-    auto fed = getFederateAt (federateID);
-    if (fed != nullptr)
+    auto ept = handles.read([&name](auto &hand) { return hand.getEndpoint(name); });
+    if (ept->local_fed_id != federateID)
     {
-        auto ept = fed->getEndpoint (name);
-        if (ept != nullptr)
-        {
-            return ept->id;
+        return handle_id_t ();
         }
-    }
-    return handle_id_t ();
+    return ept->handle;
 }
 
 handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
@@ -2235,7 +2227,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto fed = getFederateCore (global_federate_id_t (command.source_id));
             if (fed != nullptr)
             {
-                auto pubInfo = fed->getPublication (handle_id_t (command.source_handle));
+                auto pubInfo = fed->interfaces().getPublication (handle_id_t (command.source_handle));
                 if (pubInfo != nullptr)
                 {
                     for (auto &subscriber : pubInfo->subscribers)
@@ -2868,6 +2860,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             FiltI->filterOp = std::move (M);
         }
     }
+    break;
     case UPDATE_LOGGER_FUNCTION:
     {
         int ii = cmd.counter;

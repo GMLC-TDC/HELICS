@@ -11,15 +11,12 @@
 ***********************************************************************/
 
 /*
-
-Copyright (C) 2017-2018, Battelle Memorial Institute
-All rights reserved.
-
-This software was modified by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
-
-additions include load store operations and template specialization for std::mutex and std::timed_mutex
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
+*/
+/*
+additions include load store operations and use of handles.hpp
 */
 
 #ifndef LIBGUARDED_ORDERED_GUARDED_HPP
@@ -163,7 +160,6 @@ typename std::enable_if<
 ordered_guarded<T, M>::read(Func &&func) const
 {
     typename shared_handle::lock_type glock(m_mutex);
-
     func(m_obj);
 }
 
