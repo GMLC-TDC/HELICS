@@ -19,11 +19,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 BOOST_AUTO_TEST_SUITE (subPubObject_tests)
 
-namespace utf = boost::unit_test;
-
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
 {
     helics::FederateInfo fi ("test1");
@@ -62,7 +59,6 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
     vFed->finalize ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
 BOOST_AUTO_TEST_CASE (subscriptionObject_tests)
 {
     helics::FederateInfo fi ("test1");
@@ -123,34 +119,35 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
-    BOOST_CHECK_MESSAGE (s == valrx,std::string(typeid(TX).name())+" to "+ typeid(RX).name());
+    BOOST_CHECK_MESSAGE (s == valrx, std::string (typeid (TX).name ()) + " to " + typeid (RX).name ());
     vFed->finalize ();
 }
 
 template <class IX, class TX, class RX>
-void runPubSubThroughTypeTests(const TX &valtx, const RX &valrx)
+void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
-    auto pubObj = helics::make_publication<IX>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto pubObj = helics::make_publication<IX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription(vFed.get(), "pub1");
-    vFed->setTimeDelta(1.0);
-    vFed->enterExecutionState();
+    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    vFed->setTimeDelta (1.0);
+    vFed->enterExecutionState ();
     // publish string1 at time=0.0;
-    pubObj->publish(valtx);
-    auto gtime = vFed->requestTime(1.0);
+    pubObj->publish (valtx);
+    auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL(gtime, 1.0);
-    auto s = subObj.getValue<RX>();
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
-    BOOST_CHECK_MESSAGE(s == valrx, std::string(typeid(TX).name()) + " -> " + typeid(IX).name() + " -> " + typeid(RX).name());
-    vFed->finalize();
+    BOOST_CHECK_MESSAGE (s == valrx, std::string (typeid (TX).name ()) + " -> " + typeid (IX).name () + " -> " +
+                                       typeid (RX).name ());
+    vFed->finalize ();
 }
 
 #ifdef QUICK_TESTS_ONLY
@@ -159,7 +156,6 @@ void runPubSubThroughTypeTests(const TX &valtx, const RX &valrx)
 #define SKIPTEST
 #endif
 
-BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
 {
     SKIPTEST runPubSubTypeTests<std::string, std::string> ("test1", "test1");
@@ -169,26 +165,23 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
     SKIPTEST runPubSubTypeTests<int64_t, double> (34, 34.0);
     SKIPTEST runPubSubTypeTests<int64_t, std::string> (34, "34");
     SKIPTEST runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
-    SKIPTEST runPubSubTypeTests<helics::named_point, double>({ std::string(),-3.14159 }, -3.14159);
-    SKIPTEST runPubSubTypeTests<helics::named_point, int64_t>({ std::string(),-3.14159 }, -3);
+    SKIPTEST runPubSubTypeTests<helics::named_point, double> ({std::string (), -3.14159}, -3.14159);
+    SKIPTEST runPubSubTypeTests<helics::named_point, int64_t> ({std::string (), -3.14159}, -3);
 }
 
-
-BOOST_TEST_DECORATOR(*utf::timeout(35))
-BOOST_AUTO_TEST_CASE(subscriptionObject_bool_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests)
 {
-    runPubSubTypeTests<bool, int64_t>(true, 1);
-    runPubSubTypeTests<bool, std::string>(true, "1");
-    SKIPTEST runPubSubTypeTests<bool, double>(false, 0.0);
-    runPubSubTypeTests<double, bool>(47.9, true);
-    runPubSubTypeTests < std::string, bool > ("0", false);
-    SKIPTEST runPubSubTypeTests < int64_t, bool >(-10, true);
-    SKIPTEST runPubSubTypeTests < int64_t, bool >(0, false);
-    SKIPTEST runPubSubTypeTests<helics::named_point, bool>({ std::string(),-3.14159 }, true);
-    SKIPTEST runPubSubTypeTests<helics::named_point, bool>({"0",std::nan("0") }, false);
+    runPubSubTypeTests<bool, int64_t> (true, 1);
+    runPubSubTypeTests<bool, std::string> (true, "1");
+    SKIPTEST runPubSubTypeTests<bool, double> (false, 0.0);
+    runPubSubTypeTests<double, bool> (47.9, true);
+    runPubSubTypeTests<std::string, bool> ("0", false);
+    SKIPTEST runPubSubTypeTests<int64_t, bool> (-10, true);
+    SKIPTEST runPubSubTypeTests<int64_t, bool> (0, false);
+    SKIPTEST runPubSubTypeTests<helics::named_point, bool> ({std::string (), -3.14159}, true);
+    SKIPTEST runPubSubTypeTests<helics::named_point, bool> ({"0", std::nan ("0")}, false);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
 {
     using c = std::complex<double>;
@@ -198,11 +191,11 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<std::string, c> ("3.14159-2j", c (3.14159, -2));
     SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159-2j", c (-3.14159, -2));
     runPubSubTypeTests<std::string, c> ("-3.14159 - 2i", c (-3.14159, -2));
-    runPubSubTypeTests<helics::named_point, c>({ "-3.14159 - 2i",std::nan("0") }, c(-3.14159, -2));
-    runPubSubTypeTests<helics::named_point, c>({"",-3.14159 }, c(-3.14159,0));
+    runPubSubTypeTests<helics::named_point, c> ({"-3.14159 - 2i", std::nan ("0")}, c (-3.14159, -2));
+    runPubSubTypeTests<helics::named_point, c> ({"", -3.14159}, c (-3.14159, 0));
 
-    SKIPTEST runPubSubTypeTests< c, helics::named_point>(c(-3.14159, -2), { "-3.14159 -2j",std::nan("0") } );
-    SKIPTEST runPubSubTypeTests< c, helics::named_point>(c(-3.14159, 0), { "value",-3.14159 });
+    SKIPTEST runPubSubTypeTests<c, helics::named_point> (c (-3.14159, -2), {"-3.14159 -2j", std::nan ("0")});
+    SKIPTEST runPubSubTypeTests<c, helics::named_point> (c (-3.14159, 0), {"value", -3.14159});
     SKIPTEST runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
 
     SKIPTEST runPubSubTypeTests<std::string, c> ("2i", c (0, 2));
@@ -216,7 +209,6 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (45))
 BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
 {
     using v = std::vector<double>;
@@ -245,7 +237,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
 
     SKIPTEST runPubSubTypeTests<c, v> (c{0.0, 2}, v{0, 2});
 
-    SKIPTEST runPubSubTypeTests<v, double> (tvec1, sqrt(12.4*12.4+0.3*0.3+0.7*0.7));
+    SKIPTEST runPubSubTypeTests<v, double> (tvec1, sqrt (12.4 * 12.4 + 0.3 * 0.3 + 0.7 * 0.7));
 
     SKIPTEST runPubSubTypeTests<double, v> (0.34, v{0.34});
 
@@ -254,7 +246,6 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (35))
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 {
     using v = std::vector<double>;
@@ -277,8 +268,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
     runPubSubTypeTests<vc, std::string> (eVec, helics::helicsComplexVectorString (eVec));
     runPubSubTypeTests<std::string, vc> (helics::helicsComplexVectorString (eVec), eVec);
 
-
-    runPubSubTypeTests<vc, helics::named_point>(tcvec2, { helics::helicsComplexVectorString(tcvec2),std::nan("0") });
+    runPubSubTypeTests<vc, helics::named_point> (tcvec2,
+                                                 {helics::helicsComplexVectorString (tcvec2), std::nan ("0")});
 
     SKIPTEST runPubSubTypeTests<std::string, vc> ("3.14159-2j", vc{c{3.14159, -2}});
     SKIPTEST runPubSubTypeTests<std::string, vc> ("-3.14159-2j", vc{c{-3.14159, -2}});
@@ -292,7 +283,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
 
     SKIPTEST runPubSubTypeTests<c, vc> (c{0.0, 2}, vc{c{0, 2}});
 
-    SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, helics::vectorNorm(tcvec2));
+    SKIPTEST runPubSubTypeTests<vc, double> (tcvec2, helics::vectorNorm (tcvec2));
 
     SKIPTEST runPubSubTypeTests<double, vc> (0.34, vc{c{0.34}});
 
@@ -301,109 +292,107 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
 
-BOOST_AUTO_TEST_CASE(subscriptionChangedDetection_tests)
+BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
-    auto pubObj = helics::make_publication<double>(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto pubObj = helics::make_publication<double> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj1 = helics::Subscription(vFed.get(), "pub1");
-    auto subObj2 = helics::Subscription(vFed.get(), "pub1");
-    subObj2.setMinimumChange(0.1);
-    vFed->setTimeDelta(1.0);
-    vFed->enterExecutionState();
+    auto subObj1 = helics::Subscription (vFed.get (), "pub1");
+    auto subObj2 = helics::Subscription (vFed.get (), "pub1");
+    subObj2.setMinimumChange (0.1);
+    vFed->setTimeDelta (1.0);
+    vFed->enterExecutionState ();
     // publish string1 at time=0.0;
-    pubObj->publish(23.7);
-    auto gtime = vFed->requestTime(1.0);
+    pubObj->publish (23.7);
+    auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL(gtime, 1.0);
-    BOOST_CHECK(subObj1.isUpdated());
-    BOOST_CHECK(subObj2.isUpdated());
-    //check a second time
-    BOOST_CHECK(subObj1.isUpdated());
-    BOOST_CHECK(subObj2.isUpdated());
-    auto val1 = subObj1.getValue<double>();
-    auto val2 = subObj2.getValue<double>();
-    //now that we got the value it should not be updated
-    BOOST_CHECK(!subObj1.isUpdated());
-    BOOST_CHECK(!subObj2.isUpdated());
-    BOOST_CHECK_EQUAL(val1, val2);
-    BOOST_CHECK_EQUAL(val1, 23.7);
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    BOOST_CHECK (subObj1.isUpdated ());
+    BOOST_CHECK (subObj2.isUpdated ());
+    // check a second time
+    BOOST_CHECK (subObj1.isUpdated ());
+    BOOST_CHECK (subObj2.isUpdated ());
+    auto val1 = subObj1.getValue<double> ();
+    auto val2 = subObj2.getValue<double> ();
+    // now that we got the value it should not be updated
+    BOOST_CHECK (!subObj1.isUpdated ());
+    BOOST_CHECK (!subObj2.isUpdated ());
+    BOOST_CHECK_EQUAL (val1, val2);
+    BOOST_CHECK_EQUAL (val1, 23.7);
     // publish a second string
-    pubObj->publish(23.61);
+    pubObj->publish (23.61);
     // advance time
-    gtime = vFed->requestTime(2.0);
+    gtime = vFed->requestTime (2.0);
 
-    BOOST_CHECK(subObj1.isUpdated());
-    BOOST_CHECK(!subObj2.isUpdated());
+    BOOST_CHECK (subObj1.isUpdated ());
+    BOOST_CHECK (!subObj2.isUpdated ());
 
-    vFed->finalize();
+    vFed->finalize ();
 }
 
-
-BOOST_AUTO_TEST_CASE(subscriptionstringSize_tests)
+BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
-    auto pubObj = helics::make_publication < std::string > (helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto pubObj = helics::make_publication<std::string> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription(vFed.get(), "pub1");
+    auto subObj = helics::Subscription (vFed.get (), "pub1");
 
-    vFed->setTimeDelta(1.0);
-    vFed->enterExecutionState();
+    vFed->setTimeDelta (1.0);
+    vFed->enterExecutionState ();
     // publish string1 at time=0.0;
-    std::string str("this is a string test");
-    pubObj->publish(str);
-    auto gtime = vFed->requestTime(1.0);
+    std::string str ("this is a string test");
+    pubObj->publish (str);
+    auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL(gtime, 1.0);
-    BOOST_CHECK(subObj.isUpdated());
-    BOOST_CHECK_EQUAL(subObj.getStringSize(), str.size()+1);
-    BOOST_CHECK_EQUAL(subObj.getRawSize(), str.size());
-    auto val1 = subObj.getValue<std::string>();
-    //now that we got the value it should not be updated
-    BOOST_CHECK(!subObj.isUpdated());
-    BOOST_CHECK_EQUAL(val1, str);
-    vFed->finalize();
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    BOOST_CHECK (subObj.isUpdated ());
+    BOOST_CHECK_EQUAL (subObj.getStringSize (), str.size () + 1);
+    BOOST_CHECK_EQUAL (subObj.getRawSize (), str.size ());
+    auto val1 = subObj.getValue<std::string> ();
+    // now that we got the value it should not be updated
+    BOOST_CHECK (!subObj.isUpdated ());
+    BOOST_CHECK_EQUAL (val1, str);
+    vFed->finalize ();
 }
 
-
-
-BOOST_AUTO_TEST_CASE(subscriptionVectorSize_tests)
+BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    auto vFed = std::make_shared<helics::ValueFederate> (fi);
     // register the publications
-    auto pubObj = helics::make_publication < std::vector<double> >(helics::GLOBAL, vFed.get(), std::string("pub1"));
+    auto pubObj =
+      helics::make_publication<std::vector<double>> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription(vFed.get(), "pub1");
+    auto subObj = helics::Subscription (vFed.get (), "pub1");
 
-    vFed->setTimeDelta(1.0);
-    vFed->enterExecutionState();
+    vFed->setTimeDelta (1.0);
+    vFed->enterExecutionState ();
     // publish string1 at time=0.0;
-    std::vector<double> tvec{ 5,7,234.23,99.1,1e7,0.0 };
-    pubObj->publish(tvec);
-    auto gtime = vFed->requestTime(1.0);
+    std::vector<double> tvec{5, 7, 234.23, 99.1, 1e7, 0.0};
+    pubObj->publish (tvec);
+    auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL(gtime, 1.0);
-    BOOST_CHECK(subObj.isUpdated());
-    BOOST_CHECK_EQUAL(subObj.getVectorSize(), tvec.size());
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    BOOST_CHECK (subObj.isUpdated ());
+    BOOST_CHECK_EQUAL (subObj.getVectorSize (), tvec.size ());
 
-    auto val1 = subObj.getValue<std::vector<double>>();
-    //now that we got the value it should not be updated
-    BOOST_CHECK(!subObj.isUpdated());
-    BOOST_CHECK(val1==tvec);
-    vFed->finalize();
+    auto val1 = subObj.getValue<std::vector<double>> ();
+    // now that we got the value it should not be updated
+    BOOST_CHECK (!subObj.isUpdated ());
+    BOOST_CHECK (val1 == tvec);
+    vFed->finalize ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

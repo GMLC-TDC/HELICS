@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using helics::operator"" _t ;
 helics::Time tend = 3600.0_t;  // simulation end time
 
-namespace utf = boost::unit_test;
+
 
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock
@@ -233,7 +233,6 @@ class observer
 
 BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
-BOOST_TEST_DECORATOR (*utf::timeout (30))
 BOOST_AUTO_TEST_CASE (linear_tests)
 {
     auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "22");
