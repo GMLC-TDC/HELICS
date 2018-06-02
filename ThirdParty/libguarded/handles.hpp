@@ -47,6 +47,14 @@ public:
     {
         return (data != nullptr);
     }
+    auto begin()
+    {
+        return std::begin(*data);
+    }
+    auto end()
+    {
+        return std::end(*data);
+    }
 private:
     //this is a non owning pointer
     pointer data;
@@ -159,6 +167,14 @@ public:
     operator bool() const noexcept
     {
         return (data != nullptr);
+    }
+    auto begin() const
+    {
+        return std::cbegin(*data);
+    }
+    auto end() const
+    {
+        return std::cend(*data);
     }
 private:
     //this is a non owning pointer
