@@ -18,6 +18,7 @@ namespace helics
     class InterfaceInfo
     {
     public:
+        InterfaceInfo() = default;
         const SubscriptionInfo *getSubscription(const std::string &subName) const;
         const SubscriptionInfo *getSubscription(Core::handle_id_t handle_) const;
         SubscriptionInfo *getSubscription(const std::string &subName);
