@@ -1141,23 +1141,11 @@ std::string FederateState::processQuery (const std::string &query) const
 {
     if (query == "publications")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            for (auto &pub : interfaceInformation.getPublications())
-            {
-                ret.append (pub->key);
-                ret.push_back (';');
+        return generateStringVector(interfaceInformation.getPublications(), [](auto &pub) {return pub->key; });
     }
     if (query == "endpoints")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            for (auto &ept : interfaceInformation.getEndpoints())
-            {
-                ret.append (ept->key);
-                ret.push_back (';');
+        return generateStringVector(interfaceInformation.getEndpoints(), [](auto &ept) {return ept->key; });
     }
     if (queryCallback)
     {

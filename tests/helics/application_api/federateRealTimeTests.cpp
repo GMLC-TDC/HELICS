@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(federate_delay_tests)
     fi.coreInitString = "1";
     fi.realtime = true;
     fi.rt_lead = 0.1;
-    fi.period = 1.0;
+    fi.period = 0.5;
     auto fed = std::make_shared<helics::ValueFederate>(fi);
 
     helics::Publication pubid(helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(federate_initialize_tests)
     fi.coreInitString = "1";
     fi.realtime = true;
     fi.rt_lead = 0.1;
-    fi.period = 1.0;
+    fi.period = 0.5;
     auto fed = std::make_shared<helics::ValueFederate>(fi);
 
     helics::Publication pubid(helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
