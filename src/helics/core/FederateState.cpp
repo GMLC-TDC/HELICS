@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/helics-config.h"
 #include <boost/foreach.hpp>
+#include "MessageTimer.hpp"
 
 
 static const std::string nullStr;
@@ -470,13 +471,16 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         processing = false;
         if ((realtime)&&(ret == iteration_state::next_step))
         {
-            servicePtr = AsioServiceManager::getServicePointer();
-            loopHandle = servicePtr->runServiceLoop();
+            if (!mTimer)
+            {
+                mTimer = std::make_shared<MessageTimer>([this](ActionMessage &&mess) {return this->addAction(std::move(mess)); });
+            }
             start_clock_time = std::chrono::steady_clock::now();
         }
         return static_cast<iteration_result> (ret);
     }
-
+    //the following code is for situation which this has been called multiple times, which really shouldn't be done
+    //but it isn't really an error so we need to deal with it.
     while (!processing.compare_exchange_weak (expected, true))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -531,14 +535,24 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         addAction (treq);
         LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
-        if (realtime)
+        if ((realtime)&&(rt_lag<Time::maxVal()))
         {
             auto current_clock_time = std::chrono::steady_clock::now();
             auto timegap = current_clock_time - start_clock_time;
             auto current_lead = (nextTime + rt_lag).to_ns()-timegap;
-            if (current_lead > std::chrono::nanoseconds(0))
+            if (current_lead > std::chrono::milliseconds(0))
             {
-
+                ActionMessage tforce(CMD_FORCE_TIME_GRANT);
+                tforce.source_id = global_id;
+                tforce.actionTime = nextTime;
+                if (realTimeTimerIndex < 0)
+                {
+                    realTimeTimerIndex = mTimer->addTimer(current_clock_time+current_lead,std::move(tforce));
+                }
+                else
+                {
+                    mTimer->updateTimer(realTimeTimerIndex, current_clock_time + current_lead, std::move(tforce));
+                }
             }
             else
             {
@@ -582,20 +596,28 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
             break;
         }
-        processing = false;
-        if ((realtime)&&(ret==iteration_state::next_step))
+        if (realtime)
         {
-            auto current_clock_time = std::chrono::steady_clock::now();
-            auto timegap = current_clock_time - start_clock_time;
-            if (time_granted-Time(timegap)>rt_lead)
+            if (rt_lag < Time::maxVal())
             {
-                auto current_lead = (time_granted - rt_lead).to_ns()-timegap;
-                if ( current_lead> std::chrono::milliseconds(5))
+                mTimer->cancelTimer(realTimeTimerIndex);
+            }
+            if (ret == iteration_state::next_step)
+            {
+                auto current_clock_time = std::chrono::steady_clock::now();
+                auto timegap = current_clock_time - start_clock_time;
+                if (time_granted - Time(timegap)>rt_lead)
                 {
-                    std::this_thread::sleep_for(current_lead);
+                    auto current_lead = (time_granted - rt_lead).to_ns() - timegap;
+                    if (current_lead> std::chrono::milliseconds(5))
+                    {
+                        std::this_thread::sleep_for(current_lead);
+                    }
                 }
             }
-        }
+       }
+        
+        processing = false;
         return retTime;
     }
     // this would not be good practice to get into this part of the function

@@ -17,7 +17,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
-#include "../common/AsioServiceManager.h"
 #include <atomic>
 #include <map>
 #include <mutex>
@@ -33,7 +32,7 @@ class FilterInfo;
 class CommonCore;
 
 class TimeCoordinator;
-
+class MessageTimer;
 
 constexpr Time startupTime = Time::minVal ();
 constexpr Time initialTime{-1000000.0};
@@ -75,6 +74,7 @@ class FederateState
     decltype(std::chrono::steady_clock::now()) start_clock_time; 
     Time rt_lag=timeZero;  //!<max lag for the rt control
     Time rt_lead=timeZero; //!< min lag for the realtime control
+    int32_t realTimeTimerIndex; //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 
@@ -87,6 +87,7 @@ class FederateState
 
     //   std::vector<ActionMessage> messLog;
   private:
+      std::shared_ptr<MessageTimer> mTimer; //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
@@ -98,8 +99,6 @@ class FederateState
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
-    std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
-    decltype(servicePtr->runServiceLoop()) loopHandle; //!< loop controller for async real time operations
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
