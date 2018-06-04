@@ -18,13 +18,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
+
 
 BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
@@ -105,7 +105,7 @@ run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &
     return results;
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 3);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_loop3)
     }
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);

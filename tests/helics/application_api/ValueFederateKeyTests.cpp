@@ -24,7 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 BOOST_FIXTURE_TEST_SUITE (value_federate_key_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
+
 
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
                       bdata::make (core_types_single),
@@ -79,7 +79,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK (vFed1->getCurrentState () == Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -117,7 +117,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     vFed1->finalize ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2);
@@ -167,7 +167,6 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), co
     vFed2->finalize ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (10))
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -212,7 +211,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     vFed1->finalize ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -238,7 +237,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), 
 
 /** test the all callback*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1, 1.0);

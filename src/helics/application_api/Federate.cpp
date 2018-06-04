@@ -594,7 +594,7 @@ Time Federate::requestTimeComplete ()
 
         auto asyncInfo = asyncCallInfo->lock();
         auto newTime = asyncInfo->timeRequestFuture.get ();
-        asyncInfo = nullptr; //remove the lock;
+        asyncInfo.unlock(); //remove the lock;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime (newTime, oldTime);

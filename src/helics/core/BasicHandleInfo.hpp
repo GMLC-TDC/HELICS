@@ -62,6 +62,7 @@ class BasicHandleInfo
     bool mapped = false;
     bool hasSourceFilter = false;  //!< indicator that an endpoint handle has a source filter
     bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
+    bool hasNonCloningDestFilter = false; //!< indicator that and endpoint has a non-cloning dest filter
     bool used = false;  //!< indicator that the publication or filter is used
     bool cloning = false;  //!< indicator that the filter is a cloning filter
     // 4 byte hole here

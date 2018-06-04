@@ -204,7 +204,7 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             {
                 // first copy the callback in case it gets changed via another operation
                 auto callbackFunction = callbacks[fid->callbackIndex];
-                subHandle = nullptr;  //need to free the lock
+                subHandle.unlock();  //need to free the lock
                 // callbacks can do all sorts of things, best not to have it locked during the callback
                 callbackFunction (fid->id, CurrentTime);
                 subHandle = subscriptions.lock();
@@ -213,7 +213,7 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             {
                 // first copy the callback in case it gets changed via another operation
                 auto allCallBackFunction = callbacks[allCallbackIndex];
-                subHandle = nullptr;  //need to free the lock
+                subHandle.unlock();  //need to free the lock
                 // callbacks can do all sorts of strange things, best not to have it locked during the callback
                 allCallBackFunction (fid->id, CurrentTime);
                 subHandle = subscriptions.lock();

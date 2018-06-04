@@ -261,7 +261,8 @@ class CommonCore : public Core, public BrokerBase
                                     const std::string &key,
                                     const std::string &target,
                                     const std::string &type_in,
-                                    const std::string &type_out);
+                                    const std::string &type_out,
+                                    bool cloning);
 
     /** create a destination filter */
     FilterInfo *createDestFilter (federate_id_t dest,
@@ -269,7 +270,8 @@ class CommonCore : public Core, public BrokerBase
                                   const std::string &key,
                                   const std::string &target,
                                   const std::string &type_in,
-                                  const std::string &type_out);
+                                  const std::string &type_out,
+                                   bool cloning);
 
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -293,9 +295,9 @@ class CommonCore : public Core, public BrokerBase
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent
-                                              //!< confustion
+                                              //!< confusion
 
-    HandlePointerManager handles;  //!< local handle information;
+    ordered_guarded<HandlePointerManager> handles;  //!< local handle information;
 
     std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;  //!< sets of ongoing filtered messages
     std::map<int32_t, std::set<int32_t>>
@@ -306,10 +308,10 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<int> queryCounter{0};
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
-    DualMappedPointerVector<FilterInfo, std::string,
-                            fed_handle_pair> filters;  //!< storage for all the filters
-    mutable std::mutex
-      _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
+    shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
+                            fed_handle_pair>> filters;  //!< storage for all the filters
+   // mutable std::mutex
+   //   _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
 
