@@ -29,6 +29,11 @@ static void processTimerCallback(std::shared_ptr<MessageTimer> mtimer, int32_t i
     }
 }
 
+int32_t  MessageTimer::addTimerFromNow(std::chrono::nanoseconds time, ActionMessage mess)
+{
+    return addTimer(std::chrono::steady_clock::now() + time, std::move(mess));
+}
+
 int32_t MessageTimer::addTimer(time_type expireTime, ActionMessage mess)
 {
     //these two calls need to be before the lock
@@ -43,6 +48,7 @@ int32_t MessageTimer::addTimer(time_type expireTime, ActionMessage mess)
     timer->async_wait(timerCallback);
     timers.push_back(std::move(timer));
     buffers.push_back(std::move(mess));
+    expirationTimes.push_back(expireTime);
     return index;
 }
 
@@ -56,6 +62,19 @@ void MessageTimer::cancelTimer(int32_t index)
     }
 }
 
+void MessageTimer::cancelAll()
+{
+    std::lock_guard<std::mutex> lock(timerLock);
+    for (auto &tmr : timers)
+    {
+        tmr->cancel();
+    }
+    for (auto &buf : buffers)
+    {
+        buf.setAction(CMD_IGNORE);
+    }
+
+}
 
 void  MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime, ActionMessage mess)
 {
@@ -72,6 +91,23 @@ void  MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime, Ac
     }
 }
 
+bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds time)
+{
+    std::lock_guard<std::mutex> lock(timerLock);
+    if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size())))
+    {
+        auto newTime = timers[timerIndex]->expires_at() + time;
+        timers[timerIndex]->expires_at(newTime);
+        auto timerCallback = [ptr = shared_from_this(), timerIndex](const boost::system::error_code &ec) {
+            processTimerCallback(ptr, timerIndex, ec);
+        };
+        expirationTimes[timerIndex] = newTime;
+        auto ret = (buffers[timerIndex].action() != CMD_IGNORE);
+        timers[timerIndex]->async_wait(timerCallback);
+        return ret;
+    }
+    return false;
+}
 
 bool MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime)
 {
