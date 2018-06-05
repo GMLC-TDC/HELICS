@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cereal/archives/portable_binary.hpp>
 #include <complex>
 //#include <cereal/archives/binary.hpp>
-#include <fmt/format.h>
+#include "fmt_wrapper.h"
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/stream.hpp>
 

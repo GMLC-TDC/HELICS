@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ForwardingTimeCoordinator.hpp"
 #include "../flag-definitions.h"
 #include <algorithm>
-#include <fmt/format.h>
+#include "fmt_wrapper.h"
 
 namespace helics
 {

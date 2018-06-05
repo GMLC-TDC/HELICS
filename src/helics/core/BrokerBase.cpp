@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include <fmt/format.h>
+#include "fmt_wrapper.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class

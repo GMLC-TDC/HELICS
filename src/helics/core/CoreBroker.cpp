@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/argParser.h"
 #include <boost/filesystem.hpp>
-#include <fmt/format.h>
+#include "fmt_wrapper.h"
 
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"

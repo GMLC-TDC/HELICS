@@ -30,7 +30,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 
 #include "../common/DelayedObjects.hpp"
-#include <fmt/format.h>
+#include "fmt_wrapper.h"
 
 namespace helics
 {
