@@ -322,6 +322,11 @@ if (NOT DISABLE_LOGGING)
 	OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
 endif()
 
+#-----------------------------------------------------------------------------
+# create the fmt header only targets
+#-----------------------------------------------------------------------------
+set(FMT_TEST OFF)
+add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories

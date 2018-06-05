@@ -30,7 +30,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 
 #include "../common/DelayedObjects.hpp"
-#include <boost/format.hpp>
+#include "fmt/format.h"
 
 namespace helics
 {
@@ -758,7 +758,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::subscription, key, type, units,
                                      (check_mode == handle_check_mode::required));
 
-    LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering SUB %s") % key).str ());
+    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering SUB {}",key));
     auto id = handle->handle;
     fed->createSubscription (id, key, type, units, check_mode);
 
@@ -801,7 +801,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
-    LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering PUB %s") % key).str ());
+    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     std::unique_lock<std::mutex> lock (_handlemutex);
     auto pub = handles.getPublication (key);
     lock.unlock ();
@@ -944,7 +944,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     if (fed->checkAndSetValue (handle, data, len))
     {
         LOG_DEBUG (0, fed->getIdentifier (),
-                   (boost::format ("setting Value for %s size %d") % handleInfo->key % len).str ());
+                   fmt::format ("setting Value for {} size {}",handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
@@ -1958,7 +1958,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     // deal with a few types of message immediately
     LOG_TRACE (
       global_broker_id, getIdentifier (),
-      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+      fmt::format ("|| priority_cmd:{} from {}", prettyPrintString (command) , command.source_id));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -2008,8 +2008,8 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 LOG_ERROR (0, identifier,
-                           std::string ("broker responded with error for registration of ") + command.name +
-                             "::" + commandErrorString (command.index) + "\n");
+                           fmt::format ("broker responded with error for registration of {}::{}\n", command.name,
+                             commandErrorString (command.index)));
             }
             else
             {
@@ -2167,7 +2167,7 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
 void CommonCore::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
-               (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+               fmt::format ("|| cmd:{} from {}", prettyPrintString (command) ,command.source_id));
     switch (command.action ())
     {
     case CMD_IGNORE:

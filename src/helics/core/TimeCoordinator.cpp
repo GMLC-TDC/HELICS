@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeCoordinator.hpp"
 #include "../flag-definitions.h"
 #include <algorithm>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace helics
 {
@@ -436,11 +436,10 @@ void TimeCoordinator::updateTimeGrant ()
 }
 std::string TimeCoordinator::printTimeStatus () const
 {
-    return (boost::format ("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
-            static_cast<double> (time_exec) % static_cast<double> (time_allow) % static_cast<double> (time_value) %
-            static_cast<double> (time_message) % static_cast<double> (time_minDe) %
-            static_cast<double> (time_minminDe))
-      .str ();
+    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={}",
+            static_cast<double> (time_exec), static_cast<double> (time_allow), static_cast<double> (time_value),
+            static_cast<double> (time_message), static_cast<double> (time_minDe),
+            static_cast<double> (time_minminDe));
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }

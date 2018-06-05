@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/argParser.h"
 #include <boost/filesystem.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
@@ -205,7 +205,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     // deal with a few types of message immediately
     LOG_TRACE (
       global_broker_id, getIdentifier (),
-      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+      fmt::format ("|| priority_cmd:{} from {}", prettyPrintString (command),command.source_id));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -450,7 +450,7 @@ void CoreBroker::transmitDelayedMessages ()
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
-               (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+               fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -653,7 +653,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         if (command.source_id == global_broker_id)
         {
             LOG_DEBUG (global_broker_id, getIdentifier (),
-                       (boost::format ("time request update %s") % prettyPrintString (command)).str ());
+                       fmt::format ("time request update {}",prettyPrintString (command)));
             for (auto dep : timeCoord->getDependents ())
             {
                 routeMessage (command, dep);
@@ -995,7 +995,7 @@ bool CoreBroker::connect ()
             auto res = brokerConnect ();
             if (res)
             {
-                LOG_NORMAL (0, getIdentifier (), (boost::format ("||connected on %s") % getAddress ()).str ());
+                LOG_NORMAL (0, getIdentifier (), fmt::format ("||connected on {}",getAddress ()));
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);

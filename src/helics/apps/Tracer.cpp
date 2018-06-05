@@ -23,7 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include "../common/logger.h"
 
 

@@ -171,6 +171,9 @@ target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:helics_b
 target_compile_definitions(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
 target_compile_options(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
 
+target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>)
+target_compile_definitions(helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>)
+
 if (APPLE)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)

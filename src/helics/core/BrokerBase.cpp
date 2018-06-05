@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/uuid/uuid.hpp>  // uuid class
@@ -329,9 +329,8 @@ void BrokerBase::queueProcessingLoop ()
             for (auto &act : dumpMessages)
             {
                 sendToLogger (0, -10, identifier,
-                              (boost::format ("|| dl cmd:%s from %d to %d") % prettyPrintString (act) %
-                               act.source_id % act.dest_id)
-                                .str ());
+                              fmt::format ("|| dl cmd:{} from {} to {}", prettyPrintString (act),
+                               act.source_id, act.dest_id));
             }
         }
     };
