@@ -30,7 +30,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 
 #include "../common/DelayedObjects.hpp"
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 namespace helics
 {
@@ -166,7 +166,6 @@ void CommonCore::unregister ()
 CommonCore::~CommonCore ()
 {
     // make sure everything is synced up so just run the lock
-    std::unique_lock<std::mutex> lock (_handlemutex);
     joinAllThreads ();
 }
 
@@ -184,11 +183,7 @@ FederateState *CommonCore::getFederate (const std::string &federateName) const
 
 FederateState *CommonCore::getHandleFederate (handle_id_t id_)
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_handlemutex);
-    // this list is now constant no need to lock
-    auto local_fed_id = handles.getLocalFedID (id_);
+    auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
     if (local_fed_id != invalid_fed_id)
     {
         auto feds = federates.lock ();
@@ -212,13 +207,10 @@ FederateState *CommonCore::getFederateCore (const std::string &federateName)
 
 FederateState *CommonCore::getHandleFederateCore (handle_id_t id_)
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_handlemutex);
     // this list is now constant no need to lock
-    auto local_fed_id = handles.getLocalFedID (id_);
+    auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
     if (local_fed_id != invalid_fed_id)
-    {  // now need to be careful about deadlock here
+    {
         return loopFederates[local_fed_id];
     }
 
@@ -227,18 +219,12 @@ FederateState *CommonCore::getHandleFederateCore (handle_id_t id_)
 
 BasicHandleInfo *CommonCore::getHandleInfo (handle_id_t id_) const
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_handlemutex);
-    return handles.getHandleInfo (id_);
+    return handles.read ([id_](auto &hand) { return hand.getHandleInfo (id_); });
 }
 
 BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name)
 {
-    // only activate the lock if we not in an operating state
-    auto lock = (brokerState == operating) ? std::unique_lock<std::mutex> (_handlemutex, std::defer_lock) :
-                                             std::unique_lock<std::mutex> (_handlemutex);
-    return handles.getEndpoint (name);
+    return handles.read ([&name](auto &hand) { return hand.getEndpoint (name); });
 }
 
 bool CommonCore::isLocal (Core::federate_id_t global_id) const
@@ -435,7 +421,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         return local_id;
     }
-    throw (RegistrationFailure (fed->lastErrorString()));
+    throw (RegistrationFailure (fed->lastErrorString ()));
 }
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
@@ -717,11 +703,12 @@ BasicHandleInfo *CommonCore::createBasicHandle (federate_id_t global_federateId,
                                                 const std::string &units,
                                                 bool required)
 {
-    std::lock_guard<std::mutex> lock (_handlemutex);
-    auto handle = handles.addHandle (global_federateId, HandleType, key, type, units);
-    handle->local_fed_id = local_federateId;
-    handle->flag = required;
-    return handle;
+    return handles.modify ([&](auto &hand) {
+        auto hndl = hand.addHandle (global_federateId, HandleType, key, type, units);
+        hndl->local_fed_id = local_federateId;
+        hndl->flag = required;
+        return hndl;
+    });
 }
 
 BasicHandleInfo *CommonCore::createBasicHandle (federate_id_t global_federateId,
@@ -732,10 +719,11 @@ BasicHandleInfo *CommonCore::createBasicHandle (federate_id_t global_federateId,
                                                 const std::string &type_in,
                                                 const std::string &type_out)
 {
-    std::lock_guard<std::mutex> lock (_handlemutex);
-    auto handle = handles.addHandle (global_federateId, HandleType, key, target, type_in, type_out);
-    handle->local_fed_id = local_federateId;
-    return handle;
+    return handles.modify([&](auto &hand) {
+        auto hndl = hand.addHandle(global_federateId, HandleType, key, target, type_in, type_out);
+        hndl->local_fed_id = local_federateId;
+        return hndl;
+    });
 }
 
 handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
@@ -760,7 +748,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
 
     LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering SUB {}",key));
     auto id = handle->handle;
-    fed->createSubscription (id, key, type, units, check_mode);
+    fed->interfaces().createSubscription (id, key, type, units, check_mode);
 
     ActionMessage m (CMD_REG_SUB);
     m.source_id = fed->global_id;
@@ -782,7 +770,7 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
     auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
-        return fed->getSubscription (key)->id;
+        return fed->interfaces().getSubscription (key)->id;
     }
     return invalid_handle;
 }
@@ -802,18 +790,17 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
     LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
-    std::unique_lock<std::mutex> lock (_handlemutex);
-    auto pub = handles.getPublication (key);
-    lock.unlock ();
+    auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
-        throw (InvalidParameter ());
+        throw (InvalidParameter ("publication already present"));
     }
-    auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::publication, key, type, units, false);
+    auto handle =
+      createBasicHandle (fed->global_id, fed->local_id, handle_type_t::publication, key, type, units, false);
 
     auto id = handle->handle;
 
-    fed->createPublication (id, key, type, units);
+    fed->interfaces().createPublication (id, key, type, units);
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id;
@@ -828,16 +815,12 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
 
 handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::string &key) const
 {
-    auto fed = getFederateAt (federateID);
-    if (fed != nullptr)
+    auto pub = handles.read([&key](auto &hand) { return hand.getPublication(key); });
+    if (pub->local_fed_id != federateID)
     {
-        auto pub = fed->getPublication (key);
-        if (pub != nullptr)
-        {
-            return pub->id;
+        return invalid_handle;
         }
-    }
-    return invalid_handle;
+    return pub->handle;
 }
 
 const std::string nullStr;
@@ -870,7 +853,7 @@ const std::string &CommonCore::getType (handle_id_t handle) const
         if (handleInfo->handle_type == handle_type_t::subscription)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto subInfo = fed->getSubscription (handleInfo->handle);
+            auto subInfo = fed->interfaces().getSubscription (handleInfo->handle);
             if (subInfo != nullptr)
             {
                 if (!subInfo->pubType.empty())
@@ -967,8 +950,8 @@ std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
     {
         throw (InvalidIdentifier ("Handle does not identify a subscription"));
     }
-
-    return getFederateAt (handleInfo->local_fed_id)->getSubscription (handle)->getData ();
+    //todo:: this is a long chain should be refactored
+    return getFederateAt (handleInfo->local_fed_id)->interfaces().getSubscription (handle)->getData ();
 }
 
 const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t federateID)
@@ -993,19 +976,17 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     {
         throw (InvalidFunctionCall ("endpoints must be registered before calling enterInitializationMode"));
     }
-
-    std::unique_lock<std::mutex> lock (_handlemutex);
-    auto ept = handles.getEndpoint (name);
+    auto ept = handles.read ([&name](auto &hand) { return hand.getEndpoint (name); });
     if (ept != nullptr)
     {
         throw (InvalidIdentifier ("endpoint name is already used"));
     }
-    lock.unlock ();
-    auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, "", false);
+    auto handle =
+      createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, "", false);
 
     auto id = handle->handle;
-    fed->createEndpoint (id, name, type);
-
+    fed->interfaces().createEndpoint (id, name, type);
+    fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_END);
     m.source_id = fed->global_id;
     m.source_handle = id;
@@ -1019,16 +1000,12 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
 
 handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string &name) const
 {
-    auto fed = getFederateAt (federateID);
-    if (fed != nullptr)
+    auto ept = handles.read([&name](auto &hand) { return hand.getEndpoint(name); });
+    if (ept->local_fed_id != federateID)
     {
-        auto ept = fed->getEndpoint (name);
-        if (ept != nullptr)
-        {
-            return ept->id;
+        return invalid_handle;
         }
-    }
-    return invalid_handle;
+    return ept->handle;
 }
 
 handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
@@ -1043,8 +1020,7 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        auto handle = handles.getFilter (filterName);
+        auto handle = handles.read ([&filterName](auto &hand) { return hand.getFilter (filterName); });
         if (handle != nullptr)
         {
             throw (InvalidIdentifier ("there already exists a filter with this name"));
@@ -1055,7 +1031,7 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
       createBasicHandle (global_broker_id, 0, handle_type_t::source_filter, filterName, source, type_in, type_out);
 
     auto id = handle->handle;
-    auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out);
+    auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out,false);
 
     ActionMessage m (CMD_REG_SRC_FILTER);
     m.source_id = global_broker_id;
@@ -1064,16 +1040,18 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     m.info ().target = source;
     m.info ().type = type_in;
     m.info ().type_out = type_out;
-
-    std::unique_lock<std::mutex> lock (_handlemutex);
-
-    auto ept = handles.getEndpoint (source);
+    auto ept = handles.modify ([&source](auto &hand) {
+        auto epthand = hand.getEndpoint (source);
+        if (epthand != nullptr)
+        {
+            epthand->hasSourceFilter = true;
+        }
+        return epthand;
+    });
     if (ept != nullptr)
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
-        ept->hasSourceFilter = true;
-        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1085,7 +1063,6 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     }
     else
     {
-        lock.unlock ();
         //
         addActionMessage (m);
     }
@@ -1104,8 +1081,7 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        auto handle = handles.getFilter (filterName);
+        auto handle = handles.read ([&filterName](auto &hand) { return hand.getFilter (filterName); });
         if (handle != nullptr)
         {
             throw (InvalidIdentifier ("there already exists a filter with this name"));
@@ -1117,12 +1093,7 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
 
     auto id = handle->handle;
     handle->cloning = true;
-    auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out);
-
-    {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        filtInfo->cloning = true;
-    }
+    auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out,true);
 
     ActionMessage m (CMD_REG_SRC_FILTER);
     m.source_id = global_broker_id;
@@ -1133,15 +1104,18 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    std::unique_lock<std::mutex> lock (_handlemutex);
-
-    auto ept = handles.getEndpoint (source);
+    auto ept = handles.modify ([&source](auto &hand) {
+        auto epthand = hand.getEndpoint (source);
+        if (epthand != nullptr)
+        {
+            epthand->hasSourceFilter = true;
+        }
+        return epthand;
+    });
     if (ept != nullptr)
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
-        ept->hasSourceFilter = true;
-        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1153,8 +1127,6 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     }
     else
     {
-        lock.unlock ();
-        //
         addActionMessage (m);
     }
     return id;
@@ -1162,8 +1134,8 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
 
 handle_id_t CommonCore::getSourceFilter (const std::string &name) const
 {
-    std::lock_guard<std::mutex> lock (_handlemutex);
-    auto filter = filters.find (name);
+    auto filtslock = filters.lock();
+    auto filter = filtslock->find (name);
     if (filter != nullptr)
     {
         return (!filter->dest_filter) ? filter->handle : invalid_handle;
@@ -1184,19 +1156,19 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        auto handle = handles.getFilter (filterName);
+        auto handle = handles.read ([&filterName](auto &hand) { return hand.getFilter (filterName); });
         if (handle != nullptr)
         {
             throw (InvalidIdentifier ("there already exists a filter with this name"));
         }
     }
 
-    auto handle = createBasicHandle (global_broker_id, 0, handle_type_t::destination_filter, filterName, dest, type_in, type_out);
+    auto handle = createBasicHandle (global_broker_id, 0, handle_type_t::destination_filter, filterName, dest,
+                                     type_in, type_out);
 
     auto id = handle->handle;
 
-    auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out);
+    auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out,false);
 
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = global_broker_id;
@@ -1206,19 +1178,23 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    std::unique_lock<std::mutex> lock (_handlemutex);
-
-    auto ept = handles.getEndpoint (dest);
+    auto ept = handles.modify ([&dest](auto &hand) {
+        auto epthand = hand.getEndpoint (dest);
+        if (epthand != nullptr)
+        {
+            if (epthand->hasNonCloningDestFilter)
+            {
+                throw (RegistrationFailure ("endpoint " + dest + " already has a noncloning destination filter"));
+            }
+            epthand->hasDestFilter = true;
+            epthand->hasNonCloningDestFilter = true;
+        }
+        return epthand;
+    });
     if (ept != nullptr)
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
-        if (ept->hasDestFilter)
-        {
-            throw (RegistrationFailure ("endpoint " + dest + " already has a destination filter"));
-        }
-        ept->hasDestFilter = true;
-        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1230,8 +1206,6 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     }
     else
     {
-        lock.unlock ();
-        //
         addActionMessage (std::move (m));
     }
     return id;
@@ -1250,24 +1224,20 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        auto handle = handles.getFilter (filterName);
+        auto handle = handles.read ([&filterName](auto &hand) { return hand.getFilter (filterName); });
         if (handle != nullptr)
         {
             throw (InvalidIdentifier ("there already exists a filter with this name"));
         }
     }
 
-    auto handle = createBasicHandle (global_broker_id, 0, handle_type_t::destination_filter, filterName, dest, type_in, type_out);
+    auto handle = createBasicHandle (global_broker_id, 0, handle_type_t::destination_filter, filterName, dest,
+                                     type_in, type_out);
 
     handle->cloning = true;
     auto id = handle->handle;
 
-    auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out);
-    {  // this is just to keep a scope around the lock
-        std::lock_guard<std::mutex> lock (_handlemutex);
-        filtInfo->cloning = true;
-    }
+    auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out,true);
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = global_broker_id;
     m.source_handle = id;
@@ -1277,16 +1247,18 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    std::unique_lock<std::mutex> lock (_handlemutex);
-
-    auto ept = handles.getEndpoint (dest);
+    auto ept = handles.modify ([&dest](auto &hand) {
+        auto epthand = hand.getEndpoint (dest);
+        if (epthand != nullptr)
+        {
+            epthand->hasDestFilter = true;
+        }
+        return epthand;
+    });
     if (ept != nullptr)
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
-
-        ept->hasDestFilter = true;
-        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1298,8 +1270,6 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     }
     else
     {
-        lock.unlock ();
-        //
         addActionMessage (std::move (m));
     }
     return id;
@@ -1307,8 +1277,8 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
 
 handle_id_t CommonCore::getDestinationFilter (const std::string &name) const
 {
-    std::lock_guard<std::mutex> lock (_handlemutex);
-    auto filter = filters.find (name);
+    auto filtslock = filters.lock_shared();
+    auto filter = filtslock->find (name);
     if (filter != nullptr)
     {
         return (filter->dest_filter) ? filter->handle : invalid_handle;
@@ -1321,28 +1291,30 @@ FilterInfo *CommonCore::createSourceFilter (federate_id_t dest,
                                             const std::string &key,
                                             const std::string &target,
                                             const std::string &type_in,
-                                            const std::string &type_out)
+                                            const std::string &type_out,
+                                            bool cloning)
 {
     auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
                                               type_in, type_out, false);
 
     auto retTarget = filt.get ();
     auto actualKey = key;
+    retTarget->cloning = cloning;
     if (actualKey.empty ())
     {
         actualKey = "sFilter_";
         actualKey.append (std::to_string (handle));
     }
-    std::lock_guard<std::mutex> lock (_handlemutex);
+    auto filtlock = filters.lock();
     if (filt->fed_id == global_broker_id)
     {
-        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
+        filtlock->insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
     else
     {
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->fed_id));
-        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
+        filtlock->insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
 
     return retTarget;
@@ -1353,27 +1325,29 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
                                           const std::string &key,
                                           const std::string &target,
                                           const std::string &type_in,
-                                          const std::string &type_out)
+                                          const std::string &type_out,
+                                            bool cloning)
 {
     auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
                                               type_in, type_out, true);
     auto retTarget = filt.get ();
     auto actualKey = key;
+    retTarget->cloning = cloning;
     if (actualKey.empty ())
     {
         actualKey = "dFilter_";
         actualKey.append (std::to_string (handle));
     }
-    std::lock_guard<std::mutex> lock (_handlemutex);
+    auto filtlock = filters.lock();
     if (filt->fed_id == global_broker_id)
     {
-        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
+        filtlock->insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
     else
     {
         actualKey.push_back ('_');
         actualKey.append (std::to_string (filt->fed_id));
-        filters.insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
+        filtlock->insert (actualKey, {filt->fed_id, filt->handle}, std::move (filt));
     }
     return retTarget;
 }
@@ -1551,7 +1525,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
             {
                 if (clFilter->fed_id == global_broker_id)
                 {
-                    auto FiltI = filters.find (fed_handle_pair (global_broker_id, clFilter->handle));
+                    auto FiltI = (filters.lock())->find (fed_handle_pair (global_broker_id, clFilter->handle));
                     if (FiltI != nullptr)
                     {
                         if (FiltI->filterOp != nullptr)
@@ -1699,6 +1673,7 @@ void CommonCore::setLoggingCallback (
     {
         ActionMessage loggerUpdate(CMD_CORE_CONFIGURE);
         loggerUpdate.index = UPDATE_LOGGING_CALLBACK;
+		loggerUpdate.source_handle = global_broker_id;
         if (logFunction)
         {
             auto ii = getNextAirlockIndex();
@@ -1754,7 +1729,8 @@ void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOp
     {
         throw (InvalidIdentifier ("filter is not a valid handle"));
     }
-    if ((hndl->handle_type != handle_type_t::destination_filter) && (hndl->handle_type != handle_type_t::source_filter))
+    if ((hndl->handle_type != handle_type_t::destination_filter) &&
+        (hndl->handle_type != handle_type_t::source_filter))
     {
         throw (InvalidIdentifier ("filter identifier does not point a filter"));
     }
@@ -1846,13 +1822,11 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        std::lock_guard<std::mutex> lock(_handlemutex);
-        return generateStringVector_if(handles, [](auto &handle) {return handle->key; }, [](auto &handle) {return (handle->handle_type == handle_type_t::publication); });
+        return generateStringVector_if(handles.lock_shared(), [](auto &handle) {return handle->key; }, [](const auto &handle) {return (handle->handle_type == handle_type_t::publication); });
     }
     if (queryStr == "endpoints")
     {
-        std::lock_guard<std::mutex> lock(_handlemutex);
-        return generateStringVector_if(handles, [](auto &handle) {return handle->key; }, [](auto &handle) {return (handle->handle_type == handle_type_t::endpoint); });
+        return generateStringVector_if(handles.lock_shared(), [](auto &handle) {return handle->key; }, [](const auto &handle) {return (handle->handle_type == handle_type_t::endpoint); });
     }
     if (queryStr == "dependencies")
     {
@@ -2342,7 +2316,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto fed = getFederateCore (command.source_id);
             if (fed != nullptr)
             {
-                auto pubInfo = fed->getPublication (command.source_handle);
+                auto pubInfo = fed->interfaces().getPublication (command.source_handle);
                 if (pubInfo != nullptr)
                 {
                     for (auto &subscriber : pubInfo->subscribers)
@@ -2409,7 +2383,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_END:
         if (command.dest_id == global_broker_id)
         {  // in this branch the message came from somewhere else and is targeted at a filter
-            auto filtI = filters.find (fed_handle_pair (global_broker_id, command.dest_handle));
+            auto filtI = filters.lock_shared()->find (fed_handle_pair (global_broker_id, command.dest_handle));
             if (filtI != nullptr)
             {
                 filtI->target = {command.source_id, command.source_handle};
@@ -2418,7 +2392,8 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto filthandle = getHandleInfo (command.dest_handle);
             if (filthandle != nullptr)
             {
-                if ((filthandle->handle_type == handle_type_t::destination_filter) || (filthandle->handle_type == handle_type_t::source_filter))
+                if ((filthandle->handle_type == handle_type_t::destination_filter) ||
+                    (filthandle->handle_type == handle_type_t::source_filter))
                 {
                     filthandle->used = true;
                 }
@@ -2500,20 +2475,20 @@ void CommonCore::processCommand (ActionMessage &&command)
         if (command.dest_id == global_broker_id)
         {
             helics::FilterInfo *filtI = nullptr;
-            { //scope for the lock_guard
-                std::lock_guard<std::mutex> lock(_handlemutex);
-                filtI = filters.find(fed_handle_pair(global_broker_id, command.dest_handle));
+            {  // scope for the lock_guard
+                filtI = filters.lock_shared()->find (fed_handle_pair (global_broker_id, command.dest_handle));
                 if (filtI != nullptr)
                 {
-                    filtI->target = { command.source_id, command.source_handle };
-                    timeCoord->addDependency(command.source_id);
+                    filtI->target = {command.source_id, command.source_handle};
+                    timeCoord->addDependency (command.source_id);
                 }
             }
-            
+
             auto filthandle = getHandleInfo (command.dest_handle);
             if (filthandle != nullptr)
             {
-                if ((filthandle->handle_type == handle_type_t::destination_filter) || (filthandle->handle_type == handle_type_t::source_filter))
+                if ((filthandle->handle_type == handle_type_t::destination_filter) ||
+                    (filthandle->handle_type == handle_type_t::source_filter))
                 {
                     filthandle->used = true;
                 }
@@ -2672,21 +2647,16 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     return;
                 }
             }
-            std::unique_lock<std::mutex> hlock(_handlemutex);
-            auto filter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
-            hlock.unlock();
+            auto filter = filters.lock_shared()->find (fed_handle_pair (command.source_id, command.source_handle));
             if (filter == nullptr)
             {
                 filter = createDestFilter (command.source_id, command.source_handle, command.payload,
-                                           command.info ().target, command.info ().type, command.info ().type_out);
+                                           command.info ().target, command.info ().type, command.info ().type_out, checkActionFlag(command, clone_flag));
             }
 
             filterInfo->hasDestFilters = true;
             if (checkActionFlag (command, clone_flag))
             {
-                hlock.lock();
-                filter->cloning = true;
-                hlock.unlock();
                 filterInfo->cloningDestFilters.push_back (filter);
             }
             else
@@ -2711,21 +2681,13 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         }
         if (!FilterAlreadyPresent)
         {
-            std::unique_lock<std::mutex> hlock(_handlemutex);
-            auto newFilter = filters.find (fed_handle_pair (command.source_id, command.source_handle));
-            hlock.unlock();
+            auto newFilter = filters.lock_shared()->find (fed_handle_pair (command.source_id, command.source_handle));
             if (newFilter == nullptr)
             {
                 newFilter =
                   createSourceFilter (command.source_id, command.source_handle, command.name,
-                                      command.info ().target, command.info ().type, command.info ().type_out);
-                if (checkActionFlag (command, clone_flag))
-                {
-                    hlock.lock();
-                    newFilter->cloning = true;
-                    hlock.unlock();
+                                      command.info ().target, command.info ().type, command.info ().type_out, checkActionFlag(command, clone_flag));
                 }
-            }
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
         }
@@ -2988,14 +2950,14 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         break;
     case UPDATE_FILTER_OPERATOR:
     {
-        std::lock_guard<std::mutex> lock(_handlemutex);
-        auto FiltI = filters.find (fed_handle_pair{global_broker_id.load (), cmd.source_handle});
+        auto filtHandle = filters.lock();
+        auto FiltI = filtHandle->find (fed_handle_pair{global_broker_id.load (), cmd.source_handle});
         int ii = cmd.counter;
         auto op = dataAirlocks[ii].try_unload ();
         if (op)
         {
-            auto M = stx::any_cast<std::shared_ptr<FilterOperator>> (std::move(*op));
-            FiltI->filterOp = std::move(M);
+            auto M = stx::any_cast<std::shared_ptr<FilterOperator>> (std::move (*op));
+            FiltI->filterOp = std::move (M);
         }
     }
     break;
@@ -3046,9 +3008,9 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
 
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {
-    std::unique_lock<std::mutex> lock (_handlemutex);
-    auto pub = handles.getPublication (cmd.payload);
-    lock.unlock ();
+    auto handlelock = handles.lock_shared ();
+    auto pub = handlelock->getPublication (cmd.payload);
+    handlelock.unlock ();
     if (pub != nullptr)
     {
         // now send the same command to the publication
@@ -3271,7 +3233,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
         {
             if (clFilter->fed_id == global_broker_id)
             {
-                auto FiltI = filters.find (fed_handle_pair (global_broker_id, clFilter->handle));
+                auto FiltI = filters.lock_shared()->find (fed_handle_pair (global_broker_id, clFilter->handle));
                 if (FiltI != nullptr)
                 {
                     if (FiltI->filterOp != nullptr)
@@ -3390,7 +3352,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     {
         // deal with local source filters
 
-        auto FiltI = filters.find (fed_handle_pair (global_broker_id, cmd.dest_handle));
+        auto FiltI = filters.lock_shared()->find (fed_handle_pair (global_broker_id, cmd.dest_handle));
         if (FiltI != nullptr)
         {
             if (FiltI->filterOp != nullptr)

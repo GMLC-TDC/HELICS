@@ -240,4 +240,3 @@ class CoreBroker : public Broker, public BrokerBase
 };
 
 }  // namespace helics
-

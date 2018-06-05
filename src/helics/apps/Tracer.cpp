@@ -302,22 +302,22 @@ void Tracer::captureForCurrentTime(Time currentTime, int iteration)
                 {
                     if (iteration > 0)
                     {
-                        valstr = (boost::format("[%f:%d]value %s=%s") % currentTime %iteration% sub.getKey() % val).str();
+                        valstr = fmt::format("[{}:{}]value {}={}", currentTime,iteration,sub.getKey(), val);
                     }
                     else
                     {
-                        valstr = (boost::format("[%f]value %s=%s") % currentTime % sub.getKey() % val).str();
+                        valstr = fmt::format("[{}]value {}={}", currentTime, sub.getKey(), val);
                     }
                 }
                 else
                 {
                     if (iteration > 0)
                     {
-                        valstr = (boost::format("[%f:%d]value %s=block[%d]") % currentTime %iteration% sub.getKey() % val.size()).str();
+                        valstr = fmt::format("[{}:{}]value {}=block[{}]", currentTime ,iteration, sub.getKey() , val.size());
                     }
                     else
                     {
-                        valstr = (boost::format("[%f]value %s=block[%d]") % currentTime % sub.getKey() % val.size()).str();
+                        valstr = fmt::format("[{}]value {}=block[{}]", currentTime, sub.getKey() , val.size());
                     }
                    
                 }
@@ -341,11 +341,11 @@ void Tracer::captureForCurrentTime(Time currentTime, int iteration)
                 std::string messstr;
                 if (mess->data.size() < 50)
                 {
-                    messstr = (boost::format("[%f]message from %s to %s::%s") % currentTime % mess->source % mess->dest %mess->data.to_string()).str();
+                    messstr = fmt::format("[{}]message from {} to {}::{}", currentTime , mess->source, mess->dest,mess->data.to_string());
                 }
                 else
                 {
-                    messstr = (boost::format("[%f]message from %s to %s:: size %d") % currentTime % mess->source % mess->dest %mess->data.size()).str();
+                    messstr = fmt::format("[{}]message from {} to {}:: size {}", currentTime, mess->source, mess->dest,mess->data.size());
                 }
                 logger->addMessage(std::move(messstr));
             }
@@ -367,11 +367,11 @@ void Tracer::captureForCurrentTime(Time currentTime, int iteration)
                 std::string messstr;
                 if (mess->data.size() < 50)
                 {
-                    messstr = (boost::format("[%f]message from %s to %s::%s") % currentTime % mess->source % mess->original_dest %mess->data.to_string()).str();
+                    messstr = fmt::format("[{}]message from {} to {}::{}", currentTime , mess->source , mess->original_dest ,mess->data.to_string());
                 }
                 else
                 {
-                    messstr = (boost::format("[%f]message from %s to %s:: size %d") % currentTime % mess->source % mess->original_dest %mess->data.size()).str();
+                    messstr = fmt::format("[{}]message from %s to %s:: size %d",currentTime,mess->source,mess->original_dest,mess->data.size());
                 }
                 logger->addMessage(std::move(messstr));
             }
