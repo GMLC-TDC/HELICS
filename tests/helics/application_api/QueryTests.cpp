@@ -14,11 +14,11 @@ BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 
-namespace utf = boost::unit_test;
+
 
 /** test simple creation and destruction*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2, 1.0);
@@ -55,7 +55,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2);
@@ -78,7 +78,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2, 1.0);

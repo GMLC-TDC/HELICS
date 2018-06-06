@@ -956,6 +956,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             global_id = global_federate_id_t(cmd.dest_id);
             interfaceInformation.setGlobalId(global_federate_id_t(cmd.dest_id));
+            interfaceInformation.setGlobalId(cmd.dest_id);
             timeCoord->source_id = global_id;
             return iteration_state::next_step;
         }
