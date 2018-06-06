@@ -121,4 +121,99 @@ BOOST_AUTO_TEST_CASE(basic_test_multiple_cancel)
     BOOST_CHECK_EQUAL(counter.load(), 2);
 
 }
+
+BOOST_AUTO_TEST_CASE(basic_test_multiple_change_time)
+{
+    std::atomic<int> counter{ 0 };
+    auto cback = [&counter](helics::ActionMessage &&) {++counter; };
+    auto mtimer = std::make_shared<helics::MessageTimer>(cback);
+
+    mtimer->addTimerFromNow(std::chrono::milliseconds(200), helics::CMD_PROTOCOL);
+    auto t2=mtimer->addTimerFromNow(std::chrono::milliseconds(400), helics::CMD_PROTOCOL);
+    auto t3=mtimer->addTimerFromNow(std::chrono::milliseconds(600), helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow(std::chrono::milliseconds(800), helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    BOOST_CHECK_EQUAL(counter.load(), 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    mtimer->addTimeToTimer(t2, std::chrono::milliseconds(400));
+    mtimer->addTimeToTimer(t3, std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 4);
+
+}
+
+BOOST_AUTO_TEST_CASE(basic_test_multiple_change_time2)
+{
+    std::atomic<int> counter{ 0 };
+    auto cback = [&counter](helics::ActionMessage &&) {++counter; };
+    auto mtimer = std::make_shared<helics::MessageTimer>(cback);
+    auto ctime = std::chrono::steady_clock::now();
+    mtimer->addTimerFromNow(std::chrono::milliseconds(200), helics::CMD_PROTOCOL);
+    auto t2 = mtimer->addTimerFromNow(std::chrono::milliseconds(400), helics::CMD_PROTOCOL);
+    auto t3 = mtimer->addTimerFromNow(std::chrono::milliseconds(600), helics::CMD_PROTOCOL);
+    auto t4=mtimer->addTimerFromNow(std::chrono::milliseconds(800), helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    BOOST_CHECK_EQUAL(counter.load(), 0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    mtimer->updateTimer(t2, ctime+std::chrono::milliseconds(800));
+    mtimer->updateTimer(t3, ctime+std::chrono::milliseconds(800));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    mtimer->cancelTimer(t4);
+    BOOST_CHECK_EQUAL(counter.load(), 1);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    BOOST_CHECK_EQUAL(counter.load(), 3);
+
+}
+
+BOOST_AUTO_TEST_CASE(basic_test_updatemessage)
+{
+    std::mutex mlock;
+    helics::ActionMessage M;
+    auto cback = [&](ActionMessage &&m) {std::lock_guard<std::mutex> locker(mlock);
+    M = std::move(m); };
+    auto mtimer = std::make_shared<MessageTimer>(cback);
+    auto ctime = std::chrono::steady_clock::now();
+    std::unique_lock<std::mutex> localLock(mlock);
+
+    auto index = mtimer->addTimer(ctime+std::chrono::milliseconds(400), CMD_PROTOCOL);
+    BOOST_CHECK(M.action() == CMD_IGNORE);
+    localLock.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    mtimer->updateTimer(index, ctime+std::chrono::milliseconds(700),CMD_BROKER_ACK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    BOOST_CHECK(M.action() == CMD_IGNORE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    BOOST_CHECK(M.action() == CMD_BROKER_ACK);
+}
+
+BOOST_AUTO_TEST_CASE(basic_test_updatemessage2)
+{
+    std::mutex mlock;
+    helics::ActionMessage M;
+    auto cback = [&](ActionMessage &&m) {std::lock_guard<std::mutex> locker(mlock);
+    M = std::move(m); };
+    auto mtimer = std::make_shared<MessageTimer>(cback);
+    auto ctime = std::chrono::steady_clock::now();
+    std::unique_lock<std::mutex> localLock(mlock);
+
+    auto index = mtimer->addTimer(ctime + std::chrono::milliseconds(400), CMD_PROTOCOL);
+    BOOST_CHECK(M.action() == CMD_IGNORE);
+    localLock.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    mtimer->updateMessage(index, CMD_BROKER_ACK);
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    BOOST_CHECK(M.action() == CMD_BROKER_ACK);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()

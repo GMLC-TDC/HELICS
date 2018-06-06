@@ -932,7 +932,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         timeCoord->processTimeMessage(cmd);
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
-        LOG_DEBUG(std::string("Granted Time=") + std::to_string(time_granted));
+        LOG_WARNING(std::string("forced Granted Time=") + std::to_string(time_granted));
         timeGranted_mode = true;
         return iteration_state::next_step;
     }

@@ -69,7 +69,7 @@ class FederateState
     decltype(std::chrono::steady_clock::now()) start_clock_time; 
     Time rt_lag=timeZero;  //!<max lag for the rt control
     Time rt_lead=timeZero; //!< min lag for the realtime control
-    int32_t realTimeTimerIndex; //!< the timer index for the real time timer;
+    int32_t realTimeTimerIndex=-1; //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 

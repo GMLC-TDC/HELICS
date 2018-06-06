@@ -27,6 +27,7 @@
 #if !defined(STX_NO_STD_OPTIONAL) && defined(__GNUC__) && (__cplusplus < 201402)
 #define STX_NO_STD_OPTIONAL
 #endif
+
 // disable usage of <optional> but allow <experimental/optional>
 #define STD_NO_LIBRARY_OPTIONAL 1
 
