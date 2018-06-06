@@ -19,101 +19,103 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <chrono>
 
 /** @file these test cases test out the real time mode for HELICS
-*/
-
+ */
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
-BOOST_AUTO_TEST_SUITE(federate_realtime_tests)
+BOOST_AUTO_TEST_SUITE (federate_realtime_tests)
 
-BOOST_AUTO_TEST_CASE(federate_delay_tests)
+BOOST_AUTO_TEST_CASE (federate_delay_tests)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "1";
     fi.realtime = true;
     fi.rt_lead = 0.1;
     fi.period = 0.5;
-    auto fed = std::make_shared<helics::ValueFederate>(fi);
+    auto fed = std::make_shared<helics::ValueFederate> (fi);
 
-    helics::Publication pubid(helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
+    helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
 
-    helics::Subscription subid(fed, "pub1");
-    fed->enterExecutionState();
+    helics::Subscription subid (fed, "pub1");
+    fed->enterExecutionState ();
     // publish string1 at time=0.0;
-    auto now = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now ();
     helics::Time reqTime = 0.5;
+    int outofTimeBounds = 0;
     for (int ii = 0; ii < 8; ++ii)
     {
-        pubid.publish(static_cast<double>(reqTime));
-        auto gtime = fed->requestTime(reqTime);
-        auto ctime = std::chrono::steady_clock::now();
-        BOOST_CHECK_EQUAL(gtime, reqTime);
+        pubid.publish (static_cast<double> (reqTime));
+        auto gtime = fed->requestTime (reqTime);
+        auto ctime = std::chrono::steady_clock::now ();
+        BOOST_CHECK_EQUAL (gtime, reqTime);
         auto td = ctime - now;
-        auto tdiff = helics::Time(td) - reqTime;
-        BOOST_CHECK(tdiff >= -0.106);
+        auto tdiff = helics::Time (td) - reqTime;
+        
         if (tdiff < -0.11)
         {
-            printf("tdiff=%f at time %f\n", static_cast<double>(tdiff), static_cast<double>(reqTime));
+            ++outofTimeBounds;
+         //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
         reqTime += 0.5;
     }
-    fed->finalize();
+    BOOST_CHECK_LT(outofTimeBounds, 3);
+    fed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE(federate_trigger_tests_adelay)
+BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
     fi.realtime = true;
     fi.rt_lag = 0.1;
     fi.rt_lead = 0.1;
     fi.period = 0.5;
-    auto fed = std::make_shared<helics::ValueFederate>(fi);
+    auto fed = std::make_shared<helics::ValueFederate> (fi);
     fi.realtime = false;
     fi.name = "test2";
-    auto fed2 = std::make_shared<helics::ValueFederate>(fi);
-    helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
-    std::atomic<int> warnCounter{ 0 };
-    fed->setLoggingCallback([&warnCounter](int logLevel, const std::string &, const std::string &) {if (logLevel == 1) {++warnCounter; }
-});
-    helics::Subscription subid(fed, "pub1");
-    fed2->enterExecutionStateAsync();
-    fed->enterExecutionState();
-    fed2->enterExecutionStateComplete();
+    auto fed2 = std::make_shared<helics::ValueFederate> (fi);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
+    std::atomic<int> warnCounter{0};
+    fed->setLoggingCallback ([&warnCounter](int logLevel, const std::string &, const std::string &) {
+        if (logLevel == 1)
+        {
+            ++warnCounter;
+        }
+    });
+    helics::Subscription subid (fed, "pub1");
+    fed2->enterExecutionStateAsync ();
+    fed->enterExecutionState ();
+    fed2->enterExecutionStateComplete ();
     // publish string1 at time=0.0;
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    auto now = std::chrono::steady_clock::now();
+    std::this_thread::sleep_for (std::chrono::seconds (5));
     helics::Time reqTime = 0.5;
     for (int ii = 0; ii < 8; ++ii)
     {
         if (ii < 5)
-        { //this is designed to go faster than real time for a little while, then the dependency will halt and should trigger the force grant
-            pubid.publish(static_cast<double>(reqTime));
-            fed2->requestTimeAsync(reqTime);
+        {  // this is designed to go faster than real time for a little while, then the dependency will halt and
+           // should trigger the force grant
+            pubid.publish (static_cast<double> (reqTime));
+            fed2->requestTimeAsync (reqTime);
         }
 
-
-        auto gtime = fed->requestTime(reqTime);
-        //auto ctime = std::chrono::steady_clock::now();
-        BOOST_CHECK_EQUAL(gtime, reqTime);
-        // auto td = ctime - now;
-        //auto tdiff = helics::Time(td) - reqTime;
+        auto gtime = fed->requestTime (reqTime);
+        BOOST_CHECK_EQUAL (gtime, reqTime);
 
         reqTime += 0.5;
         if (ii < 5)
         {
-            fed2->requestTimeComplete();
+            fed2->requestTimeComplete ();
         }
     }
-    BOOST_CHECK_EQUAL(warnCounter, 8);
-    fed2->finalize();
-    fed->finalize();
+    BOOST_CHECK_EQUAL (warnCounter, 8);
+    fed2->finalize ();
+    fed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE(federate_trigger_tests)
+BOOST_AUTO_TEST_CASE (federate_trigger_tests)
 {
-    helics::FederateInfo fi("test1");
+    helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreInitString = "2";
     fi.realtime = true;
@@ -121,50 +123,53 @@ BOOST_AUTO_TEST_CASE(federate_trigger_tests)
     fi.rt_lead = 0.1;
     fi.period = 0.5;
     fi.logLevel = 0;
-    auto fed = std::make_shared<helics::ValueFederate>(fi);
+    auto fed = std::make_shared<helics::ValueFederate> (fi);
     fi.realtime = false;
-    fi.name="test2";
-    auto fed2 = std::make_shared<helics::ValueFederate>(fi);
-    helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
+    fi.name = "test2";
+    auto fed2 = std::make_shared<helics::ValueFederate> (fi);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
 
-    helics::Subscription subid(fed, "pub1");
-    fed2->enterExecutionStateAsync();
-    fed->enterExecutionState();
-    fed2->enterExecutionStateComplete();
+    helics::Subscription subid (fed, "pub1");
+    fed2->enterExecutionStateAsync ();
+    fed->enterExecutionState ();
+    fed2->enterExecutionStateComplete ();
     // publish string1 at time=0.0;
-    auto now = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now ();
     helics::Time reqTime = 0.5;
+    int outofTimeBounds = 0;
     for (int ii = 0; ii < 8; ++ii)
     {
         if (ii < 5)
-        { //this is designed to go faster than real time for a little while, then the dependency will halt and should trigger the force grant
-            pubid.publish(static_cast<double>(reqTime));
-            fed2->requestTimeAsync(reqTime);
+        {  // this is designed to go faster than real time for a little while, then the dependency will halt and
+           // should trigger the force grant
+            pubid.publish (static_cast<double> (reqTime));
+            fed2->requestTimeAsync (reqTime);
         }
-       
 
-        auto gtime = fed->requestTime(reqTime);
-        auto ctime = std::chrono::steady_clock::now();
-        BOOST_CHECK_EQUAL(gtime, reqTime);
+        auto gtime = fed->requestTime (reqTime);
+        auto ctime = std::chrono::steady_clock::now ();
+        BOOST_CHECK_EQUAL (gtime, reqTime);
         auto td = ctime - now;
-        auto tdiff = helics::Time(td) - reqTime;
-        BOOST_CHECK(tdiff >= -0.106);
+        auto tdiff = helics::Time (td) - reqTime;
+        BOOST_CHECK (tdiff >= -0.11);
         if (tdiff < -0.11)
         {
-            printf("tdiff=%f at time %f\n", static_cast<double>(tdiff), static_cast<double>(reqTime));
+            ++outofTimeBounds;
+            //printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
-        BOOST_CHECK(tdiff <= 0.106);
         if (tdiff > 0.11)
         {
-            printf("tdiff=%f at time %f\n", static_cast<double>(tdiff), static_cast<double>(reqTime));
+            ++outofTimeBounds;
+            //printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
         reqTime += 0.5;
         if (ii < 5)
         {
-            fed2->requestTimeComplete();
+            fed2->requestTimeComplete ();
         }
     }
-    fed2->finalize();
-    fed->finalize();
+    BOOST_CHECK_LT(outofTimeBounds, 3);
+    fed2->finalize ();
+    fed->finalize ();
 }
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END ()
