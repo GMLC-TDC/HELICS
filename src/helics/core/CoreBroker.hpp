@@ -31,7 +31,7 @@ namespace helics
 class BasicFedInfo
 {
   public:
-    std::string name;  //!< name of the federate
+    const std::string name;  //!< name of the federate
     Core::federate_id_t global_id = invalid_fed_id;  //!< the identification code for the federate
     int32_t route_id = invalid_fed_id;  //!< the routing information for data to be sent to the federate
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
@@ -41,7 +41,7 @@ class BasicFedInfo
 class BasicBrokerInfo
 {
   public:
-    std::string name;  //!< the name of the broker
+    const std::string name;  //!< the name of the broker
 
     Core::federate_id_t global_id = invalid_fed_id;  //!< the global identifier for the broker
     int32_t route_id = invalid_fed_id;  //!< the identifier for the route to take to the broker

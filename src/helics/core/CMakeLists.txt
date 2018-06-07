@@ -101,6 +101,7 @@ set(INCLUDE_FILES
 	PublicationInfo.hpp
 	EndpointInfo.hpp
 	FilterInfo.hpp
+	fmt_wrapper.h
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp

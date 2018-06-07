@@ -8,24 +8,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
+#include "../common/argParser.h"
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
 #include <algorithm>
+#include <iostream>
 #include <map>
 #include <memory>
-#include <iostream>
 #include <regex>
 #include <stdexcept>
 #include <boost/filesystem.hpp>
-#include "../common/argParser.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/logger.h"
+#include "../core/fmt_wrapper.h"
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
-#include "../core/fmt_wrapper.h"
-#include "../common/logger.h"
-
 
 namespace filesystem = boost::filesystem;
 
@@ -33,184 +32,187 @@ namespace helics
 {
 namespace apps
 {
-Tracer::Tracer(FederateInfo &fi) : App(fi)
-{
-    fed->setFlag(OBSERVER_FLAG);
-}
+Tracer::Tracer (FederateInfo &fi) : App (fi) { fed->setFlag (OBSERVER_FLAG); }
 
 static const ArgDescriptors InfoArgs{
-    {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
-    { "endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time" },
-    {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
-    {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
-    {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
-    { "allow_iteration", ArgDescriptor::arg_type_t::flag_type,"allow iteration on values" },
-    {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
+  {"tags", ArgDescriptor::arg_type_t::vector_string,
+   "tags to record, this argument may be specified any number of times"},
+  {"endpoints", ArgDescriptor::arg_type_t::vector_string,
+   "endpoints to capture, this argument may be specified multiple time"},
+  {"sourceclone", ArgDescriptor::arg_type_t::vector_string,
+   "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
+  {"destclone", ArgDescriptor::arg_type_t::vector_string,
+   "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be "
+   "specified multiple time"},
+  {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
+  {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
+  {"capture", ArgDescriptor::arg_type_t::vector_string,
+   "capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple "
+   "arguments or a comma separated list"},
 };
 
-Tracer::Tracer(int argc, char *argv[]):App("tracer",argc,argv)
+Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
 {
     if (!deactivated)
     {
-        fed->setFlag(OBSERVER_FLAG);
+        fed->setFlag (OBSERVER_FLAG);
         variable_map vm_map;
-        argumentParser(argc, argv, vm_map, InfoArgs);
-        loadArguments(vm_map);
-        if (!masterFileName.empty())
+        argumentParser (argc, argv, vm_map, InfoArgs);
+        loadArguments (vm_map);
+        if (!masterFileName.empty ())
         {
-            loadFile(masterFileName);
+            loadFile (masterFileName);
         }
     }
 }
 
-Tracer::Tracer(const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+Tracer::Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
 {
-    fed->setFlag(OBSERVER_FLAG);
+    fed->setFlag (OBSERVER_FLAG);
 }
 
-Tracer::Tracer(const std::string &name, const std::string &jsonString) : App(name,jsonString)
+Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlag(OBSERVER_FLAG);
-    loadJsonFile(jsonString);
+    fed->setFlag (OBSERVER_FLAG);
+    loadJsonFile (jsonString);
 }
 
-Tracer::~Tracer() = default;
+Tracer::~Tracer () = default;
 
-void Tracer::loadJsonFile(const std::string &jsonString)
+void Tracer::loadJsonFile (const std::string &jsonString)
 {
-    loadJsonFileConfiguration("tracer",jsonString);
+    loadJsonFileConfiguration ("tracer", jsonString);
 
     auto subCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back(fed.get(), ii);
-        subkeys.emplace(subscriptions.back().getName(), static_cast<int> (subscriptions.size()) - 1);
+        subscriptions.emplace_back (fed.get (), ii);
+        subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
     }
-    auto eptCount = fed->getEndpointCount();
+    auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back(fed.get(), ii);
-        eptNames[endpoints.back().getName()] = static_cast<int> (endpoints.size() - 1);
+        endpoints.emplace_back (fed.get (), ii);
+        eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
-    auto doc = loadJsonString(jsonString);
+    auto doc = loadJsonString (jsonString);
 
     auto tags = doc["tag"];
-    if (tags.isArray())
+    if (tags.isArray ())
     {
         for (const auto &tag : tags)
         {
-            addSubscription(tag.asString());
+            addSubscription (tag.asString ());
         }
     }
-    else if (tags.isString())
+    else if (tags.isString ())
     {
-        addSubscription(tags.asString());
+        addSubscription (tags.asString ());
     }
     auto sourceClone = doc["sourceclone"];
-    if (sourceClone.isArray())
+    if (sourceClone.isArray ())
     {
         for (const auto &sc : sourceClone)
         {
-            addSourceEndpointClone(sc.asString());
+            addSourceEndpointClone (sc.asString ());
         }
     }
-    else if (sourceClone.isString())
+    else if (sourceClone.isString ())
     {
-        addSourceEndpointClone(sourceClone.asString());
+        addSourceEndpointClone (sourceClone.asString ());
     }
     auto destClone = doc["destclone"];
-    if (destClone.isArray())
+    if (destClone.isArray ())
     {
         for (const auto &dc : destClone)
         {
-            addDestEndpointClone(dc.asString());
+            addDestEndpointClone (dc.asString ());
         }
     }
-    else if (destClone.isString())
+    else if (destClone.isString ())
     {
-        addDestEndpointClone(destClone.asString());
+        addDestEndpointClone (destClone.asString ());
     }
     auto clones = doc["clone"];
-    if (clones.isArray())
+    if (clones.isArray ())
     {
         for (const auto &clone : clones)
         {
-            addSourceEndpointClone(clone.asString());
-            addDestEndpointClone(clone.asString());
+            addSourceEndpointClone (clone.asString ());
+            addDestEndpointClone (clone.asString ());
         }
     }
-    else if (clones.isString())
+    else if (clones.isString ())
     {
-        addSourceEndpointClone(clones.asString());
-        addDestEndpointClone(clones.asString());
+        addSourceEndpointClone (clones.asString ());
+        addDestEndpointClone (clones.asString ());
     }
     auto captures = doc["capture"];
-    if (captures.isArray())
+    if (captures.isArray ())
     {
         for (const auto &capture : captures)
         {
-            addCapture(capture.asString());
+            addCapture (capture.asString ());
         }
     }
-    else if (captures.isString())
+    else if (captures.isString ())
     {
-        addCapture(captures.asString());
+        addCapture (captures.asString ());
     }
-
 }
 
-void Tracer::loadTextFile(const std::string &textFile)
+void Tracer::loadTextFile (const std::string &textFile)
 {
     using namespace stringOps;
-    App::loadTextFile(textFile);
-    std::ifstream infile(textFile);
+    App::loadTextFile (textFile);
+    std::ifstream infile (textFile);
     std::string str;
     int lc = 0;
-    while (std::getline(infile, str))
+    while (std::getline (infile, str))
     {
         ++lc;
-        if (str.empty())
+        if (str.empty ())
         {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
+        auto fc = str.find_first_not_of (" \t\n\r\0");
         if ((fc == std::string::npos) || (str[fc] == '#') || (str[fc] == '!'))
         {
             continue;
         }
-        auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
+        auto blk = splitlineQuotes (str, ",\t ", default_quote_chars, delimiter_compression::on);
 
-        switch (blk.size())
+        switch (blk.size ())
         {
         case 1:
-            addSubscription(removeQuotes(blk[0]));
+            addSubscription (removeQuotes (blk[0]));
             break;
         case 2:
             if ((blk[0] == "subscription") || (blk[0] == "s") || (blk[0] == "sub") || (blk[0] == "tag"))
             {
-                addSubscription(removeQuotes(blk[1]));
+                addSubscription (removeQuotes (blk[1]));
             }
             else if ((blk[0] == "endpoint") || (blk[0] == "ept") || (blk[0] == "e"))
             {
-                addEndpoint(removeQuotes(blk[1]));
+                addEndpoint (removeQuotes (blk[1]));
             }
             else if ((blk[0] == "sourceclone") || (blk[0] == "source") || (blk[0] == "src"))
             {
-                addSourceEndpointClone(removeQuotes(blk[1]));
+                addSourceEndpointClone (removeQuotes (blk[1]));
             }
             else if ((blk[0] == "destclone") || (blk[0] == "dest") || (blk[0] == "destination"))
             {
-                addDestEndpointClone(removeQuotes(blk[1]));
+                addDestEndpointClone (removeQuotes (blk[1]));
             }
             else if (blk[0] == "capture")
             {
-                addCapture(removeQuotes(blk[1]));
+                addCapture (removeQuotes (blk[1]));
             }
             else if (blk[0] == "clone")
             {
-                addSourceEndpointClone(removeQuotes(blk[1]));
-                addDestEndpointClone(removeQuotes(blk[1]));
+                addSourceEndpointClone (removeQuotes (blk[1]));
+                addDestEndpointClone (removeQuotes (blk[1]));
             }
             else
             {
@@ -222,11 +224,11 @@ void Tracer::loadTextFile(const std::string &textFile)
             {
                 if ((blk[1] == "source") || (blk[1] == "src"))
                 {
-                    addSourceEndpointClone(removeQuotes(blk[2]));
+                    addSourceEndpointClone (removeQuotes (blk[2]));
                 }
                 else if ((blk[1] == "dest") || (blk[1] == "destination"))
                 {
-                    addDestEndpointClone(removeQuotes(blk[2]));
+                    addDestEndpointClone (removeQuotes (blk[2]));
                 }
                 else
                 {
@@ -242,116 +244,117 @@ void Tracer::loadTextFile(const std::string &textFile)
             break;
         }
     }
-    infile.close();
+    infile.close ();
 }
 
-void Tracer::initialize()
+void Tracer::initialize ()
 {
-    auto state = fed->getCurrentState();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
-        generateInterfaces();
+        generateInterfaces ();
 
-        fed->enterInitializationState();
-        captureForCurrentTime(-1.0);
+        fed->enterInitializationState ();
+        captureForCurrentTime (-1.0);
     }
 }
 
-void Tracer::generateInterfaces()
+void Tracer::generateInterfaces ()
 {
     for (auto &tag : subkeys)
     {
         if (tag.second == -1)
         {
-            addSubscription(tag.first);
+            addSubscription (tag.first);
         }
     }
 
-    loadCaptureInterfaces();
+    loadCaptureInterfaces ();
 }
 
-void Tracer::loadCaptureInterfaces()
+void Tracer::loadCaptureInterfaces ()
 {
     for (auto &capt : captureInterfaces)
     {
-        auto res = waitForInit(fed.get(), capt);
+        auto res = waitForInit (fed.get (), capt);
         if (res)
         {
-            auto pubs = vectorizeQueryResult(fed->query(capt, "publications"));
+            auto pubs = vectorizeQueryResult (fed->query (capt, "publications"));
             for (auto &pub : pubs)
             {
-                addSubscription(pub);
+                addSubscription (pub);
             }
         }
     }
 }
 
-void Tracer::captureForCurrentTime(Time currentTime, int iteration)
+void Tracer::captureForCurrentTime (Time currentTime, int iteration)
 {
-    static auto logger = LoggerManager::getLoggerCore();
+    static auto logger = LoggerManager::getLoggerCore ();
     for (auto &sub : subscriptions)
     {
-        if (sub.isUpdated())
+        if (sub.isUpdated ())
         {
-            auto val = sub.getValue<std::string>();
+            auto val = sub.getValue<std::string> ();
 
             if (printMessage)
             {
                 std::string valstr;
-                if (val.size() < 150)
+                if (val.size () < 150)
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format("[{}:{}]value {}={}", currentTime,iteration,sub.getKey(), val);
+                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getKey (), val);
                     }
                     else
                     {
-                        valstr = fmt::format("[{}]value {}={}", currentTime, sub.getKey(), val);
+                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getKey (), val);
                     }
                 }
                 else
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format("[{}:{}]value {}=block[{}]", currentTime ,iteration, sub.getKey() , val.size());
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getKey (),
+                                              val.size ());
                     }
                     else
                     {
-                        valstr = fmt::format("[{}]value {}=block[{}]", currentTime, sub.getKey() , val.size());
+                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getKey (), val.size ());
                     }
-                   
                 }
-                logger->addMessage(std::move(valstr));
+                logger->addMessage (std::move (valstr));
             }
             if (valueCallback)
             {
-                valueCallback(currentTime, sub.getKey(), val);
+                valueCallback (currentTime, sub.getKey (), val);
             }
-
         }
     }
 
     for (auto &ept : endpoints)
     {
-        while (ept.hasMessage())
+        while (ept.hasMessage ())
         {
-            auto mess = ept.getMessage();
+            auto mess = ept.getMessage ();
             if (printMessage)
             {
                 std::string messstr;
-                if (mess->data.size() < 50)
+                if (mess->data.size () < 50)
                 {
-                    messstr = fmt::format("[{}]message from {} to {}::{}", currentTime , mess->source, mess->dest,mess->data.to_string());
+                    messstr = fmt::format ("[{}]message from {} to {}::{}", currentTime, mess->source, mess->dest,
+                                           mess->data.to_string ());
                 }
                 else
                 {
-                    messstr = fmt::format("[{}]message from {} to {}:: size {}", currentTime, mess->source, mess->dest,mess->data.size());
+                    messstr = fmt::format ("[{}]message from {} to {}:: size {}", currentTime, mess->source,
+                                           mess->dest, mess->data.size ());
                 }
-                logger->addMessage(std::move(messstr));
+                logger->addMessage (std::move (messstr));
             }
             if (endpointMessageCallback)
             {
-                endpointMessageCallback(currentTime, ept.getName(), std::move(mess));
+                endpointMessageCallback (currentTime, ept.getName (), std::move (mess));
             }
         }
     }
@@ -359,49 +362,47 @@ void Tracer::captureForCurrentTime(Time currentTime, int iteration)
     // get the clone endpoints
     if (cloneEndpoint)
     {
-        while (cloneEndpoint->hasMessage())
+        while (cloneEndpoint->hasMessage ())
         {
-            auto mess = cloneEndpoint->getMessage();
+            auto mess = cloneEndpoint->getMessage ();
             if (printMessage)
             {
                 std::string messstr;
-                if (mess->data.size() < 50)
+                if (mess->data.size () < 50)
                 {
-                    messstr = fmt::format("[{}]message from {} to {}::{}", currentTime , mess->source , mess->original_dest ,mess->data.to_string());
+                    messstr = fmt::format ("[{}]message from {} to {}::{}", currentTime, mess->source,
+                                           mess->original_dest, mess->data.to_string ());
                 }
                 else
                 {
-                    messstr = fmt::format("[{}]message from %s to %s:: size %d",currentTime,mess->source,mess->original_dest,mess->data.size());
+                    messstr = fmt::format ("[{}]message from %s to %s:: size %d", currentTime, mess->source,
+                                           mess->original_dest, mess->data.size ());
                 }
-                logger->addMessage(std::move(messstr));
+                logger->addMessage (std::move (messstr));
             }
             if (clonedMessageCallback)
             {
-                clonedMessageCallback(currentTime, std::move(mess));
+                clonedMessageCallback (currentTime, std::move (mess));
             }
         }
     }
 }
 
-
 /** run the Player until the specified time*/
-void Tracer::runTo(Time runToTime)
+void Tracer::runTo (Time runToTime)
 {
-    auto state = fed->getCurrentState();
+    auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
-        initialize();
+        initialize ();
         state = Federate::op_states::initialization;
     }
 
     if (state == Federate::op_states::initialization)
     {
-        fed->enterExecutionState();
-        captureForCurrentTime(0.0);
+        fed->enterExecutionState ();
+        captureForCurrentTime (0.0);
     }
-
-
-    
 
     Time nextPrintTime = 10.0;
     try
@@ -412,19 +413,19 @@ void Tracer::runTo(Time runToTime)
             int iteration = 0;
             if (allow_iteration)
             {
-                auto ItRes = fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
+                auto ItRes = fed->requestTimeIterative (runToTime, iteration_request::iterate_if_needed);
                 if (ItRes.state == iteration_result::next_step)
                 {
                     iteration = 0;
                 }
                 T = ItRes.grantedTime;
-                captureForCurrentTime(T,iteration);
+                captureForCurrentTime (T, iteration);
                 ++iteration;
             }
             else
             {
-                T = fed->requestTime(runToTime);
-                captureForCurrentTime(T);
+                T = fed->requestTime (runToTime);
+                captureForCurrentTime (T);
             }
             if (T >= runToTime)
             {
@@ -442,129 +443,127 @@ void Tracer::runTo(Time runToTime)
     }
 }
 /** add a subscription to record*/
-void Tracer::addSubscription(const std::string &key)
+void Tracer::addSubscription (const std::string &key)
 {
-    auto res = subkeys.find(key);
-    if ((res == subkeys.end()) || (res->second == -1))
+    auto res = subkeys.find (key);
+    if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.push_back(helics::Subscription(fed.get(), key));
-        auto index = static_cast<int> (subscriptions.size()) - 1;
+        subscriptions.push_back (helics::Subscription (fed.get (), key));
+        auto index = static_cast<int> (subscriptions.size ()) - 1;
         subkeys[key] = index;  // this is a potential replacement
     }
 }
 
-
 /** add an endpoint*/
-void Tracer::addEndpoint(const std::string &endpoint)
+void Tracer::addEndpoint (const std::string &endpoint)
 {
-    auto res = eptNames.find(endpoint);
-    if ((res == eptNames.end()) || (res->second == -1))
+    auto res = eptNames.find (endpoint);
+    if ((res == eptNames.end ()) || (res->second == -1))
     {
-        endpoints.push_back(helics::Endpoint(GLOBAL, fed.get(), endpoint));
-        auto index = static_cast<int> (endpoints.size()) - 1;
+        endpoints.push_back (helics::Endpoint (GLOBAL, fed.get (), endpoint));
+        auto index = static_cast<int> (endpoints.size ()) - 1;
         eptNames[endpoint] = index;  // this is a potential replacement
     }
 }
-void Tracer::addSourceEndpointClone(const std::string &sourceEndpoint)
+void Tracer::addSourceEndpointClone (const std::string &sourceEndpoint)
 {
     if (!cFilt)
     {
-        cFilt = std::make_unique<CloningFilter>(fed.get());
-        cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
-        cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
+        cFilt = std::make_unique<CloningFilter> (fed.get ());
+        cloneEndpoint = std::make_unique<Endpoint> (fed.get (), "cloneE");
+        cFilt->addDeliveryEndpoint (cloneEndpoint->getName ());
     }
-    cFilt->addSourceTarget(sourceEndpoint);
+    cFilt->addSourceTarget (sourceEndpoint);
 }
 
-void Tracer::addDestEndpointClone(const std::string &destEndpoint)
+void Tracer::addDestEndpointClone (const std::string &destEndpoint)
 {
     if (!cFilt)
     {
-        cFilt = std::make_unique<CloningFilter>(fed.get());
-        cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
-        cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
+        cFilt = std::make_unique<CloningFilter> (fed.get ());
+        cloneEndpoint = std::make_unique<Endpoint> (fed.get (), "cloneE");
+        cFilt->addDeliveryEndpoint (cloneEndpoint->getName ());
     }
-    cFilt->addDestinationTarget(destEndpoint);
+    cFilt->addDestinationTarget (destEndpoint);
 }
 
-void Tracer::addCapture(const std::string &captureDesc) { captureInterfaces.push_back(captureDesc); }
+void Tracer::addCapture (const std::string &captureDesc) { captureInterfaces.push_back (captureDesc); }
 
-int Tracer::loadArguments(boost::program_options::variables_map &vm_map)
+int Tracer::loadArguments (boost::program_options::variables_map &vm_map)
 {
-    if (vm_map.count("input") == 0)
+    if (vm_map.count ("input") == 0)
     {
         return -1;
     }
 
-    if (!filesystem::exists(vm_map["input"].as<std::string>()))
+    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
     {
-        std::cerr << vm_map["input"].as<std::string>() << "is not a valid input file \n";
+        std::cerr << vm_map["input"].as<std::string> () << "is not a valid input file \n";
         return -3;
     }
-    loadFile(vm_map["input"].as<std::string>());
+    loadFile (vm_map["input"].as<std::string> ());
 
     // get the extra tags from the arguments
-    if (vm_map.count("tags") > 0)
+    if (vm_map.count ("tags") > 0)
     {
-        auto argTags = vm_map["tags"].as<std::vector<std::string>>();
+        auto argTags = vm_map["tags"].as<std::vector<std::string>> ();
         for (const auto &tag : argTags)
         {
-            auto taglist = stringOps::splitlineQuotes(tag);
+            auto taglist = stringOps::splitlineQuotes (tag);
             for (const auto &tagname : taglist)
             {
-                subkeys.emplace(stringOps::removeQuotes(tagname), -1);
+                subkeys.emplace (stringOps::removeQuotes (tagname), -1);
             }
         }
     }
 
     // capture the all the publications from a particular federate
-    if (vm_map.count("capture") > 0)
+    if (vm_map.count ("capture") > 0)
     {
-        auto captures = vm_map["capture"].as<std::vector<std::string>>();
+        auto captures = vm_map["capture"].as<std::vector<std::string>> ();
         for (const auto &capt : captures)
         {
-            auto captFeds = stringOps::splitlineQuotes(capt);
+            auto captFeds = stringOps::splitlineQuotes (capt);
             for (auto &captFed : captFeds)
             {
-                auto actCapt = stringOps::removeQuotes(captFed);
-                captureInterfaces.push_back(actCapt);
+                auto actCapt = stringOps::removeQuotes (captFed);
+                captureInterfaces.push_back (actCapt);
             }
         }
     }
 
-    if (vm_map.count("clone") > 0)
+    if (vm_map.count ("clone") > 0)
     {
-        auto clones = vm_map["clone"].as<std::vector<std::string>>();
+        auto clones = vm_map["clone"].as<std::vector<std::string>> ();
         for (const auto &clone : clones)
         {
-            addDestEndpointClone(clone);
-            addSourceEndpointClone(clone);
+            addDestEndpointClone (clone);
+            addSourceEndpointClone (clone);
         }
     }
 
-    if (vm_map.count("sourceclone") > 0)
+    if (vm_map.count ("sourceclone") > 0)
     {
-        auto clones = vm_map["sourceclone"].as<std::vector<std::string>>();
+        auto clones = vm_map["sourceclone"].as<std::vector<std::string>> ();
         for (const auto &clone : clones)
         {
-            addSourceEndpointClone(clone);
+            addSourceEndpointClone (clone);
         }
     }
 
-    if (vm_map.count("destclone") > 0)
+    if (vm_map.count ("destclone") > 0)
     {
-        auto clones = vm_map["destclone"].as<std::vector<std::string>>();
+        auto clones = vm_map["destclone"].as<std::vector<std::string>> ();
         for (const auto &clone : clones)
         {
-            addDestEndpointClone(clone);
+            addDestEndpointClone (clone);
         }
     }
-    if (vm_map.count("allow_iteration") > 0)
+    if (vm_map.count ("allow_iteration") > 0)
     {
         allow_iteration = true;
     }
     return 0;
 }
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics

@@ -9,5 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <fmt/format.h>
 #pragma warning(pop)
 #else
+#ifdef __GNUC__
+#pragma GCC system_header
+#endif
 #include <fmt/format.h>
 #endif

@@ -106,4 +106,20 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     vFed1->finalize ();
     vFed2->finalize ();
 }
+
+BOOST_AUTO_TEST_CASE(test_federate_map)
+{
+    SetupTest<helics::ValueFederate>("test2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("root", "federate_map");
+    vFed1->enterInitializationStateAsync();
+    vFed2->enterInitializationState();
+    vFed1->enterInitializationStateComplete();
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
 BOOST_AUTO_TEST_SUITE_END ()
