@@ -50,15 +50,15 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
         BOOST_CHECK_EQUAL (gtime, reqTime);
         auto td = ctime - now;
         auto tdiff = helics::Time (td) - reqTime;
-        
+
         if (tdiff < -0.11)
         {
             ++outofTimeBounds;
-         //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
         reqTime += 0.5;
     }
-    BOOST_CHECK_LT(outofTimeBounds, 3);
+    BOOST_CHECK_LT (outofTimeBounds, 3);
     fed->finalize ();
 }
 
@@ -155,12 +155,12 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
         if (tdiff < -0.11)
         {
             ++outofTimeBounds;
-            //printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
         if (tdiff > 0.11)
         {
             ++outofTimeBounds;
-            //printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
+            // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
         reqTime += 0.5;
         if (ii < 5)
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
             fed2->requestTimeComplete ();
         }
     }
-    BOOST_CHECK_LT(outofTimeBounds, 3);
+    BOOST_CHECK_LT (outofTimeBounds, 3);
     fed2->finalize ();
     fed->finalize ();
 }
