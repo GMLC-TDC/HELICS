@@ -98,7 +98,7 @@ enum class action_t : int32_t
     priority_null_info_command = -cmd_info_basis - 1,
     // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
-    cmd_force_time_grant =525, //!< command to for grant a time regardless of other considerations
+    cmd_force_time_grant = 525, //!< command to force grant a time regardless of other considerations
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
