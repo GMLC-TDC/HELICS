@@ -98,6 +98,7 @@ enum class action_t : int32_t
     priority_null_info_command = -cmd_info_basis - 1,
     // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
+    cmd_force_time_grant = 525, //!< command to force grant a time regardless of other considerations
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -151,6 +152,7 @@ enum class action_t : int32_t
 #define CMD_TERMINATE_IMMEDIATELY action_message_def::action_t::cmd_terminate_immediately
 #define CMD_TIME_REQUEST action_message_def::action_t::cmd_time_request
 #define CMD_TIME_GRANT action_message_def::action_t::cmd_time_grant
+#define CMD_FORCE_TIME_GRANT action_message_def::action_t::cmd_force_time_grant
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
 #define CMD_REQUEST_CURRENT_TIME action_message_def::action_t::cmd_request_current_time
 
@@ -235,13 +237,15 @@ enum class action_t : int32_t
 #define UPDATE_MAX_ITERATION 5
 #define UPDATE_LOG_LEVEL 6
 #define UPDATE_FLAG 7
+#define UPDATE_RTLAG 10
+#define UPDATE_RTLEAD 11
 
 //definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_LOGGER_FUNCTION 589
 
 /** check if the action has an info structure associated with it*/
-inline bool hasInfo (action_message_def::action_t action)
+inline bool hasInfo (action_message_def::action_t action) noexcept
 {
     return ((action > action_message_def::action_t::null_info_command) ||
             (action < action_message_def::action_t::priority_null_info_command));

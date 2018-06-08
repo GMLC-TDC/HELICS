@@ -27,6 +27,8 @@ set(SRC_FILES
 	helics-time.cpp
 	HandleManager.cpp
 	HandlePointerManager.cpp
+	MessageTimer.cpp
+	
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -106,6 +108,8 @@ set(INCLUDE_FILES
 	NetworkBrokerData.hpp
 	HandleManager.hpp
 	HandlePointerManager.hpp
+	queryHelpers.hpp
+	MessageTimer.hpp
 )
 
 set(TESTCORE_HEADER_FILES
