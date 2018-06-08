@@ -105,7 +105,7 @@ class Subscription : public SubscriptionBase
 
     mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
-    // bool hasUpdate = false;  //!< the value has been updated
+    bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
   public:
@@ -149,6 +149,8 @@ class Subscription : public SubscriptionBase
     Subscription (ValueFederate *valueFed, int subIndex) : SubscriptionBase (valueFed, subIndex) {}
     /** check if the value has been updated*/
     virtual bool isUpdated () const override;
+    /** check if the value has been updated and load the value into buffer*/
+    bool getAndCheckForUpdate();
 
     using SubscriptionBase::registerCallback;
     /** register a callback for the update
@@ -202,7 +204,7 @@ class Subscription : public SubscriptionBase
     template <class X>
     void getValue_impl (std::true_type /*V*/, X &out)
     {
-        if (fed->isUpdated (id))
+        if (fed->isUpdated (id)||(hasUpdate && !changeDetectionEnabled))
         {
             auto dv = fed->getValueRaw (id);
             if (type == helics_type_t::helicsInvalid)
@@ -237,6 +239,7 @@ class Subscription : public SubscriptionBase
         {
             valueExtract (lastValue, out);
         }
+        hasUpdate = false;
     }
     template <class X>
     void getValue_impl (std::false_type /*V*/, X &out)
@@ -281,6 +284,13 @@ class Subscription : public SubscriptionBase
         return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid),
                                                     std::true_type, std::false_type> ());
     }
+    /** get the size of the raw data*/
+    size_t getRawSize();
+    /** get the size of the data if it were a string*/
+    size_t getStringSize();
+    /** get the number of elements in the data if it were a vector*/
+    size_t getVectorSize();
+
 };
 
 /** class to handle a subscription

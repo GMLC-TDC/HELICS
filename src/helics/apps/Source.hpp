@@ -74,9 +74,10 @@ class Source:public App
     */
     Source (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
+    @param[in] name the name of the app
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
-    explicit Source (const std::string &jsonString);
+    Source (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
     Source (Source &&other_source) = default;

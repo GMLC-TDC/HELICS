@@ -21,7 +21,7 @@ BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture_cpp)
 
 namespace bdata = boost::unit_test::data;
 
-namespace utf = boost::unit_test;
+
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
@@ -65,7 +65,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1, 1.0);
@@ -102,7 +102,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
 }
 
 /*
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
    // extraBrokerArgs = "--logleve=4";
@@ -174,7 +174,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 */
 /*
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
 {
     using namespace helics;
@@ -234,7 +234,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
@@ -428,7 +428,6 @@ class pingpongFed
 };
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (20))
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
     if (core_type != "test")
@@ -465,7 +464,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 }
 
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);

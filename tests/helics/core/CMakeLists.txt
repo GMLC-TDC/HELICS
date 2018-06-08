@@ -30,9 +30,9 @@ ForwardingTimeCoordinatorTests.cpp
 TimeCoordinatorTests.cpp
 networkInfoTests.cpp
 )
-if (HELICS_HAVE_ZMQ)
+if (HELICS_HAVE_ZEROMQ)
 	list(APPEND core_test_sources ZeromqCore-tests.cpp)
-endif(HELICS_HAVE_ZMQ)
+endif(HELICS_HAVE_ZEROMQ)
 
 if (NOT DISABLE_TCP_CORE)
     list(APPEND core_test_sources TcpCore-tests.cpp)
@@ -46,10 +46,6 @@ add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
-
-if (HELICS_HAVE_ZEROMQ)
-   target_include_directories (core-tests PRIVATE "${ZeroMQ_INCLUDE_DIR}")
-endif (HELICS_HAVE_ZEROMQ)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
 set_target_properties (core-tests PROPERTIES FOLDER tests)

@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "CommonCore.hpp"
+#include "InterfaceInfo.hpp"
 #include "Core.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
@@ -51,17 +52,11 @@ class FederateState
     std::atomic<Core::federate_id_t> global_id{invalid_fed_id};  //!< global id code, default to invalid
 
   private:
-    shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
-      subscriptions;  //!< storage for all the subscriptions
     
     std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
-    bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
-    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>>
-      publications;  //!< storage for all the publications
-    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>>
-      endpoints;  //!< storage for all the endpoints
+    InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
@@ -123,30 +118,12 @@ class FederateState
     /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
     federate_state_t getState () const;
-
-    const SubscriptionInfo *getSubscription (const std::string &subName) const;
-    const SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
-    SubscriptionInfo *getSubscription (const std::string &subName);
-    SubscriptionInfo *getSubscription (Core::handle_id_t handle_);
-    const PublicationInfo *getPublication (const std::string &pubName) const;
-    const PublicationInfo *getPublication (Core::handle_id_t handle_) const;
-    PublicationInfo *getPublication (const std::string &pubName);
-    PublicationInfo *getPublication (Core::handle_id_t handle_);
-    const EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    const EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
-    EndpointInfo *getEndpoint (const std::string &endpointName);
-    EndpointInfo *getEndpoint (Core::handle_id_t handle_);
-
-    void createSubscription (Core::handle_id_t handle,
-                             const std::string &key,
-                             const std::string &type,
-                             const std::string &units,
-                             handle_check_mode check_mode);
-    void createPublication (Core::handle_id_t handle,
-                            const std::string &key,
-                            const std::string &type,
-                            const std::string &units);
-    void createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type);
+    InterfaceInfo &interfaces() {
+        return interfaceInformation;
+    }
+    const InterfaceInfo &interfaces() const {
+        return interfaceInformation;
+    }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize (Core::handle_id_t id) const;

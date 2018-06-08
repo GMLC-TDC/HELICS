@@ -38,10 +38,6 @@ heat-transfer-tests.cpp
 ValueFederateExtendedTests.cpp
 )
 
-include_directories( SYSTEM ${Boost_INCLUDE_DIR})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/ThirdParty)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
 #  QUICK API TESTS
 
 add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
@@ -58,16 +54,6 @@ add_executable(extended-api-tests ${application_api_test_sources} ${extended_tes
 target_link_libraries(extended-api-tests helics-static helics_test_base)
 
 set_target_properties (application-api-tests extended-api-tests key-tests PROPERTIES FOLDER tests)
-
-
-#add a bigobj indicator for this project
-#IF(MINGW)
-#	target_compile_options(application-api-tests PRIVATE "-Wa,-mbig-obj")
-#ENDIF(MINGW)
-
-#if (MSVC)
-#	target_compile_options(application-api-tests PRIVATE /bigobj)
-#endif(MSVC)
 
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")

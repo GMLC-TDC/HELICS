@@ -247,20 +247,23 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 #include <set>
 #include <limits>
 
-#if __cplusplus >= 201103L
-  #include <cstdio>
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#include <cstdio>
 
-  #if !defined(snprintf)
-    #define snprintf std::snprintf
-  #endif
+#if !defined(snprintf)
+#define snprintf std::snprintf
+#endif
 
-  #if !defined(sscanf)
-    #define sscanf std::sscanf
-  #endif
+#if !defined(sscanf)
+#define sscanf std::sscanf
+#endif
 #else
-  #include <stdio.h>
+#include <stdio.h>
 
   #if defined(_MSC_VER)
+#ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#endif
     #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
     #if !defined(snprintf)
       #define snprintf _snprintf
@@ -4196,65 +4199,65 @@ Value& Path::make(Value& root) const {
 #include <cassert>
 #include <cstring>
 
-#if __cplusplus >= 201103L
-  #include <cmath>
-  #include <cstdio>
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#include <cmath>
+#include <cstdio>
 
-  #if !defined(isnan)
-    #define isnan std::isnan
-  #endif
+#if !defined(isnan)
+#define isnan std::isnan
+#endif
 
-  #if !defined(isfinite)
-    #define isfinite std::isfinite
-  #endif
+#if !defined(isfinite)
+#define isfinite std::isfinite
+#endif
 
-  #if !defined(snprintf)
-    #define snprintf std::snprintf
-  #endif
+#if !defined(snprintf)
+#define snprintf std::snprintf
+#endif
 #else
-  #include <math.h>
-  #include <stdio.h>
+#include <math.h>
+#include <stdio.h>
 
-  #if defined(_MSC_VER)
-    #if !defined(isnan)
-      #include <float.h>
-      #define isnan _isnan
-    #endif
+#if defined(_MSC_VER)
+#if !defined(isnan)
+#include <float.h>
+#define isnan _isnan
+#endif
 
-    #if !defined(isfinite)
-      #include <float.h>
-      #define isfinite _finite
-    #endif
+#if !defined(isfinite)
+#include <float.h>
+#define isfinite _finite
+#endif
 
-    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
-    #if !defined(snprintf)
-      #define snprintf _snprintf
-    #endif
-  #endif
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+#if !defined(snprintf)
+#define snprintf _snprintf
+#endif
+#endif
 
-  #if defined(__sun) && defined(__SVR4) //Solaris
-    #if !defined(isfinite)
-      #include <ieeefp.h>
-      #define isfinite finite
-    #endif
-  #endif
+#if defined(__sun) && defined(__SVR4) //Solaris
+#if !defined(isfinite)
+#include <ieeefp.h>
+#define isfinite finite
+#endif
+#endif
 
-  #if defined(__hpux)
-    #if !defined(isfinite)
-      #if defined(__ia64) && !defined(finite)
-        #define isfinite(x) ((sizeof(x) == sizeof(float) ? _Isfinitef(x) : _IsFinite(x)))
-      #endif
-    #endif
-  #endif
+#if defined(__hpux)
+#if !defined(isfinite)
+#if defined(__ia64) && !defined(finite)
+#define isfinite(x) ((sizeof(x) == sizeof(float) ? _Isfinitef(x) : _IsFinite(x)))
+#endif
+#endif
+#endif
 
-  #if !defined(isnan)
-    // IEEE standard states that NaN values will not compare to themselves
-    #define isnan(x) (x!=x)
-  #endif
+#if !defined(isnan)
+// IEEE standard states that NaN values will not compare to themselves
+#define isnan(x) (x!=x)
+#endif
 
-  #if !defined(isfinite)
-    #define isfinite finite
-  #endif
+#if !defined(isfinite)
+#define isfinite finite
+#endif
 #endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400 // VC++ 8.0

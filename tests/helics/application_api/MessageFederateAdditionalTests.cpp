@@ -23,7 +23,7 @@ BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture
 
 namespace bdata = boost::unit_test::data;
 
-namespace utf = boost::unit_test;
+
 
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -94,7 +94,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1);
@@ -143,7 +143,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1);
@@ -190,7 +190,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1);
@@ -237,7 +237,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
@@ -436,7 +436,6 @@ class pingpongFed
     }
 };
 
-BOOST_TEST_DECORATOR (*utf::timeout (20))
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
     if (core_type != "test")

@@ -1,11 +1,11 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "Player.hpp"
+#include "BrokerApp.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../application_api/Federate.hpp"
 #include <iostream>
 
 int main (int argc, char *argv[])
@@ -13,12 +13,7 @@ int main (int argc, char *argv[])
     int ret = 0;
     try
     {
-        helics::apps::Player Player(argc, argv);
-        if (Player.isActive())
-        {
-            Player.run();
-        }
-
+        helics::apps::BrokerApp broker(argc, argv);
     }
     catch (const std::invalid_argument &ia)
     {
@@ -33,6 +28,4 @@ int main (int argc, char *argv[])
 
     helics::cleanupHelicsLibrary();
     return ret;
-
 }
-

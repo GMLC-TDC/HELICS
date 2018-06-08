@@ -11,6 +11,7 @@ set(SRC_FILES
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	PublicationInfo.cpp
+	InterfaceInfo.cpp
 	#FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
@@ -90,6 +91,7 @@ set(INCLUDE_FILES
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
 	CoreBroker.hpp
+	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp
 	CommonCore.hpp
@@ -197,20 +199,3 @@ if (HELICS_HAVE_MPI)
 endif(HELICS_HAVE_MPI)
 
 install (FILES ${PUBLIC_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core COMPONENT headers)
-
-OPTION(BUILD_BROKER "Build a helics Broker" ON)
-if (BUILD_BROKER)
-add_executable(helics_broker helics-broker.cpp)
-   target_link_libraries(helics_broker helics-static)
-   target_include_directories(helics_broker SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-   set_target_properties (helics_broker PROPERTIES FOLDER apps)
-   set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
-   INSTALL(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET helics_broker POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-        "${keyfile}"      # <--this is in-file
-        "$<TARGET_FILE_DIR:helics_broker>/")                 # <--this is out-file path
-endforeach(keyfile)
-endif()
-
