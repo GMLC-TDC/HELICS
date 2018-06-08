@@ -678,57 +678,42 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_REG_PUB:
-        if (!_isRoot)
+        if ((!_isRoot) && (command.dest_id != 0))
         {
-            if (command.dest_id != 0)
-            {
-                routeMessage (command);
-                break;
-            }
+            routeMessage (command);
+            break;
         }
         addPublication (command);
         break;
     case CMD_REG_SUB:
-        if (!_isRoot)
+        if ((!_isRoot) && (command.dest_id != 0))
         {
-            if (command.dest_id != 0)
-            {
-                routeMessage (command);
-                break;
-            }
+            routeMessage (command);
+            break;
         }
         addSubscription (command);
         break;
     case CMD_REG_END:
-        if (!_isRoot)
+        if ((!_isRoot) && (command.dest_id != 0))
         {
-            if (command.dest_id != 0)
-            {
-                routeMessage (command);
-                break;
-            }
+            routeMessage (command);
+            break;
         }
         addEndpoint (command);
         break;
     case CMD_REG_DST_FILTER:
-        if (!_isRoot)
+        if ((!_isRoot) && (command.dest_id != 0))
         {
-            if (command.dest_id != 0)
-            {
-                routeMessage (command);
-                break;
-            }
+            routeMessage (command);
+            break;
         }
         addDestFilter (command);
         break;
     case CMD_REG_SRC_FILTER:
-        if (!_isRoot)
+        if ((!_isRoot) && (command.dest_id != 0))
         {
-            if (command.dest_id != 0)
-            {
-                routeMessage (command);
-                break;
-            }
+            routeMessage (command);
+            break;
         }
         addSourceFilter (command);
         break;
@@ -766,8 +751,18 @@ void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage 
 
 void CoreBroker::addPublication (ActionMessage &m)
 {
-    auto &pub =
-      handles.addHandle (m.source_id, m.source_handle, handle_type_t::publication, m.name, m.info ().type, m.info ().units);
+    //detect duplicate publications
+    if (handles.getPublication(m.name) != nullptr)
+    {
+        ActionMessage eret(CMD_ERROR,global_broker_id,m.source_id);
+        eret.dest_handle = m.source_handle;
+        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.payload = "Duplicate publication names (" + m.name + ")";
+        routeMessage(eret);
+        return;
+    }
+    auto &pub = handles.addHandle (m.source_id, m.source_handle, handle_type_t::publication, m.name,
+                                   m.info ().type, m.info ().units);
 
     addLocalInfo (pub, m);
     if (!_isRoot)
@@ -781,8 +776,8 @@ void CoreBroker::addPublication (ActionMessage &m)
 }
 void CoreBroker::addSubscription (ActionMessage &m)
 {
-    auto &sub =
-      handles.addHandle (m.source_id, m.source_handle, handle_type_t::subscription, m.name, m.info ().type, m.info ().units);
+    auto &sub = handles.addHandle (m.source_id, m.source_handle, handle_type_t::subscription, m.name,
+                                   m.info ().type, m.info ().units);
 
     addLocalInfo (sub, m);
     sub.processed = checkActionFlag (m, processing_complete_flag);
@@ -804,8 +799,18 @@ void CoreBroker::addSubscription (ActionMessage &m)
 
 void CoreBroker::addEndpoint (ActionMessage &m)
 {
-    auto &ept =
-      handles.addHandle (m.source_id, m.source_handle, handle_type_t::endpoint, m.name, m.info ().type, m.info ().units);
+    //detect duplicate endpoints
+    if (handles.getEndpoint(m.name) != nullptr)
+    {
+        ActionMessage eret(CMD_ERROR, global_broker_id, m.source_id);
+        eret.dest_handle = m.source_handle;
+        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.payload = "Duplicate endpoint names (" + m.name + ")";
+        routeMessage(eret);
+        return;
+    }
+    auto &ept = handles.addHandle (m.source_id, m.source_handle, handle_type_t::endpoint, m.name, m.info ().type,
+                                   m.info ().units);
 
     addLocalInfo (ept, m);
 
@@ -832,8 +837,8 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 }
 void CoreBroker::addSourceFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::source_filter, m.name, m.info ().target,
-                                    m.info ().type, m.info ().type_out);
+    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::source_filter, m.name,
+                                    m.info ().target, m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))
     {
@@ -882,8 +887,8 @@ bool CoreBroker::updateSourceFilterOperator (ActionMessage &m)
 
 void CoreBroker::addDestFilter (ActionMessage &m)
 {
-    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::destination_filter, m.name, m.info ().target,
-                                    m.info ().type, m.info ().type_out);
+    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type_t::destination_filter, m.name,
+                                    m.info ().target, m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     if (checkActionFlag (m, clone_flag))
     {
@@ -995,7 +1000,7 @@ bool CoreBroker::connect ()
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
 void CoreBroker::processDisconnect (bool skipUnregister)
-{ 
+{
     LOG_NORMAL (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
@@ -1178,7 +1183,7 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
 
             // notify the endpoint about its filter
             m.setAction ((handleInfo.handle_type == handle_type_t::source_filter) ? CMD_NOTIFY_SRC_FILTER :
-                                                                     CMD_NOTIFY_DST_FILTER);
+                                                                                    CMD_NOTIFY_DST_FILTER);
             m.source_id = handleInfo.fed_id;
             m.source_handle = handleInfo.handle;
             if (handleInfo.cloning)
@@ -1212,7 +1217,7 @@ void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
         }
         // notify the endpoint about a filter
         ActionMessage m ((handleInfo.handle_type == handle_type_t::source_filter) ? CMD_NOTIFY_SRC_FILTER :
-                                                                     CMD_NOTIFY_DST_FILTER);
+                                                                                    CMD_NOTIFY_DST_FILTER);
         m.source_id = filtInfo.fed_id;
         m.source_handle = filtInfo.handle;
         m.dest_id = handleInfo.fed_id;
@@ -1435,7 +1440,8 @@ void CoreBroker::checkFilters ()
     // LOG(INFO) << "performing filter check" << ENDL;
     for (auto &hndl : handles)
     {
-        if ((hndl.handle_type == handle_type_t::destination_filter) || (hndl.handle_type == handle_type_t::source_filter))
+        if ((hndl.handle_type == handle_type_t::destination_filter) ||
+            (hndl.handle_type == handle_type_t::source_filter))
         {
             auto fnd = FindandNotifyFilterEndpoint (hndl);
             if (!fnd)

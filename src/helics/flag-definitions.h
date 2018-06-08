@@ -35,5 +35,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** used to clear the DELAY_INIT_ENTRY flag in cores*/
 #define ENABLE_INIT_ENTRY 47
 
+// error code definitions
+#define ERROR_CODE_REGISTRATION_FAILURE 2
+#define ERROR_CODE_INVALID_OBJECT 4
+#define ERROR_CODE_INVALID_ARGUMENT 6
+#define ERROR_CODE_DISCARD 8
+#define ERROR_CODE_CONNECTION_FAILURE 10
+#define ERROR_CODE_INVALID_STATE_TRANSITION 12
+#define ERROR_CODE_INVALID_FUNCTION_CALL 15
+
 #endif
 

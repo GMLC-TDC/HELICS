@@ -80,7 +80,8 @@ class SubscriptionBase
     }
     /** get the key for the subscription*/
     const std::string &getKey () const { return key_; }
-    /** get the key for the subscription*/
+    /** get the Name for the subscription 
+    @details the name is the local name if given, key is the full key name*/
     const std::string &getName () const { return key_; }
     /** get the key for the subscription*/
     std::string getType () const { return fed->getPublicationType (id); }

@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
@@ -36,7 +37,15 @@ class PublicationBase
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
-        id = fed->registerPublication (key_, type_, units_);
+        try
+        {
+            id = fed->registerPublication (key_, type_, units_);
+        }
+        catch (const RegistrationFailure &)
+        {
+            id = fed->getPublicationId(key_);
+            loadFromId();
+        }
     }
 
     /** base constructor for a publication
@@ -54,13 +63,21 @@ class PublicationBase
                      const std::string &units = std::string ())
         : fed (std::addressof (*valueFed)), key_ (key), type_ (type), units_ (units)
     {
-        if (locality == GLOBAL)
+        try
         {
-            id = fed->registerGlobalPublication (key, type, units);
+            if (locality == GLOBAL)
+            {
+                id = fed->registerGlobalPublication (key, type, units);
+            }
+            else
+            {
+                id = fed->registerPublication (key, type, units);
+            }
         }
-        else
+        catch (const RegistrationFailure &)
         {
-            id = fed->registerPublication (key, type, units);
+            id = fed->getPublicationId(key_);
+            loadFromId();
         }
     }
     /** generate a publication object from an existing publication in a federate
@@ -82,6 +99,8 @@ class PublicationBase
     const std::string &getType () const { return type_; }
     /** get the units of the Publication*/
     const std::string &getUnits () const { return units_; }
+private:
+    void loadFromId();
 };
 
 /** class wrapping the calls for a publication in an object so identifiers and pointers do not
@@ -132,8 +151,18 @@ class Publication : public PublicationBase
     @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
-    Publication (ValueFederate *valueFed, int pubIndex)
-        : PublicationBase (valueFed, pubIndex), pubType (getTypeFromString (getType ()))
+    template <class FedPtr>
+    Publication (FedPtr valueFed, int pubIndex)
+        : PublicationBase (std::addressof (*valueFed), pubIndex), pubType (getTypeFromString (getType ()))
+    {
+    }
+    /** generate a publication object from a preexisting publication
+    @param valueFed a pointer to the appropriate value Federate
+    @param pubIndex the index of the subscription
+    */
+    template <class FedPtr>
+    Publication (FedPtr valueFed, publication_id_t pid)
+        : PublicationBase (std::addressof (*valueFed), pid.value ()), pubType (getTypeFromString (getType ()))
     {
     }
     /** send a value for publication
@@ -148,9 +177,9 @@ class Publication : public PublicationBase
     void publish (std::complex<double> val) const;
     void publish (const defV &val) const;
     void publish (bool val) const;
-    void publish(const named_point &np) const;
-    void publish(const std::string &name, double val) const;
-    void publish(const char *str, double val) const;
+    void publish (const named_point &np) const;
+    void publish (const std::string &name, double val) const;
+    void publish (const char *str, double val) const;
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

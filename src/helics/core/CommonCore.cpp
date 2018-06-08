@@ -266,7 +266,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     }
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id;
-    m.source_handle = errorCode;
+    m.counter = static_cast<int16_t>(errorCode);
     addActionMessage (m);
     fed->addAction (m);
     iteration_result ret = iteration_result::next_step;
@@ -334,12 +334,38 @@ void CommonCore::setCoreReadyToInit ()
     setFlag (invalid_fed_id, ENABLE_INIT_ENTRY);
 }
 
+/** this function will generate an appropriate exception for the error 
+code listed in a Federate*/
+static void generateFederateException(const FederateState *fed)
+{
+    auto eCode = fed->lastErrorCode();
+    switch (eCode)
+    {
+    case 0:
+        return;
+    case ERROR_CODE_INVALID_ARGUMENT:
+        throw(InvalidParameter(fed->lastErrorString()));
+    case ERROR_CODE_INVALID_FUNCTION_CALL:
+        throw(InvalidFunctionCall(fed->lastErrorString()));
+    case ERROR_CODE_INVALID_OBJECT:
+        throw(InvalidIdentifier(fed->lastErrorString()));
+    case ERROR_CODE_INVALID_STATE_TRANSITION:
+        throw(InvalidFunctionCall(fed->lastErrorString()));
+    case ERROR_CODE_CONNECTION_FAILURE:
+        throw(ConnectionFailure(fed->lastErrorString()));
+    case ERROR_CODE_REGISTRATION_FAILURE:
+        throw(RegistrationFailure(fed->lastErrorString()));
+    default:
+        throw(HelicsException(fed->lastErrorString()));
+
+    }
+}
 void CommonCore::enterInitializingState (federate_id_t federateID)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
-        throw (InvalidIdentifier ("federateID not valid  Enter Enit"));
+        throw (InvalidIdentifier ("federateID not valid for Entering Init"));
     }
     switch (fed->getState ())
     {
@@ -362,7 +388,11 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
         if (check != iteration_result::next_step)
         {
             fed->init_requested = false;
-            throw (FunctionExecutionFailure ());
+            if (check == iteration_result::halted)
+            {
+                throw(HelicsTerminated());
+            }
+            generateFederateException(fed);
         }
         return;
     }
@@ -809,7 +839,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     lock.unlock ();
     if (pub != nullptr)  // this key is already found
     {
-        throw (InvalidParameter ());
+        throw (RegistrationFailure ("Publication key already exists"));
     }
     auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::publication, key, type, units, false);
 
@@ -998,7 +1028,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     auto ept = handles.getEndpoint (name);
     if (ept != nullptr)
     {
-        throw (InvalidIdentifier ("endpoint name is already used"));
+        throw (RegistrationFailure ("endpoint name is already used"));
     }
     lock.unlock ();
     auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, "", false);
@@ -2023,7 +2053,7 @@ void CommonCore::transmitDelayedMessages ()
 void CommonCore::sendErrorToFederates (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
-    errorCom.index = error_code;
+    errorCom.counter = static_cast<int16_t>(error_code);
     for (auto &fed : loopFederates)
     {
         routeMessage (errorCom, fed->global_id);
@@ -2568,6 +2598,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     err.dest_id = command.source_id;
                     err.source_id = command.dest_id;
                     err.source_handle = command.dest_handle;
+                    err.counter = ERROR_CODE_REGISTRATION_FAILURE;
                     err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
                     return;

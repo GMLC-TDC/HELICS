@@ -17,10 +17,15 @@ PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
     id = static_cast<publication_id_t> (pubIndex);
-    key_ = fed->getPublicationKey (id);
+    loadFromId();
+}
 
-    type_ = fed->getPublicationType (id);
-    units_ = fed->getPublicationUnits (id);
+void PublicationBase::loadFromId()
+{
+    key_ = fed->getPublicationKey(id);
+
+    type_ = fed->getPublicationType(id);
+    units_ = fed->getPublicationUnits(id);
 }
 
 void Publication::publish (double val) const

@@ -117,7 +117,7 @@ class ActionMessage
     @param message the message to move.
     */
     void moveInfo (std::unique_ptr<Message> message);
-
+    /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
     {
@@ -133,7 +133,7 @@ class ActionMessage
             ar (extraInfo);
         }
     }
-
+    /** load the data from an archive*/
     template <class Archive>
     void load (Archive &ar)
     {
