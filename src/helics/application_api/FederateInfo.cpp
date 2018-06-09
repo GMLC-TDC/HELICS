@@ -27,6 +27,7 @@ static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to con
                                      {"offset"s, "the offset of the time steps"s},
                                      {"period"s, "the period of the federate"s},
                                      {"timedelta"s, "the time delta of the federate"s},
+                                     { "rttolerance"s, "the time tolerance of the real time mode"s },
                                      {"coreinit,i"s, "the core initialization string"s},
                                      {"separator"s, "separator character for local federates"s},
                                      {"inputdelay"s, "the input delay on incoming communication of the federate"s},
@@ -85,7 +86,19 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         timeDelta = loadTimeFromString (vm["inputdelay"].as<std::string> ());
     }
-
+    if (vm.count("rttolerance") > 0)
+    {
+        rt_lead = loadTimeFromString(vm["rttolerance"].as<std::string>());
+        rt_lag = rt_lead;
+    }
+    if (vm.count("rtlag") > 0)
+    {
+        rt_lag = loadTimeFromString(vm["rtlag"].as<std::string>());
+    }
+    if (vm.count("rtlead") > 0)
+    {
+        rt_lead = loadTimeFromString(vm["rtlead"].as<std::string>());
+    }
     if (vm.count ("outputdelay") > 0)
     {
         timeDelta = loadTimeFromString (vm["outputdelay"].as<std::string> ());
@@ -145,6 +158,18 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
             {
                 uninterruptible = false;
             }
+            else if (flag == "forward_compute")
+            {
+                forwardCompute = true;
+            }
+            else if (flag == "realtime")
+            {
+                realtime = true;
+            }
+            else if (flag == "delayed_update")
+            {
+               wait_for_current_time_updates = true;
+            }
             else
             {
                 std::cerr << "unrecognized flag " << flag << std::endl;
@@ -164,7 +189,7 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     Json_helics::Value doc;
     try
     {
-        doc = loadJsonString (jsonString);
+        doc = loadJson (jsonString);
     }
     catch (const std::invalid_argument &ia)
     {
@@ -208,6 +233,23 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     {
         fi.forwardCompute = doc["forward_compute"].asBool ();
     }
+    if (doc.isMember("realtime"))
+    {
+        fi.realtime= doc["realtime"].asBool();
+    }
+    if (doc.isMember("rttolerance"))
+    {
+        fi.rt_lag = loadJsonTime(doc["rttolerance"]);
+        fi.rt_lead = fi.rt_lag;
+    }
+    if (doc.isMember("rtlag"))
+    {
+        fi.rt_lag = loadJsonTime(doc["rtlag"]);
+    }
+    if (doc.isMember("rtlead"))
+    {
+        fi.rt_lead = loadJsonTime(doc["rtlead"]);
+    }
     if (doc.isMember ("separator"))
     {
         auto sep = doc["separator"].asString ();
@@ -234,6 +276,10 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     if (doc.isMember ("coreInit"))
     {
         fi.coreInitString = doc["coreInit"].asString ();
+    }
+    if (doc.isMember("delayed_update"))
+    {
+        fi.wait_for_current_time_updates= doc["delayed_update"].asBool();
     }
     if (doc.isMember ("maxIterations"))
     {

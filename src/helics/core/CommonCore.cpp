@@ -1669,7 +1669,7 @@ void CommonCore::setLoggingCallback (
   federate_id_t federateID,
   std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
-    if (federateID == 0)
+    if (federateID == invalid_fed_id)
     {
         ActionMessage loggerUpdate(CMD_CORE_CONFIGURE);
         loggerUpdate.index = UPDATE_LOGGING_CALLBACK;

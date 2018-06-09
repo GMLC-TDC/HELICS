@@ -84,99 +84,10 @@ const BasicBrokerInfo *CoreBroker::getBrokerById (Core::federate_id_t fedid) con
     return (fnd != _brokers.end ()) ? &(*fnd) : nullptr;
 }
 
-void CoreBroker::generateQueryResult (const ActionMessage &command)
-{
-    std::string repStr;
-    bool listV = true;
-    if (command.payload == "federates")
-    {
-        repStr.push_back ('[');
-        for (const auto &fed : _federates)
-        {
-            repStr.append (fed.name);
-            repStr.push_back (';');
-        }
-    }
-    else if (command.payload == "publications")
-    {
-        repStr.push_back ('[');
-        for (const auto &handle : handles)
-        {
-            if (handle.handle_type == handle_type_t::publication)
-            {
-                repStr.append (handle.key);
-                repStr.push_back (';');
-            }
-        }
-    }
-    else if (command.payload == "endpoints")
-    {
-        repStr.push_back ('[');
-        for (const auto &handle : handles)
-        {
-            if (handle.handle_type == handle_type_t::endpoint)
-            {
-                repStr.append (handle.key);
-                repStr.push_back (';');
-            }
-        }
-    }
-    else if (command.payload == "brokers")
-    {
-        repStr.push_back ('[');
-        for (const auto &brk : _brokers)
-        {
-            repStr.append (brk.name);
-            repStr.push_back (';');
-        }
-    }
-    else if (command.payload == "dependencies")
-    {
-        repStr.push_back('[');
-        for (const auto &dep : timeCoord->getDependencies())
-        {
-            repStr.append(std::to_string(dep));
-            repStr.push_back(';');
-        }
-    }
-    else if (command.payload == "dependents")
-    {
-        repStr.push_back('[');
-        for (const auto &dep : timeCoord->getDependents())
-        {
-            repStr.append(std::to_string(dep));
-            repStr.push_back(';');
-        }
-    }
-    else
-    {
-        repStr = "#invalid";
-        listV = false;
-    }
-    if (listV)
-    {
-        if (repStr.size () > 1)
-        {
-            repStr.back () = ']';
-        }
-        else
-        {
-            repStr.push_back (']');
-        }
-    }
-
-    ActionMessage queryResp (CMD_QUERY_REPLY);
-    queryResp.dest_id = command.source_id;
-    queryResp.source_id = global_broker_id;
-    queryResp.index = command.index;
-
-    queryResp.payload = repStr;
-    transmit (getRoute (queryResp.dest_id), queryResp);
-}
-
 void CoreBroker::setLoggingCallback (
   const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {
+//TODO:: this is not thread safe if done after startup
     BrokerBase::setLoggerFunction (logFunction);
 }
 
@@ -421,14 +332,21 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         }
         else
         {
-            transmit(getRoute(command.dest_id), command);
+            routeMessage(command);
         }
         break;
     case CMD_QUERY:
         processQuery (command);
         break;
     case CMD_QUERY_REPLY:
-        transmit (getRoute (command.dest_id), command);
+        if (command.dest_id == global_broker_id)
+        {
+
+        }
+        else
+        {
+            transmit(getRoute(command.dest_id), command);
+        }
         break;
     default:
         // must not have been a priority command
@@ -1369,7 +1287,7 @@ std::string CoreBroker::query(const std::string &target, const std::string &quer
     return "#invalid";
 }
 
-std::string CoreBroker::generateQueryAnswer (const std::string &query) const
+std::string CoreBroker::generateQueryAnswer (const std::string &query)
 {
     if (query == "isinit")
     {
@@ -1393,16 +1311,56 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
     }
     if (query == "federate_map")
     {
-        return generateFederateMap();
+        if (fedMap.isCompleted())
+        {
+            return fedMap.generate();
+        }
+        else if (fedMap.isActive())
+        {
+            return "#wait";
+        }
+        else
+        {
+            initializeFederateMap();
+            if (fedMap.isCompleted())
+            {
+                return fedMap.generate();
+            }
+            return "#wait";
+        }
     }
     if (query == "dependency_graph")
     {
-        // TOOD:  create this information
-        return generateDependencyGraph();
+        if (depMap.isCompleted())
+        {
+            return depMap.generate();
+        }
+        else if (depMap.isActive())
+        {
+            return "#wait";
+        }
+        else
+        {
+            initializeDependencyGraph();
+            if (depMap.isCompleted())
+            {
+                return depMap.generate();
+            }
+            return "#wait";
+        }
+    }
+    if (query == "dependson")
+    {
+        return generateStringVector(timeCoord->getDependencies(), [](const auto &dep) {return std::to_string(dep); });
+    }
+    if (query == "dependents")
+    {
+        return generateStringVector(timeCoord->getDependents(), [](const auto &dep) {return std::to_string(dep); });
     }
     if (query == "dependencies")
     {
-        Json_helics::Value base;
+        JsonMapBuilder deps;
+        Json_helics::Value &base = deps.getJValue();
         base["name"] = getIdentifier();
         base["id"] = static_cast<int> (global_broker_id);
         if (!isRoot())
@@ -1410,33 +1368,23 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query) const
             base["parent"] = static_cast<int> (global_broker_id);
         }
         base["dependents"] = Json_helics::arrayValue;
-        int index = 0;
         for (auto &dep : timeCoord->getDependents())
         {
-            base["dependents"][index] = dep;
-            ++index;
+            base["dependents"].append(dep);
         }
         base["dependencies"] = Json_helics::arrayValue;
-        index = 0;
         for (auto &dep : timeCoord->getDependencies())
         {
-            base["dependencies"][index] = dep;
-            ++index;
+            base["dependencies"].append(dep);
         }
-        Json_helics::StreamWriterBuilder builder;
-        builder["commentStyle"] = "None";
-        builder["indentation"] = "   ";  // or whatever you like
-        auto writer(builder.newStreamWriter());
-        std::stringstream sstr;
-        writer->write(base, &sstr);
-        return sstr.str();
+        return deps.generate();
     } 
     return "#invalid";
 }
 
-std::string CoreBroker::generateFederateMap () const
+void CoreBroker::initializeFederateMap ()
 {
-    Json_helics::Value base;
+    Json_helics::Value &base = fedMap.getJValue();
     base["name"] = getIdentifier ();
     base["id"] = static_cast<int> (global_broker_id);
     if (!isRoot ())
@@ -1444,32 +1392,42 @@ std::string CoreBroker::generateFederateMap () const
         base["parent"] = static_cast<int> (global_broker_id);
     }
     base["brokers"] = Json_helics::arrayValue;
-    //  int index = 0;
-    //  for (auto &dep : timeCoord->getDependents())
-    // {
-    // base["brokers"][index] = dep;
-    //     ++index;
-    //  }
-    base["cores"] = Json_helics::arrayValue;
-    //  index = 0;
-    //  for (auto &dep : timeCoord->getDependencies())
-    //  {
-    //  base["cores"][index] = dep;
-    //      ++index;
-    //  }
-    Json_helics::StreamWriterBuilder builder;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "   ";  // or whatever you like
-    auto writer (builder.newStreamWriter ());
-    std::stringstream sstr;
-    writer->write (base, &sstr);
-    return sstr.str ();
+    ActionMessage queryReq(CMD_BROKER_QUERY);
+    queryReq.payload = "federate_map";
+    queryReq.source_id = global_broker_id;
+    queryReq.counter = 2; //indicating which processing to use
+    bool hasCores = false;
+    for (auto &broker : _brokers)
+    {
+        if (!broker._nonLocal)
+        {
+            int index;
+            if (broker._core)
+            {
+                if (!hasCores)
+                {
+                    hasCores = true;
+                    base["cores"] = Json_helics::arrayValue;
+                }
+                index = fedMap.generatePlaceHolder("cores");
+            }
+            else
+            {
+                index = fedMap.generatePlaceHolder("brokers");
+            }
+            queryReq.index = fedMap.generatePlaceHolder("cores");
+            queryReq.dest_id = broker.global_id;
+            transmit(broker.route_id, queryReq);
+        }
+    }
+   
+    
 }
 
 
-std::string CoreBroker::generateDependencyGraph() const
+void CoreBroker::initializeDependencyGraph()
 {
-    Json_helics::Value base;
+    Json_helics::Value &base = depMap.getJValue();
     base["name"] = getIdentifier();
     base["id"] = static_cast<int> (global_broker_id);
     if (!isRoot())
@@ -1477,26 +1435,40 @@ std::string CoreBroker::generateDependencyGraph() const
         base["parent"] = static_cast<int> (global_broker_id);
     }
     base["brokers"] = Json_helics::arrayValue;
-    //  int index = 0;
-    //  for (auto &dep : timeCoord->getDependents())
-    // {
-    // base["brokers"][index] = dep;
-    //     ++index;
-    //  }
-    base["cores"] = Json_helics::arrayValue;
-    //  index = 0;
-    //  for (auto &dep : timeCoord->getDependencies())
-    //  {
-    //  base["cores"][index] = dep;
-    //      ++index;
-    //  }
-    Json_helics::StreamWriterBuilder builder;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "   ";  // or whatever you like
-    auto writer(builder.newStreamWriter());
-    std::stringstream sstr;
-    writer->write(base, &sstr);
-    return sstr.str();
+    ActionMessage queryReq(CMD_BROKER_QUERY);
+    queryReq.payload = "dependency_graph";
+    queryReq.counter = 4; //indicating which processing to use
+    bool hasCores = false;
+    for (auto &broker : _brokers)
+    {
+        int index;
+        if (broker._core)
+        {
+            if (!hasCores)
+            {
+                hasCores = true;
+                base["cores"] = Json_helics::arrayValue;
+            }
+            index = fedMap.generatePlaceHolder("cores");
+        }
+        else
+        {
+            index = fedMap.generatePlaceHolder("brokers");
+        }
+        queryReq.index = fedMap.generatePlaceHolder("cores");
+        queryReq.dest_id = broker.global_id;
+        transmit(broker.route_id, queryReq);
+    }
+    base["dependents"] = Json_helics::arrayValue;
+    for (auto &dep : timeCoord->getDependents())
+    {
+        base["dependents"].append(dep);
+    }
+    base["dependencies"] = Json_helics::arrayValue;
+    for (auto &dep : timeCoord->getDependencies())
+    {
+        base["dependencies"].append(dep);
+    }
 }
 
 void CoreBroker::processLocalQuery (const ActionMessage &m)
@@ -1505,18 +1477,34 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
     queryRep.source_id = global_broker_id;
     queryRep.index = m.index;
     queryRep.payload = generateQueryAnswer (m.payload);
-    routeMessage (queryRep, m.source_id);
+    queryRep.counter = m.counter;
+    if (queryRep.payload == "#wait")
+    {
+        if (m.payload == "dependency_graph")
+        {
+            depMapRequestors.push_back(queryRep);
+        }
+        else if (m.payload == "federate_map")
+        {
+            fedMapRequestors.push_back(queryRep);
+        }
+    }
+    else
+    {
+        routeMessage(queryRep, m.source_id);
+    }
+    
 }
 
 void CoreBroker::processQuery (const ActionMessage &m)
 {
     if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
     {
-        generateQueryResult (m);
+        processLocalQuery (m);
     }
     else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
     {
-        generateQueryResult (m);
+        processLocalQuery (m);
     }
     else
     {
@@ -1551,6 +1539,22 @@ void CoreBroker::processQuery (const ActionMessage &m)
     }
 }
 
+void CoreBroker::processQueryResponse(const ActionMessage &m)
+{
+    switch (m.counter)
+    {
+    case 0:
+    default:
+        ActiveQueries.setDelayedValue(m.index, m.payload);
+        break;
+    case 2:
+        fedMap.addComponent(m.payload, m.index);
+        break;
+    case 4:
+        depMap.addComponent(m.payload, m.index);
+        break;
+    }
+}
 void CoreBroker::checkEndpoints () {}
 
 void CoreBroker::checkFilters ()

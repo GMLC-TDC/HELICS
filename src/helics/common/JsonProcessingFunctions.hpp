@@ -16,7 +16,11 @@ using the jsoncpp library
 /** load a JSON string or filename that points to a JSON file and return a
 json::Value to the root object
 */
-Json_helics::Value loadJsonString (const std::string &jsonString);
+Json_helics::Value loadJson (const std::string &jsonString);
+
+/** load a JSON object in a string
+*/
+Json_helics::Value loadJsonStr(const std::string &jsonString);
 
 /** read a time from a JSON value element*/
 helics::Time loadJsonTime (const Json_helics::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);

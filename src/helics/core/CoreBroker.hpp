@@ -24,6 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
 #include "TimeDependencies.hpp"
+#include "JsonMapBuilder.hpp"
 
 namespace helics
 {
@@ -50,6 +51,7 @@ class BasicBrokerInfo
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
     bool _nonLocal = false;  //!< flag indicating that a broker is a direct subbroker of the managing object
+    bool _core = false;  //!< if set to true the broker is a core false is a broker;
     std::string routeInfo;  //!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
@@ -93,6 +95,11 @@ class CoreBroker : public Broker, public BrokerBase
     std::mutex name_mutex_;  // mutex lock for name and identifier
     std::atomic<int> queryCounter{ 0 };
     DelayedObjects<std::string> ActiveQueries;
+    JsonMapBuilder fedMap;
+    std::vector<ActionMessage> fedMapRequestors;
+    JsonMapBuilder depMap;
+    std::vector<ActionMessage> depMapRequestors;
+
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -116,8 +123,6 @@ class CoreBroker : public Broker, public BrokerBase
     void routeMessage (const ActionMessage &cmd);
 
     int32_t fillMessageRouteInformation (ActionMessage &mess);
-    /**generate the results of a query directed at the broker*/
-    void generateQueryResult (const ActionMessage &command);
 
     /** handle initialization operations*/
     void executeInitializationOperations ();
@@ -216,10 +221,12 @@ class CoreBroker : public Broker, public BrokerBase
     void FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
+    /** answer a query or route the message the appropriate location*/
+    void processQueryResponse(const ActionMessage &m);
     /** generate an answer to a local query*/
     void processLocalQuery (const ActionMessage &m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer (const std::string &query) const;
+    std::string generateQueryAnswer (const std::string &query);
     /** locate the route to take to a particular federate*/
     int32_t getRoute (Core::federate_id_t fedid) const;
     const BasicBrokerInfo *getBrokerById (Core::federate_id_t fedid) const;
@@ -234,9 +241,9 @@ class CoreBroker : public Broker, public BrokerBase
     void addSourceFilter (ActionMessage &m);
     bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a json string containing the federate/broker/Core Map*/
-    std::string generateFederateMap () const;
+    void initializeFederateMap ();
     /** generate a json string containing the dependency information for all federation object*/
-    std::string generateDependencyGraph() const;
+    void initializeDependencyGraph();
 };
 
 }  // namespace helics

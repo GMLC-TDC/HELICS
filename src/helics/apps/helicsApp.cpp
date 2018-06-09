@@ -161,7 +161,7 @@ void App::loadJsonFileConfiguration(const std::string &appName, const std::strin
     fed->registerInterfaces(jsonString);
 
 
-    auto doc = loadJsonString(jsonString);
+    auto doc = loadJson(jsonString);
 
 
     if (doc.isMember("app"))

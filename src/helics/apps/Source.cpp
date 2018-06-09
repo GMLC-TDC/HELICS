@@ -107,7 +107,7 @@ static void setGeneratorProperty(SignalGenerator *gen, const std::string &name, 
 void Source::loadJsonFile(const std::string &jsonFile)
 {
     //we want to load the default period before constructing the interfaces so the default period works
-    auto doc = loadJsonString(jsonFile);
+    auto doc = loadJson(jsonFile);
 
     if (doc.isMember("source"))
     {

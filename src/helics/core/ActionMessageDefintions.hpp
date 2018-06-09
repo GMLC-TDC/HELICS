@@ -15,15 +15,19 @@ enum action_message_flags : uint16_t
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
     processing_complete_flag = 1,  //!< indicator that processing has been completed
     required_flag = 2,  //!< flag indicating that an action or match is required
-
+    core_flag=3, //!< flag indicating that message comes from a core vs a broker
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
     empty_flag=6, //!< flag indicating that the message is empty
     extra_flag1 = 7,  //!< extra flag
     forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
+    extra_flag2 = 8, //!< extra flag
     destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
     broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
+    extra_flag3 = 13, //!< extra flag
+    extra_flag4 = 14, //!< extra flag
+    extra_flag5 =15, //!< extra flag
 };
 /** namespace for message definitions*/
 namespace action_message_def
@@ -100,6 +104,7 @@ enum class action_t : int32_t
     priority_null_info_command = -cmd_info_basis - 1,
     // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
+    cmd_force_time_grant = 525, //!< command to force grant a time regardless of other considerations
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -153,6 +158,7 @@ enum class action_t : int32_t
 #define CMD_TERMINATE_IMMEDIATELY action_message_def::action_t::cmd_terminate_immediately
 #define CMD_TIME_REQUEST action_message_def::action_t::cmd_time_request
 #define CMD_TIME_GRANT action_message_def::action_t::cmd_time_grant
+#define CMD_FORCE_TIME_GRANT action_message_def::action_t::cmd_force_time_grant
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
 #define CMD_REQUEST_CURRENT_TIME action_message_def::action_t::cmd_request_current_time
 
@@ -238,6 +244,8 @@ enum class action_t : int32_t
 #define UPDATE_MAX_ITERATION 5
 #define UPDATE_LOG_LEVEL 6
 #define UPDATE_FLAG 7
+#define UPDATE_RTLAG 10
+#define UPDATE_RTLEAD 11
 
 //definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
@@ -245,7 +253,7 @@ enum class action_t : int32_t
 #define UPDATE_LOGGING_CALLBACK 592
 
 /** check if the action has an info structure associated with it*/
-inline bool hasInfo (action_message_def::action_t action)
+inline bool hasInfo (action_message_def::action_t action) noexcept
 {
     return ((action > action_message_def::action_t::null_info_command) ||
             (action < action_message_def::action_t::priority_null_info_command));

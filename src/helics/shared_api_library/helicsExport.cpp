@@ -219,31 +219,34 @@ helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, he
     switch (flag)
     {
     case OBSERVER_FLAG:
-        hfi->observer = (value != 0);
+        hfi->observer = (value != helics_false);
         break;
     case UNINTERRUPTIBLE_FLAG:
-        hfi->uninterruptible = (value != 0);
+        hfi->uninterruptible = (value != helics_false);
         break;
     case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-        hfi->only_transmit_on_change = (value != 0);
+        hfi->only_transmit_on_change = (value != helics_false);
         break;
     case ONLY_UPDATE_ON_CHANGE_FLAG:
-        hfi->only_update_on_change = (value != 0);
+        hfi->only_update_on_change = (value != helics_false);
         break;
     case SOURCE_ONLY_FLAG:
-        hfi->source_only = (value != 0);
+        hfi->source_only = (value != helics_false);
         break;
     case ROLLBACK_FLAG:
-        hfi->rollback = (value != 0);
+        hfi->rollback = (value != helics_false);
         break;
     case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != 0);
+        hfi->forwardCompute = (value != helics_false);
         break;
     case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-        hfi->wait_for_current_time_updates = (value != 0);
+        hfi->wait_for_current_time_updates = (value != helics_false);
+        break;
+    case REALTIME_FLAG:
+        hfi->realtime = (value != helics_false);
         break;
     default:
-        return helics_invalid_object;
+        return helics_invalid_argument;
     }
     return helics_ok;
 }

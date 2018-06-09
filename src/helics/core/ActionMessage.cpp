@@ -446,7 +446,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
 constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
-
+//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
+//be used as the program is shutting down
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
@@ -466,6 +467,8 @@ constexpr std::pair<int, const char *> errorStrings[] = {
 using errorPair = std::pair<int, const char *>;
 constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
+//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
+//be used as the program is shutting down
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
