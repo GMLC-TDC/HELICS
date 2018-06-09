@@ -14,7 +14,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics.hpp"
 #include "testFixtures.hpp"
 
-BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
 
 
 

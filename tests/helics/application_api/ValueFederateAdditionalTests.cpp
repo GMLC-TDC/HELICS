@@ -21,10 +21,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value federates with some additional tests
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
 
 
 /** test simple creation and destruction*/

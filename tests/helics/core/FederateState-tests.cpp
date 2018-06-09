@@ -14,7 +14,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/SubscriptionInfo.hpp"
 
-BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture)
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture, *utf::label("core"))
 
 BOOST_AUTO_TEST_CASE (constructor_test)
 {

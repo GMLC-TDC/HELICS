@@ -10,11 +10,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
-
+BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture, *utf::label("extended"))
 
 /** test simple creation and destruction*/
 

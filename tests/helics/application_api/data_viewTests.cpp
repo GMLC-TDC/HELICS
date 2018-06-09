@@ -11,7 +11,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/application_api/data_view.hpp"
 
-BOOST_AUTO_TEST_SUITE (data_view_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (data_view_tests, *utf::label("daily") *utf::label("release"))
 
 using namespace helics;
 

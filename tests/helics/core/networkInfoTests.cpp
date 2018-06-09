@@ -9,7 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/NetworkBrokerData.hpp"
 #include "helics/common/stringToCmdLine.h"
 
-BOOST_AUTO_TEST_SUITE(networkData_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE(networkData_tests, *utf::label("core"))
 
 BOOST_AUTO_TEST_CASE(basic_test)
 {

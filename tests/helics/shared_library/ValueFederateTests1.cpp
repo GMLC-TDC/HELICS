@@ -15,12 +15,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using namespace std::string_literals;
 /** these test cases test out the value federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
-
 namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture, *utf::label("shared_library"))
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/

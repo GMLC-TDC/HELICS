@@ -20,7 +20,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 //#include "boost/process.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (UDPCore_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (UDPCore_tests, *utf::label("core"))
 
 using boost::asio::ip::udp;
 using helics::Core;

@@ -167,20 +167,21 @@ before_install:
   - $CXX --version
 
 install:
-  - source scripts/install-ci-dependencies.sh
   - export HELICS_DEPENDENCY_FLAGS=""
   - export HELICS_OPTION_FLAGS="${OPTION_FLAGS}"
-
-script:
-  - mkdir build && cd build
-  - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
-  - HELICS_OPTION_FLAGS+="-DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
   - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
   - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
+  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
+
+  - source scripts/install-ci-dependencies.sh
+  - HELICS_DEPENDENCY_FLAGS+=" -DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+ 
+script:
+  - mkdir build && cd build
+  - HELICS_OPTION_FLAGS+=" -DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.${SHARED_LIB_EXT} -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/"
     # - echo "$HELICS_OPTION_FLAGS"
     # - echo "$HELICS_DEPENDENCY_FLAGS"
-  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
   # For controlling which tests get run:
@@ -198,13 +199,8 @@ script:
   # - ctest --verbose --timeout 240 -I 0,0,0,7
   - ctest --verbose --timeout 200 -I 0,0,0,3
   - ctest --verbose -L Java
+  - ctest --verbose -L Python
   - ctest -L Examples
-
-  - export PYTHONPATH="$(pwd)/swig/python"
-    # - echo "$LD_LIBRARY_PATH"
-    # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
-  - python3 -m helics
-  - python3 -m pytest -sv ../tests/python_helics
 
 notifications:
     email: false

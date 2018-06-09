@@ -16,7 +16,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (recorder_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (recorder_tests, *utf::label("apps"))
 
 BOOST_AUTO_TEST_CASE (simple_recorder_test)
 {

@@ -11,7 +11,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/FilterInfo.hpp"
 #include "helics/core/SubscriptionInfo.hpp"
 
-BOOST_AUTO_TEST_SUITE (InfoClass_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (InfoClass_tests, *utf::label("core"))
 
 BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 {

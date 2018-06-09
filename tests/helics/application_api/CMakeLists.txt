@@ -19,7 +19,6 @@ ValueFederateTestTemplates.hpp
 )
 
 set(application_api_test_sources
-${key_test_files}
 ValueConverterTests.cpp
 application-api-tests.cpp
 data_viewTests.cpp
@@ -38,40 +37,22 @@ heat-transfer-tests.cpp
 ValueFederateExtendedTests.cpp
 )
 
-#  QUICK API TESTS
-
-add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
+add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers} ${key_test_files} ${extended_test_sources})
 target_link_libraries(application-api-tests helics-static helics_test_base)
 
-#  KEY TESTS
-add_executable(key-tests key-tests.cpp ${key_test_files} ${application_api_test_headers})
-target_link_libraries(key-tests helics-static helics_test_base)
-
-
-#  EXTENDED TESTS
-add_executable(extended-api-tests ${application_api_test_sources} ${extended_test_sources} ${application_api_test_headers})
-
-target_link_libraries(extended-api-tests helics-static helics_test_base)
-
-set_target_properties (application-api-tests extended-api-tests key-tests PROPERTIES FOLDER tests)
+set_target_properties (application-api-tests PROPERTIES FOLDER tests)
 
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
 
 target_compile_definitions(application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-target_compile_definitions(extended-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
-target_compile_definitions(extended-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
-
-target_compile_definitions(extended-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
-target_compile_definitions(key-tests PRIVATE "-DKEY_TESTS")
+add_test(NAME key-tests COMMAND application-api-tests --run_test=@key --log_level=message --report_level=short)
+add_test(NAME application-api-tests COMMAND application-api-tests --run_test=!extended --log_level=message --report_level=short)
 
-add_test(NAME key-tests COMMAND key-tests --log_level=message --report_level=short)
-add_test(NAME application-api-tests COMMAND application-api-tests --log_level=message --report_level=short)
-
-add_test(NAME extended-api-tests COMMAND extended-api-tests --log_level=message --report_level=short)
+add_test(NAME extended-api-tests COMMAND application-api-tests --log_level=message --report_level=short)
 
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

@@ -15,9 +15,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  */
 #include "helics/application_api/HelicsPrimaryTypes.hpp"
 
+namespace utf = boost::unit_test;
+
 using namespace std::string_literals;
 using namespace helics;
-BOOST_AUTO_TEST_SUITE (type_conversion_tests)
+BOOST_AUTO_TEST_SUITE (type_conversion_tests, *utf::label("key") *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 template <class T1, class T2>
 bool checkTypeConversion1 (const T1 &val1, const T2 &exp)

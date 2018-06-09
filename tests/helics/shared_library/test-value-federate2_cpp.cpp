@@ -16,10 +16,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value converters and some of the other functions
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *utf::label("shared_library"))
+
 // const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/

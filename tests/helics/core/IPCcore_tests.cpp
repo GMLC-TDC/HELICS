@@ -23,7 +23,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 //#include "boost/process.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (IPCCore_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label("core"))
 
 using helics::Core;
 

@@ -18,7 +18,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (combo_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (combo_tests, *utf::label("apps"))
 
 // this is the same as another test in test recorders
 BOOST_AUTO_TEST_CASE (save_load_file1)

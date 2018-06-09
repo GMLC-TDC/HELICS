@@ -16,12 +16,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../src/helics/cpp98/MessageFederate.hpp"
 // these test cases test out the message federates
-
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture_cpp)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
-
+BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture_cpp, *utf::label("shared_library"))
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)

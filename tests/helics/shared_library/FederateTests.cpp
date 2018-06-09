@@ -15,7 +15,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** these test cases test out the value converters
  */
 
-BOOST_AUTO_TEST_SUITE (federate_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (federate_tests, *utf::label("shared_library"))
 
 BOOST_AUTO_TEST_CASE (federate_initialize_tests)
 {

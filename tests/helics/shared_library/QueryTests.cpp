@@ -10,12 +10,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
+
+BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture, *utf::label("shared_library"))
 
 /** test simple creation and destruction*/
 #if ENABLE_TEST_TIMEOUTS > 0

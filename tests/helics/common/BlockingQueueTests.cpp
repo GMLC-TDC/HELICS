@@ -16,7 +16,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/common/BlockingQueue.hpp"
 //#include "helics/common/blocking_queue.h"
 
-BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (blocking_queue_tests, *utf::label("common"))
 
 /** test basic operations */
 BOOST_AUTO_TEST_CASE (basic_tests)

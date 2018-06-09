@@ -19,6 +19,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <thread>
 
+namespace utf = boost::unit_test;
+
 static helics::Barrier barrier (4);
 
 void simA (std::shared_ptr<helics::Core> core, const std::string &NAME)
@@ -105,7 +107,7 @@ void simB (std::shared_ptr<helics::Core> core, const std::string &NAME)
     core->finalize (id);
 }
 
-BOOST_AUTO_TEST_SUITE (Node_Core_tests, *boost::unit_test::disabled ())
+BOOST_AUTO_TEST_SUITE (Node_Core_tests, *utf::label("core") *utf::disabled ())
 
 BOOST_AUTO_TEST_CASE (TestCore_node_tests)
 {
