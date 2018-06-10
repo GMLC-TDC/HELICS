@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(duplicate_publication_names)
     BOOST_CHECK_THROW(fed2->registerGlobalPublication("testkey", ""), helics::RegistrationFailure);
     fed1->finalize();
     fed2->finalize();
-
+    broker->disconnect();
 }
 
 
@@ -182,6 +182,25 @@ BOOST_AUTO_TEST_CASE(duplicate_endpoint_names2)
     fed1->registerGlobalEndpoint("testEpt");
     fed2->registerGlobalEndpoint("testEpt");
 
+    BOOST_CHECK_THROW(fed2->enterInitializationState(), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(missing_required_pub)
+{
+    auto broker = AddBroker("test", 2);
+     
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "");
+    fed2->registerRequiredSubscription("abcd","");
+    fed1->enterInitializationStateAsync();
     BOOST_CHECK_THROW(fed2->enterInitializationState(), helics::RegistrationFailure);
     fed1->finalize();
     fed2->finalize();

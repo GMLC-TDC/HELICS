@@ -738,7 +738,10 @@ BasicHandleInfo *CommonCore::createBasicHandle (federate_id_t global_federateId,
     return handles.modify ([&](auto &hand) {
         auto hndl = hand.addHandle (global_federateId, HandleType, key, type, units);
         hndl->local_fed_id = local_federateId;
-        hndl->flag = required;
+    if (required)
+    {
+        setActionFlag(*handle, required_flag);
+    }
         return hndl;
     });
 }
@@ -851,7 +854,7 @@ handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::str
     if (pub->local_fed_id != federateID)
     {
         return invalid_handle;
-    }
+        }
     return pub->handle;
 }
 
@@ -890,8 +893,8 @@ const std::string &CommonCore::getType (handle_id_t handle) const
             {
                 if (!subInfo->pubType.empty())
                 {
-                    return subInfo->pubType;
-                }
+            return subInfo->pubType;
+        }
             }
         }
         return handleInfo->type;
@@ -1036,7 +1039,7 @@ handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string
     if (ept->local_fed_id != federateID)
     {
         return invalid_handle;
-    }
+        }
     return ept->handle;
 }
 
@@ -1084,6 +1087,8 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
+        setActionFlag(*ept, has_source_filter_flag);
+        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1124,7 +1129,7 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
       createBasicHandle (global_broker_id, 0, handle_type_t::source_filter, filterName, source, type_in, type_out);
 
     auto id = handle->handle;
-    handle->cloning = true;
+    setActionFlag(*handle, clone_flag);
     auto filtInfo = createSourceFilter (global_broker_id, id, handle->key, source, type_in, type_out,true);
 
     ActionMessage m (CMD_REG_SRC_FILTER);
@@ -1148,6 +1153,8 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
+        setActionFlag(*ept, has_source_filter_flag);
+        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1227,6 +1234,12 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
+        if (checkActionFlag(*ept,has_dest_filter_flag))
+        {
+            throw (RegistrationFailure ("endpoint " + dest + " already has a destination filter"));
+        }
+        setActionFlag(*ept, has_dest_filter_flag);
+        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1266,7 +1279,7 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     auto handle = createBasicHandle (global_broker_id, 0, handle_type_t::destination_filter, filterName, dest,
                                      type_in, type_out);
 
-    handle->cloning = true;
+    setActionFlag(*handle, clone_flag);
     auto id = handle->handle;
 
     auto filtInfo = createDestFilter (global_broker_id, id, handle->key, dest, type_in, type_out,true);
@@ -1291,6 +1304,9 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     {
         auto endhandle = ept->handle;
         auto endid = ept->fed_id;
+
+        setActionFlag(*ept, has_dest_filter_flag);
+        lock.unlock ();
         setActionFlag (m, processing_complete_flag);
         // send to broker and core
         addActionMessage (m);
@@ -1516,7 +1532,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
             return;
         }
         // now we deal with local processing
-        if (localP->hasDestFilter)
+        if (checkActionFlag(*localP,has_dest_filter_flag))
         {
             auto ffunc = getFilterCoordinator (localP->handle);
             if (ffunc->destFilter != nullptr)
@@ -1540,17 +1556,17 @@ void CommonCore::deliverMessage (ActionMessage &message)
                     routeMessage (std::move (message));
                     return;
                 }
-                // the filter is part of this core
-                auto tempMessage = createMessageFromCommand (std::move (message));
-                if (ffunc->destFilter->filterOp)
-                {
-                    auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-                    message.moveInfo (std::move (nmessage));
-                }
-                else
-                {
-                    message.moveInfo (std::move (tempMessage));
-                }
+                    // the filter is part of this core
+                    auto tempMessage = createMessageFromCommand (std::move (message));
+                    if (ffunc->destFilter->filterOp)
+                    {
+                        auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
+                        message.moveInfo (std::move (nmessage));
+                    }
+                    else
+                    {
+                        message.moveInfo (std::move (tempMessage));
+                    }
             }
             // now go to the cloning filters
             for (auto &clFilter : ffunc->cloningDestFilters)
@@ -2443,7 +2459,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         auto endhandle = getHandleInfo (command.dest_handle);
         if (endhandle != nullptr)
         {
-            endhandle->hasSourceFilter = true;
+            setActionFlag(*endhandle, has_source_filter_flag);
         }
 
         processFilterInfo (command);
@@ -2573,7 +2589,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             auto endhandle = getHandleInfo (command.dest_handle);
             if (endhandle != nullptr)
             {
-                endhandle->hasDestFilter = true;
+                setActionFlag(*endhandle, has_dest_filter_flag);
                 if ((!checkActionFlag (command, clone_flag)) && (filterInfo->hasDestFilters))
                 {
                     // duplicate non cloning destination filters are not allowed
@@ -2627,7 +2643,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 newFilter =
                   createSourceFilter (command.source_id, command.source_handle, command.name,
                                       command.info ().target, command.info ().type, command.info ().type_out, checkActionFlag(command, clone_flag));
-            }
+                }
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
         }
@@ -2894,7 +2910,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         {
             auto logFunction = stx::any_cast<std::function<void(int, const std::string &, const std::string &)>> (std::move(*op));
             setLoggerFunction(std::move(logFunction));
-        }
+    }
         
     }
     break;
@@ -3079,7 +3095,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
     {
         return m;
     }
-    if (handle->hasSourceFilter)
+    if (checkActionFlag(*handle,has_source_filter_flag))
     {
         auto filtFunc = getFilterCoordinator (handle->handle);
         if (filtFunc->hasSourceFilters)
