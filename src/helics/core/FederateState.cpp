@@ -10,11 +10,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PublicationInfo.hpp"
 #include "SubscriptionInfo.hpp"
 #include "TimeCoordinator.hpp"
-
+#include "queryHelpers.hpp"
 #include <algorithm>
 #include <chrono>
 #include <thread>
 
+#include "MessageTimer.hpp"
 #include "helics/helics-config.h"
 #include <boost/foreach.hpp>
 
@@ -65,14 +66,16 @@ static const std::string nullStr;
 
 namespace helics
 {
-FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
+FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
+    : name (name_), logLevel (info_.logLevel)
 {
     state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> (info_);
     timeCoord->setMessageSender ([this](const ActionMessage &msg) { routeMessage (msg); });
-
-    logLevel = info_.logLevel;
-    interfaceInformation.setChangeUpdateFlag(info_.only_update_on_change);
+    rt_lag = info_.rt_lag;
+    rt_lead = info_.rt_lead;
+    realtime = info_.realtime;
+    interfaceInformation.setChangeUpdateFlag (info_.only_update_on_change);
     only_transmit_on_change = info_.only_transmit_on_change;
 }
 
@@ -113,7 +116,7 @@ void FederateState::setState (federate_state_t newState)
 void FederateState::reset ()
 {
     global_id = invalid_fed_id;
-    interfaceInformation.setGlobalId(invalid_fed_id);
+    interfaceInformation.setGlobalId (invalid_fed_id);
     local_id = invalid_fed_id;
     state = HELICS_CREATED;
     queue.clear ();
@@ -156,7 +159,6 @@ void FederateState::updateFederateInfo (const ActionMessage &cmd)
     }
 }
 
-
 bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len)
 {
     if (!only_transmit_on_change)
@@ -182,7 +184,7 @@ uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
 uint64_t FederateState::getQueueSize () const
 {
     uint64_t cnt = 0;
-    for (const auto &end_point : interfaceInformation.getEndpoints() )
+    for (const auto &end_point : interfaceInformation.getEndpoints ())
     {
         cnt += end_point->queueSize (time_granted);
     }
@@ -203,7 +205,7 @@ std::unique_ptr<Message> FederateState::receiveAny (Core::handle_id_t &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
-    auto elock = interfaceInformation.getEndpoints();
+    auto elock = interfaceInformation.getEndpoints ();
     // Find the end point with the earliest message time
     for (auto &end_point : elock)
     {
@@ -351,7 +353,7 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
 
         addAction (exec);
-       
+
         auto ret = processQueue ();
         if (ret == iteration_state::next_step)
         {
@@ -379,9 +381,19 @@ iteration_result FederateState::enterExecutingState (iteration_request iterate)
         }
 
         processing = false;
+        if ((realtime) && (ret == iteration_state::next_step))
+        {
+            if (!mTimer)
+            {
+                mTimer = std::make_shared<MessageTimer> (
+                  [this](ActionMessage &&mess) { return this->addAction (std::move (mess)); });
+            }
+            start_clock_time = std::chrono::steady_clock::now ();
+        }
         return static_cast<iteration_result> (ret);
     }
-
+    // the following code is for situation which this has been called multiple times, which really shouldn't be
+    // done but it isn't really an error so we need to deal with it.
     while (!processing.compare_exchange_weak (expected, true))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -436,7 +448,34 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         addAction (treq);
         LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
-
+        if ((realtime) && (rt_lag < Time::maxVal ()))
+        {
+            auto current_clock_time = std::chrono::steady_clock::now ();
+            auto timegap = current_clock_time - start_clock_time;
+            auto current_lead = (nextTime + rt_lag).to_ns () - timegap;
+            if (current_lead > std::chrono::milliseconds (0))
+            {
+                ActionMessage tforce (CMD_FORCE_TIME_GRANT);
+                tforce.source_id = global_id;
+                tforce.actionTime = nextTime;
+                if (realTimeTimerIndex < 0)
+                {
+                    realTimeTimerIndex = mTimer->addTimer (current_clock_time + current_lead, std::move (tforce));
+                }
+                else
+                {
+                    mTimer->updateTimer (realTimeTimerIndex, current_clock_time + current_lead,
+                                         std::move (tforce));
+                }
+            }
+            else
+            {
+                ActionMessage tforce (CMD_FORCE_TIME_GRANT);
+                tforce.source_id = global_id;
+                tforce.actionTime = nextTime;
+                addAction (tforce);
+            }
+        }
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
@@ -471,6 +510,27 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
             break;
         }
+        if (realtime)
+        {
+            if (rt_lag < Time::maxVal ())
+            {
+                mTimer->cancelTimer (realTimeTimerIndex);
+            }
+            if (ret == iteration_state::next_step)
+            {
+                auto current_clock_time = std::chrono::steady_clock::now ();
+                auto timegap = current_clock_time - start_clock_time;
+                if (time_granted - Time (timegap) > rt_lead)
+                {
+                    auto current_lead = (time_granted - rt_lead).to_ns () - timegap;
+                    if (current_lead > std::chrono::milliseconds (5))
+                    {
+                        std::this_thread::sleep_for (current_lead);
+                    }
+                }
+            }
+        }
+
         processing = false;
         return retTime;
     }
@@ -497,7 +557,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 void FederateState::fillEventVectorUpTo (Time currentTime)
 {
     events.clear ();
-    for (auto &sub : interfaceInformation.getSubscriptions())
+    for (auto &sub : interfaceInformation.getSubscriptions ())
     {
         bool updated = sub->updateTimeUpTo (currentTime);
         if (updated)
@@ -510,7 +570,7 @@ void FederateState::fillEventVectorUpTo (Time currentTime)
 void FederateState::fillEventVectorInclusive (Time currentTime)
 {
     events.clear ();
-    for (auto &sub : interfaceInformation.getSubscriptions())
+    for (auto &sub : interfaceInformation.getSubscriptions ())
     {
         bool updated = sub->updateTimeInclusive (currentTime);
         if (updated)
@@ -523,7 +583,7 @@ void FederateState::fillEventVectorInclusive (Time currentTime)
 void FederateState::fillEventVectorNextIteration (Time currentTime)
 {
     events.clear ();
-    for (auto &sub : interfaceInformation.getSubscriptions())
+    for (auto &sub : interfaceInformation.getSubscriptions ())
     {
         bool updated = sub->updateTimeNextIteration (currentTime);
         if (updated)
@@ -674,13 +734,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             {
                 if (state == HELICS_INITIALIZING)
                 {
-                    cmd.setAction(CMD_EXEC_CHECK);
-                    return processActionMessage(cmd);
+                    cmd.setAction (CMD_EXEC_CHECK);
+                    return processActionMessage (cmd);
                 }
                 else if (state == HELICS_EXECUTING)
                 {
-                    cmd.setAction(CMD_TIME_CHECK);
-                    return processActionMessage(cmd);
+                    cmd.setAction (CMD_TIME_CHECK);
+                    return processActionMessage (cmd);
                 }
             }
         }
@@ -706,13 +766,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
-            auto ret = processDelayQueue();
+            auto ret = processDelayQueue ();
             if (ret != iteration_state::continue_processing)
             {
                 return ret;
             }
-            cmd.setAction(CMD_EXEC_CHECK);
-            return processActionMessage(cmd);
+            cmd.setAction (CMD_EXEC_CHECK);
+            return processActionMessage (cmd);
         }
         FALLTHROUGH
         /* FALLTHROUGH */
@@ -819,13 +879,13 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             }
             timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
-            auto ret=processDelayQueue ();
+            auto ret = processDelayQueue ();
             if (ret != iteration_state::continue_processing)
             {
                 return ret;
             }
-            cmd.setAction(CMD_TIME_CHECK);
-            return processActionMessage(cmd);
+            cmd.setAction (CMD_TIME_CHECK);
+            return processActionMessage (cmd);
         }
         FALLTHROUGH
         /* FALLTHROUGH */
@@ -842,7 +902,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             break;
         }
         FALLTHROUGH
-       /* FALLTHROUGH */
+        /* FALLTHROUGH */
     case CMD_TIME_CHECK:
     {
         if (state != HELICS_EXECUTING)
@@ -863,6 +923,19 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
     }
     break;
+    case CMD_FORCE_TIME_GRANT:
+    {
+        if (cmd.actionTime < time_granted)
+        {
+            break;
+        }
+        timeCoord->processTimeMessage (cmd);
+        time_granted = timeCoord->getGrantedTime ();
+        allowed_send_time = timeCoord->allowedSendTime ();
+        LOG_WARNING (std::string ("forced Granted Time=") + std::to_string (time_granted));
+        timeGranted_mode = true;
+        return iteration_state::next_step;
+    }
     case CMD_SEND_MESSAGE:
     {
         auto epi = interfaceInformation.getEndpoint (cmd.dest_handle);
@@ -893,9 +966,9 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
-        if (cmd.payload.empty())
+        if (cmd.payload.empty ())
         {
-            errorString = commandErrorString(cmd.index);
+            errorString = commandErrorString (cmd.index);
         }
         else
         {
@@ -948,7 +1021,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
 
         break;
-   
+
     case CMD_FED_ACK:
         if (state != HELICS_CREATED)
         {
@@ -959,17 +1032,17 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             if (checkActionFlag (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
-                errorString = commandErrorString(cmd.index);
+                errorString = commandErrorString (cmd.index);
                 return iteration_state::error;
             }
             global_id = cmd.dest_id;
-            interfaceInformation.setGlobalId(cmd.dest_id);
+            interfaceInformation.setGlobalId (cmd.dest_id);
             timeCoord->source_id = global_id;
             return iteration_state::next_step;
         }
         break;
     case CMD_FED_CONFIGURE:
-        processConfigUpdate(cmd);
+        processConfigUpdate (cmd);
         break;
     }
     return iteration_state::continue_processing;
@@ -983,6 +1056,12 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
     case UPDATE_LOG_LEVEL:
         logLevel = static_cast<int> (m.dest_id);
         break;
+    case UPDATE_RTLAG:
+        rt_lag = m.actionTime;
+        break;
+    case UPDATE_RTLEAD:
+        rt_lead = m.actionTime;
+        break;
     case UPDATE_FLAG:
         switch (m.dest_id)
         {
@@ -990,7 +1069,10 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
             only_transmit_on_change = checkActionFlag (m, indicator_flag);
             break;
         case ONLY_UPDATE_ON_CHANGE_FLAG:
-            interfaceInformation.setChangeUpdateFlag(checkActionFlag (m, indicator_flag));
+            interfaceInformation.setChangeUpdateFlag (checkActionFlag (m, indicator_flag));
+            break;
+        case REALTIME_FLAG:
+            realtime = checkActionFlag (m, indicator_flag);
             break;
         default:
             break;
@@ -1014,7 +1096,7 @@ void FederateState::addDependent (Core::federate_id_t fedThatDependsOnThis)
 Time FederateState::nextValueTime () const
 {
     auto firstValueTime = Time::maxVal ();
-    for (auto &sub : interfaceInformation.getSubscriptions())
+    for (auto &sub : interfaceInformation.getSubscriptions ())
     {
         auto nvt = sub->nextValueTime ();
         if (nvt >= time_granted)
@@ -1032,7 +1114,7 @@ Time FederateState::nextValueTime () const
 Time FederateState::nextMessageTime () const
 {
     auto firstMessageTime = Time::maxVal ();
-    for (auto &ep : interfaceInformation.getEndpoints())
+    for (auto &ep : interfaceInformation.getEndpoints ())
     {
         auto messageTime = ep->firstMessageTime ();
         if (messageTime >= time_granted)
@@ -1067,45 +1149,11 @@ std::string FederateState::processQuery (const std::string &query) const
 {
     if (query == "publications")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            for (auto &pub : interfaceInformation.getPublications())
-            {
-                ret.append (pub->key);
-                ret.push_back (';');
-            }
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
+        return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
     }
     if (query == "endpoints")
     {
-        std::string ret;
-        ret.push_back ('[');
-        {
-            for (auto &ept : interfaceInformation.getEndpoints())
-            {
-                ret.append (ept->key);
-                ret.push_back (';');
-            }
-        }
-        if (ret.size () > 1)
-        {
-            ret.back () = ']';
-        }
-        else
-        {
-            ret.push_back (']');
-        }
-        return ret;
+        return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
     }
     if (queryCallback)
     {
