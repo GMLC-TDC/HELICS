@@ -26,10 +26,10 @@ enum class handle_type_t : char
 /** define extra flag definitions*/
 enum handle_flag_definitions
 {
-    mapped_flag = 13,
-    has_source_filter_flag = 14,
-    has_dest_filter_flag = 15,
-
+    mapped_flag = extra_flag1,
+    has_source_filter_flag = 13,
+    has_dest_filter_flag = 14,
+    has_non_cloning_dest_filter_flag=15
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -68,10 +68,9 @@ class BasicHandleInfo
     const Core::federate_id_t fed_id = invalid_fed_id;  //!< the global federate id for the creator of the handle
     Core::federate_id_t local_fed_id = invalid_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
-    uint16_t flags = 0; //!< flags corresponding to the flags used in ActionMessages +some extra ones
-    bool hasNonCloningDestFilter = false; //!< indicator that and endpoint has a non-cloning dest filter
     bool used = false;  //!< indicator that the publication or filter is used
-    // 4 byte hole here
+    uint16_t flags = 0; //!< flags corresponding to the flags used in ActionMessages +some extra ones
+
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
