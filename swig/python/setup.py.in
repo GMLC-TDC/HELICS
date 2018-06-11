@@ -27,8 +27,8 @@ else:
     extra_compile_args = ['-std=c++11']
 
 HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${PROJECT_BINARY_DIR}'))
-HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "src/helics/shared_api_library/")))
-HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "src/helics/shared_api_library/")))
+HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../src/helics/shared_api_library/")))
+HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_LIB", os.path.join(HELICS_INSTALL, "src/helics/shared_api_library/")))
 HELICS_ADDITIONAL_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "src/helics/shared_api_library/")))
 ZMQ_INCLUDE_DIR = os.path.abspath(os.getenv("ZMQ_INCLUDE", '${ZMQ_INCLUDE_DIR}'))
 ZMQ_LIB_DIR = os.path.abspath(os.getenv("ZMQ_LIB", '${ZMQ_LIB_DIR}'))
