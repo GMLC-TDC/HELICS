@@ -21,7 +21,7 @@ namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE (federate_tests, *utf::label("daily") *utf::label("release"))
 
-BOOST_AUTO_TEST_CASE (federate_initialize_tests)
+BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE (federate_initialize_tests)
     Fed = nullptr;  // force the destructor
 }
 
-BOOST_AUTO_TEST_CASE (federate_time_step_tests)
+BOOST_AUTO_TEST_CASE (federate_time_step_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -66,7 +66,6 @@ BOOST_AUTO_TEST_CASE (federate_time_step_tests)
     BOOST_CHECK_EQUAL (res, 3.0);
 }
 
-#ifndef QUICK_TESTS_ONLY
 BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 {
     auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "1");
@@ -115,9 +114,8 @@ BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> (fi), helics::RegistrationFailure);
 }
-#endif
 
-BOOST_AUTO_TEST_CASE (federate_multiple_federates)
+BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label("ci"))
 {
     helics::FederateInfo fi ("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -169,7 +167,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates)
 }
 
 /** the same as the previous test except with multiple cores and a single broker*/
-BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
+BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label("ci"))
 {
     helics::FederateInfo fi ("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -220,7 +218,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores)
     Fed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls)
+BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label("ci"))
 {
     helics::FederateInfo fi ("fed1");
     fi.coreType = CORE_TYPE_TO_TEST;

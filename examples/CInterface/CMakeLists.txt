@@ -81,7 +81,7 @@ if (BUILD_HELICS_EXAMPLES AND BUILD_HELICS_TESTS AND NOT MSVC)
              COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:nonlings_fed1> $<TARGET_FILE:nonlings_fed2>)
     add_test(NAME hello_world_example
              COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:hello_world_sender> $<TARGET_FILE:hello_world_receiver>)
-    set_tests_properties(pi_example pi_example2 nonlings_example hello_world_example PROPERTIES LABELS Examples)
+    set_property(TEST pi_example pi_example2 nonlings_example hello_world_example PROPERTY LABELS Examples Continuous)
 endif()
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

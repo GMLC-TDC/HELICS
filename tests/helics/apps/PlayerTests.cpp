@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (player_tests, *utf::label("apps"))
+BOOST_AUTO_TEST_SUITE (player_tests, *utf::label("daily") *utf::label("release"))
 
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {

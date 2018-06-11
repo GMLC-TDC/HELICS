@@ -28,9 +28,18 @@ TimeTests.cpp
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers} )
 target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
+set_target_properties (common-tests PROPERTIES FOLDER tests)
 
 add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
-set_target_properties (common-tests PROPERTIES FOLDER tests)
+set_property(TEST common-tests PROPERTY LABELS Common)
+
+# Tests for Continuous, Daily, and Release builds
+add_test(NAME common-ci-tests COMMAND common-tests --run_test=@ci --log_level=message --report_level=short)
+add_test(NAME common-daily-tests COMMAND common-tests --run_test=@daily --log_level=message --report_level=short)
+add_test(NAME common-release-tests COMMAND common-tetss --run_test=@release --log_level=message --report_level=short)
+set_property(TEST common-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST common-daily-tests PROPERTY LABELS Daily)
+set_property(TEST common-release-tests PROPERTY LABELS Release)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build event to core tests

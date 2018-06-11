@@ -19,7 +19,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (filter_tests_cpp, FederateTestFixture, *utf::label("shared_library"))
+BOOST_FIXTURE_TEST_SUITE (filter_tests_cpp, FederateTestFixture, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 /** test registration of filters*/
 

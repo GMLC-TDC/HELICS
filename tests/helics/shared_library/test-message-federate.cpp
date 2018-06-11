@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture, *utf::label("shared_library"))
+BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)

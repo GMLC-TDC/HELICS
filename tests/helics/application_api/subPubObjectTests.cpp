@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE (subPubObject_tests, *utf::label("daily") *utf::label("rel
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
+BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests)
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -158,7 +158,7 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
 #define SKIPTEST
 #endif
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests, *utf::label("ci"))
 {
     SKIPTEST runPubSubTypeTests<std::string, std::string> ("test1", "test1");
     runPubSubTypeTests<std::string, double> ("3.14159", 3.14159);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests)
     SKIPTEST runPubSubTypeTests<helics::named_point, int64_t> ({std::string (), -3.14159}, -3);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests, *utf::label("ci"))
 {
     runPubSubTypeTests<bool, int64_t> (true, 1);
     runPubSubTypeTests<bool, std::string> (true, "1");
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests)
     SKIPTEST runPubSubTypeTests<helics::named_point, bool> ({"0", std::nan ("0")}, false);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests, *utf::label("ci"))
 {
     using c = std::complex<double>;
 
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests)
     SKIPTEST runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests, *utf::label("ci"))
 {
     using v = std::vector<double>;
     using c = std::complex<double>;
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, v> (56, v{56});
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
+BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests, *utf::label("ci"))
 {
     using v = std::vector<double>;
     using c = std::complex<double>;
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests)
     SKIPTEST runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests)
+BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests)
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests)
+BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests)
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests)
+BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;

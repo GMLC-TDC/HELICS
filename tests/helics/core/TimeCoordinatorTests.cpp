@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (timeCoord_tests, *utf::label("core"))
+BOOST_AUTO_TEST_SUITE (timeCoord_tests, *utf::label("daily") *utf::label("release"))
 using namespace helics;
 
 BOOST_AUTO_TEST_CASE (dependency_tests)

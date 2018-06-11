@@ -17,7 +17,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture, *utf::label("shared_library"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 // const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 

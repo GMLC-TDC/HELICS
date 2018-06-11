@@ -18,11 +18,11 @@ using namespace std::string_literals;
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture, *utf::label("shared_library"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type, *utf::label("ci"))
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
@@ -39,7 +39,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
     BOOST_CHECK (state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
@@ -79,7 +79,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     BOOST_CHECK (state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
@@ -118,7 +118,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     BOOST_CHECK (state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
@@ -165,7 +165,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
                       bdata::make (core_types_single),
-                      core_type)
+                      core_type,
+                      *utf::label("ci"))
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);

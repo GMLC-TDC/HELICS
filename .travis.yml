@@ -184,23 +184,7 @@ script:
     # - echo "$HELICS_DEPENDENCY_FLAGS"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
-  # For controlling which tests get run:
-  # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = common_tests
-  # 2 = core tests
-  # 3 = key_tests
-  # 4 = application api tests
-  # 5 = extended_api tests
-  # 6 = shared_library tests
-  # 7 = helics-apps tests
-  - ctest --verbose --timeout 220 -I 0,0,0,1
-  # - ctest --verbose --timeout 120 -I 0,0,0,2
-  - ctest --verbose --timeout 240 -I 0,0,0,6
-  # - ctest --verbose --timeout 240 -I 0,0,0,7
-  - ctest --verbose --timeout 200 -I 0,0,0,3
-  - ctest --verbose -L Java
-  - ctest --verbose -L Python
-  - ctest -L Examples
+  - ctest -L Continuous
 
 notifications:
     email: false

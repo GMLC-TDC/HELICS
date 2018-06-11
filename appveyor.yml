@@ -35,19 +35,10 @@ after_build:
 
 test_script:
   - cd build
-  # For controlling which tests get run:
-  # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = common_tests
-  # 2 = core tests
-  # 3 = key_tests
-  # 4 = application api tests
-  # 5 = extended_api tests
-  # 6 = shared_library tests
-  # 7 = helics-apps tests
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,2
-  - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,8
+  - ctest -C Release --verbose --timeout 120 -L Common
+  - ctest -C Release --verbose --timeout 120 -L Core
+  - ctest -C Release --verbose --timeout 240 -L ApplicationApi
+  - ctest -C Release --verbose --timeout 120 -L HelicsApps
   - ctest --verbose -L Java
   - cd ..
 

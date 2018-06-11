@@ -44,16 +44,21 @@ set_target_properties (application-api-tests PROPERTIES FOLDER tests)
 
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
-
 target_compile_definitions(application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
-
 target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
-add_test(NAME key-tests COMMAND application-api-tests --run_test=@key --log_level=message --report_level=short)
+add_test(NAME key-api-tests COMMAND application-api-tests --run_test=@key --log_level=message --report_level=short)
 add_test(NAME application-api-tests COMMAND application-api-tests --run_test=!extended --log_level=message --report_level=short)
-
 add_test(NAME extended-api-tests COMMAND application-api-tests --log_level=message --report_level=short)
+set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi)
 
+# Tests for Continous, Daily, and Release builds
+add_test(NAME application-api-ci-tests COMMAND application-api-tests --run_test=@ci --log_level=message --report_level=short)
+add_test(NAME application-api-daily-tests COMMAND application-api-tests --run_test=@daily --log_level=message --report_level=short)
+add_test(NAME application-api-release-tests COMMAND application-api-tests --run_test=@release --log_level=message --report_level=short)
+set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST application-api-daily-tests PROPERTY LABELS Daily)
+set_property(TEST application-api-release-tests PROPERTY LABELS Release)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET application-api-tests POST_BUILD        # Adds a post-build event to api tests

@@ -27,10 +27,19 @@ target_link_libraries(helics_apps-tests helics_apps-static helics_test_base)
 
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
-add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
-
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
+
+add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
+set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps)
+
+# Tests for Continous, Daily, and Release builds
+add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --run_test=@ci --log_level=test_suite --report_level=short)
+add_test(NAME helics_apps-daily-tests COMMAND helics_apps-tests --run_test=@daily --log_level=test_suite --report_level=short)
+add_test(NAME helics_apps-release-tests COMMAND helics_apps-tests --run_test=@release --log_level=test_suite --report_level=short)
+set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST helics_apps-daily-tests PROPERTY LABELS Daily)
+set_property(TEST helics_apps-release-tests PROPERTY LABELS Release)
 
 IF(WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

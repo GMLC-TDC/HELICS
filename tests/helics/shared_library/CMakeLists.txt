@@ -59,6 +59,21 @@ target_compile_definitions(shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAK
 
 add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_level=test_suite --report_level=short)
 
+set_property(TEST shared-library-tests shared-library-tests-cpp PROPERTY LABELS SharedLibrary)
+
+# Tests used for Continuous, Daily, and Release builds
+add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --run_test=@ci --log_level=message --report_level=short)
+add_test(NAME shared-library-daily-tests COMMAND shared-library-tests --run_test=@daily --log_level=message --report_level=short)
+add_test(NAME shared-library-release-tests COMMAND shared-library-tests --run_test=@release --log_level=message --report_level=short)
+
+add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp --run_test=@ci --log_level=test_suite --report_level=short)
+add_test(NAME shared-library-daily-tests-cpp COMMAND shared-library-tests-cpp --run_test=@daily --log_level=test_suite --report_level=short)
+add_test(NAME shared-library-release-tests-cpp COMMAND shared-library-tests-cpp --run_test=@release --log_level=test_suite --report_level=short)
+
+set_property(TEST shared-library-ci-tests shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
+set_property(TEST shared-library-daily-tests shared-library-daily-tests-cpp PROPERTY LABELS Daily)
+set_property(TEST shared-library-release-tests shared-library-release-tests-cpp PROPERTY LABELS Release)
+
 if (WIN32)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

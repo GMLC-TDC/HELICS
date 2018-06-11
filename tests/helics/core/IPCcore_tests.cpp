@@ -25,7 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label("core"))
+BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label("daily") *utf::label("release"))
 
 using helics::Core;
 

@@ -14,4 +14,4 @@ add_test(NAME python_message_filter_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/s
 
 add_test(NAME python_value_federate_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/swig/python COMMAND ${PYTHON_EXECUTABLE} -m pytest ${CMAKE_CURRENT_SOURCE_DIR}/test_value_federate.py)
 
-set_tests_properties(python_basic_test python_message_federate_test python_message_filter_test python_value_federate_test PROPERTIES LABELS Python)
+set_property(TEST python_basic_test python_message_federate_test python_message_filter_test python_value_federate_test PROPERTY LABELS Python Continuous Daily Release)
