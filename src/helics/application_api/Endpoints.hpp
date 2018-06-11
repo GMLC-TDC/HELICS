@@ -27,16 +27,28 @@ class Endpoint
     @param[in] name the name of the endpoint
     @param[in] type a named type associated with the endpoint
     */
+    Endpoint(MessageFederate *mFed, const std::string &name, const std::string &type = std::string());
+    /**constructor to build an endpoint object
+    @param[in] mFed  the MessageFederate to use
+    @param[in] name the name of the endpoint
+    @param[in] type a named type associated with the endpoint
+    */
     template <class FedPtr>
-    Endpoint (FedPtr mFed, const std::string &name, const std::string &type = std::string ())
-        : fed (std::addressof (*mFed))
+    Endpoint (FedPtr &mFed, const std::string &name, const std::string &type = std::string ())
+        : Endpoint (std::addressof (*mFed),name,type)
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
                        "first argument must be a pointer to a MessageFederate");
-        id = fed->registerEndpoint (name, type);
-        actualName = fed->getEndpointName (id);
     }
-
+    /**constructor to build an endpoint object
+    @param[in] mFed  the MessageFederate to use
+    @param[in] name the name of the endpoint
+    @param[in] type a named type associated with the endpoint
+    */
+    Endpoint(interface_visibility locality,
+        MessageFederate *mFed,
+        const std::string &name,
+        const std::string &type = std::string());
     /**constructor to build an endpoint object
     @param[in] mFed  the MessageFederate to use
     @param[in] name the name of the endpoint
@@ -44,15 +56,13 @@ class Endpoint
     */
     template <class FedPtr>
     Endpoint (interface_visibility locality,
-              FedPtr mFed,
+              FedPtr &mFed,
               const std::string &name,
               const std::string &type = std::string ())
-        : fed (std::addressof (*mFed))
+        : Endpoint (locality,std::addressof (*mFed),name,type)
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
                        "second argument must be a pointer to a MessageFederate");
-        id = (locality == GLOBAL) ? fed->registerGlobalEndpoint (name, type) : fed->registerEndpoint (name, type);
-        actualName = fed->getEndpointName (id);
     }
     /** generate an endpoint from a MessageFederate pointer and an endpoint index
      */

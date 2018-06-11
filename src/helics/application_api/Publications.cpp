@@ -9,6 +9,48 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+PublicationBase::PublicationBase(ValueFederate *valueFed,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units)
+    : fed(valueFed), key_(key), type_(type), units_(units)
+{
+    try
+    {
+        id = fed->registerPublication(key_, type_, units_);
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getPublicationId(key_);
+        loadFromId();
+    }
+}
+
+PublicationBase::PublicationBase(interface_visibility locality,
+    ValueFederate *valueFed,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units)
+    : fed(valueFed), key_(key), type_(type), units_(units)
+{
+    try
+    {
+        if (locality == GLOBAL)
+        {
+            id = fed->registerGlobalPublication(key, type, units);
+        }
+        else
+        {
+            id = fed->registerPublication(key, type, units);
+        }
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getPublicationId(key_);
+        loadFromId();
+    }
+}
+
 PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (valueFed)
 {
     auto cnt = fed->getPublicationCount ();

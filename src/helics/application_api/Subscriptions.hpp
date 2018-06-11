@@ -25,36 +25,53 @@ class SubscriptionBase
   public:
     SubscriptionBase () = default;
 
+    SubscriptionBase(ValueFederate *valueFed,
+        const std::string &key,
+        const std::string &type = "def",
+        const std::string &units = std::string())
+        : fed(valueFed), key_(key), type_(type), units_(units)
+    {
+        id = fed->registerRequiredSubscription(key_, type_, units_);
+    }
+
     template <class FedPtr>
-    SubscriptionBase (FedPtr valueFed,
+    SubscriptionBase (FedPtr & valueFed,
                       const std::string &key,
                       const std::string &type = "def",
                       const std::string &units = std::string ())
-        : fed (std::addressof (*valueFed)), key_ (key), type_ (type), units_ (units)
+        : SubscriptionBase(std::addressof (*valueFed),key,type,units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
-        id = fed->registerRequiredSubscription (key_, type_, units_);
+    }
+
+    SubscriptionBase(interface_availability required,
+        ValueFederate *valueFed,
+        const std::string &key,
+        const std::string &type = "def",
+        const std::string &units = std::string())
+        : fed(valueFed), key_(key), type_(type), units_(units)
+    {
+        if (required == interface_availability::required)
+        {
+            id = fed->registerRequiredSubscription(key_, type_, units_);
+        }
+        else
+        {
+            id = fed->registerOptionalSubscription(key_, type_, units_);
+        }
     }
 
     template <class FedPtr>
     SubscriptionBase (interface_availability required,
-                      FedPtr valueFed,
+        FedPtr & valueFed,
                       const std::string &key,
                       const std::string &type = "def",
                       const std::string &units = std::string ())
-        : fed (std::addressof (*valueFed)), key_ (key), type_ (type), units_ (units)
+        : SubscriptionBase (required, std::addressof (*valueFed), key, type,units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "second argument must be a pointer to a ValueFederate");
-        if (required == interface_availability::required)
-        {
-            id = fed->registerRequiredSubscription (key_, type_, units_);
-        }
-        else
-        {
-            id = fed->registerOptionalSubscription (key_, type_, units_);
-        }
     }
 
     SubscriptionBase (ValueFederate *valueFed, int subIndex);
@@ -110,32 +127,62 @@ class Subscription : public SubscriptionBase
     double delta = -1.0;  //!< the minimum difference
   public:
     Subscription () = default;
+    Subscription(ValueFederate *valueFed, const std::string &key, const std::string &units = std::string())
+        : SubscriptionBase(valueFed, key, "def", units)
+    {
+    }
+
     template <class FedPtr>
-    Subscription (FedPtr valueFed, const std::string &key, const std::string &units = std::string ())
+    Subscription (FedPtr & valueFed, const std::string &key, const std::string &units = std::string ())
         : SubscriptionBase (valueFed, key, "def", units)
+    {
+    }
+
+    Subscription(interface_availability required,
+        ValueFederate *valueFed,
+        const std::string &key,
+        const std::string &units = std::string())
+        : SubscriptionBase(required, valueFed, key, "def", units)
     {
     }
 
     template <class FedPtr>
     Subscription (interface_availability required,
-                  FedPtr valueFed,
+                  FedPtr &valueFed,
                   const std::string &key,
                   const std::string &units = std::string ())
         : SubscriptionBase (required, valueFed, key, "def", units)
     {
     }
 
+    Subscription(ValueFederate *valueFed,
+        const std::string &key,
+        helics_type_t defType,
+        const std::string &units = std::string())
+        : SubscriptionBase(valueFed, key, typeNameStringRef(defType), units)
+    {
+    }
+
     template <class FedPtr>
-    Subscription (FedPtr valueFed,
+    Subscription (FedPtr &valueFed,
                   const std::string &key,
                   helics_type_t defType,
                   const std::string &units = std::string ())
         : SubscriptionBase (valueFed, key, typeNameStringRef (defType), units)
     {
     }
+
+    Subscription(interface_availability required,
+        ValueFederate *valueFed,
+        const std::string &key,
+        helics_type_t defType,
+        const std::string &units = std::string())
+        : SubscriptionBase(required, valueFed, key, typeNameStringRef(defType), units)
+    {
+    }
     template <class FedPtr>
     Subscription (interface_availability required,
-                  ValueFederate *valueFed,
+                  FedPtr &valueFed,
                   const std::string &key,
                   helics_type_t defType,
                   const std::string &units = std::string ())
@@ -312,9 +359,31 @@ class SubscriptionT : public SubscriptionBase
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
+    SubscriptionT(ValueFederate *valueFed, const std::string &name, const std::string &units = std::string())
+        : SubscriptionBase(valueFed, name, ValueConverter<X>::type(), units)
+    {
+    }
+    /**constructor to build a subscription object
+    @param[in] valueFed  the ValueFederate to use
+    @param[in] name the name of the subscription
+    @param[in] units the units associated with a Federate
+    */
     template <class FedPtr>
-    SubscriptionT (FedPtr valueFed, const std::string &name, const std::string &units = std::string ())
+    SubscriptionT (FedPtr &valueFed, const std::string &name, const std::string &units = std::string ())
         : SubscriptionBase (valueFed, name, ValueConverter<X>::type (), units)
+    {
+    }
+    /**constructor to build a subscription object
+    @param[in] required a flag indicating that the subscription is required to have a matching publication
+    @param[in] valueFed  the ValueFederate to use
+    @param[in] name the name of the subscription
+    @param[in] units the units associated with a Federate
+    */
+    SubscriptionT(interface_availability required,
+        ValueFederate *valueFed,
+        const std::string &name,
+        const std::string &units = "")
+        : SubscriptionBase(required, valueFed, name, ValueConverter<X>::type(), units)
     {
     }
     /**constructor to build a subscription object
