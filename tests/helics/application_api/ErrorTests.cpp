@@ -30,6 +30,7 @@ BOOST_AUTO_TEST_CASE (duplicate_federate_names)
     auto Fed = std::make_shared<helics::Federate> (fi);
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> (fi), helics::RegistrationFailure);
+    Fed->finalize();
 }
 
 BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
