@@ -27,3 +27,6 @@ helics::Time loadJsonTime (const Json_helics::Value &timeElement, timeUnits defa
 
 /** get a name or key from the element*/
 std::string getKey (const Json_helics::Value &Element);
+
+/** generate a Json String*/
+std::string generateJsonString(const Json_helics::Value &block);

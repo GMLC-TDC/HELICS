@@ -31,6 +31,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DelayedObjects.hpp"
 #include "fmt_wrapper.h"
+#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
@@ -78,6 +79,7 @@ bool CommonCore::connect ()
                 ActionMessage m (CMD_REG_BROKER);
                 m.name = getIdentifier ();
                 m.info ().target = getAddress ();
+                setActionFlag(m, core_flag);
                 transmit (0, m);
                 brokerState = broker_state_t::connected;
             }
@@ -1844,6 +1846,55 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     {
         return getAddress();
     }
+    if (queryStr == "federate_map")
+    {
+        Json_helics::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = static_cast<int> (global_broker_id);
+        block["parent"] = static_cast<int> (global_broker_id);
+        block["federates"] = Json_helics::arrayValue;
+        for (auto fed : loopFederates)
+        {
+            Json_helics::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load();
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
+    }
+    if (queryStr == "dependency_graph")
+    {
+        Json_helics::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = static_cast<int> (global_broker_id);
+        block["parent"] = static_cast<int> (global_broker_id);
+        block["federates"] = Json_helics::arrayValue;
+        block["dependents"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependents())
+        {
+            block["dependents"].append(dep);
+        }
+        block["dependencies"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependencies())
+        {
+            block["dependencies"].append(dep);
+        }
+        for (auto fed : loopFederates)
+        {
+            Json_helics::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load();
+            fedBlock["dependencies"] = Json_helics::arrayValue;
+           
+            fedBlock["dependents"] = Json_helics::arrayValue;
+            for (auto &dep : fed->getDependents())
+            {
+                fedBlock["dependents"].append(dep);
+            }
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
+    }
     return "#invalid";
 }
 
@@ -2025,7 +2076,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
                 queryResp.source_id = global_broker_id;
                 queryResp.index = command.index;
                 queryResp.payload = std::move(repStr);
-
+                queryResp.counter = command.counter;
                 transmit(getRoute(queryResp.dest_id), queryResp);
             }
         }
@@ -2041,6 +2092,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         queryResp.dest_id = command.source_id;
         queryResp.source_id = command.dest_id;
         queryResp.index = command.index;
+        queryResp.counter = command.counter;
         if (command.info ().target == getIdentifier ())
         {
             queryResp.source_id = global_broker_id;
@@ -2053,7 +2105,6 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
 
         queryResp.payload = std::move(repStr);
-
         transmit (getRoute (queryResp.dest_id), queryResp);
     }
     break;

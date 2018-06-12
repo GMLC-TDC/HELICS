@@ -211,7 +211,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.back ().route_id = getRoute (command.source_id);
             _brokers.back ()._nonLocal = true;
         }
-
+        _brokers.back()._core = checkActionFlag(command, core_flag);
         if (!_isRoot)
         {
             if (global_broker_id != 0)
@@ -341,7 +341,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     case CMD_QUERY_REPLY:
         if (command.dest_id == global_broker_id)
         {
-
+            processQueryResponse(command);
         }
         else
         {
@@ -1415,7 +1415,7 @@ void CoreBroker::initializeFederateMap ()
             {
                 index = fedMap.generatePlaceHolder("brokers");
             }
-            queryReq.index = fedMap.generatePlaceHolder("cores");
+            queryReq.index = index;
             queryReq.dest_id = broker.global_id;
             transmit(broker.route_id, queryReq);
         }
@@ -1475,6 +1475,7 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
 {
     ActionMessage queryRep (CMD_QUERY_REPLY);
     queryRep.source_id = global_broker_id;
+    queryRep.dest_id = m.source_id;
     queryRep.index = m.index;
     queryRep.payload = generateQueryAnswer (m.payload);
     queryRep.counter = m.counter;
@@ -1548,10 +1549,44 @@ void CoreBroker::processQueryResponse(const ActionMessage &m)
         ActiveQueries.setDelayedValue(m.index, m.payload);
         break;
     case 2:
-        fedMap.addComponent(m.payload, m.index);
+        if (fedMap.addComponent(m.payload, m.index))
+        {
+            if (fedMapRequestors.size() == 1)
+            {
+                fedMapRequestors.front().payload = fedMap.generate();
+                routeMessage(fedMapRequestors.front());
+            }
+            else
+            {
+                auto str = fedMap.generate();
+                for (auto &resp : fedMapRequestors)
+                {
+                    resp.payload = str;
+                    routeMessage(resp);
+                }
+            }
+            fedMapRequestors.clear();
+        }
         break;
     case 4:
-        depMap.addComponent(m.payload, m.index);
+        if (depMap.addComponent(m.payload, m.index))
+        {
+            if (depMapRequestors.size() == 1)
+            {
+                depMapRequestors.front().payload = depMap.generate();
+                routeMessage(depMapRequestors.front());
+            }
+            else
+            {
+                auto str = depMap.generate();
+                for (auto &resp : depMapRequestors)
+                {
+                    resp.payload = str;
+                    routeMessage(resp);
+                }
+            }
+            depMapRequestors.clear();
+        }
         break;
     }
 }

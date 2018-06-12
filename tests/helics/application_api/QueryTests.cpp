@@ -14,10 +14,7 @@ BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
 
-
-
 /** test simple creation and destruction*/
-
 
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
@@ -55,7 +52,6 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     helics::cleanupHelicsLibrary ();
 }
 
-
 BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2);
@@ -77,7 +73,6 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     vFed2->finalize ();
     helics::cleanupHelicsLibrary ();
 }
-
 
 BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
 {
@@ -107,19 +102,19 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE(test_federate_map)
+BOOST_AUTO_TEST_CASE (test_federate_map)
 {
-    SetupTest<helics::ValueFederate>("test2", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    auto core = vFed1->getCorePointer();
-    auto res = core->query("root", "federate_map");
-    vFed1->enterInitializationStateAsync();
-    vFed2->enterInitializationState();
-    vFed1->enterInitializationStateComplete();
+    SetupTest<helics::ValueFederate> ("test2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+    auto core = vFed1->getCorePointer ();
+    auto res = core->query ("root", "federate_map");
+    vFed1->enterInitializationStateAsync ();
+    vFed2->enterInitializationState ();
+    vFed1->enterInitializationStateComplete ();
     core = nullptr;
-    vFed1->finalize();
-    vFed2->finalize();
-    helics::cleanupHelicsLibrary();
+    vFed1->finalize ();
+    vFed2->finalize ();
+    helics::cleanupHelicsLibrary ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

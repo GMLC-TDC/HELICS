@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include <atomic>
@@ -92,13 +91,13 @@ class CoreBroker : public Broker, public BrokerBase
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, int32_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
-    std::mutex name_mutex_;  // mutex lock for name and identifier
-    std::atomic<int> queryCounter{ 0 };
-    DelayedObjects<std::string> ActiveQueries;
-    JsonMapBuilder fedMap;
-    std::vector<ActionMessage> fedMapRequestors;
-    JsonMapBuilder depMap;
-    std::vector<ActionMessage> depMapRequestors;
+    std::mutex name_mutex_;  //!< mutex lock for name and identifier
+    std::atomic<int> queryCounter{ 1 }; //counter for active queries going to the local API
+    DelayedObjects<std::string> ActiveQueries;  //!< holder for 
+    JsonMapBuilder fedMap; //!< builder for the federate_map 
+    std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
+    JsonMapBuilder depMap; //!< builder for the dependency graph
+    std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
 
   private:
     /** function that processes all the messages

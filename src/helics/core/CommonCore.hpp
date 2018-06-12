@@ -308,15 +308,14 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
-    std::atomic<int> queryCounter{0};
-    DelayedObjects<std::string> ActiveQueries;
+    std::atomic<int> queryCounter{1}; //counter for queries start at 1 so the default value isn't used
+    DelayedObjects<std::string> ActiveQueries; //holder for active queries
 
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
     shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
                             fed_handle_pair>> filters;  //!< storage for all the filters
-   // mutable std::mutex
-   //   _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
+
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
 

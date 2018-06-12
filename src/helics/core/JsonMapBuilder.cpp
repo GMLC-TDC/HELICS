@@ -27,7 +27,7 @@ namespace helics
 
     int JsonMapBuilder::generatePlaceHolder(const std::string &location)
     {
-        int index = static_cast<int>(missing_components.size());
+        int index = static_cast<int>(missing_components.size())+2;
         missing_components.emplace(index, location);
         return index;
     }
@@ -50,13 +50,7 @@ namespace helics
     {
         if (jMap)
         {
-            Json_helics::StreamWriterBuilder builder;
-            builder["commentStyle"] = "None";
-            builder["indentation"] = "   ";  // or whatever you like
-            auto writer(builder.newStreamWriter());
-            std::stringstream sstr;
-            writer->write(*jMap, &sstr);
-            return sstr.str();
+            return generateJsonString(*jMap);
         }
         return "{}";
     }

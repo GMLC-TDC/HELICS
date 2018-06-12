@@ -94,3 +94,15 @@ std::string getKey (const Json_helics::Value &element)
              element["key"].asString () :
              ((element.isMember ("name")) ? element["name"].asString () : std::string ());
 }
+
+
+std::string generateJsonString(const Json_helics::Value &block)
+{
+    Json_helics::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "   ";  // or whatever you like
+    auto writer(builder.newStreamWriter());
+    std::stringstream sstr;
+    writer->write(block, &sstr);
+    return sstr.str();
+}
