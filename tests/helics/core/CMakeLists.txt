@@ -49,7 +49,7 @@ target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
-set_property(TEST core-tests PROPERTY Core)
+set_property(TEST core-tests PROPERTY LABELS Core)
 
 # Tests for Continuous, Daily, and Release builds
 add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=message --report_level=short)

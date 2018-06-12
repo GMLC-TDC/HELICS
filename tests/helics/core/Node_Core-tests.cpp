@@ -107,7 +107,7 @@ void simB (std::shared_ptr<helics::Core> core, const std::string &NAME)
     core->finalize (id);
 }
 
-BOOST_AUTO_TEST_SUITE (Node_Core_tests, *utf::label("daily") *utf::label("release") *utf::disabled ())
+BOOST_AUTO_TEST_SUITE (Node_Core_tests, *utf::label("ci") *utf::label("daily") *utf::label("release") *utf::disabled ())
 
 BOOST_AUTO_TEST_CASE (TestCore_node_tests)
 {

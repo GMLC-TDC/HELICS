@@ -184,7 +184,9 @@ script:
     # - echo "$HELICS_DEPENDENCY_FLAGS"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
-  - ctest --output-on-failure -L Continuous
+  - ctest --output-on-failure -L Common
+  - ctest --output-on-failure -L SharedLibrary
+  - ctest --output-on-failure -L KeyApi
 
 notifications:
     email: false

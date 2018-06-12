@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("daily") *utf::label("release"))
+BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 #if HELICS_HAVE_ZEROMQ
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
