@@ -415,9 +415,9 @@ void Federate::setLoggingCallback (
 
 void Federate::setFlag (int flag, bool flagValue)
 {
-    if ((flag > 10) || (flag < 0))
+    if ((flag > 12) || (flag < 0))
     {
-        throw (InvalidParameter ("flag must be between 0 and 10"));
+        throw (InvalidParameter ("flag must be between 0 and 12"));
     }
     switch (flag)
     {

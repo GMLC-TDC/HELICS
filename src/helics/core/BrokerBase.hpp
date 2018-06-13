@@ -3,14 +3,14 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
+#pragma once
 /**
 @file
 virtual base class for object that function like a broker includes common parameters
 and some common methods used cores and brokers
 */
 
-#pragma once
+
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
 #include "federate_id.hpp"
