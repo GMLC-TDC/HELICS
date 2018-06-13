@@ -118,8 +118,8 @@ def test_value_federate_publisher_registration(vFed):
     # BOOST_CHECK_EQUAL(tmp, "V");
 
 def test_value_federate_subscription_registration(vFed):
-    subid1 = h.helicsFederateRegisterSubscription(vFed, "sub1", "double", "V")
-    subid2 = h.helicsFederateRegisterTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
+    subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V")
+    subid2 = h.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
     subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "double", "V")
     h.helicsFederateEnterExecutionMode(vFed)
 

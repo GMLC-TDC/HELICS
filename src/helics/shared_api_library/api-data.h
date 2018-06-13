@@ -22,6 +22,7 @@ extern "C" {
 typedef enum {
 
     helics_ok = 0, /*!< the function executed successfully */
+    helics_registration_failure,  /*!< registration has failed*/
     helics_invalid_object, /*!< indicator that the object used was not a valid object */
     helics_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
     helics_discard, /*!< the input was discarded and not used for some reason */

@@ -238,7 +238,7 @@ class CoreBroker : public Broker, public BrokerBase
     void addEndpoint (ActionMessage &m);
     void addDestFilter (ActionMessage &m);
     void addSourceFilter (ActionMessage &m);
-    bool updateSourceFilterOperator (ActionMessage &m);
+ //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a json string containing the federate/broker/Core Map*/
     void initializeFederateMap ();
     /** generate a json string containing the dependency information for all federation object*/
