@@ -30,7 +30,7 @@ static inline std::string gen_id ()
     std::string nm = std::string(21, ' ');
     std::random_device rd;     // only used once to initialize (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-    std::uniform_int_distribution<int> uni(0, 62); // guaranteed unbiased
+    std::uniform_int_distribution<int> uni(0, 61); // guaranteed unbiased
 
     nm[10] = '-';
     for (int i = 0; i<21; i++) {
