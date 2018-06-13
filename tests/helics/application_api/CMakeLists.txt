@@ -48,7 +48,7 @@ target_compile_definitions(application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_C
 target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
 add_test(NAME key-api-tests COMMAND application-api-tests --run_test=@key --log_level=message --report_level=short)
-add_test(NAME application-api-tests COMMAND application-api-tests --run_test='!@extended' --log_level=message --report_level=short)
+add_test(NAME application-api-tests COMMAND application-api-tests --run_test=!@extended --log_level=message --report_level=short)
 add_test(NAME extended-api-tests COMMAND application-api-tests --log_level=message --report_level=short)
 set_property(TEST key-api-tests PROPERTY LABELS KeyApi)
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi)

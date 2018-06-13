@@ -62,7 +62,7 @@ add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_le
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary)
 # Setting a different label, because the test fixture for the C++ shared library tests doesn't work
 # push_back for vector causes a segfault for unknown reasons (Boost UTF related?)
-set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp
+set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp)
 
 # Tests used for Continuous, Daily, and Release builds
 add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --run_test=@ci --log_level=message --report_level=short)
