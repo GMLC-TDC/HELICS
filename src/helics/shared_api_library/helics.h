@@ -132,10 +132,8 @@ must still be active in the process
 @return NULL if no fed is available by that name otherwise a helics_federate with that name*/
 HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName);
 
-/** get the network address associated with a broker
-@param broker the broker to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
+/** disconnect a broker
+@param broker the broker to disconnect
 @return a helics_status enumeration indicating any error condition
 */
 HELICS_EXPORT helics_status helicsBrokerDisconnect (helics_broker broker);
@@ -259,6 +257,17 @@ HELICS_EXPORT helics_status helicsFederateInfoSetCoreType (helics_federate_info_
 is not recognized
 */
 HELICS_EXPORT helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value);
+
+/** set the separator charactor in the info structure
+@details the separator character is the separation charactor for local publications/endpoints in creating their global name
+for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
+@param fi the federate info object to alter
+@param separator the character to use as a separator
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+is not recognized
+*/
+HELICS_EXPORT helics_status helicsFederateInfoSetSeparator(helics_federate_info_t fi, char separator);
+
 /** set the output delay for a federate
 @param fi the federate info object to alter
 @param outputDelay the desired output delay of the federate
@@ -504,6 +513,17 @@ HELICS_EXPORT helics_status helicsFederateSetPeriod (helics_federate fed, helics
 @param flagValue the new value of the flag 0 for false !=0 for true
 */
 HELICS_EXPORT helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_t flagValue);
+
+/** set the separator charactor in the info structure
+@details the separator character is the separation charactor for local publications/endpoints in creating their global name
+for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
+@param fi the federate info object to alter
+@param separator the character to use as a separator
+@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+is not recognized
+*/
+HELICS_EXPORT helics_status helicsFederateSetSeparator(helics_federate fed, char separator);
+
 /**  set the logging level for the federate
 @ details debug and trace only do anything if they were enabled in the compilation
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
@@ -535,9 +555,27 @@ HELICS_EXPORT helics_query helicsCreateQuery (const char *target, const char *qu
 @param query the query object to use in the query
 @param fed a federate to send the query through
 @return a pointer to a string.  the string will remain valid until the query is freed or executed again
-the return will be nullptr if fed or query is an invalid object
+the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
 */
 HELICS_EXPORT const char *helicsQueryExecute (helics_query query, helics_federate fed);
+
+/** Execute a query directly on a core
+@details the call will block until the query finishes which may require communication or other delays
+@param query the query object to use in the query
+@param core the core to send the query to
+@return a pointer to a string.  the string will remain valid until the query is freed or executed again
+the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+*/
+HELICS_EXPORT const char *helicsQueryCoreExecute(helics_query query, helics_core core);
+
+/** Execute a query directly on a broker
+@details the call will block until the query finishes which may require communication or other delays
+@param query the query object to use in the query
+@param broker the broker to send the query to
+@return a pointer to a string.  the string will remain valid until the query is freed or executed again
+the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+*/
+HELICS_EXPORT const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker);
 
 /** Execute a query in a non-blocking call
 @param query the query object to use in the query

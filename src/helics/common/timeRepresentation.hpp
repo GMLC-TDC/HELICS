@@ -1,6 +1,6 @@
 /*
  * LLNS Copyright Start
- * Copyright (c) 2017, Lawrence Livermore National Security
+ * Copyright (c) 2014-2018, Lawrence Livermore National Security
  * This work was performed under the auspices of the U.S. Department
  * of Energy by Lawrence Livermore National Laboratory in part under
  * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
@@ -342,10 +342,13 @@ class TimeRepresentation
 #ifdef _DEBUG
     /** normal time constructor from a double representation of seconds*/
     constexpr TimeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)), dtime_ (t) {}
-    TimeRepresentation (std::int64_t count, timeUnits units) noexcept
-        : timecode_ (Tconv::fromCount (count, units)){DOUBLETIME} TimeRepresentation (
+    TimeRepresentation(std::int64_t count, timeUnits units) noexcept
+        : timecode_(Tconv::fromCount(count, units)) {
+        DOUBLETIME
+    };
+    TimeRepresentation (
             std::chrono::nanoseconds nsTime) noexcept
-        : timecode (Tconv::convert (nsTime))
+        : timecode_ (Tconv::convert (nsTime))
     {
         DOUBLETIME
     }
@@ -400,7 +403,7 @@ class TimeRepresentation
         return *this;
     }
     /** direct conversion to chrono nanoseconds*/
-    operator std::chrono::nanoseconds ()
+    std::chrono::nanoseconds to_ns() const
     {
         return std::chrono::nanoseconds (Tconv::toCount (timecode_, timeUnits::ns));
     }

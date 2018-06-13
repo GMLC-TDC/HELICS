@@ -17,23 +17,34 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
+#include "fmt_wrapper.h"
+#include <random>
 #include <boost/program_options.hpp>
-#include <boost/uuid/uuid.hpp>  // uuid class
-#include <boost/uuid/uuid_generators.hpp>  // generators
-#include <boost/uuid/uuid_io.hpp>  // streaming operators etc.
+
+
+
+static constexpr auto chars= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 static inline std::string gen_id ()
 {
-    boost::uuids::uuid uuid = boost::uuids::random_generator () ();
-    std::string uuid_str = boost::lexical_cast<std::string> (uuid);
+    std::string nm = std::string(21, ' ');
+    std::random_device rd;     // only used once to initialize (seed) engine
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni(0, 61); // guaranteed unbiased
+
+    nm[10] = '-';
+    for (int i = 0; i<21; i++) {
+        if (i != 10)
+        {
+            nm[i] = chars[uni(rng)];
+        }
+    }
 #ifdef _WIN32
     std::string pid_str = std::to_string (GetCurrentProcessId ());
 #else
     std::string pid_str = std::to_string (getpid ());
 #endif
-    return pid_str + "-" + uuid_str;
+    return pid_str + "-" + nm;
 }
 
 namespace helics
@@ -329,9 +340,8 @@ void BrokerBase::queueProcessingLoop ()
             for (auto &act : dumpMessages)
             {
                 sendToLogger (0, -10, identifier,
-                              (boost::format ("|| dl cmd:%s from %d to %d") % prettyPrintString (act) %
-                               act.source_id % act.dest_id)
-                                .str ());
+                              fmt::format ("|| dl cmd:{} from {} to {}", prettyPrintString (act),
+                               act.source_id, act.dest_id));
             }
         }
     };

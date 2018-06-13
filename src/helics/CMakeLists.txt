@@ -4,6 +4,7 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
+
 add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
@@ -11,6 +12,7 @@ add_subdirectory(application_api)
 # -------------------------------------------------------------
 # Add the main HELICS library
 # -------------------------------------------------------------
+
 
 add_library(helics-static STATIC
     $<TARGET_OBJECTS:application_api>

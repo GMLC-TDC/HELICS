@@ -23,8 +23,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (defHnd.fed_id, helics::invalid_fed_id);
     BOOST_CHECK_EQUAL (defHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK (defHnd.handle_type==helics::handle_type_t::unknown);
-    BOOST_CHECK_EQUAL (defHnd.flag, false);
-    BOOST_CHECK_EQUAL (defHnd.hasDestFilter, false);
+    BOOST_CHECK_EQUAL (defHnd.flags, 0);
     BOOST_CHECK (defHnd.key.empty ());
     BOOST_CHECK (defHnd.type.empty ());
     BOOST_CHECK (defHnd.units.empty ());
@@ -36,8 +35,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (hnd1.fed_id, 15);
     BOOST_CHECK_EQUAL (hnd1.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK(hnd1.handle_type==helics::handle_type_t::endpoint);
-    BOOST_CHECK_EQUAL (hnd1.flag, false);
-    BOOST_CHECK_EQUAL (hnd1.hasDestFilter, false);
+    BOOST_CHECK_EQUAL(hnd1.flags, 0);
     BOOST_CHECK_EQUAL(hnd1.key,"key");
     BOOST_CHECK_EQUAL(hnd1.type,"type");
     BOOST_CHECK_EQUAL(hnd1.units,"units");
@@ -49,7 +47,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (hnd2.fed_id, 1500);
     BOOST_CHECK_EQUAL (hnd2.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK (hnd2.handle_type==helics::handle_type_t::endpoint);
-    BOOST_CHECK_EQUAL (hnd2.hasDestFilter, false);
+    BOOST_CHECK_EQUAL(hnd1.flags, 0);
     BOOST_CHECK_EQUAL(hnd2.key,"key");
     BOOST_CHECK_EQUAL(hnd2.type,"type");
     BOOST_CHECK_EQUAL(hnd2.units,"units");
@@ -65,8 +63,7 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (srcFiltHnd.fed_id, 2);
     BOOST_CHECK_EQUAL (srcFiltHnd.local_fed_id, helics::invalid_fed_id);
     BOOST_CHECK(srcFiltHnd.handle_type==helics::handle_type_t::source_filter);
-    BOOST_CHECK_EQUAL (srcFiltHnd.flag, false);
-    BOOST_CHECK_EQUAL (srcFiltHnd.hasDestFilter, false);
+    BOOST_CHECK_EQUAL(hnd1.flags, 0);
     BOOST_CHECK_EQUAL(srcFiltHnd.key,"key");
     BOOST_CHECK_EQUAL(srcFiltHnd.type_in,"type_in");
     BOOST_CHECK_EQUAL(srcFiltHnd.type_out,"type_out");

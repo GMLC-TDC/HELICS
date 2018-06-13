@@ -29,6 +29,7 @@ iterationTests.cpp
 subPubObjectTests.cpp
 ValueFederateAdditionalTests.cpp
 ErrorTests.cpp
+federateRealTimeTests.cpp
 )
 
 set(extended_test_sources

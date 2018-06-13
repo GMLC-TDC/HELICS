@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -32,6 +32,7 @@ BOOST_AUTO_TEST_CASE (duplicate_federate_names)
     auto Fed = std::make_shared<helics::Federate> (fi);
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> (fi), helics::RegistrationFailure);
+    Fed->finalize();
 }
 
 BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
@@ -77,4 +78,135 @@ BOOST_AUTO_TEST_CASE(already_init_core)
 
 }
 
+
+BOOST_AUTO_TEST_CASE(duplicate_publication_names)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 2, broker, 1.0, "fed");
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("testkey", "");
+    BOOST_CHECK_THROW(fed2->registerGlobalPublication("testkey", ""), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+
+BOOST_AUTO_TEST_CASE(duplicate_publication_names2)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+   
+    fed1->registerGlobalPublication("testkey", "");
+    fed2->registerGlobalPublication("testkey", "");
+
+    BOOST_CHECK_THROW(fed2->enterInitializationState(), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(duplicate_publication_names3)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    fed1->registerPublication("testkey", "");
+
+    BOOST_CHECK_THROW(fed1->registerPublication("testkey", ""), helics::RegistrationFailure);
+    fed1->finalize();
+    broker->disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(duplicate_publication_names4)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto pubid=fed1->registerPublication("testkey", "");
+    //these two publications should publish to the same thing
+    helics::Publication pub(fed1,"testkey",helics::helics_type_t::helicsDouble);
+    helics::Publication pub2(fed1,pubid);
+
+    helics::Subscription sub(fed1,fed1->getPublicationKey(pubid)); 
+    fed1->enterExecutionState();
+    fed1->publish(pubid, 45.7);
+    fed1->requestTime(1.0);
+    auto res = sub.getValue<double>();
+    BOOST_CHECK_EQUAL(res, 45.7);
+    pub.publish(99.2);
+
+    fed1->requestTime(2.0);
+    res = sub.getValue<double>();
+    BOOST_CHECK_EQUAL(res, 99.2);
+    pub2.publish(103.8);
+
+    fed1->requestTime(3.0);
+    res = sub.getValue<double>();
+    BOOST_CHECK_EQUAL(res, 103.8);
+    fed1->finalize();
+    broker->disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(duplicate_endpoint_names)
+{
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::MessageFederate>("test", 2, broker, 1.0, "fed");
+    auto fed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto fed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    fed1->registerGlobalEndpoint("testEpt");
+    BOOST_CHECK_THROW(fed2->registerGlobalEndpoint("testEpt"), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+
+BOOST_AUTO_TEST_CASE(duplicate_endpoint_names2)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto fed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    fed1->registerGlobalEndpoint("testEpt");
+    fed2->registerGlobalEndpoint("testEpt");
+
+    BOOST_CHECK_THROW(fed2->enterInitializationState(), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
+BOOST_AUTO_TEST_CASE(missing_required_pub)
+{
+    auto broker = AddBroker("test", 2);
+     
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("t1", "");
+    fed2->registerRequiredSubscription("abcd","");
+    fed1->enterInitializationStateAsync();
+    BOOST_CHECK_THROW(fed2->enterInitializationState(), helics::RegistrationFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
 BOOST_AUTO_TEST_SUITE_END ()

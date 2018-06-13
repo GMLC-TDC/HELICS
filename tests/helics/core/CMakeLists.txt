@@ -19,6 +19,7 @@ FederateState-tests.cpp
 ActionMessage-tests.cpp
 #CoreBroker-tests.cpp
 CoreFactory-tests.cpp
+MessageTimerTests.cpp
 #CommonCore-tests.cpp
 TestCore-tests.cpp
 Node_Core-tests.cpp

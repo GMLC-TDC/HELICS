@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
 #include "../common/AirLock.hpp"
+#include "../common/DelayedObjects.hpp"
 #include "helics_includes/any.hpp"
 #include "HandlePointerManager.hpp"
 #include <atomic>
@@ -285,6 +286,8 @@ class CommonCore : public Core, public BrokerBase
     bool checkForLocalPublication (ActionMessage &cmd);
     /** get an index for an airlock*/
     uint16_t getNextAirlockIndex();
+    /** generate results for core queries*/
+    std::string coreQuery(const std::string &queryStr) const;
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -305,13 +308,14 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
-    std::atomic<int> queryCounter{0};
+    std::atomic<int> queryCounter{1}; //counter for queries start at 1 so the default value isn't used
+    DelayedObjects<std::string> ActiveQueries; //holder for active queries
+
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
     shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
                             fed_handle_pair>> filters;  //!< storage for all the filters
-   // mutable std::mutex
-   //   _handlemutex;  //!< mutex protecting the publications, subscription, endpoint and filter structures
+
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
 
@@ -365,7 +369,7 @@ class CommonCore : public Core, public BrokerBase
     @param federateID the identifier for the federate to query
     @param queryStr  the string containing the actual query
     */
-    std::string federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const;
+    std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);

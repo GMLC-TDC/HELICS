@@ -303,7 +303,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
-    auto doc = loadJsonString(jsonFile);
+    auto doc = loadJson(jsonFile);
 
 
     if (doc.isMember("player"))

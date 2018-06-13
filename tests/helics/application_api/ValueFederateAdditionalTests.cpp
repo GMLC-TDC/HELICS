@@ -109,8 +109,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    auto subid = vFed1->registerRequiredSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerRequiredSubscription<int> ("sub2");
+    auto subid = vFed1->registerOptionalSubscription ("sub1", "double", "V");
+    auto subid2 = vFed1->registerOptionalSubscription<int> ("sub2");
 
     auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
     vFed1->enterExecutionState ();

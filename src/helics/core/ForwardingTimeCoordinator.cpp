@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ForwardingTimeCoordinator.hpp"
 #include "../flag-definitions.h"
 #include <algorithm>
-#include <boost/format.hpp>
+#include "fmt_wrapper.h"
 
 namespace helics
 {
@@ -214,9 +214,8 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
 
 std::string ForwardingTimeCoordinator::printTimeStatus () const
 {
-    return (boost::format (" minDe=%f minminDe=%f") % static_cast<double> (time_minDe) %
-            static_cast<double> (time_minminDe))
-      .str ();
+    return fmt::format (" minDe={} minminDe={}", static_cast<double> (time_minDe),
+            static_cast<double> (time_minminDe));
 }
 
 bool ForwardingTimeCoordinator::isDependency (Core::federate_id_t ofed) const
