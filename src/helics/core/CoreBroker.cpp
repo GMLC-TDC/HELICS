@@ -1455,7 +1455,7 @@ void CoreBroker::initializeDependencyGraph()
         {
             index = fedMap.generatePlaceHolder("brokers");
         }
-        queryReq.index = fedMap.generatePlaceHolder("cores");
+        queryReq.index = index;
         queryReq.dest_id = broker.global_id;
         transmit(broker.route_id, queryReq);
     }
