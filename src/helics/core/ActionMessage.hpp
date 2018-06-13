@@ -117,7 +117,7 @@ class ActionMessage
     @param message the message to move.
     */
     void moveInfo (std::unique_ptr<Message> message);
-
+    /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
     {
@@ -133,7 +133,7 @@ class ActionMessage
             ar (extraInfo);
         }
     }
-
+    /** load the data from an archive*/
     template <class Archive>
     void load (Archive &ar)
     {
@@ -195,21 +195,21 @@ class ActionMessage
 template <class FlagContainer, class FlagIndex>
 inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags |= (decltype (M.flags) (1) << (flag));
+    M.flags |= (static_cast<decltype (M.flags)> (1) << (flag));
 }
 
 /** template function to check a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
 {
-    return ((M.flags & (decltype (M.flags) (1) << (flag))) != 0);
+    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0);
 }
 
 /** template function to clear a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags &= ~(decltype (M.flags) (1) << (flag));
+    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory

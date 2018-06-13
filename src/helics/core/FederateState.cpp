@@ -966,7 +966,15 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
-        errorString = commandErrorString (cmd.index);
+        if (cmd.payload.empty ())
+        {
+            errorString = commandErrorString (cmd.index);
+        }
+        else
+        {
+            errorString = cmd.payload;
+        }
+        errorCode = cmd.counter;
         return iteration_state::error;
     case CMD_REG_PUB:
     {
