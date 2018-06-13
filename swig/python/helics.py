@@ -811,6 +811,10 @@ def helicsFederateInfoSetFlag(fi: 'helics_federate_info_t', flag: 'int', value: 
     """
     return _helics.helicsFederateInfoSetFlag(fi, flag, value)
 
+def helicsFederateInfoSetSeparator(fi: 'helics_federate_info_t', separator: 'char') -> "helics_status":
+    return _helics.helicsFederateInfoSetSeparator(fi, separator)
+helicsFederateInfoSetSeparator = _helics.helicsFederateInfoSetSeparator
+
 def helicsFederateInfoSetOutputDelay(fi: 'helics_federate_info_t', outputDelay: 'helics_time_t') -> "helics_status":
     """
 
@@ -1230,6 +1234,10 @@ def helicsFederateSetFlag(fed: 'helics_federate', flag: 'int', flagValue: 'helic
     """
     return _helics.helicsFederateSetFlag(fed, flag, flagValue)
 
+def helicsFederateSetSeparator(fed: 'helics_federate', separator: 'char') -> "helics_status":
+    return _helics.helicsFederateSetSeparator(fed, separator)
+helicsFederateSetSeparator = _helics.helicsFederateSetSeparator
+
 def helicsFederateSetLoggingLevel(fed: 'helics_federate', loggingLevel: 'int') -> "helics_status":
     """
 
@@ -1303,6 +1311,14 @@ def helicsQueryExecute(query: 'helics_query', fed: 'helics_federate') -> "char c
 
     """
     return _helics.helicsQueryExecute(query, fed)
+
+def helicsQueryCoreExecute(query: 'helics_query', core: 'helics_core') -> "char const *":
+    return _helics.helicsQueryCoreExecute(query, core)
+helicsQueryCoreExecute = _helics.helicsQueryCoreExecute
+
+def helicsQueryBrokerExecute(query: 'helics_query', broker: 'helics_broker') -> "char const *":
+    return _helics.helicsQueryBrokerExecute(query, broker)
+helicsQueryBrokerExecute = _helics.helicsQueryBrokerExecute
 
 def helicsQueryExecuteAsync(query: 'helics_query', fed: 'helics_federate') -> "helics_status":
     """

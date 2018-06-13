@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "Core.hpp"
+#include "ActionMessageDefintions.hpp"
 
 namespace helics
 {
@@ -19,6 +20,15 @@ enum class handle_type_t : char
     source_filter,  //!< handle to a source filter
     destination_filter,  //!< handle to a destination filter
     cloning_filter,  //!< handle for a cloning filter
+};
+
+/** define extra flag definitions*/
+enum handle_flag_definitions
+{
+    mapped_flag = extra_flag1,
+    has_source_filter_flag = extra_flag2,
+    has_dest_filter_flag = extra_flag3,
+    has_non_cloning_dest_filter_flag=extra_flag4
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -56,15 +66,9 @@ class BasicHandleInfo
     const handle_id_t handle;  //!< the identification number for the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
-    bool flag = false;  //!< indicator flag
-    bool processed = false;  //!< indicator if the handle has been processed (subscription or endpoint found)
-    bool mapped = false;
-    bool hasSourceFilter = false;  //!< indicator that an endpoint handle has a source filter
-    bool hasDestFilter = false;  //!< indicator that an endpoint has a destination filter
-    bool hasNonCloningDestFilter = false; //!< indicator that and endpoint has a non-cloning dest filter
     bool used = false;  //!< indicator that the publication or filter is used
-    bool cloning = false;  //!< indicator that the filter is a cloning filter
-    // 4 byte hole here
+    uint16_t flags = 0; //!< flags corresponding to the flags used in ActionMessages +some extra ones
+
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle

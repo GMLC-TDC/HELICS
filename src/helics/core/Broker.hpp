@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include <functional>
@@ -58,5 +57,16 @@ class Broker
     */
     virtual void
     setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
+
+    /** make a query for information from the co-simulation
+    @details the format is somewhat unspecified  target is the name of an object typically one of
+    "federation",  "broker", or the name of a specific object
+    query is a broken
+    @param target the specific target of the query
+    @param queryStr the actual query
+    @return a string containing the response to the query.  Query is a blocking call and will not return until the
+    query is answered so use with caution
+    */
+    virtual std::string query(const std::string &target, const std::string &queryStr) = 0;
 };
 }  // namespace helics

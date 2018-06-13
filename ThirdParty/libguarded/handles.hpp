@@ -168,11 +168,11 @@ public:
     {
         return (data != nullptr);
     }
-    const auto begin() const
+    auto begin() const
     {
         return std::begin(*data);
     }
-    const auto end() const
+    auto end() const
     {
         return std::end(*data);
     }

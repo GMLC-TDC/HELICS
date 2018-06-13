@@ -96,7 +96,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
         eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
     }
 
-    auto doc = loadJsonString (jsonString);
+    auto doc = loadJson (jsonString);
 
     auto tags = doc["tag"];
     if (tags.isArray ())

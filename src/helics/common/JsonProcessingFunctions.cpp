@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -8,13 +7,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "JsonProcessingFunctions.hpp"
 #include <fstream>
 
-Json_helics::Value loadJsonString (const std::string &jsonString)
+Json_helics::Value loadJson (const std::string &jsonString)
 {
+    if (jsonString.size() > 128)
+    {
+        try
+        {
+            return loadJsonStr(jsonString);
+        }
+        catch (const std::invalid_argument &)
+        {
+            //this was an assumption lets try a file now, the same error will be generated again later as well
+        }
+    }
     std::ifstream file (jsonString);
-    Json_helics::Value doc;
+    
 
     if (file.is_open ())
     {
+        Json_helics::Value doc;
         Json_helics::CharReaderBuilder rbuilder;
         std::string errs;
         bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
@@ -22,17 +33,21 @@ Json_helics::Value loadJsonString (const std::string &jsonString)
         {
             throw (std::invalid_argument (errs.c_str ()));
         }
+        return doc;
     }
-    else
+    return loadJsonStr(jsonString);
+}
+
+Json_helics::Value loadJsonStr(const std::string &jsonString)
+{
+    Json_helics::Value doc;
+    Json_helics::CharReaderBuilder rbuilder;
+    std::string errs;
+    std::istringstream jstring(jsonString);
+    bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
+    if (!ok)
     {
-        Json_helics::CharReaderBuilder rbuilder;
-        std::string errs;
-        std::istringstream jstring (jsonString);
-        bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
-        if (!ok)
-        {
-            throw (std::invalid_argument (errs.c_str ()));
-        }
+        throw (std::invalid_argument(errs.c_str()));
     }
     return doc;
 }
@@ -78,4 +93,16 @@ std::string getKey (const Json_helics::Value &element)
     return (element.isMember ("key")) ?
              element["key"].asString () :
              ((element.isMember ("name")) ? element["name"].asString () : std::string ());
+}
+
+
+std::string generateJsonString(const Json_helics::Value &block)
+{
+    Json_helics::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "   ";  // or whatever you like
+    auto writer(builder.newStreamWriter());
+    std::stringstream sstr;
+    writer->write(block, &sstr);
+    return sstr.str();
 }

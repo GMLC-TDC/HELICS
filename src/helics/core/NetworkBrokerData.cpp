@@ -287,7 +287,7 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
     boost::asio::ip::tcp::resolver::query query_server(boost::asio::ip::tcp::v4(), server, "");
     boost::system::error_code ec;
-    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve(query_server,ec);
+    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve(query_server, ec);
     if (ec)
     {
         return getLocalExternalAddressV4();

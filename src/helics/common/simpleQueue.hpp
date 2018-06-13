@@ -142,8 +142,46 @@ class SimpleQueue
             }
         }
     }
-    /** push an element onto the queue
-    val the value to push on the queue
+
+/** push a vector onto the queue
+    val the vector of values to push on the queue
+    */
+    void pushVector (const std::vector<X> &val)  // universal reference
+    {
+        std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
+        if (!pushElements.empty())
+        {
+            pushElements.insert(pushElements.end(), val.begin(), val.end());
+        }
+        else
+        {
+            bool expEmpty = true;
+            if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+            {
+                // release the push lock
+                pushLock.unlock();
+                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+                queueEmptyFlag = false;
+                if (pullElements.empty())
+                {
+                    pullElements.insert(pullElements.end(), val.rbegin(), val.rend());
+                    pullLock.unlock();
+                }
+                else
+                {
+                    pushLock.lock();
+                    pushElements.insert(pushElements.end(), val.begin(), val.end());
+                }
+            }
+            else
+            {
+                pushElements.insert(pushElements.end(), val.begin(), val.end());
+            }
+        }
+    }
+
+    /** emplace an element onto the queue
+    val the value to emplace on the queue
     */
     template <class... Args>
     void emplace (Args &&... args)

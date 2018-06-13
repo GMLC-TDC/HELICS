@@ -279,7 +279,9 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 SET(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
 
@@ -320,6 +322,11 @@ if (NOT DISABLE_LOGGING)
 	OPTION(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
 endif()
 
+#-----------------------------------------------------------------------------
+# create the fmt header only targets
+#-----------------------------------------------------------------------------
+set(FMT_TEST OFF)
+add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories
@@ -415,7 +422,7 @@ configure_file (
   install(FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/compiler-config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
 		COMPONENT headers)
   install(DIRECTORY ThirdParty/cereal DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-		COMPONENT headers) 
+		COMPONENT headers)
 
 install(DIRECTORY ThirdParty/helics_includes DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 		COMPONENT headers)

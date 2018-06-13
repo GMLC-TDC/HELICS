@@ -662,7 +662,7 @@ void Federate::registerInterfaces (const std::string &jsonString) { registerFilt
 
 void Federate::registerFilterInterfaces (const std::string &jsonString)
 {
-    auto doc = loadJsonString (jsonString);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("filters"))
     {

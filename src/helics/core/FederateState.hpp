@@ -63,9 +63,10 @@ class FederateState
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
+    int errorCode = 0;  //!< storage for an error code
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
-    decltype (std::chrono::steady_clock::now ()) start_clock_time;
+    decltype (std::chrono::steady_clock::now ()) start_clock_time; //!< time the initialization mode started for real time capture
     Time rt_lag = timeZero;  //!< max lag for the rt control
     Time rt_lead = timeZero;  //!< min lag for the realtime control
     int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
@@ -208,6 +209,9 @@ class FederateState
     const std::vector<global_federate_id_t> &getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
+    /** get the last error code*/
+    int lastErrorCode () const noexcept { return errorCode; }
+    /** set the managing core object */
     void setCoreObject (CommonCore *parent);
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
