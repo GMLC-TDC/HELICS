@@ -11,6 +11,7 @@ functions for dealing with query results*/
 
 #include <string>
 #include <vector>
+#include <chrono>
 
 // forward declare Federate
 namespace helics
@@ -40,15 +41,16 @@ std::vector<std::string> vectorizeAndSortQueryResult (const std::string &queryre
 interface
 @param[in] fed  a pointer to the federate
 @param[in] fedName the name of the federate we are querying
+@param timeout the time to wait for the fed to initialize
 @return true if the federate is now trying to enter initialization false if the timeout was reached
 */
-bool waitForInit (helics::Federate *fed, const std::string &fedName, int timeout = 10000 /*time in ms*/);
+bool waitForInit(helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
 
 /** helper function to wait for a particular federate to be created
 @details this is useful if some reason we need to make sure a federate is created before proceeding
 @param[in] fed  a pointer to the federate
-@param[in] fedName the name of the federate we are querying
-@param[in] timeout the amount of time in ms to wait before returning false
+@param fedName the name of the federate we are querying
+@param timeout the amount of time in ms to wait before returning false
 @return true if the federate exists, false if the timeout occurred
 */
-bool waitForFed (helics::Federate *fed, const std::string &fedName, int timeout = 10000 /*time in ms*/);
+bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));

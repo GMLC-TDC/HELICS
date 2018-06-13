@@ -108,7 +108,7 @@ void Echo::loadJsonFile (const std::string &jsonFile)
           [this](const Endpoint *ept, Time messageTime) { echoMessage (ept, messageTime); });
     }
 
-    auto doc = loadJsonString (jsonFile);
+    auto doc = loadJson (jsonFile);
 
     if (doc.isMember ("echo"))
     {

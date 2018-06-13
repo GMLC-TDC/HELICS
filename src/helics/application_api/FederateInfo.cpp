@@ -189,7 +189,7 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     Json_helics::Value doc;
     try
     {
-        doc = loadJsonString (jsonString);
+        doc = loadJson (jsonString);
     }
     catch (const std::invalid_argument &ia)
     {

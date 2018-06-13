@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cereal/archives/portable_binary.hpp>
 #include <complex>
 //#include <cereal/archives/binary.hpp>
-#include <boost/format.hpp>
+#include "fmt_wrapper.h"
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/stream.hpp>
 
@@ -500,13 +500,13 @@ std::string prettyPrintString (const ActionMessage &command)
         else
         {
             ret.append (std::to_string (command.dest_id));
-        }
+        } 
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append ((boost::format ("From (%d) handle(%d) size %d at %f") % command.source_id %
-                     command.dest_handle % command.payload.size () % static_cast<double> (command.actionTime))
-                      .str ());
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {}",command.source_id,
+                     command.dest_handle, command.payload.size (), static_cast<double> (command.actionTime))
+                      );
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -514,25 +514,22 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_TIME_GRANT:
         ret.push_back (':');
-        ret.append ((boost::format ("From (%d) Granted Time(%f)") % command.source_id %
-                     static_cast<double> (command.actionTime))
-                      .str ());
+        ret.append (fmt::format ("From ({}) Granted Time({})", command.source_id ,
+                     static_cast<double> (command.actionTime)));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
-        ret.append ((boost::format ("From (%d) Time(%f, %f, %f)") % command.source_id %
-                     static_cast<double> (command.actionTime) % static_cast<double> (command.Te) %
-                     static_cast<double> (command.Tdemin))
-                      .str ());
+        ret.append (fmt::format ("From ({}) Time({}, {}, {})", command.source_id,
+                     static_cast<double> (command.actionTime), static_cast<double> (command.Te),
+                     static_cast<double> (command.Tdemin)));
         break;
     case CMD_FED_CONFIGURE:
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
-        ret.append ((boost::format ("From (%s)(%d:%d) To %s size %d at %f") % command.info ().orig_source %
-                     command.source_id % command.source_handle % command.info ().target % command.payload.size () %
-                     static_cast<double> (command.actionTime))
-                      .str ());
+        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f",command.info ().orig_source,
+                     command.source_id, command.source_handle, command.info ().target, command.payload.size (),
+                     static_cast<double> (command.actionTime)));
         break;
     default:
         break;

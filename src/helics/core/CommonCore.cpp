@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include <boost/filesystem.hpp>
+#include "queryHelpers.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -29,15 +30,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 
 #include "../common/DelayedObjects.hpp"
-#include <boost/format.hpp>
+#include "fmt_wrapper.h"
+#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
 using federate_id_t = Core::federate_id_t;
 using handle_id_t = Core::handle_id_t;
-
-// file local declarator for active queries
-static DelayedObjects<std::string> ActiveQueries;
 
 CommonCore::CommonCore () noexcept {}
 
@@ -80,6 +79,7 @@ bool CommonCore::connect ()
                 ActionMessage m (CMD_REG_BROKER);
                 m.name = getIdentifier ();
                 m.info ().target = getAddress ();
+                setActionFlag(m, core_flag);
                 transmit (0, m);
                 brokerState = broker_state_t::connected;
             }
@@ -376,7 +376,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
             if (check == iteration_result::halted)
             {
                 throw (HelicsTerminated ());
-            }
+        }
             generateFederateException (fed);
         }
         return;
@@ -780,7 +780,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::subscription, key, type, units,
                                      (check_mode == handle_check_mode::required));
 
-    LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering SUB %s") % key).str ());
+    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering SUB {}",key));
     auto id = handle->handle;
     fed->interfaces ().createSubscription (id, key, type, units, check_mode);
 
@@ -823,7 +823,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
-    LOG_DEBUG (0, fed->getIdentifier (), (boost::format ("registering PUB %s") % key).str ());
+    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
@@ -853,7 +853,7 @@ handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::str
     if (pub->local_fed_id != federateID)
     {
         return invalid_handle;
-    }
+        }
     return pub->handle;
 }
 
@@ -961,7 +961,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     if (fed->checkAndSetValue (handle, data, len))
     {
         LOG_DEBUG (0, fed->getIdentifier (),
-                   (boost::format ("setting Value for %s size %d") % handleInfo->key % len).str ());
+                   fmt::format ("setting Value for {} size {}",handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
@@ -1038,7 +1038,7 @@ handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string
     if (ept->local_fed_id != federateID)
     {
         return invalid_handle;
-    }
+        }
     return ept->handle;
 }
 
@@ -1359,7 +1359,7 @@ FilterInfo *CommonCore::createDestFilter (federate_id_t dest,
                                           const std::string &target,
                                           const std::string &type_in,
                                           const std::string &type_out,
-                                          bool cloning)
+                                            bool cloning)
 {
     auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, target,
                                               type_in, type_out, true);
@@ -1541,17 +1541,17 @@ void CommonCore::deliverMessage (ActionMessage &message)
                     routeMessage (std::move (message));
                     return;
                 }
-                // the filter is part of this core
-                auto tempMessage = createMessageFromCommand (std::move (message));
-                if (ffunc->destFilter->filterOp)
-                {
-                    auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-                    message.moveInfo (std::move (nmessage));
-                }
-                else
-                {
-                    message.moveInfo (std::move (tempMessage));
-                }
+                    // the filter is part of this core
+                    auto tempMessage = createMessageFromCommand (std::move (message));
+                    if (ffunc->destFilter->filterOp)
+                    {
+                        auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
+                        message.moveInfo (std::move (nmessage));
+                    }
+                    else
+                    {
+                        message.moveInfo (std::move (tempMessage));
+                    }
             }
             // now go to the cloning filters
             for (auto &clFilter : ffunc->cloningDestFilters)
@@ -1705,13 +1705,20 @@ void CommonCore::setLoggingCallback (
     if (federateID == invalid_fed_id)
     {
         ActionMessage loggerUpdate (CMD_CORE_CONFIGURE);
-        loggerUpdate.index = UPDATE_LOGGER_FUNCTION;
+        loggerUpdate.index = UPDATE_LOGGING_CALLBACK;
+		loggerUpdate.source_handle = global_broker_id;
+        if (logFunction)
+        {
+            auto ii = getNextAirlockIndex();
+            dataAirlocks[ii].load(std::move(logFunction));
+            loggerUpdate.counter = ii;
+    }
+    else
+    {
+            setActionFlag(loggerUpdate, empty_flag);
+        }
 
-        auto ii = getNextAirlockIndex ();
-        dataAirlocks[ii].load (std::move (logFunction));
-        loggerUpdate.counter = ii;
-        loggerUpdate.source_handle = global_broker_id;
-        actionQueue.push (loggerUpdate);
+        actionQueue.push(loggerUpdate);
     }
     else
     {
@@ -1804,19 +1811,18 @@ void CommonCore::setIdentifier (const std::string &name)
 }
 
 void CommonCore::setQueryCallback (federate_id_t federateID,
-                                   std::function<std::string (const std::string &)> /*queryFunction*/)
+                                   std::function<std::string (const std::string &)> queryFunction)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("FederateID is invalid (setQueryCallback)"));
     }
-    // TODO:: PT add a query callback processing
+    fed->setQueryCallback(std::move(queryFunction));
 }
 
-std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std::string &queryStr) const
+std::string CommonCore::federateQuery (const FederateState *fed, const std::string &queryStr) const
 {
-    auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         if ((queryStr == "exists") || (queryStr == "exist"))
@@ -1837,52 +1843,169 @@ std::string CommonCore::federateQuery (Core::federate_id_t federateID, const std
     {
         return std::to_string (static_cast<int> (fed->getState ()));
     }
-    if (queryStr == "dependencies")
-    {
-        return nullStr;
-    }
 
     return fed->processQuery (queryStr);
 }
 
+std::string  CommonCore::coreQuery(const std::string &queryStr) const
+{
+    if (queryStr == "federates")
+    {
+        return generateStringVector(loopFederates, [](auto &fed) {return fed->getIdentifier(); });
+    }
+    if (queryStr == "publications")
+    {
+        return generateStringVector_if(handles.lock_shared(), [](auto &handle) {return handle->key; }, [](const auto &handle) {return (handle->handle_type == handle_type_t::publication); });
+    }
+    if (queryStr == "endpoints")
+    {
+        return generateStringVector_if(handles.lock_shared(), [](auto &handle) {return handle->key; }, [](const auto &handle) {return (handle->handle_type == handle_type_t::endpoint); });
+    }
+    if (queryStr == "dependencies")
+    {
+        return generateStringVector(timeCoord->getDependencies(), [](auto &dep) {return std::to_string(dep); });
+    }
+    if (queryStr == "dependents")
+    {
+        return generateStringVector(timeCoord->getDependents(), [](auto &dep) {return std::to_string(dep); });
+    }
+    if (queryStr == "isinit")
+    {
+        return (allInitReady()) ? "true" : "false";
+    }
+    if (queryStr == "address")
+    {
+        return getAddress();
+    }
+    if (queryStr == "federate_map")
+    {
+        Json_helics::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = static_cast<int> (global_broker_id);
+        block["parent"] = static_cast<int> (higher_broker_id);
+        block["federates"] = Json_helics::arrayValue;
+        for (auto fed : loopFederates)
+        {
+            Json_helics::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load();
+            fedBlock["parent"] = static_cast<int> (global_broker_id);
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
+    }
+    if (queryStr == "dependency_graph")
+    {
+        Json_helics::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = static_cast<int> (global_broker_id);
+        block["parent"] = static_cast<int> (higher_broker_id);
+        block["federates"] = Json_helics::arrayValue;
+        block["dependents"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependents())
+        {
+            block["dependents"].append(dep);
+        }
+        block["dependencies"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependencies())
+        {
+            block["dependencies"].append(dep);
+        }
+        for (auto fed : loopFederates)
+        {
+            Json_helics::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load();
+            fedBlock["parent"] = static_cast<int> (global_broker_id);
+            fedBlock["dependencies"] = Json_helics::arrayValue;
+           
+            fedBlock["dependents"] = Json_helics::arrayValue;
+            for (auto &dep : fed->getDependents())
+            {
+                fedBlock["dependents"].append(dep);
+            }
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
+    }
+    return "#invalid";
+}
+
 std::string CommonCore::query (const std::string &target, const std::string &queryStr)
 {
-    if ((target == "core") || (target == getIdentifier ()))
+    if ((target == "core") || (target == getIdentifier()))
     {
-        // TODO:: move to a coreQuery Function
-        if (queryStr == "federates")
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = global_broker_id;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(index);
+        addActionMessage(std::move(querycmd));
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
+    }
+    else if ((target == "parent") || (target == "broker"))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = higher_broker_id;
+        querycmd.index = ++queryCounter;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        addActionMessage(querycmd);
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(querycmd.index);
+        return ret;
+    }
+    else if ((target == "root") || (target == "rootbroker"))
+    {
+        ActionMessage querycmd(CMD_BROKER_QUERY);
+        querycmd.source_id = global_broker_id;
+        querycmd.dest_id = 0;
+        auto index = ++queryCounter;
+        querycmd.index = index;
+        querycmd.payload = queryStr;
+        auto fut = ActiveQueries.getFuture(querycmd.index);
+        if (global_broker_id == invalid_fed_id)
         {
+            delayTransmitQueue.push(std::move(querycmd));
         }
-        else if (queryStr == "publications")
+        else
         {
+            transmit(0, querycmd);
         }
-        else if (queryStr == "endpoints")
-        {
-        }
-        else if (queryStr == "dependencies")
-        {
-        }
-        else if (queryStr == "isinit")
-        {
-            return (allInitReady ()) ? "true" : "false";
-        }
+        auto ret = fut.get();
+        ActiveQueries.finishedWithValue(index);
+        return ret;
     }
     else
     {
-        auto id = getFederateId (target);
-        if (id != invalid_fed_id)
+        auto fed = getFederate (target);
+        if (fed != nullptr)
         {
-            return federateQuery (id, queryStr);
+            return federateQuery (fed, queryStr);
         }
         ActionMessage querycmd (CMD_QUERY);
         querycmd.source_id = global_broker_id;
-        querycmd.index = ++queryCounter;
+        auto index = ++queryCounter;
+        querycmd.index = index;
         querycmd.payload = queryStr;
         querycmd.info ().target = target;
         auto fut = ActiveQueries.getFuture (querycmd.index);
-        transmit (0, querycmd);
+        if (global_broker_id == invalid_fed_id)
+        {
+            delayTransmitQueue.push(std::move(querycmd));
+        }
+        else
+        {
+            transmit(0, querycmd);
+        }
+        
         auto ret = fut.get ();
-        ActiveQueries.finishedWithValue (querycmd.index);
+        ActiveQueries.finishedWithValue (index);
         return ret;
     }
     return "#invalid";
@@ -1893,7 +2016,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     // deal with a few types of message immediately
     LOG_TRACE (
       global_broker_id, getIdentifier (),
-      (boost::format ("|| priority_cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+      fmt::format ("|| priority_cmd:{} from {}", prettyPrintString (command) , command.source_id));
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -1943,8 +2066,8 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 LOG_ERROR (0, identifier,
-                           std::string ("broker responded with error for registration of ") + command.name +
-                             "::" + commandErrorString (command.index) + "\n");
+                           fmt::format ("broker responded with error for registration of {}::{}\n", command.name,
+                             commandErrorString (command.index)));
             }
             else
             {
@@ -1953,7 +2076,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             }
 
             // push the command to the local queue
-            fed->addAction (command);
+            fed->addAction (std::move(command));
         }
     }
     break;
@@ -1971,6 +2094,30 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             addActionMessage (CMD_STOP);
         }
         break;
+    case CMD_BROKER_QUERY:
+        if (command.dest_id == global_broker_id)
+        {
+            std::string repStr = coreQuery(command.payload);
+            if (command.source_id == global_broker_id)
+            {
+                ActiveQueries.setDelayedValue(command.index, std::move(repStr));
+            }
+            else
+            {
+                ActionMessage queryResp(CMD_QUERY_REPLY);
+                queryResp.dest_id = command.source_id;
+                queryResp.source_id = global_broker_id;
+                queryResp.index = command.index;
+                queryResp.payload = std::move(repStr);
+                queryResp.counter = command.counter;
+                transmit(getRoute(queryResp.dest_id), queryResp);
+            }
+        }
+        else
+        {
+            routeMessage(std::move(command));
+        }
+        break;
     case CMD_QUERY:
     {
         std::string repStr;
@@ -1978,6 +2125,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         queryResp.dest_id = command.source_id;
         queryResp.source_id = command.dest_id;
         queryResp.index = command.index;
+        queryResp.counter = command.counter;
         if (command.info ().target == getIdentifier ())
         {
             queryResp.source_id = global_broker_id;
@@ -1985,13 +2133,11 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
         else
         {
-            // TODO PT This could be done better
-            auto fedID = getFederateId (command.info ().target);
-            repStr = federateQuery (fedID, command.payload);
+            auto fedptr = getFederateCore(command.info().target);
+            repStr = federateQuery(fedptr, command.payload);
         }
 
-        queryResp.payload = repStr;
-
+        queryResp.payload = std::move(repStr);
         transmit (getRoute (queryResp.dest_id), queryResp);
     }
     break;
@@ -2008,9 +2154,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     {
         if (!isPriorityCommand (command))
         {
-            // make a copy and go through the regular processing
-            ActionMessage cmd (command);
-            processCommand (std::move (cmd));
+            processCommand (std::move (command));
         }
     }
 
@@ -2081,7 +2225,7 @@ void CommonCore::transmitDelayedMessages (federate_id_t source)
 void CommonCore::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
-               (boost::format ("|| cmd:%s from %d") % prettyPrintString (command) % command.source_id).str ());
+               fmt::format ("|| cmd:{} from {}", prettyPrintString (command) ,command.source_id));
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -2631,7 +2775,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 newFilter = createSourceFilter (command.source_id, command.source_handle, command.name,
                                                 command.info ().target, command.info ().type,
                                                 command.info ().type_out, checkActionFlag (command, clone_flag));
-            }
+                }
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
         }
@@ -2877,6 +3021,21 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
     case UPDATE_LOG_LEVEL:
         setLogLevel (cmd.dest_id);
         break;
+    case UPDATE_LOGGING_CALLBACK:
+        if (checkActionFlag(cmd, empty_flag))
+        {
+            setLoggerFunction(nullptr);
+        }
+        else
+        {
+            auto op = dataAirlocks[cmd.counter].try_unload();
+            if (op)
+            {
+                auto M = stx::any_cast<std::function<void(int,const std::string &, const std::string &)>> (std::move(*op));
+                setLoggerFunction(std::move(M));
+            }
+        }
+        break;
     case UPDATE_FILTER_OPERATOR:
     {
         auto filtHandle = filters.lock ();
@@ -2887,18 +3046,6 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         {
             auto M = stx::any_cast<std::shared_ptr<FilterOperator>> (std::move (*op));
             FiltI->filterOp = std::move (M);
-        }
-    }
-    break;
-    case UPDATE_LOGGER_FUNCTION:
-    {
-        int ii = cmd.counter;
-        auto op = dataAirlocks[ii].try_unload ();
-        if (op)
-        {
-            auto logFunction =
-              stx::any_cast<std::function<void(int, const std::string &, const std::string &)>> (std::move (*op));
-            setLoggerFunction (std::move (logFunction));
         }
     }
     break;

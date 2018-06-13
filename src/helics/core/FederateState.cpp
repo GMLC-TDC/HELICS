@@ -1151,9 +1151,21 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
     }
+    if (query == "subscriptions")
+    {
+        return generateStringVector(interfaceInformation.getSubscriptions(), [](auto &sub) {return sub->key; });
+    }
     if (query == "endpoints")
     {
         return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
+    }
+    if (query == "dependencies")
+    {
+        return generateStringVector(timeCoord->getDependencies(), [](auto &dep) {return std::to_string(dep); });
+    }
+    if (query == "dependents")
+    {
+        return generateStringVector(timeCoord->getDependents(), [](auto &dep) {return std::to_string(dep); });
     }
     if (queryCallback)
     {

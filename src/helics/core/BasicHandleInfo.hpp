@@ -26,9 +26,9 @@ enum class handle_type_t : char
 enum handle_flag_definitions
 {
     mapped_flag = extra_flag1,
-    has_source_filter_flag = 13,
-    has_dest_filter_flag = 14,
-    has_non_cloning_dest_filter_flag=15
+    has_source_filter_flag = extra_flag2,
+    has_dest_filter_flag = extra_flag3,
+    has_non_cloning_dest_filter_flag=extra_flag4
 };
 
 /** class defining and capturing basic information about a handle*/
