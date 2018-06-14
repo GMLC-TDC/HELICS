@@ -10,7 +10,6 @@ virtual base class for object that function like a broker includes common parame
 and some common methods used cores and brokers
 */
 
-
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
 #include "Core.hpp"
