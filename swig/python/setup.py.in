@@ -41,7 +41,7 @@ if HELICS_INSTALL is None or "CMAKE_INSTALL_PREFIX" in HELICS_INSTALL:
 
 os.environ['CFLAGS'] = '-Wall -I"{}" -I"{}" -I"{}" -I"{}" -I"{}" -fPIC {os_specific_cflags}'.format(
     HELICS_INCLUDE_DIR,
-	HELICS_ADDITIONAL_INCLUDE_DIR,
+    HELICS_ADDITIONAL_INCLUDE_DIR,
     os.path.join(HELICS_INCLUDE_DIR, 'helics'),
     os.path.join(HELICS_INCLUDE_DIR, 'shared_api_library'),
     ZMQ_INCLUDE_DIR,
