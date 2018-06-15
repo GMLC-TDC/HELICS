@@ -347,6 +347,7 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
     {
         return newDestGeneration (src, dest, newDest.load ());
     }
+
     for (auto &sr : *cond)
     {
         std::regex reg (sr);

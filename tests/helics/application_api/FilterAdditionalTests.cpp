@@ -29,7 +29,7 @@ Test rerouter filter
 This test case sets reroute filter on a source endpoint. Ths means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
+
 BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -81,7 +81,7 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 Ths means message sent from this endpoint will be rerouted to a new destination 
 endpoint only if condition matches.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
+
 BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -116,7 +116,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make(core_types), 
 	auto m2 = mFed->getMessage(p3);
 
 	BOOST_CHECK_EQUAL(m2->source, "port1");
-	BOOST_CHECK_EQUAL(m2->dest, "endpt2");
+	BOOST_CHECK_EQUAL(m2->dest, "port3");
 	BOOST_CHECK_EQUAL(m2->data.size(), data.size());
 
 	fFed->requestTimeAsync(2.0);
@@ -133,7 +133,7 @@ Test rerouter filter
 This test case sets reroute filter on a destination endpoint. Ths means message
 sent to this endpoint will be rerouted to a new destination endpoint.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
+
 BOOST_DATA_TEST_CASE(message_reroute_filter_object2, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -147,6 +147,13 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_object2, bdata::make(core_types), co
 	auto p2 = mFed->registerGlobalEndpoint("port2");
 	auto p3 = mFed->registerGlobalEndpoint("port3");
 
+    auto f1 = fFed->registerSourceFilter("filter1", "port1");
+    auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
+    filter_op->setString("newdestination", "port3");
+    filter_op->setString("condition", "test.*"); //match all messages with a destination endpoint starting with "test"
+
+    fFed->setFilterOperator(f1, filter_op->getOperator());
+
 	fFed->enterExecutionStateAsync();
 	mFed->enterExecutionState();
 	fFed->enterExecutionStateComplete();
@@ -158,16 +165,11 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_object2, bdata::make(core_types), co
 	mFed->requestTimeAsync(1.0);
 	fFed->requestTime(1.0);
 	mFed->requestTimeComplete();
-
+    //this one was delivered to the original destination
 	BOOST_REQUIRE(mFed->hasMessage(p2));
-	auto f1 = fFed->registerSourceFilter("filter1", "port1");
-	auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
-	filter_op->setString("newdestination", "port3");
-	filter_op->setString("condition", "test"); //match all messages with a destination endpoint stating with "test"
-
-	fFed->setFilterOperator(f1, filter_op->getOperator());
-
-	mFed->sendMessage(p1, "port2", data);
+	
+    //this message should be delivered to the rerouted destination
+	mFed->sendMessage(p1, "test324525", data);
 
 	mFed->requestTimeAsync(2.0);
 	fFed->requestTime(2.0);
@@ -180,8 +182,6 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_object2, bdata::make(core_types), co
 	BOOST_CHECK_EQUAL(m2->dest, "port3");
 	BOOST_CHECK_EQUAL(m2->data.size(), data.size());
 
-	mFed->requestTime(3.0);
-	fFed->requestTimeComplete();
 	mFed->finalize();
 	fFed->finalize();
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::finalize);
@@ -193,7 +193,7 @@ This test case sets random drop filter on a source endpoint with a particular
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
+
 BOOST_DATA_TEST_CASE(message_random_drop_object, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -244,7 +244,7 @@ This test case sets random drop filter on a source endpoint with a particular
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
+
 BOOST_DATA_TEST_CASE(message_random_drop_object1, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -259,7 +259,7 @@ BOOST_DATA_TEST_CASE(message_random_drop_object1, bdata::make(core_types), core_
 
 	auto f1 = fFed->registerSourceFilter("filter1", "port1");
 	auto op = std::make_shared<helics::RandomDropFilterOperation>();
-	float prob = 0.9;
+	double prob = 0.9;
 	op->set("prob", prob);
 	fFed->setFilterOperator(f1, op->getOperator());
 
@@ -297,7 +297,6 @@ This test case sets random drop filter on a destination endpoint with a particul
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
 BOOST_DATA_TEST_CASE(message_random_drop_dest_object, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -346,7 +345,6 @@ This test case sets random drop filter on a destination endpoint with a particul
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(15))
 BOOST_DATA_TEST_CASE(message_random_drop_dest_object1, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -361,7 +359,7 @@ BOOST_DATA_TEST_CASE(message_random_drop_dest_object1, bdata::make(core_types), 
 
 	auto f1 = fFed->registerDestinationFilter("filter1", "port2");
 	auto op = std::make_shared<helics::RandomDropFilterOperation>();
-	float prob = 0.9;
+	double prob = 0.9;
 	op->set("prob", prob);
 	fFed->setFilterOperator(f1, op->getOperator());
 
@@ -396,7 +394,6 @@ This test case sets random delay filter on a source endpoint.
 This means messages may be delayed by random delay based on
 binomial distribution.
 */
-BOOST_TEST_DECORATOR(*utf::timeout(12))
 BOOST_DATA_TEST_CASE(message_random_delay_object, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
