@@ -181,7 +181,8 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-               
+               
+
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
                     if (playerConfig["timeunits"] == "ns")
@@ -803,14 +804,29 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
 
 static int hasB64Wrapper (const std::string &str)
 {
-    if ((str.compare (1, 3, "64[") == 0) && (str.back () == ']'))
+    if (str.front() == '\"')
     {
-        return 4;
+        if ((str.compare(2, 3, "64[") == 0) && (str[str.size()-2] == ']'))
+        {
+            return 5;
+        }
+        if ((str.compare(5, 3, "64[") == 0) && (str[str.size() - 2] == ']'))
+        {
+            return 8;
+        }
     }
-    if ((str.compare (4, 3, "64[") == 0) && (str.back () == ']'))
+    else
     {
-        return 7;
+        if ((str.compare(1, 3, "64[") == 0) && (str.back() == ']'))
+        {
+            return 4;
+        }
+        if ((str.compare(4, 3, "64[") == 0) && (str.back() == ']'))
+        {
+            return 7;
+        }
     }
+    
     return 0;
 }
 
@@ -823,6 +839,11 @@ static std::string decode (std::string &&stringToDecode)
     auto offset = hasB64Wrapper (stringToDecode);
     if (offset != 0)
     {
+        if (stringToDecode.back() == '\"')
+        {
+            stringToDecode.pop_back();
+        }
+
         stringToDecode.pop_back ();
         return utilities::base64_decode_to_string (stringToDecode, offset);
     }

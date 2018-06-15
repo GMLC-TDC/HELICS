@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/helics.h"
-
+#include "config.hpp"
 #include <string>
 
 namespace helics
@@ -18,16 +18,24 @@ class Broker
 {
   public:
     // Default constructor, not meant to be used
-    Broker () {};
+    Broker ():broker(NULL) {};
 
     Broker (std::string type, std::string name, std::string initString)
     {
         broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
+        if (broker == NULL)
+        {
+            throw(std::exception("broker registration failed"));
+        }
     }
 
     Broker (std::string type, std::string name, int argc, const char **argv)
     {
         broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
+        if (broker == NULL)
+        {
+            throw(std::exception("broker registration failed"));
+        }
     }
 
     Broker(const Broker &brk)
@@ -39,9 +47,25 @@ class Broker
         broker = helicsBrokerClone(brk.broker);
         return *this;
     }
+#ifdef HELICS_HAS_RVALUE_REFS
+    Broker(Broker &&brk)
+    {
+        broker = brk.broker;
+        brk.broker = NULL;
+    }
+    Broker &operator=(Broker &&brk)
+    {
+        broker = brk.broker;
+        brk.broker = NULL;
+        return *this;
+    }
+#endif
     virtual ~Broker ()
     {
-        helicsBrokerFree (broker);
+        if (broker != NULL)
+        {
+            helicsBrokerFree(broker);
+        }
     }
 
     operator helics_broker() { return broker; }

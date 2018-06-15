@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
     BOOST_CHECK_EQUAL (play1.messageCount (), 2);
     BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
-
+   
     play1.finalize ();
     boost::filesystem::remove (filename);
 }
@@ -220,6 +220,21 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on(
     BOOST_CHECK_EQUAL(play1.messageCount(), 2);
     BOOST_CHECK_EQUAL(play1.endpointCount(), 2);
 
+    auto &b1 = play1.getMessage(0);
+    helics::data_block n5(256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n5[ii] = ii;
+    }
+    BOOST_CHECK_EQUAL(b1.mess.data.to_string(), n5.to_string());
+
+    auto &b2 = play1.getMessage(1);
+    helics::data_block n6(256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n6[ii] = 255 - ii;
+    }
+    BOOST_CHECK_EQUAL(b2.mess.data.to_string(), n6.to_string());
     play1.finalize();
     boost::filesystem::remove(filename);
 }
@@ -242,6 +257,22 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary2, *boost::unit_test::depends_on(
     BOOST_CHECK_EQUAL(play1.messageCount(), 2);
     
     BOOST_CHECK_EQUAL(play1.endpointCount(), 2);
+
+    auto &b1 = play1.getMessage(0);
+    helics::data_block n5(256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n5[ii] = ii;
+    }
+    BOOST_CHECK_EQUAL(b1.mess.data.to_string(), n5.to_string());
+
+    auto &b2 = play1.getMessage(1);
+    helics::data_block n6(256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n6[ii] = 255 - ii;
+    }
+    BOOST_CHECK_EQUAL(b2.mess.data.to_string(), n6.to_string());
 
     play1.finalize();
     boost::filesystem::remove(filename);

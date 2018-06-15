@@ -174,7 +174,10 @@ class Player : public App
     auto publicationCount () const { return publications.size (); }
     /** get the number of endpoints*/
     auto endpointCount () const { return endpoints.size (); }
-
+    /** get the point from an index*/
+    const auto &getPoint(int index) const { return points[index]; }
+    /** get the messages from an index*/
+    const auto &getMessage(int index) const { return messages[index]; }
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
