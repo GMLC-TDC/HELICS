@@ -87,7 +87,7 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (res, str);
 
     std::string res2 = helicsQueryExecute(q1, vFed1);
-    BOOST_CHECK_EQUAL(res, str);
+    BOOST_CHECK_EQUAL(res2, str);
     CE(helicsFederateEnterInitializationModeAsync(vFed1));
     CE(helicsFederateEnterInitializationMode(vFed2));
     CE(helicsFederateEnterInitializationModeComplete(vFed1));
