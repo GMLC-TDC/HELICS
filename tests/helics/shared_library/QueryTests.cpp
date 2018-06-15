@@ -4,112 +4,97 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "testFixtures.hpp"
+#include "ctestFixtures.hpp"
 
-#include "helics/application_api/queryFunctions.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
 BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
+
 
 /** test simple creation and destruction*/
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate> (core_type, 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+    SetupTest(helicsCreateValueFederate, core_type, 2);
+    auto vFed1 = GetFederateAt(0);
+    auto vFed2 = GetFederateAt(1);
+    
     // register the publications
-    vFed1->registerGlobalPublication<double> ("pub1");
 
-    vFed2->registerRequiredSubscription<double> ("pub1");
+    helicsFederateRegisterGlobalPublication(vFed1, "pub1", "double", "");
+    helicsFederateRegisterPublication(vFed1, "pub2", "double", "");
+    helicsFederateRegisterPublication(vFed2, "pub3", "double", "");
+    CE(helicsFederateEnterInitializationModeAsync(vFed1));
+    CE(helicsFederateEnterInitializationMode(vFed2));
+    CE(helicsFederateEnterInitializationModeComplete(vFed1));
 
-    vFed1->registerPublication<double> ("pub2");
+    auto core = helicsFederateGetCoreObject(vFed1);
 
-    vFed2->registerPublication<double> ("pub3");
-
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
-
-    auto core = vFed1->getCorePointer ();
-    auto res = core->query ("fed0", "publications");
+    auto q1 = helicsCreateQuery("fed0", "publications");
+    
+    std::string res(helicsQueryCoreExecute(q1, core));
+    
     BOOST_CHECK_EQUAL (res, "[pub1;fed0/pub2]");
-    auto rvec = vectorizeQueryResult (res);
 
-    BOOST_REQUIRE_EQUAL (rvec.size (), 2);
-    BOOST_CHECK_EQUAL (rvec[0], "pub1");
-    BOOST_CHECK_EQUAL (rvec[1], "fed0/pub2");
-    BOOST_CHECK_EQUAL (vFed2->query ("fed0", "publications"), "[pub1;fed0/pub2]");
-    BOOST_CHECK_EQUAL (vFed1->query ("fed1", "isinit"), "true");
+    std::string res2(helicsQueryExecute(q1, vFed2));
+    BOOST_CHECK_EQUAL(res2, "[pub1;fed0/pub2]");
 
-    BOOST_CHECK_EQUAL (vFed1->query ("fed1", "publications"), "[fed1/pub3]");
-    core = nullptr;
-    vFed1->finalize ();
-    vFed2->finalize ();
-    helics::cleanupHelicsLibrary ();
+    helicsQueryFree(q1);
+    q1 = helicsCreateQuery("fed1", "isinit");
+   
+    res = helicsQueryExecute(q1, vFed1);
+    BOOST_CHECK_EQUAL (res, "true");
+    helicsQueryFree(q1);
+
+    q1 = helicsCreateQuery("fed1", "publications");
+    res = helicsQueryExecute(q1, vFed1);
+    BOOST_CHECK_EQUAL (res, "[fed1/pub3]");
+    helicsQueryFree(q1);
+    helicsCoreFree(core);
+    CE(helicsFederateFinalize(vFed1));
+    CE(helicsFederateFinalize(vFed2));
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+
 BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 {
-    SetupTest<helics::ValueFederate> (core_type, 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
-    auto core = vFed1->getCorePointer ();
-    auto res = core->query ("root", "federates");
-    std::string str ("[");
-    str.append (vFed1->getName ());
-    str.push_back (';');
-    str.append (vFed2->getName ());
-    str.push_back (']');
-    BOOST_CHECK_EQUAL (res, "[fed0;fed1]");
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
-    core = nullptr;
-    vFed1->finalize ();
-    vFed2->finalize ();
-    helics::cleanupHelicsLibrary ();
-}
+    SetupTest(helicsCreateValueFederate, core_type, 2);
+    auto vFed1 = GetFederateAt(0);
+    auto vFed2 = GetFederateAt(1);
 
-#if ENABLE_TEST_TIMEOUTS > 0
-BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
-BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), core_type)
-{
-    SetupTest<helics::ValueFederate> (core_type, 2, 1.0);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
-    vFed1->registerPublication<double> ("pub1");
 
-    vFed2->registerPublication<double> ("pub2");
+    
 
-    vFed2->registerPublication<double> ("pub3");
+    auto core = helicsFederateGetCoreObject(vFed1);
 
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    auto q1 = helicsCreateQuery("root", "federates");
+    std::string res = helicsQueryCoreExecute(q1, core);
+    std::string str ("[");
+    std::string name;
+    name.resize(100);
+    CE(helicsFederateGetName(vFed1, &(name[0]), 100));
+    str.append (name.c_str());
+    str.push_back (';');
+    CE(helicsFederateGetName(vFed2, &(name[0]), 100));
+    str.append (name.c_str());
+    str.push_back (']');
 
-    auto res = vFed1->query ("federation", "publications");
+    BOOST_CHECK_EQUAL (res, str);
 
-    auto rvec = vectorizeAndSortQueryResult (res);
-
-    BOOST_REQUIRE_EQUAL (rvec.size (), 3);
-    BOOST_CHECK_EQUAL (rvec[0], "fed0/pub1");
-    BOOST_CHECK_EQUAL (rvec[1], "fed1/pub2");
-    BOOST_CHECK_EQUAL (rvec[2], "fed1/pub3");
-    vFed1->finalize ();
-    vFed2->finalize ();
+    std::string res2 = helicsQueryExecute(q1, vFed1);
+    BOOST_CHECK_EQUAL(res, str);
+    CE(helicsFederateEnterInitializationModeAsync(vFed1));
+    CE(helicsFederateEnterInitializationMode(vFed2));
+    CE(helicsFederateEnterInitializationModeComplete(vFed1));
+    helicsQueryFree(q1);
+    helicsCoreFree(core);
+    CE(helicsFederateFinalize(vFed1));
+    CE(helicsFederateFinalize(vFed2));
 }
+
 BOOST_AUTO_TEST_SUITE_END ()

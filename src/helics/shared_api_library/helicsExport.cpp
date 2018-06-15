@@ -807,16 +807,16 @@ const char *helicsQueryCoreExecute(helics_query query, helics_core core)
 {
     if (core == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     if (core == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     auto coreObj = getCore(core);
     if (coreObj == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
@@ -829,16 +829,16 @@ const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
 {
     if (broker == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     if (broker == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
     auto brokerObj = getCore(broker);
     if (brokerObj == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
@@ -888,7 +888,7 @@ const char *helicsQueryExecuteComplete (helics_query query)
 {
     if (query == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);
