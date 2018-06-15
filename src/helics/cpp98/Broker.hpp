@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
 #include <string>
+#include <exception>
 
 namespace helics
 {
@@ -25,7 +26,7 @@ class Broker
         broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
         if (broker == NULL)
         {
-            throw(std::exception("broker registration failed"));
+            throw(std::runtime_error("broker creation failed"));
         }
     }
 
@@ -34,7 +35,7 @@ class Broker
         broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
         if (broker == NULL)
         {
-            throw(std::exception("broker registration failed"));
+            throw(std::runtime_error("broker creation failed"));
         }
     }
 
@@ -48,12 +49,12 @@ class Broker
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Broker(Broker &&brk)
+    Broker(Broker &&brk) noexcept
     {
         broker = brk.broker;
         brk.broker = NULL;
     }
-    Broker &operator=(Broker &&brk)
+    Broker &operator=(Broker &&brk) noexcept
     {
         broker = brk.broker;
         brk.broker = NULL;

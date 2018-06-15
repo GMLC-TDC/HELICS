@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "config.hpp"
 #include <string>
 #include "../cpp98/Filter.hpp"
+#include <exception>
 
 namespace helics
 {
@@ -25,11 +26,19 @@ class Core
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
         core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str());
+        if (core == NULL)
+        {
+            throw(std::runtime_error("core creation failed"));
+        }
     }
 
     Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
         core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv);
+        if (core == NULL)
+        {
+            throw(std::runtime_error("core creation failed"));
+        }
     }
 
     ~Core ()
@@ -57,12 +66,12 @@ class Core
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Core(Core &&cr)
+    Core(Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
     }
-    Core &operator=(Core &&cr)
+    Core &operator=(Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
