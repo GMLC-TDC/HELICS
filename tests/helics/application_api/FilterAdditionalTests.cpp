@@ -98,6 +98,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make(core_types), 
 	auto f1 = fFed->registerSourceFilter("filter1", "port1");
 	auto filter_op = std::make_shared<helics::RerouteFilterOperation>();
 	filter_op->setString("newdestination", "port3");
+	filter_op->setString("condition", "end"); //match all messages with a destination endpoint stating with "end"
 	fFed->setFilterOperator(f1, filter_op->getOperator());
 
 	fFed->enterExecutionStateAsync();
