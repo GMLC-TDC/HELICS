@@ -9,9 +9,7 @@
 * For details, see the LICENSE file.
 * LLNS Copyright End
 */
-
-#ifndef BASE_64_ENCODING_H_
-#define BASE_64_ENCODING_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -20,6 +18,7 @@ namespace utilities
 {
 /** encode a binary sequence to a string*/
 std::string base64_encode(unsigned char const *bytes_to_encode, int32_t in_len);
+
 /** decode a string to a vector of unsigned chars*/
 std::vector<unsigned char> base64_decode(std::string const& encoded_string, size_t offset = 0);
 
@@ -41,5 +40,4 @@ std::vector<vType> base64_decode_type(std::string const& encoded_string)
 }
 
 }//namespace utilities
-#endif
 

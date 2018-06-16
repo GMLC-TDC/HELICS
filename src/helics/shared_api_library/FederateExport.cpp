@@ -248,7 +248,7 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
         return nullptr;
     }
     auto core = std::make_unique<helics::CoreObject> ();
-    core->valid = fedValidationIdentifier;
+    core->valid = coreValidationIdentifier;
     core->coreptr = fedObj->getCorePointer ();
     auto retcore = reinterpret_cast<helics_core> (core.get ());
     getMasterHolder ()->addCore (std::move (core));

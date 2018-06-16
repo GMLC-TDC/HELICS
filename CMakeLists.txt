@@ -326,6 +326,7 @@ endif()
 # create the fmt header only targets
 #-----------------------------------------------------------------------------
 set(FMT_TEST OFF)
+set(FMT_ASSUME_CPP14_SUPPORT ON)
 add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 
 #-----------------------------------------------------------------------------
