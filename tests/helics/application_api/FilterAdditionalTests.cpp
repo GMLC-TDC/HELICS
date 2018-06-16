@@ -225,9 +225,7 @@ BOOST_DATA_TEST_CASE(message_random_drop_object, bdata::make(core_types), core_t
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
 		timestep+=1.0;
-		mFed->requestTimeAsync(timestep);
-		fFed->requestTime(timestep);
-		mFed->requestTimeComplete();
+		mFed->requestTime(timestep);
 		// Check if message is received
 		if (!mFed->hasMessage(p2)) {
 			dropped++;
@@ -283,14 +281,12 @@ BOOST_DATA_TEST_CASE(message_random_drop_object1, bdata::make(core_types), core_
 	helics::data_block data(100, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 100;
+	int max_iterations = 150;
 	int count = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
 		timestep+=1.0;
-		mFed->requestTimeAsync(timestep);
-		fFed->requestTime(timestep);
-		mFed->requestTimeComplete();
+		mFed->requestTime(timestep);
 		// Check if message is received
 		if (mFed->hasMessage(p2)) {
 			count++;
@@ -340,14 +336,12 @@ BOOST_DATA_TEST_CASE(message_random_drop_dest_object, bdata::make(core_types), c
 	helics::data_block data(100, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 200;
+	int max_iterations = 150;
 	int dropped = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
 		timestep+=1.0;
-		//fFed->requestTimeAsync(timestep);
 		mFed->requestTime(timestep);
-		//fFed->requestTimeComplete();
 		// Check if message is received
 		if (!mFed->hasMessage(p2)) {
 			dropped++;
@@ -402,15 +396,12 @@ BOOST_DATA_TEST_CASE(message_random_drop_dest_object1, bdata::make(core_types), 
 	helics::data_block data(500, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 300;
+	int max_iterations = 150;
 	int count = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
 		timestep++;
-		mFed->requestTimeAsync(timestep);
-		//fFed->requestTime(timestep);
-		mFed->requestTimeComplete();
-		// Check if message is received
+		mFed->requestTime(timestep);
 		if (mFed->hasMessage(p2)) {
 			count++;
             mFed->getMessage(p2);
