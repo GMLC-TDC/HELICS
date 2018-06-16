@@ -537,7 +537,7 @@ HELICS_EXPORT helics_status helicsFederateSetLoggingLevel (helics_federate fed, 
 @return a helics_status enumeration helics_ok on success helics_invalid_object if fed is not a valid reference helics_discard if the
 specified offset is invalid
 */
-HELICS_EXPORT helics_status helicsFederateSetMaxIterations (helics_federate_info_t fi, int maxIterations);
+HELICS_EXPORT helics_status helicsFederateSetMaxIterations (helics_federate fi, int maxIterations);
 
 /** get the current time of the federate
 @param fed the federate object to query
