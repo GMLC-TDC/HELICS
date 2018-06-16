@@ -25,12 +25,15 @@ def vFed():
 
     # Set Federate name #
     status = h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    assert status == 0
 
     # Set core type from string #
     status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    assert status == 0
 
     # Federate init string #
     status = h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+    assert status == 0
 
     # Set the message interval (timedelta) for federate. Note th#
     # HELICS minimum message time interval is 1 ns and by default
@@ -39,16 +42,20 @@ def vFed():
 
     # Set one second message interval #
     status = h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    assert status == 0
 
     status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    assert status == 0
 
     vFed = h.helicsCreateValueFederate(fedinfo)
 
     yield vFed
 
     status = h.helicsFederateFinalize(vFed)
+    assert status == 0
 
     status, state = h.helicsFederateGetState(vFed)
+    assert status == 0
     assert state == 3
 
     while (h.helicsBrokerIsConnected(broker)):
@@ -62,11 +69,13 @@ def vFed():
 
 def test_value_federate_initialize(vFed):
     status, state = h.helicsFederateGetState(vFed)
+    assert status == 0
     assert state == 0
 
     h.helicsFederateEnterExecutionMode(vFed)
 
     status, state = h.helicsFederateGetState(vFed)
+    assert status == 0
     assert state == 2
 
 def test_value_federate_publication_registration(vFed):
@@ -147,11 +156,10 @@ def test_value_federate_single_transfer(vFed):
     h.helicsPublicationPublishString(pubid, "string1")
 
     status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
-
+    assert status == 0
     assert grantedtime == 0.01
 
     status, s = h.helicsSubscriptionGetString(subid)
-
     assert status == 0
     assert s == "string1"
 
@@ -223,20 +231,25 @@ def test_value_federate_runFederateTestInteger(vFed):
     h.helicsPublicationPublishInteger(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetInteger(subid)
+    assert status == 0
     assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
+    assert status == 0
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetInteger(subid)
+    assert status == 0
     assert value == testValue
 
     h.helicsPublicationPublishInteger(pubid, testValue + 1)
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
+    assert status == 0
     assert grantedtime == 0.02
 
     status, value = h.helicsSubscriptionGetInteger(subid)
+    assert status == 0
     assert value == testValue + 1
 
 
@@ -253,12 +266,15 @@ def test_value_federate_runFederateTestString(vFed):
     h.helicsPublicationPublishString(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetString(subid)
+    assert status == 0
     assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    assert status == 0
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetString(subid)
+    assert status == 0
     assert value == testValue
 
 def test_value_federate_runFederateTestVectorD(vFed):
@@ -274,10 +290,13 @@ def test_value_federate_runFederateTestVectorD(vFed):
     h.helicsPublicationPublishVector(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetVector(subid)
+    assert status == 0
     assert value == [0, 1, 2]
 
     status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
+    assert status == 0
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetVector(subid)
+    assert status == 0
     assert value == [3, 4, 5]
