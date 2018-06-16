@@ -5,9 +5,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include "../application_api/Publications.hpp"
+#include "helicsApp.hpp"
 
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include <map>
@@ -42,7 +42,7 @@ and sending signals at the appropriate times
 @details  the Player class is not thread-safe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
-class Player:public App
+class Player : public App
 {
   public:
     /** default constructor*/
@@ -137,13 +137,13 @@ class Player:public App
     @param val the value to publish
     */
     template <class valType>
-    void addPoint(Time pubTime, int iteration, const std::string &key, const valType &val)
+    void addPoint (Time pubTime, int iteration, const std::string &key, const valType &val)
     {
-        points.resize(points.size() + 1);
-        points.back().time = pubTime;
-        points.back().iteration = iteration;
-        points.back().pubName = key;
-        points.back().value = val;
+        points.resize (points.size () + 1);
+        points.back ().time = pubTime;
+        points.back ().iteration = iteration;
+        points.back ().pubName = key;
+        points.back ().value = val;
     }
     /** add a message to a Player queue
     @param pubTime  the time the message should be sent
@@ -174,7 +174,10 @@ class Player:public App
     auto publicationCount () const { return publications.size (); }
     /** get the number of endpoints*/
     auto endpointCount () const { return endpoints.size (); }
-
+    /** get the point from an index*/
+    const auto &getPoint(int index) const { return points[index]; }
+    /** get the messages from an index*/
+    const auto &getMessage(int index) const { return messages[index]; }
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
@@ -191,10 +194,9 @@ class Player:public App
     void generateEndpoints ();
     /** helper function to sort the points and link them to publications*/
     void cleanUpPointList ();
-    /** function to decode data strings for messages*/
-    std::string decode (std::string &&stringToDecode);
+
     /** send all points and messages up to the specified time*/
-    void sendInformation (Time sendTime, int iteration=0);
+    void sendInformation (Time sendTime, int iteration = 0);
 
     /** extract a time from the string based on Player parameters
     @param str the string containing the time
@@ -219,5 +221,4 @@ class Player:public App
     double timeMultiplier = 1.0;  //!< specify the time multiplier for different time specifications
 };
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics

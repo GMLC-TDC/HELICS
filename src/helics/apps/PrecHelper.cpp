@@ -17,10 +17,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 
 #include <algorithm>
-#include <complex>
-#include <regex>
-#include <sstream>
-
 
 #include "../application_api/Federate.hpp"
 
@@ -94,3 +90,7 @@ char typeCharacter (helics_type_t type)
     }
 }
 
+bool isBinaryData(helics::data_block &data)
+{
+    return std::any_of(data.begin(), data.end(), [](const auto &c) {return ((c < 32) || (c == 34) || (c > 126)); });
+}
