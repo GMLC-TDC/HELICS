@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
         auto td = ctime - now;
         auto tdiff = helics::Time (td) - reqTime;
 
-        if (tdiff < -0.11)
+        if (tdiff < -0.15)
         {
             ++outofTimeBounds;
             //   printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
@@ -159,13 +159,13 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
         BOOST_CHECK_EQUAL (gtime, reqTime);
         auto td = ctime - now;
         auto tdiff = helics::Time (td) - reqTime;
-        BOOST_CHECK (tdiff >= -0.11);
-        if (tdiff < -0.11)
+        BOOST_CHECK (tdiff >= -0.15);
+        if (tdiff < -0.15)
         {
             ++outofTimeBounds;
             // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));
         }
-        if (tdiff > 0.11)
+        if (tdiff > 0.15)
         {
             ++outofTimeBounds;
             // printf ("tdiff=%f at time %f\n", static_cast<double> (tdiff), static_cast<double> (reqTime));

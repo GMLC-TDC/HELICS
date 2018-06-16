@@ -18,8 +18,7 @@ test-message-federate.cpp
 #FederateTests.cpp
 #TimingTests.cpp
 #iterationTests.cpp
-#subPubObjectTests.cpp
-#QueryTests.cpp
+QueryTests.cpp
 )
 
 set(cpp_shared_library_test_sources
