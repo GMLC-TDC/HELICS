@@ -58,6 +58,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make(core_types), co
 	fFed->requestTime(1.0);
 	mFed->requestTimeComplete();
 
+    BOOST_CHECK(!mFed->hasMessage(p2));
 	BOOST_REQUIRE(mFed->hasMessage(p3));
 
 	auto m2 = mFed->getMessage(p3);
@@ -112,7 +113,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make(core_types), 
 	mFed->requestTimeAsync(1.0);
 	fFed->requestTime(1.0);
 	mFed->requestTimeComplete();
-
+    BOOST_CHECK(!mFed->hasMessage(p2));
 	BOOST_REQUIRE(mFed->hasMessage(p3));
 	auto m2 = mFed->getMessage(p3);
 
@@ -216,10 +217,10 @@ BOOST_DATA_TEST_CASE(message_random_drop_object, bdata::make(core_types), core_t
 	fFed->enterExecutionStateComplete();
 
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::execution);
-	helics::data_block data(500, 'a');
+	helics::data_block data(100, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 300;
+	int max_iterations = 200;
 	int dropped = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
@@ -279,10 +280,10 @@ BOOST_DATA_TEST_CASE(message_random_drop_object1, bdata::make(core_types), core_
 	fFed->enterExecutionStateComplete();
 	
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::execution);
-	helics::data_block data(500, 'a');
+	helics::data_block data(100, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 12;
+	int max_iterations = 100;
 	int count = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
@@ -336,10 +337,10 @@ BOOST_DATA_TEST_CASE(message_random_drop_dest_object, bdata::make(core_types), c
 	fFed->enterExecutionStateComplete();
 	
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::execution);
-	helics::data_block data(500, 'a');
+	helics::data_block data(100, 'a');
 
 	double timestep = 0.0; // 1 second
-	int max_iterations = 500;
+	int max_iterations = 200;
 	int dropped = 0;
 	for (int i = 0; i < max_iterations; i++) {
 		mFed->sendMessage(p1, "port2", data);
@@ -455,7 +456,7 @@ BOOST_DATA_TEST_CASE(message_random_delay_object, bdata::make(core_types), core_
 	fFed->enterExecutionStateComplete();
 
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::execution);
-	helics::data_block data(500, 'a');
+	helics::data_block data(100, 'a');
 	mFed->sendMessage(p1, "port2", data);
 
 	double timestep = 0.0; // 1 second
@@ -464,10 +465,8 @@ BOOST_DATA_TEST_CASE(message_random_delay_object, bdata::make(core_types), core_
 	double actual_delay = 100.0;
 
 	for (int i = 0; i < max_iterations; i++) {
-		timestep++;
-		mFed->requestTimeAsync(timestep);
-		fFed->requestTime(timestep);
-		mFed->requestTimeComplete();
+		timestep+=1.0;
+		mFed->requestTime(timestep);
 		// Check if message is received
 		if (mFed->hasMessage(p2)) {
 			auto m2 = mFed->getMessage(p2);
