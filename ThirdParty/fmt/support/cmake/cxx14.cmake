@@ -3,8 +3,24 @@
 if (NOT FMT_USE_CPP14)
   return()
 endif ()
-
 include(CheckCXXCompilerFlag)
+if (FMT_ASSUME_CPP14_SUPPORT)
+	set(CMAKE_REQUIRED_FLAGS )
+	set(FMT_CPP14_CMATH ON)
+	#this is not a windows thing so probably still need to check
+	check_cxx_source_compiles("
+      #include <unistd.h>
+      int main() {}" FMT_CPP14_UNISTD_H)
+	  
+	 set(FMT_CPP14_SNPRINTF ON)
+	 set(SUPPORTS_VARIADIC_TEMPLATES ON)
+	 set(SUPPORTS_INITIALIZER_LIST ON)
+	 set(SUPPORTS_ENUM_BASE ON)
+	 set(SUPPORTS_TYPE_TRAITS ON)
+	 set(SUPPORTS_USER_DEFINED_LITERALS ON)
+	return()
+endif()
+
 
 if (FMT_USE_CPP14)
   check_cxx_compiler_flag(-std=c++14 HAVE_STD_CPP14_FLAG)

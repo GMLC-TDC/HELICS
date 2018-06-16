@@ -1285,35 +1285,35 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
     return "#invalid";
 }
 
-std::string CoreBroker::generateQueryAnswer (const std::string &query)
+std::string CoreBroker::generateQueryAnswer (const std::string &request)
 {
-    if (query == "isinit")
+    if (request == "isinit")
     {
         return (brokerState >= broker_state_t::operating) ? "true" : "false";
     }
-    if (query == "federates")
+    if (request == "federates")
     {
         return generateStringVector (_federates, [](auto &fed) { return fed.name; });
     }
-    if (query == "brokers")
+    if (request == "brokers")
     {
         return generateStringVector (_brokers, [](auto &brk) { return brk.name; });
     }
-    if (query == "publications")
+    if (request == "publications")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
                                         [](auto &handle) {
                                             return (handle.handle_type == handle_type_t::publication);
                                         });
     }
-    if (query == "endpoints")
+    if (request == "endpoints")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
                                         [](auto &handle) {
                                             return (handle.handle_type == handle_type_t::endpoint);
                                         });
     }
-    if (query == "federate_map")
+    if (request == "federate_map")
     {
         if (fedMap.isCompleted ())
         {
@@ -1333,7 +1333,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query)
             return "#wait";
         }
     }
-    if (query == "dependency_graph")
+    if (request == "dependency_graph")
     {
         if (depMap.isCompleted ())
         {
@@ -1353,17 +1353,17 @@ std::string CoreBroker::generateQueryAnswer (const std::string &query)
             return "#wait";
         }
     }
-    if (query == "dependson")
+    if (request == "dependson")
     {
         return generateStringVector (timeCoord->getDependencies (),
                                      [](const auto &dep) { return std::to_string (dep); });
     }
-    if (query == "dependents")
+    if (request == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
                                      [](const auto &dep) { return std::to_string (dep); });
     }
-    if (query == "dependencies")
+    if (request == "dependencies")
     {
         Json_helics::Value base;
         base["name"] = getIdentifier ();

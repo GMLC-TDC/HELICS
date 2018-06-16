@@ -137,7 +137,12 @@ class Federate
         return *this;
     }
 #endif
-    virtual ~Federate () { helicsFederateFree (fed); }
+    virtual ~Federate() {
+        if (fed != NULL)
+        {
+            helicsFederateFree(fed);
+        }
+    }
 
     operator helics_federate () const { return fed; }
 
