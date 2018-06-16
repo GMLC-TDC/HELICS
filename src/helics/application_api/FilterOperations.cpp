@@ -269,7 +269,7 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 RandomDropFilterOperation::RandomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
-      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, dropProb, 1.0) > 0.1); });
+      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0-dropProb), 1.0) > 0.1); });
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation () = default;
@@ -351,7 +351,7 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
-        if (std::regex_match (dest, reg))
+        if (std::regex_search (dest, reg,std::regex_constants::match_any))
         {
             return newDestGeneration (src, dest, newDest.load ());
         }

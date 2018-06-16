@@ -3302,7 +3302,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
     {
         return;
     }
-    auto messID = (command.action () == CMD_DEST_FILTER_RESULT) ? command.info ().messageID : command.index;
+    auto messID = (command.action () == CMD_DEST_FILTER_RESULT) ? command.info ().messageID : command.source_handle;
     if (ongoingDestFilterProcesses[handle->fed_id].find (messID) !=
         ongoingDestFilterProcesses[handle->fed_id].end ())
     {
@@ -3483,6 +3483,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                     {
                         cmd.dest_id = source;
                         cmd.dest_handle = source_handle;
+                        
                         if (cmd.action () == CMD_IGNORE)
                         {
                             cmd.setAction (destFilter ? CMD_NULL_DEST_MESSAGE : CMD_NULL_MESSAGE);
