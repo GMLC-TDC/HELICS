@@ -11,6 +11,7 @@ ValueFederateKeyTests.cpp
 FilterTests.cpp
 testFixtures.cpp
 PrimaryTypeConversionTests.cpp
+FilterAdditionalTests.cpp
 )
  
 set(application_api_test_headers

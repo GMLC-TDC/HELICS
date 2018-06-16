@@ -4,8 +4,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef ACTION_MESSAGE_H_
-#define ACTION_MESSAGE_H_
 #pragma once
 
 #include "ActionMessageDefintions.hpp"
@@ -289,4 +287,4 @@ std::string prettyPrintString (const ActionMessage &command);
 std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
 }  // namespace helics
-#endif
+
