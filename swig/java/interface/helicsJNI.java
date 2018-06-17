@@ -87,6 +87,7 @@ public class helicsJNI {
   public final static native int helicsFederateInfoSetCoreTypeFromString(long jarg1, String jarg2);
   public final static native int helicsFederateInfoSetCoreType(long jarg1, int jarg2);
   public final static native int helicsFederateInfoSetFlag(long jarg1, int jarg2, int jarg3);
+  public final static native int helicsFederateInfoSetSeparator(long jarg1, char jarg2);
   public final static native int helicsFederateInfoSetOutputDelay(long jarg1, double jarg2);
   public final static native int helicsFederateInfoSetTimeDelta(long jarg1, double jarg2);
   public final static native int helicsFederateInfoSetInputDelay(long jarg1, double jarg2);
@@ -121,11 +122,14 @@ public class helicsJNI {
   public final static native int helicsFederateSetInputDelay(long jarg1, double jarg2);
   public final static native int helicsFederateSetPeriod(long jarg1, double jarg2, double jarg3);
   public final static native int helicsFederateSetFlag(long jarg1, int jarg2, int jarg3);
+  public final static native int helicsFederateSetSeparator(long jarg1, char jarg2);
   public final static native int helicsFederateSetLoggingLevel(long jarg1, int jarg2);
   public final static native int helicsFederateSetMaxIterations(long jarg1, int jarg2);
   public final static native int helicsFederateGetCurrentTime(long jarg1, double[] jarg2);
   public final static native long helicsCreateQuery(String jarg1, String jarg2);
   public final static native String helicsQueryExecute(long jarg1, long jarg2);
+  public final static native String helicsQueryCoreExecute(long jarg1, long jarg2);
+  public final static native String helicsQueryBrokerExecute(long jarg1, long jarg2);
   public final static native int helicsQueryExecuteAsync(long jarg1, long jarg2);
   public final static native String helicsQueryExecuteComplete(long jarg1);
   public final static native int helicsQueryIsCompleted(long jarg1);

@@ -10,6 +10,7 @@ package com.java.helics;
 
 public final class helics_status {
   public final static helics_status helics_ok = new helics_status("helics_ok", helicsJNI.helics_ok_get());
+  public final static helics_status helics_registration_failure = new helics_status("helics_registration_failure");
   public final static helics_status helics_invalid_object = new helics_status("helics_invalid_object");
   public final static helics_status helics_invalid_argument = new helics_status("helics_invalid_argument");
   public final static helics_status helics_discard = new helics_status("helics_discard");
@@ -53,7 +54,7 @@ public final class helics_status {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_status[] swigValues = { helics_ok, helics_invalid_object, helics_invalid_argument, helics_discard, helics_terminated, helics_warning, helics_invalid_state_transition, helics_invalid_function_call, helics_error };
+  private static helics_status[] swigValues = { helics_ok, helics_registration_failure, helics_invalid_object, helics_invalid_argument, helics_discard, helics_terminated, helics_warning, helics_invalid_state_transition, helics_invalid_function_call, helics_error };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

@@ -96,6 +96,7 @@ except __builtin__.Exception:
     _newclass = 0
 
 helics_ok = _helics.helics_ok
+helics_registration_failure = _helics.helics_registration_failure
 helics_invalid_object = _helics.helics_invalid_object
 helics_invalid_argument = _helics.helics_invalid_argument
 helics_discard = _helics.helics_discard
