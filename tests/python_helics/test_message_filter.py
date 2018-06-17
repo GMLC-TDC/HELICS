@@ -9,6 +9,7 @@ def AddBroker(core_type="zmq", number_of_federates=1):
     deltat = 0.01
 
     helicsversion = h.helicsGetVersion()
+    print("HELICS version = {}".format(helicsversion))
 
     # Create broker #
     broker = h.helicsCreateBroker(core_type, "", initstring)
@@ -27,13 +28,16 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
 
     # Set Federate name #
     status = h.helicsFederateInfoSetFederateName(fedinfo, name_prefix)
+    assert status == 0
 
     # Set core type from string #
     status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    assert status == 0
 
     # Federate init string #
     fedinitstring = "--broker=mainbroker --federates={}".format(count)
     status = h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+    assert status == 0
 
     # Set the message interval (timedelta) for federate. Note th#
     # HELICS minimum message time interval is 1 ns and by default
@@ -42,8 +46,10 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
 
     # Set one second message interval #
     status = h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    assert status == 0
 
     status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    assert status == 0
 
     mFed = h.helicsCreateMessageFederate(fedinfo)
 

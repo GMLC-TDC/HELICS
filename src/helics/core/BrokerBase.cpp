@@ -27,16 +27,19 @@ static constexpr auto chars= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn
 
 static inline std::string gen_id ()
 {
-    std::string nm = std::string(21, ' ');
+    std::string nm = std::string(23, ' ');
     std::random_device rd;     // only used once to initialize (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni(0, 61); // guaranteed unbiased
 
-    nm[10] = '-';
-    for (int i = 0; i<21; i++) {
-        if (i != 10)
+    nm[5] = '-';
+    nm[11] = '-';
+    nm[17] = '-';
+
+    for (int ii = 0; ii<23; ii++) {
+        if ((ii != 5)&&(ii!=11)&& (ii != 17))
         {
-            nm[i] = chars[uni(rng)];
+            nm[ii] = chars[uni(rng)];
         }
     }
 #ifdef _WIN32
@@ -201,6 +204,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
 }
 
 void BrokerBase::generateNewIdentifier () { identifier = gen_id (); }
+
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
