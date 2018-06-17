@@ -310,7 +310,6 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     auto sub3 = vFed1->registerOptionalSubscription ("fed0/pub3", "");
 
     helics::data_block db (547, ';');
-    helics::subscription_id_t lastId;
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
     vFed1->registerSubscriptionNotificationCallback ({sub1, sub2},
