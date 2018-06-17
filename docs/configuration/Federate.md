@@ -3,14 +3,14 @@ General federate configuration consists of setting up the name, connectivity inf
 This is generally done through a FederateInfo object and passing that into the construction function for a federate
 
 ## Federate Name
-A federate name is a string that contains the name of the federate, it should be unique in the federation, if not included a random UID is 
-automatically generated.  This name is prependend for any local interfaces
+A federate name is a string that contains the name of the federate, it should be unique in the federation, if not included a random UID is
+automatically generated.  This name is prepended for any local interfaces
 
 ## Core information
 Certain information is used by the federate to establish linkages to a core object this
 ### Core name
  the corename identifies a potentially preexisting core in the same process that can be used
-or just names the created core. 
+or just names the created core.
 
 ### Core type
 see [Core Types](CoreTypes) for more details on the specific types of cores which are available and their purposes
@@ -21,7 +21,7 @@ the core init string is a string used by any created core to establish connectiv
 this includes port numbers, addresses, and the minimum number of federates
 
 ## Timing information
-There are a number of parameters related to timing information in HELICS.  These deterimine what times the request time returns and how a federate handles interruptions and interacts with other federates
+There are a number of parameters related to timing information in HELICS.  These determine what times the request time returns and how a federate handles interruptions and interacts with other federates
 For a detailed description of the timing parameters see [Timing in Helics](Timing)
 
 ## Interface configuration
@@ -38,7 +38,7 @@ Filters can be configured via files the following is an example
 {
 	"name":"filtername",  //filters can have names (optional)
 	"target":"ept1",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom" 
+	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
 	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
@@ -66,7 +66,7 @@ Filters can be configured via files the following is an example
 	//"operation":"clone", //cloning filters don't really need an operation since clone is all they do if one is specified it must be "clone" or "cloning"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	[{   
-		"name":"destination",  //destination adds a cloning filter for all messages delivered to a particular 
+		"name":"destination",  //destination adds a cloning filter for all messages delivered to a particular
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	},
 	{
@@ -89,5 +89,3 @@ for source and dest filters valid operations include "delay", "reroute", "randde
 for clone filters an operation of "clone" is assumed other specification result in errors on configuration.
 
 "custom" filter operations usually require setting of a custom callback otherwise the filter won't do anything.
-
-

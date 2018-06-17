@@ -273,7 +273,7 @@ helics_status helicsFilterGetName (helics_filter filt, char *outputString, int m
     }
     try
     {
-        auto name = filter->getTarget ();
+        auto name = filter->getName ();
         if (static_cast<int> (name.size ()) > maxlen)
         {
             strncpy (outputString, name.c_str (), maxlen);
