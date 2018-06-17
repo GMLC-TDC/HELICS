@@ -1,4 +1,3 @@
-import time
 import helics as h
 import random
 
@@ -98,17 +97,22 @@ def main():
         while grantedtime < stop_at_time:
             print(">>>>>>>> Requesting time = {}".format(stop_at_time))
             status, grantedtime = h.helicsFederateRequestTime(fed, stop_at_time)
+            assert status == 0
             if grantedtime != stop_at_time:
                 status, value = h.helicsSubscriptionGetString(subid)
+                assert status == 0
                 print("Interrupt value '{}' from Federate 1".format(value))
             print("<<<<<<<< Granted Time = {}".format(grantedtime))
         assert grantedtime == stop_at_time, "stop_at_time = {}, grantedtime = {}".format(stop_at_time, grantedtime)
         if value_to_send is not None and value_to_send != '':
             print("Sending '{}' to Federate 1".format(value_to_send))
             status = h.helicsPublicationPublishString(pubid, str(value_to_send))
+            assert status == 0
             status = h.helicsEndpointSendMessageRaw(epid, "endpoint1", str(value_to_send))
+            assert status == 0
 
         status, value = h.helicsSubscriptionGetString(subid)
+        assert status == 0
         print("Received value '{}' from Federate 1".format(value))
         while h.helicsEndpointHasMessage(epid):
             value = h.helicsEndpointGetMessage(epid)

@@ -4,8 +4,6 @@ import helics as h
 
 @pt.fixture
 def mFed():
-    import helics as h
-
     initstring = "1 --name=mainbroker"
     fedinitstring = "--broker=mainbroker --federates=1"
     deltat = 0.01
@@ -102,7 +100,7 @@ def test_message_federate_endpoint_registration(mFed):
     status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1.0)
 
     status, granted_time = h.helicsFederateRequestTime(mFed, 1.0)
-
+    assert status == 0
     assert granted_time == 1.0
 
     res = h.helicsFederateHasMessage(mFed)

@@ -810,7 +810,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
             {
                 *actualSize = length;
             }
-            return (length < maxlen) ? helics_ok : helics_warning;
+            return (length <= maxlen) ? helics_ok : helics_warning;
         }
 
         auto V = subObj->subptr->getValue<std::vector<double>> ();
@@ -820,7 +820,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
         {
             *actualSize = length;
         }
-        return (length < maxlen) ? helics_ok : helics_warning;
+        return (length <= maxlen) ? helics_ok : helics_warning;
     }
     catch (...)
     {
