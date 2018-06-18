@@ -3,6 +3,26 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.2.0] - 2018-06-18
+### Fixed
+ - issue with various filter tyes and random drop filters
+ - a few minor issues with C api (helicsFederateSetMaxIterations)
+ - potential threading issues when updating the logger on an executing federate
+ - federates will now propagate errors properly for duplicate publications and endpoints
+ - federates will now error on missing required publications
+
+### Changed
+ - implement use of fmt library instead of boost::format
+ - improved python installation scripts
+ - general threading and refactoring of the core
+ - automatic name generation no longer uses random uuid's, but a shorter 20 character random string
+
+### Added
+ - queryCoreExecute, queryBrokerExecute to the C api to allow queries to be executed directly on brokers and cores
+ - C++ API changes to for Brokers and Core to allow queries
+ - new queries (federate_map, and dependency_graph(partial))
+ - additional filter tests and query tests
+ - realtime mode for HELICS specified by activating the realtime flag, and specifying rt_lag and rt_lead  the federate will then delay grant or force_grant based on computer clock to match wall time.
 
 ## [1.1.1] - 2018-05-25
 ### Added

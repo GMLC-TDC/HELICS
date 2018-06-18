@@ -180,6 +180,10 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetFlag(SWIGTYPE_p_void.getCPtr(fi), flag, value));
   }
 
+  public static helics_status helicsFederateInfoSetSeparator(SWIGTYPE_p_void fi, char separator) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetSeparator(SWIGTYPE_p_void.getCPtr(fi), separator));
+  }
+
   public static helics_status helicsFederateInfoSetOutputDelay(SWIGTYPE_p_void fi, double outputDelay) {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetOutputDelay(SWIGTYPE_p_void.getCPtr(fi), outputDelay));
   }
@@ -317,6 +321,10 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsFederateSetFlag(SWIGTYPE_p_void.getCPtr(fed), flag, flagValue));
   }
 
+  public static helics_status helicsFederateSetSeparator(SWIGTYPE_p_void fed, char separator) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateSetSeparator(SWIGTYPE_p_void.getCPtr(fed), separator));
+  }
+
   public static helics_status helicsFederateSetLoggingLevel(SWIGTYPE_p_void fed, int loggingLevel) {
     return helics_status.swigToEnum(helicsJNI.helicsFederateSetLoggingLevel(SWIGTYPE_p_void.getCPtr(fed), loggingLevel));
   }
@@ -336,6 +344,14 @@ public class helics implements helicsConstants {
 
   public static String helicsQueryExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void fed) {
     return helicsJNI.helicsQueryExecute(SWIGTYPE_p_void.getCPtr(query), SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static String helicsQueryCoreExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void core) {
+    return helicsJNI.helicsQueryCoreExecute(SWIGTYPE_p_void.getCPtr(query), SWIGTYPE_p_void.getCPtr(core));
+  }
+
+  public static String helicsQueryBrokerExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void broker) {
+    return helicsJNI.helicsQueryBrokerExecute(SWIGTYPE_p_void.getCPtr(query), SWIGTYPE_p_void.getCPtr(broker));
   }
 
   public static helics_status helicsQueryExecuteAsync(SWIGTYPE_p_void query, SWIGTYPE_p_void fed) {

@@ -11,10 +11,10 @@ project (HELICS)
 # HELICS Version number
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
-set (HELICS_VERSION_MINOR 1)
-set (HELICS_VERSION_PATCH 1)
+set (HELICS_VERSION_MINOR 2)
+set (HELICS_VERSION_PATCH 0)
 set (HELICS_VERSION_BUILD )
-set (HELICS_DATE "05-25-18")
+set (HELICS_DATE "06-18-18")
 
 if (NOT HELICS_VERSION_BUILD)
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")
@@ -326,6 +326,7 @@ endif()
 # create the fmt header only targets
 #-----------------------------------------------------------------------------
 set(FMT_TEST OFF)
+set(FMT_ASSUME_CPP14_SUPPORT ON)
 add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 
 #-----------------------------------------------------------------------------

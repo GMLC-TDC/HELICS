@@ -11496,6 +11496,7 @@ SWIG_init(void) {
   SWIG_InstallConstants(d,swig_const_table);
   
   SWIG_Python_SetConstant(d, "helics_ok",SWIG_From_int((int)(helics_ok)));
+  SWIG_Python_SetConstant(d, "helics_registration_failure",SWIG_From_int((int)(helics_registration_failure)));
   SWIG_Python_SetConstant(d, "helics_invalid_object",SWIG_From_int((int)(helics_invalid_object)));
   SWIG_Python_SetConstant(d, "helics_invalid_argument",SWIG_From_int((int)(helics_invalid_argument)));
   SWIG_Python_SetConstant(d, "helics_discard",SWIG_From_int((int)(helics_discard)));
