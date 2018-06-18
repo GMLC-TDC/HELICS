@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 /*
 * LLNS Copyright Start
-* Copyright (c) 2017, Lawrence Livermore National Security
+* Copyright (c) 2014-2018, Lawrence Livermore National Security
 * This work was performed under the auspices of the U.S. Department
 * of Energy by Lawrence Livermore National Laboratory in part under
 * Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
@@ -14,8 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 * For details, see the LICENSE file.
 * LLNS Copyright End
 */
-#ifndef STRING_TO_CMD_LINE
-#define STRING_TO_CMD_LINE
 #pragma once
 
 #include <string>
@@ -43,6 +41,4 @@ private:
 	int argCount;	//!< the number of arguments
 
 };
-
-#endif
 

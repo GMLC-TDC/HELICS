@@ -30,10 +30,22 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** flag indicating that a federate performs forward computation and does internal rollback*/
 #define FORWARD_COMPUTE_FLAG 9
 
+/** flag indicating that a federate needs to run in real time*/
+#define REALTIME_FLAG 12
+
 /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
 #define DELAY_INIT_ENTRY 45
 /** used to clear the DELAY_INIT_ENTRY flag in cores*/
 #define ENABLE_INIT_ENTRY 47
+
+/* error code definitions */
+#define ERROR_CODE_REGISTRATION_FAILURE 2
+#define ERROR_CODE_INVALID_OBJECT 4
+#define ERROR_CODE_INVALID_ARGUMENT 6
+#define ERROR_CODE_DISCARD 8
+#define ERROR_CODE_CONNECTION_FAILURE 10
+#define ERROR_CODE_INVALID_STATE_TRANSITION 12
+#define ERROR_CODE_INVALID_FUNCTION_CALL 15
 
 #endif
 

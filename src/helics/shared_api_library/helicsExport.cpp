@@ -219,31 +219,34 @@ helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, he
     switch (flag)
     {
     case OBSERVER_FLAG:
-        hfi->observer = (value != 0);
+        hfi->observer = (value != helics_false);
         break;
     case UNINTERRUPTIBLE_FLAG:
-        hfi->uninterruptible = (value != 0);
+        hfi->uninterruptible = (value != helics_false);
         break;
     case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-        hfi->only_transmit_on_change = (value != 0);
+        hfi->only_transmit_on_change = (value != helics_false);
         break;
     case ONLY_UPDATE_ON_CHANGE_FLAG:
-        hfi->only_update_on_change = (value != 0);
+        hfi->only_update_on_change = (value != helics_false);
         break;
     case SOURCE_ONLY_FLAG:
-        hfi->source_only = (value != 0);
+        hfi->source_only = (value != helics_false);
         break;
     case ROLLBACK_FLAG:
-        hfi->rollback = (value != 0);
+        hfi->rollback = (value != helics_false);
         break;
     case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != 0);
+        hfi->forwardCompute = (value != helics_false);
         break;
     case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-        hfi->wait_for_current_time_updates = (value != 0);
+        hfi->wait_for_current_time_updates = (value != helics_false);
+        break;
+    case REALTIME_FLAG:
+        hfi->realtime = (value != helics_false);
         break;
     default:
-        return helics_invalid_object;
+        return helics_invalid_argument;
     }
     return helics_ok;
 }
@@ -259,6 +262,17 @@ helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helic
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
     hfi->outputDelay = outputDelay;
+    return helics_ok;
+}
+
+helics_status helicsFederateInfoSetSeparator(helics_federate_info_t fi, char separator)
+{
+    if (fi == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
+    hfi->separator=separator;
     return helics_ok;
 }
 
@@ -789,6 +803,50 @@ const char *helicsQueryExecute (helics_query query, helics_federate fed)
     return queryObj->response.c_str ();
 }
 
+const char *helicsQueryCoreExecute(helics_query query, helics_core core)
+{
+    if (core == nullptr)
+    {
+        return invalidStringConst;
+    }
+    if (core == nullptr)
+    {
+        return invalidStringConst;
+    }
+    auto coreObj = getCore(core);
+    if (coreObj == nullptr)
+    {
+        return invalidStringConst;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    queryObj->response = coreObj->query(queryObj->target,queryObj->query);
+
+    return queryObj->response.c_str();
+}
+
+const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
+{
+    if (broker == nullptr)
+    {
+        return invalidStringConst;
+    }
+    if (broker == nullptr)
+    {
+        return invalidStringConst;
+    }
+    auto brokerObj = getCore(broker);
+    if (brokerObj == nullptr)
+    {
+        return invalidStringConst;
+    }
+
+    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
+
+    return queryObj->response.c_str();
+}
+
 helics_status helicsQueryExecuteAsync (helics_query query, helics_federate fed)
 {
     if (fed == nullptr)
@@ -830,7 +888,7 @@ const char *helicsQueryExecuteComplete (helics_query query)
 {
     if (query == nullptr)
     {
-        return nullptr;
+        return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::queryObject *> (query);

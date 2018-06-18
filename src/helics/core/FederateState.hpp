@@ -12,12 +12,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CommonCore.hpp"
 #include "Core.hpp"
 #include "CoreFederateInfo.hpp"
+#include "InterfaceInfo.hpp"
 #include "TimeDependencies.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
+#include <chrono>
 #include <map>
 #include <mutex>
 #include <vector>
@@ -31,6 +33,7 @@ class FilterInfo;
 class CommonCore;
 
 class TimeCoordinator;
+class MessageTimer;
 
 constexpr Time startupTime = Time::minVal ();
 constexpr Time initialTime{-1000000.0};
@@ -51,23 +54,22 @@ class FederateState
     std::atomic<Core::federate_id_t> global_id{invalid_fed_id};  //!< global id code, default to invalid
 
   private:
-    shared_guarded<DualMappedPointerVector<SubscriptionInfo, std::string, Core::handle_id_t>>
-      subscriptions;  //!< storage for all the subscriptions
-    
     std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
-    bool only_update_on_change{false};  //!< flag indicating that values should only be updated on change
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
-    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, Core::handle_id_t>>
-      publications;  //!< storage for all the publications
-    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, Core::handle_id_t>>
-      endpoints;  //!< storage for all the endpoints
+    bool realtime{false};  //!< flag indicating that the federate runs in real time
+    InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
+    int errorCode = 0;  //!< storage for an error code
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
-    std::string errorString; //!< storage for an error string populated on an error
+    std::string errorString;  //!< storage for an error string populated on an error
+    decltype (std::chrono::steady_clock::now ()) start_clock_time; //!< time the initialization mode started for real time capture
+    Time rt_lag = timeZero;  //!< max lag for the rt control
+    Time rt_lead = timeZero;  //!< min lag for the realtime control
+    int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
 
@@ -80,6 +82,7 @@ class FederateState
 
     //   std::vector<ActionMessage> messLog;
   private:
+    std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
     std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
@@ -91,7 +94,6 @@ class FederateState
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     mutable std::mutex _mutex;  //!< the mutex protecting the fed state
-
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
@@ -122,30 +124,8 @@ class FederateState
     /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
     federate_state_t getState () const;
-
-    const SubscriptionInfo *getSubscription (const std::string &subName) const;
-    const SubscriptionInfo *getSubscription (Core::handle_id_t handle_) const;
-    SubscriptionInfo *getSubscription (const std::string &subName);
-    SubscriptionInfo *getSubscription (Core::handle_id_t handle_);
-    const PublicationInfo *getPublication (const std::string &pubName) const;
-    const PublicationInfo *getPublication (Core::handle_id_t handle_) const;
-    PublicationInfo *getPublication (const std::string &pubName);
-    PublicationInfo *getPublication (Core::handle_id_t handle_);
-    const EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    const EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
-    EndpointInfo *getEndpoint (const std::string &endpointName);
-    EndpointInfo *getEndpoint (Core::handle_id_t handle_);
-
-    void createSubscription (Core::handle_id_t handle,
-                             const std::string &key,
-                             const std::string &type,
-                             const std::string &units,
-                             handle_check_mode check_mode);
-    void createPublication (Core::handle_id_t handle,
-                            const std::string &key,
-                            const std::string &type,
-                            const std::string &units);
-    void createEndpoint (Core::handle_id_t handle, const std::string &key, const std::string &type);
+    InterfaceInfo &interfaces () { return interfaceInformation; }
+    const InterfaceInfo &interfaces () const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
     uint64_t getQueueSize (Core::handle_id_t id) const;
@@ -228,7 +208,10 @@ class FederateState
      */
     const std::vector<Core::federate_id_t> &getDependents () const;
     /** get the last error string */
-    const std::string &lastErrorString() const { return errorString; }
+    const std::string &lastErrorString () const { return errorString; }
+    /** get the last error code*/
+    int lastErrorCode () const noexcept { return errorCode; }
+    /** set the managing core object */
     void setCoreObject (CommonCore *parent);
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/

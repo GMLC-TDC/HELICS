@@ -415,9 +415,9 @@ void Federate::setLoggingCallback (
 
 void Federate::setFlag (int flag, bool flagValue)
 {
-    if ((flag > 10) || (flag < 0))
+    if ((flag > 12) || (flag < 0))
     {
-        throw (InvalidParameter ("flag must be between 0 and 10"));
+        throw (InvalidParameter ("flag must be between 0 and 12"));
     }
     switch (flag)
     {
@@ -594,7 +594,7 @@ Time Federate::requestTimeComplete ()
 
         auto asyncInfo = asyncCallInfo->lock();
         auto newTime = asyncInfo->timeRequestFuture.get ();
-        asyncInfo = nullptr; //remove the lock;
+        asyncInfo.unlock(); //remove the lock;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime (newTime, oldTime);
@@ -662,7 +662,7 @@ void Federate::registerInterfaces (const std::string &jsonString) { registerFilt
 
 void Federate::registerFilterInterfaces (const std::string &jsonString)
 {
-    auto doc = loadJsonString (jsonString);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("filters"))
     {

@@ -5,7 +5,7 @@
 ##############################################################################
 
 set(helics_apps_test_sources
-player_recorder_tests.cpp
+helics_apps_tests.cpp
 multi_player_tests.cpp
 multi_tests.cpp
 PlayerTests.cpp

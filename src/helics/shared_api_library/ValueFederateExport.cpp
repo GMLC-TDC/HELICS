@@ -179,7 +179,7 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
     try
     {
         auto sub = std::make_unique<helics::SubscriptionObject> ();
-        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
+        sub->subptr = std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj, key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_subscription> (sub.get ());
@@ -810,7 +810,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
             {
                 *actualSize = length;
             }
-            return (length < maxlen) ? helics_ok : helics_warning;
+            return (length <= maxlen) ? helics_ok : helics_warning;
         }
 
         auto V = subObj->subptr->getValue<std::vector<double>> ();
@@ -820,7 +820,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
         {
             *actualSize = length;
         }
-        return (length < maxlen) ? helics_ok : helics_warning;
+        return (length <= maxlen) ? helics_ok : helics_warning;
     }
     catch (...)
     {

@@ -181,6 +181,7 @@ class ValueFederateManager
   private:
     shared_guarded_m<DualMappedVector<subscription_info, std::string, Core::handle_id_t>> subscriptions;
     shared_guarded_m<MappedVector<publication_info>> publications;
+
     std::atomic<publication_id_t::underlyingType> publicationCount{0};  //!< the count of actual endpoints
     std::vector<std::function<void(subscription_id_t, Time)>> callbacks;  //!< the all callback function
     std::vector<data_view> lastData;  //!< the last data to arrive

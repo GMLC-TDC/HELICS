@@ -11,6 +11,7 @@ set(SRC_FILES
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	PublicationInfo.cpp
+	InterfaceInfo.cpp
 	#FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
@@ -26,6 +27,9 @@ set(SRC_FILES
 	helics-time.cpp
 	HandleManager.cpp
 	HandlePointerManager.cpp
+	MessageTimer.cpp
+	JsonMapBuilder.cpp
+	
 )
 
 set(TESTCORE_SOURCE_FILES
@@ -90,6 +94,7 @@ set(INCLUDE_FILES
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
 	CoreBroker.hpp
+	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp
 	CommonCore.hpp
@@ -99,11 +104,15 @@ set(INCLUDE_FILES
 	PublicationInfo.hpp
 	EndpointInfo.hpp
 	FilterInfo.hpp
+	fmt_wrapper.h
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
 	HandlePointerManager.hpp
+	queryHelpers.hpp
+	MessageTimer.hpp
+	JsonMapBuilder.hpp
 )
 
 set(TESTCORE_HEADER_FILES
@@ -170,6 +179,9 @@ target_include_directories(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_inc
 target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 target_compile_definitions(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
 target_compile_options(helics_core PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
+
+target_include_directories(helics_core SYSTEM PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>)
+target_compile_definitions(helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>)
 
 if (APPLE)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")

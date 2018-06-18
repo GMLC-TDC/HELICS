@@ -10,6 +10,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
 
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../common/argParser.h"
+#include "../common/base64.h"
+#include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -17,10 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include "../common/argParser.h"
 #include "boost/filesystem.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
-#include "PrecHelper.hpp"
 
 #include <thread>
 
@@ -30,56 +31,57 @@ namespace helics
 {
 namespace apps
 {
-Recorder::Recorder (FederateInfo &fi) : App(fi)
-{
-    fed->setFlag (OBSERVER_FLAG);
-}
+Recorder::Recorder (FederateInfo &fi) : App (fi) { fed->setFlag (OBSERVER_FLAG); }
 
 static const ArgDescriptors InfoArgs{
-    {"tags",ArgDescriptor::arg_type_t::vector_string,"tags to record, this argument may be specified any number of times"},
-    {"endpoints",ArgDescriptor::arg_type_t::vector_string,"endpoints to capture, this argument may be specified multiple time"},
-    {"sourceclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
-    {"destclone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be specified multiple time"},
-    {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
-    {"capture", ArgDescriptor::arg_type_t::vector_string,"capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a comma separated list"},
-    {"output,o","the output file for recording the data"},
-    {"allow_iteration", ArgDescriptor::arg_type_t::flag_type,"allow iteration on values"},
-    {"mapfile", "write progress to a memory mapped file"}
-};
+  {"tags", ArgDescriptor::arg_type_t::vector_string,
+   "tags to record, this argument may be specified any number of times"},
+  {"endpoints", ArgDescriptor::arg_type_t::vector_string,
+   "endpoints to capture, this argument may be specified multiple time"},
+  {"sourceclone", ArgDescriptor::arg_type_t::vector_string,
+   "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
+  {"destclone", ArgDescriptor::arg_type_t::vector_string,
+   "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be "
+   "specified multiple time"},
+  {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
+  {"capture", ArgDescriptor::arg_type_t::vector_string,
+   "capture all the publications of a particular federate capture=\"fed1;fed2\"  supports multiple arguments or a "
+   "comma separated list"},
+  {"output,o", "the output file for recording the data"},
+  {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
+  {"mapfile", "write progress to a memory mapped file"}};
 
-Recorder::Recorder (int argc, char *argv[]):App("recorder",argc,argv)
+Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
 {
     if (!deactivated)
     {
-        fed->setFlag(OBSERVER_FLAG);
+        fed->setFlag (OBSERVER_FLAG);
         variable_map vm_map;
-        argumentParser(argc, argv, vm_map, InfoArgs);
-        loadArguments(vm_map);
-        if (!masterFileName.empty())
+        argumentParser (argc, argv, vm_map, InfoArgs);
+        loadArguments (vm_map);
+        if (!masterFileName.empty ())
         {
-            loadFile(masterFileName);
+            loadFile (masterFileName);
         }
     }
-    
 }
 
-Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi):App(core,fi)
+Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
 {
     fed->setFlag (OBSERVER_FLAG);
 }
 
-Recorder::Recorder (const std::string &name, const std::string &jsonString) : App(name, jsonString)
+Recorder::Recorder (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
     fed->setFlag (OBSERVER_FLAG);
-    Recorder::loadJsonFile(jsonString);
+    Recorder::loadJsonFile (jsonString);
 }
 
 Recorder::~Recorder () { saveFile (outFileName); }
 
-
 void Recorder::loadJsonFile (const std::string &jsonString)
 {
-    loadJsonFileConfiguration("recorder", jsonString);
+    loadJsonFileConfiguration ("recorder", jsonString);
 
     auto pubCount = fed->getSubscriptionCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -96,7 +98,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
         eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
     }
 
-    auto doc = loadJsonString (jsonString);
+    auto doc = loadJson (jsonString);
 
     auto tags = doc["tag"];
     if (tags.isArray ())
@@ -120,7 +122,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     }
     else if (sourceClone.isString ())
     {
-        addSourceEndpointClone (sourceClone.asString());
+        addSourceEndpointClone (sourceClone.asString ());
     }
     auto destClone = doc["destclone"];
     if (destClone.isArray ())
@@ -252,7 +254,7 @@ void Recorder::writeJsonFile (const std::string &filename)
     Json_helics::Value doc;
     if (!points.empty ())
     {
-        doc["points"] = Json_helics::Value(Json_helics::arrayValue);
+        doc["points"] = Json_helics::Value (Json_helics::arrayValue);
         for (auto &v : points)
         {
             Json_helics::Value point;
@@ -267,13 +269,13 @@ void Recorder::writeJsonFile (const std::string &filename)
             {
                 point["type"] = subscriptions[v.index].getType ();
             }
-           doc["points"].append(point);
+            doc["points"].append (point);
         }
     }
 
     if (!messages.empty ())
     {
-        doc["messages"] = Json_helics::Value(Json_helics::arrayValue);
+        doc["messages"] = Json_helics::Value (Json_helics::arrayValue);
         for (auto &mess : messages)
         {
             Json_helics::Value message;
@@ -292,8 +294,16 @@ void Recorder::writeJsonFile (const std::string &filename)
             {
                 message["dest"] = mess->original_dest;
             }
-            message["message"] = encode (mess->data.to_string ());
-            doc["messages"].append(message);
+            if (isBinaryData (mess->data))
+            {
+                message["encoding"] = "base64";
+                message["message"] = encode (mess->data.to_string ());
+            }
+            else
+            {
+                message["message"] = mess->data.to_string ();
+            }
+            doc["messages"].append (message);
         }
     }
 
@@ -319,15 +329,14 @@ void Recorder::writeTextFile (const std::string &filename)
         {
             if (v.iteration > 0)
             {
-                outFile << static_cast<double> (v.time)<<':'<<v.iteration << "\t\t" << subscriptions[v.index].getKey() << '\t'
-                    << v.value << '\n';
+                outFile << static_cast<double> (v.time) << ':' << v.iteration << "\t\t"
+                        << subscriptions[v.index].getKey () << '\t' << v.value << '\n';
             }
             else
             {
-                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey() << '\t'
-                    << v.value << '\n';
+                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
+                        << v.value << '\n';
             }
-           
         }
     }
     if (!messages.empty ())
@@ -345,7 +354,14 @@ void Recorder::writeTextFile (const std::string &filename)
         {
             outFile << m->original_dest;
         }
-        outFile << "\t\"" << encode (m->data.to_string ()) << "\"\n";
+        if (isBinaryData (m->data))
+        {
+            outFile << "\t\"" << encode (m->data.to_string ()) << "\"\n";
+        }
+        else
+        {
+            outFile << "\t\"" << m->data.to_string () << "\"\n";
+        }
     }
 }
 
@@ -366,7 +382,6 @@ void Recorder::initialize ()
     fed->enterExecutionState ();
     captureForCurrentTime (0.0);
 }
-
 
 void Recorder::generateInterfaces ()
 {
@@ -414,9 +429,9 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
             points.emplace_back (currentTime, ii, val);
             if (iteration > 0)
             {
-                points.back().iteration = iteration;
+                points.back ().iteration = iteration;
             }
-           
+
             if (vStat[ii].cnt == 0)
             {
                 points.back ().first = true;
@@ -444,7 +459,13 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
     }
 }
 
-std::string Recorder::encode (const std::string &str2encode) { return str2encode; }
+std::string Recorder::encode (const std::string &str2encode)
+{
+    return std::string ("b64[") +
+           utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
+                                     static_cast<int>(str2encode.size ())) +
+           ']';
+}
 
 /** run the Player until the specified time*/
 void Recorder::runTo (Time runToTime)
@@ -469,29 +490,29 @@ void Recorder::runTo (Time runToTime)
             int iteration = 0;
             if (allow_iteration)
             {
-                auto ItRes = fed->requestTimeIterative(runToTime, iteration_request::iterate_if_needed);
+                auto ItRes = fed->requestTimeIterative (runToTime, iteration_request::iterate_if_needed);
                 if (ItRes.state == iteration_result::next_step)
                 {
                     iteration = 0;
                 }
                 T = ItRes.grantedTime;
-                captureForCurrentTime(T, iteration);
+                captureForCurrentTime (T, iteration);
                 ++iteration;
             }
             else
             {
-                T = fed->requestTime(runToTime);
-                captureForCurrentTime(T);
+                T = fed->requestTime (runToTime);
+                captureForCurrentTime (T);
             }
-            if (!mapfile.empty())
+            if (!mapfile.empty ())
             {
-                std::ofstream out(mapfile);
+                std::ofstream out (mapfile);
                 for (auto &stat : vStat)
                 {
                     out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
                         << stat.lastVal << '\n';
                 }
-                out.flush();
+                out.flush ();
             }
             if (T >= runToTime)
             {
@@ -593,7 +614,6 @@ void Recorder::saveFile (const std::string &filename)
 
 int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
 {
-
     // get the extra tags from the arguments
     if (vm_map.count ("tags") > 0)
     {
@@ -663,7 +683,7 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
             addDestEndpointClone (clone);
         }
     }
-    if (vm_map.count("allow_iteration") > 0)
+    if (vm_map.count ("allow_iteration") > 0)
     {
         allow_iteration = true;
     }
@@ -680,5 +700,4 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     return 0;
 }
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics

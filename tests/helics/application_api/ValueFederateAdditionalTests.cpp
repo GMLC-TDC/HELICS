@@ -25,7 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture)
 
 namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
+
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)
@@ -109,8 +109,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    auto subid = vFed1->registerRequiredSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerRequiredSubscription<int> ("sub2");
+    auto subid = vFed1->registerOptionalSubscription ("sub1", "double", "V");
+    auto subid2 = vFed1->registerOptionalSubscription<int> ("sub2");
 
     auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
     vFed1->enterExecutionState ();
@@ -189,7 +189,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -226,8 +226,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (10))
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types8, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types), core_type)
 {
     // this one is going to test really ugly strings
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
@@ -236,8 +235,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types8, bdata::make (core_typ
     runDualFederateTest<std::string> (core_type, std::string (86263, '\0'), specialString, std::string ());
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (10))
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types9, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_vector, bdata::make (core_types), core_type)
 {
     std::vector<double> defVec = {34.3, 24.2};
     std::vector<double> v1Vec = {12.4, 14.7, 16.34, 18.17};
@@ -245,8 +243,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types9, bdata::make (core_typ
     runDualFederateTestv2<std::vector<double>> (core_type, defVec, v1Vec, v2Vec);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types10, bdata::make (core_types), core_type)
+
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_complex, bdata::make (core_types), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
@@ -254,7 +252,14 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types10, bdata::make (core_ty
     runDualFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_complex_long)
+{
+    std::complex<double> def = { 54.23233, 0.7 };
+    std::complex<double> v1 = std::polar(10.0, 0.43);
+    std::complex<double> v2 = { -3e45, 1e-23 };
+    runDualFederateTest<std::complex<double>>("test_7", def, v1, v2);
+}
+
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core_types), core_type)
 {
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
@@ -264,7 +269,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core
     runDualFederateTestObj<std::string> (core_type, std::string (86263, '\0'), specialString, std::string ());
 }
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
@@ -289,7 +294,7 @@ BOOST_DATA_TEST_CASE(value_federate_dual_transfer_types_obj11, bdata::make(core_
 
 /** test the callback specification with a vector list*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1, 1.0);
@@ -305,7 +310,6 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     auto sub3 = vFed1->registerOptionalSubscription ("fed0/pub3", "");
 
     helics::data_block db (547, ';');
-    helics::subscription_id_t lastId;
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
     vFed1->registerSubscriptionNotificationCallback ({sub1, sub2},
@@ -333,7 +337,7 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
 
 /** test the publish/subscribe to a vectorized array*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -364,7 +368,7 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
 
 /** test the publish/subscribe to a vectorized array*/
 
-BOOST_TEST_DECORATOR (*utf::timeout (12))
+
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2);

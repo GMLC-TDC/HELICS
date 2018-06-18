@@ -68,10 +68,6 @@ class ValueFederate : public virtual Federate
     // Default constructor, not meant to be used
     ValueFederate () {}
 
-    virtual ~ValueFederate ()
-    {
-    }
-
     /** Methods to register publications **/
     Publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")

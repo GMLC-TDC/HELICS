@@ -39,7 +39,10 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 GridDyn supports HELICS in experimental versions, and several components of GridDyn code were used in the development of HELICS, given they have several of the same authors.  
 
 ### [libguarded](https://github.com/copperspice/libguarded)
-several components of libguarded are being used in the core and application libraries to better encapsulate the locks for threading.  The library was extended to add std::mutex and std::timed_mutex support for the shared_guarded class.  
+several components of libguarded are being used in the core and application libraries to better encapsulate the locks for threading.  The library was extended to add std::mutex and std::timed_mutex support for the shared_guarded class, and also modified to use handles.  An atomic_guarded class was added for std::atomic like support for allocating classes.
+
+### [fmt](http://fmtlib.net/latest/index.html)
+FMT replaces boost::format for internal logging and message printing.  The library is included in the source code.  The CMAKE scripts were modified so they don't trigger a bunch of unnecessary checks as nearly all are already required for building HELICS based on minimum compiler support.  HELICS uses the header only library for the time being.  
 
 ### [Cereal](https://github.com/USCiLab/cereal)
 The cereal library is used for serialization of messages sent around inside HELICS.  

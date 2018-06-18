@@ -9,12 +9,43 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+Endpoint::Endpoint(MessageFederate *mFed, const std::string &name, const std::string &type)
+    : fed(mFed)
+{
+    try
+    {
+        id = fed->registerEndpoint(name, type);
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getEndpointId(name);
+    }
+    actualName = fed->getEndpointName(id);
+}
+
+Endpoint::Endpoint(interface_visibility locality,
+    MessageFederate *mFed,
+    const std::string &name,
+    const std::string &type)
+    : fed(mFed)
+{
+    try
+    {
+        id = (locality == GLOBAL) ? fed->registerGlobalEndpoint(name, type) : fed->registerEndpoint(name, type);
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getEndpointId(name);
+    }
+    actualName = fed->getEndpointName(id);
+}
+
 Endpoint::Endpoint (MessageFederate *mFed, int endpointIndex) : fed (mFed)
 {
     auto cnt = fed->getEndpointCount ();
     if ((endpointIndex >= cnt) || (cnt < 0))
     { 
-        throw (helics::InvalidParameter ("no subscription with the specified index"));
+        throw (helics::InvalidParameter ("no endpoint with the specified index"));
     }
     id = static_cast<endpoint_id_t> (endpointIndex);
     actualName = fed->getEndpointName (id);

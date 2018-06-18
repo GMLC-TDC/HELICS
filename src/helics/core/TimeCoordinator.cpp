@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeCoordinator.hpp"
 #include "../flag-definitions.h"
 #include <algorithm>
-#include <boost/format.hpp>
+#include "fmt_wrapper.h"
 
 namespace helics
 {
@@ -436,11 +436,10 @@ void TimeCoordinator::updateTimeGrant ()
 }
 std::string TimeCoordinator::printTimeStatus () const
 {
-    return (boost::format ("exec=%f allow=%f, value=%f, message=%f, minDe=%f minminDe=%f") %
-            static_cast<double> (time_exec) % static_cast<double> (time_allow) % static_cast<double> (time_value) %
-            static_cast<double> (time_message) % static_cast<double> (time_minDe) %
-            static_cast<double> (time_minminDe))
-      .str ();
+    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={}",
+            static_cast<double> (time_exec), static_cast<double> (time_allow), static_cast<double> (time_value),
+            static_cast<double> (time_message), static_cast<double> (time_minDe),
+            static_cast<double> (time_minminDe));
 }
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
@@ -579,6 +578,21 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
     if ((cmd.action () == CMD_TIME_BLOCK) || (cmd.action () == CMD_TIME_UNBLOCK))
     {
         return processTimeBlockMessage (cmd);
+    }
+    if (cmd.action() == CMD_FORCE_TIME_GRANT)
+    {
+        if (time_granted < cmd.actionTime)
+        {
+            time_granted = cmd.actionTime;
+            time_grantBase = time_granted;
+
+            ActionMessage treq(CMD_TIME_GRANT);
+            treq.source_id = source_id;
+            treq.actionTime = time_granted;
+            transmitTimingMessage(treq);
+            return message_process_result::processed;
+        }
+        return message_process_result::no_effect;
     }
     if (isDelayableMessage (cmd, source_id))
     {
@@ -752,6 +766,12 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool
             if (initMode)
             {
                 info.observer = checkActionFlag (cmd, indicator_flag);
+            }
+            break;
+        case REALTIME_FLAG:
+            if (initMode)
+            {
+                info.realtime = checkActionFlag(cmd, indicator_flag);
             }
             break;
         default:
