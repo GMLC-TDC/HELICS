@@ -27,6 +27,7 @@ if (USE_BOOST_STATIC_LIBS)
   set(BOOST_STATIC ON)
 endif ()
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
 if (MSVC)
 
@@ -78,6 +79,8 @@ find_path(BOOST_TEST_PATH
 else(MSVC)
 	set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
 endif(MSVC)
+
+HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
 	set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)

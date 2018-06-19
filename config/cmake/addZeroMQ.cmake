@@ -1,8 +1,13 @@
 #file to include ZMQ
 option(USE_SYSTEM_ZEROMQ_ONLY "only search for system zeromq libraries, bypass autobuild option" OFF)
 
+mark_as_advanced(USE_SYSTEM_ZEROMQ_ONLY)
+
 cmake_dependent_option(ZMQ_USE_STATIC_LIBRARY
   "use the ZMQ static library" OFF "NOT USE_SYSTEM_ZEROMQ_ONLY" OFF)
+ 
+mark_as_advanced(ZMQ_USE_STATIC_LIBRARY)
+  
   
 if (USE_SYSTEM_ZEROMQ_ONLY)
 	find_package(ZeroMQ)

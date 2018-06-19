@@ -2,6 +2,9 @@
 option(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON)
 option(ENABLE_ERROR_ON_WARNINGS "generate a compiler error for any warning encountered" OFF)
 
+mark_as_advanced(ENABLE_EXTRA_COMPILER_WARNINGS)
+mark_as_advanced(ENABLE_ERROR_ON_WARNINGS)
+
 # -------------------------------------------------------------
 # Setup compiler options and configurations
 # -------------------------------------------------------------
@@ -47,6 +50,7 @@ if(UNIX)
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   option (USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
+  mark_as_advanced(USE_LIBCXX)
   if(USE_LIBCXX)
       add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
       link_libraries("-stdlib=libc++")
@@ -100,10 +104,10 @@ if(MSVC)
   add_compile_options(/MP /EHsc)
   add_compile_options(/sdl)
   if (ENABLE_EXTRA_COMPILER_WARNINGS)
-  add_compile_options(-W4  /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
-  endif(ENABLE_EXTRA_COMPILER_WARNINGS)
-  add_definitions(-D_WIN32_WINNT=0x0601)
-endif(MSVC)
+	add_compile_options(-W4  /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
+	endif(ENABLE_EXTRA_COMPILER_WARNINGS)
+	add_definitions(-D_WIN32_WINNT=0x0601)
+  endif(MSVC)
   endif(MINGW)
 endif(UNIX)
 
@@ -116,3 +120,4 @@ if (NOT VERSION_OPTION)
 	set(CMAKE_CXX_STANDARD 14)
 endif ()
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)

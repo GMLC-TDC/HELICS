@@ -4,7 +4,7 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-if(BUILD_PLAYER OR BUILD_RECORDER OR BUILD_APPS OR BUILD_BROKER)
+if(BUILD_APPS OR BUILD_BROKER)
 
 set(helics_apps_public_headers
 	Player.hpp
@@ -41,20 +41,17 @@ target_compile_definitions(helics_apps-static PRIVATE $<TARGET_PROPERTY:fmt-head
 #add and alias library to match the find_package
 add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 
-if (BUILD_PLAYER)
+
 	add_executable(helics_player playerMain.cpp)
 	target_link_libraries(helics_player helics_apps-static )
 	set_target_properties (helics_player PROPERTIES FOLDER apps)
 	install(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-endif()
 
-
-if (BUILD_RECORDER)
 	add_executable(helics_recorder recorderMain.cpp)
 	target_link_libraries(helics_recorder helics_apps-static)
 	set_target_properties (helics_recorder PROPERTIES FOLDER apps)
 	install(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-endif()
+
 
 if (BUILD_BROKER)
 	add_executable(helics_broker helics-broker.cpp)

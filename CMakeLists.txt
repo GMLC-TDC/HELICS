@@ -47,6 +47,8 @@ endif()
 SHOW_VARIABLE(AUTOBUILD_INSTALL_PATH PATH
   "location to install the autobuild libraries and Headers" "${PROJECT_BINARY_DIR}/libs")
 
+mark_as_advanced(AUTOBUILD_INSTALL_PATH)
+
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
 option(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
@@ -67,22 +69,20 @@ option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
 if (BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE OR BUILD_OCTAVE_INTERFACE)
 	set(INTERFACE_BUILD ON)
-	HIDE_VARIABLE(BUILD_C_SHARED_LIB)
-	SHOW_VARIABLE(DISABLE_SWIG BOOL "Disable the use of swig to generate interface code and use repo code" OFF)
 else()
 	set(INTERFACE_BUILD OFF)
-	HIDE_VARIABLE(DISABLE_SWIG)
-	SHOW_VARIABLE(BUILD_C_SHARED_LIB BOOL "Build the Shared Libraries with a C interface" ON)
 endif()
 
+cmake_dependent_option(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON "NOT INTERFACE_BUILD" ON)
+cmake_dependent_option(DISABLE_SWIG "disable the use of the swigh executable to generate interface code and use repository code instead" OFF "INTERFACE_BUILD" OFF)
 	option(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
-	mark_as_advanced(BUILD_CXX_SHARED_LIB)
+
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
 	set(BUILD_SHARED_LIBS ON)
-else()
-	option(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF)
 endif()
+
+cmake_dependent_option(USE_POSITION_INDEPENDENT_CODE "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library" OFF "NOT BUILD_SHARED_LIBS" ON)
 
 if(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -134,7 +134,7 @@ if(BUILD_HELICS_TESTS)
 
 	endif(TEST_CODE_COVERAGE)
  endif(BUILD_HELICS_TESTS)
-
+mark_as_advanced(TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available
@@ -308,19 +308,17 @@ if (NOT Boost_USE_STATIC_LIBS)
 endif()
 
 option(BUILD_BROKER "Build a helics Broker executable" ON)
-option(BUILD_PLAYER "Build a helics player standalone executable" ON)
-option(BUILD_RECORDER "Build a helics recorder standalone executable" ON)
-option(BUILD_APPS "Build helics application to run various apps" ON)
+option(BUILD_APPS "Build helics applications to run various apps, including player, recorder, and helics_apps" ON)
 
 
 FILE(GLOB KEY_LIBRARY_FILES  ${AUTOBUILD_INSTALL_PATH}/bin/*)
 #message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
-if (NOT DISABLE_LOGGING)
-	option(DISABLE_TRACE_LOGGING "disable trace logging" OFF)
-	option(DISABLE_DEBUG_LOGGING "disable debug logging" OFF)
-endif()
+
+cmake_dependent_option(DISABLE_TRACE_LOGGING "disable trace logging" OFF "NOT DISABLE_LOGGING" OFF)
+cmake_dependent_option(DISABLE_DEBUG_LOGGING "disable debug logging" OFF "NOT DISABLE_LOGGING" OFF)
+
 
 #-----------------------------------------------------------------------------
 # create the fmt header only targets
@@ -328,6 +326,11 @@ endif()
 set(FMT_TEST OFF)
 set(FMT_ASSUME_CPP14_SUPPORT ON)
 add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
+HIDE_VARIABLE(FMT_DOC)
+HIDE_VARIABLE(FMT_INSTALL)
+HIDE_VARIABLE(FMT_PEDANTIC)
+HIDE_VARIABLE(FMT_TEST)
+HIDE_VARIABLE(FMT_USE_CPP14)
 
 #-----------------------------------------------------------------------------
 # CMAKE Subdirectories
@@ -369,7 +372,7 @@ endif()
 # -------------------------------------------------------------
 
 option(ENABLE_CLANG_TOOLS "if clang is found enable some custom targets for clang formatting and tidy" OFF)
-
+mark_as_advanced(ENABLE_CLANG_TOOLS)
 if (ENABLE_CLANG_TOOLS)
 	include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
@@ -404,6 +407,7 @@ else()
 endif()
 
 set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for HELICSConfig.cmake")
+mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
 
 install (EXPORT helics-targets
 	NAMESPACE HELICS::
