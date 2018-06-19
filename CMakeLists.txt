@@ -108,14 +108,14 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif()
 
 include(compiler_flags)
-message(STATUS "setting version build options to \"${VERSION_option}\"")
-if (VERSION_option)
+message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
+if (VERSION_OPTION)
 	if (MSVC)
-		target_compile_options(helics_base_includes INTERFACE ${VERSION_option})
+		target_compile_options(helics_base_includes INTERFACE ${VERSION_OPTION})
 	else()
-		target_compile_options(helics_base_includes INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_option}>)
+		target_compile_options(helics_base_includes INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
 	endif (MSVC)
-endif(VERSION_option)
+endif(VERSION_OPTION)
 
 # -------------------------------------------------------------
 # add coverage target
