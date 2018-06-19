@@ -24,15 +24,11 @@ target_link_libraries(helics-static PUBLIC helics_base)
 #add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
 if(BUILD_CXX_SHARED_LIB)
-	#if (BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
-	#	message(WARNING "Building the CXX shared library and C shared library in the same build is not advisable due to conflicting symbol visibility guidelines and is unlikely to work very well")
-	#endif()
-
 	add_library(helics-shared SHARED
-	../empty.cpp
-    $<TARGET_OBJECTS:application_api>
-    $<TARGET_OBJECTS:helics_core>
-    $<TARGET_OBJECTS:helics_common>
+		../empty.cpp
+		$<TARGET_OBJECTS:application_api>
+		$<TARGET_OBJECTS:helics_core>
+		$<TARGET_OBJECTS:helics_common>
 )
 
 	add_library(HELICS::helics-shared ALIAS helics-shared)
@@ -67,9 +63,9 @@ install (TARGETS helics-static EXPORT helics-targets
 
 if(BUILD_CXX_SHARED_LIB)
 	install (TARGETS helics-shared EXPORT helics-targets
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+		RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 	install(FILES $<TARGET_LINKER_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 	install(FILES $<TARGET_FILE:helics-shared> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs)

@@ -22,6 +22,8 @@ else(UNIX)
   endif(MSYS)
 endif(UNIX)
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)
+
 if (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)

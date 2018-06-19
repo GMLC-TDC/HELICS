@@ -45,8 +45,8 @@ endif()
 
 set_target_properties (helicsSharedLib PROPERTIES FOLDER interfaces)
 
-OPTION(STATIC_STANDARD_LIB "Link against a static standard lib" OFF)
-
+option(STATIC_STANDARD_LIB "Link against a static standard lib" OFF)
+mark_as_advanced(STATIC_STANDARD_LIB)
 if (STATIC_STANDARD_LIB)
 	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		if (USE_LIBCXX)

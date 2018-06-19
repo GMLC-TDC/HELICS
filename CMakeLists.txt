@@ -227,6 +227,7 @@ endif(MSYS)
 # -------------------------------------------------------------
 
 option(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
+mark_as_advanced(ZeroMQ_ENABLE)
 # If ZeroMQ library is enabled try to locate it and link against it
 
 if (ZeroMQ_ENABLE)
@@ -280,11 +281,7 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-
 set(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
-
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
@@ -318,7 +315,8 @@ option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" 
 
 cmake_dependent_option(DISABLE_TRACE_LOGGING "disable trace logging" OFF "NOT DISABLE_LOGGING" OFF)
 cmake_dependent_option(DISABLE_DEBUG_LOGGING "disable debug logging" OFF "NOT DISABLE_LOGGING" OFF)
-
+mark_as_advanced(DISABLE_TRACE_LOGGING)
+mark_as_advanced(DISABLE_DEBUG_LOGGING)
 
 #-----------------------------------------------------------------------------
 # create the fmt header only targets

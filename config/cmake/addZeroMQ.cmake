@@ -16,6 +16,8 @@ else()
 SHOW_VARIABLE(ZeroMQ_INSTALL_PATH PATH
   "path to the zmq libraries" "${AUTOBUILD_INSTALL_PATH}")
 
+mark_as_advanced(ZeroMQ_INSTALL_PATH)
+
 set(ZMQ_CMAKE_SUFFIXES 
 	cmake/ZeroMQ 
 	cmake
@@ -77,3 +79,4 @@ if (NOT ZeroMQ_FOUND)
 endif()
 
 endif() # USE_SYSTEM_ZEROMQ_ONLY
+HIDE_VARIABLE(ZeroMQ_DIR)
