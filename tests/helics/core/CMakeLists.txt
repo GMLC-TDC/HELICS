@@ -31,6 +31,7 @@ ForwardingTimeCoordinatorTests.cpp
 TimeCoordinatorTests.cpp
 networkInfoTests.cpp
 )
+
 if (HELICS_HAVE_ZEROMQ)
 	list(APPEND core_test_sources ZeromqCore-tests.cpp)
 endif(HELICS_HAVE_ZEROMQ)
@@ -52,8 +53,8 @@ add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=s
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+	add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:core-tests>/")                 # <--this is out-file path
 endforeach(keyfile)

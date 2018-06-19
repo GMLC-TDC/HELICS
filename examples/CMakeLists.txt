@@ -4,18 +4,18 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-IF (EXAMPLES_WARNINGS_AS_ERROR)
+if (EXAMPLES_WARNINGS_AS_ERROR)
 	#the examples had better compile without warnings otherwise they should not be allowed
-	IF(WIN32)
-		IF (MSVC)
+	if(WIN32)
+		if (MSVC)
 			add_compile_options(/WX)
-		ELSE(MSVC)
+		else(MSVC)
 			add_compile_options(-Werror)
-		ENDIF(MSVC)
-	ELSE(WIN32)
+		endif(MSVC)
+	else(WIN32)
 		add_compile_options(-Werror)
-	ENDIF(WIN32)
-ENDIF()
+	endif(WIN32)
+endif()
 
 add_subdirectory (ipcTest)
 add_subdirectory (valueFederates1)
