@@ -12,10 +12,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 417b4c1a518dfd6de5b8fd8e73e0b0c8b6107dc8
 BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 /** test simple creation and destruction*/
