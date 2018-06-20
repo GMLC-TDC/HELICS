@@ -6,8 +6,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-#include <cstdio>
-
 #include "exeTestHelper.h"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/apps/Source.hpp"
@@ -15,8 +13,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
-
+//BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
+BOOST_AUTO_TEST_SUITE(source_tests)
 BOOST_AUTO_TEST_CASE (simple_source_test )
 {
     helics::FederateInfo fi ("player1");
