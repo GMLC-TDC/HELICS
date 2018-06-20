@@ -6,7 +6,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp" 
 #include <complex>
 
 /** these test cases test out the value converters
@@ -190,5 +191,135 @@ BOOST_AUTO_TEST_CASE(timing_with_period_change)
     res = vFed1->requestTime(res);
     BOOST_CHECK_EQUAL(res, 2.1);
     vFed1->finalize();
+}
+
+BOOST_AUTO_TEST_CASE(sender_finalize_timing_result)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    helics::Publication sender(helics::interface_visibility::global, vFed1, "pub", helics::helics_type_t::helicsDouble);
+    helics::Subscription receiver( vFed2, "pub");
+    vFed1->enterExecutionStateAsync();
+    vFed2->enterExecutionState();
+    vFed1->enterExecutionStateComplete();
+    auto granted1=vFed1->requestTime(1.0);
+    BOOST_CHECK_EQUAL(granted1, 1.0);
+    sender.publish(1.0);
+
+    granted1 = vFed1->requestTime(2.0);
+    BOOST_CHECK_EQUAL(granted1, 2.0);
+    //now check that the receiver got the data at time 1.0
+    auto granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 1.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 1.0);
+
+    //now do 2 publish cycles in a row
+    sender.publish(2.0);
+    granted1 = vFed1->requestTime(3.0);
+    BOOST_CHECK_EQUAL(granted1, 3.0);
+
+    sender.publish(3.0);
+    granted1 = vFed1->requestTime(4.0);
+    BOOST_CHECK_EQUAL(granted1, 4.0);
+    sender.publish(4.0);
+
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 2.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 2.0);
+
+    granted1 = vFed1->requestTime(6.0);
+    BOOST_CHECK_EQUAL(granted1, 6.0);
+    sender.publish(6.0);
+
+    vFed1->finalize();
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 3.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 3.0);
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 4.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 4.0);
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 6.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 6.0);
+    vFed2->finalize();
+}
+
+
+BOOST_AUTO_TEST_CASE(sender_finalize_timing_result2)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    helics::Publication sender(helics::interface_visibility::global, vFed1, "pub", helics::helics_type_t::helicsDouble);
+    helics::Subscription receiver(vFed2, "pub");
+    vFed1->enterExecutionStateAsync();
+    vFed2->enterExecutionState();
+    vFed1->enterExecutionStateComplete();
+    auto granted1 = vFed1->requestTime(1.0);
+    BOOST_CHECK_EQUAL(granted1, 1.0);
+    sender.publish(1.0);
+
+    granted1 = vFed1->requestTime(2.0);
+    BOOST_CHECK_EQUAL(granted1, 2.0);
+    //now check that the receiver got the data at time 1.0
+    auto granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 1.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 1.0);
+
+    //now do 2 publish cycles in a row
+    sender.publish(2.0);
+    granted1 = vFed1->requestTime(3.0);
+    BOOST_CHECK_EQUAL(granted1, 3.0);
+
+    sender.publish(3.0);
+    granted1 = vFed1->requestTime(4.0);
+    BOOST_CHECK_EQUAL(granted1, 4.0);
+    sender.publish(4.0);
+
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 2.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 2.0);
+
+    granted1 = vFed1->requestTime(6.0);
+    BOOST_CHECK_EQUAL(granted1, 6.0);
+    sender.publish(6.0);
+
+    vFed1->finalize();
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 3.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 3.0);
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 4.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 4.0);
+    //check the grant at time 2.0
+    granted2 = vFed2->requestTime(5.0); //request time of 5
+    BOOST_CHECK_EQUAL(granted2, 5.0);
+    BOOST_CHECK(!receiver.isUpdated());  //should not have an update
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 4.0);  //the get value should be the previous value
+
+    granted2 = vFed2->requestTime(400.0); //request a big time
+    BOOST_CHECK_EQUAL(granted2, 6.0);
+    BOOST_CHECK(receiver.isUpdated());
+    BOOST_CHECK_EQUAL(receiver.getValue<double>(), 6.0);
+    vFed2->finalize();
 }
 BOOST_AUTO_TEST_SUITE_END ()
