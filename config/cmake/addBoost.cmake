@@ -29,7 +29,6 @@ if (USE_BOOST_STATIC_LIBS)
   set(BOOST_STATIC ON)
 endif ()
 
-mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
 if (MSVC)
 
@@ -103,7 +102,6 @@ else()
 	set(BOOST_VERSION_LEVEL 1)
 endif()
 
-#mark_as_advanced(CLEAR BOOST_ROOT)
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
