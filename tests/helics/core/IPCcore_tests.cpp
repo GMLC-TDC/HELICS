@@ -193,6 +193,11 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
     }
+    if (counter3 != 1)
+    {
+        std::cout << "ipc core extra sleep required\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
+    }
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
