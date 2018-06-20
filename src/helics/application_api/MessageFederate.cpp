@@ -99,7 +99,7 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-    auto doc = loadJsonString (jsonString);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("endpoints"))
     {

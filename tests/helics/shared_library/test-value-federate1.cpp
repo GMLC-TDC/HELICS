@@ -122,8 +122,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
 
-    auto subid = helicsFederateRegisterSubscription (vFed1, "sub1", "double", "V");
-    auto subid2 = helicsFederateRegisterTypeSubscription (vFed1, "sub2", HELICS_DATA_TYPE_INT, "");
+    auto subid = helicsFederateRegisterOptionalSubscription (vFed1, "sub1", "double", "V");
+    auto subid2 = helicsFederateRegisterOptionalTypeSubscription (vFed1, "sub2", HELICS_DATA_TYPE_INT, "");
 
     auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
     CE (helicsFederateEnterExecutionMode (vFed1));
@@ -734,9 +734,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     pubid3 = helicsFederateRegisterPublication (vFed, "pub3", "double", "V");
 
     // these aren't meant to match the publications
-    subid = helicsFederateRegisterSubscription (vFed, "sub1", "", "");
-    subid2 = helicsFederateRegisterSubscription (vFed, "sub2", "int", "");
-    subid3 = helicsFederateRegisterSubscription (vFed, "sub3", "", "V");
+    subid = helicsFederateRegisterOptionalSubscription (vFed, "sub1", "", "");
+    subid2 = helicsFederateRegisterOptionalSubscription (vFed, "sub2", "int", "");
+    subid3 = helicsFederateRegisterOptionalSubscription (vFed, "sub3", "", "V");
 
     // enter execution
     CE (helicsFederateEnterExecutionMode (vFed));

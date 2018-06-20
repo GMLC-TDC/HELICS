@@ -18,33 +18,33 @@ public class TestValueFederate {
 		assert isconnected == 1;
 		return broker;
 	}
-	
-	public static SWIGTYPE_p_void AddFederate(SWIGTYPE_p_void broker, String core_type, 
+
+	public static SWIGTYPE_p_void AddFederate(SWIGTYPE_p_void broker, String core_type,
 			int count, double deltat, String name_prefix) {
 
 	    // Create Federate Info object that describes the federate properties #
 	    SWIGTYPE_p_void fedinfo = helics.helicsFederateInfoCreate();
 
-	    // Set Federate name 
+	    // Set Federate name
 	    helics_status status = helics.helicsFederateInfoSetFederateName(fedinfo, name_prefix + "TestA Federate");
 
-	    // Set core type from string 
+	    // Set core type from string
 	    status = helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
 
-	    // Federate init string 
+	    // Federate init string
 	    String fedinitstring = "--broker=mainbroker --federates="+ Integer.toString(count);
 	    status = helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
 
-	    // Set one second message interval 
+	    // Set one second message interval
 	    status = helics.helicsFederateInfoSetTimeDelta(fedinfo, deltat);
 
 	    status = helics.helicsFederateInfoSetLoggingLevel(fedinfo, 1);
 
 	    SWIGTYPE_p_void vFed = helics.helicsCreateValueFederate(fedinfo);
-	    
+
 	    return vFed;
 	}
-	
+
 	public static void test_value_federate_initialize(SWIGTYPE_p_void vFed) {
 		int[] state = new int[1];
 		helics_status status = helics.helicsFederateGetState(vFed, state);
@@ -53,26 +53,26 @@ public class TestValueFederate {
 		status = helics.helicsFederateGetState(vFed, state);
 		assert state[0] == 3;
 	}
-	
+
 	public static void test_value_federate_publisher_registration(SWIGTYPE_p_void vFed) {
-		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterTypePublication(vFed, "pub1", 
+		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterTypePublication(vFed, "pub1",
 								 helicsConstants.HELICS_DATA_TYPE_STRING, "");
-		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", 
+		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalTypePublication(vFed, "pub2",
 				 helicsConstants.HELICS_DATA_TYPE_INT, "");
-		SWIGTYPE_p_void pubid3 = helics.helicsFederateRegisterTypePublication(vFed, "pub3", 
+		SWIGTYPE_p_void pubid3 = helics.helicsFederateRegisterTypePublication(vFed, "pub3",
 				 helicsConstants.HELICS_DATA_TYPE_DOUBLE, "V");
 		helics.helicsFederateEnterExecutionMode(vFed);
 	}
-	
+
 	public static void test_value_federate_publication_registration(SWIGTYPE_p_void vFed) {
-		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterPublication(vFed, "pub1", 
+		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterPublication(vFed, "pub1",
 				 "string", "");
-		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalPublication(vFed, "pub2", 
+		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalPublication(vFed, "pub2",
 				"int", "");
-		SWIGTYPE_p_void pubid3 = helics.helicsFederateRegisterPublication(vFed, "pub3", 
+		SWIGTYPE_p_void pubid3 = helics.helicsFederateRegisterPublication(vFed, "pub3",
 				"double", "V");
 		helics.helicsFederateEnterExecutionMode(vFed);
-	    
+
 	    int maxLen = 100;
 	    byte[] publication_key = new byte[100];
 	    helics_status status = helics.helicsPublicationGetKey(pubid1, publication_key);
@@ -98,33 +98,33 @@ public class TestValueFederate {
 		String pub_units = new String(publication_units);
 	    assert pub_units == "V";
 	}
-	
+
 	public static void test_value_federate_subscription_registration(SWIGTYPE_p_void vFed) {
-		SWIGTYPE_p_void subid1 = helics.helicsFederateRegisterSubscription(vFed, "sub1", "double", "V");
-		SWIGTYPE_p_void subid2 = helics.helicsFederateRegisterTypeSubscription(vFed, "sub2", 
+		SWIGTYPE_p_void subid1 = helics.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V");
+		SWIGTYPE_p_void subid2 = helics.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2",
 				helicsConstants.HELICS_DATA_TYPE_INT, "");
 		SWIGTYPE_p_void subid3 = helics.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "double", "V");
 		helics.helicsFederateEnterExecutionMode(vFed);
 	}
 
 	public static void test_value_federate_subscription_and_publication_registration(SWIGTYPE_p_void vFed) {
-		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterTypePublication(vFed, "pub1", 
+		SWIGTYPE_p_void pubid1 = helics.helicsFederateRegisterTypePublication(vFed, "pub1",
 				helicsConstants.HELICS_DATA_TYPE_STRING, "");
-		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", 
+		SWIGTYPE_p_void pubid2 = helics.helicsFederateRegisterGlobalTypePublication(vFed, "pub2",
 				helicsConstants.HELICS_DATA_TYPE_INT, "");
-	
+
 		SWIGTYPE_p_void pubid3 = helics.helicsFederateRegisterPublication(vFed, "pub3", "double", "V");
-	
+
 		SWIGTYPE_p_void subid1 = helics.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V");
-		SWIGTYPE_p_void subid2 = helics.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", 
+		SWIGTYPE_p_void subid2 = helics.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2",
 				helicsConstants.HELICS_DATA_TYPE_INT, "");
-	
-		SWIGTYPE_p_void subid3 = helics.helicsFederateRegisterOptionalSubscription(vFed, "sub3", 
+
+		SWIGTYPE_p_void subid3 = helics.helicsFederateRegisterOptionalSubscription(vFed, "sub3",
 				"double", "V");
 	}
-		
+
 	public static void test_value_federate_single_transfer(SWIGTYPE_p_void vFed) {
-		SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", 
+		SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1",
 	    		helicsConstants.HELICS_DATA_TYPE_STRING, "");
 		SWIGTYPE_p_void subid = helics.helicsFederateRegisterSubscription (vFed, "pub1", "string", "");
 
@@ -148,44 +148,44 @@ public class TestValueFederate {
 	public static void test_value_federate_runFederateTestDouble(SWIGTYPE_p_void vFed) {
 	    double defaultValue = 1.0;
 	    double testValue = 2.0;
-	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", 
+	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1",
 	    		helicsConstants.HELICS_DATA_TYPE_DOUBLE, "");
 	    SWIGTYPE_p_void subid = helics.helicsFederateRegisterSubscription (vFed, "pub1", "double", "");
 	    helics.helicsSubscriptionSetDefaultDouble(subid, defaultValue);
-	
+
 	    helics.helicsFederateEnterExecutionMode (vFed);
-	
+
 	    // publish string1 at time=0.0;
 	    helics.helicsPublicationPublishDouble(pubid, testValue);
-	    
+
 	    double[] value = new double[1];
 	    helics_status status = helics.helicsSubscriptionGetDouble(subid, value);
 	    assert value[0] == defaultValue;
-	    
+
 	    double requesttime = 0.0;
 	    double[] timeout = {1.0};
 	    status = helics.helicsFederateRequestTime (vFed, requesttime, timeout);
 	    assert requesttime == 0.1;
-	    
+
 	    status = helics.helicsSubscriptionGetDouble(subid, value);
 	    assert value[0] == testValue;
-	
+
 	    // publish string1 at time=0.0;
 	    helics.helicsPublicationPublishDouble(pubid, testValue + 1);
 	    timeout[0] = 2.0;
 	    status = helics.helicsFederateRequestTime (vFed, requesttime, timeout);
 	    assert requesttime == 0.02;
-	
+
 	    status = helics.helicsSubscriptionGetDouble(subid, value);
 	    assert value[0] == testValue + 1;
 	}
-	
+
 	public static void test_value_federate_runFederateTestComplex(SWIGTYPE_p_void vFed) {
 	    double rDefaultValue = 1.0;
 	    double iDefaultValue = 1.0;
 	    double rTestValue = 2.0;
 	    double iTestValue = 2.0;
-	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", 
+	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1",
 	    		helicsConstants.HELICS_DATA_TYPE_COMPLEX, "");
 	    SWIGTYPE_p_void subid = helics.helicsFederateRegisterSubscription (vFed, "pub1", "double", "");
 	    helics.helicsSubscriptionSetDefaultComplex(subid, rDefaultValue, iDefaultValue);
@@ -198,7 +198,7 @@ public class TestValueFederate {
 	    double[] value2 = new double[1];
 	    helics_status status = helics.helicsSubscriptionGetComplex(subid, value1, value2);
 	    assert value2[0] == iDefaultValue;
-	    
+
 	    double requesttime = 0.0;
 	    double[] timeout = {1.0};
 	    status = helics.helicsFederateRequestTime (vFed, requesttime, timeout);
@@ -208,7 +208,7 @@ public class TestValueFederate {
 	    assert value1[0] == rTestValue;
 	    assert value2[1] == iTestValue;
 	}
-	
+
 
 	public static void test_value_federate_runFederateTestInteger(SWIGTYPE_p_void vFed) {
 	    double defaultValue = 1;
@@ -217,7 +217,7 @@ public class TestValueFederate {
 	    SWIGTYPE_p_void subid = helics.helicsFederateRegisterSubscription (vFed, "pub1", "int", "");
 	    //SWIGTYPE_p_int64_t pDf = null;
 	    //helics.helicsSubscriptionSetDefaultInteger(subid, pDf);
-	
+
 	    helics.helicsFederateEnterExecutionMode (vFed);
 	    //SWIGTYPE_p_int64_t pValue = null;
 	    //helics.helicsPublicationPublishInteger(pubid, pValue);
@@ -228,23 +228,23 @@ public class TestValueFederate {
 	    double[] timeout = {1.0};
 	    status = helics.helicsFederateRequestTime(vFed, requesttime, timeout);
 	    assert requesttime == 0.01;
-	    
+
 	    status = helics.helicsSubscriptionGetInteger(subid, value);
 	    assert value[0] == testValue;
-	
+
 	    //helics.helicsPublicationPublishInteger(pubid, pValue);
 	    timeout[0] = 2.0;
 	    status = helics.helicsFederateRequestTime (vFed, requesttime, timeout);
 	    assert requesttime == testValue;
-	
+
 	    status = helics.helicsSubscriptionGetInteger(subid, value);
 	    assert value[0] == testValue + 1;
 	}
-	
+
 	public static void test_value_federate_runFederateTestString(SWIGTYPE_p_void vFed) {
 	    String defaultValue = "String1";
 	    String testValue = "String2";
-	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", 
+	    SWIGTYPE_p_void pubid = helics.helicsFederateRegisterGlobalTypePublication (vFed, "pub1",
 	    		helicsConstants.HELICS_DATA_TYPE_STRING, "");
 	    SWIGTYPE_p_void subid = helics.helicsFederateRegisterSubscription (vFed, "pub1", "string", "");
 	    helics.helicsSubscriptionSetDefaultString(subid, defaultValue);
@@ -267,7 +267,7 @@ public class TestValueFederate {
 		String val2 = new String(value);
 	    assert val2 == testValue;
 	}
-	
+
 	public static void test_value_federate_runFederateTestVectorD(SWIGTYPE_p_void vFed) {
 	    double[] defaultValue = {0, 1, 2};
 	    double[] testValue = {3, 4, 5};
@@ -281,7 +281,7 @@ public class TestValueFederate {
 	    // TODO: Fix error with the following function
 	    double[] data = new double[100];
 	    helics.helicsPublicationPublishVector(pubid, data, 100);
-	    
+
 	    int[] actualLen = new int[1];
 		SWIGTYPE_p_double pData = null;
 	    helics_status status = helics.helicsSubscriptionGetVector(subid, pData, 3,actualLen);
@@ -290,12 +290,12 @@ public class TestValueFederate {
 	    double[] timeout = {1.0};
 	    status = helics.helicsFederateRequestTime(vFed, requesttime, timeout);
 	    assert requesttime == 0.01;
-	    
+
 	    double[] value = new double[1];
 	    status = helics.helicsSubscriptionGetVector(subid, pData, 3,actualLen);
 	    //assert value == [3, 4, 5]
 	}
-	
+
 	public static void main(String[] args) {
 		SWIGTYPE_p_void broker = AddBroker("zmq");
 		String initstring = "--broker=";

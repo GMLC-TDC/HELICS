@@ -107,7 +107,7 @@ static void setGeneratorProperty(SignalGenerator *gen, const std::string &name, 
 void Source::loadJsonFile(const std::string &jsonFile)
 {
     //we want to load the default period before constructing the interfaces so the default period works
-    auto doc = loadJsonString(jsonFile);
+    auto doc = loadJson(jsonFile);
 
     if (doc.isMember("source"))
     {
@@ -124,7 +124,7 @@ void Source::loadJsonFile(const std::string &jsonFile)
     {
         SourceObject newObj;
 
-        newObj.pub = Publication(fed.get(), ii);
+        newObj.pub = Publication(fed, ii);
         newObj.period = defaultPeriod;
         sources.push_back(newObj);
         pubids[newObj.pub.getKey()] = static_cast<int> (sources.size()) - 1;
@@ -325,7 +325,7 @@ void Source::addPublication(const std::string  &key, const std::string &generato
     }
     SourceObject newObj;
     
-    newObj.pub=Publication (useLocal?LOCAL:GLOBAL, fed.get (), key, type, units);
+    newObj.pub=Publication (useLocal?LOCAL:GLOBAL, fed, key, type, units);
     newObj.period = period;
     if (!generator.empty())
     {

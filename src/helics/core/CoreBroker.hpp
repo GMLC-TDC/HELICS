@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include <atomic>
@@ -16,12 +15,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
+#include "../common/DelayedObjects.hpp"
+
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
 #include "TimeDependencies.hpp"
+#include "JsonMapBuilder.hpp"
 
 namespace helics
 {
@@ -29,7 +31,7 @@ namespace helics
 class BasicFedInfo
 {
   public:
-    std::string name;  //!< name of the federate
+    const std::string name;  //!< name of the federate
     Core::federate_id_t global_id = invalid_fed_id;  //!< the identification code for the federate
     int32_t route_id = invalid_fed_id;  //!< the routing information for data to be sent to the federate
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
@@ -39,7 +41,7 @@ class BasicFedInfo
 class BasicBrokerInfo
 {
   public:
-    std::string name;  //!< the name of the broker
+    const std::string name;  //!< the name of the broker
 
     Core::federate_id_t global_id = invalid_fed_id;  //!< the global identifier for the broker
     int32_t route_id = invalid_fed_id;  //!< the identifier for the route to take to the broker
@@ -48,6 +50,7 @@ class BasicBrokerInfo
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
     bool _nonLocal = false;  //!< flag indicating that a broker is a direct subbroker of the managing object
+    bool _core = false;  //!< if set to true the broker is a core false is a broker;
     std::string routeInfo;  //!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
@@ -88,7 +91,14 @@ class CoreBroker : public Broker, public BrokerBase
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, int32_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
-    std::mutex name_mutex_;  // mutex lock for name and identifier
+    std::mutex name_mutex_;  //!< mutex lock for name and identifier
+    std::atomic<int> queryCounter{ 1 }; //counter for active queries going to the local API
+    DelayedObjects<std::string> ActiveQueries;  //!< holder for 
+    JsonMapBuilder fedMap; //!< builder for the federate_map 
+    std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
+    JsonMapBuilder depMap; //!< builder for the dependency graph
+    std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
+
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -112,8 +122,6 @@ class CoreBroker : public Broker, public BrokerBase
     void routeMessage (const ActionMessage &cmd);
 
     int32_t fillMessageRouteInformation (ActionMessage &mess);
-    /**generate the results of a query directed at the broker*/
-    void generateQueryResult (const ActionMessage &command);
 
     /** handle initialization operations*/
     void executeInitializationOperations ();
@@ -195,7 +203,7 @@ class CoreBroker : public Broker, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
-
+    virtual std::string query(const std::string &target, const std::string &queryStr) override final;
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -212,10 +220,12 @@ class CoreBroker : public Broker, public BrokerBase
     void FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
+    /** answer a query or route the message the appropriate location*/
+    void processQueryResponse(const ActionMessage &m);
     /** generate an answer to a local query*/
     void processLocalQuery (const ActionMessage &m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer (const std::string &query) const;
+    std::string generateQueryAnswer (const std::string &query);
     /** locate the route to take to a particular federate*/
     int32_t getRoute (Core::federate_id_t fedid) const;
     const BasicBrokerInfo *getBrokerById (Core::federate_id_t fedid) const;
@@ -228,9 +238,11 @@ class CoreBroker : public Broker, public BrokerBase
     void addEndpoint (ActionMessage &m);
     void addDestFilter (ActionMessage &m);
     void addSourceFilter (ActionMessage &m);
-    bool updateSourceFilterOperator (ActionMessage &m);
+ //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a json string containing the federate/broker/Core Map*/
-    std::string generateFederateMap () const;
+    void initializeFederateMap ();
+    /** generate a json string containing the dependency information for all federation object*/
+    void initializeDependencyGraph();
 };
 
 }  // namespace helics

@@ -109,6 +109,7 @@ m <sendtime> <deliverytime> <source> <dest> <time> <data>
 ```
 
 the second option allows sending events at a different time than they are triggered
+the data portion of messages can be encoded in base64 by marking as b64[<data>] or base64[X]  all data between the brackets will be converted to raw binary.  A ']' must be last
 
 ### JSON configuration
 player values can also be specified via JSON files
@@ -129,6 +130,12 @@ JSON example
 			"time": 1.0,
 			"data":"this is a test message"
 		}, {
+  			"source": "src",
+  			"dest": "dest",
+  			"time": 1.0,
+        "encoding":"base64"
+  			"data":AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
+  		},{
 			"source": "src",
 			"dest": "dest",
 			"time": 2.0,

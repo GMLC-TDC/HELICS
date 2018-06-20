@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#define BOOST_TEST_MODULE player_recorder_tests
+#define BOOST_TEST_MODULE helics_apps-tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include "../../../src/helics/application_api/Federate.hpp"

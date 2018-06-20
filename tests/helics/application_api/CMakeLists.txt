@@ -11,6 +11,7 @@ ValueFederateKeyTests.cpp
 FilterTests.cpp
 testFixtures.cpp
 PrimaryTypeConversionTests.cpp
+FilterAdditionalTests.cpp
 )
  
 set(application_api_test_headers
@@ -29,6 +30,7 @@ iterationTests.cpp
 subPubObjectTests.cpp
 ValueFederateAdditionalTests.cpp
 ErrorTests.cpp
+federateRealTimeTests.cpp
 )
 
 set(extended_test_sources
