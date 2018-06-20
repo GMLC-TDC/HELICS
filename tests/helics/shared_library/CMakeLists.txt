@@ -61,15 +61,15 @@ add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_le
 if (WIN32)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+	add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 
     add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
         COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-            "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
-            "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
+		"$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
+		"$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endif(WIN32)
 
