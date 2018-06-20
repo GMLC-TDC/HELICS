@@ -245,10 +245,12 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
 
     // get the value
     CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
-
+    
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
-
+    //check the time
+    auto time = helicsSubscriptionLastUpdateTime(subid);
+    BOOST_CHECK_EQUAL(time, 1.0);
     // publish a second string
     CE (helicsPublicationPublishString (pubid, "string2"));
 

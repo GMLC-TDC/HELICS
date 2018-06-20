@@ -1357,12 +1357,12 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
     if (subObj->rawOnly)
     {
         auto time = subObj->fedptr->getLastUpdateTime (subObj->id);
-        return time.getBaseTimeCode ();
+        return time;
     }
     else
     {
         auto time = subObj->subptr->getLastUpdate ();
-        return time.getBaseTimeCode ();
+        return time;
     }
 }
 
