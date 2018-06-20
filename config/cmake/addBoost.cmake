@@ -29,6 +29,7 @@ if (USE_BOOST_STATIC_LIBS)
   set(BOOST_STATIC ON)
 endif ()
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
 if (MSVC)
 
