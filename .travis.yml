@@ -185,9 +185,12 @@ script:
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
   
-  - ctest --output-on-failure -L Common
-  - ctest --output-on-failure -L SharedLibrary -LE SharedLibraryCpp
-  - ctest --output-on-failure -L KeyApi
+  - ctest --output-on-failure --timeout 220 -L Common
+  - ctest --output-on-failure --timeout 240 -L SharedLibrary -LE SharedLibraryCpp
+  - ctest --output-on-failure --timeout 240 -L KeyApi
+  - ctest --output-on-failure -L Examples
+  - ctest --output-on-failure -L Java
+  - ctest --output-on-failure -L Python
 
 notifications:
     email: false
