@@ -1097,7 +1097,13 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         break;
     }
 }
-const std::vector<Core::federate_id_t> &FederateState::getDependents () const
+
+std::vector<Core::federate_id_t> FederateState::getDependencies() const
+{
+    return timeCoord->getDependencies();
+}
+
+std::vector<Core::federate_id_t> FederateState::getDependents () const
 {
     return timeCoord->getDependents ();
 }

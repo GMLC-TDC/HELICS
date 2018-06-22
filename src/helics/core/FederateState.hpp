@@ -203,9 +203,12 @@ class FederateState
     /**get a reference to the handles of subscriptions with value updates
      */
     const std::vector<Core::handle_id_t> &getEvents () const;
-    /** get a reference to the global ids of dependent federates
+    /** get a vector of the federates this one depends on
+    */
+    std::vector<Core::federate_id_t> getDependencies() const;
+    /** get a vector to the global ids of dependent federates
      */
-    const std::vector<Core::federate_id_t> &getDependents () const;
+    std::vector<Core::federate_id_t> getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
     /** get the last error code*/
