@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (dependent_tests)
     TimeCoordinator ftc;
     ftc.addDependent (2);
     ftc.addDependent (3);
-    auto &deps = ftc.getDependents ();
+    auto deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE (dependent_test_message)
     ftc.processDependencyUpdateMessage (addDep);
     addDep.source_id = 3;
     ftc.processDependencyUpdateMessage (addDep);
-    auto &deps = ftc.getDependents ();
+    auto deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == 2);
     BOOST_CHECK (deps[1] == 3);
