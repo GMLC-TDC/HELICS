@@ -41,24 +41,29 @@ enum class core_type : int
 };
 
 
-/** enumeration of the possible states of convergence*/
-enum class iteration_state : signed char
+/** enumeration of the possible message processing results*/
+enum class message_processing_result : signed char
 {
-    error = -5,  //!< indicator that an error has occurred
-    continue_processing = -1,  //!< the current loop should continue
+    
+    continue_processing = -2,  //!< the current loop should continue
+    delay_message = -1, //!< delay the current message and continue processing
     next_step = 0,  //!< indicator that the iterations have completed
     iterating = 2,  //!< indicator that the iterations need to continue
     halted = 3,  //!< indicator that the simulation has been halted
-
+    error = 7,  //!< indicator that an error has occurred
 };
 
+inline bool returnableResult(message_processing_result result)
+{
+    return (result >= message_processing_result::next_step);
+}
 /** enumeration of the possible states of iteration*/
 enum class iteration_result : signed char
 {
-    error = -5,  //!< indicator that an error has occurred
     next_step = 0,  //!< indicator that the iterations have completed and the federate has moved to the next step
     iterating = 2,  //!< indicator that the iterations need to continue
     halted = 3,  //!< indicator that the simulation has been halted
+    error = 7,  //!< indicator that an error has occurred
 };
 
 /** enumeration of the possible iteration requests by a federate*/

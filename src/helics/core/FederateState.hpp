@@ -154,7 +154,7 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processQueue ();
+    message_processing_result processQueue ();
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -164,11 +164,11 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processDelayQueue ();
+    message_processing_result processDelayQueue ();
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processActionMessage (ActionMessage &cmd);
+    message_processing_result processActionMessage (ActionMessage &cmd);
     /** process a message that updates the configuration of the federate for timing*/
     void processConfigUpdate (const ActionMessage &m);
     /** fill event list

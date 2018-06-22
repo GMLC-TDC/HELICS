@@ -150,7 +150,7 @@ class TimeCoordinator
     void removeDependent (Core::federate_id_t fedID);
 
     /** check if entry to the executing state can be granted*/
-    iteration_state checkExecEntry ();
+    message_processing_result checkExecEntry ();
     /** request a time
     @param nextTime the new requested time
     @param iterate the mode of iteration to use (no_iteration, force_iteration, iterate_if_needed)
@@ -163,7 +163,7 @@ class TimeCoordinator
     */
     void enteringExecMode (iteration_request mode);
     /** check if it is valid to grant a time*/
-    iteration_state checkTimeGrant ();
+    message_processing_result checkTimeGrant ();
     /** disconnect*/
     void disconnect ();
     /** generate a string with the current time status*/
