@@ -164,6 +164,12 @@ size_t Subscription::getRawSize ()
 size_t Subscription::getStringSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        auto out = getValue<std::string>();
+        return out.size();
+    }
+
     if (lastValue.index() == stringLoc)
     {
         return mpark::get<std::string>(lastValue).size();
@@ -180,6 +186,11 @@ size_t Subscription::getStringSize ()
 size_t Subscription::getVectorSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        auto out = getValue<std::vector<double>>();
+        return out.size();
+    }
     switch (lastValue.index())
     {
     case doubleLoc:
