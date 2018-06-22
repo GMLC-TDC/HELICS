@@ -93,7 +93,6 @@ class FederateState
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    mutable std::mutex _mutex;  //!< the mutex protecting the fed state
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
