@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests)
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK (subObj.isUpdated ());
-    BOOST_CHECK_EQUAL (subObj.getStringSize (), str.size () + 1);
+    BOOST_CHECK_EQUAL (subObj.getStringSize (), str.size ());
     BOOST_CHECK_EQUAL (subObj.getRawSize (), str.size ());
     auto val1 = subObj.getValue<std::string> ();
     // now that we got the value it should not be updated

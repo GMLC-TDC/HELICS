@@ -1254,7 +1254,7 @@ def helicsFederateSetLoggingLevel(fed: 'helics_federate', loggingLevel: 'int') -
     """
     return _helics.helicsFederateSetLoggingLevel(fed, loggingLevel)
 
-def helicsFederateSetMaxIterations(fi: 'helics_federate_info_t', maxIterations: 'int') -> "helics_status":
+def helicsFederateSetMaxIterations(fi: 'helics_federate', maxIterations: 'int') -> "helics_status":
     return _helics.helicsFederateSetMaxIterations(fi, maxIterations)
 helicsFederateSetMaxIterations = _helics.helicsFederateSetMaxIterations
 
