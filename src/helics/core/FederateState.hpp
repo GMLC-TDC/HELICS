@@ -85,7 +85,7 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
+    std::map<Core::federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
     std::vector<Core::federate_id_t> delayedFederates;  //!< list of federates to delay messages from

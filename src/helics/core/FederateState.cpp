@@ -120,7 +120,7 @@ void FederateState::reset ()
     local_id = invalid_fed_id;
     state = HELICS_CREATED;
     queue.clear ();
-    delayQueue.clear ();
+    delayQueues.clear ();
     // TODO:: this probably needs to do a lot more
 }
 /** reset the federate to the initializing state*/
@@ -128,7 +128,7 @@ void FederateState::reInit ()
 {
     state = HELICS_INITIALIZING;
     queue.clear ();
-    delayQueue.clear ();
+    delayQueues.clear ();
     // TODO:: this needs to reset a bunch of stuff as well as check a few things
 }
 federate_state_t FederateState::getState () const { return state; }
@@ -628,34 +628,33 @@ iteration_state FederateState::processDelayQueue ()
 {
     delayedFederates.clear ();
     auto ret_code = iteration_state::continue_processing;
-    if (!delayQueue.empty ())
+    bool allEmpty = true;
+    if (!delayQueues.empty ())
     {
-        // copy the messages over since they could just be placed on the delay queue again
-        decltype (delayQueue) tempQueue;
-        std::swap (delayQueue, tempQueue);
-        while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty ()))
+        for (auto &dQ : delayQueues)
         {
-            auto &cmd = tempQueue.front ();
-
-            if (messageShouldBeDelayed (cmd))
+            auto &tempQueue = dQ.second;
+            bool doneProc = false;
+            while ((ret_code == iteration_state::continue_processing) && (!tempQueue.empty())&&(doneProc==false))
             {
-                delayQueue.push_back (std::move (cmd));
+                auto &cmd = tempQueue.front();
+                if (messageShouldBeDelayed(cmd))
+                {
+                    doneProc = true;
+                    allEmpty = false;
+                }
+                else
+                {
+                    ret_code = processActionMessage(cmd);
+                }
+                tempQueue.pop_front();
             }
-            else
+            if (ret_code != iteration_state::continue_processing)
             {
-                ret_code = processActionMessage (cmd);
-            }
-            tempQueue.pop_front ();
-        }
-        if (ret_code != iteration_state::continue_processing)
-        {
-            while (!tempQueue.empty ())
-            {
-                auto &cmd = tempQueue.front ();
-                delayQueue.push_back (std::move (cmd));
-                tempQueue.pop_front ();
+                break;
             }
         }
+        
     }
     return ret_code;
 }
@@ -681,12 +680,21 @@ void FederateState::addFederateToDelay (Core::federate_id_t id)
 
 bool FederateState::messageShouldBeDelayed (const ActionMessage &cmd) const
 {
-    if (delayedFederates.empty ())
+    switch (delayedFederates.size())
     {
+    case 0:
         return false;
+    case 1:
+        return (cmd.source_id == delayedFederates.front());
+    case 2:
+        return ((cmd.source_id == delayedFederates.front())|| (cmd.source_id == delayedFederates.back()));
+    default:
+    {
+        auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), cmd.source_id);
+        return ((res != delayedFederates.end()) && (*res == cmd.source_id));
     }
-    auto res = std::lower_bound (delayedFederates.begin (), delayedFederates.end (), cmd.source_id);
-    return ((res != delayedFederates.end ()) && (*res == cmd.source_id));
+    }
+    
 }
 
 iteration_state FederateState::processQueue ()
@@ -707,7 +715,7 @@ iteration_state FederateState::processQueue ()
         auto cmd = queue.pop ();
         if (messageShouldBeDelayed (cmd))
         {
-            delayQueue.push_back (cmd);
+            delayQueues[cmd.source_id].push_back (cmd);
             continue;
         }
         //    messLog.push_back(cmd);
@@ -781,7 +789,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
         case message_process_result::delay_processing:
             addFederateToDelay (cmd.source_id);
-            delayQueue.push_back (std::move (cmd));
+            delayQueues[cmd.source_id].push_back (std::move (cmd));
             return iteration_state::continue_processing;
         case message_process_result::no_effect:
             return iteration_state::continue_processing;
@@ -844,7 +852,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
             {
             case message_process_result::delay_processing:
                 addFederateToDelay (cmd.source_id);
-                delayQueue.push_back (std::move (cmd));
+                delayQueues[cmd.source_id].push_back (std::move (cmd));
                 return iteration_state::continue_processing;
             case message_process_result::no_effect:
                 return iteration_state::continue_processing;
@@ -894,7 +902,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         {
         case message_process_result::delay_processing:
             addFederateToDelay (cmd.source_id);
-            delayQueue.push_back (std::move (cmd));
+            delayQueues[cmd.source_id].push_back (std::move (cmd));
             return iteration_state::continue_processing;
         case message_process_result::no_effect:
             return iteration_state::continue_processing;
