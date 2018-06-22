@@ -92,7 +92,7 @@ target_compile_definitions(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_i
 target_compile_options(helics_common PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
 
 if (HELICS_HAVE_ZEROMQ)
-target_include_directories(helics_common SYSTEM PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
+	target_include_directories(helics_common SYSTEM PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
 endif (HELICS_HAVE_ZEROMQ)
 
 if (APPLE)

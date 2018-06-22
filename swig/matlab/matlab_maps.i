@@ -24,7 +24,7 @@
 }
 
 %typemap(check)(char *outputString, int maxStringlen, int *actualLength) {
-    $2=helicsSubscriptionGetValueSize(arg1)+2;
+    $2=helicsSubscriptionGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 

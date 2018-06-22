@@ -6196,7 +6196,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_helicsFederateSetMaxIterations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
   int arg2 ;
   int res1 ;
   int val2 ;
@@ -6208,7 +6208,7 @@ SWIGINTERN PyObject *_wrap_helicsFederateSetMaxIterations(PyObject *SWIGUNUSEDPA
   if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateSetMaxIterations",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetMaxIterations" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetMaxIterations" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {

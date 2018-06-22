@@ -187,13 +187,18 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (3, localLocB);
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     comm2.transmit (3, helics::CMD_ACK);
 
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
     if (counter3 != 1)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (350));
+    }
+    if (counter3 != 1)
+    {
+        std::cout << "ipc core extra sleep required\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(350));
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);

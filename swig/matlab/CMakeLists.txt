@@ -4,12 +4,13 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-# Generate SWIG wrapper (for both MATLAB)
+# Generate SWIG wrapper for MATLAB
+if (NOT MATLAB_GENERATE_ONLY)
+	set(Matlab_FIND_COMPONENTS "MAIN_PROGRAM")
+	find_package(MATLAB)
+endif()
 
-set(Matlab_FIND_COMPONENTS "MAIN_PROGRAM")
-FIND_PACKAGE(MATLAB)
-
-IF (NOT DISABLE_SWIG AND SWIG_EXECUTABLE)
+if (NOT DISABLE_SWIG AND SWIG_EXECUTABLE)
 
 	execute_process(COMMAND ${SWIG_EXECUTABLE} -help OUTPUT_VARIABLE SWIG_HELP_OUTPUT)
 	STRING(FIND "${SWIG_HELP_OUTPUT}" "-matlab" MATLAB_HELP_FOUND)
@@ -17,26 +18,26 @@ IF (NOT DISABLE_SWIG AND SWIG_EXECUTABLE)
 		set (MATLAB_SWIG_NOT_AVAILABLE 1)
 		message(warning " SWIG VERSION does not support matlab, reverting to build only")
 	endif()
-ENDIF()
-MESSAGE(STATUS "Building MATLAB")
-IF (DISABLE_SWIG OR MATLAB_SWIG_NOT_AVAILABLE)
+endif()
+message(STATUS "Building MATLAB")
+if (DISABLE_SWIG OR MATLAB_SWIG_NOT_AVAILABLE)
 
-  ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     COMMAND "${CMAKE_COMMAND}"
       -E copy ${CMAKE_CURRENT_SOURCE_DIR}/helicsMEX.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 	  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/helicsMEX.cpp
   )
-  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics DESTINATION matlab COMPONENT matlab)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics DESTINATION matlab COMPONENT matlab)
 
-  FILE(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.m)
-  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics DESTINATION matlab COMPONENT matlab)
-  INSTALL(FILES ${MATLAB_FILES} DESTINATION matlab COMPONENT matlab)
-ELSE()
+  file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.m)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics DESTINATION matlab COMPONENT matlab)
+  install(FILES ${MATLAB_FILES} DESTINATION matlab COMPONENT matlab)
+else()
 
 	FILE(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
 	#custom command for building the wrap file
-	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+	add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 		COMMAND "${SWIG_EXECUTABLE}"
 		"-matlab" "-c++"
 		-o "helicsMEX.cpp"
@@ -46,7 +47,7 @@ ELSE()
 	)
 
 	if (OVERWRITE_MATLAB_FILES)
-		ADD_CUSTOM_TARGET(mfile_overwrite ALL
+		add_custom_target(mfile_overwrite ALL
 			COMMAND ${CMAKE_COMMAND} 
 				-D TARGET_DIR=${CMAKE_CURRENT_SOURCE_DIR}
 				-P ${CMAKE_CURRENT_SOURCE_DIR}/overwriteMatlabFiles.cmake
@@ -54,17 +55,17 @@ ELSE()
 		)
 	endif(OVERWRITE_MATLAB_FILES)
 
-	#ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+	#add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 	#  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/modifyOctSourceFile.cmake
 	#  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 	#)
 
-	INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+helics DESTINATION matlab COMPONENT matlab)
-	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION matlab COMPONENT matlab)
-	INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pisender.m ${CMAKE_CURRENT_SOURCE_DIR}/pireceiver.m ${CMAKE_CURRENT_SOURCE_DIR}/GetFullPath.m DESTINATION matlab COMPONENT matlab)
-ENDIF()
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/+helics DESTINATION matlab COMPONENT matlab)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/SwigGet.m ${CMAKE_CURRENT_BINARY_DIR}/SwigMem.m ${CMAKE_CURRENT_BINARY_DIR}/SwigRef.m DESTINATION matlab COMPONENT matlab)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pisender.m ${CMAKE_CURRENT_SOURCE_DIR}/pireceiver.m ${CMAKE_CURRENT_SOURCE_DIR}/GetFullPath.m DESTINATION matlab COMPONENT matlab)
+endif()
 
-ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
   COMMAND ${CMAKE_COMMAND} 
   -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helicsSharedLib> 
   -D BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp 
@@ -76,34 +77,34 @@ ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
 )
 
 
-	IF (WIN32)
-		ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
-		COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nosplash -minimize -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
-		)
-	ELSE()
-	   ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
-		COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
-	)
-	ENDIF()
+	if (WIN32)
+		add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+			COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nosplash -minimize -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+			)
+	else()
+	   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+			COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+			)
+	endif()
 	
 if (NOT MATLAB_GENERATE_ONLY)
 	ADD_CUSTOM_TARGET(helicsMEX ALL
 		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
 	)
 	set_target_properties (helicsMEX PROPERTIES FOLDER interfaces)
-ENDIF(NOT MATLAB_GENERATE_ONLY)
+endif(NOT MATLAB_GENERATE_ONLY)
 
 
 file( GLOB HSHARED_LIB_SOURCES ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h )
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} DESTINATION matlab COMPONENT matlab)
-INSTALL(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp DESTINATION matlab COMPONENT matlab)
-INSTALL(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
-INSTALL(FILES ${KEY_LIBRARY_FILES} DESTINATION matlab COMPONENT matlab)
-INSTALL(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
-INSTALL(FILES ${PROJECT_BINARY_DIR}/src/helics/shared_api_library/helics_export.h DESTINATION matlab/headers COMPONENT matlab)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m DESTINATION matlab COMPONENT matlab)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} DESTINATION matlab COMPONENT matlab)
+install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp DESTINATION matlab COMPONENT matlab)
+install(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
+install(FILES ${KEY_LIBRARY_FILES} DESTINATION matlab COMPONENT matlab)
+install(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
+install(FILES ${PROJECT_BINARY_DIR}/src/helics/shared_api_library/helics_export.h DESTINATION matlab/headers COMPONENT matlab)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m DESTINATION matlab COMPONENT matlab)
 

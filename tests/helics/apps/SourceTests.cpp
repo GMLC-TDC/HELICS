@@ -1,12 +1,10 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-
-#include <cstdio>
 
 #include "exeTestHelper.h"
 #include "helics/application_api/Subscriptions.hpp"
@@ -17,7 +15,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (source_tests, *utf::label("ci") *utf::label("daily") *utf::label("release") *utf::disabled())
+//BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
+BOOST_AUTO_TEST_SUITE (source_tests, *utf::label("ci") *utf::label("daily") *utf::label("release"))
 
 BOOST_AUTO_TEST_CASE (simple_source_test )
 {
