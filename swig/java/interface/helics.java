@@ -454,6 +454,10 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetRawValue(SWIGTYPE_p_void.getCPtr(sub), SWIGTYPE_p_void.getCPtr(data), maxlen, actualLength));
   }
 
+  public static int helicsSubscriptionGetStringSize(SWIGTYPE_p_void sub) {
+    return helicsJNI.helicsSubscriptionGetStringSize(SWIGTYPE_p_void.getCPtr(sub));
+  }
+
   public static helics_status helicsSubscriptionGetString(SWIGTYPE_p_void sub, byte[] outputString, int[] actualLength) {
     return helics_status.swigToEnum(helicsJNI.helicsSubscriptionGetString(SWIGTYPE_p_void.getCPtr(sub), outputString, actualLength));
   }

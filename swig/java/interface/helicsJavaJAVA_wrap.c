@@ -3008,6 +3008,20 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetRawV
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetStringSize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jint jresult = 0 ;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_subscription *)&jarg1; 
+  result = (int)helicsSubscriptionGetStringSize(arg1);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsSubscriptionGetString(JNIEnv *jenv, jclass jcls, jlong jarg1, jbyteArray jarg2, jintArray jarg4) {
   jint jresult = 0 ;
   helics_subscription arg1 = (helics_subscription) 0 ;
