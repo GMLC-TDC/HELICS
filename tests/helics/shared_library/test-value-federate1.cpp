@@ -535,8 +535,9 @@ void runFederateTestVectorD (const char *core,
                              int len2)
 {
     helics_time_t gtime;
-
-    double val[100] = {0};
+    int maxlen = (len1 > len2) ? len1 : len2;
+    maxlen = (maxlen > len) ? maxlen : len;
+    double *val = new double[maxlen];
 
     FederateTestFixture fixture;
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
@@ -553,7 +554,7 @@ void runFederateTestVectorD (const char *core,
     int actualLen = helicsSubscriptionGetVectorSize (subid);
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    CE (helicsSubscriptionGetVector (subid, val, 100, &actualLen));
+    CE (helicsSubscriptionGetVector (subid, val, maxlen, &actualLen));
 
     BOOST_CHECK_EQUAL (actualLen, len);
     for (int i = 0; i < len; i++)
@@ -561,26 +562,36 @@ void runFederateTestVectorD (const char *core,
         BOOST_CHECK_EQUAL (val[i], defaultValue[i]);
         // std::cout << defaultValue[i] << "\n";
     }
+    
 
     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
 
-    CE (helicsSubscriptionGetVector (subid, val, 100, &actualLen));
+    CE (helicsSubscriptionGetVector (subid, val, maxlen, &actualLen));
     BOOST_CHECK_EQUAL (actualLen, len1);
-    // make sure the string is what we expect
+    // make sure the vector is what we expect
     for (int i = 0; i < len1; i++)
     {
         BOOST_CHECK_EQUAL (val[i], testValue1[i]);
         // std::cout << testValue1[i] << "\n";
     }
 
-    // publish a second string
+    //test getting a vector as a string
+    actualLen = helicsSubscriptionGetStringSize(subid);
+    std::string buf;
+    buf.resize(actualLen + 2);
+    CE(helicsSubscriptionGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen));
+    buf.resize(actualLen);
+    BOOST_CHECK_EQUAL(buf[0], 'v');
+    BOOST_CHECK_EQUAL(buf.back(), ']');
+
+    // publish a second vector
     CE (helicsPublicationPublishVector (pubid, testValue2, len2));
 
     // make sure the value is still what we expect
-    CE (helicsSubscriptionGetVector (subid, val, 100, &actualLen));
+    CE (helicsSubscriptionGetVector (subid, val, maxlen, &actualLen));
     BOOST_CHECK_EQUAL (actualLen, len1);
     for (int i = 0; i < len1; i++)
     {
@@ -593,7 +604,7 @@ void runFederateTestVectorD (const char *core,
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsSubscriptionGetVector (subid, val, 100, &actualLen));
+    CE (helicsSubscriptionGetVector (subid, val, maxlen, &actualLen));
 
     BOOST_CHECK_EQUAL (actualLen, len2);
     for (int i = 0; i < len2; i++)
@@ -603,6 +614,7 @@ void runFederateTestVectorD (const char *core,
     }
 
     CE (helicsFederateFinalize (vFed));
+    delete[] val;
 }
 
 void runFederateTestNamedPoint (const char *core,
@@ -711,12 +723,22 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_boolean, bdata::make (core_
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_vector, bdata::make (core_types), core_type)
 {
-    const int len = 100;
-    const double val1[len] = {34.3, 24.2};
-    const double val2[len] = {12.4, 14.7, 16.34, 18.17};
-    const double val3[len] = {9.9999, 8.8888, 7.7777};
+    const double val1[] = {34.3, 24.2};
+    const double val2[] = {12.4, 14.7, 16.34, 18.17};
+    const double val3[] = {9.9999, 8.8888, 7.7777};
     runFederateTestVectorD (core_type.c_str (), val1, val2, val3, 2, 4, 3);
 }
+
+BOOST_DATA_TEST_CASE(value_federate_single_transfer_vector2, bdata::make(core_types), core_type)
+{
+    std::vector<double> V1(34, 39.4491966662);
+    std::vector<double> V2(100, 45.236262626221);
+    std::vector<double> V3(452, -25.25263858741);
+    runFederateTestVectorD(core_type.c_str(), V1.data(), V2.data(), V3.data(), 34, 100, 452);
+}
+
+
+
 
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
 {
