@@ -444,19 +444,29 @@ std::string TimeCoordinator::printTimeStatus () const
 
 bool TimeCoordinator::isDependency (Core::federate_id_t ofed) const { return dependencies.isDependency (ofed); }
 
-bool TimeCoordinator::addDependency (Core::federate_id_t fedID) { return dependencies.addDependency (fedID); }
+bool TimeCoordinator::addDependency (Core::federate_id_t fedID) 
+{
+    if (dependencies.addDependency(fedID))
+    {
+        dependency_federates.lock()->push_back(fedID);
+        return true;
+    }
+    return false;
+}
 
 bool TimeCoordinator::addDependent (Core::federate_id_t fedID)
 {
     if (dependents.empty ())
     {
         dependents.push_back (fedID);
+        dependent_federates.lock()->push_back(fedID);
         return true;
     }
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep == dependents.end ())
     {
         dependents.push_back (fedID);
+        dependent_federates.lock()->push_back(fedID);
     }
     else
     {
@@ -465,11 +475,22 @@ bool TimeCoordinator::addDependent (Core::federate_id_t fedID)
             return false;
         }
         dependents.insert (dep, fedID);
+        dependent_federates.lock()->push_back(fedID);
     }
     return true;
 }
 
-void TimeCoordinator::removeDependency (Core::federate_id_t fedID) { dependencies.removeDependency (fedID); }
+void TimeCoordinator::removeDependency (Core::federate_id_t fedID) 
+{ 
+    dependencies.removeDependency (fedID);
+    //remove the thread safe version
+    auto dlock=dependency_federates.lock();
+    auto res = std::find(dlock.begin(), dlock.end(), fedID);
+    if (res != dlock.end())
+    {
+        dlock->erase(res);
+    }
+}
 
 void TimeCoordinator::removeDependent (Core::federate_id_t fedID)
 {
@@ -479,6 +500,13 @@ void TimeCoordinator::removeDependent (Core::federate_id_t fedID)
         if (*dep == fedID)
         {
             dependents.erase (dep);
+            //remove the thread safe version
+            auto dlock = dependent_federates.lock();
+            auto res = std::find(dlock.begin(), dlock.end(), fedID);
+            if (res != dlock.end())
+            {
+                dlock->erase(res);
+            }
         }
     }
 }
@@ -490,13 +518,7 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (Core::federate_id_t ofed)
 
 std::vector<Core::federate_id_t> TimeCoordinator::getDependencies () const
 {
-    std::vector<Core::federate_id_t> deps;
-    deps.reserve (dependencies.size ());
-    for (auto &dep : dependencies)
-    {
-        deps.push_back (dep.fedID);
-    }
-    return deps;
+   return *dependency_federates.lock_shared();
 }
 
 void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
