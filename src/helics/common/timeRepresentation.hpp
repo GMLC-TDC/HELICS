@@ -64,7 +64,9 @@ inline constexpr double pow2 (unsigned int exponent)
 {
     return (exponent == 0) ? 1.0 : (2.0 * pow2 (exponent - 1));
 }
-
+/** generate a quick rounding operation as constexpr
+@details doesn't deal with very large numbers appropriately so 
+assumes the numbers given are normal and within the type specified*/
 template <typename ITYPE>
 inline constexpr ITYPE quick_round(double val)
 {
