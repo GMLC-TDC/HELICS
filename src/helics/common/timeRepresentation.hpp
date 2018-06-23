@@ -64,6 +64,14 @@ inline constexpr double pow2 (unsigned int exponent)
 {
     return (exponent == 0) ? 1.0 : (2.0 * pow2 (exponent - 1));
 }
+/** generate a quick rounding operation as constexpr
+@details doesn't deal with very large numbers appropriately so 
+assumes the numbers given are normal and within the type specified*/
+template <typename ITYPE>
+inline constexpr ITYPE quick_round(double val)
+{
+    return static_cast<ITYPE>((val>=0.0)?(val+0.5):(val-0.5));
+}
 /** prototype class for representing time
 @details implements time as a count of 1/2^N seconds
 this is done for performance because many mathematical operations are needed on the time and this way
@@ -178,7 +186,7 @@ class count_time
     static constexpr baseType epsilon () noexcept { return baseType (1); }
     static constexpr baseType convert (double t) noexcept
     {
-        return (t > -1e12) ? ((t < 1e12) ? (static_cast<baseType> (t * dFactor)) : maxVal ()) : minVal ();
+        return (t > -1e12) ? ((t < 1e12) ? (quick_round<baseType> (t * dFactor)) : maxVal ()) : minVal ();
     }
     static CHRONO_CONSTEXPR baseType convert (std::chrono::nanoseconds nsTime) noexcept
     {
