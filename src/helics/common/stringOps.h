@@ -268,7 +268,7 @@ std::string removeBrackets(const std::string &str);
 @param[in]  the string to replace the key with
 @return  the string after the specified replacement
 */
-std::string characterReplace (const std::string &source, char key, std::string repStr);
+std::string characterReplace (const std::string &source, char key, const std::string &repStr);
 
 /** @brief replace XML character codes with the appropriate character
 @param[in] str  the string to do the replacement on

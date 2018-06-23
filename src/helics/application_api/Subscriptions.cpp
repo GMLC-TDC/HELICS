@@ -164,13 +164,47 @@ size_t Subscription::getRawSize ()
 size_t Subscription::getStringSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        auto out = getValue<std::string>();
+        return out.size();
+    }
+
+    if (lastValue.index() == stringLoc)
+    {
+        return mpark::get<std::string>(lastValue).size();
+    }
+    else if (lastValue.index() == namedPointLoc)
+    {
+        const auto &np= mpark::get<named_point>(lastValue);
+        return np.name.size();
+    }
     auto out = getValue<std::string>();
-    return out.size()+1;
+    return out.size();
 }
 
 size_t Subscription::getVectorSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        auto out = getValue<std::vector<double>>();
+        return out.size();
+    }
+    switch (lastValue.index())
+    {
+    case doubleLoc:
+    case intLoc:
+        return 1;
+    case complexLoc:
+        return 2;
+    case vectorLoc:
+        return mpark::get<std::vector<double>>(lastValue).size();
+    case complexVectorLoc:
+        return mpark::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+    default:
+        break;
+    }
     auto out = getValue<std::vector<double>>();
     return out.size();
 }
