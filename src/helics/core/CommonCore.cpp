@@ -1918,7 +1918,10 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
             fedBlock["id"] = fed->global_id.load();
             fedBlock["parent"] = static_cast<int> (global_broker_id);
             fedBlock["dependencies"] = Json_helics::arrayValue;
-           
+            for (auto &dep : fed->getDependencies())
+            {
+                fedBlock["dependencies"].append(dep);
+            }
             fedBlock["dependents"] = Json_helics::arrayValue;
             for (auto &dep : fed->getDependents())
             {

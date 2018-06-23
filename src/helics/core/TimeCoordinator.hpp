@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeDependencies.hpp"
 #include <atomic>
 #include <functional>
+#include "../common/GuardedTypes.hpp"
 
 namespace helics
 {
@@ -40,6 +41,8 @@ class TimeCoordinator
     Time time_grantBase = Time::minVal ();  //!< time to use as a basis for calculating the next grantable
                                             //!< time(usually time granted unless values are changing)
     Time time_block = Time::maxVal ();  //!< a blocking time to not grant time >= the specified time
+    shared_guarded_m<std::vector<Core::federate_id_t>> dependent_federates; //!<these are to maintain an accessible record of dependent federates 
+    shared_guarded_m<std::vector<Core::federate_id_t>> dependency_federates; //!<these are to maintain an accessible record of dependency federates 
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
@@ -82,7 +85,7 @@ class TimeCoordinator
     /** get a list of actual dependencies*/
     std::vector<Core::federate_id_t> getDependencies () const;
     /** get a reference to the dependents vector*/
-    const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
+    std::vector<Core::federate_id_t> getDependents() const { return *dependent_federates.lock_shared(); }
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
@@ -98,14 +101,15 @@ class TimeCoordinator
      */
     void updateMessageTime (Time messageUpdateTime);
 
-    /** take a global id and get a pointer to the dependencyInfo for the other fed
-    will be nullptr if it doesn't exist
-    */
-    DependencyInfo *getDependencyInfo (Core::federate_id_t ofed);
-    /** check whether a federate is a dependency*/
-    bool isDependency (Core::federate_id_t ofed) const;
-
+    
   private:
+      /** take a global id and get a pointer to the dependencyInfo for the other fed
+      will be nullptr if it doesn't exist
+      */
+      DependencyInfo *getDependencyInfo(Core::federate_id_t ofed);
+
+      /** check whether a federate is a dependency*/
+      bool isDependency(Core::federate_id_t ofed) const;
     /** helper function for computing the next event time*/
     bool updateNextExecutionTime ();
     /** helper function for computing the next possible time to generate an external event

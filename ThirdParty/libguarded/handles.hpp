@@ -97,6 +97,32 @@ lock_handle<T, M> try_lock_handle_until(T *obj, M &gmutex, const TimePoint & tp)
     }
 }
 
+/** template SFINAE if lock shared is available*/
+template < class T >                                                             
+class Has_lock_shared                                                         
+{                                                                                
+private:                                                                         
+    using Yes = char[2];                                                         
+    using  No = char[1];                                                         
+                                                                                 
+    struct Fallback { int member; };                                             
+    struct Derived : T, Fallback { };                                            
+                                                                                 
+    template < class U >                                                         
+    static No& test ( decltype(U::lock_shared)* );                                    
+    template < typename U >                                                      
+    static Yes& test ( U* );                                                     
+                                                                                  
+public:                                                                           
+    static constexpr bool RESULT = sizeof(test<Derived>(nullptr)) == sizeof(Yes); 
+};                                                                                
+                                                                                  
+template < class T >                                                              
+struct has_lock_shared                                                       
+: public std::integral_constant<bool, Has_lock_shared<T>::RESULT>              
+{                                                                                 
+};
+
 template <typename M>
 class shared_locker
 {
