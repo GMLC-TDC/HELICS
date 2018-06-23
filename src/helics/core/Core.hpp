@@ -334,7 +334,7 @@ class Core
      */
     virtual handle_id_t registerSubscription (federate_id_t federateID,
                                               const std::string &key,
-                                              const std::string &(type),
+                                              const std::string &type,
                                               const std::string &units,
                                               handle_check_mode check_mode) = 0;
     /** get a subscription Handle from its key
@@ -363,6 +363,47 @@ class Core
     @key the name of the publication
      @return a handle to identify the publication*/
     virtual handle_id_t getPublication (federate_id_t federateID, const std::string &key) const = 0;
+
+    /**
+    * Register a control input for the specified federate.
+    *
+    * May only be invoked in the initialize state.
+    * @param[in] federateID
+    * @param[in] key the name of the control input
+    * @param[in] type a string describing the type of the federate
+    * @param[in] units a string naming the units of the federate
+    */
+    virtual handle_id_t registerControlInput(federate_id_t federateID,
+        const std::string &key,
+        const std::string &type,
+        const std::string &units) = 0;
+    /** get a subscription Handle from its key
+    @param federateID the identifier for the federate
+    @key the tag of the subscription
+    @return a handle to identify the subscription*/
+    virtual handle_id_t getControlInput(federate_id_t federateID, const std::string &key) const = 0;
+
+    /**
+    * Register a control output for the specified federate.
+    *
+    * May only be invoked in the initialize state.
+    * @param[in] federateID
+    * @param[in] key the name of the control input
+    * @param[in] type a string describing the type of the federate
+    * @param[in] units a string naming the units of the federate
+    * @param[in] check_mode  if set to required the core will error if the subscription does not have a
+    * corresponding publication when converting to init mode
+    */
+    virtual handle_id_t registerControlOutput(federate_id_t federateID,
+        const std::string &key,
+        const std::string &type,
+        const std::string &units,
+        handle_check_mode check_mode) = 0;
+    /** get a subscription Handle from its key
+    @param federateID the identifier for the federate
+    @key the tag of the subscription
+    @return a handle to identify the subscription*/
+    virtual handle_id_t getControlOutput(federate_id_t federateID, const std::string &key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle

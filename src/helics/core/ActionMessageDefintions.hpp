@@ -127,6 +127,11 @@ enum class action_t : int32_t
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
     cmd_notify_end = 90,  //!< notify of an endpoint
 
+    cmd_reg_control_output = cmd_info_basis + 100,  //!< register a control output
+    cmd_notify_control_output = 100,  //!< notify of a control output
+    cmd_reg_control_input = cmd_info_basis + 110,  //!< register a control input
+    cmd_notify_control_input = 110,  //!< notify of a control input
+
     cmd_has_operator = 92,  //!< notify that a filter has an operator
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
@@ -178,11 +183,17 @@ enum class action_t : int32_t
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
 #define CMD_ERROR action_message_def::action_t::cmd_error
+
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
 #define CMD_NOTIFY_PUB action_message_def::action_t::cmd_notify_pub
-
 #define CMD_REG_SUB action_message_def::action_t::cmd_reg_sub
 #define CMD_NOTIFY_SUB action_message_def::action_t::cmd_notify_sub
+
+#define CMD_REG_CONTROL_INPUT action_message_def::action_t::cmd_reg_control_input
+#define CMD_NOTIFY_CONTROL_INPUT action_message_def::action_t::cmd_notify_control_input
+#define CMD_REG_CONTROL_OUTPUT action_message_def::action_t::cmd_reg_control_output
+#define CMD_NOTIFY_CONTROL_OUTPUT action_message_def::action_t::cmd_notify_control_output
+
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
 #define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
 #define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst_filter

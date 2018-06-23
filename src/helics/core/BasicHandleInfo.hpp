@@ -16,6 +16,8 @@ enum class handle_type_t : char
     unknown,
     publication,  //!< handle to publish interface
     subscription,  //!< handle to a subscribe interface
+    control_input, //!< handle for a control input
+    control_output, //!< handle for a control output
     endpoint,  //!< handle to an endpoint
     source_filter,  //!< handle to a source filter
     destination_filter,  //!< handle to a destination filter

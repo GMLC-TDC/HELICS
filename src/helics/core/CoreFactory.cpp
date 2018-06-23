@@ -128,7 +128,7 @@ namespace CoreFactory
 {
 std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
 {
-    auto core = makeCore (type, "");
+    auto core = makeCore (type, std::string());
     core->initialize (initializationString);
     registerCore (core);
 
