@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/timeRepresentation.hpp"
 #include "core-types.hpp"
+#include "helics/helics-config.h"
 #include <cstdint>
 /** @file
 @details defining the time representation to use throughout helics
@@ -18,7 +19,11 @@ namespace helics
  *
  * Class represents time in the core.
  */
+#ifdef HELICS_USE_PICOSECOND_TIME
+using Time = TimeRepresentation<count_time<12>>;
+#else
 using Time = TimeRepresentation<count_time<9>>;
+#endif
 
 constexpr Time timeZero = Time::zeroVal ();
 constexpr Time timeEpsilon = Time::epsilon ();
