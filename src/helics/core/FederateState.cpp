@@ -138,7 +138,6 @@ int32_t FederateState::getCurrentIteration () const { return timeCoord->getCurre
 CoreFederateInfo FederateState::getInfo () const
 {
     // lock the mutex to ensure we have the latest values
-    std::lock_guard<std::mutex> lock (_mutex);
     return timeCoord->getFedInfo ();
 }
 
@@ -150,8 +149,13 @@ void FederateState::updateFederateInfo (const ActionMessage &cmd)
     }
     if (state == HELICS_CREATED)
     {
-        std::lock_guard<std::mutex> lock (_mutex);
-        processConfigUpdate (cmd);
+        bool expected = false;
+        while (!processing.compare_exchange_weak(expected, true))
+        {
+            ;
+        }
+        processConfigUpdate(cmd);
+        processing = false;
     }
     else
     {
@@ -165,10 +169,16 @@ bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data
     {
         return true;
     }
+    bool expected = false;
+    while (!processing.compare_exchange_weak(expected, true))
+    {
+        ;
+    }
     // this function could be called externally in a multi-threaded context
-    std::lock_guard<std::mutex> lock (_mutex);
-    auto pub = interfaceInformation.getPublication (pub_id);
-    return pub->CheckSetValue (data, len);
+        auto pub = interfaceInformation.getPublication(pub_id);
+        auto res= pub->CheckSetValue(data, len);
+        processing = false;
+        return res;
 }
 
 uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
@@ -276,6 +286,11 @@ iteration_result FederateState::waitSetup ()
     iteration_result ret;
     switch (getState ())
     {
+    case HELICS_CREATED:
+    { //we are still in the created state
+        processing = false;
+        return waitSetup();
+    }
     case HELICS_ERROR:
         ret = iteration_result::error;
         break;
@@ -320,9 +335,10 @@ iteration_result FederateState::enterInitializationState ()
         ret = iteration_result::halted;
         break;
     case HELICS_CREATED:
-        // not sure this can actually happen
-        ret = iteration_result::iterating;
-        break;
+    {
+        processing = false;
+        return enterInitializationState();
+    }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
@@ -1096,7 +1112,13 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
         break;
     }
 }
-const std::vector<Core::federate_id_t> &FederateState::getDependents () const
+
+std::vector<Core::federate_id_t> FederateState::getDependencies() const
+{
+    return timeCoord->getDependencies();
+}
+
+std::vector<Core::federate_id_t> FederateState::getDependents () const
 {
     return timeCoord->getDependents ();
 }
@@ -1145,8 +1167,13 @@ Time FederateState::nextMessageTime () const
 
 void FederateState::setCoreObject (CommonCore *parent)
 {
-    std::lock_guard<std::mutex> lock (_mutex);
+    bool expected = false;
+    while (!processing.compare_exchange_weak(expected, true))
+    {
+        ;
+    }
     parent_ = parent;
+    processing = false;
 }
 
 void FederateState::logMessage (int level, const std::string &logMessageSource, const std::string &message) const
