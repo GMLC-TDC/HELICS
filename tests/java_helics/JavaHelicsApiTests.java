@@ -22,7 +22,7 @@ public class JavaHelicsApiTests {
 	}
 	
 	public static void main(String[] args) {
-		JavaHelicsApiTests javaHelicsApiTests = new JavaHelicsApiTests(93);
+		JavaHelicsApiTests javaHelicsApiTests = new JavaHelicsApiTests(94);
 		try {
 			//General HELICS Functions
 			double helicsTimeZero = helics.getHelics_time_zero();
@@ -139,12 +139,6 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateInfoFree(fedInfo1);
 			//Federate API Functions
 			SWIGTYPE_p_void broker3 = helics.helicsCreateBroker("zmq", "broker3", "--federates 1 --loglevel 1");
-			byte[] broker3Address = new byte[256];
-			byte[] broker3Identifier = new byte[256];
-			rv = helics.helicsBrokerGetAddress(broker3, broker3Address);
-			rv = helics.helicsBrokerGetIdentifier(broker3, broker3Identifier);
-			String broker3AddressString = new String(broker3Address);
-			String broker3IdentifierString = new String(broker3Identifier);
 			SWIGTYPE_p_void fedInfo2 = helics.helicsFederateInfoCreate();
 			String coreInitString = "--federates 1";
 			rv = helics.helicsFederateInfoSetCoreInitString(fedInfo2, coreInitString);
@@ -407,19 +401,19 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("msg2Length != 5");
 			}
 			String msg2OriginalSource = msg2.getOriginal_source();
-			if(!msg2OriginalSource.equals("fed1/Ep1")) {
+			if(!"fed1/Ep1".equals(msg2OriginalSource)) {
 				javaHelicsApiTests.helicsAssert("!msg2OriginalSource.equals(\"fed1/Ep1\")");
 			}
 			String msg2Source = msg2.getSource();
-			if(!msg2Source.equals("fed1/Ep1")) {
+			if(!"fed1/Ep1".equals(msg2Source)) {
 				javaHelicsApiTests.helicsAssert("!msg2Source.equals(\"fed1/Ep1\")");
 			}
 			String msg2Destination = msg2.getDest();
-			if(!msg2Destination.equals("Ep2")) {
+			if(!"Ep2".equals(msg2Destination)) {
 				javaHelicsApiTests.helicsAssert("!msg2Destination.equals(\"Ep2\")");
 			}
 			String msg2OriginalDestination = msg2.getOriginal_dest();
-			if(!msg2OriginalDestination.equals("")) {
+			if(!"".equals(msg2OriginalDestination)) {
 				javaHelicsApiTests.helicsAssert("!msg2OriginalDestination.equals(\"\")");
 			}
 			int fed1MsgCount = helics.helicsFederateReceiveCount(fed1);
@@ -436,7 +430,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("msg3Time != 1.0");
 			}
 			String msg3Data = msg3.getData();
-			if(!msg3Data.equals("There")) {
+			if(!"There".equals(msg3Data)) {
 				javaHelicsApiTests.helicsAssert("!msg3Data.equals(\"There\")");
 			}
 			long msg3Length = msg3.getLength();
@@ -444,19 +438,19 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("msg3Length != 5");
 			}
 			String msg3OriginalSource = msg3.getOriginal_source();
-			if(!msg3OriginalSource.equals("fed1/Ep1")) {
+			if(!"fed1/Ep1".equals(msg3OriginalSource)) {
 				javaHelicsApiTests.helicsAssert("!msg3OriginalSource.equals(\"fed1/Ep1\")");
 			}
 			String msg3Source = msg3.getSource();
-			if(!msg3Source.equals("fed1/Ep1")) {
+			if(!"fed1/Ep1".equals(msg3Source)) {
 				javaHelicsApiTests.helicsAssert("!msg3Source.equals(\"fed1/Ep1\")");
 			}
 			String msg3Destination = msg3.getDest();
-			if(!msg3Destination.equals("Ep2")) {
+			if(!"Ep2".equals(msg3Destination)) {
 				javaHelicsApiTests.helicsAssert("!msg3Destination.equals(\"Ep2\")");
 			}
 			String msg3OriginalDestination = msg3.getOriginal_dest();
-			if(!msg3OriginalDestination.equals("")) {
+			if(!"".equals(msg3OriginalDestination)) {
 				javaHelicsApiTests.helicsAssert("!msg3OriginalDestination.equals(\"\")");
 			}
 			byte[] sub1Type = new byte[256];
@@ -535,6 +529,9 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateFree(fed2);
 			helics.helicsFederateInfoFree(fedInfo2);
 			rv = helics.helicsBrokerDisconnect(broker3);
+			if(rv != helics_status.helics_ok) {
+				javaHelicsApiTests.helicsAssert("rv != helics_status.helics_ok");
+			}
 			helics.helicsBrokerFree(broker3);
 			//Clean Up Functions
 			helics.helicsCleanupHelicsLibrary();
@@ -545,6 +542,9 @@ public class JavaHelicsApiTests {
 			int totalNumberOfTests = javaHelicsApiTests.numberOfPassingTests + javaHelicsApiTests.numberOfFailedTests;
 			double percentagePassed = (javaHelicsApiTests.numberOfPassingTests * 100) / (totalNumberOfTests);
 			System.out.println(String.format("%d of %d tests passed.%n%.0f%% successfull.%n%d tests failed.", javaHelicsApiTests.numberOfPassingTests,totalNumberOfTests,percentagePassed,javaHelicsApiTests.numberOfFailedTests));
+            if(javaHelicsApiTests.numberOfFailedTests > 0) {
+                System.exit(1);
+            }
 		}
 	}
 }
