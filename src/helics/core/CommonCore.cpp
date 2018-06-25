@@ -2299,7 +2299,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == iteration_state::next_step)
+                if (res == message_processing_result::next_step)
                 {
                     enteredExecutionMode = true;
                 }
@@ -2654,7 +2654,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
             timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
-            if (res == iteration_state::next_step)
+            if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
             }
@@ -3063,7 +3063,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         {
             timeCoord->processTimeMessage (cmd);
             auto res = timeCoord->checkExecEntry ();
-            if (res == iteration_state::next_step)
+            if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
             }
