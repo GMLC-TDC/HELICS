@@ -470,7 +470,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("sub1Updated != 1");
 			}
 			double sub2UpdateTime = helics.helicsSubscriptionLastUpdateTime(sub2);
-			if(sub2UpdateTime != 1.0e9) {
+			if(sub2UpdateTime != 1.0) {
 				javaHelicsApiTests.helicsAssert("sub2UpdateTime != 1.0e9");
 			}
 			int[] sub5Value = {9};
