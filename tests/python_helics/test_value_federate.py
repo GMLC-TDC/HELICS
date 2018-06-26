@@ -109,7 +109,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     testVal2 = 0.0
 
     pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "named_point", "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "named_point", "")
 
     status = h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
     assert status == 0
