@@ -100,7 +100,7 @@ def test_value_federate_publication_registration(vFed):
     assert status == 0
     assert publication_units == 'V'
 
-def test_value_federate_named_point(vFed):
+def test_value_federate_runFederateTestNamedPoint(vFed):
     defaultValue = "start"
     defVal = 5.3
     testValue1 = "inside of the functional relationship of helics"
