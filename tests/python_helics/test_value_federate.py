@@ -100,6 +100,69 @@ def test_value_federate_publication_registration(vFed):
     assert status == 0
     assert publication_units == 'V'
 
+def test_value_federate_named_point(vFed):
+    defaultValue = "start"
+    defVal = 5.3
+    testValue1 = "inside of the functional relationship of helics"
+    testVal1 = 45.7823
+    testValue2 = "I am a string"
+    testVal2 = 0.0
+
+    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "named_point", "")
+
+    status = h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
+    assert status == 0
+
+    status = h.helicsFederateEnterExecutionMode(vFed)
+    assert status == 0
+
+    # publish string1 at time=0.0;
+    status = h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
+    assert status == 0
+
+    # double val;
+    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    assert value == defaultValue
+    assert val == defVal
+
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
+
+    assert grantedtime == 0.01
+
+    # get the value
+    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value == testValue1
+    assert val == testVal1
+
+    # publish a second string
+    status = h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
+    assert status == 0
+
+    # make sure the value is still what we expect
+    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value == testValue1
+    assert val == testVal1
+
+    # advance time
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
+    assert status == 0
+    assert grantedtime == 0.02
+
+    # make sure the value was updated
+    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value == testValue2
+    assert val == testVal2
+
+
+
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
     pubid2 = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", h.HELICS_DATA_TYPE_INT, "")
