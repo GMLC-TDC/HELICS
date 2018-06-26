@@ -14,55 +14,55 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** data class for managing information about a subscription*/
-class SubscriptionInfo
+class ControlInputInfo
 {
   public:
     struct dataRecord
     {
         Time time;
+        unsigned int iteration = 0;
         std::shared_ptr<const data_block> data;
-        int32_t index = 0;
         dataRecord () = default;
         dataRecord (Time recordTime, std::shared_ptr<const data_block> recordData)
             : time (recordTime), data (std::move (recordData))
         {
         }
-        dataRecord (Time recordTime, int32_t recordIndex, std::shared_ptr<const data_block> recordData)
-            : time (recordTime), data (std::move (recordData)), index(recordIndex)
+        dataRecord (Time recordTime, int recordIteration, std::shared_ptr<const data_block> recordData)
+            : time (recordTime), iteration (recordIteration), data (std::move (recordData))
         {
         }
     };
 
     /** constructor with all the information*/
-    SubscriptionInfo (Core::handle_id_t id_,
+    ControlInputInfo (Core::handle_id_t id_,
                       Core::federate_id_t fed_id_,
                       const std::string &key_,
                       const std::string &type_,
-                      const std::string &units_,
-                      bool required_ = false)
-        : id (id_), fed_id (fed_id_), key (key_), type (type_), units (units_), required (required_)
+                      const std::string &units_)
+        : id (id_), fed_id (fed_id_), key (key_), type (type_), units (units_)
     {
     }
 
     const Core::handle_id_t id;  //!< identifier for the handle
     const Core::federate_id_t fed_id;  //!< the federate that created the handle
-    const std::string key;  //!< the identifier for the subscription
-    const std::string type;  //! the type of data for the subscription
-    std::string pubType;  //!< the type of data that its matching publication uses
-    const std::string units;  //!< the units of the subscription
-    const bool required;  //!< flag indicating that the subscription requires a matching publication
+    const std::string key;  //!< the identifier for the controlInput
+    const std::string type;  //! the type of data for the controlInput
+    std::string inputType;  //!< the type of data that its matching controlOutput uses
+    const std::string units;  //!< the units of the controlInput
     bool has_target = false;  //!< flag indicating that a target publication was found
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
-    dataRecord current_data;  //!< the most recent published data
-    std::pair<Core::federate_id_t, Core::handle_id_t> target;  //!< the publication information
+    std::vector<dataRecord> current_data;  //!< the most recent published data
+    std::vector<std::pair<Core::federate_id_t, Core::handle_id_t>> input_sources;  //!< the sources of the input signals
   private:
-    std::vector<dataRecord> data_queue;  //!< queue of the data
+    std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
   public:
-    /** get the current data*/
-    std::shared_ptr<const data_block> getData ();
+    /** get all the current data*/
+    std::vector<std::shared_ptr<const data_block>> getData ();
+    /** get a particular data input*/
+    std::vector<std::shared_ptr<const data_block>> getData(int index);
     /** add a data block into the queue*/
-    void addData (Time valueTime, unsigned int index, std::shared_ptr<const data_block> data);
+    void addData (Core::federate_id_t source_id, Core::handle_id_t source_handle, Time valueTime, unsigned int index, std::shared_ptr<const data_block> data);
 
     /** update current data not including data at the specified time
     @param newTime the time to move the subscription to
@@ -84,6 +84,6 @@ class SubscriptionInfo
     Time nextValueTime () const;
 
   private:
-    bool updateData (dataRecord &&update);
+    bool updateData (dataRecord &&update, int index);
 };
 }  // namespace helics

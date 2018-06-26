@@ -69,7 +69,7 @@ class BasicHandleInfo
     const Core::federate_id_t fed_id = invalid_fed_id;  //!< the global federate id for the creator of the handle
     Core::federate_id_t local_fed_id = invalid_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
-    bool used = false;  //!< indicator that the publication or filter is used
+    bool used = false;  //!< indicator that the handle is being used to link with another federate
     uint16_t flags = 0; //!< flags corresponding to the flags used in ActionMessages +some extra ones
 
     const std::string key;  //!< the name of the handle

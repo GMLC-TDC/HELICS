@@ -107,18 +107,20 @@ class Core
     virtual void finalize (federate_id_t federateID) = 0;
 
     /**
-     * Federates may be in three states.
+     * Federates may be in four states.
      *
-     * Federates are in three states.
+     * Federates are in three Modes.
      *    -# Startup
      *       Configuration of the federate.
      *       State begins when registerFederate() is invoked and ends when enterInitializingState() is invoked.
      *    -# Initializing
      *       Configure of the simulation state prior to the start of time stepping.
      *       State begins when enterInitializingState() is invoked and ends when enterExecutingState(true) is
-     * invoked.
+     *       invoked.
      *    -# Executing
-     *       State begins when enterExecutingState() is invoked and ends when Finalize() is invoked.
+     *       State begins when enterExecutingState() is invoked and ends when finalize() is invoked.
+     *    -# Finalized
+     *       state after finalize is invoked.
      */
 
     /**
@@ -412,7 +414,7 @@ class Core
 
     /**
     * Returns the target of a specified handle
-    @details for publications and subscriptions this is the key
+    @details for publications and subscriptions control input and control output this is the key
     for filters this is the target and for endpoints this will return an empty string
     */
     virtual const std::string &getTarget (handle_id_t handle) const = 0;
@@ -424,23 +426,23 @@ class Core
     /**
      * Returns type for specified handle.
      @details for endpoints, publications, and filters, this is the input type
-     for subscriptions this is the type of the publication(if available)
-     @param handle the handle from the publication, subscription, endpoint or filter
+     for subscriptions and control inputs this is the type of the publication or control input(if available)
+     @param handle the handle from the publication, subscription,control_input/output, endpoint or filter
      */
     virtual const std::string &getType (handle_id_t handle) const = 0;
 
     /**
     * Returns output type for specified handle.
-    @details for filters this is the outputType, for Subscriptions this is the expected type
-    for endpoints and publications this is the same as getType();
-    @param handle the handle from the publication, subscription, endpoint or filter
+    @details for filters this is the outputType, for Subscriptions and control inputs this is the expected type
+    for endpoints and publications and control Inputs this is the same as getType();
+    @param handle the handle from the interface
     */
     virtual const std::string &getOutputType (handle_id_t handle) const = 0;
 
     /**
      * Publish specified data to the specified key.
      *
-     * @param handle a handle to a publication to use for the value
+     * @param handle a handle to a publication or control output to use for the value
      @param[in] data the raw data to send
      @param len the size of the data
      */
@@ -453,7 +455,7 @@ class Core
     virtual std::shared_ptr<const data_block> getValue (handle_id_t handle) = 0;
 
     /**
-     * Returns vector of subscription handles that received an update during the last
+     * Returns vector of subscription and control input handles that received an update during the last
      * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
      *@param federateID the identification code of the federate to query
      @return a reference to the location of an array of handles that have been updated
@@ -617,12 +619,12 @@ class Core
     virtual void sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message) = 0;
 
     /**
-     * Returns the number of pending receives for the specified destination endpoint or filter.
+     * Returns the number of pending receives for the specified destination endpoint.
      */
     virtual uint64_t receiveCount (handle_id_t destination) = 0;
 
     /**
-     * Returns the next buffered message the specified destination endpoint or filter.
+     * Returns the next buffered message the specified destination endpoint.
      @details this is a non-blocking call and will return a nullptr if no message are available
      */
     virtual std::unique_ptr<Message> receive (handle_id_t destination) = 0;

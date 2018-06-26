@@ -11,6 +11,8 @@ set(SRC_FILES
 	FederateState.cpp
 	SubscriptionInfo.cpp
 	PublicationInfo.cpp
+	ControlInputInfo.cpp
+	ControlOutputInfo.cpp
 	InterfaceInfo.cpp
 	#FilterInfo.cpp
 	EndpointInfo.cpp
@@ -26,7 +28,6 @@ set(SRC_FILES
 	NetworkBrokerData.cpp
 	helics-time.cpp
 	HandleManager.cpp
-	HandlePointerManager.cpp
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
 	
@@ -102,6 +103,8 @@ set(INCLUDE_FILES
 	FederateState.hpp
 	SubscriptionInfo.hpp
 	PublicationInfo.hpp
+	ControlInputInfo.hpp
+	ControlOutputInfo.hpp
 	EndpointInfo.hpp
 	FilterInfo.hpp
 	fmt_wrapper.h
@@ -109,7 +112,6 @@ set(INCLUDE_FILES
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
-	HandlePointerManager.hpp
 	queryHelpers.hpp
 	MessageTimer.hpp
 	JsonMapBuilder.hpp

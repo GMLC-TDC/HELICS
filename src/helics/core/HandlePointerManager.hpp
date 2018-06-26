@@ -24,8 +24,10 @@ class HandlePointerManager
     std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
     std::unordered_map<std::string, Core::handle_id_t> publications;  //!< map of all local publications
     std::unordered_map<std::string, Core::handle_id_t> endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string, Core::handle_id_t> controlInputs;  //!< map of all local controlInputs
     std::unordered_multimap<std::string, Core::handle_id_t> subscriptions;  //!< multimap of subscriptions
     std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
+    std::unordered_multimap<std::string, Core::handle_id_t> controlOutputs;  //!< multimap for all the control outputs
   public:
     /** default constructor*/
     HandlePointerManager () = default;
