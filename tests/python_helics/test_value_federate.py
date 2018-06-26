@@ -162,6 +162,53 @@ def test_value_federate_named_point(vFed):
     assert val == testVal2
 
 
+def test_value_federate_runFederateTestBool(vFed):
+    defaultValue = True
+    testValue1 = True
+    testValue2 = False
+
+    # register the publications
+    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "bool", "")
+
+    status = h.helicsSubscriptionSetDefaultDouble(subid, h.helics_true if defaultValue else h.helics_false)
+    assert status == 0
+
+    status = h.helicsFederateEnterExecutionMode(vFed)
+    assert status == 0
+
+    # publish string1 at time=0.0;
+    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+
+    assert val == h.helics_true if defaultValue else h.helics_false
+
+    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    assert status == 0
+    assert grantedtime == 0.01
+
+    # get the value
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+
+    # make sure the string is what we expect
+    assert val == h.helics_true if testValue1 else h.helics_false
+
+    # publish a second string
+    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue2 else h.helics_false)
+    assert status == 0
+
+    # make sure the value is still what we expect
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+    assert val == h.helics_true if testValue1 else h.helics_false
+    # advance time
+    status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
+    # make sure the value was updated
+    assert grantedtime == 0.02
+
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+    assert status == 0
+    assert val == h.helics_false if testValue2 else h.helics_true
+
 
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
