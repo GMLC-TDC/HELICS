@@ -206,6 +206,16 @@ BasicHandleInfo *HandleManager::getControlInput(const std::string &name)
     return nullptr;
 }
 
+const BasicHandleInfo *HandleManager::getControlInput(const std::string &name) const
+{
+    auto fnd = controlInputs.find(name);
+    if (fnd != controlInputs.end())
+    {
+        return &(handles[fnd->second]);
+    }
+    return nullptr;
+}
+
 
 BasicHandleInfo *HandleManager::getFilter(int32_t index)
 {

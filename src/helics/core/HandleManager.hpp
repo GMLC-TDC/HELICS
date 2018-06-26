@@ -91,6 +91,7 @@ class HandleManager
     @return nullptr if the index doesn't point to a valid publication*/
     BasicHandleInfo *getPublication(int32_t index);
     BasicHandleInfo *getControlInput(const std::string &name);
+    const BasicHandleInfo *getControlInput(const std::string &name) const;
     int32_t getLocalFedID (Core::handle_id_t id_) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }

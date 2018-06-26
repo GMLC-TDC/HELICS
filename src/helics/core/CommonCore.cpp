@@ -809,6 +809,57 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
     return invalid_handle;
 }
 
+handle_id_t CommonCore::registerControlOutput(federate_id_t federateID,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units,
+    handle_check_mode check_mode)
+{
+    auto fed = getFederateAt(federateID);
+
+    if (fed == nullptr)
+    {
+        throw (InvalidIdentifier("federateID not valid (registerControlOutput)"));
+    }
+    if (fed->getState() != HELICS_CREATED)
+    {
+        throw (InvalidFunctionCall("control outputs must be registered before calling enterInitializationMode"));
+    }
+
+    auto flags = (check_mode == handle_check_mode::required) ? make_flags(required_flag) : 0;
+    auto &handle =
+        createBasicHandle(fed->global_id, fed->local_id, handle_type_t::control_output, key, type, units, flags);
+
+    auto id = handle.handle;
+    LOG_DEBUG(0, fed->getIdentifier(), fmt::format("registering CONTROL OUTPUT {}", key));
+    fed->interfaces().createControlOutput(id, key, type, units);
+
+    ActionMessage m(CMD_REG_CONTROL_OUTPUT);
+    m.source_id = fed->global_id;
+    m.source_handle = id;
+    m.name = key;
+    m.info().type = type;
+    m.info().units = units;
+    if (check_mode == handle_check_mode::required)
+    {
+        setActionFlag(m, required_flag);
+    }
+    addActionMessage(m);
+
+    return id;
+}
+
+handle_id_t CommonCore::getControlOutput(federate_id_t federateID, const std::string &key) const
+{
+    auto fed = getFederateAt(federateID);
+    if (fed != nullptr)
+    {
+        auto co = fed->interfaces().getControlOutput(key);
+        return (co != nullptr) ? co->id : invalid_handle;
+    }
+    return invalid_handle;
+}
+
 handle_id_t CommonCore::registerPublication (federate_id_t federateID,
                                              const std::string &key,
                                              const std::string &type,
@@ -817,7 +868,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
-        throw (InvalidIdentifier ("federateID not valid (getSubscription)"));
+        throw (InvalidIdentifier ("federateID not valid (registerPublication)"));
     }
     if (fed->getState () != HELICS_CREATED)
     {
@@ -853,6 +904,53 @@ handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::str
         return invalid_handle;
     }
     return pub->handle;
+}
+
+
+handle_id_t CommonCore::registerControlInput(federate_id_t federateID,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units)
+{
+    auto fed = getFederateAt(federateID);
+    if (fed == nullptr)
+    {
+        throw (InvalidIdentifier("federateID not valid (registerControlInput)"));
+    }
+    if (fed->getState() != HELICS_CREATED)
+    {
+        throw (InvalidFunctionCall("control Inputs must be registered before calling enterInitializationMode"));
+    }
+    LOG_DEBUG(0, fed->getIdentifier(), fmt::format("registering CONTROL INPUT {}", key));
+    auto ci = handles.read([&key](auto &hand) { return hand.getControlInput(key); });
+    if (ci != nullptr)  // this key is already found
+    {
+        throw (RegistrationFailure("control input already exists"));
+    }
+    auto &handle = createBasicHandle(fed->global_id, fed->local_id, handle_type_t::control_input, key, type, units);
+
+    auto id = handle.handle;
+    fed->interfaces().createControlInput(id, key, type, units);
+
+    ActionMessage m(CMD_REG_CONTROL_INPUT);
+    m.source_id = fed->global_id;
+    m.source_handle = id;
+    m.name = key;
+    m.info().type = type;
+    m.info().units = units;
+
+    actionQueue.push(m);
+    return id;
+}
+
+handle_id_t CommonCore::getControlInput(federate_id_t federateID, const std::string &key) const
+{
+    auto ci = handles.read([&key](auto &hand) { return hand.getControlInput(key); });
+    if (ci->local_fed_id != federateID)
+    {
+        return invalid_handle;
+    }
+    return ci->handle;
 }
 
 const std::string nullStr;
