@@ -101,7 +101,7 @@ def test_value_federate_publication_registration(vFed):
     assert publication_units == 'V'
 
 def test_value_federate_runFederateTestNamedPoint(vFed):
-    defaultValue = "start of a longer string in place of the shorter one"
+    defaultValue = "start of a longer string in place of the shorter one and now this should be very long"
     defVal = 5.3
     #testValue1 = "inside of the functional relationship of helics"
     testValue1 = "short string"
@@ -133,22 +133,22 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert grantedtime == 0.01
 
     # get the value
-    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    status, value2, val2 = h.helicsSubscriptionGetNamedPoint(subid)
     assert status == 0
     # make sure the string is what we expect
-    assert value == testValue1
-    assert val == testVal1
+    assert value2 == testValue1
+    assert val2 == testVal1
 
     # publish a second string
     status = h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
     assert status == 0
 
     # make sure the value is still what we expect
-    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    status, value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
     assert status == 0
     # make sure the string is what we expect
-    assert value == testValue1
-    assert val == testVal1
+    assert value3 == testValue1
+    assert val3 == testVal1
 
     # advance time
     status, grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
@@ -156,11 +156,11 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert grantedtime == 0.02
 
     # make sure the value was updated
-    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    status, value4, val4 = h.helicsSubscriptionGetNamedPoint(subid)
     assert status == 0
     # make sure the string is what we expect
-    assert value == testValue2
-    assert val == testVal2
+    assert value4 == testValue2
+    assert val4 == testVal2
 
 
 def test_value_federate_runFederateTestBool(vFed):
