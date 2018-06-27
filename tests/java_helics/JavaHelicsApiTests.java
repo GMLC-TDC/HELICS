@@ -393,7 +393,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("msg2Time != 1.0");
 			}
 			String msg2Data = msg2.getData();
-			if(!"Hello".equals(msg2Data) {
+			if(!"Hello".equals(msg2Data)) {
 				javaHelicsApiTests.helicsAssert("!msg2Data.equals(\"Hello\")");
 			}
 			long msg2Length = msg2.getLength();
