@@ -104,7 +104,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     defaultValue = "start of a longer string in place of the shorter one"
     defVal = 5.3
     #testValue1 = "inside of the functional relationship of helics"
-	testValue1 = "short string"
+    testValue1 = "short string"
     testVal1 = 45.7823
     testValue2 = "I am a string"
     testVal2 = 0.0
