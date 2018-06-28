@@ -220,7 +220,7 @@ def test_value_federate_publisher_registration(vFed):
     status, publication_key = h.helicsPublicationGetKey(pubid1)
     assert status == 0
     assert publication_key == 'TestA Federate/pub1'
-	status, publication_type = h.helicsPublicationGetType(pubid1)
+    status, publication_type = h.helicsPublicationGetType(pubid1)
     assert status == 0
     assert publication_type == 'string'
     status, publication_key = h.helicsPublicationGetKey(pubid2)
@@ -235,7 +235,7 @@ def test_value_federate_publisher_registration(vFed):
     status, publication_units = h.helicsPublicationGetUnits(pubid3)
     assert status == 0
     assert publication_units == 'V'
-	 status, publication_type = h.helicsPublicationGetType(pubid2)
+    status, publication_type = h.helicsPublicationGetType(pubid2)
     assert status == 0
     assert publication_type == 'int'
 
@@ -312,7 +312,7 @@ def test_value_federate_runFederateTestComplex(vFed):
     rTestValue = 2.0
     iTestValue = 2.0
     pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_COMPLEX, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "double", "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "complex", "")
     h.helicsSubscriptionSetDefaultComplex(subid, rDefaultValue, iDefaultValue)
 
     h.helicsFederateEnterExecutionMode (vFed)
@@ -399,7 +399,6 @@ def test_value_federate_runFederateTestVectorD(vFed):
 
     h.helicsFederateEnterExecutionMode(vFed)
 
-    # TODO: Fix error with the following function
     h.helicsPublicationPublishVector(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetVector(subid)
