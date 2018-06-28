@@ -116,6 +116,13 @@ Add the install directory path to the MATLAB files to your PATH, and then open M
 
 Now in MATLAB, run the following:
 
+```
+helicsStartup
+display(helics.helicsGetVersion())
+```
+
+Alternatively, you can load the helics library manually, depending on which operating system you use.
+
 ```matlab
 loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
 loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.so'));
