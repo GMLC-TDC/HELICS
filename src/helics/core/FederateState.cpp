@@ -644,7 +644,6 @@ message_processing_result FederateState::processDelayQueue ()
 {
     delayedFederates.clear ();
     auto ret_code = message_processing_result::continue_processing;
-    bool allEmpty = true;
     if (!delayQueues.empty ())
     {
         for (auto &dQ : delayQueues)
@@ -657,7 +656,7 @@ message_processing_result FederateState::processDelayQueue ()
                 auto &cmd = tempQueue.front();
                 if (messageShouldBeDelayed(cmd))
                 {
-                    allEmpty = false;
+                    ret_code = message_processing_result::delay_message;
                     continue;
                 }
                 else
@@ -665,7 +664,6 @@ message_processing_result FederateState::processDelayQueue ()
                     ret_code = processActionMessage(cmd);
                     if (ret_code == message_processing_result::delay_message)
                     {
-                        allEmpty = false;
                         continue;
                     }
                 }

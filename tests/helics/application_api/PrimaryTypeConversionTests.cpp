@@ -155,5 +155,11 @@ BOOST_AUTO_TEST_CASE (namedpoint_conversion_tests)
     BOOST_CHECK (checkTypeConversion1 (vp2, std::vector<std::complex<double>>{std::complex<double> (3.0, -4.0)}));
     BOOST_CHECK (checkTypeConversion1 (vp2, true));
     BOOST_CHECK (checkTypeConversion1 (vp2, vp2.name));
+
+    named_point t1("this is a longer string for testing purposes", 234.252622334);
+    auto s = helicsNamedPointString(t1);
+    auto t2 = helicsGetNamedPoint(s);
+    BOOST_CHECK_EQUAL(t1.name, t2.name);
+    BOOST_CHECK_CLOSE(t1.value, t2.value,0.00001);
 }
 BOOST_AUTO_TEST_SUITE_END ()

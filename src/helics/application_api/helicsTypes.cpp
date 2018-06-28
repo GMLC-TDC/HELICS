@@ -315,7 +315,7 @@ named_point helicsGetNamedPoint (const std::string &val)
     str1.pop_back ();
 
     named_point point;
-    point.name = str1.substr (1);
+    point.name = stringOps::removeQuotes(str1);
     auto vstr = val.substr (locsep + 1, locend - locsep - 1);
     stringOps::trimString(vstr);
     point.value = boost::lexical_cast<double> (vstr);
