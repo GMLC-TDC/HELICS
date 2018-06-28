@@ -1131,7 +1131,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     m.name = name;
     m.info ().type = type;
 
-    actionQueue.push (m);
+    addActionMessage(std::move(m));
 
     return id;
 }
@@ -1178,32 +1178,14 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     m.info ().target = source;
     m.info ().type = type_in;
     m.info ().type_out = type_out;
-    auto ept = handles.modify ([&source](auto &hand) {
+    handles.modify ([&source](auto &hand) {
         auto epthand = hand.getEndpoint (source);
         if (epthand != nullptr)
         {
             setActionFlag (*epthand, has_source_filter_flag);
         }
-        return epthand;
     });
-    if (ept != nullptr)
-    {
-        auto endhandle = ept->handle;
-        auto endid = ept->fed_id;
-        setActionFlag (m, processing_complete_flag);
-        // send to broker and core
-        addActionMessage (m);
-        // now send the same command to the endpoint
-        m.dest_handle = endhandle;
-        m.dest_id = endid;
-        // send to
-        addActionMessage (m);
-    }
-    else
-    {
-        //
-        addActionMessage (m);
-    }
+    addActionMessage(std::move(m));
     return id;
 }
 
@@ -1242,30 +1224,14 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    auto ept = handles.modify ([&source](auto &hand) {
+    handles.modify ([&source](auto &hand) {
         auto epthand = hand.getEndpoint (source);
         if (epthand != nullptr)
         {
             setActionFlag (*epthand, has_source_filter_flag);
         }
-        return epthand;
     });
-    if (ept != nullptr)
-    {
-        auto endhandle = ept->handle;
-        auto endid = ept->fed_id;
-        // send to broker and core
-        addActionMessage (m);
-        // now send the same command to the endpoint
-        m.dest_handle = endhandle;
-        m.dest_id = endid;
-        // send to
-        addActionMessage (m);
-    }
-    else
-    {
-        addActionMessage (m);
-    }
+    addActionMessage (std::move(m));
     return id;
 }
 
@@ -1309,12 +1275,12 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = global_broker_id;
     m.source_handle = id;
-    m.name = handle.key;
+    m.name = filterName;
     m.info ().target = dest;
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    auto ept = handles.modify ([&dest](auto &hand) {
+    handles.modify ([&dest](auto &hand) {
         auto epthand = hand.getEndpoint (dest);
         if (epthand != nullptr)
         {
@@ -1325,25 +1291,9 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
             setActionFlag (*epthand, has_dest_filter_flag);
             setActionFlag (*epthand, has_non_cloning_dest_filter_flag);
         }
-        return epthand;
     });
-    if (ept != nullptr)
-    {
-        auto endhandle = ept->handle;
-        auto endid = ept->fed_id;
-        setActionFlag (m, processing_complete_flag);
-        // send to broker and core
-        addActionMessage (m);
-        // now send the same command to the endpoint
-        m.dest_handle = endhandle;
-        m.dest_id = endid;
-        // send to
-        addActionMessage (std::move (m));
-    }
-    else
-    {
-        addActionMessage(std::move(m));
-    }
+    
+    addActionMessage(std::move(m));
     return id;
 }
 
@@ -1375,37 +1325,20 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     ActionMessage m (CMD_REG_DST_FILTER);
     m.source_id = global_broker_id;
     m.source_handle = id;
-    m.name = filtInfo->key;
+    m.name = filterName;
     setActionFlag (m, clone_flag);
     m.info ().target = dest;
     m.info ().type = type_in;
     m.info ().type_out = type_out;
 
-    const auto ept = handles.modify ([&dest](auto &hand) {
+    handles.modify ([&dest](auto &hand) {
         auto epthand = hand.getEndpoint (dest);
         if (epthand != nullptr)
         {
             setActionFlag (*epthand, has_dest_filter_flag);
         }
-        return epthand;
     });
-    if (ept != nullptr)
-    {
-        auto endhandle = ept->handle;
-        auto endid = ept->fed_id;
-        setActionFlag (m, processing_complete_flag);
-        // send to broker and core
-        addActionMessage (m);
-        // now send the same command to the endpoint
-        m.dest_handle = endhandle;
-        m.dest_id = endid;
-        // send to
-        addActionMessage (std::move (m));
-    }
-    else
-    {
-        addActionMessage (std::move (m));
-    }
+    addActionMessage (std::move (m));
     return id;
 }
 
@@ -2789,12 +2722,34 @@ if (command.source_id != global_broker_id)
 
 void CommonCore::localFilterCreation(ActionMessage &command)
 {
+    //add the local handle from the global one
+    auto filt = getHandleInfo(command.source_handle);
+    if (filt != nullptr)
+    {
+        loopHandles.addHandleAtIndex(*filt, command.source_handle);
+    }
     if (command.action() == CMD_REG_DST_FILTER)
     {
         auto filtInfo = createDestFilter(global_broker_id, command.source_handle, command.name, command.info().target, command.info().type, command.info().type_out, checkActionFlag(command,clone_flag));
         if (filtInfo->key != command.name)
         {
             command.name = filtInfo->key;
+        }
+        auto epthand = loopHandles.getEndpoint(command.info().target);
+        if (epthand != nullptr)
+        {
+            setActionFlag(*epthand, has_dest_filter_flag);
+            if (!checkActionFlag(command, clone_flag))
+            {
+                setActionFlag(*epthand, has_non_cloning_dest_filter_flag);
+            }
+            setActionFlag(command, processing_complete_flag);
+            command.dest_handle = epthand->handle;
+            command.dest_id = epthand->fed_id;
+            routeMessage(command);
+            command.dest_id = 0;
+            command.dest_handle = 0;
+            
         }
     }
     else if (command.action() == CMD_REG_SRC_FILTER)
@@ -2808,12 +2763,10 @@ void CommonCore::localFilterCreation(ActionMessage &command)
         if (ept != nullptr)
         {
             setActionFlag(*ept, has_source_filter_flag);
-            auto endhandle = ept->handle;
-            auto endid = ept->fed_id;
             setActionFlag(command, processing_complete_flag); 
             // now send the same command to the endpoint
-            command.dest_handle = endhandle;
-            command.dest_id = endid;
+            command.dest_handle = ept->handle;
+            command.dest_id = ept->fed_id;
             routeMessage(command);
             command.dest_id = 0;
             command.dest_handle = 0;
