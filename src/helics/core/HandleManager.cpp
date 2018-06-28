@@ -216,7 +216,25 @@ const BasicHandleInfo *HandleManager::getControlInput(const std::string &name) c
     return nullptr;
 }
 
+BasicHandleInfo *HandleManager::getFilter(const std::string &name)
+{
+    auto ar = filters.equal_range(name);
+    if (ar.first == ar.second)
+    {
+        return nullptr;
+    }
+    return &(handles[ar.first->second]);
+}
 
+const BasicHandleInfo *HandleManager::getFilter(const std::string &name) const
+{
+    auto ar= filters.equal_range(name);
+    if (ar.first == ar.second)
+    {
+        return nullptr;
+    }
+    return &(handles[ar.first->second]);
+}
 BasicHandleInfo *HandleManager::getFilter(int32_t index)
 {
     if (isValidIndex(index, handles))

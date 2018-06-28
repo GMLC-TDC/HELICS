@@ -79,6 +79,8 @@ class HandleManager
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
     BasicHandleInfo *getEndpoint(int32_t index);
+    const BasicHandleInfo *getFilter(const std::string &name) const;
+    BasicHandleInfo *getFilter(const std::string &name);
     auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/

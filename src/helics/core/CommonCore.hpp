@@ -327,8 +327,11 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
-    shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
-                            fed_handle_pair>> filters;  //!< storage for all the filters
+    //shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
+     //                       fed_handle_pair>> filters;  //!< storage for all the filters
+
+    DualMappedPointerVector<FilterInfo, std::string,
+        fed_handle_pair> filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
@@ -368,7 +371,8 @@ class CommonCore : public Core, public BrokerBase
     @param[in] global_id the federate global id
     @return 0 if unknown, otherwise returns the route_id*/
     int32_t getRoute (Core::federate_id_t global_id) const;
-
+    /** handle the creation of local filters */
+    void localFilterCreation(ActionMessage &command);
     /** process a message for potential additions to the filter ordering
     @param command the message to process
     */
