@@ -110,6 +110,21 @@ make -j8
 make install
 ```
 
+Add the install directory path to the MATLAB files to your PATH, and then open MATLAB.
+
+Now in MATLAB, run the following:
+
+```matlab
+loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
+
+display(helics.helicsGetVersion())
+```
+
+This should print the version number of HELICS.
+
+
+*Optional*
+
 If you have changed the C-interface, and want to regenerate the SWIG MATLAB bindings, you will need to use a custom version of SWIG to build the MATLAB interface.
 To do that, you can follow the following instructions.
 
