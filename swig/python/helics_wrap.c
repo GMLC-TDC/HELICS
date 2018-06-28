@@ -7279,6 +7279,26 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsSubscriptionGetStringSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_subscription arg1 = (helics_subscription) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsSubscriptionGetStringSize",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetStringSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+  }
+  result = (int)helicsSubscriptionGetStringSize(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsSubscriptionGetString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_subscription arg1 = (helics_subscription) 0 ;
@@ -7298,7 +7318,7 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetString(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
   {
-    arg3=helicsSubscriptionGetValueSize(arg1)+2;
+    arg3=helicsSubscriptionGetStringSize(arg1)+2;
     arg2 = (char *) malloc(arg3);
   }
   result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3,arg4);
@@ -7541,7 +7561,7 @@ SWIGINTERN PyObject *_wrap_helicsSubscriptionGetNamedPoint(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetNamedPoint" "', argument " "1"" of type '" "helics_subscription""'"); 
   }
   {
-    arg3=helicsSubscriptionGetValueSize(arg1)+2;
+    arg3=helicsSubscriptionGetStringSize(arg1)+2;
     arg2 = (char *) malloc(arg3);
   }
   result = (helics_status)helicsSubscriptionGetNamedPoint(arg1,arg2,arg3,arg4,arg5);
@@ -10430,6 +10450,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"helicsSubscriptionGetRawValue", _wrap_helicsSubscriptionGetRawValue, METH_VARARGS, NULL},
+	 { (char *)"helicsSubscriptionGetStringSize", _wrap_helicsSubscriptionGetStringSize, METH_VARARGS, NULL},
 	 { (char *)"helicsSubscriptionGetString", _wrap_helicsSubscriptionGetString, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
