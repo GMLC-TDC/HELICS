@@ -118,6 +118,8 @@ Now in MATLAB, run the following:
 
 ```matlab
 loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
+loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.so'));
+loadlibrary(GetFullPath('C:\path\to\helics\install\helicsSharedLib.dll'));
 
 display(helics.helicsGetVersion())
 ```
