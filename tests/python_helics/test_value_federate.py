@@ -100,6 +100,117 @@ def test_value_federate_publication_registration(vFed):
     assert status == 0
     assert publication_units == 'V'
 
+def test_value_federate_runFederateTestNamedPoint(vFed):
+    defaultValue = "start of a longer string in place of the shorter one and now this should be very long"
+    defVal = 5.3
+    #testValue1 = "inside of the functional relationship of helics"
+    testValue1 = "short string"
+    testVal1 = 45.7823
+    testValue2 = "I am a string"
+    testVal2 = 0.0
+
+    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "named_point", "")
+
+    status = h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
+    assert status == 0
+
+    status = h.helicsFederateEnterExecutionMode(vFed)
+    assert status == 0
+
+    # publish string1 at time=0.0;
+    status = h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
+    assert status == 0
+
+    # double val;
+    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    assert value == defaultValue
+    assert val == defVal
+
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
+
+    assert grantedtime == 0.01
+
+    # get the value
+    status, value2, val2 = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value2 == testValue1
+    assert val2 == testVal1
+
+    # publish a second string
+    status = h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
+    assert status == 0
+
+    # make sure the value is still what we expect
+    status, value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value3 == testValue1
+    assert val3 == testVal1
+
+    # advance time
+    status, grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
+    assert status == 0
+    assert grantedtime == 0.02
+
+    # make sure the value was updated
+    status, value4, val4 = h.helicsSubscriptionGetNamedPoint(subid)
+    assert status == 0
+    # make sure the string is what we expect
+    assert value4 == testValue2
+    assert val4 == testVal2
+
+
+def test_value_federate_runFederateTestBool(vFed):
+    defaultValue = True
+    testValue1 = True
+    testValue2 = False
+
+    # register the publications
+    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "bool", "")
+
+    status = h.helicsSubscriptionSetDefaultDouble(subid, h.helics_true if defaultValue else h.helics_false)
+    assert status == 0
+
+    status = h.helicsFederateEnterExecutionMode(vFed)
+    assert status == 0
+
+    # publish string1 at time=0.0;
+    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+
+    assert val == h.helics_true if defaultValue else h.helics_false
+
+    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    assert status == 0
+    assert grantedtime == 0.01
+
+    # get the value
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+
+    # make sure the string is what we expect
+    assert val == h.helics_true if testValue1 else h.helics_false
+
+    # publish a second string
+    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue2 else h.helics_false)
+    assert status == 0
+
+    # make sure the value is still what we expect
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+    assert val == h.helics_true if testValue1 else h.helics_false
+    # advance time
+    status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
+    # make sure the value was updated
+    assert grantedtime == 0.02
+
+    status, val = h.helicsSubscriptionGetBoolean(subid)
+    assert status == 0
+    assert val == h.helics_false if testValue2 else h.helics_true
+
+
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
     pubid2 = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", h.HELICS_DATA_TYPE_INT, "")
