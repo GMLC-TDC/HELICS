@@ -12,6 +12,64 @@ function teardown(testCase)  % do not change function name
 % close figure, for example
 end
 
+
+function [fedStruct,success]=generateFed()
+import helics.*
+success=true;
+initstring = '1 --name=mainbroker';
+fedinitstring = '--broker=mainbroker --federates=1';
+fedStruct.broker=helicsCreateBroker('zmq','',initstring);
+if (fedStruct.broker==0)
+    success=false;
+    return;
+end
+fedInfo=helicsFederateInfoCreate();
+if (fedInfo==0)
+    success=false;
+    return;
+end
+status=helicsFederateInfoSetFederateName(fedInfo,'fed1');
+if (status~=0)
+    success=false;
+end
+status=helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
+if (status~=0)
+    success=false;
+end
+status=helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
+if (status~=0)
+    success=false;
+end
+status=helicsFederateInfoSetTimeDelta(fedInfo, 0.01);
+if (status~=0)
+    success=false;
+end
+status=helicsFederateInfoSetLoggingLevel(fedInfo,1);
+if (status~=0)
+    success=false;
+end
+fedStruct.vFed=helicsCreateValueFederate(fedInfo);
+if (fedStruct.vFed==0)
+    success=false;
+end
+helicsFederateInfoFree(fedInfo);
+end
+
+function success=closeStruct(fedStruct)
+import helics.*
+success=true;
+status=helicsFederateFinalize(fedStruct.vFed);
+if (status~=0)
+    success=false;
+end
+while (helicsBrokerIsConnected(fedStruct.broker))
+    pause(1);
+end
+helicsFederateFree(fedStruct.vFed);
+helicsCloseLibrary();
+
+end
+
 function testBasic(testCase)
 import matlab.unittest.constraints.IsGreaterThan
 ver=helics.helicsGetVersion();
@@ -128,59 +186,64 @@ defaultValue = 'start';
     testCase.verifyThat(success,IsTrue);
 end
 
-function [fedStruct,success]=generateFed()
+function testBool(testCase)
+import matlab.unittest.constraints.IsTrue;
 import helics.*
-success=true;
-initstring = '1 --name=mainbroker';
-fedinitstring = '--broker=mainbroker --federates=1';
-fedStruct.broker=helicsCreateBroker('zmq','',initstring);
-if (fedStruct.broker==0)
-    success=false;
-    return;
-end
-fedInfo=helicsFederateInfoCreate();
-if (fedInfo==0)
-    success=false;
-    return;
-end
-status=helicsFederateInfoSetFederateName(fedInfo,'fed1');
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetTimeDelta(fedInfo, 0.01);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetLoggingLevel(fedInfo,1);
-if (status~=0)
-    success=false;
-end
-fedStruct.vFed=helicsCreateValueFederate(fedInfo);
-if (fedStruct.vFed==0)
-    success=false;
-end
-helicsFederateInfoFree(fedInfo);
-end
+[feds,success]=generateFed();
+testCase.verifyThat(success,IsTrue);
 
-function success=closeStruct(fedStruct)
-import helics.*
-success=true;
-status=helicsFederateFinalize(fedStruct.vFed);
-if (status~=0)
-    success=false;
-end
-while (helicsBrokerIsConnected(fedStruct.broker))
-    pause(1);
-end
-helicsFederateFree(fedStruct.vFed);
-helicsCloseLibrary();
+defaultValue = helics_true;
+    testValue1 = helics_true;
+    testValue2 = helics_false;
 
+    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_BOOLEAN, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'bool', '');
+
+    status = helicsSubscriptionSetDefaultBoolean(subid, defaultValue);
+    testCase.verifyEqual(status,helics.helics_ok);
+
+    status = helicsFederateEnterExecutionMode(feds.vFed);
+    testCase.verifyEqual(status,helics.helics_ok);
+
+    % publish string1 at time=0.0;
+    status = helicsPublicationBoolean(pubid, testValue1);
+    testCase.verifyEqual(status,helics.helics_ok);
+
+    % double val;
+    [status, value] = helicsSubscriptionGetBoolean(subid);
+    testCase.verifyEqual(status,helics.helics_ok);
+    testCase.verifyEqual(value,defaultValue);
+
+    [status,grantedtime] = helicsFederateRequestTime(feds.vFed, 1.0);
+    testCase.verifyEqual(status,helics.helics_ok);
+    testCase.verifyEqual(grantedtime,0.01);
+
+    % get the value
+    [status, value] = helicsSubscriptionGetBoolean(subid);
+    testCase.verifyEqual(status,helics.helics_ok);
+    % make sure the string is what we expect
+    testCase.verifyEqual(value,testValue1);
+
+    % publish a second string
+    status = helicsPublicationPublishBoolean(pubid, testValue2);
+    testCase.verifyEqual(status,helics.helics_ok);
+
+    % make sure the value is still what we expect
+    [status, value] = helicsSubscriptionGetBoolean(subid);
+    testCase.verifyEqual(status,helics.helics_ok);
+    % make sure the string is what we expect
+    testCase.verifyEqual(value,testValue1);
+
+    % advance time
+    [status, grantedtime] = helicsFederateRequestTime(feds.vFed, 2.0);
+    testCase.verifyEqual(status,helics.helics_ok);
+    testCase.verifyEqual(grantedtime,0.02);
+
+    % make sure the value was updated
+    [status, value] = helicsSubscriptionGetBoolean(subid);
+    testCase.verifyEqual(status,helics.helics_ok);
+    % make sure the string is what we expect
+    testCase.verifyEqual(value,testValue2);
+    success=closeStruct(feds);
+    testCase.verifyThat(success,IsTrue);
 end
