@@ -66,6 +66,27 @@ while (helicsBrokerIsConnected(fedStruct.broker))
     pause(1);
 end
 helicsFederateFree(fedStruct.vFed);
+helicsBrokerFree(fedStruct.broker);
+helicsCloseLibrary();
+
+end
+
+function forceCloseStruct(fedStruct)
+import helics.*
+helicsFederateFinalize(fedStruct.vFed);
+
+cnt=0;
+while (helicsBrokerIsConnected(fedStruct.broker))
+    pause(1);
+    cnt=cnt+1;
+    if (cnt>5)
+        helicsBrokerDisconnect(fedStruct.broker);
+        break;
+    end
+end
+
+helicsFederateFree(fedStruct.vFed);
+helicsBrokerFree(fedStruct.broker);
 helicsCloseLibrary();
 
 end
@@ -79,6 +100,7 @@ end
 function testEnterExecution(testCase)
 import matlab.unittest.constraints.IsTrue;
 [feds,success]=generateFed();
+try
 testCase.verifyThat(success,IsTrue);
 helics.helicsFederateEnterExecutionMode(feds.vFed);
 [status,state]=helics.helicsFederateGetState(feds.vFed);
@@ -86,6 +108,12 @@ testCase.verifyEqual(status,helics.helics_ok);
 testCase.verifyEqual(state,helics.helics_execution_state);
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+    disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
 end
 
 function testPublicationRegistration(testCase)
@@ -93,6 +121,7 @@ import matlab.unittest.constraints.IsTrue;
 import helics.*
 [feds,success]=generateFed();
 testCase.verifyThat(success,IsTrue);
+try
 pubid1 = helicsFederateRegisterPublication(feds.vFed, 'pub1', 'string', '');
 pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', 'int', '');
 pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', 'double', 'V');
@@ -115,6 +144,12 @@ testCase.verifyEqual(status,helics.helics_ok);
 testCase.verifyEqual(publication_units,'V');
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+   disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
 end
 
 function testNamedPoint(testCase)
@@ -129,7 +164,7 @@ defaultValue = 'start';
     testVal1 = 45.7823;
     testValue2 = 'I am a string';
     testVal2 = 0.0;
-
+try
     pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_NAMEDPOINT, '');
     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'named_point', '');
 
@@ -184,6 +219,12 @@ defaultValue = 'start';
     testCase.verifyEqual(val,testVal2);
     success=closeStruct(feds);
     testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+    disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
 end
 
 function testBool(testCase)
@@ -192,6 +233,7 @@ import helics.*
 [feds,success]=generateFed();
 testCase.verifyThat(success,IsTrue);
 
+try
 defaultValue = helics_true;
     testValue1 = helics_true;
     testValue2 = helics_false;
@@ -206,7 +248,7 @@ defaultValue = helics_true;
     testCase.verifyEqual(status,helics.helics_ok);
 
     % publish string1 at time=0.0;
-    status = helicsPublicationBoolean(pubid, testValue1);
+    status = helicsPublicationPublishBoolean(pubid, testValue1);
     testCase.verifyEqual(status,helics.helics_ok);
 
     % double val;
@@ -246,4 +288,57 @@ defaultValue = helics_true;
     testCase.verifyEqual(value,testValue2);
     success=closeStruct(feds);
     testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+    disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
+end
+
+function testPublisherRegistration(testCase)
+import matlab.unittest.constraints.IsTrue;
+import helics.*
+[feds,success]=generateFed();
+testCase.verifyThat(success,IsTrue);
+
+try
+    pubid1 = helicsFederateRegisterTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
+    pubid2 = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub2', HELICS_DATA_TYPE_INT, '');
+    pubid3 = helicsFederateRegisterTypePublication(feds.vFed, 'pub3', HELICS_DATA_TYPE_DOUBLE, 'V');
+
+    [status, publication_key] = helicsPublicationGetKey(pubid1);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_key,'fed1/pub1');
+[status, publication_type] = helicsPublicationGetType(pubid1);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_type,'string');
+[status, publication_key] = helicsPublicationGetKey(pubid2);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_key,'pub2');
+[status, publication_type] = helicsPublicationGetType(pubid2);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_type,'int64');
+[status, publication_key] = helicsPublicationGetKey(pubid3);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_key,'fed1/pub3');
+[status, publication_type] = helicsPublicationGetType(pubid3);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_type,'double');
+[status, publication_units] = helicsPublicationGetUnits(pubid3);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(publication_units,'V');
+
+    status = helicsFederateEnterExecutionMode(feds.vFed);
+    testCase.verifyEqual(status,helics.helics_ok);
+
+   %% add state and some type checks
+    success=closeStruct(feds);
+    testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+    disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
 end
