@@ -1,4 +1,6 @@
-# HELICS with Python3
+# HELICS with language bindings support
+
+## HELICS with Python3
 
 Run the following:
 
@@ -29,7 +31,7 @@ Out[2]: '1.0.2 (04-28-18)'
 
 ```
 
-# HELICS with Python2
+## HELICS with Python2
 
 Run the following:
 
@@ -60,7 +62,7 @@ Out[2]: '1.0.2 (04-28-18)'
 
 ```
 
-# HELICS with GCC and Python3
+## HELICS with GCC and Python3
 
 First you will need to build boost using gcc from source. Download
 [boost](http://www.boost.org/users/history/version_1_64_0.html) from the
@@ -87,7 +89,7 @@ $ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0/" -DBOOST_RO
 $ make clean; make -j 4; make install
 ```
 
-# HELICS with MATLAB
+## HELICS with MATLAB
 
 To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
 
