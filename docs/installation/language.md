@@ -121,6 +121,8 @@ helicsStartup
 display(helics.helicsGetVersion())
 ```
 
+![](./../img/matlab-success.png)
+
 Alternatively, you can load the helics library manually, depending on which operating system you use.
 
 ```matlab
