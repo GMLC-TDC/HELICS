@@ -172,7 +172,7 @@ def test_value_federate_runFederateTestBool(vFed):
     pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
     subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "bool", "")
 
-    status = h.helicsSubscriptionSetDefaultDouble(subid, h.helics_true if defaultValue else h.helics_false)
+    status = h.helicsSubscriptionSetDefaultBoolean(subid, h.helics_true if defaultValue else h.helics_false)
     assert status == 0
 
     status = h.helicsFederateEnterExecutionMode(vFed)
@@ -217,25 +217,27 @@ def test_value_federate_publisher_registration(vFed):
     pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", h.HELICS_DATA_TYPE_DOUBLE, "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    # federate_state state;
-    # CE(helicsFederateGetState(vFed1, &state));
-    # BOOST_CHECK(state == helics_execution_state);
-
-    # char sv[HELICS_SIZE_MAX];
-    # CE(helicsPublicationGetKey(pubid, sv, HELICS_SIZE_MAX));
-    # char sv2[HELICS_SIZE_MAX];
-    # CE(helicsPublicationGetKey(pubid2, sv2, HELICS_SIZE_MAX));
-    # BOOST_CHECK_EQUAL(sv, "fed0/pub1");
-    # BOOST_CHECK_EQUAL(sv2, "pub2");
-    # char pub3name[HELICS_SIZE_MAX];
-    # CE(helicsPublicationGetKey(pubid3, pub3name, HELICS_SIZE_MAX));
-    # BOOST_CHECK_EQUAL(pub3name, "fed0/pub3");
-
-    # char tmp[HELICS_SIZE_MAX];
-    # CE(helicsPublicationGetType(pubid3, tmp, HELICS_SIZE_MAX));
-    # BOOST_CHECK_EQUAL(tmp, "double");
-    # CE(helicsPublicationGetUnits(pubid3, tmp, HELICS_SIZE_MAX));
-    # BOOST_CHECK_EQUAL(tmp, "V");
+    status, publication_key = h.helicsPublicationGetKey(pubid1)
+    assert status == 0
+    assert publication_key == 'TestA Federate/pub1'
+    status, publication_type = h.helicsPublicationGetType(pubid1)
+    assert status == 0
+    assert publication_type == 'string'
+    status, publication_key = h.helicsPublicationGetKey(pubid2)
+    assert status == 0
+    assert publication_key == 'pub2'
+    status, publication_key = h.helicsPublicationGetKey(pubid3)
+    assert status == 0
+    assert publication_key == 'TestA Federate/pub3'
+    status, publication_type = h.helicsPublicationGetType(pubid3)
+    assert status == 0
+    assert publication_type == 'double'
+    status, publication_units = h.helicsPublicationGetUnits(pubid3)
+    assert status == 0
+    assert publication_units == 'V'
+    status, publication_type = h.helicsPublicationGetType(pubid2)
+    assert status == 0
+    assert publication_type == 'int64'
 
 def test_value_federate_subscription_registration(vFed):
     subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V")
@@ -310,7 +312,7 @@ def test_value_federate_runFederateTestComplex(vFed):
     rTestValue = 2.0
     iTestValue = 2.0
     pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_COMPLEX, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "double", "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "complex", "")
     h.helicsSubscriptionSetDefaultComplex(subid, rDefaultValue, iDefaultValue)
 
     h.helicsFederateEnterExecutionMode (vFed)
@@ -397,7 +399,6 @@ def test_value_federate_runFederateTestVectorD(vFed):
 
     h.helicsFederateEnterExecutionMode(vFed)
 
-    # TODO: Fix error with the following function
     h.helicsPublicationPublishVector(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetVector(subid)
