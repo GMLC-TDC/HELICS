@@ -635,9 +635,9 @@ import helics.*
 testCase.verifyThat(success,IsTrue);
 
 try
-defaultValue = [34.5,22.1,-10.4];
+defaultValue = [34.5;22.1;-10.4];
     testValue1 = ones(22,1);
-    testValue2 = [99.1,-99,2];
+    testValue2 = [99.1;-99;2;0.0;-1e35;4.56e-7];
 
     pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'vector', '');
