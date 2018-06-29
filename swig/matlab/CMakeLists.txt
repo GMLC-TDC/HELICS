@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -48,7 +48,7 @@ else()
 
 	if (OVERWRITE_MATLAB_FILES)
 		add_custom_target(mfile_overwrite ALL
-			COMMAND ${CMAKE_COMMAND} 
+			COMMAND ${CMAKE_COMMAND}
 				-D TARGET_DIR=${CMAKE_CURRENT_SOURCE_DIR}
 				-P ${CMAKE_CURRENT_SOURCE_DIR}/overwriteMatlabFiles.cmake
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
@@ -66,9 +66,9 @@ else()
 endif()
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
-  COMMAND ${CMAKE_COMMAND} 
-  -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helicsSharedLib> 
-  -D BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp 
+  COMMAND ${CMAKE_COMMAND}
+  -D LIBRARY_FILE=$<TARGET_LINKER_FILE:helicsSharedLib>
+  -D BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
   -D LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/
   -D OTHER_INCLUDE_LOCATION=${PROJECT_BINARY_DIR}/src/helics/shared_api_library/
   -D SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
@@ -88,7 +88,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
 			)
 	endif()
-	
+
 if (NOT MATLAB_GENERATE_ONLY)
 	ADD_CUSTOM_TARGET(helicsMEX ALL
 		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
@@ -107,4 +107,5 @@ install(FILES ${KEY_LIBRARY_FILES} DESTINATION matlab COMPONENT matlab)
 install(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
 install(FILES ${PROJECT_BINARY_DIR}/src/helics/shared_api_library/helics_export.h DESTINATION matlab/headers COMPONENT matlab)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m DESTINATION matlab COMPONENT matlab)
+install(FILES helicsSharedLib.h libhelicsSharedLib.h DESTINATION matlab COMPONENT matlab)
 
