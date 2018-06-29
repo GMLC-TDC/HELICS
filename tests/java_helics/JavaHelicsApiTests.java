@@ -80,6 +80,7 @@ public class JavaHelicsApiTests {
 			rv = helics.helicsBrokerDisconnect(broker2);
 			helics.helicsBrokerFree(broker1);
 			helics.helicsBrokerFree(broker2);
+			helics.helicsCloseLibrary();
 			//Core API Functions
 			SWIGTYPE_p_void core1 = helics.helicsCreateCore("zmq", "core1", "--federates 3 --port 5570");
 			if(core1 == null) {
@@ -372,6 +373,7 @@ public class JavaHelicsApiTests {
 			rv = helics.helicsPublicationPublishString(pub3, "Mayhem");
 			double[] pub6Vector = {4.5, 56.5};
 			rv = helics.helicsPublicationPublishVector(pub6, pub6Vector, 2);
+			Thread.sleep(500);
 			rv = helics.helicsFederateRequestTimeAsync(fed1, 1.0);
 			double[] returnTime = {4.5};
 			rv = helics.helicsFederateRequestTimeComplete(fed1, returnTime);
