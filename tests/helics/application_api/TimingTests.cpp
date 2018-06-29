@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(dual_fast_sender_tests)
         sender1.publish(static_cast<double>(currentTime));
     }
     vFed1->finalize();
-    currentTime == helics::timeZero;
+    currentTime = helics::timeZero;
     while (currentTime <= endTime)
     {
         currentTime += 1.0;
