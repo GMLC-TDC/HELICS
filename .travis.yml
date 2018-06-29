@@ -197,7 +197,6 @@ script:
   - ctest --verbose --timeout 240 -I 0,0,0,6
   # - ctest --verbose --timeout 240 -I 0,0,0,7
   - ctest --verbose --timeout 240 -I 0,0,0,3
-  - ls -l tests/java_helics
   - ctest --verbose -L Java
   - ctest -L Examples
 
