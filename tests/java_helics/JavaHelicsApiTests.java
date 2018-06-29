@@ -116,6 +116,7 @@ public class JavaHelicsApiTests {
 			rv = helics.helicsCoreDisconnect(core2);
 			helics.helicsCoreFree(core1);
 			helics.helicsCoreFree(core2);
+			helics.helicsCloseLibrary();
 			//Federate Info API Functions
 			SWIGTYPE_p_void fedInfo1 = helics.helicsFederateInfoCreate();
 			if(fedInfo1 == null) {
