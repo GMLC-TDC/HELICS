@@ -1003,7 +1003,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
         }
     }
     break;
-    case CMD_NOTIFY_PUB:
+    case CMD_SET_PUBLISHER:
     {
         auto subI = interfaceInformation.getSubscription (cmd.dest_handle);
         if (subI != nullptr)
@@ -1015,7 +1015,7 @@ iteration_state FederateState::processActionMessage (ActionMessage &cmd)
     }
     break;
     case CMD_REG_SUB:
-    case CMD_NOTIFY_SUB:
+    case CMD_ADD_SUBSCRIBER:
     {
         auto pubI = interfaceInformation.getPublication (cmd.dest_handle);
         if (pubI != nullptr)

@@ -1046,7 +1046,7 @@ bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo
                 // pubInfo->type << ENDL;
             }
             // notify the subscription about its publisher
-            ActionMessage m (CMD_NOTIFY_PUB);
+            ActionMessage m (CMD_SET_PUBLISHER);
             m.source_id = pubHandle->fed_id;
             m.source_handle = pubHandle->handle;
             m.dest_id = handleInfo.fed_id;
@@ -1055,7 +1055,7 @@ bool CoreBroker::FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo
             transmit (getRoute (m.dest_id), m);
 
             // notify the publisher about its subscription
-            m.setAction (CMD_NOTIFY_SUB);
+            m.setAction (CMD_ADD_SUBSCRIBER);
             m.source_id = handleInfo.fed_id;
             m.source_handle = handleInfo.handle;
             m.dest_id = pubHandle->fed_id;
@@ -1084,7 +1084,7 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
                          std::string ("types do not match ") + handleInfo.type + " vs " + subInfo.type);
         }
         // notify the publication about its subscriber
-        ActionMessage m (CMD_NOTIFY_SUB);
+        ActionMessage m (CMD_ADD_SUBSCRIBER);
         m.source_id = subInfo.fed_id;
         m.source_handle = subInfo.handle;
         m.dest_id = handleInfo.fed_id;
@@ -1093,7 +1093,7 @@ void CoreBroker::FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInf
         transmit (getRoute (m.dest_id), m);
 
         // notify the subscriber about its publisher
-        m.setAction (CMD_NOTIFY_PUB);
+        m.setAction (CMD_SET_PUBLISHER);
         m.source_id = handleInfo.fed_id;
         m.source_handle = handleInfo.handle;
         m.dest_id = subInfo.fed_id;

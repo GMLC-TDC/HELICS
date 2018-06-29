@@ -428,11 +428,11 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_null_message, "null message"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
-  {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
+  {action_message_def::action_t::cmd_set_publisher, "notify_pub"},
   {action_message_def::action_t::cmd_reg_dst_filter, "reg_dst_filter"},
   {action_message_def::action_t::cmd_notify_dst_filter, "notify_dst_filter"},
   {action_message_def::action_t::cmd_reg_sub, "reg_sub"},
-  {action_message_def::action_t::cmd_notify_sub, "notify_sub"},
+  {action_message_def::action_t::cmd_add_subscriber, "notify_sub"},
   {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
   {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},

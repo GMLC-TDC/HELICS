@@ -791,7 +791,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     {
         setActionFlag (m, required_flag);
     }
-    addActionMessage (m);
+    actionQueue.push(std::move(m));
 
     return id;
 }
@@ -842,7 +842,7 @@ handle_id_t CommonCore::registerControlOutput(federate_id_t federateID,
     {
         setActionFlag(m, required_flag);
     }
-    addActionMessage(m);
+    actionQueue.push(std::move(m));
 
     return id;
 }
@@ -890,7 +890,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     m.info ().type = type;
     m.info ().units = units;
 
-    actionQueue.push (m);
+    actionQueue.push (std::move(m));
     return id;
 }
 
@@ -937,7 +937,7 @@ handle_id_t CommonCore::registerControlInput(federate_id_t federateID,
     m.info().type = type;
     m.info().units = units;
 
-    actionQueue.push(m);
+    actionQueue.push(std::move(m));
     return id;
 }
 
@@ -1131,7 +1131,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     m.name = name;
     m.info ().type = type;
 
-    addActionMessage(std::move(m));
+    actionQueue.push(std::move(m));
 
     return id;
 }
@@ -1185,7 +1185,7 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
             setActionFlag (*epthand, has_source_filter_flag);
         }
     });
-    addActionMessage(std::move(m));
+    actionQueue.push(std::move(m));
     return id;
 }
 
@@ -1231,7 +1231,7 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
             setActionFlag (*epthand, has_source_filter_flag);
         }
     });
-    addActionMessage (std::move(m));
+    actionQueue.push(std::move(m));
     return id;
 }
 
@@ -1293,7 +1293,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
         }
     });
     
-    addActionMessage(std::move(m));
+    actionQueue.push(std::move(m));
     return id;
 }
 
@@ -1338,7 +1338,7 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
             setActionFlag (*epthand, has_dest_filter_flag);
         }
     });
-    addActionMessage (std::move (m));
+    actionQueue.push(std::move(m));
     return id;
 }
 
@@ -2490,14 +2490,23 @@ void CommonCore::processCommand (ActionMessage &&command)
                 auto pubhandle = loopHandles.getPublication(command.dest_handle);
                 if (pubhandle != nullptr)
                 {
-                    pubhandle->used = true;
+                    if (!pubhandle->used)
+                    {
+                        pubhandle->used = true;
+                        handles.modify([&](auto &hand) {hand.getPublication(command.dest_handle)->used = true; });
+                    }
+                    
                 }
             }
         }
         else
         {
             auto sub = getHandleInfo(command.source_handle);
-            loopHandles.addHandleAtIndex(*sub,command.source_handle);
+            if (sub != nullptr)
+            {
+                loopHandles.addHandleAtIndex(*sub, command.source_handle);
+            }
+            
             if (checkForLocalPublication (command))
             {
                 setActionFlag (command, processing_complete_flag);
@@ -2558,7 +2567,10 @@ void CommonCore::processCommand (ActionMessage &&command)
         if (command.dest_id == 0)
         {
             auto pub = getHandleInfo(command.source_handle);
-            loopHandles.addHandle(*pub);
+            if (pub != nullptr)
+            {
+                loopHandles.addHandleAtIndex(*pub, command.source_handle);
+            }
         }
         routeMessage (command);
         break;
@@ -2584,7 +2596,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
 
-    case CMD_NOTIFY_SUB:
+    case CMD_ADD_SUBSCRIBER:
     {
         // just forward these to the appropriate federate
         auto fed = getFederateCore (command.dest_id);
@@ -2621,7 +2633,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
     }
     break;
-    case CMD_NOTIFY_PUB:
+    case CMD_SET_PUBLISHER:
         routeMessage (command);
         break;
     case CMD_NOTIFY_SRC_FILTER:
@@ -3197,11 +3209,15 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
         // now send the same command to the publication
         cmd.dest_handle = pub->handle;
         cmd.dest_id = pub->fed_id;
-        pub->used = true;
+        if (!pub->used)
+        {
+            pub->used = true;
+            handles.modify([&](auto &hand) {hand.getPublication(cmd.dest_handle)->used = true; });
+        }
         // send to
         routeMessage (cmd);
         // now send the notification to the subscription in the federateState
-        ActionMessage notice (CMD_NOTIFY_PUB);
+        ActionMessage notice (CMD_SET_PUBLISHER);
         notice.dest_id = cmd.source_id;
         notice.dest_handle = cmd.source_handle;
         notice.source_id = pub->fed_id;

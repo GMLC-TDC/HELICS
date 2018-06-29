@@ -117,20 +117,20 @@ enum class action_t : int32_t
     cmd_dest_filter_result =
       cmd_info_basis + 41,  //!< the result of a destination filter going back to its originator
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
-    cmd_notify_pub = 50,  //!< notify of a publication
+    cmd_set_publisher = 50,  //!< notify of a publication
     cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
     cmd_notify_dst_filter = cmd_info_basis + 62,  //!< notify of a destination filter
     cmd_reg_sub = cmd_info_basis + 70,  //!< register a subscription
-    cmd_notify_sub = 70,  //!< notify of a subscription
+    cmd_add_subscriber = 70,  //!< notify of a subscription
     cmd_reg_src_filter = cmd_info_basis + 80,  //!< register a source filter
     cmd_notify_src_filter = cmd_info_basis + 82,  //!< notify of a source
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
     cmd_notify_end = 90,  //!< notify of an endpoint
 
     cmd_reg_control_output = cmd_info_basis + 100,  //!< register a control output
-    cmd_notify_control_output = 100,  //!< notify of a control output
+    cmd_set_output_target = 100,  //!< notify of a control output
     cmd_reg_control_input = cmd_info_basis + 110,  //!< register a control input
-    cmd_notify_control_input = 110,  //!< notify of a control input
+    cmd_add_control_input = 110,  //!< notify of a control input
 
     cmd_has_operator = 92,  //!< notify that a filter has an operator
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
@@ -185,14 +185,14 @@ enum class action_t : int32_t
 #define CMD_ERROR action_message_def::action_t::cmd_error
 
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
-#define CMD_NOTIFY_PUB action_message_def::action_t::cmd_notify_pub
+#define CMD_SET_PUBLISHER action_message_def::action_t::cmd_set_publisher
 #define CMD_REG_SUB action_message_def::action_t::cmd_reg_sub
-#define CMD_NOTIFY_SUB action_message_def::action_t::cmd_notify_sub
+#define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
 
 #define CMD_REG_CONTROL_INPUT action_message_def::action_t::cmd_reg_control_input
-#define CMD_NOTIFY_CONTROL_INPUT action_message_def::action_t::cmd_notify_control_input
+#define CMD_ADD_CONTROL_INPUT action_message_def::action_t::cmd_add_control_input
 #define CMD_REG_CONTROL_OUTPUT action_message_def::action_t::cmd_reg_control_output
-#define CMD_NOTIFY_CONTROL_OUTPUT action_message_def::action_t::cmd_notify_control_output
+#define CMD_SET_OUTPUT_TARGET action_message_def::action_t::cmd_set_output_target
 
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
 #define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
