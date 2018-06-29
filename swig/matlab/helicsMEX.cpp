@@ -5672,7 +5672,7 @@ int _wrap_helicsSubscriptionGetVector(int resc, mxArray *resv[], int argc, mxArr
   }
   {
     arg3=helicsSubscriptionGetVectorSize(arg1);
-    arg2 = (double *) malloc(arg3*sizeof(double));
+    arg2 = (double *) mxCalloc(arg3,sizeof(double));
   }
   result = (helics_status)helicsSubscriptionGetVector(arg1,arg2,arg3,arg4);
   _out = SWIG_From_int(static_cast< int >(result));
@@ -5683,12 +5683,12 @@ int _wrap_helicsSubscriptionGetVector(int resc, mxArray *resv[], int argc, mxArr
     if (--resc>=0) *resv++ = mat;
   }
   {
-    if (arg2) free(arg2);
+    //if (arg2) free(arg2);
   }
   return 0;
 fail:
   {
-    if (arg2) free(arg2);
+    //if (arg2) free(arg2);
   }
   return 1;
 }

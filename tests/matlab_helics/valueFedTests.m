@@ -662,7 +662,7 @@ defaultValue = [34.5,22.1,-10.4];
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    [status, value] = helicsSubscriptionGetString(subid);
+    [status, value] = helicsSubscriptionGetVector(subid);
     testCase.verifyEqual(status,helics.helics_ok);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);

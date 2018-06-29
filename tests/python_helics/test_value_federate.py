@@ -237,7 +237,7 @@ def test_value_federate_publisher_registration(vFed):
     assert publication_units == 'V'
     status, publication_type = h.helicsPublicationGetType(pubid2)
     assert status == 0
-    assert publication_type == 'int'
+    assert publication_type == 'int64'
 
 def test_value_federate_subscription_registration(vFed):
     subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V")
