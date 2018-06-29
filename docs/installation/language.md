@@ -102,16 +102,26 @@ cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/
 make -j8
 make install
 ```
-Cmake will search for the MATLAB executable and execute a mex command inside MATLAB to build the interface.  
-For this operation to succeed MATLAB must be available and mex must be setup to use an appropriate C compiler.  The setup is only required once for each MATLAB installation and does not need to repeated unless the compiler changes.  From within MATLAB Run
+
+On windows using visual studio the command line cmake would look like
 ```
-mex -setup
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DDISABLE_SWIG -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
+
+cmake --build . --config Release --target INSTALL
+```
+Cmake will search for the MATLAB executable and execute a mex command inside MATLAB to build the interface.  
+For this operation to succeed MATLAB must be available and mex must be setup to use an appropriate C compiler.  The setup is only required once for each MATLAB installation and does not need to repeated unless the compiler changes.  From within MATLAB run
+```
+>>mex -setup
 ```
 and follow the prompted instructions.  
 
-Reconstructing the files requires a specific version of SWIG with Matlab support.  IF swig is not used then adding `-DDISABLE_SWIG=ON` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.    
+Reconstructing the files requires a specific version of SWIG with MATLAB support.  IF swig is not used then adding `-DDISABLE_SWIG=ON` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.    
 
-Add the install directory path to the MATLAB files to your PATH, and then open MATLAB.
+Add the install directory path to the MATLAB files to your PATH. This can be the system path, or the MATLAB path through the addpath command or the graphical equivalent
+```
+>> addpath('path/to/helics/install/matlab')
+```
 
 Now in MATLAB, run the following:
 
@@ -122,7 +132,7 @@ display(helics.helicsGetVersion())
 
 ![](./../img/matlab-success.png)
 
-Alternatively, you can load the helics library manually, depending on which operating system you use.
+Alternatively, you can load the HELICS library manually, depending on which operating system you use.
 
 ```matlab
 loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
