@@ -21,13 +21,19 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ### Argonne National Lab
  - Shrirang Abhyankar
 
+### Others
+ - Monish Mukherjee for bug reports and some tests
+ 
 ## Used Libraries or Code
 
 ### [BOOST](www.boost.org)
   Boost is used throughout the code, inluding Asio for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code.
 
 ### [zmq](www.zeromq.org)
-  ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.3. No zmq library code is included in the HELICS source
+  ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No zmq library code is included in the HELICS source
+  
+### [cppzmq](https://github.com/zeromq/cppzmq)
+  the header only bindings for the zmq library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source
 
 ### [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
   JsonCPP is used for parsing json files, it was chosen for easy inclusion the project and its support for comments.
