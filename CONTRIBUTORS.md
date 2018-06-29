@@ -7,6 +7,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
  - Andy Fisher
  - Jason Fuller
  - Shwetha Niddodi
+ - Monish Mukherjee
 
 ### Lawrence Livermore National Lab
  - Ryan Mast
@@ -20,9 +21,6 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ### Argonne National Lab
  - Shrirang Abhyankar
-
-### Others
- - Monish Mukherjee for bug reports and some tests
  
 ## Used Libraries or Code
 
