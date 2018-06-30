@@ -123,7 +123,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
 }
 /*
 
-iteration_state ForwardingTimeCoordinator::checkTimeGrant()
+message_processing_result ForwardingTimeCoordinator::checkTimeGrant()
 {
     bool update = updateTimeFactors();
     if ((!iterating) || (time_exec > time_granted))
@@ -131,19 +131,19 @@ iteration_state ForwardingTimeCoordinator::checkTimeGrant()
         if (time_allow > time_exec)
         {
             updateTimeGrant();
-            return iteration_state::next_step;
+            return message_processing_result::next_step;
         }
         if (time_allow == time_exec)
         {
             if (time_requested <= time_exec)
             {
                 updateTimeGrant();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
             if (dependencies.checkIfReadyForTimeGrant(false, time_exec))
             {
                 updateTimeGrant();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
         }
     }
@@ -153,7 +153,7 @@ iteration_state ForwardingTimeCoordinator::checkTimeGrant()
         {
             dependencies.resetIteratingTimeRequests(time_exec);
             updateTimeGrant();
-            return iteration_state::iterating;
+            return message_processing_result::iterating;
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
@@ -161,7 +161,7 @@ iteration_state ForwardingTimeCoordinator::checkTimeGrant()
             {
                 dependencies.resetIteratingTimeRequests(time_exec);
                 updateTimeGrant();
-                return iteration_state::iterating;
+                return message_processing_result::iterating;
             }
         }
     }
@@ -171,7 +171,7 @@ iteration_state ForwardingTimeCoordinator::checkTimeGrant()
     {
         sendTimeRequest();
     }
-    return iteration_state::continue_processing;
+    return message_processing_result::continue_processing;
 }
 
 */
@@ -288,15 +288,15 @@ bool ForwardingTimeCoordinator::hasActiveTimeDependencies () const
     return dependencies.hasActiveTimeDependencies ();
 }
 
-iteration_state ForwardingTimeCoordinator::checkExecEntry ()
+message_processing_result ForwardingTimeCoordinator::checkExecEntry ()
 {
-    auto ret = iteration_state::continue_processing;
+    auto ret = message_processing_result::continue_processing;
     if (!dependencies.checkIfReadyForExecEntry (false))
     {
         return ret;
     }
 
-    ret = iteration_state::next_step;
+    ret = message_processing_result::next_step;
 
     executionMode = true;
     time_next = timeZero;

@@ -164,13 +164,74 @@ size_t Subscription::getRawSize ()
 size_t Subscription::getStringSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        if (lastValue.index() == namedPointLoc)
+        {
+            auto np = getValue<named_point>();
+            if (np.name.empty())
+            {
+                return 30;  //"#invalid" string +20
+            }
+            else
+            {
+                //+20 is just in case the the converted string is actually being requested in which case it
+                return np.name.size() + 20;
+            }
+        }
+        else
+        {
+            auto out = getValue<std::string>();
+            return out.size();
+        }
+       
+    }
+
+    if (lastValue.index() == stringLoc)
+    {
+        return mpark::get<std::string>(lastValue).size();
+    }
+    else if (lastValue.index() == namedPointLoc)
+    {
+        const auto &np= mpark::get<named_point>(lastValue);
+        
+        if (np.name.empty())
+        {
+            return 30;  //"#invalid" string +20
+        }
+        else
+        {
+            //+20 is just in case the the converted string is actually being requested in which case it
+            return np.name.size() + 20;
+        }
+        
+    }
     auto out = getValue<std::string>();
-    return out.size()+1;
+    return out.size();
 }
 
 size_t Subscription::getVectorSize () 
 { 
     getAndCheckForUpdate();
+    if (hasUpdate && !changeDetectionEnabled)
+    {
+        auto out = getValue<std::vector<double>>();
+        return out.size();
+    }
+    switch (lastValue.index())
+    {
+    case doubleLoc:
+    case intLoc:
+        return 1;
+    case complexLoc:
+        return 2;
+    case vectorLoc:
+        return mpark::get<std::vector<double>>(lastValue).size();
+    case complexVectorLoc:
+        return mpark::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+    default:
+        break;
+    }
     auto out = getValue<std::vector<double>>();
     return out.size();
 }

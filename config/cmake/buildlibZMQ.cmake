@@ -25,7 +25,6 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 	else(UNIX)
 	endif()
 
-
 	# both required to be on due to a bug in the zmq cmake CONFIG
 	if (ZMQ_USE_STATIC_LIBRARY)
 	   set(zmq_static_build ON)
@@ -108,9 +107,6 @@ if (NOT BUILD_RELEASE_ONLY)
 		OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_build_debug.log
         )
 endif()
-
-
-
 
 endfunction()
 

@@ -1925,7 +1925,10 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
             fedBlock["id"] = static_cast<int>(fed->global_id.load ());
             fedBlock["parent"] = static_cast<int> (global_broker_id_local);
             fedBlock["dependencies"] = Json_helics::arrayValue;
-
+            for (auto &dep : fed->getDependencies())
+            {
+                fedBlock["dependencies"].append(static_cast<int>(dep));
+            }
             fedBlock["dependents"] = Json_helics::arrayValue;
             for (auto &dep : fed->getDependents ())
             {
@@ -2304,7 +2307,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == iteration_state::next_step)
+                if (res == message_processing_result::next_step)
                 {
                     enteredExecutionMode = true;
                 }
@@ -2664,7 +2667,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
             timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
-            if (res == iteration_state::next_step)
+            if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
             }
@@ -3076,7 +3079,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         {
             timeCoord->processTimeMessage (cmd);
             auto res = timeCoord->checkExecEntry ();
-            if (res == iteration_state::next_step)
+            if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
             }

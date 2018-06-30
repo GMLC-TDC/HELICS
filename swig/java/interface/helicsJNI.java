@@ -161,6 +161,7 @@ public class helicsJNI {
   public final static native int helicsPublicationPublishNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native int helicsSubscriptionGetValueSize(long jarg1);
   public final static native int helicsSubscriptionGetRawValue(long jarg1, long jarg2, int jarg3, int[] jarg4);
+  public final static native int helicsSubscriptionGetStringSize(long jarg1);
   public final static native int helicsSubscriptionGetString(long jarg1, byte[] jarg2, int[] jarg4);
   public final static native int helicsSubscriptionGetInteger(long jarg1, long[] jarg2);
   public final static native int helicsSubscriptionGetBoolean(long jarg1, int[] jarg2);

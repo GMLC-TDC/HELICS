@@ -329,7 +329,7 @@ bool TimeCoordinator::updateTimeFactors ()
     return update;
 }
 
-iteration_state TimeCoordinator::checkTimeGrant ()
+message_processing_result TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
     if (time_exec == Time::maxVal())
@@ -342,12 +342,12 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             ActionMessage treq(CMD_DISCONNECT);
             treq.source_id = source_id;
             transmitTimingMessage(treq);
-            return iteration_state::halted;
+            return message_processing_result::halted;
         }
     }
     if (time_block <= time_exec)
     {
-        return iteration_state::continue_processing;
+        return message_processing_result::continue_processing;
     }
     if ((!iterating) || (time_exec > time_granted))
     {
@@ -355,19 +355,19 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         if (time_allow > time_exec)
         {
             updateTimeGrant ();
-            return iteration_state::next_step;
+            return message_processing_result::next_step;
         }
         if (time_allow == time_exec)
         {
             if (time_requested <= time_exec)
             {
                 updateTimeGrant ();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
             if (dependencies.checkIfReadyForTimeGrant (false, time_exec))
             {
                 updateTimeGrant ();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
         }
     }
@@ -377,7 +377,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         {
             ++iteration;
             updateTimeGrant ();
-            return iteration_state::iterating;
+            return message_processing_result::iterating;
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
@@ -385,7 +385,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             {
                 ++iteration;
                 updateTimeGrant ();
-                return iteration_state::iterating;
+                return message_processing_result::iterating;
             }
         }
     }
@@ -395,7 +395,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     {
         sendTimeRequest ();
     }
-    return iteration_state::continue_processing;
+    return message_processing_result::continue_processing;
 }
 
 void TimeCoordinator::sendTimeRequest () const
@@ -444,19 +444,29 @@ std::string TimeCoordinator::printTimeStatus () const
 
 bool TimeCoordinator::isDependency (global_federate_id_t ofed) const { return dependencies.isDependency (ofed); }
 
-bool TimeCoordinator::addDependency (global_federate_id_t fedID) { return dependencies.addDependency (fedID); }
+bool TimeCoordinator::addDependency (global_federate_id_t fedID) 
+{
+    if (dependencies.addDependency(fedID))
+    {
+        dependency_federates.lock()->push_back(fedID);
+        return true;
+    }
+    return false;
+}
 
 bool TimeCoordinator::addDependent (global_federate_id_t fedID)
 {
     if (dependents.empty ())
     {
         dependents.push_back (fedID);
+        dependent_federates.lock()->push_back(fedID);
         return true;
     }
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep == dependents.end ())
     {
         dependents.push_back (fedID);
+        dependent_federates.lock()->push_back(fedID);
     }
     else
     {
@@ -465,11 +475,22 @@ bool TimeCoordinator::addDependent (global_federate_id_t fedID)
             return false;
         }
         dependents.insert (dep, fedID);
+        dependent_federates.lock()->push_back(fedID);
     }
     return true;
 }
 
-void TimeCoordinator::removeDependency (global_federate_id_t fedID) { dependencies.removeDependency (fedID); }
+void TimeCoordinator::removeDependency (global_federate_id_t fedID) 
+{ 
+    dependencies.removeDependency (fedID);
+    //remove the thread safe version
+    auto dlock=dependency_federates.lock();
+    auto res = std::find(dlock.begin(), dlock.end(), fedID);
+    if (res != dlock.end())
+    {
+        dlock->erase(res);
+    }
+}
 
 void TimeCoordinator::removeDependent (global_federate_id_t fedID)
 {
@@ -479,7 +500,14 @@ void TimeCoordinator::removeDependent (global_federate_id_t fedID)
         if (*dep == fedID)
         {
             dependents.erase (dep);
+            //remove the thread safe version
+            auto dlock = dependent_federates.lock();
+            auto res = std::find(dlock.begin(), dlock.end(), fedID);
+            if (res != dlock.end())
+            {
+                dlock->erase(res);
         }
+    }
     }
 }
 
@@ -490,13 +518,7 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (global_federate_id_t ofed)
 
 std::vector<global_federate_id_t> TimeCoordinator::getDependencies () const
 {
-    std::vector<global_federate_id_t> deps;
-    deps.reserve (dependencies.size ());
-    for (auto &dep : dependencies)
-    {
-        deps.push_back (dep.fedID);
-    }
-    return deps;
+   return *dependency_federates.lock_shared();
 }
 
 void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
@@ -508,9 +530,9 @@ void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
     }
 }
 
-iteration_state TimeCoordinator::checkExecEntry ()
+message_processing_result TimeCoordinator::checkExecEntry ()
 {
-    auto ret = iteration_state::continue_processing;
+    auto ret = message_processing_result::continue_processing;
     if (time_block <= timeZero)
     {
         return ret;
@@ -525,24 +547,24 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             if (iteration >= info.maxIterations)
             {
-                ret = iteration_state::next_step;
+                ret = message_processing_result::next_step;
             }
             else
             {
-                ret = iteration_state::iterating;
+                ret = message_processing_result::iterating;
             }
         }
         else
         {
-            ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
+            ret = message_processing_result::next_step;  // todo add a check for updates and iteration limit
         }
     }
     else
     {
-        ret = iteration_state::next_step;
+        ret = message_processing_result::next_step;
     }
 
-    if (ret == iteration_state::next_step)
+    if (ret == message_processing_result::next_step)
     {
         time_granted = timeZero;
         time_grantBase = time_granted;
@@ -553,7 +575,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         execgrant.source_id = source_id;
         transmitTimingMessage (execgrant);
     }
-    else if (ret == iteration_state::iterating)
+    else if (ret == message_processing_result::iterating)
     {
         dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;

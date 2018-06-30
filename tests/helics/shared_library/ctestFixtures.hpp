@@ -147,7 +147,7 @@ struct FederateTestFixture
         }
         break;
         }
-
+        helicsFederateInfoFree(fi);
         return federates_added;
     }
 

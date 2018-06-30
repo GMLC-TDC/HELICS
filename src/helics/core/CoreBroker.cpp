@@ -466,7 +466,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             timeCoord->enteringExecMode ();
             auto res = timeCoord->checkExecEntry ();
-            if (res == iteration_state::next_step)
+            if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
             }
@@ -549,7 +549,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (!enteredExecutionMode)
             {
                 auto res = timeCoord->checkExecEntry ();
-                if (res == iteration_state::next_step)
+                if (res == message_processing_result::next_step)
                 {
                     enteredExecutionMode = true;
                     LOG_DEBUG (global_broker_id.load(), getIdentifier (), "entering Exec Mode");
@@ -1034,7 +1034,7 @@ void CoreBroker::executeInitializationOperations ()
     }
     timeCoord->enteringExecMode ();
     auto res = timeCoord->checkExecEntry ();
-    if (res == iteration_state::next_step)
+    if (res == message_processing_result::next_step)
     {
         enteredExecutionMode = true;
     }

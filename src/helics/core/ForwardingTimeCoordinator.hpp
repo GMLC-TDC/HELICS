@@ -98,7 +98,7 @@ class ForwardingTimeCoordinator
     void removeDependent (global_federate_id_t fedID);
 
     /** check if entry to the executing state can be granted*/
-    iteration_state checkExecEntry ();
+    message_processing_result checkExecEntry ();
 
     /** function to enter the exec Mode
      */
