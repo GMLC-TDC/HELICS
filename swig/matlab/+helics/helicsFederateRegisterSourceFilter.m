@@ -20,5 +20,5 @@ function varargout = helicsFederateRegisterSourceFilter(varargin)
     %-------
     %a helics_source_filter object
     %
-  [varargout{1:nargout}] = helicsMEX(174, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(175, varargin{:});
 end

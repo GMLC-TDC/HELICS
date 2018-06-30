@@ -379,7 +379,7 @@ std::string removeChar (const std::string &source, char remchar)
     return result;
 }
 
-std::string characterReplace (const std::string &source, char key, std::string repStr)
+std::string characterReplace (const std::string &source, char key, const std::string &repStr)
 {
     std::string result;
     result.reserve (source.length ());

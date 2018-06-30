@@ -18,4 +18,6 @@ if (BUILD_JAVA_INTERFACE)
 	add_subdirectory(java_helics)
 endif()
 
-
+if (BUILD_MATLAB_INTERFACE)
+	add_subdirectory(matlab_helics)
+endif()
