@@ -85,7 +85,7 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
+    std::map<Core::federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
     std::vector<Core::federate_id_t> delayedFederates;  //!< list of federates to delay messages from
@@ -93,7 +93,6 @@ class FederateState
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    mutable std::mutex _mutex;  //!< the mutex protecting the fed state
     std::atomic<bool> processing{false};  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
@@ -154,7 +153,7 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processQueue ();
+    message_processing_result processQueue ();
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -164,11 +163,11 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processDelayQueue ();
+    message_processing_result processDelayQueue ();
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processActionMessage (ActionMessage &cmd);
+    message_processing_result processActionMessage (ActionMessage &cmd);
     /** process a message that updates the configuration of the federate for timing*/
     void processConfigUpdate (const ActionMessage &m);
     /** fill event list
@@ -204,9 +203,12 @@ class FederateState
     /**get a reference to the handles of subscriptions with value updates
      */
     const std::vector<Core::handle_id_t> &getEvents () const;
-    /** get a reference to the global ids of dependent federates
+    /** get a vector of the federates this one depends on
+    */
+    std::vector<Core::federate_id_t> getDependencies() const;
+    /** get a vector to the global ids of dependent federates
      */
-    const std::vector<Core::federate_id_t> &getDependents () const;
+    std::vector<Core::federate_id_t> getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
     /** get the last error code*/

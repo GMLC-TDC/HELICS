@@ -646,7 +646,7 @@ void runFederateTestNamedPoint (const char *core,
     double val;
     CE (helicsSubscriptionGetNamedPoint (subid, str, STRINGSIZE, &len, &val));
 
-    BOOST_CHECK_EQUAL (str, defaultValue);
+    BOOST_CHECK_EQUAL (std::string(str), std::string(defaultValue));
     BOOST_CHECK_EQUAL (val, defVal);
     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
 
@@ -656,7 +656,7 @@ void runFederateTestNamedPoint (const char *core,
     CE (helicsSubscriptionGetNamedPoint (subid, str, STRINGSIZE, &len, &val));
 
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (str, testValue1);
+    BOOST_CHECK_EQUAL (std::string(str), std::string(testValue1));
     BOOST_CHECK_EQUAL (val, testVal1);
 
     // publish a second string
@@ -664,7 +664,7 @@ void runFederateTestNamedPoint (const char *core,
 
     // make sure the value is still what we expect
     CE (helicsSubscriptionGetNamedPoint (subid, str, STRINGSIZE, &len, &val));
-    BOOST_CHECK_EQUAL (str, testValue1);
+    BOOST_CHECK_EQUAL (std::string(str), std::string(testValue1));
     BOOST_CHECK_EQUAL (val, testVal1);
 
     // advance time
@@ -673,7 +673,7 @@ void runFederateTestNamedPoint (const char *core,
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
     CE (helicsSubscriptionGetNamedPoint (subid, str, STRINGSIZE, &len, &val));
-    BOOST_CHECK_EQUAL (str, testValue2);
+    BOOST_CHECK_EQUAL (std::string(str), std::string(testValue2));
     BOOST_CHECK_EQUAL (val, testVal2);
 
     CE (helicsFederateFinalize (vFed));

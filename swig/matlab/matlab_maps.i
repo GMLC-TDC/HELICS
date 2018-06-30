@@ -103,13 +103,13 @@
 }
 
 %typemap(freearg) (double data[], int maxlen, int *actualSize) {
-   if ($1) free($1);
+   //if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(double data[], int maxlen, int *actualSize) {
     $2=helicsSubscriptionGetVectorSize(arg1);
-    $1 = (double *) malloc($2*sizeof(double));
+    $1 = (double *) mxCalloc($2,sizeof(double));
 }
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {

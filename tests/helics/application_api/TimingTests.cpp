@@ -19,11 +19,7 @@ namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
 
-
-
 /** just a check that in the simple case we do actually get the time back we requested*/
-
-
 BOOST_AUTO_TEST_CASE (simple_timing_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
@@ -322,6 +318,91 @@ BOOST_AUTO_TEST_CASE(sender_finalize_timing_result2)
     BOOST_CHECK_EQUAL(granted2, 6.0);
     BOOST_CHECK(receiver.isUpdated());
     BOOST_CHECK_EQUAL(receiver.getValue<double>(), 6.0);
+    vFed2->finalize();
+}
+
+
+BOOST_AUTO_TEST_CASE(fast_sender_tests)
+{
+    SetupTest<helics::ValueFederate>("zmq_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    helics::Publication sender(helics::interface_visibility::global, vFed1, "pub", helics::helics_type_t::helicsDouble);
+    helics::Subscription receiver(vFed2, "pub");
+    vFed1->enterExecutionStateAsync();
+    vFed2->enterExecutionState();
+    vFed1->enterExecutionStateComplete();
+    const helics::Time endTime(8000.0);
+    helics::Time currentTime = 0.0;
+    while (currentTime <= endTime)
+    {
+        currentTime += 1.0;
+        currentTime=vFed1->requestTime(currentTime);
+        sender.publish(static_cast<double>(currentTime));
+    }
+    vFed1->finalize();
+    currentTime = 0.0;
+    while (currentTime <= endTime)
+    {
+        currentTime = vFed2->requestTime(endTime+2000.0);
+        if (receiver.isUpdated())
+        {
+            double val = receiver.getValue<double>();
+            BOOST_CHECK_EQUAL(val, static_cast<double>(currentTime));
+            
+        }
+    }
+    vFed2->finalize();
+}
+
+BOOST_AUTO_TEST_CASE(dual_fast_sender_tests)
+{
+    SetupTest<helics::ValueFederate>("zmq_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+    helics::Publication sender1(helics::interface_visibility::global, vFed1, "pub1", helics::helics_type_t::helicsDouble);
+    helics::Subscription receiver1(vFed2, "pub1");
+    helics::Publication sender2(helics::interface_visibility::global, vFed3, "pub2", helics::helics_type_t::helicsDouble);
+    helics::Subscription receiver2(vFed2, "pub2");
+    vFed1->enterExecutionStateAsync();
+    vFed3->enterExecutionStateAsync();
+    vFed2->enterExecutionState();
+    vFed1->enterExecutionStateComplete();
+    vFed3->enterExecutionStateComplete();
+    const helics::Time endTime(500.0);
+    helics::Time currentTime = helics::timeZero;
+    while (currentTime <= endTime)
+    {
+        currentTime += 1.0;
+        currentTime = vFed1->requestTime(currentTime);
+        sender1.publish(static_cast<double>(currentTime));
+    }
+    vFed1->finalize();
+    currentTime = helics::timeZero;
+    while (currentTime <= endTime)
+    {
+        currentTime += 1.0;
+        currentTime = vFed3->requestTime(currentTime);
+        sender2.publish(static_cast<double>(currentTime));
+    }
+    vFed3->finalize();
+    currentTime = helics::timeZero;
+    while (currentTime <= endTime)
+    {
+        currentTime = vFed2->requestTime(endTime + 2000.0);
+        if (receiver1.isUpdated())
+        {
+            double val = receiver1.getValue<double>();
+            BOOST_CHECK_EQUAL(val, static_cast<double>(currentTime));
+        }
+        if (receiver2.isUpdated())
+        {
+            double val = receiver2.getValue<double>();
+            BOOST_CHECK_EQUAL(val, static_cast<double>(currentTime));
+        }
+    }
     vFed2->finalize();
 }
 BOOST_AUTO_TEST_SUITE_END ()

@@ -3,6 +3,25 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.2.1] - 2018-06-30
+### Fixed
+ - bug in the conversion of named points from strings
+ - matlab helicsSubscriptionGetVector function was producing a seg fault, now this is fixed
+ - performance issue in the delay buffers of federateState
+ - findMPI for MPI libraries with multiple libraries
+ - federates will now error on missing required publications
+
+### Added
+ - first cut of matlab interface tests
+ - some additional Java test cases
+ - Python test cases for named point and bool tests
+ - Matlab helper scripts for loading the libary
+ - String length function for subscriptions
+
+### Changed
+ - conversion of doubles into the internal time base now rounds to the nearest ns instead of truncating
+ - unify cmake scripts to use lower case commands
+ 
 ## [1.2.0] - 2018-06-18
 ### Fixed
  - issue with various filter tyes and random drop filters
@@ -20,6 +39,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added
  - queryCoreExecute, queryBrokerExecute to the C api to allow queries to be executed directly on brokers and cores
  - C++ API changes to for Brokers and Core to allow queries
+ - Get StringLength function to the C and interface api
  - new queries (federate_map, and dependency_graph(partial))
  - additional filter tests and query tests
  - realtime mode for HELICS specified by activating the realtime flag, and specifying rt_lag and rt_lead  the federate will then delay grant or force_grant based on computer clock to match wall time.

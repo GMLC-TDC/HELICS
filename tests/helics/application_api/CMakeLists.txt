@@ -31,6 +31,7 @@ subPubObjectTests.cpp
 ValueFederateAdditionalTests.cpp
 ErrorTests.cpp
 federateRealTimeTests.cpp
+TimingTests2.cpp
 )
 
 set(extended_test_sources

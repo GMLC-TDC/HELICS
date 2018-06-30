@@ -19,6 +19,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #cmakedefine BOOST_STATIC
 
+#cmakedefine HELICS_USE_PICOSECOND_TIME
+
 #define BOOST_VERSION_LEVEL @BOOST_VERSION_LEVEL@
 
 #define HELICS_VERSION_MAJOR ${HELICS_VERSION_MAJOR}
