@@ -85,7 +85,7 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::deque<ActionMessage> delayQueue;  //!< queue for delaying processing of messages for a time
+    std::map<Core::federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
     std::vector<Core::federate_id_t> delayedFederates;  //!< list of federates to delay messages from
@@ -153,7 +153,7 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processQueue ();
+    message_processing_result processQueue ();
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -163,11 +163,11 @@ class FederateState
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processDelayQueue ();
+    message_processing_result processDelayQueue ();
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    iteration_state processActionMessage (ActionMessage &cmd);
+    message_processing_result processActionMessage (ActionMessage &cmd);
     /** process a message that updates the configuration of the federate for timing*/
     void processConfigUpdate (const ActionMessage &m);
     /** fill event list

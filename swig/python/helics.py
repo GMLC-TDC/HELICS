@@ -1605,6 +1605,10 @@ def helicsSubscriptionGetRawValue(sub: 'helics_subscription', data: 'void *', ma
     return _helics.helicsSubscriptionGetRawValue(sub, data, maxlen)
 helicsSubscriptionGetRawValue = _helics.helicsSubscriptionGetRawValue
 
+def helicsSubscriptionGetStringSize(sub: 'helics_subscription') -> "int":
+    return _helics.helicsSubscriptionGetStringSize(sub)
+helicsSubscriptionGetStringSize = _helics.helicsSubscriptionGetStringSize
+
 def helicsSubscriptionGetString(sub: 'helics_subscription') -> "int *":
     """
 

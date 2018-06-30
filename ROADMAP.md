@@ -2,13 +2,13 @@
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change.  see the [projects](https://github.com/GMLC-TDC/HELICS-src/projects) for additional details
 
 
-## [1.3] ~ 2018-07-16  Improvements planned before the 2.0 release
+## [1.3] ~ 2018-07-29  Improvements planned before the 2.0 release
  - see [HELICS 1.2](https://github.com/GMLC-TDC/HELICS-src/projects/6) for up to date information
 ### Features
  - Support for TOML configuration
  - Octave support
  - add a control point type for N to 1 control of federates this new interface will be symmetric with the publication and subscriptions interface which is a 1 to N fanout.
- - rework of testing executables to reduce builds
+ - rework of testing executables to reduce build time and simplify testing
 
 ### Improvements
  - some initial performance testing and improvements

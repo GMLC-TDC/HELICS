@@ -12,9 +12,9 @@ project (HELICS)
 #-----------------------------------------------------------------------------
 set (HELICS_VERSION_MAJOR 1)
 set (HELICS_VERSION_MINOR 2)
-set (HELICS_VERSION_PATCH 0)
+set (HELICS_VERSION_PATCH 1)
 set (HELICS_VERSION_BUILD )
-set (HELICS_DATE "06-18-18")
+set (HELICS_DATE "06-30-18")
 
 if (NOT HELICS_VERSION_BUILD)
 	set (HELICS_VERSION "${HELICS_VERSION_MAJOR}.${HELICS_VERSION_MINOR}.${HELICS_VERSION_PATCH}")

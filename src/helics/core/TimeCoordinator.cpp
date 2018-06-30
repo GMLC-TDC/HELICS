@@ -329,7 +329,7 @@ bool TimeCoordinator::updateTimeFactors ()
     return update;
 }
 
-iteration_state TimeCoordinator::checkTimeGrant ()
+message_processing_result TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
     if (time_exec == Time::maxVal())
@@ -342,12 +342,12 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             ActionMessage treq(CMD_DISCONNECT);
             treq.source_id = source_id;
             transmitTimingMessage(treq);
-            return iteration_state::halted;
+            return message_processing_result::halted;
         }
     }
     if (time_block <= time_exec)
     {
-        return iteration_state::continue_processing;
+        return message_processing_result::continue_processing;
     }
     if ((!iterating) || (time_exec > time_granted))
     {
@@ -355,19 +355,19 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         if (time_allow > time_exec)
         {
             updateTimeGrant ();
-            return iteration_state::next_step;
+            return message_processing_result::next_step;
         }
         if (time_allow == time_exec)
         {
             if (time_requested <= time_exec)
             {
                 updateTimeGrant ();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
             if (dependencies.checkIfReadyForTimeGrant (false, time_exec))
             {
                 updateTimeGrant ();
-                return iteration_state::next_step;
+                return message_processing_result::next_step;
             }
         }
     }
@@ -377,7 +377,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
         {
             ++iteration;
             updateTimeGrant ();
-            return iteration_state::iterating;
+            return message_processing_result::iterating;
         }
         if (time_allow == time_exec)  // time_allow==time_exec==time_granted
         {
@@ -385,7 +385,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
             {
                 ++iteration;
                 updateTimeGrant ();
-                return iteration_state::iterating;
+                return message_processing_result::iterating;
             }
         }
     }
@@ -395,7 +395,7 @@ iteration_state TimeCoordinator::checkTimeGrant ()
     {
         sendTimeRequest ();
     }
-    return iteration_state::continue_processing;
+    return message_processing_result::continue_processing;
 }
 
 void TimeCoordinator::sendTimeRequest () const
@@ -530,9 +530,9 @@ void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
     }
 }
 
-iteration_state TimeCoordinator::checkExecEntry ()
+message_processing_result TimeCoordinator::checkExecEntry ()
 {
-    auto ret = iteration_state::continue_processing;
+    auto ret = message_processing_result::continue_processing;
     if (time_block <= timeZero)
     {
         return ret;
@@ -547,24 +547,24 @@ iteration_state TimeCoordinator::checkExecEntry ()
         {
             if (iteration >= info.maxIterations)
             {
-                ret = iteration_state::next_step;
+                ret = message_processing_result::next_step;
             }
             else
             {
-                ret = iteration_state::iterating;
+                ret = message_processing_result::iterating;
             }
         }
         else
         {
-            ret = iteration_state::next_step;  // todo add a check for updates and iteration limit
+            ret = message_processing_result::next_step;  // todo add a check for updates and iteration limit
         }
     }
     else
     {
-        ret = iteration_state::next_step;
+        ret = message_processing_result::next_step;
     }
 
-    if (ret == iteration_state::next_step)
+    if (ret == message_processing_result::next_step)
     {
         time_granted = timeZero;
         time_grantBase = time_granted;
@@ -575,7 +575,7 @@ iteration_state TimeCoordinator::checkExecEntry ()
         execgrant.source_id = source_id;
         transmitTimingMessage (execgrant);
     }
-    else if (ret == iteration_state::iterating)
+    else if (ret == message_processing_result::iterating)
     {
         dependencies.resetIteratingExecRequests ();
         hasInitUpdates = false;
