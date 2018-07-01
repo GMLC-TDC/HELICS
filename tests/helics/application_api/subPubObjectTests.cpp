@@ -220,7 +220,6 @@ BOOST_AUTO_TEST_CASE(subscriptionObject_complex_tests_ext)
 BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests, *utf::label("ci"))
 {
     using v = std::vector<double>;
-    using c = std::complex<double>;
     v tvec1{12.4, 0.3, 0.7};
     v tvec2{0.0, -1241.23, 5.0, 7.9};
     v eVec{};
