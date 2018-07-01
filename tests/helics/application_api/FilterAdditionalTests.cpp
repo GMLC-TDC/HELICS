@@ -29,7 +29,7 @@ Test rerouter filter
 This test case sets reroute filter on a source endpoint. Ths means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -82,7 +82,7 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 Ths means message sent from this endpoint will be rerouted to a new destination 
 endpoint only if condition matches.
 */
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make(core_types), core_type)
 {
 	auto broker = AddBroker(core_type, 2);
@@ -370,8 +370,9 @@ This test case sets random drop filter on a destination endpoint with a particul
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_DATA_TEST_CASE(message_random_drop_dest_object1, bdata::make(core_types), core_type)
+BOOST_AUTO_TEST_CASE(message_random_drop_dest_object1, *utf::label("ci"))
 {
+    std::string core_type = "test_2";
 	auto broker = AddBroker(core_type, 2);
 	AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "filter");
 	AddFederates<helics::MessageFederate>(core_type, 1, broker, 1.0, "message");
@@ -476,8 +477,4 @@ BOOST_DATA_TEST_CASE(message_random_delay_object, bdata::make(core_types), core_
 	BOOST_CHECK(fFed->getCurrentState() == helics::Federate::op_states::finalize);
 }
 
-BOOST_AUTO_TEST_CASE(test_empty)
-{
-
-}
 BOOST_AUTO_TEST_SUITE_END()

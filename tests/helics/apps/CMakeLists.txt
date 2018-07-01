@@ -34,12 +34,10 @@ add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite
 set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps)
 
 # Tests for Continous, Daily, and Release builds
-add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --run_test=@ci --log_level=test_suite --report_level=short)
-add_test(NAME helics_apps-daily-tests COMMAND helics_apps-tests --run_test=@daily --log_level=test_suite --report_level=short)
-add_test(NAME helics_apps-release-tests COMMAND helics_apps-tests --run_test=@release --log_level=test_suite --report_level=short)
+add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --run_test=@ci --report_level=short)
+add_test(NAME helics_apps-daily-tests COMMAND helics_apps-tests --report_level=short)
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
 set_property(TEST helics_apps-daily-tests PROPERTY LABELS Daily)
-set_property(TEST helics_apps-release-tests PROPERTY LABELS Release)
 
 if(WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

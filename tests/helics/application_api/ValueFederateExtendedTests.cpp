@@ -21,7 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_extended_tests, FederateTestFixture, *utf::label("extended"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_extended_tests, FederateTestFixture)
 
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), core_type)

@@ -20,7 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture, *utf::label("key") *utf::label("ci") *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (message_federate_tests, FederateTestFixture, *utf::label("ci"))
 
 /** test simple creation and destruction*/
 
@@ -276,7 +276,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 }
 
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -350,7 +350,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 }
 
 
-BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);

@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture, *utf::label("ci"))
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 BOOST_AUTO_TEST_CASE (simple_timing_test)

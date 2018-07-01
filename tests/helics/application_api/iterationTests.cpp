@@ -20,11 +20,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
@@ -106,7 +106,7 @@ run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &
 }
 
 
-BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0).get ();
@@ -123,7 +123,7 @@ BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types),
     BOOST_CHECK_CLOSE (res1.first, 2.5, 0.1);
 }
 
-BOOST_AUTO_TEST_CASE (execution_iteration_loop3)
+BOOST_AUTO_TEST_CASE (execution_iteration_loop3, *utf::label("ci"))
 {
     int N = 5;
     SetupTest<helics::ValueFederate> ("test", N);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_loop3)
     }
 }
 
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-
+BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);

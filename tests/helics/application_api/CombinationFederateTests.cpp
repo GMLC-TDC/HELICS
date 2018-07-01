@@ -13,20 +13,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "testFixtures.h"
-#include "test_configuration.h"
+#include "testFixtures.hpp"
 #include <future>
 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (combo_federate_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (combo_federate_tests, FederateTestFixture)
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (combo_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 1);
+    SetupTest<helics::CombinationFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     vFed1->enterExecutionState ();
@@ -40,7 +39,7 @@ BOOST_DATA_TEST_CASE (combo_federate_initialize_tests, bdata::make (core_types_s
 
 BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 1);
+    SetupTest<helics::CombinationFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     auto pubid = vFed1->registerPublication<std::string> ("pub1");
@@ -71,7 +70,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
 
 BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 1);
+    SetupTest<helics::CombinationFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
@@ -107,7 +106,7 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
 
 BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_types_single), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 1);
+    SetupTest<helics::CombinationFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
     auto epid = mFed1->registerEndpoint ("ep1");
@@ -135,7 +134,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
 
 BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 2);
+    SetupTest<helics::CombinationFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::CombinationFederate> (0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate> (1);
 
@@ -189,7 +188,7 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
 
 BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core_types), core_type)
 {
-    SetupSingleBrokerTest<helics::CombinationFederate> (core_type, 2);
+    SetupTest<helics::CombinationFederate> (core_type, 2);
     auto cFed1 = GetFederateAs<helics::CombinationFederate> (0);
     auto cFed2 = GetFederateAs<helics::CombinationFederate> (1);
 

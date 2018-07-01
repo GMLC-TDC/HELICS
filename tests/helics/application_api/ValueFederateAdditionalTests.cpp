@@ -24,7 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture)
 
 
 /** test simple creation and destruction*/
@@ -226,7 +226,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types_all), core_type)
 {
     // this one is going to test really ugly strings
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
@@ -270,7 +270,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core
 }
 
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types_all), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);

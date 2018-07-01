@@ -18,7 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (blocking_queue_tests, *utf::label("daily") *utf::label("release"))
+BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
 
 /** test basic operations */
 BOOST_AUTO_TEST_CASE (basic_tests, *utf::label("ci"))

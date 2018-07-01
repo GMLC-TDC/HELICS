@@ -20,7 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
 BOOST_AUTO_TEST_CASE (duplicate_federate_names)

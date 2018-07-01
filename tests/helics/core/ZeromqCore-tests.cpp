@@ -23,7 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (ZMQCore_tests, *utf::label("ci") *utf::label("daily") *utf::label("release"))
+BOOST_AUTO_TEST_SUITE (ZMQCore_tests, *utf::label("ci"))
 
 using helics::Core;
 const std::string defServer ("tcp://127.0.0.1:23405");

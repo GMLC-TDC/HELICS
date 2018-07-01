@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture, *utf::label("ci") *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (constructor_test)
 {

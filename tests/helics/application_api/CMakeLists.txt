@@ -32,6 +32,7 @@ ValueFederateAdditionalTests.cpp
 ErrorTests.cpp
 federateRealTimeTests.cpp
 TimingTests2.cpp
+CombinationFederateTests.cpp
 )
 
 set(extended_test_sources
