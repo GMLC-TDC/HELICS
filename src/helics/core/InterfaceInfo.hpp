@@ -34,10 +34,10 @@ class InterfaceInfo
     const ControlOutputInfo *getControlOutput(Core::handle_id_t handle_) const;
     ControlOutputInfo *getControlOutput(const std::string &coName);
     ControlOutputInfo *getControlOutput(Core::handle_id_t handle_);
-    const ControlInputInfo *getControlInput(const std::string &ciName) const;
-    const  ControlInputInfo *getControlInput(Core::handle_id_t handle_) const;
-    ControlInputInfo *getControlInput(const std::string &ciName);
-    ControlInputInfo *getControlInput(Core::handle_id_t handle_);
+    const ControlInputInfo *getNamedInput(const std::string &ciName) const;
+    const  ControlInputInfo *getNamedInput(Core::handle_id_t handle_) const;
+    ControlInputInfo *getNamedInput(const std::string &ciName);
+    ControlInputInfo *getNamedInput(Core::handle_id_t handle_);
     const EndpointInfo *getEndpoint (const std::string &endpointName) const;
     const EndpointInfo *getEndpoint (Core::handle_id_t handle_) const;
     EndpointInfo *getEndpoint (const std::string &endpointName);

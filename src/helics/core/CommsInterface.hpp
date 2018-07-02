@@ -108,17 +108,6 @@ class CommsInterface
     tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
 };
 
-template <class X>
-class changeOnDestroy
-{
-  private:
-    std::atomic<X> &aref;
-    X fval;
-
-  public:
-    changeOnDestroy (std::atomic<X> &var, X finalValue) : aref (var), fval (std::move (finalValue)) {}
-    ~changeOnDestroy () { aref.store (fval); }
-};
 
 template <class X>
 class conditionalChangeOnDestroy

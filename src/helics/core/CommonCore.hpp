@@ -96,19 +96,12 @@ class CommonCore : public Core, public BrokerBase
                                              const std::string &type,
                                              const std::string &units) override final;
     virtual handle_id_t getPublication (federate_id_t federateID, const std::string &key) const override final;
-    virtual handle_id_t registerControlInput(federate_id_t federateID,
+    virtual handle_id_t registerNamedInput(federate_id_t federateID,
         const std::string &key,
         const std::string &type,
         const std::string &units) override final;
 
-    virtual handle_id_t getControlInput(federate_id_t federateID, const std::string &key) const override final;
-
-    virtual handle_id_t registerControlOutput(federate_id_t federateID,
-        const std::string &key,
-        const std::string &type,
-        const std::string &units,
-        handle_check_mode check_mode) override final;
-    virtual handle_id_t getControlOutput(federate_id_t federateID, const std::string &key) const override final;
+    virtual handle_id_t getNamedInput(federate_id_t federateID, const std::string &key) const override final;
 
     virtual const std::string &getHandleName (handle_id_t handle) const override final;
     virtual const std::string &getTarget (handle_id_t handle) const override final;

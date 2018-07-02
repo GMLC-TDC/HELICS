@@ -17,7 +17,6 @@ enum class handle_type_t : char
     publication,  //!< handle to publish interface
     subscription,  //!< handle to a subscribe interface
     control_input, //!< handle for a control input
-    control_output, //!< handle for a control output
     endpoint,  //!< handle to an endpoint
     source_filter,  //!< handle to a source filter
     destination_filter,  //!< handle to a destination filter
@@ -75,7 +74,7 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    const std::string target;  //!< the target of the handle mapped onto units since they will not be used together
+    const std::string target;  //!< the target of the handle 
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 };

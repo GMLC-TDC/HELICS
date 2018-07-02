@@ -196,7 +196,7 @@ BasicHandleInfo *HandleManager::getPublication(int32_t index)
     return nullptr;
 }
 
-BasicHandleInfo *HandleManager::getControlInput(const std::string &name)
+BasicHandleInfo *HandleManager::getNamedInput(const std::string &name)
 {
     auto fnd = controlInputs.find(name);
     if (fnd != controlInputs.end())
@@ -206,7 +206,7 @@ BasicHandleInfo *HandleManager::getControlInput(const std::string &name)
     return nullptr;
 }
 
-const BasicHandleInfo *HandleManager::getControlInput(const std::string &name) const
+const BasicHandleInfo *HandleManager::getNamedInput(const std::string &name) const
 {
     auto fnd = controlInputs.find(name);
     if (fnd != controlInputs.end())

@@ -807,57 +807,6 @@ handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::st
     return invalid_handle;
 }
 
-handle_id_t CommonCore::registerControlOutput(federate_id_t federateID,
-    const std::string &key,
-    const std::string &type,
-    const std::string &units,
-    handle_check_mode check_mode)
-{
-    auto fed = getFederateAt(federateID);
-
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier("federateID not valid (registerControlOutput)"));
-    }
-    if (fed->getState() != HELICS_CREATED)
-    {
-        throw (InvalidFunctionCall("control outputs must be registered before calling enterInitializationMode"));
-    }
-
-    auto flags = (check_mode == handle_check_mode::required) ? make_flags(required_flag) : 0;
-    auto &handle =
-        createBasicHandle(fed->global_id, fed->local_id, handle_type_t::control_output, key, type, units, flags);
-
-    auto id = handle.handle;
-    LOG_DEBUG(0, fed->getIdentifier(), fmt::format("registering CONTROL OUTPUT {}", key));
-    fed->interfaces().createControlOutput(id, key, type, units);
-
-    ActionMessage m(CMD_REG_CONTROL_OUTPUT);
-    m.source_id = fed->global_id;
-    m.source_handle = id;
-    m.name = key;
-    m.info().type = type;
-    m.info().units = units;
-    if (check_mode == handle_check_mode::required)
-    {
-        setActionFlag(m, required_flag);
-    }
-    actionQueue.push(std::move(m));
-
-    return id;
-}
-
-handle_id_t CommonCore::getControlOutput(federate_id_t federateID, const std::string &key) const
-{
-    auto fed = getFederateAt(federateID);
-    if (fed != nullptr)
-    {
-        auto co = fed->interfaces().getControlOutput(key);
-        return (co != nullptr) ? co->id : invalid_handle;
-    }
-    return invalid_handle;
-}
-
 handle_id_t CommonCore::registerPublication (federate_id_t federateID,
                                              const std::string &key,
                                              const std::string &type,
@@ -905,7 +854,7 @@ handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::str
 }
 
 
-handle_id_t CommonCore::registerControlInput(federate_id_t federateID,
+handle_id_t CommonCore::registerNamedInput(federate_id_t federateID,
     const std::string &key,
     const std::string &type,
     const std::string &units)
@@ -913,14 +862,14 @@ handle_id_t CommonCore::registerControlInput(federate_id_t federateID,
     auto fed = getFederateAt(federateID);
     if (fed == nullptr)
     {
-        throw (InvalidIdentifier("federateID not valid (registerControlInput)"));
+        throw (InvalidIdentifier("federateID not valid (registerNamedInput)"));
     }
     if (fed->getState() != HELICS_CREATED)
     {
         throw (InvalidFunctionCall("control Inputs must be registered before calling enterInitializationMode"));
     }
     LOG_DEBUG(0, fed->getIdentifier(), fmt::format("registering CONTROL INPUT {}", key));
-    auto ci = handles.read([&key](auto &hand) { return hand.getControlInput(key); });
+    auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
     if (ci != nullptr)  // this key is already found
     {
         throw (RegistrationFailure("control input already exists"));
@@ -941,9 +890,9 @@ handle_id_t CommonCore::registerControlInput(federate_id_t federateID,
     return id;
 }
 
-handle_id_t CommonCore::getControlInput(federate_id_t federateID, const std::string &key) const
+handle_id_t CommonCore::getNamedInput(federate_id_t federateID, const std::string &key) const
 {
-    auto ci = handles.read([&key](auto &hand) { return hand.getControlInput(key); });
+    auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
     if (ci->local_fed_id != federateID)
     {
         return invalid_handle;
@@ -1004,7 +953,6 @@ const std::string &CommonCore::getOutputType (handle_id_t handle) const
         {
         case handle_type_t::publication:
         case handle_type_t::endpoint:
-        case handle_type_t::control_output:
             return handleInfo->type;
         case handle_type_t::destination_filter:
         case handle_type_t::source_filter:
@@ -1029,7 +977,6 @@ const std::string &CommonCore::getTarget (handle_id_t handle) const
             return handleInfo->key;
         case handle_type_t::destination_filter:
         case handle_type_t::source_filter:
-        case handle_type_t::control_output:
             return handleInfo->target;
         case handle_type_t::endpoint:
         default:
@@ -1046,7 +993,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     {
         throw (InvalidIdentifier ("Handle not valid (setValue)"));
     }
-    if (!((handleInfo->handle_type == handle_type_t::publication)|| (handleInfo->handle_type == handle_type_t::control_output)))
+    if (handleInfo->handle_type != handle_type_t::publication)
     {
         throw (InvalidIdentifier ("handle does not point to a publication or control output"));
     }
@@ -1084,7 +1031,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
     }
     else if (handleInfo->handle_type == handle_type_t::control_input)
     {
-        return getFederateAt(handleInfo->local_fed_id)->interfaces().getControlInput(handle)->getData().front();
+        return getFederateAt(handleInfo->local_fed_id)->interfaces().getNamedInput(handle)->getData().front();
     }
     else
     {

@@ -127,22 +127,22 @@ ControlOutputInfo *InterfaceInfo::getControlOutput(Core::handle_id_t handle_)
     return controlOutputs.lock()->find(handle_);
 }
 
-const ControlInputInfo *InterfaceInfo::getControlInput(const std::string &pubName) const
+const ControlInputInfo *InterfaceInfo::getNamedInput(const std::string &pubName) const
 {
     return controlInputs.lock_shared()->find(pubName);
 }
 
-const ControlInputInfo *InterfaceInfo::getControlInput(Core::handle_id_t handle_) const
+const ControlInputInfo *InterfaceInfo::getNamedInput(Core::handle_id_t handle_) const
 {
     return controlInputs.lock()->find(handle_);
 }
 
-ControlInputInfo *InterfaceInfo::getControlInput(const std::string &pubName)
+ControlInputInfo *InterfaceInfo::getNamedInput(const std::string &pubName)
 {
     return controlInputs.lock()->find(pubName);
 }
 
-ControlInputInfo *InterfaceInfo::getControlInput(Core::handle_id_t handle_)
+ControlInputInfo *InterfaceInfo::getNamedInput(Core::handle_id_t handle_)
 {
     return controlInputs.lock()->find(handle_);
 }
