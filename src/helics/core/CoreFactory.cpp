@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -128,7 +127,7 @@ namespace CoreFactory
 {
 std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
 {
-    auto core = makeCore (type, "");
+    auto core = makeCore (type, std::string());
     core->initialize (initializationString);
     registerCore (core);
 

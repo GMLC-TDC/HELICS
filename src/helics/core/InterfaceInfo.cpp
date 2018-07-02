@@ -20,7 +20,15 @@ void InterfaceInfo::createSubscription (handle_id_t handle,
     subHandle->back ()->only_update_on_change = only_update_on_change;
 }
 
-void InterfaceInfo::createPublication (handle_id_t handle,
+void InterfaceInfo::createControlOutput(Core::handle_id_t handle,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units)
+{
+    controlOutputs.lock()->insert(key, handle, handle, global_id, key, type, units);
+}
+
+void InterfaceInfo::createPublication(Core::handle_id_t handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
@@ -28,7 +36,19 @@ void InterfaceInfo::createPublication (handle_id_t handle,
     publications.lock ()->insert (key, handle, global_id, handle, key, type, units);
 }
 
-void InterfaceInfo::createEndpoint (handle_id_t handle, const std::string &endpointName, const std::string &type)
+void InterfaceInfo::createControlInput(Core::handle_id_t handle,
+    const std::string &key,
+    const std::string &type,
+    const std::string &units)
+{
+    auto ciHandle = controlInputs.lock();
+    ciHandle->insert(key, handle, handle, global_id, key, type, units);
+    ciHandle->back()->only_update_on_change = only_update_on_change;
+}
+
+void InterfaceInfo::createEndpoint(Core::handle_id_t handle,
+    const std::string &endpointName,
+    const std::string &type)
 {
     endpoints.lock ()->insert (endpointName, handle, global_id, handle, endpointName, type);
 }
@@ -85,7 +105,47 @@ PublicationInfo *InterfaceInfo::getPublication (handle_id_t handle_)
     return publications.lock ()->find (handle_);
 }
 
-const EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName) const
+const ControlOutputInfo *InterfaceInfo::getControlOutput(const std::string &subName) const
+{
+    return controlOutputs.lock_shared()->find(subName);
+}
+
+ControlOutputInfo *InterfaceInfo::getControlOutput(const std::string &subName)
+{
+    return controlOutputs.lock()->find(subName);
+}
+
+const ControlOutputInfo *InterfaceInfo::getControlOutput(Core::handle_id_t handle_) const
+{
+    return controlOutputs.lock_shared()->find(handle_);
+}
+
+ControlOutputInfo *InterfaceInfo::getControlOutput(Core::handle_id_t handle_)
+{
+    return controlOutputs.lock()->find(handle_);
+}
+
+const ControlInputInfo *InterfaceInfo::getNamedInput(const std::string &pubName) const
+{
+    return controlInputs.lock_shared()->find(pubName);
+}
+
+const ControlInputInfo *InterfaceInfo::getNamedInput(Core::handle_id_t handle_) const
+{
+    return controlInputs.lock()->find(handle_);
+}
+
+ControlInputInfo *InterfaceInfo::getNamedInput(const std::string &pubName)
+{
+    return controlInputs.lock()->find(pubName);
+}
+
+ControlInputInfo *InterfaceInfo::getNamedInput(Core::handle_id_t handle_)
+{
+    return controlInputs.lock()->find(handle_);
+}
+
+const EndpointInfo *InterfaceInfo::getEndpoint(const std::string &endpointName) const
 {
     return endpoints.lock_shared ()->find (endpointName);
 }

@@ -29,6 +29,8 @@ enum class identifiers : char
     filter,
     endpoint,
     query,
+    controlInput,
+    controlOutput,
 
 };
 
@@ -100,14 +102,16 @@ using publication_id_t = identifier_id_t<identifier_type, identifiers::publicati
 using subscription_id_t = identifier_id_t<identifier_type, identifiers::subscription, invalid_id_value>;
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
+using control_input_id_t = identifier_id_t<identifier_type, identifiers::controlInput, invalid_id_value>;
+using control_output_id_t = identifier_id_t<identifier_type, identifiers::controlOutput, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** data class for pair of a string and double*/
 class named_point
 {
   public:
-    std::string name;
-    double value;
+    std::string name;  //!< the text value for the named point
+    double value;   //!< the data value for the named point
     named_point () = default;
     named_point (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
     bool operator== (const named_point &opt) const
@@ -116,6 +120,10 @@ class named_point
                                                                     ((value == opt.value) && (name == opt.name));
     }
     bool operator!= (const named_point &opt) const { return !operator== (opt); }
+    bool operator< (const named_point &opt) const
+    {
+        return (name == opt.name) ? (name < opt.name) :(value < opt.value);
+    }
 };
 
 /** template class for generating a known name of a type*/
@@ -258,7 +266,7 @@ std::string helicsVectorString (const double *vals, size_t size);
 @details string will look like cv[1.02+2j,45]*/
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
 /** generate a named point string 
-@details string will look like {<name>:val}
+@details string will look like {"<name>":val}
 */
 std::string helicsNamedPointString (const named_point &point);
 std::string helicsNamedPointString (const std::string &pointName, double val);

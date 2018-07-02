@@ -63,6 +63,33 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
     return handles.back ();
 }
 
+void HandleManager::addHandle(const BasicHandleInfo &otherHandle)
+{
+    auto index = static_cast<int32_t> (handles.size());
+    handles.push_back(otherHandle);
+    addSearchFields(handles.back(), index);
+}
+
+void HandleManager::addHandleAtIndex(const BasicHandleInfo &otherHandle, int32_t index)
+{
+    if (index == static_cast<int32_t>(handles.size()))
+    {
+        addHandle(otherHandle);
+    }
+    else if (isValidIndex(index, handles))
+    {
+        //use placement new to reconstruct new object
+        new(&handles[index]) BasicHandleInfo(otherHandle);
+        addSearchFields(handles[index], index);
+    }
+    else if (index>0)
+    {
+        handles.resize(index + 1);
+        //use placement new to reconstruct new object
+        new(&handles[index]) BasicHandleInfo(otherHandle);
+        addSearchFields(handles[index], index);
+    }
+}
 BasicHandleInfo *HandleManager::getHandleInfo (int32_t index)
 {
     if (isValidIndex (index, handles))
@@ -72,6 +99,17 @@ BasicHandleInfo *HandleManager::getHandleInfo (int32_t index)
 
     return nullptr;
 }
+
+const BasicHandleInfo *HandleManager::getHandleInfo(int32_t index) const
+{
+    if (isValidIndex(index, handles))
+    {
+        return &handles[index];
+    }
+
+    return nullptr;
+}
+
 static uint64_t generateSearchKey (global_federate_id_t fed_id, handle_id_t id)
 {
     auto searchKey = static_cast<uint64_t> (fed_id) << 32;
@@ -100,6 +138,30 @@ BasicHandleInfo *HandleManager::getEndpoint (const std::string &name)
     return nullptr;
 }
 
+const BasicHandleInfo *HandleManager::getEndpoint(const std::string &name) const
+{
+    auto fnd = endpoints.find(name);
+    if (fnd != endpoints.end())
+    {
+        return &handles[fnd->second];
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getEndpoint(int32_t index)
+{
+    if (isValidIndex(index, handles))
+    {
+        auto &hand = handles[index];
+        if (hand.handle_type == handle_type_t::endpoint)
+        {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
 BasicHandleInfo *HandleManager::getPublication (const std::string &name)
 {
     auto fnd = publications.find (name);
@@ -110,7 +172,84 @@ BasicHandleInfo *HandleManager::getPublication (const std::string &name)
     return nullptr;
 }
 
-federate_id_t HandleManager::getLocalFedID (handle_id_t id_) const
+const BasicHandleInfo *HandleManager::getPublication(const std::string &name) const
+{
+    auto fnd = publications.find(name);
+    if (fnd != publications.end())
+    {
+        return &(handles[fnd->second]);
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getPublication(int32_t index)
+{
+    if (isValidIndex(index, handles))
+    {
+        auto &hand=handles[index];
+        if (hand.handle_type == handle_type_t::publication)
+        {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getNamedInput(const std::string &name)
+{
+    auto fnd = controlInputs.find(name);
+    if (fnd != controlInputs.end())
+    {
+        return &(handles[fnd->second]);
+    }
+    return nullptr;
+}
+
+const BasicHandleInfo *HandleManager::getNamedInput(const std::string &name) const
+{
+    auto fnd = controlInputs.find(name);
+    if (fnd != controlInputs.end())
+    {
+        return &(handles[fnd->second]);
+    }
+    return nullptr;
+}
+
+BasicHandleInfo *HandleManager::getFilter(const std::string &name)
+{
+    auto ar = filters.equal_range(name);
+    if (ar.first == ar.second)
+    {
+        return nullptr;
+    }
+    return &(handles[ar.first->second]);
+}
+
+const BasicHandleInfo *HandleManager::getFilter(const std::string &name) const
+{
+    auto ar= filters.equal_range(name);
+    if (ar.first == ar.second)
+    {
+        return nullptr;
+    }
+    return &(handles[ar.first->second]);
+}
+BasicHandleInfo *HandleManager::getFilter(int32_t index)
+{
+    if (isValidIndex(index, handles))
+    {
+        auto &hand = handles[index];
+        if ((hand.handle_type == handle_type_t::source_filter)||(hand.handle_type==handle_type_t::destination_filter))
+        {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
+int32_t HandleManager::getLocalFedID (handle_id_t id_) const
 {
     // only activate the lock if we not in an operating state
     return (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles)) ? handles[id_].local_fed_id : federate_id_t();

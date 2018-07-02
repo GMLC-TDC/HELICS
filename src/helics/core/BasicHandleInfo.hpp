@@ -16,6 +16,7 @@ enum class handle_type_t : char
     unknown,
     publication,  //!< handle to publish interface
     subscription,  //!< handle to a subscribe interface
+    control_input, //!< handle for a control input
     endpoint,  //!< handle to an endpoint
     source_filter,  //!< handle to a source filter
     destination_filter,  //!< handle to a destination filter
@@ -66,13 +67,13 @@ class BasicHandleInfo
     const handle_id_t handle;  //!< the identification number for the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
-    bool used = false;  //!< indicator that the publication or filter is used
+    bool used = false;  //!< indicator that the handle is being used to link with another federate
     uint16_t flags = 0; //!< flags corresponding to the flags used in ActionMessages +some extra ones
 
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    const std::string target;  //!< the target of the handle mapped onto units since they will not be used together
+    const std::string target;  //!< the target of the handle 
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 };

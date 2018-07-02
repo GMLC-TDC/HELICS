@@ -1016,7 +1016,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
     }
     break;
-    case CMD_NOTIFY_PUB:
+    case CMD_SET_PUBLISHER:
     {
         auto subI = interfaceInformation.getSubscription (handle_id_t(cmd.dest_handle));
         if (subI != nullptr)
@@ -1028,7 +1028,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     }
     break;
     case CMD_REG_SUB:
-    case CMD_NOTIFY_SUB:
+    case CMD_ADD_SUBSCRIBER:
     {
         auto pubI = interfaceInformation.getPublication (handle_id_t(cmd.dest_handle));
         if (pubI != nullptr)

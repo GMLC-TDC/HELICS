@@ -26,6 +26,8 @@ class HandlePointerManager
     std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
     std::unordered_multimap<std::string, handle_id_t> subscriptions;  //!< multimap of subscriptions
     std::unordered_multimap<std::string, handle_id_t> filters;  //!< multimap for all the filters
+    std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
+    std::unordered_multimap<std::string, Core::handle_id_t> controlOutputs;  //!< multimap for all the control outputs
   public:
     /** default constructor*/
     HandlePointerManager () = default;

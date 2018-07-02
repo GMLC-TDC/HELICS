@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -12,7 +11,7 @@ namespace helics
 {
 std::shared_ptr<const data_block> SubscriptionInfo::getData () { return current_data.data; }
 
-auto recordComparison = [](const SubscriptionInfo::dataRecord &rec1, const SubscriptionInfo::dataRecord &rec2) {
+static auto recordComparison = [](const SubscriptionInfo::dataRecord &rec1, const SubscriptionInfo::dataRecord &rec2) {
     return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.index < rec2.index) : false);
 };
 
