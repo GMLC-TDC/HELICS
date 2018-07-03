@@ -94,6 +94,13 @@ def test_message_filter_registration(broker):
     f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "port2", "filter2")
     ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter,  "filter0/fout", "")
+    status=h.helicsFederateEnterExecutionModeAsync(fFed)
+    assert status == 0
+    status=h.helicsFederateEnterExecutionMode(mFed)
+    assert status == 0
+    status=h.helicsFederateEnterExecutionModeComplete(fFed)
+    assert status == 0
+
     status, filter_name = h.helicsFilterGetName(f1)
     assert status == 0
     assert filter_name == "filter1"
