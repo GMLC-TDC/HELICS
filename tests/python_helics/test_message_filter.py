@@ -107,11 +107,11 @@ def test_message_filter_registration(broker):
 
     status, filter_name = h.helicsFilterGetName(f2)
     assert status == 0
-    assert endpoint_name == "filter2"
+    assert filter_name == "filter2"
 
     status, filter_target = h.helicsFilterGetTarget(f2)
     assert status == 0
-    assert endpoint_name == "port2"
+    assert filter_target == "port2"
 
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
