@@ -3010,7 +3010,9 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
                     if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                     {  // make sure we only do this once
                         checkDependencies ();
+                        cmd.setAction(CMD_INIT);
                         cmd.source_id = global_broker_id;
+                        cmd.dest_id = 0;
                         transmit (0, cmd);
                     }
                 }
