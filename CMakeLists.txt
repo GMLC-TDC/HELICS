@@ -74,8 +74,8 @@ else()
 endif()
 
 cmake_dependent_option(BUILD_C_SHARED_LIB "Build the Shared Libraries with a C interface" ON "NOT INTERFACE_BUILD" ON)
-cmake_dependent_option(DISABLE_SWIG "disable the use of the swigh executable to generate interface code and use repository code instead" OFF "INTERFACE_BUILD" OFF)
-	option(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+option(DISABLE_SWIG "disable the use of the swig executable to generate interface code and use repository code instead" OFF)
+option(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
 
 
 if (INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
