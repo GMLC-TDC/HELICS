@@ -90,6 +90,28 @@ helicsBrokerFree(fedStruct.broker);
 helicsCloseLibrary();
 
 end
+function testEndpointInitialize(testCase)
+import matlab.unittest.constraints.IsTrue;
+import helics.*
+[feds,success]=generateFed();
+testCase.verifyThat(success,IsTrue);
+try
+epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
+testCase.verifyNotEqual(epid1,0);
+status=helicsFederateEnterExecutionMode(feds.mFed);
+testCase.verifyEqual(status,helics.helics_ok);
+[status,state]=helicsFederateGetState(feds.mFed);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(state,helics.helics_execution_state);
+success=closeStruct(feds);
+testCase.verifyThat(success,IsTrue);
+catch e
+    testCase.verifyThat(false,IsTrue);
+   disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
+end
 
 function testEndpointRegistration(testCase)
 import matlab.unittest.constraints.IsTrue;
@@ -120,7 +142,8 @@ testCase.verifyThat(isempty(ept_type),IsTrue);
 [status, ept_type] = helicsEndpointGetType(epid2);
 testCase.verifyEqual(status,helics.helics_ok);
 testCase.verifyEqual(ept_type,'random');
-
+success=closeStruct(feds);
+testCase.verifyThat(success,IsTrue);
 catch e
     testCase.verifyThat(false,IsTrue);
    disp(e.message)

@@ -71,19 +71,19 @@ def test_message_federate_endpoint_registration(mFed):
 
     h.helicsFederateEnterExecutionMode(mFed)
 
-    status, endpoint_name = h.helicsEndpointGetName(epid1, 100)
+    status, endpoint_name = h.helicsEndpointGetName(epid1)
     assert status == 0
     assert endpoint_name == "TestA Federate/ep1"
 
-    status, endpoint_name = h.helicsEndpointGetName(epid2, 100)
+    status, endpoint_name = h.helicsEndpointGetName(epid2)
     assert status == 0
     assert endpoint_name == "ep2"
 
-    status, endpoint_name = h.helicsEndpointGetType(epid1, 100)
+    status, endpoint_name = h.helicsEndpointGetType(epid1)
     assert status == 0
     assert endpoint_name == ""
 
-    status, endpoint_name = h.helicsEndpointGetType(epid2, 100)
+    status, endpoint_name = h.helicsEndpointGetType(epid2)
     assert status == 0
     assert endpoint_name == "random"
 
