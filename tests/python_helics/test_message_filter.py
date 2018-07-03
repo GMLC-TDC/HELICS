@@ -90,10 +90,21 @@ def test_message_filter_registration(broker):
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", None)
 
-    f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "filter1", "port1")
-    f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "filter2", "port2")
+    f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "port1", "filter1")
+    f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "port2", "filter2")
     ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
+    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter,  "filter0/fout", "")
+    status, filter_name = h.helicsFilterGetName(f1)
+    assert status == 0
+    assert filter_name == "filter1"
+
+    status, filter_name = h.helicsFilterGetName(f2)
+    assert status == 0
+    assert endpoint_name == "filter2"
+
+    status, filter_target = h.helicsFilterGetTarget(f2)
+    assert status == 0
+    assert endpoint_name == "port2"
 
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
@@ -124,14 +135,19 @@ def test_message_filter_function(broker):
     assert state == 2
     data = "hello world"
     h.helicsEndpointSendMessageRaw(p1, "port2", data)
-    grantedtime = h.helicsFederateRequestTimeAsync (mFed, 1.0)
-    assert grantedtime == 0
+    status = h.helicsFederateRequestTimeAsync (mFed, 1.0)
+    assert status == h.helics_ok
     status, grantedtime = h.helicsFederateRequestTime(fFed, 1.0)
     assert status == 0
     assert grantedtime == 1.0
     status, grantedtime = h.helicsFederateRequestTimeComplete (mFed)
     assert status == 0
     assert grantedtime == 1.0
+    res=h.helicsFederateHasMessage(mFed)
+    assert res==0
+    status, grantedtime = h.helicsFederateRequestTime(fFed, 3.0)	
+    res=h.helicsendpointHasMessage(p2)
+    assert res==h.helics_true	
 
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
