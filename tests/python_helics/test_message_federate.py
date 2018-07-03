@@ -88,7 +88,7 @@ def test_message_federate_endpoint_registration(mFed):
     assert endpoint_name == "random"
 
 
-def test_message_federate_endpoint_registration(mFed):
+def test_message_federate_send(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
     epid2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "ep2", "random")
 

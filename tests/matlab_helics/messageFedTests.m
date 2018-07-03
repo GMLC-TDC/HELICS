@@ -101,6 +101,44 @@ epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
 
 epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
 
+
+status=helicsFederateEnterExecutionMode(feds.mFed);
+testCase.verifyEqual(status,helics.helics_ok);
+
+[status, ept_key] = helicsEndpointGetName(epid1);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(ept_key,'fed1/ep1');
+
+[status, ept_key] = helicsEndpointGetName(epid2);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(ept_key,'ep2');
+
+[status, ept_type] = helicsEndpointGetType(epid1);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyThat(isempty(ept_type),IsTrue);
+
+[status, ept_type] = helicsEndpointGetType(epid2);
+testCase.verifyEqual(status,helics.helics_ok);
+testCase.verifyEqual(ept_type,'random');
+
+catch e
+    testCase.verifyThat(false,IsTrue);
+   disp(e.message)
+    disp(e.stack(1))
+    forceCloseStruct(feds);
+end
+end
+
+function testEndpointSend(testCase)
+import matlab.unittest.constraints.IsTrue;
+import helics.*
+[feds,success]=generateFed();
+testCase.verifyThat(success,IsTrue);
+try
+epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
+
+epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
+
 helicsFederateSetTimeDelta(feds.mFed,1.0);
 status=helicsFederateEnterExecutionMode(feds.mFed);
 testCase.verifyEqual(status,helics.helics_ok);
@@ -109,9 +147,7 @@ data = 'this is a random string message';
 status=helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
 testCase.verifyEqual(status,helics.helics_ok);
 
-[status, ept_key] = helicsEndpointGetName(epid2);
-testCase.verifyEqual(status,helics.helics_ok);
-testCase.verifyEqual(ept_key,'ep2');
+
 
 [status,granted_time]=helicsFederateRequestTime(feds.mFed,2.0);
 testCase.verifyEqual(status,helics.helics_ok);
