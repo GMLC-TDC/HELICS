@@ -1,5 +1,11 @@
 disp('Loading HELICS ...')
-directory = fileparts(mfilename('fullpath'));
+if (exists('helicsLibPath','var')==1)
+    directory=helicsLibPath;
+else
+    directory = fileparts(mfilename('fullpath'));
+end
+
+
 listing = dir(fullfile(directory, '*helicsSharedLib.*'));
 
 libraryName = '';
