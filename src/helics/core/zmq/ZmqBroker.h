@@ -1,11 +1,8 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef ZMQ_BROKER_H_
-#define ZMQ_BROKER_H_
 #pragma once
 
 #include "../CoreBroker.hpp"
@@ -37,5 +34,4 @@ private:
 
 } // namespace zeromq
 } // namespace helics
-#endif
 

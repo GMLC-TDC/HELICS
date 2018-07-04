@@ -253,9 +253,9 @@ void ZmqComms::queue_rx_function ()
     {
         controlSocket.bind (controlsockString.c_str ());
     }
-    catch (const zmq::error_t &)
+    catch (const zmq::error_t &e)
     {
-        std::cerr << "binding error on internal comms socket" << std::endl;
+        std::cerr << "binding error on internal comms socket:" << e.what()<<std::endl;
         rx_status = connection_status::error;
         return;
     }
@@ -419,6 +419,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         {
             brokerReqPort = DEFAULT_BROKER_REP_PORT_NUMBER;
         }
+
         zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
         brokerReq.setsockopt (ZMQ_LINGER, 50);
         try
@@ -611,12 +612,20 @@ void ZmqComms::queue_tx_function ()
     controlSocket.setsockopt (ZMQ_LINGER, 200);
     std::string controlsockString = std::string ("inproc://") + name + "_control";
     controlSocket.connect (controlsockString);
-    auto res = initializeBrokerConnections (controlSocket);
-    if (res < 0)
+    try
     {
-        controlSocket.close ();
-        return;
+        auto res = initializeBrokerConnections(controlSocket);
+        if (res < 0)
+        {
+            controlSocket.close();
+            return;
+        }
     }
+    catch (const zmq::error_t &e)
+    {
+        controlSocket.close();
+        return;
+   }
 
     zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
     brokerPushSocket.setsockopt (ZMQ_LINGER, 200);

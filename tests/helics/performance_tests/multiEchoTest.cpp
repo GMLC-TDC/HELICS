@@ -6,10 +6,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/BrokerFactory.hpp"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -17,7 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 using helics::operator"" _t;
 helics::Time tend = 3600.0_t;  // simulation end time
-
+namespace bdata = boost::unit_test::data;
 
 
 /** class implementing a single heat transfer block*/
@@ -146,27 +149,28 @@ public:
 
 BOOST_AUTO_TEST_SUITE(echo_tests)
 
-#define FED_COUNT 5000
+//const int fedCount[] = { 1,5,10,20,40,80,160,320,500,1000,2000 };
+const int fedCount[] = { 1,1,2,2,4,4,6,6,8,8,10,10,12,12 };
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
-BOOST_AUTO_TEST_CASE(echo_test)
+BOOST_DATA_TEST_CASE(echo_test_single_core,bdata::make(fedCount),feds)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate(CORE_TYPE_TO_TEST, "mcore", std::to_string(FED_COUNT+1));
+    auto wcore = helics::CoreFactory::FindOrCreate(CORE_TYPE_TO_TEST, "mcore", std::to_string(feds+1));
     //this is to delay until the threads are ready
     wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
     EchoHub hub;
-    hub.initialize("mcore",FED_COUNT);
-    std::vector<EchoLeaf> leafs(FED_COUNT);
-    for (int ii = 0; ii < FED_COUNT; ++ii)
+    hub.initialize("mcore",feds);
+    std::vector<EchoLeaf> leafs(feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
         leafs[ii].initialize("mcore",ii);
     }
 
-    std::vector<std::thread> threads(FED_COUNT + 1);
-    for (int ii = 0; ii < FED_COUNT; ++ii)
+    std::vector<std::thread> threads(feds + 1);
+    for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread([](EchoLeaf &leaf) { leaf.run(); }, std::ref(leafs[ii]));
     }
-    threads[FED_COUNT] = std::thread([&]() { hub.run(); });
+    threads[feds] = std::thread([&]() { hub.run(); });
     std::this_thread::yield();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -177,7 +181,51 @@ BOOST_AUTO_TEST_CASE(echo_test)
     }
     auto stopTime = std::chrono::high_resolution_clock::now();
     auto diff = stopTime - startTime;
-    std::cout << "total time=" << diff.count()/1000000 << "ms \n";
+    std::cout << feds <<" feds total time=" << diff.count()/1000000 << "ms \n";
+}
+
+
+const int fedCountB[] = {1,1,2,2,4,4,6,6,8,8,10,10,12,12};
+
+BOOST_DATA_TEST_CASE(echo_test_multicores, bdata::make(fedCountB), feds)
+{
+    auto cType = helics::core_type::IPC;
+    auto broker = helics::BrokerFactory::create(cType,"brokerb", std::to_string(feds+1));
+    auto wcore = helics::CoreFactory::FindOrCreate(cType, "mcore", "1 --broker=brokerb");
+    //this is to delay until the threads are ready
+    wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
+    EchoHub hub;
+    hub.initialize("mcore", feds);
+    std::vector<EchoLeaf> leafs(feds);
+    std::vector<std::shared_ptr<helics::Core>> cores(feds);
+    for (int ii = 0; ii < feds; ++ii)
+    {
+        cores[ii] = helics::CoreFactory::create(cType, "1 --broker=brokerb");
+        cores[ii]->connect();
+        leafs[ii].initialize(cores[ii]->getIdentifier(), ii);
+    }
+
+    std::vector<std::thread> threads(feds + 1);
+    for (int ii = 0; ii < feds; ++ii)
+    {
+        threads[ii] = std::thread([](EchoLeaf &leaf) { leaf.run(); }, std::ref(leafs[ii]));
+    }
+    threads[feds] = std::thread([&]() { hub.run(); });
+    std::this_thread::yield();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    auto startTime = std::chrono::high_resolution_clock::now();
+    wcore->setFlag(helics::invalid_fed_id, ENABLE_INIT_ENTRY);
+    for (auto &thrd : threads)
+    {
+        thrd.join();
+    }
+    auto stopTime = std::chrono::high_resolution_clock::now();
+    auto diff = stopTime - startTime;
+    std::cout << feds << " feds total time=" << diff.count() / 1000000 << "ms \n";
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    broker->disconnect();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
