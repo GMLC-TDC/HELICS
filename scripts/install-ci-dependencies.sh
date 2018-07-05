@@ -156,30 +156,29 @@ elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$os_name" == "Darwin" ]]; then
+if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     brew update
     brew install python3
     echo "brew upgrade python"
     brew upgrade python
     pip3 install pytest
-fi
+else
+    if hash pyenv; then
+        pyenv versions
+        # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
+        last_pyversion=$(pyenv versions | tail -1)
 
-if hash pyenv; then
-    pyenv versions
+        # This bash line strips the bit at the end saying where the version was set
+        # The result is then piped to sed to remove any leading asterisk (though setting the version is redundant in that case)
+        pyenv global $(echo ${last_pyversion%(*)} | sed 's/\*//')
+    fi
 
-    # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
-    last_pyversion=$(pyenv versions | tail -1)
-
-    # This bash line strips the bit at the end saying where the version was set
-    # The result is then piped to sed to remove any leading asterisk (though setting the version is redundant in that case)
-    pyenv global $(echo ${last_pyversion%(*)} | sed 's/\*//')
+    python3 -m pip install --user --upgrade pip wheel
+    python3 -m pip install --user --upgrade pytest
 fi
 
 pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
 pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
-
-python3 -m pip install --user --upgrade pip wheel
-python3 -m pip install --user --upgrade pytest
 
 export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver_short}m.${shared_lib_ext}
 export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver_short}m/
