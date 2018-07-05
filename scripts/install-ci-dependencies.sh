@@ -164,9 +164,7 @@ if [[ "$os_name" == "Darwin" ]]; then
     pip3 install pytest
 fi
 
-pyenv
-echo $(command -v pyenv)
-if [[ -x "$(command -v pyenv)" ]]; then
+if hash pyenv; then
     pyenv versions
 
     # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
