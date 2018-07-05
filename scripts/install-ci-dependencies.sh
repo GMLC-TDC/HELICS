@@ -167,6 +167,8 @@ fi
 pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
 pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
 
+pyenv versions
+
 pyenv global ${pyver}
 python3 -m pip install --user --upgrade pip wheel
 python3 -m pip install --user --upgrade pytest
