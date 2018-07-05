@@ -164,9 +164,17 @@ if [[ "$os_name" == "Darwin" ]]; then
     pip3 install pytest
 fi
 
-pyenv versions
-pyenv versions | tail -1
-pyenv global $(pyenv versions | tail -1)
+if [[ -x "$(command -v pyenv)" ]]; then
+    pyenv versions
+
+    # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
+    last_pyversion=$(pyenv versions | tail -1)
+
+    # This bash line strips the bit at the end saying where the version was set
+    # The result is then piped to sed to remove any leading asterisk (though setting the version is redundant in that case)
+    pyenv global $(echo ${last_pyversion%(*)} | sed 's/\*//')
+fi
+
 pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
 pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
 
