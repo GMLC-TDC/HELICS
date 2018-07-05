@@ -164,6 +164,8 @@ if [[ "$os_name" == "Darwin" ]]; then
     pip3 install pytest
 fi
 
+pyenv
+echo $(command -v pyenv)
 if [[ -x "$(command -v pyenv)" ]]; then
     pyenv versions
 
