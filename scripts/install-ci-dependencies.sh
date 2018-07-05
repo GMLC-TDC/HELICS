@@ -9,7 +9,7 @@ if [[ "$TRAVIS" == "true" ]]; then
     fi
 
     export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
-    
+
     WAIT_COMMAND=travis_wait
 
     # Convert commit message to lower case
@@ -24,6 +24,11 @@ else
     export CI_DEPENDENCY_DIR=$1
     commit_msg=""
     os_name="$(uname -s)"
+fi
+
+shared_lib_ext=so
+if [[ "$os_name" == "Darwin" ]]; then
+    shared_lib_ext=dylib
 fi
 
 boost_version=$CI_BOOST_VERSION
@@ -152,14 +157,22 @@ elif [[ "$os_name" == "Darwin" ]]; then
 fi
 
 if [[ "$os_name" == "Darwin" ]]; then
-    # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
     brew update
     brew install python3
+    echo "brew upgrade python"
     brew upgrade python
     pip3 install pytest
-else
-    pyenv global 3.6.3
-    python3 -m pip install --user --upgrade pip wheel
-    python3 -m pip install --user --upgrade pytest
 fi
 
+pyversion_str=$(python3 --version)
+pyver=${pyversion_str[1]}
+pyenv global ${pyver}
+python3 -m pip install --user --upgrade pip wheel
+python3 -m pip install --user --upgrade pytest
+
+local -a pyver_arr
+IFS='. ' read -r -a pyver_arr <<< $pyver
+pyver_short="${pyver_arr[0]}.${pyver_arr[1]}"
+
+export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver_short}m.${shared_lib_ext}
+export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver_short}m/
