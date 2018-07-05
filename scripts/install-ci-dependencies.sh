@@ -164,12 +164,12 @@ if [[ "$os_name" == "Darwin" ]]; then
     pip3 install pytest
 fi
 
+pyenv versions
+pyenv versions | tail -1
+pyenv global $(pyenv versions | tail -1)
 pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
 pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
 
-pyenv versions
-
-pyenv global ${pyver}
 python3 -m pip install --user --upgrade pip wheel
 python3 -m pip install --user --upgrade pytest
 
