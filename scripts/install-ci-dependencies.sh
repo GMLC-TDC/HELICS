@@ -164,15 +164,12 @@ if [[ "$os_name" == "Darwin" ]]; then
     pip3 install pytest
 fi
 
-pyversion_str=$(python3 --version)
-pyver=${pyversion_str[1]}
+pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
+pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
+
 pyenv global ${pyver}
 python3 -m pip install --user --upgrade pip wheel
 python3 -m pip install --user --upgrade pytest
-
-local -a pyver_arr
-IFS='. ' read -r -a pyver_arr <<< $pyver
-pyver_short="${pyver_arr[0]}.${pyver_arr[1]}"
 
 export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver_short}m.${shared_lib_ext}
 export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver_short}m/
