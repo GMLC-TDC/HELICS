@@ -164,21 +164,25 @@ if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     pip3 install pytest
 else
     if hash pyenv; then
-        pyenv versions
+        if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
+            pyenv versions
+        fi
+
         # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
         last_pyversion=$(pyenv versions | tail -1)
+        # Remove a leading asterisk if present (though setting the version is redundant, since that is the one that is already active)
+        last_pyversion=${last_pyversion/#\*/}
+        # Remove a trailing set of parenthesis saying where the version was set
+        last_pyversion=${last_pyversion%(*)}
 
-        # This bash line strips the bit at the end saying where the version was set
-        # The result is then piped to sed to remove any leading asterisk (though setting the version is redundant in that case)
-        pyenv global $(echo ${last_pyversion%(*)} | sed 's/\*//')
+        pyenv global ${last_pyversion}
     fi
 
     python3 -m pip install --user --upgrade pip wheel
     python3 -m pip install --user --upgrade pytest
 fi
 
-pyver=$(python3 -c 'import sys; ver=sys.version_info[:3]; print(".".join(map(str,ver)))')
-pyver_short=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
+pyver=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
 
-export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver_short}m.${shared_lib_ext}
-export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver_short}m/
+export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver}m.${shared_lib_ext}
+export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver}m/
