@@ -86,6 +86,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
+    dependencies.resetDependentEvents(time_granted);
     updateTimeFactors ();
 
     if (!dependents.empty ())

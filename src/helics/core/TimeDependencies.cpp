@@ -283,4 +283,13 @@ void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
     }
 }
 
+void TimeDependencies::resetDependentEvents(helics::Time grantTime)
+{
+    for (auto &dep : dependencies)
+    {
+        dep.Te = (std::max)(dep.Tnext, grantTime);
+        dep.Tdemin = dep.Te;
+    }
+}
+
 }  // namespace helics

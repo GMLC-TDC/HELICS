@@ -920,7 +920,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         FALLTHROUGH
         /* FALLTHROUGH */
     case CMD_TIME_GRANT:
-        switch (timeCoord->processTimeMessage (cmd))
+         switch (timeCoord->processTimeMessage (cmd))
         {
         case message_process_result::delay_processing:
             addFederateToDelay (cmd.source_id);
