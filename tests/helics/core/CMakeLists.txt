@@ -51,15 +51,11 @@ target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
-set_property(TEST core-tests PROPERTY LABELS Core)
+set_property(TEST core-tests PROPERTY LABELS Core Daily)
 
-# Tests for Continuous, Daily, and Release builds
+# Tests for Continuous Integration builds
 add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=message --report_level=short)
-add_test(NAME core-daily-tests COMMAND core-tests --run_test=@daily --log_level=message --report_level=short)
-add_test(NAME core-release-tests COMMAND core-tests --run_test=@release --log_level=message --report_level=short)
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
-set_property(TEST core-daily-tests PROPERTY LABELS Daily)
-set_property(TEST core-release-tests PROPERTY LABELS Release)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 	add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests

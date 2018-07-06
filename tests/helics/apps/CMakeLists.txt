@@ -31,13 +31,11 @@ target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURREN
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
 
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
-set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps)
+set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Daily)
 
-# Tests for Continous, Daily, and Release builds
+# Tests for Continous Integration builds
 add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --run_test=@ci --report_level=short)
-add_test(NAME helics_apps-daily-tests COMMAND helics_apps-tests --report_level=short)
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
-set_property(TEST helics_apps-daily-tests PROPERTY LABELS Daily)
 
 if(WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
