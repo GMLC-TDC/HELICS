@@ -45,10 +45,10 @@ def mFed():
     yield mFed
 
     status = h.helicsFederateFinalize(mFed)
-
+    assert status == h.helics_ok
     status, state = h.helicsFederateGetState(mFed)
     assert state == 3
-
+    assert status == h.helics_ok
     while (h.helicsBrokerIsConnected(broker)):
         time.sleep(1)
 
@@ -59,7 +59,7 @@ def mFed():
 def test_message_federate_initialize(mFed):
     status, state = h.helicsFederateGetState(mFed)
     assert state == 0
-
+    assert status == 0
     h.helicsFederateEnterExecutionMode(mFed)
 
     status, state = h.helicsFederateGetState(mFed)

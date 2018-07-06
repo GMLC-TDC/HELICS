@@ -6,7 +6,6 @@ import helics as h
 def AddBroker(core_type="zmq", number_of_federates=1):
 
     initstring = "{} --name=mainbroker".format(number_of_federates)
-    deltat = 0.01
 
     helicsversion = h.helicsGetVersion()
     print("HELICS version = {}".format(helicsversion))
@@ -57,7 +56,7 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
 
 def FreeFederate(fed):
     status = h.helicsFederateFinalize(fed)
-
+    assert status == 0
     status, state = h.helicsFederateGetState(fed)
     assert state == 3
 
@@ -92,7 +91,7 @@ def test_message_filter_registration(broker):
 
     f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "port1", "filter1")
     f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "port2", "filter2")
-    ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
+    h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter,  "filter0/fout", "")
     status=h.helicsFederateEnterExecutionModeAsync(fFed)
     assert status == 0
@@ -151,6 +150,8 @@ def test_message_filter_function(broker):
     assert status == 0
     assert grantedtime == 1.0
     res=h.helicsFederateHasMessage(mFed)
+    assert res==0
+    res=h.helicsEndpointHasMessage(p2)
     assert res==0
     #status, grantedtime = h.helicsFederateRequestTime(fFed, 3.0)
     #res=h.helicsendpointHasMessage(p2)
