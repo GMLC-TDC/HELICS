@@ -9,7 +9,7 @@ if [[ "$TRAVIS" == "true" ]]; then
     fi
 
     export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
-    
+
     WAIT_COMMAND=travis_wait
 
     # Convert commit message to lower case
@@ -24,6 +24,11 @@ else
     export CI_DEPENDENCY_DIR=$1
     commit_msg=""
     os_name="$(uname -s)"
+fi
+
+shared_lib_ext=so
+if [[ "$os_name" == "Darwin" ]]; then
+    shared_lib_ext=dylib
 fi
 
 boost_version=$CI_BOOST_VERSION
@@ -151,15 +156,33 @@ elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
 fi
 
-if [[ "$os_name" == "Darwin" ]]; then
-    # HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
+if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     brew update
     brew install python3
+    echo "brew upgrade python"
     brew upgrade python
     pip3 install pytest
 else
-    pyenv global 3.6.3
+    if hash pyenv; then
+        if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
+            pyenv versions
+        fi
+
+        # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
+        last_pyversion=$(pyenv versions | tail -1)
+        # Remove a leading asterisk if present (though setting the version is redundant, since that is the one that is already active)
+        last_pyversion=${last_pyversion/#\*/}
+        # Remove a trailing set of parenthesis saying where the version was set
+        last_pyversion=${last_pyversion%(*)}
+
+        pyenv global ${last_pyversion}
+    fi
+
     python3 -m pip install --user --upgrade pip wheel
     python3 -m pip install --user --upgrade pytest
 fi
 
+pyver=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
+
+export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver}m.${shared_lib_ext}
+export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver}m/
