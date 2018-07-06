@@ -51,7 +51,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
         - HOMEBREW_NO_AUTO_UPDATE=1
-        - SHARED_LIB_EXT=dylib
         - CI_BOOST_VERSION=1.58.0
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
@@ -59,7 +58,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
         - HOMEBREW_NO_AUTO_UPDATE=1
-        - SHARED_LIB_EXT=dylib
       osx_image: xcode7.3
 
     # Built without errors on my clone from one of the changes made
@@ -77,7 +75,6 @@ jobs:
             - g++-6
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - SHARED_LIB_EXT=so
         - USE_SWIG=true
         - USE_MPI=mpich
 
@@ -90,7 +87,6 @@ jobs:
             - g++-4.9
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
-        - SHARED_LIB_EXT=so
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
 
@@ -106,7 +102,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
-        - SHARED_LIB_EXT=so
         - USE_SWIG=true
 
    # ------------------------------------------------
@@ -115,13 +110,11 @@ jobs:
     - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - SHARED_LIB_EXT=so
         - USE_SWIG=true
         - RUN_VALGRIND=true
     - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - SHARED_LIB_EXT=so
         - USE_SWIG=true
         - RUN_COVERAGE=true
     - <<: *daily_linux
@@ -133,7 +126,6 @@ jobs:
             - g++-5
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
-        - SHARED_LIB_EXT=so
     - <<: *daily_linux
       compiler: clang
       addons:
@@ -147,7 +139,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
-        - SHARED_LIB_EXT=so
         - USE_SWIG=true
         - CXX_STANDARD=17
     # XCode 8gm, OS X 10.11
@@ -155,7 +146,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
-        - SHARED_LIB_EXT=dylib
       osx_image: xcode8
 
 branches:
@@ -169,6 +159,11 @@ before_install:
 install:
   - export HELICS_DEPENDENCY_FLAGS=""
   - export HELICS_OPTION_FLAGS="${OPTION_FLAGS}"
+
+script:
+  - mkdir build && cd build
+  - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+  - HELICS_OPTION_FLAGS+="-DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=${PYTHON_LIB_PATH} -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}"
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
   - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
   - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
