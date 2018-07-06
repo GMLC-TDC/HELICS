@@ -1,0 +1,4 @@
+addPath('${CMAKE_BINARY_DIR}/swig/matlab')
+runtests('valueFedTests.m')
+runtests('messageFedTests.m')
+runtests('messageFilterTests.m')

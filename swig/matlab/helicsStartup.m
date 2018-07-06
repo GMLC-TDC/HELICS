@@ -1,19 +1,43 @@
-display('Loading HELICS ...')
-directory = split(mfilename('fullpath'), '/');
-directory = strjoin({directory{1:end-1}}, '/');
+disp('Loading HELICS ...')
+if (exists('helicsLibPath','var')==1)
+    directory=helicsLibPath;
+else
+    directory = fileparts(mfilename('fullpath'));
+end
 
-listing = dir([directory, '/', '*helicsSharedLib.*']);
 
-libraryname = '';
+listing = dir(fullfile(directory, '*helicsSharedLib.*'));
+
+libraryName = '';
 
 for i=1:numel(listing)
-    if ( endsWith(listing(i).name, '.h') == 0 )
-        libraryname = listing(i).name;
+    if ( endsWith(listing(i).name, '.h') == 1 )
+        continue;
     end
+    if ( endsWith(listing(i).name, '.lib') == 1 )
+        continue;
+    end
+    librarynName = listing(i).name;
 end
 
-if length(libraryname) == 0
-    display('Unable to find library for helics')
+if isempty(librarynName)
+    %if we are empty try for a debug version
+    listing = dir(fullfile(directory, '*helicsSharedLibd.*'));
+    
+    for i=1:numel(listing)
+        if ( endsWith(listing(i).name, '.h') == 1 )
+            continue;
+        end
+        if ( endsWith(listing(i).name, '.lib') == 1 )
+            continue;
+        end
+        librarynName = listing(i).name;
+    end
+    
 end
 
-loadlibrary(GetFullPath([directory, '/', libraryname]));
+if (~isempty(libraryName))
+    loadlibrary(GetFullPath(fullfile(directory, librarynName)));
+else
+    disp('Unable to find library for helics')
+end
