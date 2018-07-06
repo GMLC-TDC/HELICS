@@ -8,7 +8,7 @@ def mFed():
     fedinitstring = "--broker=mainbroker --federates=1"
     deltat = 0.01
 
-    helicsversion = h.helicsGetVersion()
+    h.helicsGetVersion()
 
     # Create broker #
     broker = h.helicsCreateBroker("zmq", "", initstring)
@@ -22,13 +22,13 @@ def mFed():
     fedinfo = h.helicsFederateInfoCreate()
 
     # Set Federate name #
-    status = h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
 
     # Set core type from string #
-    status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 
     # Federate init string #
-    status = h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+    h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
 
     # Set the message interval (timedelta) for federate. Note th#
     # HELICS minimum message time interval is 1 ns and by default
@@ -36,9 +36,9 @@ def mFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    status = h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
 
-    status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
     mFed = h.helicsCreateMessageFederate(fedinfo)
 
@@ -107,10 +107,9 @@ def test_message_federate_send(mFed):
     assert res == 1
 
     res = h.helicsEndpointHasMessage(epid1)
-   
     assert res == 0
 
-    res = h.helicsEndpointHasMessage (epid2)
+    res = h.helicsEndpointHasMessage(epid2)
     assert res == 1
 
     message = h.helicsEndpointGetMessage(epid2)

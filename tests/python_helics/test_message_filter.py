@@ -93,7 +93,7 @@ def test_message_filter_registration(broker):
     f1 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "port1", "filter1")
     f2 = h.helicsFederateRegisterDestinationFilter (fFed, h.helics_custom_filter, "port2", "filter2")
     ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter,  "filter0/fout", "")
+    h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter,  "filter0/fout", "")
     status=h.helicsFederateEnterExecutionModeAsync(fFed)
     assert status == 0
     status=h.helicsFederateEnterExecutionMode(mFed)
@@ -152,9 +152,9 @@ def test_message_filter_function(broker):
     assert grantedtime == 1.0
     res=h.helicsFederateHasMessage(mFed)
     assert res==0
-    #status, grantedtime = h.helicsFederateRequestTime(fFed, 3.0)	
+    #status, grantedtime = h.helicsFederateRequestTime(fFed, 3.0)
     #res=h.helicsendpointHasMessage(p2)
-    #assert res==h.helics_true	
+    #assert res==h.helics_true
 
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
