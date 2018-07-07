@@ -13,7 +13,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Subscription.hpp"
 
 #include <sstream>
-#include <cinttypes>
 
 namespace helics
 {
@@ -76,7 +75,7 @@ private:
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        printf("got pub as %" PRIx64 "\n", (uint64_t)(pub));
+        printf("got pub as %x\n", (unsigned int)(pub));
         pubs.push_back(pub);
         printf("pushed back pub\n");
         return Publication(pub);
