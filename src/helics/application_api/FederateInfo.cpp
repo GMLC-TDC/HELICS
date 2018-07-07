@@ -58,13 +58,12 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         coreName = vm["corename"].as<std::string> ();
     }
-    std::string coretypename;
     if (vm.count ("core") > 0)
     {
-        coretypename = vm["core"].as<std::string> ();
+        coreType = helics::coreTypeFromString(vm["core"].as<std::string>());
     }
 
-    coreType = helics::coreTypeFromString (coretypename);
+    
 
     coreInitString = "1";
     if (vm.count ("coreinit") > 0)

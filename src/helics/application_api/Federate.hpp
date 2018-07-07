@@ -20,8 +20,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace libguarded
 {
-    template<class T, class M>
-    class shared_guarded;
+template <class T, class M>
+class shared_guarded;
 }
 
 /**
@@ -31,8 +31,6 @@ namespace helics
 {
 class Core;
 class AsyncFedCallInfo;
-
-
 
 class MessageOperator;
 class Filter;
@@ -47,14 +45,14 @@ class FederateInfo : public CoreFederateInfo
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback at least in a limited sense if set to true]
     char separator = '/';  //!< separator for global name of localFederates
-    core_type coreType;  //!< the type of the core
+    core_type coreType = core_type::ZMQ;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/
     FederateInfo () = default;
     /** construct from the federate name*/
-    explicit FederateInfo (std::string fedname) : name (std::move(fedname)){};
+    explicit FederateInfo (std::string fedname) : name (std::move (fedname)){};
     /** construct from the name and type*/
     FederateInfo (std::string fedname, core_type cType) : name (std::move (fedname)), coreType (cType){};
     /** load a federateInfo object from command line arguments
@@ -110,7 +108,8 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
-    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo,std::mutex>> asyncCallInfo;  //!< pointer to a class defining the async call information
+    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
+      asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
   public:

@@ -1,6 +1,5 @@
 import time
 import helics as h
-import random
 
 
 def get_input(grantedtime):
@@ -78,8 +77,9 @@ def create_value_federate(broker, deltat=1.0, fedinitstring="--broker=mainbroker
 
 def destroy_value_federate(fed, broker):
     status = h.helicsFederateFinalize(fed)
-
+    assert status == 0
     status, state = h.helicsFederateGetState(fed)
+    assert status == 0
     assert state == 3
 
     while (h.helicsBrokerIsConnected(broker)):
@@ -156,4 +156,3 @@ if __name__ == "__main__":
         delay = None
 
     main(delay)
-

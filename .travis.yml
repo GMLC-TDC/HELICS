@@ -176,7 +176,7 @@ script:
   
   - ctest --output-on-failure --timeout 220 -L Common
   - ctest --output-on-failure --timeout 240 -L SharedLibrary -LE SharedLibraryCpp
-  - ctest --output-on-failure --timeout 240 -L KeyApi
+  - ctest --output-on-failure --timeout 240 -L Continuous
   - ctest --output-on-failure -L Examples
   - ctest --output-on-failure -L Java
   - ctest --output-on-failure -L Python
