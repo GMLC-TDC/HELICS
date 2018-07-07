@@ -77,7 +77,7 @@ private:
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
         std::cout << pub << '\n';
         pubs.push_back(pub);
-        printf("pushed back pub\n");
+        std::cout<<"pushed back pub\n";
         return Publication(pub);
     }
 
