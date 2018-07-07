@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/ValueFederate.h"
 #include "Publication.hpp"
 #include "Subscription.hpp"
-
+#include <iostream>
 #include <sstream>
 
 namespace helics
@@ -75,7 +75,7 @@ private:
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        printf("got pub as %x\n", (unsigned int)(pub));
+        std::cout << pub << '\n';
         pubs.push_back(pub);
         printf("pushed back pub\n");
         return Publication(pub);
