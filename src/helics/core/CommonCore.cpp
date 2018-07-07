@@ -567,7 +567,7 @@ void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterati
         throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_MAX_ITERATION;
+    cmd.messageID = UPDATE_MAX_ITERATION;
     cmd.dest_id = iterations;
     fed->updateFederateInfo (cmd);
 }
@@ -589,7 +589,7 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
         time = timeEpsilon;
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_MINDELTA;
+    cmd.messageID = UPDATE_MINDELTA;
     cmd.actionTime = time;
     fed->updateFederateInfo (cmd);
 }
@@ -606,7 +606,7 @@ void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
         throw (InvalidParameter ("outputDelay time must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_OUTPUT_DELAY;
+    cmd.messageID = UPDATE_OUTPUT_DELAY;
     cmd.actionTime = outputDelayTime;
     fed->updateFederateInfo (cmd);
 }
@@ -624,7 +624,7 @@ void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
         throw (InvalidParameter ("impact window must be >=0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_INPUT_DELAY;
+    cmd.messageID = UPDATE_INPUT_DELAY;
     cmd.actionTime = inputDelayTime;
     fed->updateFederateInfo (cmd);
 }
@@ -641,7 +641,7 @@ void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
         throw (InvalidParameter ("period must be greater than 0"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_PERIOD;
+    cmd.messageID = UPDATE_PERIOD;
     cmd.actionTime = timePeriod;
     fed->updateFederateInfo (cmd);
 }
@@ -653,7 +653,7 @@ void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
         throw (InvalidIdentifier ("federateID not valid (setTimeOffset)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_OFFSET;
+    cmd.messageID = UPDATE_OFFSET;
     cmd.actionTime = timeOffset;
     fed->updateFederateInfo (cmd);
 }
@@ -663,7 +663,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
     if (federateID == invalid_fed_id)
     {
         ActionMessage cmd (CMD_CORE_CONFIGURE);
-        cmd.index = UPDATE_LOG_LEVEL;
+        cmd.messageID = UPDATE_LOG_LEVEL;
         cmd.dest_id = loggingLevel;
         addActionMessage (cmd);
         // setLogLevel (loggingLevel);
@@ -676,7 +676,7 @@ void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
         throw (InvalidIdentifier ("federateID not valid (setLoggingLevel)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_LOG_LEVEL;
+    cmd.messageID = UPDATE_LOG_LEVEL;
     cmd.dest_id = loggingLevel;
     fed->updateFederateInfo (cmd);
 }
@@ -694,7 +694,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
             else
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
-                cmd.index = UPDATE_FLAG;
+                cmd.messageID = UPDATE_FLAG;
                 cmd.dest_id = ENABLE_INIT_ENTRY;
                 addActionMessage (cmd);
             }
@@ -702,7 +702,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
         else if (flag == ENABLE_INIT_ENTRY)
         {
             ActionMessage cmd (CMD_CORE_CONFIGURE);
-            cmd.index = UPDATE_FLAG;
+            cmd.messageID = UPDATE_FLAG;
             cmd.dest_id = ENABLE_INIT_ENTRY;
             addActionMessage (cmd);
         }
@@ -715,7 +715,7 @@ void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
         throw (InvalidIdentifier ("federateID not valid (setFlag)"));
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_FLAG;
+    cmd.messageID = UPDATE_FLAG;
     cmd.dest_id = flag;
     if (flagValue)
     {
@@ -1420,7 +1420,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
 
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
-    m.info ().messageID = ++messageCounter;
+    m.messageID = ++messageCounter;
     m.source_handle = sourceHandle;
     m.source_id = hndl->fed_id;
 
@@ -1454,7 +1454,7 @@ void CommonCore::sendEvent (Time time,
     m.info ().orig_source = hndl->key;
     m.info ().source = hndl->key;
     m.info ().target = destination;
-    m.info ().messageID = ++messageCounter;
+    m.messageID = ++messageCounter;
     addActionMessage (std::move (m));
 }
 
@@ -1482,9 +1482,9 @@ void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message>
     m.info ().source = hndl->key;
     m.source_id = hndl->fed_id;
     m.source_handle = sourceHandle;
-    if (m.info ().messageID == 0)
+    if (m.messageID == 0)
     {
-        m.info ().messageID = ++messageCounter;
+        m.messageID = ++messageCounter;
     }
     auto minTime = getFederateAt (hndl->local_fed_id)->nextAllowedSendTime ();
     if (m.actionTime < minTime)
@@ -1527,12 +1527,12 @@ void CommonCore::deliverMessage (ActionMessage &message)
                     // first block the federate time advancement until the return is received
                     ActionMessage tblock (CMD_TIME_BLOCK, global_broker_id, localP->fed_id);
                     auto mid = ++messageCounter;
-                    tblock.index = mid;
+                    tblock.messageID = mid;
                     auto fed = getFederateCore (localP->fed_id);
                     fed->addAction (tblock);
                     // now send a message to get filtered
                     message.setAction (CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
-                    message.info ().messageID = mid;
+                    message.messageID = mid;
                     message.source_id = localP->fed_id;
                     message.source_handle = localP->handle;
                     message.dest_id = ffunc->destFilter->fed_id;
@@ -1675,7 +1675,7 @@ void CommonCore::logMessage (federate_id_t federateID, int logLevel, const std::
     ActionMessage m (CMD_LOG);
 
     m.source_id = fed->global_id;
-    m.index = logLevel;
+    m.messageID = logLevel;
     m.payload = messageToLog;
     actionQueue.push (m);
     sendToLogger (federateID, logLevel, fed->getIdentifier (), messageToLog);
@@ -1705,7 +1705,7 @@ void CommonCore::setLoggingCallback (
     if (federateID == invalid_fed_id)
     {
         ActionMessage loggerUpdate (CMD_CORE_CONFIGURE);
-        loggerUpdate.index = UPDATE_LOGGING_CALLBACK;
+        loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
 		loggerUpdate.source_handle = global_broker_id;
         if (logFunction)
         {
@@ -1768,7 +1768,7 @@ void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOp
         throw (InvalidIdentifier ("filter identifier does not point a filter"));
     }
     ActionMessage filtOpUpdate (CMD_CORE_CONFIGURE);
-    filtOpUpdate.index = UPDATE_FILTER_OPERATOR;
+    filtOpUpdate.messageID = UPDATE_FILTER_OPERATOR;
     if (!callback)
     {
         callback = nullFilt;
@@ -1942,7 +1942,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         querycmd.source_id = global_broker_id;
         querycmd.dest_id = global_broker_id;
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
         auto fut = ActiveQueries.getFuture(index);
         addActionMessage(std::move(querycmd));
@@ -1955,12 +1955,12 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = global_broker_id;
         querycmd.dest_id = higher_broker_id;
-        querycmd.index = ++queryCounter;
+        querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.index);
+        auto fut = ActiveQueries.getFuture(querycmd.messageID);
         addActionMessage(querycmd);
         auto ret = fut.get();
-        ActiveQueries.finishedWithValue(querycmd.index);
+        ActiveQueries.finishedWithValue(querycmd.messageID);
         return ret;
     }
     else if ((target == "root") || (target == "rootbroker"))
@@ -1969,9 +1969,9 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         querycmd.source_id = global_broker_id;
         querycmd.dest_id = 0;
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.index);
+        auto fut = ActiveQueries.getFuture(querycmd.messageID);
         if (global_broker_id == invalid_fed_id)
         {
             delayTransmitQueue.push(std::move(querycmd));
@@ -1994,10 +1994,10 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         ActionMessage querycmd (CMD_QUERY);
         querycmd.source_id = global_broker_id;
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
         querycmd.info ().target = target;
-        auto fut = ActiveQueries.getFuture (querycmd.index);
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
         if (global_broker_id == invalid_fed_id)
         {
             delayTransmitQueue.push(std::move(querycmd));
@@ -2070,7 +2070,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             {
                 LOG_ERROR (0, identifier,
                            fmt::format ("broker responded with error for registration of {}::{}\n", command.name,
-                             commandErrorString (command.index)));
+                             commandErrorString (command.messageID)));
             }
             else
             {
@@ -2103,14 +2103,14 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             std::string repStr = coreQuery(command.payload);
             if (command.source_id == global_broker_id)
             {
-                ActiveQueries.setDelayedValue(command.index, std::move(repStr));
+                ActiveQueries.setDelayedValue(command.messageID, std::move(repStr));
             }
             else
             {
                 ActionMessage queryResp(CMD_QUERY_REPLY);
                 queryResp.dest_id = command.source_id;
                 queryResp.source_id = global_broker_id;
-                queryResp.index = command.index;
+                queryResp.messageID = command.messageID;
                 queryResp.payload = std::move(repStr);
                 queryResp.counter = command.counter;
                 transmit(getRoute(queryResp.dest_id), queryResp);
@@ -2127,7 +2127,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         ActionMessage queryResp (CMD_QUERY_REPLY);
         queryResp.dest_id = command.source_id;
         queryResp.source_id = command.dest_id;
-        queryResp.index = command.index;
+        queryResp.messageID = command.messageID;
         queryResp.counter = command.counter;
         if (command.info ().target == getIdentifier ())
         {
@@ -2147,7 +2147,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_QUERY_REPLY:
         if (command.dest_id == global_broker_id)
         {
-            ActiveQueries.setDelayedValue (command.index, command.payload);
+            ActiveQueries.setDelayedValue (command.messageID, command.payload);
         }
         break;
     case CMD_PRIORITY_ACK:
@@ -2424,7 +2424,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_LOG:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger (0, command.index, getFederateNameNoThrow (command.source_id), command.payload);
+            sendToLogger (0, command.messageID, getFederateNameNoThrow (command.source_id), command.payload);
         }
         else
         {
@@ -2996,7 +2996,7 @@ void CommonCore::organizeFilterOperations ()
 }
 void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
 {
-    switch (cmd.index)
+    switch (cmd.messageID)
     {
     case UPDATE_FLAG:
         if (cmd.dest_id == ENABLE_INIT_ENTRY)
@@ -3284,7 +3284,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                     if (ii < filtFunc->sourceFilters.size () - 1)
                     {
                         m.setAction (CMD_SEND_FOR_FILTER_AND_RETURN);
-                        ongoingFilterProcesses[handle->fed_id].insert (m.info ().messageID);
+                        ongoingFilterProcesses[handle->fed_id].insert (m.messageID);
                     }
                     else
                     {
@@ -3307,7 +3307,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
     {
         return;
     }
-    auto messID = (command.action () == CMD_DEST_FILTER_RESULT) ? command.info ().messageID : command.source_handle;
+    auto messID = command.messageID;
     if (ongoingDestFilterProcesses[handle->fed_id].find (messID) !=
         ongoingDestFilterProcesses[handle->fed_id].end ())
     {
@@ -3315,7 +3315,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
         if (command.action () == CMD_NULL_DEST_MESSAGE)
         {
             ActionMessage removeTimeBlock (CMD_TIME_UNBLOCK, global_broker_id, command.dest_id);
-            removeTimeBlock.index = messID;
+            removeTimeBlock.messageID = messID;
             routeMessage (removeTimeBlock);
             return;
         }
@@ -3353,7 +3353,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
         routeMessage (std::move (command));
         // now unblock the time
         ActionMessage removeTimeBlock (CMD_TIME_UNBLOCK, global_broker_id, handle->fed_id);
-        removeTimeBlock.index = messID;
+        removeTimeBlock.messageID = messID;
         routeMessage (removeTimeBlock);
     }
 }
@@ -3366,7 +3366,7 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
         return;
     }
 
-    auto messID = (cmd.action () == CMD_FILTER_RESULT) ? cmd.info ().messageID : cmd.index;
+    auto messID = cmd.messageID;
 
     if (ongoingFilterProcesses[handle->fed_id].find (messID) != ongoingFilterProcesses[handle->fed_id].end ())
     {
@@ -3460,7 +3460,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                     bool returnToSender = ((cmd.action () == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);
                     auto source = cmd.source_id;
                     auto source_handle = cmd.source_handle;
-                    auto mid = cmd.info ().messageID;
+                    auto mid = cmd.messageID;
                     auto tempMessage = createMessageFromCommand (std::move (cmd));
                     tempMessage = FiltI->filterOp->process (std::move (tempMessage));
                     if (tempMessage)
@@ -3492,7 +3492,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
                         if (cmd.action () == CMD_IGNORE)
                         {
                             cmd.setAction (destFilter ? CMD_NULL_DEST_MESSAGE : CMD_NULL_MESSAGE);
-                            cmd.source_handle = mid;
+                            cmd.messageID = mid;
                             deliverMessage (cmd);
                             return;
                         }

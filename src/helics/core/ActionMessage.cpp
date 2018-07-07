@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
-    : messageAction (startingAction), index (dest_handle), name (payload)
+    : messageAction (startingAction), name (payload)
 {
     if (hasInfo (startingAction))
     {
@@ -32,16 +32,16 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
+    : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
+      dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
       flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
       payload (std::move (act.payload)), name (payload), extraInfo (std::move (act.extraInfo))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
+    : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
+      dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
       flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload),
       name (payload)
 
@@ -53,14 +53,13 @@ ActionMessage::ActionMessage (const ActionMessage &act)
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : messageAction (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
+    : messageAction (CMD_SEND_MESSAGE),messageID(message->messageID), actionTime (message->time),
       payload (std::move (message->data.m_data)), name (payload), extraInfo (std::make_unique<AdditionalInfo> ())
 {
     extraInfo->source = std::move (message->source);
     extraInfo->orig_source = std::move (message->original_source);
     extraInfo->original_dest = std::move (message->original_dest);
     extraInfo->target = std::move (message->dest);
-    extraInfo->messageID = message->messageID;
 }
 
 ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { from_string (bytes); }
@@ -74,6 +73,7 @@ ActionMessage::~ActionMessage () = default;
 ActionMessage &ActionMessage::operator= (const ActionMessage &act)
 {
     messageAction = act.messageAction;
+    messageID = act.messageID;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
@@ -84,7 +84,6 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     Te = act.Te;
     Tdemin = act.Tdemin;
     payload = act.payload;
-    index = act.index;
     if (act.extraInfo)
     {
         extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
@@ -95,13 +94,13 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
 ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 {
     messageAction = act.messageAction;
+    messageID = act.messageID;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
-    index = act.index;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
@@ -113,6 +112,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 {
     messageAction = CMD_SEND_MESSAGE;
+    messageID = message->messageID;
     payload = std::move (message->data.m_data);
     actionTime = message->time;
     if (!extraInfo)
@@ -123,7 +123,6 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     extraInfo->orig_source = std::move (message->original_source);
     extraInfo->original_dest = std::move (message->original_dest);
     extraInfo->target = std::move (message->dest);
-    extraInfo->messageID = message->messageID;
 }
 
 void ActionMessage::setAction (action_message_def::action_t newAction)
@@ -342,7 +341,7 @@ std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
     msg->dest = cmd.info ().target;
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
-    msg->messageID = cmd.info ().messageID;
+    msg->messageID = cmd.messageID;
     msg->source = cmd.info ().source;
 
     return msg;
@@ -357,7 +356,7 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
     msg->source = std::move (cmd.info ().source);
-    msg->messageID = cmd.info ().messageID;
+    msg->messageID = cmd.messageID;
     return msg;
 }
 

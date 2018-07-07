@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (helics::isProtocolCommand (rM));
-    rM.index = DISCONNECT;
+    rM.messageID = DISCONNECT;
     rxSocket.send_to (boost::asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
     BOOST_CHECK (!error);
     auto connected = confut.get ();

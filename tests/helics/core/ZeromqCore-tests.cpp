@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
     BOOST_CHECK (helics::isProtocolCommand (rM));
-    rM.index = DISCONNECT;
+    rM.messageID = DISCONNECT;
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     reqset.addRoutes (3, defRoute2);
 
     helics::ActionMessage M (helics::CMD_IGNORE);
-    M.index = 1;
+    M.messageID = 1;
 
     reqset.transmit (1, M);
     BOOST_CHECK (reqset.waiting ());
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     reqset.addRoutes (3, defRoute2);
 
     helics::ActionMessage M (helics::CMD_IGNORE);
-    M.index = 1;
+    M.messageID = 1;
 
     reqset.transmit (1, M);
     reqset.transmit (2, M);

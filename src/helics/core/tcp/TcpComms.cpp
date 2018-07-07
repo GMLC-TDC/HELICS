@@ -124,7 +124,7 @@ int TcpComms::processIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case CLOSE_RECEIVER:
             return (-1);
@@ -140,12 +140,12 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case QUERY_PORTS:
         {
             ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
+            portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
             return portReply;
         }
@@ -154,7 +154,7 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
         {
             auto openPort = findOpenPort ();
             ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
+            portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
             portReply.source_handle = openPort;
             return portReply;
@@ -163,7 +163,7 @@ ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
         case CLOSE_RECEIVER:
             return M;
         default:
-            M.index = NULL_REPLY;
+            M.messageID = NULL_REPLY;
             return M;
         }
     }
@@ -267,7 +267,7 @@ void TcpComms::queue_rx_function ()
         auto message = rxMessageQueue.pop ();
         if (isProtocolCommand (message))
         {
-            switch (message.index)
+            switch (message.messageID)
             {
             case PORT_DEFINITIONS:
             {
@@ -323,7 +323,7 @@ void TcpComms::queue_rx_function ()
         auto message = rxMessageQueue.pop ();
         if (isProtocolCommand (message))
         {
-            switch (message.index)
+            switch (message.messageID)
             {
             case CLOSE_RECEIVER:
             case DISCONNECT:
@@ -345,11 +345,11 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
         ActionMessage m (data, bytes_received);
         if (isProtocolCommand (m))
         {
-            if (m.index == PORT_DEFINITIONS)
+            if (m.messageID == PORT_DEFINITIONS)
             {
                 rxMessageQueue.push (m);
             }
-            else if (m.index == DISCONNECT)
+            else if (m.messageID == DISCONNECT)
             {
                 txQueue.emplace (-1, m);
             }
@@ -395,7 +395,7 @@ void TcpComms::queue_tx_function ()
             if (PortNumber <= 0)
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
-                m.index = REQUEST_PORTS;
+                m.messageID = REQUEST_PORTS;
                 try
                 {
                     brokerConnection->send (m.packetize ());
@@ -432,11 +432,11 @@ void TcpComms::queue_tx_function ()
                     {
                         if (isProtocolCommand (mess->second))
                         {
-                            if (mess->second.index == PORT_DEFINITIONS)
+                            if (mess->second.messageID == PORT_DEFINITIONS)
                             {
                                 rxMessageQueue.push (mess->second);
                             }
-                            else if (mess->second.index == DISCONNECT)
+                            else if (mess->second.messageID == DISCONNECT)
                             {
                                 brokerConnection->cancel ();
                                 tx_status = connection_status::terminated;
@@ -466,7 +466,7 @@ void TcpComms::queue_tx_function ()
         {
             PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
             ActionMessage m (CMD_PROTOCOL);
-            m.index = PORT_DEFINITIONS;
+            m.messageID = PORT_DEFINITIONS;
             m.source_handle = PortNumber;
             rxMessageQueue.push (m);
         }
@@ -485,7 +485,7 @@ void TcpComms::queue_tx_function ()
         {
             if (route_id == -1)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
@@ -638,7 +638,7 @@ CLOSE_TX_LOOP:
 void TcpComms::closeReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
+    cmd.messageID = CLOSE_RECEIVER;
     rxMessageQueue.push (cmd);
 }
 

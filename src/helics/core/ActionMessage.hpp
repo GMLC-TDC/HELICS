@@ -31,23 +31,22 @@ class ActionMessage
         std::string orig_source;  //!< the original source
         std::string &type_out;  //!< alias type_out to orig_source for filter
         std::string original_dest;  //!< the original destination of a message
-        int32_t messageID = 0;
         /** constructor*/
         AdditionalInfo () noexcept : type (source), units (target), type_out (orig_source){};
         /** copy constructor*/
         AdditionalInfo (const AdditionalInfo &ai)
             : source (ai.source), type (source), target (ai.target), units (target), orig_source (ai.orig_source),
-              type_out (orig_source), original_dest (ai.original_dest), messageID (ai.messageID){};
+              type_out (orig_source), original_dest (ai.original_dest){};
         /** move constructor*/
         AdditionalInfo (AdditionalInfo &&ai) noexcept
             : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
               orig_source (std::move (ai.orig_source)), type_out (orig_source),
-              original_dest (std::move (ai.original_dest)), messageID (ai.messageID){};
+              original_dest (std::move (ai.original_dest)){};
         ~AdditionalInfo () = default;
         template <class Archive>
         void serialize (Archive &ar)
         {
-            ar (source, target, orig_source, original_dest, messageID);
+            ar (source, target, orig_source, original_dest);
         }
     };
 
@@ -55,26 +54,30 @@ class ActionMessage
   private:
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
-    int32_t source_id = 0;  //!< 8 -- for federate_id or route_id
-    int32_t source_handle = 0;  //!< 12 -- for local handle or local code
-    int32_t dest_id = 0;  //!< 16 fed_id for a targeted message
-    int32_t dest_handle = 0;  //!< 20 local handle for a targeted message
-    int32_t &index;  //!< alias to dest_handle
-    uint16_t counter = 0;  //!< 22 counter for filter tracking or message counter
-    uint16_t flags = 0;  //!<  24 set of messageFlags
-
-    Time actionTime = timeZero;  //!< 32 the time an action took place or will take place	//32
-    Time Te = timeZero;  //!< 40 event time
-    Time Tdemin = timeZero;  //!< 48 min dependent event time;
+    int32_t messageID = 0; //!< 8 -- message ID for a variety of purposes
+    int32_t source_id = 0;  //!< 12 -- for federate_id or route_id
+    int32_t source_handle = 0;  //!< 16 -- for local handle or local code
+    int32_t dest_id = 0;  //!< 20 fed_id for a targeted message
+    int32_t dest_handle = 0;  //!< 24 local handle for a targeted message
+    uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
+    uint16_t flags = 0;  //!<  28 set of messageFlags
+    //4 byte gap
+    Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
+    Time Te = timeZero;  //!< 48 event time
+    Time Tdemin = timeZero;  //!< 56 min dependent event time
+    Time Tso = timeZero;  //!<64 the second order dependent time
+    
+private:
+    std::unique_ptr<AdditionalInfo>
+        extraInfo;  //!< pointer to an additional info structure with more data if required //72
+public:
     std::string
       payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
-  private:
-    std::unique_ptr<AdditionalInfo>
-      extraInfo;  //!< pointer to an additional info structure with more data if required
+  
   public:
     /** default constructor*/
-    ActionMessage () noexcept : index (dest_handle), name (payload){};
+    ActionMessage () noexcept : name (payload){};
     /** construct from an action type
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
@@ -119,13 +122,14 @@ class ActionMessage
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction,messageID, source_id, source_handle, dest_id, dest_handle);
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
         auto Tebase = Te.getBaseTimeCode ();
         auto Tdeminbase = Tdemin.getBaseTimeCode ();
-        ar (btc, Tebase, Tdeminbase, payload);
+        auto Tsobase = Tso.getBaseTimeCode();
+        ar (btc, Tebase,Tsobase, Tdeminbase, payload);
         if (hasInfo (messageAction))
         {
             ar (extraInfo);
@@ -135,19 +139,20 @@ class ActionMessage
     template <class Archive>
     void load (Archive &ar)
     {
-        ar (messageAction, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction,messageID, source_id, source_handle, dest_id, dest_handle);
 
         ar (counter, flags);
 
         decltype (actionTime.getBaseTimeCode ()) btc;
         decltype (Te.getBaseTimeCode ()) Tebase;
         decltype (Tdemin.getBaseTimeCode ()) Tdeminbase;
-
-        ar (btc, Tebase, Tdeminbase, payload);
+        decltype (Tso.getBaseTimeCode()) Tsobase;
+        ar (btc, Tebase, Tdeminbase, Tsobase, payload);
 
         actionTime.setBaseTimeCode (btc);
         Te.setBaseTimeCode (Tebase);
         Tdemin.setBaseTimeCode (Tdeminbase);
+        Tso.setBaseTimeCode(Tsobase);
         if (hasInfo (messageAction))
         {
             if (!extraInfo)

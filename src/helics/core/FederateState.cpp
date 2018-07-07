@@ -997,7 +997,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         setState (HELICS_ERROR);
         if (cmd.payload.empty ())
         {
-            errorString = commandErrorString (cmd.index);
+            errorString = commandErrorString (cmd.messageID);
         }
         else
         {
@@ -1061,7 +1061,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             if (checkActionFlag (cmd, error_flag))
             {
                 setState (HELICS_ERROR);
-                errorString = commandErrorString (cmd.index);
+                errorString = commandErrorString (cmd.messageID);
                 return message_processing_result::error;
             }
             global_id = cmd.dest_id;
@@ -1080,7 +1080,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
 void FederateState::processConfigUpdate (const ActionMessage &m)
 {
     timeCoord->processConfigUpdateMessage (m, (getState () == HELICS_CREATED));
-    switch (m.index)
+    switch (m.messageID)
     {
     case UPDATE_LOG_LEVEL:
         logLevel = static_cast<int> (m.dest_id);
