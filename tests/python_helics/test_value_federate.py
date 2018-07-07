@@ -265,7 +265,7 @@ def test_value_federate_subscription_and_publication_registration(vFed):
     assert sub_key == 'sub3'
     status, sub_type = h.helicsSubscriptionGetType(subid3)
     assert status == 0
-    assert sub_type == 'vector'
+    assert sub_type == 'double_vector'
     status, sub_units = h.helicsSubscriptionGetUnits(subid3)
     assert status == 0
     assert sub_units == 'V'
