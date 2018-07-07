@@ -30,8 +30,11 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     helics_time_t gtime;
     std::string s (500, ';');
     int len = static_cast<int> (s.size ());
+    BOOST_TEST_CHECKPOINT("calling setup");
     SetupTest<helics::ValueFederate> (core_type, 1);
+    BOOST_TEST_CHECKPOINT("calling get federate");
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    BOOST_TEST_CHECKPOINT("returned from vfed");
     auto pubid1 = vFed1->registerPublication ("pub1", "string", "");
     BOOST_CHECK (pubid1.baseObject () != nullptr);
     auto pubid2 = vFed1->registerGlobalPublication ("pub2", "integer", "");

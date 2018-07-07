@@ -35,11 +35,7 @@ after_build:
 
 test_script:
   - cd build
-  - ctest -C Release --verbose --timeout 120 -L Common
-  - ctest -C Release --verbose --timeout 120 -L Core
-  - ctest -C Release --verbose --timeout 240 -L ApplicationApi
-  - ctest -C Release --verbose --timeout 120 -L HelicsApps
-  - ctest --verbose -L Java
+  - ctest --output-on-failure --timeout 240 -L Continuous
   - cd ..
 
 artifacts:
