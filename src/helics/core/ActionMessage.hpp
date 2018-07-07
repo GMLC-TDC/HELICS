@@ -210,6 +210,11 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
+inline bool operator<(const ActionMessage &cmd, const ActionMessage &cmd2)
+{
+    return (cmd.actionTime < cmd2.actionTime);
+}
+
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory
  * for the message
  */

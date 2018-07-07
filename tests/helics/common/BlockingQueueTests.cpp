@@ -21,7 +21,7 @@ namespace utf = boost::unit_test;
 BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
 
 /** test basic operations */
-BOOST_AUTO_TEST_CASE (basic_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (basic_tests)
 {
     BlockingQueue<int> sq;
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (basic_tests, *utf::label("ci"))
 }
 
 /** test with a move only element*/
-BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (move_only_tests)
 {
     BlockingQueue<std::unique_ptr<double>> sq;
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
 
 /** test the ordering with a larger number of inputs*/
 
-BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (ordering_tests)
 {
     BlockingQueue<int> sq;
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
     BOOST_CHECK (sq.empty ());
 }
 
-BOOST_AUTO_TEST_CASE (emplace_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (emplace_tests)
 {
     BlockingQueue<std::pair<int, double>> sq;
 

@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (time_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (time_tests)
 
 using namespace helics;
 

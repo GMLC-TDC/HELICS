@@ -231,18 +231,25 @@ BOOST_AUTO_TEST_CASE (comparison_test)
     cmd3.actionTime = helics::Time::maxVal ();
 
     // Check less than comparison (not implemented yet)
-    /*
+    
     BOOST_CHECK(cmd1 < cmd2);
     BOOST_CHECK(cmd2 < cmd3);
     BOOST_CHECK(cmd1 < cmd3);
-    BOOST_CHECK_EQUAL(cmd1 < cmd1, false);
-    */
+    BOOST_CHECK(!(cmd1 < cmd1));
+    
 
-    // Insert messages into a deque, check for correct ordering when removed
-    std::deque<helics::ActionMessage> q;
-    q.push_back (cmd2);
-    q.push_back (cmd3);
-    q.push_back (cmd1);
+    // Insert messages into a set, check for correct ordering when scanned
+    std::set<helics::ActionMessage> q;
+    q.insert (cmd2);
+    q.insert (cmd3);
+    q.insert (cmd1);
+    helics::Time ctime = helics::Time::minVal();
+    for (const auto &cmd : q)
+    {
+        BOOST_CHECK(cmd.actionTime >= ctime);
+        ctime = cmd.actionTime;
+    }
+    
 }
 
 BOOST_AUTO_TEST_CASE (conversion_test)

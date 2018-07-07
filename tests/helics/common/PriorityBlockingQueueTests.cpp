@@ -20,7 +20,7 @@ namespace utf = boost::unit_test;
 BOOST_AUTO_TEST_SUITE (blocking_priority_queue_tests)
 
 /** test basic operations */
-BOOST_AUTO_TEST_CASE (basic_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (basic_tests)
 {
     BlockingPriorityQueue<int> sq;
 
