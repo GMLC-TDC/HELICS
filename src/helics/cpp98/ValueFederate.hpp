@@ -2,7 +2,6 @@
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
-
 */
 #ifndef HELICS_CPP98_VALUE_FEDERATE_HPP_
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
@@ -29,6 +28,9 @@ enum PubSubTypes
 
 class ValueFederate : public virtual Federate
 {
+private:
+    std::vector<helics_subscription> subs;
+    std::vector<helics_publication> pubs;
   public:
     friend class helics::FederateInfo;
 
@@ -73,7 +75,9 @@ class ValueFederate : public virtual Federate
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
+        printf("got pub as %llx\n", (unsigned long long)(pub));
         pubs.push_back(pub);
+        printf("pushed back pub\n");
         return Publication(pub);
     }
 
@@ -173,9 +177,6 @@ class ValueFederate : public virtual Federate
     std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
     // call helicsSubscriptionIsUpdated for each sub
   private:
-    std::vector<helics_subscription> subs;
-    std::vector<helics_publication> pubs;
-
     // Utility function for converting numbers to string
     template <typename T> std::string toStr (T num)
     {
