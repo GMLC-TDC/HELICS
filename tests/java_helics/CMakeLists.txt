@@ -50,5 +50,5 @@ add_test(NAME Java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.lib
 
 set_target_properties (Java_hello_world Java_Helics_Api Java_MessageFederate Java_MessageFilter Java_ValueFederate PROPERTIES FOLDER tests)
 
-set_property(TEST Java_hello_world_test Java_Helics_Api_tests Java_MessageFederate_test Java_MessageFilter_test Java_ValueFederate_test PROPERTY LABELS Java Continuous Daily Release)
+set_property(TEST Java_hello_world_test Java_Helics_Api_tests Java_MessageFederate_test Java_MessageFilter_test Java_ValueFederate_test PROPERTY LABELS Java Continuous Daily)
 
