@@ -168,6 +168,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
+    
     // make sure the check receives all messages
     reqset.checkForMessages (std::chrono::milliseconds (50));
     if (reqset.waiting ())
@@ -180,6 +181,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
         reqset.checkForMessages(std::chrono::milliseconds(50));
     }
     BOOST_REQUIRE (!reqset.waiting ());
+    std::this_thread::yield();
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);
@@ -189,14 +191,15 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);
-
+    std::this_thread::yield();
     repSocket1.recv (&msg);
 
     repSocket1.send (msg);
-
+    std::this_thread::yield();
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
+    std::this_thread::yield();
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
