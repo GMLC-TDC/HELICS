@@ -251,7 +251,7 @@ def test_value_federate_subscription_and_publication_registration(vFed):
     assert status == 0
     assert publication_type == 'double'
 
-    status, sub_key = h.helicsSubscriptionGetKey(pubid1)
+    status, sub_key = h.helicsSubscriptionGetKey(subid1)
     assert status == 0
     assert sub_key == 'sub1'
     status, sub_type = h.helicsSubscriptionGetType(subid1)
