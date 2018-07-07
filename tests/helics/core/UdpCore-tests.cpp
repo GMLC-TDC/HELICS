@@ -67,6 +67,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 
 BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::string host = "localhost";
     helics::udp::UdpComms comm (host, host);
@@ -100,6 +101,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 
 BOOST_AUTO_TEST_CASE (udpComms_rx_test)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
     std::string host = "localhost";
@@ -142,6 +144,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
 
 BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -191,6 +194,7 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
 
 BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
@@ -277,6 +281,7 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
 
 BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString =
       "1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
@@ -317,6 +322,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::UDP, initializationString);
