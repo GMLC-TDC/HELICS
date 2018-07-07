@@ -22,7 +22,6 @@ CoreFactory-tests.cpp
 MessageTimerTests.cpp
 #CommonCore-tests.cpp
 TestCore-tests.cpp
-Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
 data-block-tests.cpp

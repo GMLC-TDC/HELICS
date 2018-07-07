@@ -31,11 +31,7 @@ target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
 set_target_properties (common-tests PROPERTIES FOLDER tests)
 
 add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
-set_property(TEST common-tests PROPERTY LABELS Common Daily)
-
-# Tests for Continuous Integration builds
-add_test(NAME common-ci-tests COMMAND common-tests --run_test=@ci --log_level=message --report_level=short)
-set_property(TEST common-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST common-tests PROPERTY LABELS Common Daily Continuous)
 
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
