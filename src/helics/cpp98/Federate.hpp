@@ -15,6 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <iostream>
 
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
@@ -111,36 +112,46 @@ class Federate
 {
   public:
     // Default constructor, not meant to be used
-    Federate () : fed (NULL), exec_async_iterate (false){};
+      Federate() : fed(NULL), exec_async_iterate(false) { std::cout << "def fed constructor" << std::endl; };
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
+        std::cout << "fed copy constructor" << std::endl;
         fed = helicsFederateClone (fedObj.fed);
+        std::cout << "fed cloned " <<fed<< std::endl;
     }
     Federate &operator= (const Federate &fedObj)
     {
+        std::cout << "fed assign" << std::endl;
         exec_async_iterate = fedObj.exec_async_iterate;
         fed = helicsFederateClone (fedObj.fed);
+        std::cout << "fed assigned" <<fed<< std::endl;
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     Federate (Federate &&fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
+        std::cout << "fed move constructor" << std::endl;
         fed = fedObj.fed;
         fedObj.fed = NULL;
+        std::cout << "fed moved" << fed << std::endl;
     }
     Federate &operator= (Federate &&fedObj)
     {
+        std::cout << "fed move assign" << std::endl;
         exec_async_iterate = fedObj.exec_async_iterate;
         fed = fedObj.fed;
         fedObj.fed = NULL;
+        std::cout << "fed move assigned" << fed << std::endl;
         return *this;
     }
 #endif
     virtual ~Federate() {
         if (fed != NULL)
         {
+            std::cout << "fed destructor" <<fed<< std::endl;
             helicsFederateFree(fed);
+            std::cout << "fed freed" << fed << std::endl;
         }
     }
 
