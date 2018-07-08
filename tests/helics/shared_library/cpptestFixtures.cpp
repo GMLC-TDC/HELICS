@@ -26,6 +26,7 @@ static bool hasIndexCode (const std::string &type_name)
 
 static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
+    std::cout << "starting broker of type " << core_type_name << " and init " << initialization_string << std::endl;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);

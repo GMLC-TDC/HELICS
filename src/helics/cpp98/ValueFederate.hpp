@@ -37,7 +37,9 @@ private:
 
     explicit ValueFederate (FederateInfo &fi)
     {
+        std::cout << "makeing federate" << std::endl;
         fed = helicsCreateValueFederate (fi.getInfo());
+        std::cout << "federate made " << fed << std::endl;
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr constructor"));
