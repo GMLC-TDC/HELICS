@@ -37,11 +37,19 @@ private:
     explicit ValueFederate (FederateInfo &fi)
     {
         fed = helicsCreateValueFederate (fi.getInfo());
+        if (fed == nullptr)
+        {
+            throw(std::exception("fed==nullptr"));
+        }
     }
 
     explicit ValueFederate (const std::string &jsonString)
     {
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
+        if (fed == nullptr)
+        {
+            throw(std::exception("fed==nullptr"));
+        }
     }
 
     ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
@@ -52,6 +60,10 @@ private:
         Federate::operator=(fedObj);
         subs = fedObj.subs;
         pubs = fedObj.pubs;
+        if (fed == nullptr)
+        {
+            throw(std::exception("fed==nullptr"));
+        }
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
@@ -74,6 +86,10 @@ private:
     Publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
+        if (fed == nullptr)
+        {
+            throw(std::exception("fed==nullptr"));
+        }
         std::cout <<"fed "<< fed << std::endl;
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
         std::cout <<"pub "<< pub << std::endl;
