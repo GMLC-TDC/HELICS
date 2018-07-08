@@ -28,7 +28,7 @@ class Broker
         {
             throw(std::runtime_error("broker creation failed"));
         }
-        if (helicsBrokerIsConnected(broker) != true)
+        if (helicsBrokerIsConnected(broker) != helics_true)
         {
             throw(std::runtime_error("broker creation failed"));
         }
