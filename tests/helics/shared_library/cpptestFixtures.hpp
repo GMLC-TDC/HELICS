@@ -16,6 +16,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../src/helics/cpp98/Federate.hpp"
 #include "helics/helics-config.h"
 #include <memory>
+#include <iostream>
 
 #define HELICS_SIZE_MAX 512
 
