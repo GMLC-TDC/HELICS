@@ -211,6 +211,22 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
         {
             res = 6;
         }
+        if (res != 6)
+        {
+            res2 = reqset.checkForMessages(std::chrono::milliseconds(400));
+            if ((res + res2 == 6) || (res2 == 6))
+            {
+                res = 6;
+            }
+        }
+        if (res != 6)
+        {
+            res2 = reqset.checkForMessages(std::chrono::milliseconds(400));
+            if ((res + res2 == 6) || (res2 == 6))
+            {
+                res = 6;
+            }
+        }
     }
     BOOST_CHECK_EQUAL (res, 6);
     repSocket1.close ();
