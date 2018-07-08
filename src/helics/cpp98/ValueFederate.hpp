@@ -15,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <sstream>
 #include <exception>
 
-namespace helics
+namespace helics98
 {
 enum PubSubTypes
 {
@@ -33,7 +33,7 @@ private:
     std::vector<helics_subscription> subs;
     std::vector<helics_publication> pubs;
   public:
-    friend class helics::FederateInfo;
+    friend class helics98::FederateInfo;
 
     explicit ValueFederate (FederateInfo &fi)
     {
@@ -58,6 +58,7 @@ private:
 
     ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
     {
+        std::cout << "value fed copy constructor" << fed << std::endl;
     }
     ValueFederate &operator=(const ValueFederate &fedObj)
     {

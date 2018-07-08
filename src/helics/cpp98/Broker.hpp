@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <exception>
 
-namespace helics
+namespace helics98
 {
 
 class Broker

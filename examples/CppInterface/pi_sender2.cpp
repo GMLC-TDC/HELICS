@@ -24,16 +24,16 @@ int main(int /*argc*/,char ** /*argv*/)
   std::string    initstring="2 --name=mainbroker";
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics::Publication pub;
- helics::Subscription sub;
+  helics98::Publication pub;
+ helics98::Subscription sub;
 
-  std::string helicsversion = helics::getHelicsVersionString();
+  std::string helicsversion = helics98::getHelicsVersionString();
 
   printf("PI SENDER: Helics version = %s\n",helicsversion.c_str());
   printf("%s",help);
 
   /* Create broker */
-  helics::Broker broker("zmq","",initstring);
+  helics98::Broker broker("zmq","",initstring);
 
   if(broker.isConnected()) {
     printf("PI SENDER: Broker created and connected\n");
@@ -42,7 +42,7 @@ int main(int /*argc*/,char ** /*argv*/)
   /* Create Federate Info object that describes the federate properties
    * Sets federate name and core type from string
    */
-  helics::FederateInfo fi("TestA Federate", "zmq");
+  helics98::FederateInfo fi("TestA Federate", "zmq");
 
   /* Federate init string */
   fi.setCoreInitString(fedinitstring);
@@ -57,7 +57,7 @@ int main(int /*argc*/,char ** /*argv*/)
   fi.setLoggingLevel(1);
 
   /* Create value federate */
-  helics::ValueFederate* vfed = new helics::ValueFederate(fi);
+  helics98::ValueFederate* vfed = new helics98::ValueFederate(fi);
   printf("PI SENDER: Value federate created\n");
 
   /* Register the publication */

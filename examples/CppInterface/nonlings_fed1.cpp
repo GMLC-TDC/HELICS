@@ -20,15 +20,15 @@ int main (int /*argc*/, char ** /*argv*/)
     std::string initstring = "2 --name=mainbroker";
     std::string fedinitstring = "--broker=mainbroker --federates=1";
     double deltat = 0.01;
-    helics::Publication pub;
-    helics::Subscription sub;
+    helics98::Publication pub;
+    helics98::Subscription sub;
 
-    std::string helicsversion = helics::getHelicsVersionString();
+    std::string helicsversion = helics98::getHelicsVersionString();
 
     printf (" Helics version = %s\n", helicsversion.c_str());
 
     /* Create broker */
-    helics::Broker broker("zmq", "", initstring);
+    helics98::Broker broker("zmq", "", initstring);
 
     if (broker.isConnected())
     {
@@ -38,7 +38,7 @@ int main (int /*argc*/, char ** /*argv*/)
     /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
-    helics::FederateInfo fi ("TestA Federate", "zmq");
+    helics98::FederateInfo fi ("TestA Federate", "zmq");
 
     /* Federate init string */
     fi.setCoreInitString (fedinitstring);
@@ -48,7 +48,7 @@ int main (int /*argc*/, char ** /*argv*/)
     //fi.setLoggingLevel(5);
 
     /* Create value federate */
-    helics::ValueFederate* vfed = new helics::ValueFederate (fi);
+    helics98::ValueFederate* vfed = new helics98::ValueFederate (fi);
     printf (" Value federate created\n");
 
     /* Register the publication */
@@ -61,19 +61,19 @@ int main (int /*argc*/, char ** /*argv*/)
     /* Register the subscription */
 
     /* Enter initialization state */
-    vfed->enterInitializationMode (); // can throw helics::InvalidStateTransition exception
+    vfed->enterInitializationMode (); // can throw helics98::InvalidStateTransition exception
     printf (" Entered initialization state\n");
 
     double x = 0.0, /*yprv = 100,*/ xprv=100;
     helics_time_t currenttime = 0.0;
-    helics::helics_iteration_time currenttimeiter;
+    helics98::helics_iteration_time currenttimeiter;
     currenttimeiter.status = iterating;
    // int isUpdated;
     double tol = 1E-8;
 
     pub.publish (x);
     /* Enter execution state */
-    vfed->enterExecutionMode (); // can throw helics::InvalidStateTransition exception
+    vfed->enterExecutionMode (); // can throw helics98::InvalidStateTransition exception
     printf (" Entered execution state\n");
 
     fflush (NULL);
