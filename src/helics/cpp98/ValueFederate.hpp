@@ -74,9 +74,9 @@ private:
     Publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        std::cout <<"fed"<< fed << std::endl;
+        std::cout <<"fed "<< fed << std::endl;
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        std::cout <<"pub"<< pub << '\n';
+        std::cout <<"pub "<< pub << std::endl;
         pubs.push_back(pub);
         std::cout<<"pushed back pub\n";
         return Publication(pub);
