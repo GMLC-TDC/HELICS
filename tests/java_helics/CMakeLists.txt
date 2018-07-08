@@ -38,7 +38,7 @@ add_custom_target( Java_ValueFederate ALL
     VERBATIM
 )
 
-add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=${CMAKE_BINARY_DIR}/swig/java -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_BINARY_DIR}/tests/java_helics HelloWorld)
+add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} HelloWorld)
 
 add_test(NAME Java_Helics_Api_tests COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=${CMAKE_BINARY_DIR}/swig/java -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_BINARY_DIR}/tests/java_helics JavaHelicsApiTests)
 

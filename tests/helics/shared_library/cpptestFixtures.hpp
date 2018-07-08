@@ -92,12 +92,14 @@ struct FederateTestFixture_cpp
         fi.setTimeDelta (time_delta);
         std::vector<std::shared_ptr<helics::Federate>> federates_added;
         std::cout << "finished prelim" << std::endl;
+        std::cout << initString << " " << broker << std::endl;
         switch (setup)
         {
         case 1:
         default:
         {
             auto init = initString + " --federates " + std::to_string (count);
+            std::cout << "ctype="<<core_type_name<<" trying to make core from initString=" << init<<std::endl;
             helics::Core core (core_type_name, std::string (), init);
             std::cout << "made core" << std::endl;
             fi.setCoreName (core.getIdentifier ());
