@@ -54,6 +54,7 @@ struct FederateTestFixture_cpp
                     const std::string &name_prefix = "fed")
     {
         auto broker = AddBroker (core_type_name, count);
+        std::cout << "added broker" << std::endl;
         AddFederates<FedType> (core_type_name, count, *broker, time_delta, name_prefix);
     }
 
@@ -89,7 +90,7 @@ struct FederateTestFixture_cpp
         fi.setCoreTypeFromString (core_type_name);
         fi.setTimeDelta (time_delta);
         std::vector<std::shared_ptr<helics::Federate>> federates_added;
-
+        std::cout << "finished prelim" << std::endl;
         switch (setup)
         {
         case 1:
@@ -97,7 +98,7 @@ struct FederateTestFixture_cpp
         {
             auto init = initString + " --federates " + std::to_string (count);
             helics::Core core (core_type_name, std::string (), init);
-
+            std::cout << "made core" << std::endl;
             fi.setCoreName (core.getIdentifier ());
             size_t offset = federates.size ();
             federates.resize (count + offset);
@@ -105,9 +106,12 @@ struct FederateTestFixture_cpp
             {
                 auto name = name_prefix + std::to_string (ii + offset);
                 fi.setFederateName (name);
+                std::cout << "making federate" << std::endl;
                 auto fed = std::make_shared<FedType> (fi);
+                std::cout << "made federate" << std::endl;
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
+                std::cout << "pushed federate" << std::endl;
             }
         }
         break;
