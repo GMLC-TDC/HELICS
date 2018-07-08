@@ -28,6 +28,10 @@ class Broker
         {
             throw(std::runtime_error("broker creation failed"));
         }
+        if (helicsBrokerIsConnected(broker) != true)
+        {
+            throw(std::runtime_error("broker creation failed"));
+        }
     }
 
     Broker (std::string type, std::string name, int argc, const char **argv)
