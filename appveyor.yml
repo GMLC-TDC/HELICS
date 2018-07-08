@@ -35,7 +35,7 @@ after_build:
 
 test_script:
   - cd build
-  - ctest --output-on-failure --timeout 240 -L Continuous
+  - ctest --output-on-failure --timeout 240 -LContinuous
   - cd ..
 
 artifacts:

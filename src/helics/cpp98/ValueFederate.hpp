@@ -40,7 +40,7 @@ private:
         fed = helicsCreateValueFederate (fi.getInfo());
         if (fed == NULL)
         {
-            throw(std::exception("fed==nullptr"));
+            throw(std::runtime_error("fed==nullptr constructor"));
         }
     }
 
@@ -49,7 +49,7 @@ private:
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
         if (fed == NULL)
         {
-            throw(std::exception("fed==nullptr"));
+            throw(std::runtime_error("fed==nullptr create from json"));
         }
     }
 
@@ -63,20 +63,27 @@ private:
         pubs = fedObj.pubs;
         if (fed == NULL)
         {
-            throw(std::exception("fed==nullptr"));
+            throw(std::runtime_error("fed==nullptr assignment"));
         }
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     ValueFederate(ValueFederate &&fedObj) :Federate(std::move(fedObj)),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
     {
-
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr move constructor"));
+        }
     }
     ValueFederate &operator=(ValueFederate &&fedObj)
     {
-        Federate::operator=(std::move(fedObj));
         subs = std::move(fedObj.subs);
         pubs = std::move(fedObj.pubs);
+        Federate::operator=(std::move(fedObj));
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr move assignment"));
+        }
         return *this;
     }
 #endif
@@ -89,7 +96,7 @@ private:
     {
         if (fed == NULL)
         {
-            throw(std::exception("fed==nullptr"));
+            throw(std::runtime_error("fed==nullptr reg pub"));
         }
         std::cout <<"fed "<< fed << std::endl;
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
