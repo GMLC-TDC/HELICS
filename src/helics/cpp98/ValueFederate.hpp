@@ -68,8 +68,9 @@ private:
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate(ValueFederate &&fedObj) :Federate(std::move(fedObj)),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
+    ValueFederate(ValueFederate &&fedObj) :Federate(),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
     {
+        Federate::operator=(std::move(fedObj));
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr move constructor"));
