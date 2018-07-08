@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Subscription.hpp"
 #include <iostream>
 #include <sstream>
+#include <exception>
 
 namespace helics
 {
@@ -37,7 +38,7 @@ private:
     explicit ValueFederate (FederateInfo &fi)
     {
         fed = helicsCreateValueFederate (fi.getInfo());
-        if (fed == nullptr)
+        if (fed == NULL)
         {
             throw(std::exception("fed==nullptr"));
         }
@@ -46,7 +47,7 @@ private:
     explicit ValueFederate (const std::string &jsonString)
     {
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
-        if (fed == nullptr)
+        if (fed == NULL)
         {
             throw(std::exception("fed==nullptr"));
         }
@@ -60,7 +61,7 @@ private:
         Federate::operator=(fedObj);
         subs = fedObj.subs;
         pubs = fedObj.pubs;
-        if (fed == nullptr)
+        if (fed == NULL)
         {
             throw(std::exception("fed==nullptr"));
         }
@@ -86,7 +87,7 @@ private:
     Publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        if (fed == nullptr)
+        if (fed == NULL)
         {
             throw(std::exception("fed==nullptr"));
         }
