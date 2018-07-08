@@ -16,7 +16,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../src/helics/cpp98/Federate.hpp"
 #include "helics/helics-config.h"
 #include <memory>
-#include <iostream>
 
 #define HELICS_SIZE_MAX 512
 
@@ -55,7 +54,6 @@ struct FederateTestFixture_cpp
                     const std::string &name_prefix = "fed")
     {
         auto broker = AddBroker (core_type_name, count);
-        std::cout << "added broker" << std::endl;
         AddFederates<FedType> (core_type_name, count, *broker, time_delta, name_prefix);
     }
 
@@ -91,17 +89,13 @@ struct FederateTestFixture_cpp
         fi.setCoreTypeFromString (core_type_name);
         fi.setTimeDelta (time_delta);
         std::vector<std::shared_ptr<helics98::Federate>> federates_added;
-        std::cout << "finished prelim" << std::endl;
-        std::cout << initString << " " << broker << std::endl;
         switch (setup)
         {
         case 1:
         default:
         {
             auto init = initString + " --federates " + std::to_string (count);
-            std::cout << "ctype="<<core_type_name<<" trying to make core from initString=" << init<<std::endl;
             helics98::Core core (core_type_name, std::string (), init);
-            std::cout << "made core" << std::endl;
             fi.setCoreName (core.getIdentifier ());
             size_t offset = federates.size ();
             federates.resize (count + offset);
@@ -109,12 +103,9 @@ struct FederateTestFixture_cpp
             {
                 auto name = name_prefix + std::to_string (ii + offset);
                 fi.setFederateName (name);
-                std::cout << "making federate" << std::endl;
                 auto fed = std::make_shared<FedType> (fi);
-                std::cout << "made federate" << std::endl;
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
-                std::cout << "pushed federate" << std::endl;
             }
         }
         break;

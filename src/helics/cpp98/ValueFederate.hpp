@@ -11,7 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/ValueFederate.h"
 #include "Publication.hpp"
 #include "Subscription.hpp"
-#include <iostream>
 #include <sstream>
 #include <exception>
 
@@ -37,9 +36,7 @@ private:
 
     explicit ValueFederate (FederateInfo &fi)
     {
-        std::cout << "making value federate from fi" << std::endl;
         fed = helicsCreateValueFederate (fi.getInfo());
-        std::cout << "federate made " << fed << std::endl;
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr constructor"));
@@ -48,7 +45,6 @@ private:
 
     explicit ValueFederate (const std::string &jsonString)
     {
-        std::cout << "making value federate from file" << std::endl;
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
         if (fed == NULL)
         {
@@ -58,11 +54,9 @@ private:
 
     ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
     {
-        std::cout << "value fed copy constructor" << fed << std::endl;
     }
     ValueFederate &operator=(const ValueFederate &fedObj)
     {
-        std::cout << "assign value fed" << std::endl;
         Federate::operator=(fedObj);
         subs = fedObj.subs;
         pubs = fedObj.pubs;
@@ -75,9 +69,7 @@ private:
 #ifdef HELICS_HAS_RVALUE_REFS
     ValueFederate(ValueFederate &&fedObj) :Federate(),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
     {
-        std::cout << "value fed move construct" << std::endl;
         Federate::operator=(std::move(fedObj));
-        std::cout << "value fed move constructed" <<fed<< std::endl;
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr move constructor"));
@@ -85,11 +77,9 @@ private:
     }
     ValueFederate &operator=(ValueFederate &&fedObj)
     {
-        std::cout << "value fed move assign" << std::endl;
         subs = std::move(fedObj.subs);
         pubs = std::move(fedObj.pubs);
         Federate::operator=(std::move(fedObj));
-        std::cout << "value fed move assigned" << fed << std::endl;
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr move assignment"));
@@ -98,7 +88,7 @@ private:
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate () { std::cout << "value fed def constructor"  << std::endl; }
+    ValueFederate () { }
 
     /** Methods to register publications **/
     Publication
@@ -108,11 +98,8 @@ private:
         {
             throw(std::runtime_error("fed==nullptr reg pub"));
         }
-        std::cout <<"fed "<< fed << std::endl;
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        std::cout <<"pub "<< pub << std::endl;
         pubs.push_back(pub);
-        std::cout<<"pushed back pub\n";
         return Publication(pub);
     }
 

@@ -202,6 +202,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
@@ -248,10 +249,12 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     vfed.finalize ();
     fut.get ();
     brk = nullptr;
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     exeTestRunner playerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_player");
 
     exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_broker");
@@ -300,6 +303,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     auto out2 = res2.get ();
     res.get ();
     // out = 0;
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
