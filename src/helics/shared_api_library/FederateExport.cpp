@@ -19,6 +19,10 @@ static const int fedValidationIdentifier = 0x2352188;
 
 helics::Federate *getFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -29,6 +33,10 @@ helics::Federate *getFed (helics_federate fed)
 
 helics::ValueFederate *getValueFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -42,6 +50,10 @@ helics::ValueFederate *getValueFed (helics_federate fed)
 
 helics::MessageFederate *getMessageFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -55,6 +67,10 @@ helics::MessageFederate *getMessageFed (helics_federate fed)
 
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -65,6 +81,10 @@ std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -78,6 +98,10 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed
 
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
