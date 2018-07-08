@@ -42,11 +42,13 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     auto pubid3 = vFed1->registerPublication ("pub3", "", "");
     BOOST_CHECK (pubid3.baseObject () != nullptr);
     auto sub1 = vFed1->registerOptionalSubscription ("fed0/pub3", "", "");
+    BOOST_TEST_CHECKPOINT("reg opt1");
     vFed1->setTimeDelta (1.0);
-
+    BOOST_TEST_CHECKPOINT("set Delta");
     vFed1->enterExecutionMode ();
+    BOOST_TEST_CHECKPOINT("publish");
     pubid3.publish (s);
-
+    BOOST_TEST_CHECKPOINT("reqtime");
     gtime = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK (sub1.isUpdated ());
