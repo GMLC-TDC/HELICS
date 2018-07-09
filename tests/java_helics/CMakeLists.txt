@@ -38,15 +38,15 @@ add_custom_target( Java_ValueFederate ALL
     VERBATIM
 )
 
-add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} HelloWorld)
+add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar;${CMAKE_CURRENT_BINARY_DIR} HelloWorld)
 
-add_test(NAME Java_Helics_Api_tests COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} JavaHelicsApiTests)
+add_test(NAME Java_Helics_Api_tests COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar;${CMAKE_CURRENT_BINARY_DIR} JavaHelicsApiTests)
 
-add_test(NAME Java_MessageFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} TestMessageFederate)
+add_test(NAME Java_MessageFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar;${CMAKE_CURRENT_BINARY_DIR} TestMessageFederate)
 
-add_test(NAME Java_MessageFilter_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} TestMessageFilter)
+add_test(NAME Java_MessageFilter_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar;${CMAKE_CURRENT_BINARY_DIR} TestMessageFilter)
 
-add_test(NAME Java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar:${CMAKE_CURRENT_BINARY_DIR} TestValueFederate)
+add_test(NAME Java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar;${CMAKE_CURRENT_BINARY_DIR} TestValueFederate)
 
 set_target_properties (Java_hello_world Java_Helics_Api Java_MessageFederate Java_MessageFilter Java_ValueFederate PROPERTIES FOLDER tests)
 
