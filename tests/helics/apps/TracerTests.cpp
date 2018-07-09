@@ -252,6 +252,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
@@ -299,6 +300,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     fut.get ();
     BOOST_CHECK_EQUAL (counter.load (), 4);
     trace1.finalize ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
 BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
@@ -626,6 +628,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;

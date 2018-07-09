@@ -8,7 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/data/test_case.hpp>
 
 #include <cstdio>
-
 #include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Recorder.hpp"
@@ -259,6 +258,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
@@ -323,6 +323,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     auto m = rec1.getMessage (1);
     BOOST_REQUIRE (m);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
