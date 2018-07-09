@@ -40,3 +40,6 @@ test_script:
 
 artifacts:
   - path: build/installer-output/Helics-*.exe
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
