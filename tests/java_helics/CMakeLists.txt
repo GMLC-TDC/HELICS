@@ -38,7 +38,12 @@ add_custom_target( Java_ValueFederate ALL
     VERBATIM
 )
 
-file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS-VERSION}.jar;." java_test_classpath)
+if("${CMAKE_HOST_SYSTEM}" MATCHES ".*Windows.*")
+    set(cp_sep "\\;")
+else()
+    set(cp_sep ":")
+endif()
+set(java_test_classpath "${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS-VERSION}.jar${cp_sep}.")
 message(STATUS "Java tests classpath: ${java_test_classpath}")
 
 add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} HelloWorld)
