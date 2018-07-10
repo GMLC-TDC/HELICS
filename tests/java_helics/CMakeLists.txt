@@ -70,7 +70,7 @@ add_custom_command(TARGET Java_Helics_Api POST_BUILD        # Adds a post-build 
         "$<TARGET_FILE_DIR:Java_Helics_Api>/")                 # <--this is out-file path
 endforeach(keyfile)
 
-add_custom_command(TARGET Java_Helics_ApiPOST_BUILD        # Adds a post-build event to api tests
+add_custom_command(TARGET Java_Helics_Api POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
         "$<TARGET_FILE_DIR:Java_Helics_Api>/")                 # <--this is out-file path
