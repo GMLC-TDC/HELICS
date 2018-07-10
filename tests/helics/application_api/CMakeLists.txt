@@ -55,7 +55,7 @@ add_test(NAME application-api-tests COMMAND application-api-tests --run_test=!@c
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Daily)
 
 # Tests for Continuous Integration builds
-add_test(NAME application-api-ci-tests COMMAND application-api-tests --run_test=@ci --log_level=message --report_level=short)
+add_test(NAME application-api-ci-tests COMMAND application-api-tests --run_test=@ci --log_level=test_suite --report_level=short)
 set_property(TEST application-api-ci-tests PROPERTY LABELS ApplicationApi Continuous Daily)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
