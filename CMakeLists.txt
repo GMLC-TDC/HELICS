@@ -316,7 +316,7 @@ if (NOT WIN32)
 		list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${zmqdir}" isZMQSystemDir)
 		if("${isZMQSystemDir}" STREQUAL "-1")
 			list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
-		endif(")
+		endif()
 	endif()
 endif()
 
