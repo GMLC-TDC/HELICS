@@ -39,13 +39,13 @@ add_custom_target( Java_ValueFederate ALL
     VERBATIM
 )
 
+# Windows uses a different separator for Java classpaths than other platforms
 if (CMAKE_HOST_WIN32 AND NOT CYGWIN AND CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
     set(CMAKE_JAVA_INCLUDE_FLAG_SEP ";")
 else ()
     set(CMAKE_JAVA_INCLUDE_FLAG_SEP ":")
 endif()
 set(java_test_classpath "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}.")
-message(STATUS "Java tests classpath: ${java_test_classpath}")
 
 add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} HelloWorld)
 
