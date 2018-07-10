@@ -18,7 +18,7 @@ using namespace std::string_literals;
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture, *utf::label("daily") *utf::label("release"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/

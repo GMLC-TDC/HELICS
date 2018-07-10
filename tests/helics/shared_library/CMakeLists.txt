@@ -49,14 +49,14 @@ target_compile_definitions(shared-library-tests PRIVATE "-DHELICS_INSTALL_LOCATI
 
 target_compile_definitions(shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME shared-library-tests COMMAND shared-library-tests --run_test=!@ci --log_level=message --report_level=short)
+add_test(NAME shared-library-tests COMMAND shared-library-tests --log_level=message --report_level=short)
 
 target_compile_definitions(shared-library-tests-cpp PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\"")
 target_compile_definitions(shared-library-tests-cpp PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
 
 target_compile_definitions(shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --run_test=!@ci --log_level=test_suite --report_level=short)
+add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_level=test_suite --report_level=short)
 
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Daily)
 # Setting a different label, because the test fixture for the C++ shared library tests doesn't work
@@ -67,8 +67,8 @@ set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Dail
 add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --run_test=@ci --log_level=message --report_level=short)
 add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp --run_test=@ci --log_level=test_suite --report_level=short)
 
-set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibrary Continuous Daily)
-set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS SharedLibraryCpp Continuous Daily)
+set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
 
 if (WIN32)
 

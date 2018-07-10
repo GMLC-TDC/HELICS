@@ -33,7 +33,6 @@ set_target_properties (common-tests PROPERTIES FOLDER tests)
 add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
 set_property(TEST common-tests PROPERTY LABELS Common Daily Continuous)
 
-
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 	add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build event to core tests
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."

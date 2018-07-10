@@ -49,12 +49,12 @@ target_link_libraries(core-tests helics-static helics_test_base)
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 set_target_properties (core-tests PROPERTIES FOLDER tests)
 
-add_test(NAME core-tests COMMAND core-tests --run_test=!@ci --log_level=message --report_level=short)
+add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
 set_property(TEST core-tests PROPERTY LABELS Core Daily)
 
 # Tests for Continuous Integration builds
 add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=test_suite --report_level=short)
-set_property(TEST core-ci-tests PROPERTY LABELS Core Continuous Daily)
+set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 	add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests
