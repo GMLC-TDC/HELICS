@@ -2,7 +2,8 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-
+set(helicsJar $<TARGET_FILE_DIR:JNIhelics>/buildjar/helics-${HELICS_VERSION}.jar)
+ 
 add_custom_target( Java_hello_world ALL
     ${Java_JAVAC_EXECUTABLE} -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar -d ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
     DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
@@ -38,7 +39,12 @@ add_custom_target( Java_ValueFederate ALL
     VERBATIM
 )
 
-set(java_test_classpath "${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar${CMAKE_JAVA_INCLUDE_FLAG_SEP}.")
+if (CMAKE_HOST_WIN32 AND NOT CYGWIN AND CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")
+    set(CMAKE_JAVA_INCLUDE_FLAG_SEP ";")
+else ()
+    set(CMAKE_JAVA_INCLUDE_FLAG_SEP ":")
+endif()
+set(java_test_classpath "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}.")
 message(STATUS "Java tests classpath: ${java_test_classpath}")
 
 add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} HelloWorld)
