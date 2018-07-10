@@ -64,15 +64,15 @@ set_property(TEST Java_hello_world_test Java_Helics_Api_tests Java_MessageFedera
 
 if (WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET Java_Helics_Api POST_BUILD        # Adds a post-build event to api tests
+add_custom_command(TARGET JNIhelics POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
-        "$<TARGET_FILE_DIR:Java_Helics_Api>/")                 # <--this is out-file path
+        "${CMAKE_CURRENT_BINARY_DIR}/")                 # <--this is out-file path
 endforeach(keyfile)
 
-add_custom_command(TARGET Java_Helics_Api POST_BUILD        # Adds a post-build event to api tests
+add_custom_command(TARGET JNIhelics POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
-        "$<TARGET_FILE_DIR:Java_Helics_Api>/")                 # <--this is out-file path
+        "${CMAKE_CURRENT_BINARY_DIR}/")                 # <--this is out-file path
 
 endif (WIN32)
