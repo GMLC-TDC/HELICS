@@ -2,7 +2,7 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-set(helicsJar $<TARGET_FILE_DIR:JNIhelics>/buildjar/helics-${HELICS_VERSION}.jar)
+set(helicsJar ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar)
  
 add_custom_target( Java_hello_world ALL
     ${Java_JAVAC_EXECUTABLE} -classpath ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar -d ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
