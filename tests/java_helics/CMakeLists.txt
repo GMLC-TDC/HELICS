@@ -47,15 +47,15 @@ else ()
 endif()
 set(java_test_classpath "${helicsJar}${CMAKE_JAVA_INCLUDE_FLAG_SEP}${CMAKE_CURRENT_BINARY_DIR}")
 
-add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" HelloWorld)
+add_test(NAME Java_hello_world_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path="$<TARGET_FILE_DIR:JNIhelics>${CMAKE_JAVA_INCLUDE_FLAG_SEP}$<TARGET_FILE_DIR:helicsSharedLib>" -classpath "${java_test_classpath}" HelloWorld)
 
-add_test(NAME Java_Helics_Api_tests COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" JavaHelicsApiTests)
+add_test(NAME Java_Helics_Api_tests COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path="$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" JavaHelicsApiTests)
 
-add_test(NAME Java_MessageFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} TestMessageFederate)
+add_test(NAME Java_MessageFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" TestMessageFederate)
 
-add_test(NAME Java_MessageFilter_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} TestMessageFilter)
+add_test(NAME Java_MessageFilter_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" TestMessageFilter)
 
-add_test(NAME Java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath ${java_test_classpath} TestValueFederate)
+add_test(NAME Java_ValueFederate_test COMMAND ${Java_JAVA_EXECUTABLE} -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics> -classpath "${java_test_classpath}" TestValueFederate)
 
 set_target_properties (Java_hello_world Java_Helics_Api Java_MessageFederate Java_MessageFilter Java_ValueFederate PROPERTIES FOLDER tests)
 
