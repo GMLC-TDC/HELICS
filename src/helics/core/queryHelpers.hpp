@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -39,13 +39,13 @@ std::string generateStringVector_if(const X & data, Proc generator, validator va
     ret.push_back('[');
     {
         for (auto &ele : data)
-        { 
+        {
             if (valid(ele))
             {
                 ret.append(generator(ele));
                 ret.push_back(';');
             }
-            
+
         }
     }
     if (ret.size() > 1)
