@@ -21,7 +21,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ### Argonne National Lab
  - Shrirang Abhyankar
- 
+
 ## Used Libraries or Code
 
 ### [BOOST](www.boost.org)
@@ -29,7 +29,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ### [zmq](www.zeromq.org)
   ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No zmq library code is included in the HELICS source
-  
+
 ### [cppzmq](https://github.com/zeromq/cppzmq)
   the header only bindings for the zmq library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source
 
@@ -57,7 +57,7 @@ While not used directly much of the inspiration for HELICS comes from three sepa
 ### [c++17 headers](https://github.com/tcbrindle/cpp17_headers)
 Helics makes use of C++17 headers, but due to C++14 compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std::any, std::optional and std::string_view.  
 
-###[mpark/variant](https://github.com/mpark/variant)
+### [mpark/variant](https://github.com/mpark/variant)
 this variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available.  The single header version is included with the source.
 
 ### cmake scripts
@@ -65,3 +65,4 @@ Several cmake scripts came from other sources and were either used of modified f
  - Lars Bilke CodeCoverage.cmake
  - NATIONAL HEART, LUNG, AND BLOOD INSTITUTE  FindOctave.cmake
  - clang-format, clang-tidy scripts were creating using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
+ - Viktor Kirilov, useful cmake macros [ucm](https://github.com/onqtam/ucm)  particularly for the set_runtime macro to use static runtime libraries

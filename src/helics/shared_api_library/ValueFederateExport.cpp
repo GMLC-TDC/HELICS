@@ -325,11 +325,11 @@ helics_status helicsPublicationPublishRaw (helics_publication pub, const void *d
         auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
         if (pubObj->rawOnly)
         {
-            pubObj->fedptr->publish (pubObj->id, (const char *)data, datalen);
+            pubObj->fedptr->publish (pubObj->id, reinterpret_cast<const char *>(data), datalen);
         }
         else
         {
-            pubObj->fedptr->publish (pubObj->pubptr->getID (), (const char *)data, datalen);
+            pubObj->fedptr->publish (pubObj->pubptr->getID (), reinterpret_cast<const char *> (data), datalen);
         }
         return helics_ok;
     }
@@ -1357,11 +1357,8 @@ helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub)
         auto val = subObj->fedptr->isUpdated (subObj->id);
         return (val) ? 1 : 0;
     }
-    else
-    {
-        auto val = subObj->subptr->isUpdated ();
-        return (val) ? helics_true : helics_false;
-    }
+    auto val = subObj->subptr->isUpdated ();
+    return (val) ? helics_true : helics_false;
 }
 
 helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
@@ -1376,11 +1373,8 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
         auto time = subObj->fedptr->getLastUpdateTime (subObj->id);
         return time;
     }
-    else
-    {
-        auto time = subObj->subptr->getLastUpdate ();
-        return time;
-    }
+    auto time = subObj->subptr->getLastUpdate ();
+    return time;
 }
 
 int helicsFederateGetPublicationCount (helics_federate fed)

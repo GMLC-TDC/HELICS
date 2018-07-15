@@ -114,11 +114,20 @@ if (VERSION_OPTION)
 	endif (MSVC)
 endif(VERSION_OPTION)
 
+cmake_dependent_option(STATIC_STANDARD_LIB "Link against a static standard lib" OFF "NOT USE_LIBCXX" OFF)
+include(ucm)
+mark_as_advanced(STATIC_STANDARD_LIB)
+if (STATIC_STANDARD_LIB)
+	ucm_set_runtime(STATIC)
+else()
+	ucm_set_runtime(DYNAMIC)
+endif()
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
 if(BUILD_HELICS_TESTS)
-	option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+	cmake_dependent_option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF "BUILD_HELICS_TESTS" OFF)
 	if (TEST_CODE_COVERAGE)
 		include(CodeCoverage)
 
@@ -223,6 +232,11 @@ endif(MSYS)
 # Enable ZeroMQ
 # -------------------------------------------------------------
 
+### just check some intenal options
+if (BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
+message(fatal "BOTH BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY cannot be specified together otherwise nothing works")
+endif()
+
 option(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ZeroMQ_ENABLE)
 # If ZeroMQ library is enabled try to locate it and link against it
@@ -320,6 +334,8 @@ mark_as_advanced(DISABLE_DEBUG_LOGGING)
 #-----------------------------------------------------------------------------
 set(FMT_TEST OFF)
 set(FMT_ASSUME_CPP14_SUPPORT ON)
+set(FMT_SILENT ON)
+#get the FMT header only library
 add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 HIDE_VARIABLE(FMT_DOC)
 HIDE_VARIABLE(FMT_INSTALL)

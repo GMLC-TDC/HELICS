@@ -98,8 +98,8 @@ typedef enum {
 typedef enum {
     helics_custom_filter = 0,
     helics_delay_filter = 1,
-    helics_randomDelay_filter = 2,
-    helics_randomDrop_filter = 3,
+    helics_random_delay_filter = 2,
+    helics_random_drop_filter = 3,
     helics_reroute_filter = 4,
     helics_clone_filter = 5
 

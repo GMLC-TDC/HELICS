@@ -190,7 +190,7 @@ class Subscription : public SubscriptionBase
     {
     }
     /** generate a subscription object from a preexisting subscription
-    @param valueFed a pointer to the appropriate value Federate
+    @param value_fed a pointer to the appropriate value Federate
     @param subIndex the index of the subscription
     */
     Subscription (ValueFederate *valueFed, int subIndex) : SubscriptionBase (valueFed, subIndex) {}
@@ -355,7 +355,7 @@ class SubscriptionT : public SubscriptionBase
   public:
     SubscriptionT () = default;
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
@@ -364,7 +364,7 @@ class SubscriptionT : public SubscriptionBase
     {
     }
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
@@ -375,7 +375,7 @@ class SubscriptionT : public SubscriptionBase
     }
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
@@ -388,7 +388,7 @@ class SubscriptionT : public SubscriptionBase
     }
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] name the name of the subscription
     @param[in] units the units associated with a Federate
     */
@@ -467,7 +467,7 @@ class VectorSubscription
 
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] key the identifier for the publication to subscribe to
     @param[in] startIndex the index to start with
     @param[in] count the number of values to subscribe to
@@ -509,7 +509,7 @@ class VectorSubscription
         });
     }
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] key the identifier for the publication to subscribe to
     @param[in] startIndex the index to start with
     @param[in] count the number of values to subscribe to
@@ -598,7 +598,7 @@ class VectorSubscription2d
 
     /**constructor to build a subscription object
     @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
      @param[in] key the identifier for the publication to subscribe to
     @param[in] startIndex_x the index to start with in the x dimension
     @param[in] count_x the number of values in the x direction
@@ -655,7 +655,7 @@ class VectorSubscription2d
     }
 
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
+    @param[in] value_fed  the ValueFederate to use
     @param[in] key the identifier for the publication to subscribe to
     @param[in] startIndex_x the index to start with in the x dimension
     @param[in] count_x the number of values in the x direction

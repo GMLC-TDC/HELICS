@@ -49,11 +49,11 @@ set(ALL_CORE_FILES
 		)
 
 set(INCLUDE_DIRECTORIES
-${PROJECT_SOURCE_DIR}/src/core
-${ROJECT_SOURCE_DIR}/src/application_api
-${PROJECT_SOURCE_DIR}/src/app
-${PROJECT_SOURCE_DIR}/src/common
-${PROJECT_SOURCE_DIR}/src/shared_api_library
+${PROJECT_SOURCE_DIR}/src/helics/core
+${PROJECT_SOURCE_DIR}/src/helics/application_api
+${PROJECT_SOURCE_DIR}/src/helics/apps
+${PROJECT_SOURCE_DIR}/src/helics/common
+${PROJECT_SOURCE_DIR}/src/helics/shared_api_library
 ${PROJECT_SOURCE_DIR}/test
 ${ZMQ_INCLUDE_DIR}
 ${PROJECT_SOURCE_DIR}/src/helics
