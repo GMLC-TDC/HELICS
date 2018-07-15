@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE (tracer_tests)
 
 BOOST_AUTO_TEST_CASE (simple_tracer_test)
 {
-    std::atomic<double> lastVal;
+    std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
     auto cb = [&lastVal, &lastTime](helics::Time tm, const std::string &, const std::string &newval) {
         lastTime = static_cast<double> (tm);

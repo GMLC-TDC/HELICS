@@ -22,7 +22,7 @@ namespace libguarded
 {
     template<class T, class M>
     class shared_guarded;
-}
+} //namespace libguarded
 
 /**
  * HELICS Application API

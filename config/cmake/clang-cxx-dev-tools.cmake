@@ -60,6 +60,7 @@ ${PROJECT_SOURCE_DIR}/src/helics
 ${PROJECT_SOURCE_DIR}/src
 ${PROJECT_BINARY_DIR}/libs/include
 ${PROJECT_BINARY_DIR}/include
+${PROJECT_BINARY_DIR}/src/helics/shared_api_library
 ${PROJECT_SOURCE_DIR}/ThirdParty
 ${Boost_INCLUDE_DIR}
 )
