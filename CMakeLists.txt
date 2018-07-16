@@ -300,8 +300,8 @@ if (NOT WIN32)
 		get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 		message(STATUS "zmqdir path =${zmqdir}")
 
-		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
-		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
+		list(INSERT CMAKE_INSTALL_RPATH 0 "${zmqdir}")
+		list(INSERT CMAKE_BUILD_RPATH  0 "${zmqdir}")
 	endif()
 endif()
 
@@ -318,8 +318,8 @@ endif()
 
 
 if (NOT Boost_USE_STATIC_LIBS)
-	list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
+	list(APPEND CMAKE_INSTALL_RPATH "${Boost_LIBRARY_DIRS}")
+	list(APPEND CMAKE_BUILD_RPATH "${Boost_LIBRARY_DIRS}")
 endif()
 
 option(BUILD_BROKER "Build a helics Broker executable" ON)
