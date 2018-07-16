@@ -404,7 +404,7 @@ helics_status helicsPublicationPublishBoolean (helics_publication pub, helics_bo
         }
         else
         {
-            pubObj->pubptr->publish ((val != helics_false) ? true : false);
+            pubObj->pubptr->publish ((val != helics_false));
         }
         return helics_ok;
     }
@@ -911,7 +911,7 @@ helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const vo
         }
         else
         {
-            subObj->fedptr->setDefaultValue (subObj->id, helics::data_view ((const char *)data, dataLen));
+            subObj->fedptr->setDefaultValue (subObj->id, helics::data_view (static_cast<const char *>(data), dataLen));
         }
 
         return helics_ok;
@@ -987,7 +987,7 @@ helics_status helicsSubscriptionSetDefaultBoolean (helics_subscription sub, heli
         }
         else
         {
-            subObj->subptr->setDefault ((val != helics_false) ? true : false);
+            subObj->subptr->setDefault ((val != helics_false));
         }
         return helics_ok;
     }

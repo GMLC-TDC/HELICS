@@ -16,7 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const helics::ArgDescriptors InfoArgs{
   {"name,n", "name of the broker"},
-  {"type,t", "type of the broker (\"(zmq)\", \"ipc\", \"test\", \"mpi\", \"test\", \"tcp\", \"udp\")"}};
+  {"type,t", R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp"))lit"}};
 
 namespace helics
 {

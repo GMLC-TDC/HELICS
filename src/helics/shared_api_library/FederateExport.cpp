@@ -179,7 +179,7 @@ helics_federate helicsCreateMessageFederateFromJson (const char *json)
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)
+helics_federate helicsCreateCombinationFederate (helics_federate_info_t const fi)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try
