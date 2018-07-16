@@ -132,7 +132,7 @@ int UdpComms::processIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case CLOSE_RECEIVER:
             return (-1);
@@ -148,12 +148,12 @@ ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case QUERY_PORTS:
         {
             ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
+            portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
             return portReply;
         }
@@ -162,7 +162,7 @@ ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
         {
             auto openPort = findOpenPort ();
             ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
+            portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
             portReply.source_handle = openPort;
             return portReply;
@@ -171,7 +171,7 @@ ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
         case CLOSE_RECEIVER:
             return M;
         default:
-            M.index = NULL_REPLY;
+            M.messageID = NULL_REPLY;
             return M;
         }
     }
@@ -249,7 +249,7 @@ void UdpComms::queue_rx_function ()
         }
         if (isProtocolCommand (M))
         {
-            if (M.index == CLOSE_RECEIVER)
+            if (M.messageID == CLOSE_RECEIVER)
             {
                 goto CLOSE_RX_LOOP;
             }
@@ -259,7 +259,7 @@ void UdpComms::queue_rx_function ()
             auto reply = generateReplyToIncomingMessage (M);
             if (isProtocolCommand (reply))
             {
-                if (reply.index == DISCONNECT)
+                if (reply.messageID == DISCONNECT)
                 {
                     goto CLOSE_RX_LOOP;
                 }
@@ -316,7 +316,7 @@ void UdpComms::queue_tx_function ()
             if (PortNumber <= 0)
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
-                m.index = REQUEST_PORTS;
+                m.messageID = REQUEST_PORTS;
                 transmitSocket.send_to (boost::asio::buffer (m.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {
@@ -328,7 +328,7 @@ void UdpComms::queue_tx_function ()
                 m = ActionMessage (rx.data (), len);
                 if (isProtocolCommand (m))
                 {
-                    if (m.index == PORT_DEFINITIONS)
+                    if (m.messageID == PORT_DEFINITIONS)
                     {
                         PortNumber = m.source_handle;
                         if (openPortStart < 0)
@@ -346,7 +346,7 @@ void UdpComms::queue_tx_function ()
                         }
                         promisePort.set_value (PortNumber);
                     }
-                    else if (m.index == DISCONNECT)
+                    else if (m.messageID == DISCONNECT)
                     {
                         PortNumber = -1;
                         promisePort.set_value (-1);
@@ -385,7 +385,7 @@ void UdpComms::queue_tx_function ()
         {
             if (route_id == -1)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
@@ -515,7 +515,7 @@ void UdpComms::closeReceiver ()
     if (tx_status == connection_status::connected)
     {
         ActionMessage cmd (CMD_PROTOCOL);
-        cmd.index = CLOSE_RECEIVER;
+        cmd.messageID = CLOSE_RECEIVER;
         transmit (-1, cmd);
     }
     else if (!disconnecting)

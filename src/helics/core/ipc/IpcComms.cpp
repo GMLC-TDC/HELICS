@@ -79,12 +79,12 @@ void IpcComms::queue_rx_function ()
         }
         if (isProtocolCommand (*cmdopt))
         {
-            if (cmdopt->index == CLOSE_RECEIVER)
+            if (cmdopt->messageID == CLOSE_RECEIVER)
             {
                 disconnecting = true;
                 break;
             }
-            if (cmdopt->index == SET_TO_OPERATING)
+            if (cmdopt->messageID == SET_TO_OPERATING)
             {
                 if (!operating)
                 {
@@ -195,7 +195,7 @@ void IpcComms::queue_tx_function ()
         {
             if (route_id == -1)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
@@ -217,7 +217,7 @@ void IpcComms::queue_tx_function ()
             if (!operating)
             {
                 ActionMessage op (CMD_PROTOCOL);
-                op.index = SET_TO_OPERATING;
+                op.messageID = SET_TO_OPERATING;
                 rxQueue.sendMessage (op, 3);
             }
         }
@@ -261,7 +261,7 @@ void IpcComms::closeReceiver ()
         return;
     }
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
+    cmd.messageID = CLOSE_RECEIVER;
     if (tx_status == connection_status::connected)
     {
         transmit (-1, cmd);

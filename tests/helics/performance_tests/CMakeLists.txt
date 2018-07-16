@@ -8,6 +8,7 @@
 set(perf_sources
 performance-tests.cpp
 multiEchoTest.cpp
+ring_tests.cpp
 )
 
 

@@ -86,6 +86,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
+    dependencies.resetDependentEvents(time_granted);
     updateTimeFactors ();
 
     if (!dependents.empty ())
@@ -658,7 +659,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
 {
     if (cmd.action () == CMD_TIME_BLOCK)
     {
-        timeBlocks.emplace_back (cmd.actionTime, cmd.index);
+        timeBlocks.emplace_back (cmd.actionTime, cmd.messageID);
         if (cmd.actionTime < time_block)
         {
             time_block = cmd.actionTime;
@@ -669,7 +670,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
         if (!timeBlocks.empty ())
         {
             auto ltime = Time::maxVal ();
-            if (timeBlocks.front ().second == cmd.index)
+            if (timeBlocks.front ().second == cmd.messageID)
             {
                 ltime = timeBlocks.front ().first;
                 timeBlocks.pop_front ();
@@ -677,7 +678,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
             else
             {
                 auto blk = std::find_if (timeBlocks.begin (), timeBlocks.end (),
-                                         [&cmd](const auto &block) { return (block.second == cmd.index); });
+                                         [&cmd](const auto &block) { return (block.second == cmd.messageID); });
                 if (blk != timeBlocks.end ())
                 {
                     ltime = blk->first;
@@ -736,7 +737,7 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 
 void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool initMode)
 {
-    switch (cmd.index)
+    switch (cmd.messageID)
     {
     case UPDATE_OUTPUT_DELAY:
         info.outputDelay = cmd.actionTime;

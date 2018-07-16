@@ -136,7 +136,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             ActionMessage badInit (CMD_FED_ACK);
             setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id_local;
-            badInit.index = 5;
+            badInit.messageID = 5;
             badInit.name = command.name;
             transmit (getRoute (global_federate_id_t(command.source_id)), badInit);
             return;
@@ -147,7 +147,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             ActionMessage badName (CMD_FED_ACK);
             setActionFlag (badName, error_flag);
             badName.source_id = global_broker_id_local;
-            badName.index = 6;
+            badName.messageID = 6;
             badName.name = command.name;
             transmit (getRoute (global_federate_id_t(command.source_id)), badName);
             return;
@@ -1188,7 +1188,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         querycmd.source_id = global_broker_id.load();
         querycmd.dest_id = global_broker_id.load();
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
         auto fut = ActiveQueries.getFuture (index);
         addActionMessage (std::move (querycmd));
@@ -1205,12 +1205,12 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         ActionMessage querycmd (CMD_BROKER_QUERY);
         querycmd.source_id = global_broker_id.load();
         querycmd.dest_id = 0;
-        querycmd.index = ++queryCounter;
+        querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.index);
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
         addActionMessage (querycmd);
         auto ret = fut.get ();
-        ActiveQueries.finishedWithValue (querycmd.index);
+        ActiveQueries.finishedWithValue (querycmd.messageID);
         return ret;
     }
     else if ((target == "root") || (target == "rootbroker"))
@@ -1219,9 +1219,9 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         querycmd.source_id = global_broker_id.load();
         querycmd.dest_id = 0;
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.index);
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
         if (!global_broker_id.load().isValid())
         {
             delayTransmitQueue.push (std::move (querycmd));
@@ -1239,10 +1239,10 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         ActionMessage querycmd (CMD_QUERY);
         querycmd.source_id = global_broker_id.load();
         auto index = ++queryCounter;
-        querycmd.index = index;
+        querycmd.messageID = index;
         querycmd.payload = queryStr;
         querycmd.info ().target = target;
-        auto fut = ActiveQueries.getFuture (querycmd.index);
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
         if (!global_broker_id.load().isValid())
         {
             delayTransmitQueue.push (std::move (querycmd));
@@ -1394,7 +1394,7 @@ void CoreBroker::initializeFederateMap ()
             {
                 index = fedMap.generatePlaceHolder ("brokers");
             }
-            queryReq.index = index;
+            queryReq.messageID = index;
             queryReq.dest_id = broker.global_id;
             transmit (broker.route_id, queryReq);
         }
@@ -1432,7 +1432,7 @@ void CoreBroker::initializeDependencyGraph ()
         {
             index = depMap.generatePlaceHolder ("brokers");
         }
-        queryReq.index = index;
+        queryReq.messageID = index;
         queryReq.dest_id = broker.global_id;
         transmit(broker.route_id, queryReq);
     }
@@ -1454,7 +1454,7 @@ void CoreBroker::processLocalQuery(const ActionMessage &m)
     ActionMessage queryRep(CMD_QUERY_REPLY);
     queryRep.source_id = global_broker_id_local;
     queryRep.dest_id = m.source_id;
-    queryRep.index = m.index;
+    queryRep.messageID = m.messageID;
     queryRep.payload = generateQueryAnswer(m.payload);
     queryRep.counter = m.counter;
     if (queryRep.payload == "#wait")
@@ -1505,7 +1505,7 @@ void CoreBroker::processQuery(const ActionMessage &m)
             ActionMessage queryResp(CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
             queryResp.source_id = global_broker_id_local;
-            queryResp.index = m.index;
+            queryResp.messageID = m.messageID;
 
             queryResp.payload = "#invalid";
             transmit(getRoute(queryResp.dest_id), queryResp);
@@ -1523,16 +1523,16 @@ void CoreBroker::processQueryResponse(const ActionMessage &m)
     {
     case 0:
     default:
-        ActiveQueries.setDelayedValue(m.index, m.payload);
+        ActiveQueries.setDelayedValue(m.messageID, m.payload);
         break;
     case 2:
-        if (fedMap.addComponent(m.payload, m.index))
+        if (fedMap.addComponent(m.payload, m.messageID))
         {
             if (fedMapRequestors.size() == 1)
             {
                 if (fedMapRequestors.front().dest_id == global_broker_id_local)
                 {
-                    ActiveQueries.setDelayedValue(fedMapRequestors.front().index, fedMap.generate());
+                    ActiveQueries.setDelayedValue(fedMapRequestors.front().messageID, fedMap.generate());
                 }
                 else
                 {
@@ -1548,7 +1548,7 @@ void CoreBroker::processQueryResponse(const ActionMessage &m)
                 {
                     if (resp.dest_id == global_broker_id_local)
                     {
-                        ActiveQueries.setDelayedValue(resp.index, str);
+                        ActiveQueries.setDelayedValue(resp.messageID, str);
                     }
                     else
                     {
@@ -1561,13 +1561,13 @@ void CoreBroker::processQueryResponse(const ActionMessage &m)
         }
         break;
     case 4:
-        if (depMap.addComponent (m.payload, m.index))
+        if (depMap.addComponent (m.payload, m.messageID))
         {
             if (depMapRequestors.size () == 1)
             {
                 if (depMapRequestors.front().dest_id == global_broker_id_local)
                 {
-                    ActiveQueries.setDelayedValue(depMapRequestors.front().index, depMap.generate());
+                    ActiveQueries.setDelayedValue(depMapRequestors.front().messageID, depMap.generate());
                 }
                 else
                 {
@@ -1582,7 +1582,7 @@ void CoreBroker::processQueryResponse(const ActionMessage &m)
                 {
                     if (resp.dest_id == global_broker_id_local)
                     {
-                        ActiveQueries.setDelayedValue(resp.index, str);
+                        ActiveQueries.setDelayedValue(resp.messageID, str);
                     }
                     else
                     {
@@ -1637,7 +1637,7 @@ void CoreBroker::checkDependencies ()
             else
             {
                 ActionMessage logWarning (CMD_LOG, 0, newdep.second);
-                logWarning.index = warning;
+                logWarning.messageID = warning;
                 logWarning.payload = "unable to locate " + newdep.first + " to establish dependency";
                 routeMessage (logWarning);
             }

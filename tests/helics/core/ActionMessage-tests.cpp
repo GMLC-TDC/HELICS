@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 BOOST_AUTO_TEST_CASE (check_conversions)
 {
     helics::ActionMessage cmd (helics::CMD_PROTOCOL);
-    cmd.index = 10;
+    cmd.messageID = 10;
     cmd.payload = "this is a payload test";
 
     auto cmdStr = cmd.to_string ();

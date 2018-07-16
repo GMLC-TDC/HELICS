@@ -99,7 +99,8 @@ class TimeDependencies
     /** reset iterative time requests to prepare for next iteration
     @param requestTime  the time that is being iterated*/
     void resetIteratingTimeRequests (Time requestTime);
-
+    /** reset the tdeMin */
+    void resetDependentEvents (Time minTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies () const;
 };

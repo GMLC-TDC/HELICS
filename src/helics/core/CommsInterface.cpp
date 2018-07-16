@@ -51,7 +51,7 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
 {
     ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
-    rt.index = NEW_ROUTE;
+    rt.messageID = NEW_ROUTE;
     rt.dest_id = route_id;
     transmit (-1, rt);
 }
@@ -271,21 +271,21 @@ bool CommsInterface::isConnected () const
 void CommsInterface::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
+    rt.messageID = DISCONNECT;
     transmit (-1, rt);
 }
 
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.index = RECONNECT;
+    rt.messageID = RECONNECT;
     transmit (-1, rt);
 }
 
 void CommsInterface::reconnectReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = RECONNECT_RECEIVER;
+    cmd.messageID = RECONNECT_RECEIVER;
     transmit (-1, cmd);
 }
 
