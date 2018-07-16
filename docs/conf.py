@@ -34,6 +34,8 @@ import os
 import sphinx_rtd_theme
 from sphinxcontrib.pandoc_markdown import MarkdownParser
 
+current_directory = os.path.dirname(os.path.realpath(__file__))
+
 def which(program):
     def is_exe(fpath):
         return os.path.exists(fpath) and os.access(fpath, os.X_OK) and os.path.isfile(fpath)
@@ -72,7 +74,7 @@ extensions = [
 ]
 
 breathe_projects = {
-    "helics": "./../build-doxygen/docs/xml",
+    "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
 }
 
 breathe_default_project = "helics"
