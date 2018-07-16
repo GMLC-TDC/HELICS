@@ -66,15 +66,12 @@ class ActionMessage
     Time Te = timeZero;  //!< 48 event time
     Time Tdemin = timeZero;  //!< 56 min dependent event time
     Time Tso = timeZero;  //!<64 the second order dependent time
-    
-private:
+    std::string
+      payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
+    std::string &name;  //!< alias payload to a name reference for registration functions
+  private:
     std::unique_ptr<AdditionalInfo>
         extraInfo;  //!< pointer to an additional info structure with more data if required //72
-public:
-    std::string
-      payload;  //!< string containing the data	//64 std::string is 32 bytes on most platforms (except libc++)
-    std::string &name;  //!< alias payload to a name reference for registration functions
-  
   public:
     /** default constructor*/
     ActionMessage () noexcept : name (payload){};
