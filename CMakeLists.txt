@@ -281,11 +281,14 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
+set(CMAKE_BUILD_RPATH "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+#add the local directory to the rpath
+list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if (NOT WIN32)
 	if (HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
@@ -296,22 +299,16 @@ if (NOT WIN32)
 		message(STATUS "zmqlib file =${zmqlibfile}")
 		get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 		message(STATUS "zmqdir path =${zmqdir}")
-		list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${zmqdir}" isZMQSystemDir)
-		if("${isZMQSystemDir}" STREQUAL "-1")
-			list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH "${zmqdir}")
-		endif()
 
-		list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${zmqdir}" isZMQSystemDir)
-		if("${isZMQSystemDir}" STREQUAL "-1")
-			list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
-		endif()
+		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
+		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
 endif()
 
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
-   list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+   list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
 endif()
 
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
