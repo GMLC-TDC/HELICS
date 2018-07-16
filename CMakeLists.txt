@@ -287,6 +287,22 @@ set(CMAKE_BUILD_RPATH "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH
 # which point to directories outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# the RPATH to be used when installing, but only if it's not a system directory
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+   list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+endif()
+
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif()
+
+if (NOT Boost_USE_STATIC_LIBS)
+	list(APPEND CMAKE_INSTALL_RPATH "${Boost_LIBRARY_DIRS}")
+	list(APPEND CMAKE_BUILD_RPATH "${Boost_LIBRARY_DIRS}")
+endif()
+
 #add the local directory to the rpath
 list(APPEND CMAKE_INSTALL_RPATH "./")
 
@@ -300,27 +316,11 @@ if (NOT WIN32)
 		get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 		message(STATUS "zmqdir path =${zmqdir}")
 
-		list(INSERT CMAKE_INSTALL_RPATH 0 "${zmqdir}")
-		list(INSERT CMAKE_BUILD_RPATH  0 "${zmqdir}")
+		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
+		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
 endif()
 
-# the RPATH to be used when installing, but only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-   list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
-endif()
-
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
-
-if (NOT Boost_USE_STATIC_LIBS)
-	list(APPEND CMAKE_INSTALL_RPATH "${Boost_LIBRARY_DIRS}")
-	list(APPEND CMAKE_BUILD_RPATH "${Boost_LIBRARY_DIRS}")
-endif()
 
 option(BUILD_BROKER "Build a helics Broker executable" ON)
 option(BUILD_APPS "Build helics applications to run various apps, including player, recorder, and helics_apps" ON)
