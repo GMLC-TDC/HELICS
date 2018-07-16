@@ -8,14 +8,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork)
-    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork(targetNetwork)
+CommsInterface::CommsInterface (const std::string &localTarget,
+                                const std::string &brokerTarget,
+                                interface_networks targetNetwork)
+    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork (targetNetwork)
 {
 }
 
 CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
     : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
-      brokerName_ (netInfo.brokerName), interfaceNetwork(netInfo.interfaceNetwork)
+      brokerName_ (netInfo.brokerName), interfaceNetwork (netInfo.interfaceNetwork)
 {
 }
 
@@ -83,8 +85,28 @@ bool CommsInterface::connect ()
     {
         localTarget_ = name;
     }
-    queue_watcher = std::thread ([this] { queue_rx_function (); });
-    queue_transmitter = std::thread ([this] { queue_tx_function (); });
+    queue_watcher = std::thread ([this] {
+        try
+        {
+            queue_rx_function ();
+        }
+        catch (const std::exception &e)
+        {
+            rx_status = connection_status::error;
+            std::cerr << "error in receiver" << e.what () << std::endl;
+        }
+    });
+    queue_transmitter = std::thread ([this] {
+        try
+        {
+            queue_tx_function ();
+        }
+        catch (const std::exception &e)
+        {
+            tx_status = connection_status::error;
+            std::cerr << "error in transmitter" << e.what () << std::endl;
+        }
+    });
     std::this_thread::sleep_for (std::chrono::milliseconds (50));
     while (rx_status == connection_status::startup)
     {
