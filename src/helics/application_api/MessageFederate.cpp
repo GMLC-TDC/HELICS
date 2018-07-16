@@ -23,14 +23,14 @@ MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const Feder
 MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    MessageFederate::registerInterfaces (jsonString);
 }
 
 MessageFederate::MessageFederate (const std::string &name, const std::string &jsonString)
     : Federate (loadFederateInfo (name, jsonString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    MessageFederate::registerInterfaces (jsonString);
 }
 
 MessageFederate::MessageFederate ()

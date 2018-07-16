@@ -42,14 +42,11 @@ void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t local
     }
 }
 
-void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)
+void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::string &name)
 {
     if (endpoint.value () < endpointCount)
     {
-        auto h = coreObject->registerSubscription (fedID, name, type, std::string (), handle_check_mode::optional);
-        std::lock_guard<std::mutex> eLock (endpointLock);
-        subHandleLookup.emplace (h, std::make_pair (endpoint, name));
-        hasSubscriptions = true;
+        coreObject->addSourceTarget ((*local_endpoints.lock_shared ())[endpoint.value ()]->handle, name);
     }
     else
     {
@@ -77,7 +74,7 @@ bool MessageFederateManager::hasMessage (endpoint_id_t id) const
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-uint64_t MessageFederateManager::receiveCount (endpoint_id_t id) const
+uint64_t MessageFederateManager::pendingMessages (endpoint_id_t id) const
 {
     return (id.value () < endpointCount) ? (messageQueues[id.value ()].size ()) : 0;
 }
@@ -86,7 +83,7 @@ uint64_t MessageFederateManager::receiveCount (endpoint_id_t id) const
 @details this function is not preferred in multi-threaded contexts due to the required locking
 prefer to just use getMessage until it returns an invalid Message.
 */
-uint64_t MessageFederateManager::receiveCount () const
+uint64_t MessageFederateManager::pendingMessages () const
 {
     uint64_t sz = 0;
     for (auto &mq : messageQueues)
@@ -174,7 +171,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     // lock the data updates
     std::unique_lock<std::mutex> eplock (endpointLock);
 
-    handle_id_t endpoint_id;
+    interface_handle endpoint_id;
     for (size_t ii = 0; ii < epCount; ++ii)
     {
         auto message = coreObject->receiveAny (fedID, endpoint_id);
@@ -205,45 +202,6 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
                 eplock.unlock ();
                 ac (fid->id, CurrentTime);
                 eplock.lock ();
-            }
-        }
-    }
-    if (hasSubscriptions)
-    {
-        auto handles = coreObject->getValueUpdates (fedID);
-        for (auto handle : handles)
-        {
-            auto sfnd = subHandleLookup.find (handle);
-            if (sfnd != subHandleLookup.end ())
-            {
-                auto mv = std::make_unique<Message> ();
-                mv->source = sfnd->second.second;
-                auto localEndpointIndex = sfnd->second.first.value ();
-                auto eptInfo = (*local_endpoints.lock ())[localEndpointIndex];
-                mv->dest = eptInfo->name;
-                mv->original_source = mv->source;
-                // get the data value
-                auto data = coreObject->getValue (handle);
-
-                mv->data = *data;
-                mv->time = CurrentTime;
-                messageQueues[localEndpointIndex].push (std::move (mv));
-                if (eptInfo->callbackIndex >= 0)
-                {
-                    // make sure the lock is not engaged for the callback
-                    auto cb = callbacks[eptInfo->callbackIndex];
-                    eplock.unlock ();
-                    cb (sfnd->second.first, newTime);
-                    eplock.lock ();
-                }
-                else if (allCallbackIndex >= 0)
-                {
-                    // make sure the lock is not engaged for the callback
-                    auto ac = callbacks[allCallbackIndex];
-                    eplock.unlock ();
-                    ac (sfnd->second.first, CurrentTime);
-                    eplock.lock ();
-                }
             }
         }
     }

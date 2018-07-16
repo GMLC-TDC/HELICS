@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 
     core->setTimeDelta (id, 1.0);
 
-    helics::handle_id_t end1 = core->registerEndpoint (id, "end1", "type");
+    helics::interface_handle end1 = core->registerEndpoint (id, "end1", "type");
     BOOST_CHECK_EQUAL (core->getType (end1), "type");
 
-    helics::handle_id_t end2 = core->registerEndpoint (id, "end2", "type");
+    helics::interface_handle end2 = core->registerEndpoint (id, "end2", "type");
     BOOST_CHECK_EQUAL (core->getType (end2), "type");
 
     core->enterInitializingState (id);

@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/MessageFilters.h"
 #include <string>
 
-namespace helics
+namespace helics98
 {
 class Filter
 {

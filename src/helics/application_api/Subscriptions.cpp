@@ -11,16 +11,16 @@ namespace helics
 {
 SubscriptionBase::SubscriptionBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
 {
-    auto cnt = fed->getSubscriptionCount ();
+    auto cnt = fed->getInputCount ();
     if ((subIndex >= cnt) || (cnt < 0))
     {
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
-    id = static_cast<subscription_id_t> (subIndex);
-    key_ = fed->getSubscriptionKey (id);
+    id = static_cast<input_id_t> (subIndex);
+    target_ = fed->getTarget (id);
 
-    type_ = fed->getSubscriptionType (id);
-    units_ = fed->getSubscriptionUnits (id);
+    type_ = fed->getInputType (id);
+    units_ = fed->getInputUnits (id);
 }
 
 void Subscription::handleCallback (Time time)

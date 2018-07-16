@@ -184,7 +184,7 @@ SourceFilter::SourceFilter (Federate *fed,
     if (fed != nullptr)
     {
         fid = fed->registerSourceFilter (name, target, input_type, output_type);
-        id = handle_id_t(fid.value ());
+        id = interface_handle(fid.value ());
     }
 }
 
@@ -212,7 +212,7 @@ DestinationFilter::DestinationFilter (Federate *fed,
     if (fed != nullptr)
     {
         fid = fed->registerDestinationFilter (name, target, input_type, output_type);
-        id = handle_id_t(fid.value ());
+        id = interface_handle(fid.value ());
     }
 }
 
@@ -265,7 +265,7 @@ void CloningFilter::removeSourceTarget (const std::string &sourceName)
     {
         if (sourceEndpoints[ii] == sourceName)
         {
-            corePtr->setFilterOperator (handle_id_t(sourceFilters[ii].value ()), nullptr);
+            corePtr->setFilterOperator (interface_handle(sourceFilters[ii].value ()), nullptr);
         }
     }
 }
@@ -276,7 +276,7 @@ void CloningFilter::removeDestinationTarget (const std::string &destinationName)
     {
         if (destEndpoints[ii] == destinationName)
         {
-            corePtr->setFilterOperator (handle_id_t(destFilters[ii].value ()), nullptr);
+            corePtr->setFilterOperator (interface_handle(destFilters[ii].value ()), nullptr);
         }
     }
 }

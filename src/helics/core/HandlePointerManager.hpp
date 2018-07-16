@@ -22,12 +22,12 @@ class HandlePointerManager
 {
   private:
     std::vector<std::unique_ptr<BasicHandleInfo>> handles;  //!< local handle information
-    std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
-    std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
-    std::unordered_multimap<std::string, handle_id_t> subscriptions;  //!< multimap of subscriptions
-    std::unordered_multimap<std::string, handle_id_t> filters;  //!< multimap for all the filters
-    std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
-    std::unordered_multimap<std::string, Core::handle_id_t> controlOutputs;  //!< multimap for all the control outputs
+    std::unordered_map<std::string, interface_handle> publications;  //!< map of all local publications
+    std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
+    std::unordered_multimap<std::string, interface_handle> subscriptions;  //!< multimap of subscriptions
+    std::unordered_multimap<std::string, interface_handle> filters;  //!< multimap for all the filters
+    std::unordered_multimap<std::string, Core::interface_handle> filters;  //!< multimap for all the filters
+    std::unordered_multimap<std::string, Core::interface_handle> controlOutputs;  //!< multimap for all the control outputs
   public:
     /** default constructor*/
     HandlePointerManager () = default;
@@ -44,13 +44,13 @@ class HandlePointerManager
                                 const std::string &target,
                                 const std::string &type_in,
                                 const std::string &type_out);
-    BasicHandleInfo *getHandleInfo (handle_id_t id_) const;
+    BasicHandleInfo *getHandleInfo (interface_handle id_) const;
     BasicHandleInfo *getEndpoint (const std::string &name) const;
     BasicHandleInfo *getFilter (const std::string &name) const;
     BasicHandleInfo *getSubscription (const std::string &name) const;
     BasicHandleInfo *getPublication (const std::string &name) const;
 
-    federate_id_t getLocalFedID (handle_id_t id_) const;
+    federate_id_t getLocalFedID (interface_handle id_) const;
     auto begin () { return handles.begin (); }
     auto end () { return handles.end (); }
     auto begin () const { return handles.begin (); }

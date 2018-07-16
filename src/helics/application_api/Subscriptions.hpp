@@ -17,61 +17,32 @@ class SubscriptionBase
 {
   protected:
     ValueFederate *fed = nullptr;  //!< reference to the value federate
-    std::string key_;  //!< the name of the subscription
+    std::string target_;  //!< the name of the subscription
     std::string type_;  //!< the requested type of the subscription
     std::string units_;  //!< the defined units of the subscription
-    subscription_id_t id;  //!< the id of the federate
+    input_id_t id;  //!< the id of the federate
 
   public:
     SubscriptionBase () = default;
 
     SubscriptionBase(ValueFederate *valueFed,
-        const std::string &key,
+        const std::string &target,
         const std::string &type = "def",
         const std::string &units = std::string())
-        : fed(valueFed), key_(key), type_(type), units_(units)
+        : fed(valueFed), target_(target), type_(type), units_(units)
     {
-        id = fed->registerRequiredSubscription(key_, type_, units_);
+        id = fed->registerSubscription(target_, type_, units_);
     }
 
     template <class FedPtr>
     SubscriptionBase (FedPtr & valueFed,
-                      const std::string &key,
+                      const std::string &target,
                       const std::string &type = "def",
                       const std::string &units = std::string ())
-        : SubscriptionBase(std::addressof (*valueFed),key,type,units)
+        : SubscriptionBase(std::addressof (*valueFed),target,type,units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
-    }
-
-    SubscriptionBase(interface_availability required,
-        ValueFederate *valueFed,
-        const std::string &key,
-        const std::string &type = "def",
-        const std::string &units = std::string())
-        : fed(valueFed), key_(key), type_(type), units_(units)
-    {
-        if (required == interface_availability::required)
-        {
-            id = fed->registerRequiredSubscription(key_, type_, units_);
-        }
-        else
-        {
-            id = fed->registerOptionalSubscription(key_, type_, units_);
-        }
-    }
-
-    template <class FedPtr>
-    SubscriptionBase (interface_availability required,
-        FedPtr & valueFed,
-                      const std::string &key,
-                      const std::string &type = "def",
-                      const std::string &units = std::string ())
-        : SubscriptionBase (required, std::addressof (*valueFed), key, type,units)
-    {
-        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
-                       "second argument must be a pointer to a ValueFederate");
     }
 
     SubscriptionBase (ValueFederate *valueFed, int subIndex);
@@ -84,7 +55,7 @@ class SubscriptionBase
     Time getLastUpdate () const { return fed->getLastUpdateTime (id); }
     /** check if the value has subscription has been updated*/
     virtual bool isUpdated () const { return fed->isUpdated (id); }
-    subscription_id_t getID () const { return id; }
+    input_id_t getID () const { return id; }
 
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
@@ -93,13 +64,13 @@ class SubscriptionBase
     */
     void registerCallback (std::function<void(Time)> callback)
     {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
+        fed->registerInputNotificationCallback (id, [=](input_id_t, Time time) { callback (time); });
     }
     /** get the key for the subscription*/
-    const std::string &getKey () const { return key_; }
+    const std::string &getKey () const { return target_; }
     /** get the Name for the subscription 
     @details the name is the local name if given, key is the full key name*/
-    const std::string &getName () const { return key_; }
+    const std::string &getName () const { return target_; }
     /** get the key for the subscription*/
     std::string getType () const { return fed->getPublicationType (id); }
     /** get the units associated with a subscription*/
@@ -138,23 +109,6 @@ class Subscription : public SubscriptionBase
     {
     }
 
-    Subscription(interface_availability required,
-        ValueFederate *valueFed,
-        const std::string &key,
-        const std::string &units = std::string())
-        : SubscriptionBase(required, valueFed, key, "def", units)
-    {
-    }
-
-    template <class FedPtr>
-    Subscription (interface_availability required,
-                  FedPtr &valueFed,
-                  const std::string &key,
-                  const std::string &units = std::string ())
-        : SubscriptionBase (required, valueFed, key, "def", units)
-    {
-    }
-
     Subscription(ValueFederate *valueFed,
         const std::string &key,
         helics_type_t defType,
@@ -172,23 +126,6 @@ class Subscription : public SubscriptionBase
     {
     }
 
-    Subscription(interface_availability required,
-        ValueFederate *valueFed,
-        const std::string &key,
-        helics_type_t defType,
-        const std::string &units = std::string())
-        : SubscriptionBase(required, valueFed, key, typeNameStringRef(defType), units)
-    {
-    }
-    template <class FedPtr>
-    Subscription (interface_availability required,
-                  FedPtr &valueFed,
-                  const std::string &key,
-                  helics_type_t defType,
-                  const std::string &units = std::string ())
-        : SubscriptionBase (required, valueFed, key, typeNameStringRef (defType), units)
-    {
-    }
     /** generate a subscription object from a preexisting subscription
     @param valueFed a pointer to the appropriate value Federate
     @param subIndex the index of the subscription
@@ -210,7 +147,7 @@ class Subscription : public SubscriptionBase
     registerCallback (std::function<void(const X &, Time)> callback)
     {
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+        fed->registerSubscriptionNotificationCallback (id, [=](input_id_t, Time time) {
             handleCallback (time);
         });
     }
@@ -373,34 +310,7 @@ class SubscriptionT : public SubscriptionBase
         : SubscriptionBase (valueFed, name, ValueConverter<X>::type (), units)
     {
     }
-    /**constructor to build a subscription object
-    @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
-    */
-    SubscriptionT(interface_availability required,
-        ValueFederate *valueFed,
-        const std::string &name,
-        const std::string &units = "")
-        : SubscriptionBase(required, valueFed, name, ValueConverter<X>::type(), units)
-    {
-    }
-    /**constructor to build a subscription object
-    @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the subscription
-    @param[in] units the units associated with a Federate
-    */
-    template <class FedPtr>
-    SubscriptionT (interface_availability required,
-                   FedPtr valueFed,
-                   const std::string &name,
-                   const std::string &units = "")
-        : SubscriptionBase (required, valueFed, name, ValueConverter<X>::type (), units)
-    {
-    }
-
+   
     /** get the most recent value
     @return the value*/
     X getValue () const { return fed->getValue<X> (id); }
@@ -418,7 +328,7 @@ class SubscriptionT : public SubscriptionBase
     void registerCallback (std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+        fed->registerSubscriptionNotificationCallback (id, [=](input_id_t, Time time) {
             handleCallback (time);
         });
     }
@@ -459,7 +369,7 @@ class VectorSubscription
     ValueFederate *fed = nullptr;  //!< reference to the value federate
     std::string m_key;  //!< the key for the subscription
     std::string m_units;  //!< the defined units of the federate
-    std::vector<subscription_id_t> ids;  //!< the id of the federate
+    std::vector<input_id_t> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
   public:
@@ -475,8 +385,7 @@ class VectorSubscription
     @param[in] units the units associated with the Subscription
     */
     template <class FedPtr>
-    VectorSubscription (interface_availability required,
-                        FedPtr valueFed,
+    VectorSubscription (FedPtr valueFed,
                         const std::string &key,
                         int startIndex,
                         int count,
@@ -504,7 +413,7 @@ class VectorSubscription
                 ids.push_back (id);
             }
         }
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     }
@@ -532,7 +441,7 @@ class VectorSubscription
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     };
@@ -546,7 +455,7 @@ class VectorSubscription
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
         return *this;
@@ -566,7 +475,7 @@ class VectorSubscription
     void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (subscription_id_t id, Time time)
+    void handleCallback (input_id_t id, Time time)
     {
         X out;
         auto res = std::lower_bound (ids.begin (), ids.end (), id);
@@ -589,7 +498,7 @@ class VectorSubscription2d
     ValueFederate *fed = nullptr;  //!< reference to the value federate
     std::string m_key;  //!< the name of the subscription
     std::string m_units;  //!< the defined units of the federate
-    std::vector<subscription_id_t> ids;  //!< the id of the federate
+    std::vector<input_id_t> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
     std::array<int, 4> indices;  //!< storage for the indices and start values
@@ -649,7 +558,7 @@ class VectorSubscription2d
         indices[1] = count_x;
         indices[2] = startIndex_y;
         indices[3] = count_y;
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     }
@@ -690,7 +599,7 @@ class VectorSubscription2d
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals)), indices (vs.indices)
     {
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     };
@@ -705,7 +614,7 @@ class VectorSubscription2d
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](subscription_id_t id, Time tm) {
+        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
         indices = vs.indices;
@@ -734,7 +643,7 @@ class VectorSubscription2d
     void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (subscription_id_t id, Time time)
+    void handleCallback (input_id_t id, Time time)
     {
         auto res = std::lower_bound (ids.begin (), ids.end (), id);
         int index = static_cast<int> (res - ids.begin ());

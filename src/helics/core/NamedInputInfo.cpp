@@ -3,13 +3,13 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ControlInputInfo.hpp"
+#include "NamedInputInfo.hpp"
 
 #include <algorithm>
 
 namespace helics
 {
-std::vector<std::shared_ptr<const data_block>> ControlInputInfo::getData ()
+std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getData ()
 {
     std::vector<std::shared_ptr<const data_block>> out;
     out.reserve (current_data.size ());
@@ -20,12 +20,11 @@ std::vector<std::shared_ptr<const data_block>> ControlInputInfo::getData ()
     return out;
 }
 
-static auto recordComparison = [](const ControlInputInfo::dataRecord &rec1, const ControlInputInfo::dataRecord &rec2) {
+static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const NamedInputInfo::dataRecord &rec2) {
     return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void ControlInputInfo::addData (Core::federate_id_t source_id,
-                                Core::handle_id_t source_handle,
+void NamedInputInfo::addData (global_handle source_id,
                                 Time valueTime,
                                 unsigned int iteration,
                                 std::shared_ptr<const data_block> data)
@@ -34,7 +33,7 @@ void ControlInputInfo::addData (Core::federate_id_t source_id,
     bool found = false;
     for (index = 0; index < static_cast<int> (input_sources.size ()); ++index)
     {
-        if ((input_sources[index].first == source_id) && (input_sources[index].second == source_handle))
+        if (input_sources[index] == source_id)
         {
             found = true;
             break;
@@ -57,7 +56,7 @@ void ControlInputInfo::addData (Core::federate_id_t source_id,
     }
 }
 
-bool ControlInputInfo::updateTimeUpTo (Time newTime)
+bool NamedInputInfo::updateTimeUpTo (Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -93,7 +92,7 @@ bool ControlInputInfo::updateTimeUpTo (Time newTime)
     return updated;
 }
 
-bool ControlInputInfo::updateTimeNextIteration (Time newTime)
+bool NamedInputInfo::updateTimeNextIteration (Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -141,7 +140,7 @@ bool ControlInputInfo::updateTimeNextIteration (Time newTime)
     return updated;
 }
 
-bool ControlInputInfo::updateTimeInclusive (Time newTime)
+bool NamedInputInfo::updateTimeInclusive (Time newTime)
 {
     int index = 0;
     bool updated = false;
@@ -176,7 +175,7 @@ bool ControlInputInfo::updateTimeInclusive (Time newTime)
     return updated;
 }
 
-bool ControlInputInfo::updateData (dataRecord &&update, int index)
+bool NamedInputInfo::updateData (dataRecord &&update, int index)
 {
     if (!only_update_on_change)
     {
@@ -196,7 +195,7 @@ bool ControlInputInfo::updateData (dataRecord &&update, int index)
     return false;
 }
 
-Time ControlInputInfo::nextValueTime () const
+Time NamedInputInfo::nextValueTime () const
 {
     Time nvtime = Time::maxVal ();
     for (const auto &q : data_queues)

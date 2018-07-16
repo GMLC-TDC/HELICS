@@ -131,23 +131,34 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                                              units);
     }
 
-    /** register a subscription
+    /** register an input
     @details call is only valid in startup mode register a subscription with name type and units
     @param[in] key the name of the publication to subscribe to
     @param[in] type a string describing the type of the publication
     @param[in] units a string describing the units on the publication
     */
-    subscription_id_t registerRequiredSubscription (const std::string &key,
+    input_id_t registerInput (const std::string &key,
                                                     const std::string &type,
                                                     const std::string &units = std::string ());
+
+	/** register a globally named input
+    @details call is only valid in startup mode
+    @param[in] key the name of the input(can be blank in which case it is the same as a subscription
+    @param[in] type a string defining the type of the input
+    @param[in] units a string defining the units of the input [optional]
+    @return a input id object for use as an identifier
+    */
+    input_id_t registerGlobalInput (const std::string &key,
+                                                const std::string &type,
+                                                const std::string &units = std::string ());
     /** register a subscription
     @details call is only valid in startup mode
     */
     template <typename X>
-    subscription_id_t
-    registerRequiredSubscription (const std::string &name, const std::string &units = std::string ())
+    input_id_t
+    registerInput(const std::string &name, const std::string &units = std::string ())
     {
-        return registerRequiredSubscription (name, ValueConverter<X>::type (), units);
+        return registerInput (name, ValueConverter<X>::type (), units);
     }
 
     /** register a required subscription
@@ -157,37 +168,39 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerRequiredSubscriptionIndexed (const std::string &key,
+    input_id_t registerInputIndexed (const std::string &key,
                                                            int index1,
                                                            const std::string &units = std::string ())
     {
-        return registerRequiredSubscription<X> (key + '_' + std::to_string (index1), units);
+        return registerInput<X> (key + '_' + std::to_string (index1), units);
     }
 
-    /** register a required subscription for a 2-D array of values
-    @details call is only valid in startup mode
-    @param[in] key the name of the subscription
-    @param[in] index1 the first index of a 2-D value structure
-    @param[in] index2 the 2nd index of a 2-D value structure
-    @param[in] units the optional units on the subscription
-    */
+	 /** register a publication as part of a 2 dimensional indexed structure
+   @details call is only valid in startup mode by default prepends the name with the federate name
+   the name is registered as a global structure with the indices appended
+   @param[in] key the name of the publication
+   @param[in] index1 an index associated with the publication
+   @param[in] index2 a second index
+   @param[in] units  the optional units of the publication
+   @return an identifier for use with this publication
+   */
     template <typename X>
-    subscription_id_t registerRequiredSubscriptionIndexed (const std::string &key,
-                                                           int index1,
-                                                           int index2,
-                                                           const std::string &units = std::string ())
+    publication_id_t registerInputIndexed (const std::string &key,
+                                                 int index1,
+                                                 int index2,
+                                                 const std::string &units = std::string ())
     {
-        return registerRequiredSubscription<X> (key + '_' + std::to_string (index1) + '_' +
-                                                  std::to_string (index2),
-                                                units);
+        return registerInput<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
+                                             units);
     }
+    
     /** register a subscription
     @details call is only valid in startup mode
-    @param[in] key the name of the publication to subscribe to
+    @param[in] target the name of the publication to subscribe to
     @param[in] type the type of the subscription
     @param[in] units the units associated with the desired output
     */
-    subscription_id_t registerOptionalSubscription (const std::string &key,
+    input_id_t registerSubscription (const std::string &target,
                                                     const std::string &type,
                                                     const std::string &units = std::string ());
     /** register a subscription
@@ -196,10 +209,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t
-    registerOptionalSubscription (const std::string &key, const std::string &units = std::string ())
+    input_id_t
+    registerSubscription (const std::string &target, const std::string &units = std::string ())
     {
-        return registerOptionalSubscription (key, ValueConverter<X>::type (), units);
+        return registerSubscription (target, ValueConverter<X>::type (), units);
     }
 
     /** register an optional subscription
@@ -209,11 +222,11 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerOptionalSubscriptionIndexed (const std::string &key,
+    input_id_t registerSubscriptionIndexed (const std::string &target,
                                                            int index1,
                                                            const std::string &units = std::string ())
     {
-        return registerOptionalSubscription<X> (key + '_' + std::to_string (index1), units);
+        return registerSubscription<X> (target + '_' + std::to_string (index1), units);
     }
 
     /** register an optional subscription for a 2-D array of values
@@ -224,12 +237,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    subscription_id_t registerOptionalSubscriptionIndexed (const std::string &key,
+    input_id_t registerSubscriptionIndexed (const std::string &target,
                                                            int index1,
                                                            int index2,
                                                            const std::string &units = std::string ())
     {
-        return registerOptionalSubscription<X> (key + '_' + std::to_string (index1) + '_' +
+        return registerSubscription<X> (target + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
                                                 units);
     }
@@ -239,7 +252,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addSubscriptionShortcut (subscription_id_t subid, const std::string &shortcutName);
+    void addShortcut (input_id_t subid, const std::string &shortcutName);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
@@ -247,14 +260,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] block the data view representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (subscription_id_t id, data_view block);
+    void setDefaultValue (input_id_t id, data_view block);
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
-    @param[in] id the subscription identifier
+    @param[in] id the input identifier
     @param[in] block the data block representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (subscription_id_t id, const data_block &block)
+    void setDefaultValue (input_id_t id, const data_block &block)
     {
         setDefaultValue (id, data_view (block));
     }
@@ -265,7 +278,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    void setDefaultValue (subscription_id_t id, const X &val)
+    void setDefaultValue (input_id_t id, const X &val)
     {
         setDefaultValue (id, data_view (ValueConverter<X>::convert (val)));
     }
@@ -286,7 +299,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a constant data block
     @throw std::invalid_argument if id is invalid
     */
-    data_view getValueRaw (subscription_id_t id);
+    data_view getValueRaw (input_id_t id);
 
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
@@ -295,7 +308,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    void getValue (subscription_id_t id, X &obj)
+    void getValue (input_id_t id, X &obj)
     {
         ValueConverter<X>::interpret (getValueRaw (id), obj);
     }
@@ -306,7 +319,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    X getValue (subscription_id_t id)
+    X getValue (input_id_t id)
     {
         return ValueConverter<X>::interpret (getValueRaw (id));
     }
@@ -357,9 +370,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** check if a given subscription has an update
     @return true if the subscription id is valid and has an update*/
-    bool isUpdated (subscription_id_t sub_id) const;
+    bool isUpdated (input_id_t sub_id) const;
     /** get the time of the last update*/
-    Time getLastUpdateTime (subscription_id_t sub_id) const;
+    Time getLastUpdateTime (input_id_t sub_id) const;
 
     virtual void disconnect () override;
 
@@ -372,23 +385,23 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
     */
-    std::vector<subscription_id_t> queryUpdates ();
+    std::vector<input_id_t> queryUpdates ();
 
     /** get the key or the string identifier of a subscription from its id
     @return empty string if an invalid id is passed*/
-    std::string getSubscriptionKey (subscription_id_t) const;
+    std::string getTarget (input_id_t id) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &key) const;
+    input_id_t getInputId (const std::string &key) const;
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &key, int index1) const;
+    input_id_t getInputId (const std::string &key, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    subscription_id_t getSubscriptionId (const std::string &key, int index1, int index2) const;
+    input_id_t getInputId (const std::string &key, int index1, int index2) const;
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
-    std::string getPublicationKey (publication_id_t) const;
+    std::string getPublicationKey (publication_id_t id) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
@@ -407,7 +420,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
     @return the name or empty string on unrecognized id*/
-    std::string getSubscriptionUnits (subscription_id_t id) const;
+    std::string getInputUnits (input_id_t id) const;
 
     /** get the units of a publication from its id
     @param[in] id the publication id to query
@@ -417,7 +430,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the type of a subscription from its id
     @param[in] id the subscription id to query
     @return the type or empty string on unrecognized id*/
-    std::string getSubscriptionType (subscription_id_t id) const;
+    std::string getInputType (input_id_t id) const;
 
     /** get the type of a publication from its id
     @param[in] id the publication id to query
@@ -427,30 +440,30 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the type of the publication of a particular subscription
     @param[in] id the subscription id to query
     @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (subscription_id_t id) const;
+    std::string getPublicationType (input_id_t id) const;
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
-    @param[in] callback the function to call signature void(subscription_id_t, Time)
+    @param[in] callback the function to call signature void(input_id_t, Time)
     */
-    void registerSubscriptionNotificationCallback (std::function<void(subscription_id_t, Time)> callback);
+    void registerInputNotificationCallback (std::function<void(input_id_t, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerSubscriptionNotificationCallback (subscription_id_t id,
-                                                   std::function<void(subscription_id_t, Time)> callback);
+    void registerInputNotificationCallback (input_id_t id,
+                                                   std::function<void(input_id_t, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] ids  the set of ids to register the callback for
     @param[in] callback the function to call
     */
-    void registerSubscriptionNotificationCallback (const std::vector<subscription_id_t> &ids,
-                                                   std::function<void(subscription_id_t, Time)> callback);
+    void registerInputNotificationCallback (const std::vector<input_id_t> &ids,
+                                                   std::function<void(input_id_t, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;
     /** get a count of the number subscriptions registered*/
-    int getSubscriptionCount () const;
+    int getInputCount () const;
 
   private:
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
@@ -484,7 +497,7 @@ void publish (ValueFederate &fed, const std::string &pubKey, Us... pargs)
 }
 
 /** get a value directly from the subscription key name
-@details this is a convenience function to get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the Input name
 this function should not be used as the primary means of retrieving value as it does involve an additional map find
 operation vs the member getValue calls
 @param fed a shared pointer to a valueFederate
@@ -493,7 +506,7 @@ operation vs the member getValue calls
 template <class X>
 X getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key)
 {
-    return fed->getValue<X> (fed->getSubscriptionId (Key));
+    return fed->getValue<X> (fed->getInputId (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -507,7 +520,7 @@ operation vs the member getValue calls
 template <class X>
 void getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key, X &obj)
 {
-    obj = fed->getValue<X> (fed->getSubscriptionId (Key));
+    obj = fed->getValue<X> (fed->getInputId (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -520,7 +533,7 @@ operation vs the member getValue calls
 template <class X>
 X getValue (ValueFederate &fed, const std::string &Key)
 {
-    return fed.getValue<X> (fed.getSubscriptionId (Key));
+    return fed.getValue<X> (fed.getInputId (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -534,6 +547,6 @@ operation vs the member getValue calls
 template <class X>
 void getValue (ValueFederate &fed, const std::string &Key, X &obj)
 {
-    obj = fed.getValue<X> (fed.getSubscriptionId (Key));
+    obj = fed.getValue<X> (fed.getInputId (Key));
 }
 }  // namespace helics

@@ -14,13 +14,10 @@ namespace helics
 enum class handle_type_t : char
 {
     unknown,
-    publication,  //!< handle to publish interface
-    subscription,  //!< handle to a subscribe interface
-    control_input, //!< handle for a control input
+    publication,  //!< handle to output interface
+    input,  //!< handle to a input interface
     endpoint,  //!< handle to an endpoint
-    source_filter,  //!< handle to a source filter
-    destination_filter,  //!< handle to a destination filter
-    cloning_filter,  //!< handle for a cloning filter
+    filter,  //!< handle to a filter
 };
 
 /** define extra flag definitions*/
@@ -37,34 +34,34 @@ class BasicHandleInfo
 {
   public:
     /** default constructor*/
-    BasicHandleInfo () noexcept : fed_id(global_federate_id_t()),handle(handle_id_t()),type_in (type), type_out (units){};
+    BasicHandleInfo () noexcept : handle(global_federate_id_t(),interface_handle()),type_in (type), type_out (units){};
     /** construct from the data*/
     BasicHandleInfo (global_federate_id_t federate_id_t,
-                     handle_id_t handle_id,
+                     interface_handle handle_id,
                      handle_type_t type_of_handle,
                      const std::string &key_name,
                      const std::string &type_name,
                      const std::string &unit_name)
-        : fed_id (federate_id_t), handle(handle_id), handle_type (type_of_handle), key (key_name), type (type_name), units (unit_name), type_in (type),
+        : handle (federate_id_t, handle_id), handle_type (type_of_handle), key (key_name), type (type_name),
+          units (unit_name), type_in (type),
           type_out (units)
 
     {
     }
     /** construct from the data for filters*/
     BasicHandleInfo (global_federate_id_t federate_id_t,
-                        handle_id_t handle_id,
+                        interface_handle handle_id,
                      handle_type_t type_of_handle,
                      const std::string &key_name,
                      const std::string &target_name,
                      const std::string &type_in_name,
                      const std::string &type_out_name)
-        :  fed_id (federate_id_t), handle(handle_id), handle_type (type_of_handle), key (key_name), type (type_in_name), units (type_out_name),
+        :  handle (federate_id_t,handle_id), handle_type (type_of_handle), key (key_name), type (type_in_name), units (type_out_name),
           target (target_name), type_in (type), type_out (units)
 
     {
     }
-    const global_federate_id_t fed_id;  //!< the global federate id for the creator of the handle
-    const handle_id_t handle;  //!< the identification number for the handle
+    const global_handle handle;  //!< the global federate id for the creator of the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
     bool used = false;  //!< indicator that the handle is being used to link with another federate
@@ -73,8 +70,11 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    const std::string target;  //!< the target of the handle 
+    std::string target;  //!< the target of the handle 
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
+
+	interface_handle getInterfaceHandle () const { return handle.handle; }
+    global_federate_id_t getFederate () const { return handle.fed_id; }
 };
 }  // namespace helics

@@ -9,7 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/MessageFederate.h"
 
-
+namespace helics98
+{
 class Endpoint
 {
 public:
@@ -56,7 +57,7 @@ public:
         helicsEndpointSendMessageRaw(ep, dest.c_str(), data, static_cast<int>(len));
     }
 
-    void sendMessage( const std::string &dest, const char *data, size_t len, helics_time_t time)
+    void sendMessage(const std::string &dest, const char *data, size_t len, helics_time_t time)
     {
         helicsEndpointSendEventRaw(ep, dest.c_str(), data, static_cast<int>(len), time);
     }
@@ -66,7 +67,7 @@ public:
         helicsEndpointSendMessageRaw(ep, dest.c_str(), data.c_str(), static_cast<int>(data.size()));
     }
 
-    void sendMessage(const std::string &dest, const std::string &data,helics_time_t time)
+    void sendMessage(const std::string &dest, const std::string &data, helics_time_t time)
     {
         helicsEndpointSendEventRaw(ep, dest.c_str(), data.c_str(), static_cast<int>(data.size()), time);
     }
@@ -82,7 +83,7 @@ public:
         helicsEndpointSendEventRaw(ep, dest.c_str(), data.data(), static_cast<int>(data.size()), time);
     }
 
-    void sendMessage( message_t &message)
+    void sendMessage(message_t &message)
     {
         // returns helicsStatus
         helicsEndpointSendMessage(ep, &message);
@@ -106,4 +107,5 @@ public:
 private:
     helics_endpoint ep;
 };
+}
 #endif

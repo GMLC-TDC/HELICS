@@ -46,23 +46,23 @@ private:
 to those that are a actually required and make sense, and make it as low impact as possible.
 it also acts to limit any mistakes of a federate_id_t
 */
-class handle_id_t
+class interface_handle
 {
 
 public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr handle_id_t() = default;
+    constexpr interface_handle() = default;
 
-    constexpr explicit handle_id_t(base_type val) noexcept : _id(val) {};
+    constexpr explicit interface_handle(base_type val) noexcept : _id(val) {};
 
     constexpr operator base_type() const { return _id; }
     /** equality operator*/
-    bool operator== (handle_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (interface_handle id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (handle_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (interface_handle id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (handle_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (interface_handle id) const noexcept { return (_id < id._id); };
     bool isValid() const {
         return (_id != -1'700'000'000);
     }
@@ -71,7 +71,7 @@ private:
 
 };
 
-constexpr handle_id_t direct_send_handle =handle_id_t(-1'745'234);  //!< this special handle can be used to directly send a message in a core
+constexpr interface_handle direct_send_handle =interface_handle(-1'745'234);  //!< this special handle can be used to directly send a message in a core
 
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
 this value allows 131072 federates to be available in each core
@@ -161,7 +161,27 @@ private:
     
 };
 
-
+/** class merging a global id and handle together */
+class global_handle
+{
+  public:
+    global_federate_id_t fed_id = global_federate_id_t();
+    interface_handle handle = interface_handle();
+    global_handle() = default;
+    global_handle(global_federate_id_t fed, interface_handle hand) :fed_id(fed), handle(hand)
+    {};
+    explicit operator uint64_t() const
+    {
+        auto key = static_cast<uint64_t> (fed_id) << 32;
+        key += static_cast<uint64_t> (handle) & (0x0000'0000'FFFF'FFFF);
+        return key;
+    }
+    bool operator== (global_handle id) const noexcept { return ((fed_id == id.fed_id)&&(handle==id.handle)); };
+    /** inequality operator*/
+    bool operator!= (global_handle id) const noexcept { return ((fed_id != id.fed_id)||(handle!=id.handle)); };
+    /** less than operator for sorting*/
+    bool operator< (global_handle id) const noexcept { return (fed_id < id.fed_id)?true:((fed_id!=id.fed_id)?false:(handle<id.handle)); };
+};
 
 
 

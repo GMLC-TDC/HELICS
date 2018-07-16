@@ -13,7 +13,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            const std::string &type,
                                            const std::string &units)
 {
-    handle_id_t local_id(static_cast<handle_id_t::base_type>(handles.size ()));
+    interface_handle local_id(static_cast<interface_handle::base_type>(handles.size ()));
     std::string actKey = (!key.empty ()) ? key : generateName (what);
     handles.emplace_back ( fed_id, local_id, what, actKey, type, units);
     addSearchFields (handles.back (), local_id);
@@ -27,7 +27,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            const std::string &type_in,
                                            const std::string &type_out)
 {
-    handle_id_t local_id(static_cast<handle_id_t::base_type>(handles.size()));
+    interface_handle local_id(static_cast<interface_handle::base_type>(handles.size()));
     std::string actKey = (!key.empty ()) ? key : generateName (what);
     handles.emplace_back ( fed_id, local_id, what, actKey, target, type_in, type_out);
     addSearchFields (handles.back (), local_id);
@@ -35,7 +35,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 }
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           handle_id_t local_id,
+                                           interface_handle local_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &type,
@@ -49,7 +49,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 }
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           handle_id_t local_id,
+                                           interface_handle local_id,
                                            handle_type_t what,
                                            const std::string &key,
                                            const std::string &target,
@@ -110,16 +110,10 @@ const BasicHandleInfo *HandleManager::getHandleInfo(int32_t index) const
     return nullptr;
 }
 
-static uint64_t generateSearchKey (global_federate_id_t fed_id, handle_id_t id)
-{
-    auto searchKey = static_cast<uint64_t> (fed_id) << 32;
-    searchKey += static_cast<uint64_t> (id) & (0x0000'0000'FFFF'FFFF);
-    return searchKey;
-}
 
-BasicHandleInfo *HandleManager::findHandle (global_federate_id_t fed_id, handle_id_t id)
+BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
 {
-    auto key = generateSearchKey (fed_id, id);
+    auto key = static_cast<uint64_t> (fed_id);
     auto fnd = unique_ids.find (key);
     if (fnd != unique_ids.end ())
     {
@@ -196,20 +190,20 @@ BasicHandleInfo *HandleManager::getPublication(int32_t index)
     return nullptr;
 }
 
-BasicHandleInfo *HandleManager::getNamedInput(const std::string &name)
+BasicHandleInfo *HandleManager::getInput(const std::string &name)
 {
-    auto fnd = controlInputs.find(name);
-    if (fnd != controlInputs.end())
+    auto fnd = inputs.find(name);
+    if (fnd != inputs.end())
     {
         return &(handles[fnd->second]);
     }
     return nullptr;
 }
 
-const BasicHandleInfo *HandleManager::getNamedInput(const std::string &name) const
+const BasicHandleInfo *HandleManager::getInput(const std::string &name) const
 {
-    auto fnd = controlInputs.find(name);
-    if (fnd != controlInputs.end())
+    auto fnd = inputs.find(name);
+    if (fnd != inputs.end())
     {
         return &(handles[fnd->second]);
     }
@@ -240,7 +234,7 @@ BasicHandleInfo *HandleManager::getFilter(int32_t index)
     if (isValidIndex(index, handles))
     {
         auto &hand = handles[index];
-        if ((hand.handle_type == handle_type_t::source_filter)||(hand.handle_type==handle_type_t::destination_filter))
+        if (hand.handle_type == handle_type_t::filter)
         {
             return &hand;
         }
@@ -249,10 +243,10 @@ BasicHandleInfo *HandleManager::getFilter(int32_t index)
     return nullptr;
 }
 
-int32_t HandleManager::getLocalFedID (handle_id_t id_) const
+federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles)) ? handles[id_].local_fed_id : federate_id_t();
+    return (isValidIndex (static_cast<interface_handle::base_type>(id_), handles)) ? handles[id_].local_fed_id : federate_id_t();
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)
@@ -260,28 +254,25 @@ void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t inde
     switch (handle.handle_type)
     {
     case handle_type_t::endpoint:
-        endpoints.emplace (handle.key, handle_id_t(index));
+        endpoints.emplace (handle.key, interface_handle(index));
         break;
     case handle_type_t::publication:
-        publications.emplace (handle.key, handle_id_t(index));
+        publications.emplace (handle.key, interface_handle(index));
         break;
-    case handle_type_t::cloning_filter:
-    case handle_type_t::destination_filter:
-    case handle_type_t::source_filter:
+    case handle_type_t::filter:
         if (!handle.key.empty ())
         {
-            filters.emplace (handle.key, handle_id_t(index));
+            filters.emplace (handle.key, interface_handle(index));
         }
         break;
-    case handle_type_t::subscription:
-        subscriptions.emplace (handle.key, handle_id_t(index));
+    case handle_type_t::input:
+        inputs.emplace (handle.key, interface_handle(index));
         break;
     default:
         break;
     }
     // generate a key of the fed and handle
-    auto searchKey = generateSearchKey (handle.fed_id, handle.handle);
-    unique_ids.emplace (searchKey, index);
+    unique_ids.emplace (static_cast<uint64_t>(handle.handle), index);
 }
 
 std::string HandleManager::generateName (handle_type_t what) const
@@ -292,12 +283,8 @@ std::string HandleManager::generateName (handle_type_t what) const
         return std::string ("ept_") + std::to_string (handles.size ());
     case handle_type_t::publication:
         return std::string ("pub_") + std::to_string (handles.size ());
-    case handle_type_t::cloning_filter:
-        return std::string ("cFilter_") + std::to_string (handles.size ());
-    case handle_type_t::destination_filter:
-        return std::string ("dFilter_") + std::to_string (handles.size ());
-    case handle_type_t::source_filter:
-        return std::string ("sFilter_") + std::to_string (handles.size ());
+    case handle_type_t::filter:
+        return std::string ("filter_") + std::to_string (handles.size ());
     default:
         return std::string ("handle_") + std::to_string (handles.size ());
     }

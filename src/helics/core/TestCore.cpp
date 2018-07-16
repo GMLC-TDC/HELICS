@@ -15,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 using federate_id_t = federate_id_t;
-using handle_id_t = handle_id_t;
+using interface_handle = interface_handle;
 
 namespace testcore
 {

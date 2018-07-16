@@ -227,45 +227,22 @@ class Federate
     @return the granted time step in an iteration_time structure which contains a time and iteration result*/
     iteration_time requestTimeIterativeComplete ();
 
-    /** set the minimum time delta for the federate
-    @param[in] tdelta the minimum time delta to return from a time request function
+    /** set a time option for the federate
+    @param[in] option the option to set
+	@param[in] timeValue the value to be set
     */
-    void setTimeDelta (Time tdelta);
-    /** set the look ahead time or output delay
-    @details the look ahead is the propagation time for messages/event to propagate from the Federate
-    to the outside federation
-    @param[in] outputDelay the value of the time delay (must be >=0)
-    @throws invalid_value when using a time <0
-    */
-    void setOutputDelay (Time outputDelay);
+    void setTimeProperty (int32_t option, Time timeValue);
 
-    /** set the impact Window time
-    @details the impact window is the time window around the time request in which other federates cannot affect
-    the federate
-    @param[in] inputDelay the look ahead time
-    @throws invalid_value when using a time <0
-    */
-    void setInputDelay (Time inputDelay);
-    /** set the period and offset of the federate
-    @details the federate will on grant time on N*period+offset interval
-    @param[in] period the length of time between each subsequent grants
-    @param[in] offset the shift of the period from 0  offset must be < period
-    */
-    void setPeriod (Time period, Time offset = timeZero);
     /** set a flag for the federate
     @param[in] flag an index into the flag /ref flag-definitions.h
     @param[in] flagvalue the value of the flag defaults to true
     */
     virtual void setFlag (int flag, bool flagValue = true);
-    /**  set the logging level for the federate
+    /**  set an integer option for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
-    void setLoggingLevel (int loggingLevel);
-    /**  set the maximum number of local iterations
-    @param maxIterations the maximum number of allowed iterations before helics forces a return
-    */
-    void setMaxIterations (int maxIterations);
+    void setIntegerProperty (int32_t option, int32_t optionValue);
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
@@ -333,95 +310,53 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
-    /** define a filter interface on a source
+    /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerSourceFilter (const std::string &filterName,
-                                      const std::string &sourceEndpoint,
+    filter_id_t registerFilter (const std::string &filterName,
                                       const std::string &inputType = std::string (),
                                       const std::string &outputType = std::string ());
-    /** define a filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerDestinationFilter (const std::string &filterName,
-                                           const std::string &destEndpoint,
-                                           const std::string &inputType = std::string (),
-                                           const std::string &outputType = std::string ());
+
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
+    @param filterName the name of the filter
+    @param inputType the inputType which the filter can handle
+	@param outputType the outputType of the filter which the filter produces
     */
-    filter_id_t registerCloningSourceFilter (const std::string &filterName,
-                                             const std::string &sourceEndpoint,
+    filter_id_t registerCloningFilter (const std::string &filterName,
                                              const std::string &inputType = std::string (),
                                              const std::string &outputType = std::string ());
-    /** define a cloning filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerCloningDestinationFilter (const std::string &filterName,
-                                                  const std::string &destEndpoint,
-                                                  const std::string &inputType = std::string (),
-                                                  const std::string &outputType = std::string ());
+    
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerSourceFilter (const std::string &sourceEndpoint)
+    filter_id_t registerFilter ()
     {
-        return registerSourceFilter (std::string (), sourceEndpoint, std::string (), std::string ());
+        return registerFilter (std::string (), std::string (), std::string ());
     }
-    /** define a filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerDestinationFilter (const std::string &destEndpoint)
-    {
-        return registerDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
-    }
+    
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerCloningSourceFilter (const std::string &sourceEndpoint)
+    filter_id_t registerCloningFilter ()
     {
-        return registerCloningSourceFilter (std::string (), sourceEndpoint, std::string (), std::string ());
+        return registerCloningFilter (std::string (), std::string (), std::string ());
     }
-    /** define a cloning filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerCloningDestinationFilter (const std::string &destEndpoint)
-    {
-        return registerCloningDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
-    }
+    
     /** get the name of a filter
     @param[in] id the filter to query
     @return empty string if an invalid id is passed*/
     std::string getFilterName (filter_id_t id) const;
-
-    /** get the name of the endpoint that a filter is associated with
-    @param[in] id the filter to query
-    @return empty string if an invalid id is passed*/
-    std::string getFilterEndpoint (filter_id_t id) const;
 
     /** get the input type of a filter from its id
     @param[in] id the endpoint to query
@@ -436,15 +371,6 @@ class Federate
     @param[in] filterName the name of the filter
     @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
     filter_id_t getFilterId (const std::string &filterName) const;
-    /** get the id of a source filter from the name of the filter
-    @param[in] filterName the publication id
-    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
-    filter_id_t getSourceFilterId (const std::string &filterName) const;
-
-    /** get the id of a destination filter from the name of the endpoint
-    @param[in] filterName the publication id
-    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
-    filter_id_t getDestFilterId (const std::string &filterName) const;
 
     /** @brief register a operator for the specified filter
     @details for time_agnostic federates only,  all other settings would trigger an error

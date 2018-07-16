@@ -87,9 +87,9 @@ class FederateState
 
     std::map<global_federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
 
-    std::vector<handle_id_t> events;  //!< list of value events to process
+    std::vector<interface_handle> events;  //!< list of value events to process
     std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
-    std::map<handle_id_t, std::vector<std::unique_ptr<Message>>>
+    std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
@@ -127,7 +127,7 @@ class FederateState
     const InterfaceInfo &interfaces () const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize (handle_id_t id) const;
+    uint64_t getQueueSize (interface_handle id) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
     /** get the current iteration counter for an iterative call
@@ -137,10 +137,10 @@ class FederateState
     /** get the next available message for an endpoint
     @param id the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transfered to the caller*/
-    std::unique_ptr<Message> receive (handle_id_t id);
+    std::unique_ptr<Message> receive (interface_handle id);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny (handle_id_t &id);
+    std::unique_ptr<Message> receiveAny (interface_handle &id);
     /** set the CommonCore object that is managing this Federate*/
     void setParent (CommonCore *coreObject) { parent_ = coreObject; };
 
@@ -202,7 +202,7 @@ class FederateState
     Time nextAllowedSendTime () const { return allowed_send_time; }
     /**get a reference to the handles of subscriptions with value updates
      */
-    const std::vector<handle_id_t> &getEvents () const;
+    const std::vector<interface_handle> &getEvents () const;
     /** get a vector of the federates this one depends on
      */
     std::vector<global_federate_id_t> getDependencies() const;
@@ -273,7 +273,7 @@ class FederateState
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkAndSetValue (handle_id_t pub_id, const char *data, uint64_t len);
+    bool checkAndSetValue (interface_handle pub_id, const char *data, uint64_t len);
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);

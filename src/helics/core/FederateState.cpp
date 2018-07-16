@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../flag-definitions.h"
 #include "EndpointInfo.hpp"
 #include "PublicationInfo.hpp"
-#include "SubscriptionInfo.hpp"
+#include "NamedInputInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>
@@ -163,7 +163,7 @@ void FederateState::updateFederateInfo (const ActionMessage &cmd)
     }
 }
 
-bool FederateState::checkAndSetValue (handle_id_t pub_id, const char *data, uint64_t len)
+bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data, uint64_t len)
 {
     if (!only_transmit_on_change)
     {
@@ -181,7 +181,7 @@ bool FederateState::checkAndSetValue (handle_id_t pub_id, const char *data, uint
         return res;
 }
 
-uint64_t FederateState::getQueueSize (handle_id_t handle_) const
+uint64_t FederateState::getQueueSize (interface_handle handle_) const
 {
     auto epI = interfaceInformation.getEndpoint (handle_);
     if (epI != nullptr)
@@ -201,7 +201,7 @@ uint64_t FederateState::getQueueSize () const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive (handle_id_t handle_)
+std::unique_ptr<Message> FederateState::receive (interface_handle handle_)
 {
     auto epI = interfaceInformation.getEndpoint (handle_);
     if (epI != nullptr)
@@ -211,7 +211,7 @@ std::unique_ptr<Message> FederateState::receive (handle_id_t handle_)
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveAny (handle_id_t &id)
+std::unique_ptr<Message> FederateState::receiveAny (interface_handle &id)
 {
     Time earliest_time = Time::maxVal ();
     EndpointInfo *endpointI = nullptr;
@@ -237,7 +237,7 @@ std::unique_ptr<Message> FederateState::receiveAny (handle_id_t &id)
         id = endpointI->id;
         return result;
     }
-    id = handle_id_t();
+    id = interface_handle();
     return nullptr;
 }
 
@@ -629,9 +629,9 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     return iteration_result::next_step;
 }
 
-const std::vector<handle_id_t> emptyHandles;
+const std::vector<interface_handle> emptyHandles;
 
-const std::vector<handle_id_t> &FederateState::getEvents () const
+const std::vector<interface_handle> &FederateState::getEvents () const
 {
     if (!processing)
     {  //!< if we are processing this vector is in an undefined state
@@ -967,7 +967,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     }
     case CMD_SEND_MESSAGE:
     {
-        auto epi = interfaceInformation.getEndpoint (handle_id_t(cmd.dest_handle));
+        auto epi = interfaceInformation.getEndpoint (interface_handle(cmd.dest_handle));
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
@@ -978,7 +978,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     break;
     case CMD_PUB:
     {
-        auto subI = interfaceInformation.getSubscription (handle_id_t(cmd.dest_handle));
+        auto subI = interfaceInformation.getSubscription (interface_handle(cmd.dest_handle));
         if (subI == nullptr)
         {
             break;
@@ -1007,10 +1007,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         return message_processing_result::error;
     case CMD_REG_PUB:
     {
-        auto subI = interfaceInformation.getSubscription (handle_id_t(cmd.dest_handle));
+        auto subI = interfaceInformation.getSubscription (interface_handle(cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->target = {global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle)};
+            subI->target = {global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle)};
             subI->pubType = cmd.info ().type;
             addDependency (global_federate_id_t(cmd.source_id));
         }
@@ -1018,10 +1018,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     break;
     case CMD_SET_PUBLISHER:
     {
-        auto subI = interfaceInformation.getSubscription (handle_id_t(cmd.dest_handle));
+        auto subI = interfaceInformation.getSubscription (interface_handle(cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->target = {global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle)};
+            subI->target = {global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle)};
             subI->pubType = cmd.payload;
             addDependency (global_federate_id_t(cmd.source_id));
         }
@@ -1030,10 +1030,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_REG_SUB:
     case CMD_ADD_SUBSCRIBER:
     {
-        auto pubI = interfaceInformation.getPublication (handle_id_t(cmd.dest_handle));
+        auto pubI = interfaceInformation.getPublication (interface_handle(cmd.dest_handle));
         if (pubI != nullptr)
         {
-            pubI->subscribers.emplace_back (global_federate_id_t(cmd.source_id), handle_id_t(cmd.source_handle));
+            pubI->subscribers.emplace_back (global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle));
             addDependent (global_federate_id_t(cmd.source_id));
         }
     }

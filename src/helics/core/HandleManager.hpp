@@ -25,12 +25,11 @@ class HandleManager
       just iterators, so these properties outweigh the slight decrease in overall performance, otherwise we would need two classes that do basicall
       the same thing just with different container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
-    std::unordered_map<std::string, handle_id_t> publications;  //!< map of all local publications
-    std::unordered_map<std::string, handle_id_t> endpoints;  //!< map of all local endpoints
-    std::unordered_multimap<std::string, handle_id_t> subscriptions;  //!< multimap of subscriptions
-    std::unordered_multimap<std::string, handle_id_t> filters;  //!< multimap for all the filters
-    std::unordered_multimap<std::string, Core::handle_id_t> filters;  //!< multimap for all the filters
-    std::unordered_multimap<std::string, Core::handle_id_t> controlOutputs;  //!< multimap for all the control outputs
+    std::unordered_map<std::string, interface_handle> publications;  //!< map of all local publications
+    std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> inputs;  //!< map of all local endpoints
+    std::unordered_map<std::string, interface_handle> filters;  //!< map of all local endpoints
+    std::unordered_multimap<std::string, interface_handle> subscriptions;  //!< multimap of subscriptions
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
@@ -50,14 +49,14 @@ class HandleManager
                                 const std::string &type_out);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                handle_id_t local_id,
+                                interface_handle local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                handle_id_t local_id,
+                                interface_handle local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &target,
@@ -72,7 +71,7 @@ class HandleManager
     /** get a const handle by index*/
     const BasicHandleInfo *getHandleInfo(int32_t index) const;
     /** find a handle from both the federate and local id*/
-    BasicHandleInfo *findHandle (global_federate_id_t fed_id, handle_id_t id);
+    BasicHandleInfo *findHandle (global_handle id);
 
     BasicHandleInfo *getEndpoint (const std::string &name);
     const BasicHandleInfo *getEndpoint(const std::string &name) const;
@@ -81,20 +80,19 @@ class HandleManager
     BasicHandleInfo *getEndpoint(int32_t index);
     const BasicHandleInfo *getFilter(const std::string &name) const;
     BasicHandleInfo *getFilter(const std::string &name);
-    auto getFilters (const std::string &name) const { return filters.equal_range (name); }
+   // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
     BasicHandleInfo *getFilter(int32_t index);
     auto getSubscribers (const std::string &name) const { return subscriptions.equal_range (name); }
-    auto getControlOutputs(const std::string &name) const { return controlOutputs.equal_range(name); }
     BasicHandleInfo *getPublication (const std::string &name);
     const BasicHandleInfo *getPublication(const std::string &name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
     BasicHandleInfo *getPublication(int32_t index);
-    BasicHandleInfo *getNamedInput(const std::string &name);
-    const BasicHandleInfo *getNamedInput(const std::string &name) const;
-    federate_id_t getLocalFedID (handle_id_t id_) const;
+    BasicHandleInfo *getInput(const std::string &name);
+    const BasicHandleInfo *getInput(const std::string &name) const;
+    federate_id_t getLocalFedID (interface_handle id_) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }
     const BasicHandleInfo &operator[] (size_t index) const { return handles[index]; }

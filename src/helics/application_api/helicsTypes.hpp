@@ -25,13 +25,10 @@ constexpr identifier_type invalid_id_value = static_cast<identifier_type> (-1); 
 enum class identifiers : char
 {
     publication,
-    subscription,
+    input,
     filter,
     endpoint,
     query,
-    controlInput,
-    controlOutput,
-
 };
 
 /** enumeration of locality namespaces*/
@@ -99,11 +96,9 @@ class identifier_id_t
 };
 
 using publication_id_t = identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
-using subscription_id_t = identifier_id_t<identifier_type, identifiers::subscription, invalid_id_value>;
+using input_id_t = identifier_id_t<identifier_type, identifiers::input, invalid_id_value>;
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
 using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
-using control_input_id_t = identifier_id_t<identifier_type, identifiers::controlInput, invalid_id_value>;
-using control_output_id_t = identifier_id_t<identifier_type, identifiers::controlOutput, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** data class for pair of a string and double*/
@@ -286,8 +281,9 @@ named_point helicsGetNamedPoint (const std::string &val);
 /** get a double from a string*/
 double getDoubleFromString (const std::string &val);
 std::complex<double> getComplexFromString (const std::string &val);
-
+/** compute the L2 norm of a vector*/
 double vectorNorm (const std::vector<double> &vec);
+/** compute the L2 norm of a magnitudes of a complex vector*/
 double vectorNorm (const std::vector<std::complex<double>> &vec);
 /** convert a value to a data block to be interpreted using the specified type
 @param type the type used for the data conversion
@@ -405,6 +401,18 @@ constexpr bool isConvertableType<unsigned int> ()
 
 template <>
 constexpr bool isConvertableType<char> ()
+{
+    return true;
+}
+
+template <>
+constexpr bool isConvertableType<int8_t> ()
+{
+    return true;
+}
+
+template <>
+constexpr bool isConvertableType<uint8_t> ()
 {
     return true;
 }

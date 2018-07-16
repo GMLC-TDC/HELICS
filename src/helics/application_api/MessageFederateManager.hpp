@@ -27,10 +27,10 @@ class endpoint_info
     std::string name;
     std::string type;
     endpoint_id_t id = invalid_id_value;
-    handle_id_t handle;
+    interface_handle handle;
     int callbackIndex = -1;
     endpoint_info () = default;
-    endpoint_info (std::string n_name, std::string n_type, endpoint_id_t n_id, handle_id_t n_handle)
+    endpoint_info (std::string n_name, std::string n_type, endpoint_id_t n_id, interface_handle n_handle)
         : name (std::move (n_name)), type (std::move (n_type)), id (n_id), handle (n_handle){};
 };
 
@@ -62,7 +62,7 @@ class MessageFederateManager
     @param[in] name the name of the publication to subscribe
     @param[in] type the type of publication
     */
-    void subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type);
+    void subscribe (endpoint_id_t endpoint, const std::string &pubName);
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/
@@ -71,11 +71,11 @@ class MessageFederateManager
     /**
      * Returns the number of pending receives for the specified destination endpoint.
      */
-    uint64_t receiveCount (endpoint_id_t id) const;
+    uint64_t pendingMessages (endpoint_id_t id) const;
     /**
      * Returns the number of pending receives for the specified destination endpoint.
      */
-    uint64_t receiveCount () const;
+    uint64_t pendingMessages () const;
     /** receive a packet from a particular endpoint
     @param[in] endpoint the identifier for the endpoint
     @return a message object*/
@@ -136,11 +136,9 @@ class MessageFederateManager
     int getEndpointCount () const;
 
   private:
-    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, handle_id_t>>
+    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, interface_handle>>
       local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
-
-    std::map<handle_id_t, std::pair<endpoint_id_t, std::string>> subHandleLookup;  //!< map for subscriptions
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     std::atomic<endpoint_id_t::underlyingType> endpointCount{0};  //!< the count of actual endpoints
@@ -149,7 +147,6 @@ class MessageFederateManager
     std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
     guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
     int allCallbackIndex = -1;  //!< index of the all callback function
-    bool hasSubscriptions = false;  //!< indicator that the message filter subscribes to data values
   private:  // private functions
     void removeOrderedMessage (unsigned int index);
 };

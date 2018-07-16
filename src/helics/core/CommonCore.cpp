@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "PublicationInfo.hpp"
-#include "SubscriptionInfo.hpp"
+#include "NamedInputInfo.hpp"
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -180,7 +180,7 @@ FederateState *CommonCore::getFederate (const std::string &federateName) const
     return feds->find (federateName);
 }
 
-FederateState *CommonCore::getHandleFederate (handle_id_t id_)
+FederateState *CommonCore::getHandleFederate (interface_handle id_)
 {
     auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
     if (local_fed_id.isValid ())
@@ -204,7 +204,7 @@ FederateState *CommonCore::getFederateCore (const std::string &federateName)
     return (fed != loopFederates.end ()) ? (*fed) : nullptr;
 }
 
-FederateState *CommonCore::getHandleFederateCore (handle_id_t id_)
+FederateState *CommonCore::getHandleFederateCore (interface_handle id_)
 {
     auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
     if (local_fed_id.isValid ())
@@ -215,7 +215,7 @@ FederateState *CommonCore::getHandleFederateCore (handle_id_t id_)
     return nullptr;
 }
 
-const BasicHandleInfo *CommonCore::getHandleInfo (handle_id_t id_) const
+const BasicHandleInfo *CommonCore::getHandleInfo (interface_handle id_) const
 {
     return handles.read ([id_](auto &hand) { return hand.getHandleInfo (id_); });
 }
@@ -469,7 +469,7 @@ const std::string &CommonCore::getFederateNameNoThrow (global_federate_id_t fede
     return (fed == nullptr) ? unknownString : fed->getIdentifier ();
 }
 
-federate_id_t CommonCore::getFederateId (const std::string &name)
+federate_id_t CommonCore::getFederateId (const std::string &name) const
 {
     auto feds = federates.lock ();
     auto fed = feds->find (name);
@@ -555,7 +555,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterations)
+void CommonCore::setIntegerProperty (federate_id_t federateID,int32_t property, int16_t iterations)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -564,11 +564,11 @@ void CommonCore::setMaximumIterations (federate_id_t federateID, int32_t iterati
     }
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.index = UPDATE_MAX_ITERATION;
-    cmd.dest_id = iterations;
+    cmd.counter = iterations;
     fed->updateFederateInfo (cmd);
 }
 
-void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
+void CommonCore::setTimeProperty (federate_id_t federateID,int32_t property, Time time)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -577,107 +577,17 @@ void CommonCore::setTimeDelta (federate_id_t federateID, Time time)
     }
     if (time < timeZero)
     {
-        throw (InvalidParameter ("timeDelta must be greater than or equal to zero"));
+        throw (InvalidParameter ("time properties must be greater than or equal to zero"));
     }
-    // time delta should not be zero but we allow it here for convenience
-    if (time == timeZero)
-    {
-        time = timeEpsilon;
-    }
+   
     ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_MINDELTA;
+    cmd.index = property;
     cmd.actionTime = time;
     fed->updateFederateInfo (cmd);
 }
 
-void CommonCore::setOutputDelay (federate_id_t federateID, Time outputDelayTime)
-{
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier ("federateID not valid (setOutputDelay)"));
-    }
-    if (outputDelayTime < timeZero)
-    {
-        throw (InvalidParameter ("outputDelay time must be >=0"));
-    }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_OUTPUT_DELAY;
-    cmd.actionTime = outputDelayTime;
-    fed->updateFederateInfo (cmd);
-}
 
-void CommonCore::setInputDelay (federate_id_t federateID, Time inputDelayTime)
-{
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier ("federateID not valid (SetinputDelay)"));
-    }
-
-    if (inputDelayTime < timeZero)
-    {
-        throw (InvalidParameter ("impact window must be >=0"));
-    }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_INPUT_DELAY;
-    cmd.actionTime = inputDelayTime;
-    fed->updateFederateInfo (cmd);
-}
-
-void CommonCore::setPeriod (federate_id_t federateID, Time timePeriod)
-{
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier ("federateID not valid (setPeriod)"));
-    }
-    if (timePeriod < timeZero)
-    {
-        throw (InvalidParameter ("period must be greater than 0"));
-    }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_PERIOD;
-    cmd.actionTime = timePeriod;
-    fed->updateFederateInfo (cmd);
-}
-void CommonCore::setTimeOffset (federate_id_t federateID, Time timeOffset)
-{
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier ("federateID not valid (setTimeOffset)"));
-    }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_OFFSET;
-    cmd.actionTime = timeOffset;
-    fed->updateFederateInfo (cmd);
-}
-
-void CommonCore::setLoggingLevel (federate_id_t federateID, int loggingLevel)
-{
-    if (federateID == local_core_id)
-    {
-        ActionMessage cmd (CMD_CORE_CONFIGURE);
-        cmd.index = UPDATE_LOG_LEVEL;
-        cmd.dest_id = loggingLevel;
-        addActionMessage (cmd);
-        // setLogLevel (loggingLevel);
-        return;
-    }
-
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
-    {
-        throw (InvalidIdentifier ("federateID not valid (setLoggingLevel)"));
-    }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.index = UPDATE_LOG_LEVEL;
-    cmd.dest_id = loggingLevel;
-    fed->updateFederateInfo (cmd);
-}
-
-void CommonCore::setFlag (federate_id_t federateID, int flag, bool flagValue)
+void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool flagValue)
 {
     if (federateID == local_core_id)
     {
@@ -753,11 +663,12 @@ const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t globa
     });
 }
 
-handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
+static const std::string emptyString;
+
+interface_handle CommonCore::registerInput (federate_id_t federateID,
                                               const std::string &key,
                                               const std::string &type,
-                                              const std::string &units,
-                                              handle_check_mode check_mode)
+                                              const std::string &units)
 {
     auto fed = getFederateAt (federateID);
 
@@ -765,46 +676,38 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     {
         throw (InvalidIdentifier ("federateID not valid (registerSubscription)"));
     }
-    if (fed->getState () != HELICS_CREATED)
-    {
-        throw (InvalidFunctionCall ("subscriptions must be registered before calling enterInitializationMode"));
-    }
-
-    auto flags = (check_mode == handle_check_mode::required) ? make_flags (required_flag) : 0;
+    //TODO:: make this work with inputs
     auto &handle =
-      createBasicHandle (fed->global_id, fed->local_id, handle_type_t::subscription, key, type, units, flags);
+      createBasicHandle (fed->global_id, fed->local_id, handle_type_t::input, emptyString, type, units, 0);
 
     LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering SUB {}", key));
-    auto id = handle->handle;
-    fed->interfaces ().createSubscription (id, key, type, units, check_mode);
+    auto id = handle.getInterfaceHandle();
+    fed->interfaces ().createInput (id, key, type, units);
 
-    ActionMessage m (CMD_REG_SUB);
+    ActionMessage m (CMD_REG_INPUT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
     m.name = key;
     m.info ().type = type;
     m.info ().units = units;
-    if (check_mode == handle_check_mode::required)
-    {
-        setActionFlag (m, required_flag);
-    }
+    
     actionQueue.push(std::move(m));
 
     return id;
 }
 
-handle_id_t CommonCore::getSubscription (federate_id_t federateID, const std::string &key) const
+interface_handle CommonCore::getInput (federate_id_t federateID, const std::string &key) const
 {
     auto fed = getFederateAt (federateID);
     if (fed != nullptr)
     {
-        auto sub = fed->interfaces ().getSubscription (key);
-        return (sub != nullptr) ? sub->id : invalid_handle;
+        auto sub = fed->interfaces ().getInput (key);
+        return (sub != nullptr) ? sub->id.handle : interface_handle();
     }
-    return handle_id_t ();
+    return interface_handle ();
 }
 
-handle_id_t CommonCore::registerPublication (federate_id_t federateID,
+interface_handle CommonCore::registerPublication (federate_id_t federateID,
                                              const std::string &key,
                                              const std::string &type,
                                              const std::string &units)
@@ -826,7 +729,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     }
     auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::publication, key, type, units);
 
-    auto id = handle.handle;
+    auto id = handle.handle.handle;
     fed->interfaces ().createPublication (id, key, type, units);
 
     ActionMessage m (CMD_REG_PUB);
@@ -840,18 +743,18 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     return id;
 }
 
-handle_id_t CommonCore::getPublication (federate_id_t federateID, const std::string &key) const
+interface_handle CommonCore::getPublication (federate_id_t federateID, const std::string &key) const
 {
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub->local_fed_id != federateID)
     {
-        return handle_id_t ();
+        return interface_handle ();
     }
-    return pub->handle;
+    return pub->getInterfaceHandle();
 }
 
 
-handle_id_t CommonCore::registerNamedInput(federate_id_t federateID,
+interface_handle CommonCore::registerInput(federate_id_t federateID,
     const std::string &key,
     const std::string &type,
     const std::string &units)
@@ -865,19 +768,19 @@ handle_id_t CommonCore::registerNamedInput(federate_id_t federateID,
     {
         throw (InvalidFunctionCall("control Inputs must be registered before calling enterInitializationMode"));
     }
-    LOG_DEBUG(0, fed->getIdentifier(), fmt::format("registering CONTROL INPUT {}", key));
+    LOG_DEBUG(parent_broker_id, fed->getIdentifier(), fmt::format("registering CONTROL INPUT {}", key));
     auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
     if (ci != nullptr)  // this key is already found
     {
         throw (RegistrationFailure("control input already exists"));
     }
-    auto &handle = createBasicHandle(fed->global_id, fed->local_id, handle_type_t::control_input, key, type, units);
+    auto &handle = createBasicHandle(fed->global_id, fed->local_id, handle_type_t::input, key, type, units);
 
-    auto id = handle.handle;
-    fed->interfaces().createControlInput(id, key, type, units);
+    auto id = handle.getInterfaceHandle();
+    fed->interfaces().createInput(id, key, type, units);
 
-    ActionMessage m(CMD_REG_CONTROL_INPUT);
-    m.source_id = fed->global_id;
+    ActionMessage m(CMD_REG_INPUT);
+    m.source_id = fed->global_id.load();
     m.source_handle = id;
     m.name = key;
     m.info().type = type;
@@ -887,19 +790,19 @@ handle_id_t CommonCore::registerNamedInput(federate_id_t federateID,
     return id;
 }
 
-handle_id_t CommonCore::getNamedInput(federate_id_t federateID, const std::string &key) const
+interface_handle CommonCore::getInput(federate_id_t federateID, const std::string &key) const
 {
     auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
     if (ci->local_fed_id != federateID)
     {
-        return invalid_handle;
+        return interface_handle();
     }
     return ci->handle;
 }
 
 const std::string nullStr;
 
-const std::string &CommonCore::getHandleName (handle_id_t handle) const
+const std::string &CommonCore::getHandleName (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -909,7 +812,7 @@ const std::string &CommonCore::getHandleName (handle_id_t handle) const
     return nullStr;
 }
 
-const std::string &CommonCore::getUnits (handle_id_t handle) const
+const std::string &CommonCore::getUnits (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -919,15 +822,15 @@ const std::string &CommonCore::getUnits (handle_id_t handle) const
     return nullStr;
 }
 
-const std::string &CommonCore::getType (handle_id_t handle) const
+const std::string &CommonCore::getType (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-        if (handleInfo->handle_type == handle_type_t::subscription)
+        if (handleInfo->handle_type == handle_type_t::input)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto subInfo = fed->interfaces ().getSubscription (handleInfo->handle);
+            auto subInfo = fed->interfaces ().getInput (handleInfo->handle);
             if (subInfo != nullptr)
             {
                 if (!subInfo->pubType.empty ())
@@ -941,7 +844,7 @@ const std::string &CommonCore::getType (handle_id_t handle) const
     return nullStr;
 }
 
-const std::string &CommonCore::getOutputType (handle_id_t handle) const
+const std::string &CommonCore::getOutputType (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -951,8 +854,7 @@ const std::string &CommonCore::getOutputType (handle_id_t handle) const
         case handle_type_t::publication:
         case handle_type_t::endpoint:
             return handleInfo->type;
-        case handle_type_t::destination_filter:
-        case handle_type_t::source_filter:
+        case handle_type_t::filter:
             return handleInfo->type_out;
         default:
             return nullStr;
@@ -961,7 +863,7 @@ const std::string &CommonCore::getOutputType (handle_id_t handle) const
     return nullStr;
 }
 
-const std::string &CommonCore::getTarget (handle_id_t handle) const
+const std::string &CommonCore::getTarget (interface_handle handle,int32_t index) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -983,7 +885,7 @@ const std::string &CommonCore::getTarget (handle_id_t handle) const
     return nullStr;
 }
 
-void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
+void CommonCore::setValue (interface_handle handle, const char *data, uint64_t len)
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
@@ -1015,7 +917,7 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     }
 }
 
-std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
+std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
@@ -1037,7 +939,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (handle_id_t handle)
     }
 }
 
-const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t federateID)
+const std::vector<interface_handle> &CommonCore::getValueUpdates (federate_id_t federateID)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -1047,7 +949,7 @@ const std::vector<handle_id_t> &CommonCore::getValueUpdates (federate_id_t feder
     return fed->getEvents ();
 }
 
-handle_id_t
+interface_handle
 CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type)
 {
     auto fed = getFederateAt (federateID);
@@ -1081,17 +983,17 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     return id;
 }
 
-handle_id_t CommonCore::getEndpoint (federate_id_t federateID, const std::string &name) const
+interface_handle CommonCore::getEndpoint (federate_id_t federateID, const std::string &name) const
 {
     auto ept = handles.read ([&name](auto &hand) { return hand.getEndpoint (name); });
     if (ept->local_fed_id != federateID)
     {
-        return handle_id_t ();
+        return interface_handle ();
     }
-    return ept->handle;
+    return ept->handle.handle;
 }
 
-handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
+interface_handle CommonCore::registerSourceFilter (const std::string &filterName,
                                               const std::string &source,
                                               const std::string &type_in,
                                               const std::string &type_out)
@@ -1135,7 +1037,7 @@ handle_id_t CommonCore::registerSourceFilter (const std::string &filterName,
     return id;
 }
 
-handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterName,
+interface_handle CommonCore::registerCloningSourceFilter (const std::string &filterName,
                                                      const std::string &source,
                                                      const std::string &type_in,
                                                      const std::string &type_out)
@@ -1156,10 +1058,8 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
         }
     }
     auto brkId = global_broker_id.load ();
-    auto handle = createBasicHandle (brkId, federate_id_t (), handle_type_t::source_filter, filterName, source,
-                                     type_in, type_out);
 
-    auto &handle = createBasicHandle (global_broker_id, 0, handle_type_t::source_filter, filterName, source,
+    auto &handle = createBasicHandle (brkId, federate_id_t(), handle_type_t::source_filter, filterName, source,
                                       type_in, type_out, make_flags (clone_flag));
 
     auto id = handle.handle;
@@ -1184,17 +1084,17 @@ handle_id_t CommonCore::registerCloningSourceFilter (const std::string &filterNa
     return id;
 }
 
-handle_id_t CommonCore::getSourceFilter (const std::string &name) const
+interface_handle CommonCore::getSourceFilter (const std::string &name) const
 {
     auto filt = handles.read([&name](auto &hand) { return hand.getFilter(name); });
     if ((filt != nullptr)&&(filt->handle_type==handle_type_t::source_filter))
     {
         return filt->handle;
     }
-    return handle_id_t ();
+    return interface_handle ();
 }
 
-handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName,
+interface_handle CommonCore::registerDestinationFilter (const std::string &filterName,
                                                    const std::string &dest,
                                                    const std::string &type_in,
                                                    const std::string &type_out)
@@ -1246,7 +1146,7 @@ handle_id_t CommonCore::registerDestinationFilter (const std::string &filterName
     return id;
 }
 
-handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &filterName,
+interface_handle CommonCore::registerCloningDestinationFilter (const std::string &filterName,
                                                           const std::string &dest,
                                                           const std::string &type_in,
                                                           const std::string &type_out)
@@ -1291,18 +1191,18 @@ handle_id_t CommonCore::registerCloningDestinationFilter (const std::string &fil
     return id;
 }
 
-handle_id_t CommonCore::getDestinationFilter (const std::string &name) const
+interface_handle CommonCore::getDestinationFilter (const std::string &name) const
 {
     auto filt = handles.read([&name](auto &hand) { return hand.getFilter(name); });
     if ((filt != nullptr) && (filt->handle_type == handle_type_t::destination_filter))
     {
         return filt->handle;
     }
-    return handle_id_t ();
+    return interface_handle ();
 }
 
 FilterInfo *CommonCore::createSourceFilter (global_broker_id_t dest,
-                                            handle_id_t handle,
+                                            interface_handle handle,
                                             const std::string &key,
                                             const std::string &target,
                                             const std::string &type_in,
@@ -1335,7 +1235,7 @@ FilterInfo *CommonCore::createSourceFilter (global_broker_id_t dest,
 }
 
 FilterInfo *CommonCore::createDestFilter (global_broker_id_t dest,
-                                          handle_id_t handle,
+                                          interface_handle handle,
                                           const std::string &key,
                                           const std::string &target,
                                           const std::string &type_in,
@@ -1383,7 +1283,7 @@ void CommonCore::addDependency (federate_id_t federateID, const std::string &fed
     addActionMessage (std::move (search));
 }
 
-void CommonCore::send (handle_id_t sourceHandle, const std::string &destination, const char *data, uint64_t length)
+void CommonCore::send (interface_handle sourceHandle, const std::string &destination, const char *data, uint64_t length)
 {
     auto hndl = getHandleInfo (sourceHandle);
     if (hndl == nullptr)
@@ -1411,7 +1311,7 @@ void CommonCore::send (handle_id_t sourceHandle, const std::string &destination,
 }
 
 void CommonCore::sendEvent (Time time,
-                            handle_id_t sourceHandle,
+                            interface_handle sourceHandle,
                             const std::string &destination,
                             const char *data,
                             uint64_t length)
@@ -1438,7 +1338,7 @@ void CommonCore::sendEvent (Time time,
     addActionMessage (std::move (m));
 }
 
-void CommonCore::sendMessage (handle_id_t sourceHandle, std::unique_ptr<Message> message)
+void CommonCore::sendMessage (interface_handle sourceHandle, std::unique_ptr<Message> message)
 {
     if (sourceHandle == direct_send_handle)
     {
@@ -1585,7 +1485,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
     }
 }
 
-uint64_t CommonCore::receiveCount (handle_id_t destination)
+uint64_t CommonCore::receiveCount (interface_handle destination)
 {
     auto fed = getHandleFederate (destination);
     if (fed == nullptr)
@@ -1595,7 +1495,7 @@ uint64_t CommonCore::receiveCount (handle_id_t destination)
     return fed->getQueueSize (destination);
 }
 
-std::unique_ptr<Message> CommonCore::receive (handle_id_t destination)
+std::unique_ptr<Message> CommonCore::receive (interface_handle destination)
 {
     auto fed = getHandleFederate (destination);
     if (fed == nullptr)
@@ -1610,7 +1510,7 @@ std::unique_ptr<Message> CommonCore::receive (handle_id_t destination)
     return fed->receive (destination);
 }
 
-std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, handle_id_t &endpoint_id)
+std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, interface_handle &endpoint_id)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -1619,7 +1519,7 @@ std::unique_ptr<Message> CommonCore::receiveAny (federate_id_t federateID, handl
     }
     if (fed->getState () != HELICS_EXECUTING)
     {
-        endpoint_id = handle_id_t ();
+        endpoint_id = interface_handle ();
         return nullptr;
     }
     return fed->receiveAny (endpoint_id);
@@ -1735,7 +1635,7 @@ uint16_t CommonCore::getNextAirlockIndex ()
     return index;
 }
 
-void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOperator> callback)
+void CommonCore::setFilterOperator (interface_handle filter, std::shared_ptr<FilterOperator> callback)
 {
     static std::shared_ptr<FilterOperator> nullFilt = std::make_shared<NullFilterOperator> ();
     auto hndl = getHandleInfo (filter);
@@ -1761,7 +1661,7 @@ void CommonCore::setFilterOperator (handle_id_t filter, std::shared_ptr<FilterOp
     actionQueue.push (filtOpUpdate);
 }
 
-FilterCoordinator *CommonCore::getFilterCoordinator (handle_id_t id_)
+FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle id_)
 {
     auto fnd = filterCoord.find (id_);
     if (fnd == filterCoord.end ())
@@ -2392,7 +2292,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto fed = getFederateCore (global_federate_id_t (command.source_id));
             if (fed != nullptr)
             {
-                auto pubInfo = fed->interfaces ().getPublication (handle_id_t (command.source_handle));
+                auto pubInfo = fed->interfaces ().getPublication (interface_handle (command.source_handle));
                 if (pubInfo != nullptr)
                 {
                     for (auto &subscriber : pubInfo->subscribers)
@@ -2475,7 +2375,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             auto filtI = filters.find (fed_handle_pair (global_broker_id, command.dest_handle));
             if (filtI != nullptr)
             {
-                filtI->target = {global_federate_id_t (command.source_id), handle_id_t (command.source_handle)};
+                filtI->target = {global_federate_id_t (command.source_id), interface_handle (command.source_handle)};
                 timeCoord->addDependency (global_federate_id_t (command.source_id));
             }
             auto filthandle = loopHandles.getFilter(command.dest_handle);
@@ -2575,7 +2475,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 if (filtI != nullptr)
                 {
                     filtI->target = {global_federate_id_t (command.source_id),
-                                     handle_id_t (command.source_handle)};
+                                     interface_handle (command.source_handle)};
                     timeCoord->addDependency (global_federate_id_t (command.source_id));
                 }
             }
@@ -2743,7 +2643,7 @@ void CommonCore::localFilterCreation(ActionMessage &command)
 
 void CommonCore::processFilterInfo (ActionMessage &command)
 {
-    auto filterInfo = getFilterCoordinator (handle_id_t (command.dest_handle));
+    auto filterInfo = getFilterCoordinator (interface_handle (command.dest_handle));
     if (filterInfo == nullptr)
     {
         return;
@@ -2777,7 +2677,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
 
         if (!FilterAlreadyPresent)
         {
-            auto endhandle = getHandleInfo (handle_id_t (command.dest_handle));
+            auto endhandle = getHandleInfo (interface_handle (command.dest_handle));
             if (endhandle != nullptr)
             {
                 setActionFlag (*endhandle, has_dest_filter_flag);
@@ -2799,7 +2699,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             if (filter == nullptr)
             {
                 filter =
-                  createDestFilter (global_broker_id_t (command.source_id), handle_id_t (command.source_handle),
+                  createDestFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
                                     command.payload, command.info ().target, command.info ().type,
                                     command.info ().type_out, checkActionFlag (command, clone_flag));
             }
@@ -2836,7 +2736,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             if (newFilter == nullptr)
             {
                 newFilter =
-                  createSourceFilter (global_broker_id_t (command.source_id), handle_id_t (command.source_handle),
+                  createSourceFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
                                       command.name, command.info ().target, command.info ().type,
                                       command.info ().type_out, checkActionFlag (command, clone_flag));
             }
@@ -3292,7 +3192,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
 // Checks for filter operations
 ActionMessage &CommonCore::processMessage (ActionMessage &m)
 {
-    auto handle = getHandleInfo (handle_id_t (m.source_handle));
+    auto handle = getHandleInfo (interface_handle (m.source_handle));
     if (handle == nullptr)
     {
         return m;
@@ -3364,7 +3264,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
 
 void CommonCore::processDestFilterReturn (ActionMessage &command)
 {
-    auto handle = getHandleInfo (handle_id_t (command.dest_handle));
+    auto handle = getHandleInfo (interface_handle (command.dest_handle));
     if (handle == nullptr)
     {
         return;
@@ -3423,7 +3323,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
 
 void CommonCore::processFilterReturn (ActionMessage &cmd)
 {
-    auto handle = getHandleInfo (handle_id_t (cmd.dest_handle));
+    auto handle = getHandleInfo (interface_handle (cmd.dest_handle));
     if (handle == nullptr)
     {
         return;

@@ -19,7 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
 
-namespace helics
+namespace helics98
 {
 class FederateInfo
 {

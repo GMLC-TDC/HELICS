@@ -410,7 +410,6 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_error, "error"},
 
   {action_message_def::action_t::cmd_send_route, "send_route"},
-  {action_message_def::action_t::cmd_subscriber, "subscriber"},
   {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
   {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
   {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
@@ -428,17 +427,14 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_null_message, "null message"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
-  {action_message_def::action_t::cmd_set_publisher, "notify_pub"},
-  {action_message_def::action_t::cmd_reg_dst_filter, "reg_dst_filter"},
-  {action_message_def::action_t::cmd_notify_dst_filter, "notify_dst_filter"},
-  {action_message_def::action_t::cmd_reg_sub, "reg_sub"},
-  {action_message_def::action_t::cmd_add_subscriber, "notify_sub"},
-  {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
-  {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
+  {action_message_def::action_t::cmd_add_publisher, "add publisher"},
+  {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
+  {action_message_def::action_t::cmd_add_dst_filter, "add_dst_filter"},
+  {action_message_def::action_t::cmd_reg_input, "reg_input"},
+  {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
+  {action_message_def::action_t::cmd_add_src_filter, "add_src_filter"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
   {action_message_def::action_t::cmd_notify_end, "notify_end"},
-
-  {action_message_def::action_t::cmd_has_operator, "has_operator"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
   {action_message_def::action_t::cmd_protocol, "protocol"},

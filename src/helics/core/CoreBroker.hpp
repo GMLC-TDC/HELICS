@@ -202,7 +202,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** check subscriptions for completion and mismatches*/
     void checkSubscriptions ();
     /** find any existing publishers for a subscription*/
-    bool FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo);
+    bool FindandNotifyInputPublisher (BasicHandleInfo &handleInfo);
     void FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInfo);
     /** check endpoints for any issues*/
     void checkEndpoints ();
@@ -229,10 +229,9 @@ class CoreBroker : public Broker, public BrokerBase
 
     void addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m);
     void addPublication (ActionMessage &m);
-    void addSubscription (ActionMessage &m);
+    void addInput (ActionMessage &m);
     void addEndpoint (ActionMessage &m);
-    void addDestFilter (ActionMessage &m);
-    void addSourceFilter (ActionMessage &m);
+    void addFilter (ActionMessage &m);
  //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a json string containing the federate/broker/Core Map*/
     void initializeFederateMap ();

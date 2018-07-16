@@ -15,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <sstream>
 
-namespace helics
+namespace helics98
 {
 enum PubSubTypes
 {
@@ -30,7 +30,7 @@ enum PubSubTypes
 class ValueFederate : public virtual Federate
 {
   public:
-    friend class helics::FederateInfo;
+    friend class helics98::FederateInfo;
 
     explicit ValueFederate (FederateInfo &fi)
     {

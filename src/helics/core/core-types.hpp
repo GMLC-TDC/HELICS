@@ -37,6 +37,7 @@ enum class core_type : int
     TCP = 6,  //!< use a generic TCP protocol message stream to send messages
     UDP = 7,  //!< use UDP packets to send the data
     NNG = 9, //!< reserved for future Nanomsg implementation 
+    ZMQ_TEST=10, //!< test code for different type of ZMQ core
     UNRECOGNIZED = 22,  //!< unknown
 
 };

@@ -13,7 +13,7 @@ BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   const std::string &type,
                                                   const std::string &units)
 {
-    handle_id_t local_id(static_cast<handle_id_t::base_type> (handles.size ()));
+    interface_handle local_id(static_cast<interface_handle::base_type> (handles.size ()));
     std::string actKey = (!key.empty ()) ? key : generateName (what);
     handles.push_back (std::make_unique<BasicHandleInfo> (fed_id, local_id, what, actKey, type, units));
     auto hpointer = handles.back ().get ();
@@ -28,7 +28,7 @@ BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
                                                   const std::string &type_in,
                                                   const std::string &type_out)
 {
-    handle_id_t local_id(static_cast<handle_id_t::base_type> (handles.size ()));
+    interface_handle local_id(static_cast<interface_handle::base_type> (handles.size ()));
     handles.emplace_back (
       std::make_unique<BasicHandleInfo> ( fed_id, local_id, what, key, target, type_in, type_out));
     auto hpointer = handles.back ().get ();
@@ -36,9 +36,9 @@ BasicHandleInfo *HandlePointerManager::addHandle (global_federate_id_t fed_id,
     return hpointer;
 }
 
-BasicHandleInfo *HandlePointerManager::getHandleInfo (handle_id_t id_) const
+BasicHandleInfo *HandlePointerManager::getHandleInfo (interface_handle id_) const
 {
-    if (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles))
+    if (isValidIndex (static_cast<interface_handle::base_type>(id_), handles))
     {
         return handles[id_].get ();
     }
@@ -86,10 +86,10 @@ BasicHandleInfo *HandlePointerManager::getPublication (const std::string &name) 
     return nullptr;
 }
 
-federate_id_t HandlePointerManager::getLocalFedID (handle_id_t id_) const
+federate_id_t HandlePointerManager::getLocalFedID (interface_handle id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (static_cast<handle_id_t::base_type>(id_), handles)) ? handles[id_]->local_fed_id : federate_id_t();
+    return (isValidIndex (static_cast<interface_handle::base_type>(id_), handles)) ? handles[id_]->local_fed_id : federate_id_t();
 }
 
 void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)
@@ -97,21 +97,21 @@ void HandlePointerManager::addType (BasicHandleInfo *handle, int32_t index)
     switch (handle->handle_type)
     {
     case handle_type_t::endpoint:
-        endpoints.emplace (handle->key, handle_id_t(index));
+        endpoints.emplace (handle->key, interface_handle(index));
         break;
     case handle_type_t::publication:
-        publications.emplace (handle->key, handle_id_t(index));
+        publications.emplace (handle->key, interface_handle(index));
         break;
     case handle_type_t::cloning_filter:
     case handle_type_t::destination_filter:
     case handle_type_t::source_filter:
         if (!handle->key.empty ())
         {
-            filters.emplace (handle->key, handle_id_t(index));
+            filters.emplace (handle->key, interface_handle(index));
         }
         break;
     case handle_type_t::subscription:
-        subscriptions.emplace (handle->key, handle_id_t(index));
+        subscriptions.emplace (handle->key, interface_handle(index));
         break;
     default:
         break;

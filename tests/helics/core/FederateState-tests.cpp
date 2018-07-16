@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
 BOOST_AUTO_TEST_CASE (create_subscription_test)
 {
     using namespace helics;
-    fs->interfaces().createSubscription (handle_id_t(0), "first!", "type", "units", handle_check_mode::required);
-    fs->interfaces().createSubscription (handle_id_t(1), "second", "type", "units", handle_check_mode::required);
-    fs->interfaces().createSubscription (handle_id_t(3), "last", "type", "units", handle_check_mode::optional);
-    fs->interfaces().createSubscription (handle_id_t(2), "cut-in-line", "type", "units", handle_check_mode::optional);
+    fs->interfaces().createSubscription (interface_handle(0), "first!", "type", "units", handle_check_mode::required);
+    fs->interfaces().createSubscription (interface_handle(1), "second", "type", "units", handle_check_mode::required);
+    fs->interfaces().createSubscription (interface_handle(3), "last", "type", "units", handle_check_mode::optional);
+    fs->interfaces().createSubscription (interface_handle(2), "cut-in-line", "type", "units", handle_check_mode::optional);
 
     helics::SubscriptionInfo *info;
 
@@ -67,37 +67,37 @@ BOOST_AUTO_TEST_CASE (create_subscription_test)
     info = fs->interfaces().getSubscription ("first!");
     BOOST_CHECK_EQUAL (info->id, 0);
 
-    info = fs->interfaces().getSubscription (handle_id_t(0));
+    info = fs->interfaces().getSubscription (interface_handle(0));
     BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second subscription
     info = fs->interfaces().getSubscription ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
-    info = fs->interfaces().getSubscription (handle_id_t(1));
+    info = fs->interfaces().getSubscription (interface_handle(1));
     BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order subscription
     info = fs->interfaces().getSubscription ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
-    info = fs->interfaces().getSubscription (handle_id_t(2));
+    info = fs->interfaces().getSubscription (interface_handle(2));
     BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) subscription
     info = fs->interfaces().getSubscription ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
-    info = fs->interfaces().getSubscription (handle_id_t(3));
+    info = fs->interfaces().getSubscription (interface_handle(3));
     BOOST_CHECK_EQUAL (info->key, "last");
 }
 
 BOOST_AUTO_TEST_CASE (create_publication_test)
 {
-    fs->interfaces().createPublication (helics::handle_id_t(0), "first!", "type", "units");
-    fs->interfaces().createPublication (helics::handle_id_t(1), "second", "type", "units");
-    fs->interfaces().createPublication (helics::handle_id_t(3), "last", "type", "units");
-    fs->interfaces().createPublication (helics::handle_id_t(2), "cut-in-line", "type", "units");
+    fs->interfaces().createPublication (helics::interface_handle(0), "first!", "type", "units");
+    fs->interfaces().createPublication (helics::interface_handle(1), "second", "type", "units");
+    fs->interfaces().createPublication (helics::interface_handle(3), "last", "type", "units");
+    fs->interfaces().createPublication (helics::interface_handle(2), "cut-in-line", "type", "units");
 
     helics::PublicationInfo *info;
 
@@ -105,37 +105,37 @@ BOOST_AUTO_TEST_CASE (create_publication_test)
     info = fs->interfaces().getPublication ("first!");
     BOOST_CHECK_EQUAL (info->id, 0);
 
-    info = fs->interfaces().getPublication (helics::handle_id_t(0));
+    info = fs->interfaces().getPublication (helics::interface_handle(0));
     BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second publication
     info = fs->interfaces().getPublication ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
-    info = fs->interfaces().getPublication (helics::handle_id_t(1));
+    info = fs->interfaces().getPublication (helics::interface_handle(1));
     BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order publication
     info = fs->interfaces().getPublication ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
-    info = fs->interfaces().getPublication (helics::handle_id_t(2));
+    info = fs->interfaces().getPublication (helics::interface_handle(2));
     BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) publication
     info = fs->interfaces().getPublication ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
-    info = fs->interfaces().getPublication (helics::handle_id_t(3));
+    info = fs->interfaces().getPublication (helics::interface_handle(3));
     BOOST_CHECK_EQUAL (info->key, "last");
 }
 
 BOOST_AUTO_TEST_CASE (create_endpoint_test)
 {
-    fs->interfaces().createEndpoint (helics::handle_id_t(0), "first!", "type");
-    fs->interfaces().createEndpoint (helics::handle_id_t(1), "second", "type");
-    fs->interfaces().createEndpoint (helics::handle_id_t(3), "last", "type");
-    fs->interfaces().createEndpoint (helics::handle_id_t(2), "cut-in-line", "type");
+    fs->interfaces().createEndpoint (helics::interface_handle(0), "first!", "type");
+    fs->interfaces().createEndpoint (helics::interface_handle(1), "second", "type");
+    fs->interfaces().createEndpoint (helics::interface_handle(3), "last", "type");
+    fs->interfaces().createEndpoint (helics::interface_handle(2), "cut-in-line", "type");
 
     helics::EndpointInfo *info;
 
@@ -143,28 +143,28 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
     info = fs->interfaces().getEndpoint ("first!");
     BOOST_CHECK_EQUAL (info->id, 0);
 
-    info = fs->interfaces().getEndpoint (helics::handle_id_t(0));
+    info = fs->interfaces().getEndpoint (helics::interface_handle(0));
     BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second endpoint
     info = fs->interfaces().getEndpoint ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
-    info = fs->interfaces().getEndpoint (helics::handle_id_t(1));
+    info = fs->interfaces().getEndpoint (helics::interface_handle(1));
     BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order endpoint
     info = fs->interfaces().getEndpoint ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
-    info = fs->interfaces().getEndpoint (helics::handle_id_t(2));
+    info = fs->interfaces().getEndpoint (helics::interface_handle(2));
     BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->interfaces().getEndpoint ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
-    info = fs->interfaces().getEndpoint (helics::handle_id_t(3));
+    info = fs->interfaces().getEndpoint (helics::interface_handle(3));
     BOOST_CHECK_EQUAL (info->key, "last");
 }
 
@@ -289,12 +289,12 @@ DependencyInfo(Core::federate_id_t id) :fedID(id) {};
 */
 
 /*
-    uint64_t getQueueSize(handle_id_t id) const;
+    uint64_t getQueueSize(interface_handle id) const;
     uint64_t getQueueSize() const;
     uint64_t getFilterQueueSize() const;
-    message_t *receive(handle_id_t id);
-    std::pair<handle_id_t, message_t*> receive();
-    std::pair<handle_id_t, message_t*> receiveForFilter();
+    message_t *receive(interface_handle id);
+    std::pair<interface_handle, message_t*> receive();
+    std::pair<interface_handle, message_t*> receiveForFilter();
     bool processQueue();
     void generateKnownDependencies();
     void addDependency(Core::federate_id_t);

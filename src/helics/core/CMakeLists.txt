@@ -9,10 +9,8 @@ set(SRC_FILES
 	BrokerBase.cpp
 	CommonCore.cpp
 	FederateState.cpp
-	SubscriptionInfo.cpp
 	PublicationInfo.cpp
-	ControlInputInfo.cpp
-	ControlOutputInfo.cpp
+	NamedInputInfo.cpp
 	InterfaceInfo.cpp
 	#FilterInfo.cpp
 	EndpointInfo.cpp
@@ -102,10 +100,8 @@ set(INCLUDE_FILES
 	CommonCore.hpp
 	CommsInterface.hpp
 	FederateState.hpp
-	SubscriptionInfo.hpp
 	PublicationInfo.hpp
-	ControlInputInfo.hpp
-	ControlOutputInfo.hpp
+	NamedInputInfo.hpp
 	EndpointInfo.hpp
 	FilterInfo.hpp
 	fmt_wrapper.h
