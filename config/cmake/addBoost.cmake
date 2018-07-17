@@ -71,6 +71,7 @@ endforeach()
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
+			HINTS	ENV BOOST_INSTALL_PATH
 			PATHS		${BOOST_INSTALL_PATH}
 						${boost_paths}
 		)
@@ -79,7 +80,15 @@ find_path(BOOST_TEST_PATH
 			set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
 else(MSVC)
-	set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+	find_path(BOOST_TEST_PATH
+			NAMES 			boost/version.hpp
+			HINTS	ENV BOOST_INSTALL_PATH
+			PATHS		${BOOST_INSTALL_PATH}
+		)
+
+		if (BOOST_TEST_PATH)
+			set(BOOST_ROOT ${BOOST_TEST_PATH})
+		endif(BOOST_TEST_PATH)
 endif(MSVC)
 
 HIDE_VARIABLE(BOOST_TEST_PATH)

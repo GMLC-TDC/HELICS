@@ -516,7 +516,11 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
+	set(CPACK_NSIS_HELP_LINK "https://gmlc-tdc.github.io/HELICS-src/")
 	set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
+	set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+	set(CPACK_NSIS_MODIFY_PATH ON)
+	set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
 set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"
