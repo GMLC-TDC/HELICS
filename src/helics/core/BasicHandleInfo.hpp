@@ -75,6 +75,6 @@ class BasicHandleInfo
     const std::string &type_out;  //!< the output type of a filter
 
 	interface_handle getInterfaceHandle () const { return handle.handle; }
-    global_federate_id_t getFederate () const { return handle.fed_id; }
+    global_federate_id_t getFederateId () const { return handle.fed_id; }
 };
 }  // namespace helics
