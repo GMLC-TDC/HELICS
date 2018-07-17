@@ -23,7 +23,7 @@ class PublicationBase
   public:
     PublicationBase () = default;
     /** base constructor for a publication
-    @param a value_fed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    @param a valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
     that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
@@ -34,7 +34,7 @@ class PublicationBase
         const std::string &units = std::string());
 
     /** base constructor for a publication
-    @tparam a value_fed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    @tparam a valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
     that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
@@ -51,7 +51,7 @@ class PublicationBase
     }
     /** base constructor for a publication
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
-    @param value_fed a pointer to a value federate
+    @param valueFed a pointer to a value federate
     @param key the identifier for the publication
     @param type the type of the publication
     @param units, an optional string defining the units*/
@@ -62,7 +62,7 @@ class PublicationBase
         const std::string &units = std::string());
     /** base constructor for a publication
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
-    @tparam value_fed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    @tparam valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
     that results in a valueFederate object
     @param key the identifier for the publication
     @param type the type of the publication
@@ -116,7 +116,7 @@ class Publication : public PublicationBase
     /** default constructor*/
     Publication () = default;
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
     @param[in] units the units associated with a Federate
@@ -129,7 +129,7 @@ class Publication : public PublicationBase
     {
     }
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
     @param[in] units the units associated with a Federate
@@ -144,7 +144,7 @@ class Publication : public PublicationBase
     }
     /**constructor to build a publication object
     @param locality  set to global for a global publication or local for a local one
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
     @param[in] units the units associated with a Federate
@@ -160,7 +160,7 @@ class Publication : public PublicationBase
 
     /**constructor to build a publication object
     @param locality  set to global for a global publication or local for a local one
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param type_ the defined type of the publication
     @param[in] units the units associated with a Federate
@@ -175,7 +175,7 @@ class Publication : public PublicationBase
     {
     }
     /** generate a publication object from a preexisting publication
-    @param value_fed a pointer to the appropriate value Federate
+    @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
     Publication(ValueFederate *valueFed, int pubIndex)
@@ -183,7 +183,7 @@ class Publication : public PublicationBase
     {
     }
     /** generate a publication object from a preexisting publication
-    @param value_fed a pointer to the appropriate value Federate
+    @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
     template <class FedPtr>
@@ -192,7 +192,7 @@ class Publication : public PublicationBase
     {
     }
     /** generate a publication object from a preexisting publication
-    @param value_fed a pointer to the appropriate value Federate
+    @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
     Publication(ValueFederate *valueFed, publication_id_t pid)
@@ -200,7 +200,7 @@ class Publication : public PublicationBase
     {
     }
     /** generate a publication object from a preexisting publication
-    @param value_fed a pointer to the appropriate value Federate
+    @param valueFed a pointer to the appropriate value Federate
     @param pubIndex the index of the subscription
     */
     template <class FedPtr>
@@ -260,7 +260,7 @@ class Publication : public PublicationBase
 /** create a pointer to a publication
 @tparam X is the type of the publication
 @tparam FedPtr a pointer a value Federate
-@param value_fed pointer to a valid federate
+@param valueFed pointer to a valid federate
 @param key the identifier for the publication
 @param units optional units for the publication
 */
@@ -274,7 +274,7 @@ make_publication(ValueFederate *valueFed, const std::string &key, const std::str
 /** create a pointer to a publication
 @tparam X is the type of the publication
 @tparam FedPtr a pointer a value Federate
-@param value_fed pointer to a valid federate
+@param valueFed pointer to a valid federate
 @param key the identifier for the publication
 @param units optional units for the publication
 */
@@ -289,7 +289,7 @@ make_publication (FedPtr &valueFed, const std::string &key, const std::string &u
 @tparam X is the type of the publication
 @tparam FedPtr a pointer a value Federate
 @param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param value_fed pointer to a valid federate
+@param valueFed pointer to a valid federate
 @param key the identifier for the publication
 @param units optional units for the publication
 */
@@ -307,7 +307,7 @@ make_publication(interface_visibility locality,
 @tparam X is the type of the publication
 @tparam FedPtr a pointer a value Federate
 @param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param value_fed pointer to a valid federate
+@param valueFed pointer to a valid federate
 @param key the identifier for the publication
 @param units optional units for the publication
 */
@@ -328,7 +328,7 @@ class PublicationT : public PublicationBase
   public:
     PublicationT () = default;
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
@@ -337,7 +337,7 @@ class PublicationT : public PublicationBase
     {
     }
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
@@ -347,7 +347,7 @@ class PublicationT : public PublicationBase
     {
     }
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
@@ -359,7 +359,7 @@ class PublicationT : public PublicationBase
     {
     }
     /**constructor to build a publication object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
     */
@@ -396,7 +396,7 @@ class PublicationOnChange : public PublicationT<X>
   public:
     PublicationOnChange () = default;
     /**constructor to build a publishOnChange object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] minChange  the minimum change required to actually publish the value
     @param[in] units the units associated with a Federate
@@ -409,7 +409,7 @@ class PublicationOnChange : public PublicationT<X>
     {
     }
     /**constructor to build a publishOnChange object
-    @param[in] value_fed  the ValueFederate to use
+    @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] minChange  the minimum change required to actually publish the value
     @param[in] units the units associated with a Federate
