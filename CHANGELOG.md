@@ -11,16 +11,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [1.2.1] - 2018-06-30
 ### Fixed
  - bug in the conversion of named points from strings
- - matlab helicsSubscriptionGetVector function was producing a seg fault, now this is fixed
+ - MATLAB helicsSubscriptionGetVector function was producing a seg fault, now this is fixed
  - performance issue in the delay buffers of federateState
  - findMPI for MPI libraries with multiple libraries
  - federates will now error on missing required publications
 
 ### Added
- - first cut of Matlab interface tests
+ - first cut of MATLAB interface tests
  - some additional Java test cases
  - Python test cases for named point and bool tests
- - Matlab helper scripts for loading the library
+ - MATLAB helper scripts for loading the library
  - String length function for subscriptions
 
 ### Changed
