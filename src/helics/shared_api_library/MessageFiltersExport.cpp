@@ -247,7 +247,7 @@ helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int
     }
     try
     {
-        auto target = filter->getTarget ();
+        const auto &target = filter->getTarget ();
         if (static_cast<int> (target.size ()) > maxlen)
         {
             strncpy (outputString, target.c_str (), maxlen);
@@ -273,7 +273,7 @@ helics_status helicsFilterGetName (helics_filter filt, char *outputString, int m
     }
     try
     {
-        auto name = filter->getName ();
+        const auto &name = filter->getName ();
         if (static_cast<int> (name.size ()) > maxlen)
         {
             strncpy (outputString, name.c_str (), maxlen);

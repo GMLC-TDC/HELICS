@@ -183,9 +183,9 @@ class CoreBroker : public Broker, public BrokerBase
   public:
     /**default constructor
     @param setAsRootBroker  set to true to indicate this object is a root broker*/
-    CoreBroker (bool setAsRootBroker = false) noexcept;
+    explicit CoreBroker (bool setAsRootBroker = false) noexcept;
     /** constructor to set the name of the broker*/
-    CoreBroker (const std::string &broker_name);
+    explicit CoreBroker (const std::string &broker_name);
     /** destructor*/
     virtual ~CoreBroker ();
     /** start up the broker with an initialization string containing commands and parameters*/

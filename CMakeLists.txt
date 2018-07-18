@@ -114,11 +114,20 @@ if (VERSION_OPTION)
 	endif (MSVC)
 endif(VERSION_OPTION)
 
+cmake_dependent_option(STATIC_STANDARD_LIB "Link against a static standard lib" OFF "NOT USE_LIBCXX" OFF)
+include(ucm)
+mark_as_advanced(STATIC_STANDARD_LIB)
+if (STATIC_STANDARD_LIB)
+	ucm_set_runtime(STATIC)
+else()
+	ucm_set_runtime(DYNAMIC)
+endif()
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
 if(BUILD_HELICS_TESTS)
-	option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF)
+	cmake_dependent_option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF "BUILD_HELICS_TESTS" OFF)
 	if (TEST_CODE_COVERAGE)
 		include(CodeCoverage)
 
@@ -189,6 +198,8 @@ if (NOT WIN32)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
 elseif (MSYS)
 	set(THREADS_PREFER_PTHREAD_FLAG ON)
+else()
+	set(CMAKE_USE_WIN32_THREADS_INIT ON)
 endif()
 find_package(Threads REQUIRED)
 
@@ -222,6 +233,11 @@ endif(MSYS)
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
+
+### just check some intenal options
+if (BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
+message(fatal "BOTH BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY cannot be specified together otherwise nothing works")
+endif()
 
 option(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ZeroMQ_ENABLE)
@@ -320,6 +336,8 @@ mark_as_advanced(DISABLE_DEBUG_LOGGING)
 #-----------------------------------------------------------------------------
 set(FMT_TEST OFF)
 set(FMT_ASSUME_CPP14_SUPPORT ON)
+set(FMT_SILENT ON)
+#get the FMT header only library
 add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
 HIDE_VARIABLE(FMT_DOC)
 HIDE_VARIABLE(FMT_INSTALL)
@@ -358,7 +376,7 @@ install(DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib64/ DESTINATION ${CMAKE_INSTALL_L
 
 if (HELICS_HAVE_ZEROMQ)
 	if (WIN32 AND NOT MSYS)
-		install(FILES $<TARGET_LINKER_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libraries)
+		install(FILES $<TARGET_LINKER_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs)
 	endif()
 endif()
 
@@ -500,7 +518,11 @@ set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 	set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
 	set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/Helics-src")
+	set(CPACK_NSIS_HELP_LINK "https://gmlc-tdc.github.io/HELICS-src/")
 	set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
+	set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+	set(CPACK_NSIS_MODIFY_PATH ON)
+	set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
 set(CPACK_NSIS_MENU_LINKS
 	"https://www.github.com/GMLC-TDC/Helics-src" "HELICS Github"
 	"https://gmlc-tdc.github.io/HELICS-src/" "Helics Documentation"

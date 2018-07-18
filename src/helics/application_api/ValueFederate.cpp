@@ -26,14 +26,14 @@ ValueFederate::ValueFederate (const std::shared_ptr<Core> &core, const FederateI
 ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    ValueFederate::registerInterfaces (jsonString);
 }
 
 ValueFederate::ValueFederate (const std::string &name, const std::string &jsonString)
     : Federate (loadFederateInfo (name, jsonString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    ValueFederate::registerInterfaces (jsonString);
 }
 
 ValueFederate::ValueFederate () = default;
@@ -55,11 +55,11 @@ void ValueFederate::disconnect ()
 
 ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 {
+    vfManager = std::move (fed.vfManager);
     if (getID () != fed.getID ())
     {  // the id won't be moved, as it is copied so use it as a test if it has moved already
         Federate::operator= (std::move (fed));
     }
-    vfManager = std::move (fed.vfManager);
     return *this;
 }
 

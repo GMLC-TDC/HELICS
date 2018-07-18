@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include <memory>
@@ -35,10 +34,10 @@ namespace helics
     /** type code embedded in the objects so the library knows how to cast them appropriately*/
 	enum class vtype:int
 	{
-		genericFed,
-		valueFed,
-		messageFed,
-		combinationFed
+		generic_fed,
+		value_fed,
+		message_fed,
+		combination_fed
 	};
 
 	/** object wrapping a broker for the c-api*/
@@ -74,8 +73,8 @@ namespace helics
 	{
 	public:
 		vtype type;
-		int valid;
-        int index;
+		int valid=0;
+        int index=-2;
 		std::shared_ptr<Federate> fedptr;
 		std::unique_ptr<Message> lastMessage;
         std::vector<std::unique_ptr<SubscriptionObject>> subs;
@@ -92,7 +91,7 @@ namespace helics
 	public:
 		std::unique_ptr<Subscription> subptr;
 		subscription_id_t id;
-        int valid;
+        int valid=0;
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
 	};
@@ -102,7 +101,7 @@ namespace helics
 	public:
 		std::unique_ptr<Publication> pubptr;
 		publication_id_t id;
-        int valid;
+        int valid=0;
 		bool rawOnly = false;
 		std::shared_ptr<ValueFederate> fedptr;
 	};
@@ -113,7 +112,7 @@ namespace helics
 		std::unique_ptr<Endpoint> endptr;
 		std::shared_ptr<MessageFederate> fedptr;
 		std::unique_ptr<Message> lastMessage;
-        int valid;
+        int valid=0;
 	};
 
     /** enumeration of possible filter object types*/
@@ -129,14 +128,14 @@ namespace helics
 	{
 	public:
         ftype type;
-        int valid;
+        int valid=0;
 		std::unique_ptr<Filter> filtptr;
 		std::shared_ptr<Federate> fedptr;
         std::shared_ptr<Core> corePtr;
 	};
 
     /** object representing a query*/
-	class queryObject
+	class QueryObject
 	{
 	public:
 		std::string target; //!< the target of the query
@@ -145,10 +144,10 @@ namespace helics
         std::shared_ptr<Federate> activeFed; //!< pointer to the fed with the active Query
         query_id_t asyncIndexCode=invalid_id_value;  //!< the index to use for the queryComplete call
         bool activeAsync = false;
-        int valid;
+        int valid=0;
 
 	};
-}
+} //namespace helics
 
 helics::Federate *getFed(helics_federate fed);
 helics::ValueFederate *getValueFed(helics_federate fed);

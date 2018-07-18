@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
+#pragma once
 /** @file
 functions for dealing with query results*/
 
-#pragma once
+
 
 #include <string>
 #include <vector>
@@ -17,7 +17,8 @@ functions for dealing with query results*/
 namespace helics
 {
 class Federate;
-}
+} //namespace helics
+
 /** function takes a query result and vectorizes it if the query is a vector result, if not the results go into the
  * first element of the vector
  */
