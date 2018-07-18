@@ -8,14 +8,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "testFixtures.hpp"
 #include <complex>
 #include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value converters
  */
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueConverter.hpp"
 #include <future>
 
 namespace utf = boost::unit_test;
