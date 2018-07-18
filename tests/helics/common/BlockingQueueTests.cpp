@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 #include <memory>
 #include <thread>
-#include <utility>
 /** these test cases test data_block and data_view objects
  */
 

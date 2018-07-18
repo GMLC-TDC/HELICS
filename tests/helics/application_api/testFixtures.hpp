@@ -6,11 +6,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include <memory>
-
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+#include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/Core.hpp"
 
 #ifndef DISABLE_TCP_CORE
 #ifdef HELICS_HAVE_ZEROMQ

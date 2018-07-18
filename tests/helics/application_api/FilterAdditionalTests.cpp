@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/FilterOperations.hpp"
 #include "helics/application_api/MessageOperators.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>

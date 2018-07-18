@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageOperators.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -171,7 +172,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 */
 
 
-BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_all), core_type)
+BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
