@@ -11,14 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <map>
 #include <functional>
 
-namespace boost
-{
-namespace program_options
-{
-class variables_map;
-}
-}
-
 namespace helics
 {
 

@@ -67,5 +67,5 @@ private:
     core_type type = core_type::ZMQ;
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
 };
-}
-}
+} //namespace apps
+} //namespace helics

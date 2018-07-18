@@ -34,6 +34,7 @@ mark_as_advanced(USE_BOOST_STATIC_LIBS)
 if (MSVC)
 
 set (boost_versions
+boost_1_68_0
 boost_1_67_0
 boost_1_66_0
 boost_1_65_1
@@ -71,6 +72,7 @@ endforeach()
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
+			HINTS	ENV BOOST_INSTALL_PATH
 			PATHS		${BOOST_INSTALL_PATH}
 						${boost_paths}
 		)
@@ -79,7 +81,15 @@ find_path(BOOST_TEST_PATH
 			set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
 else(MSVC)
-	set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+	if (NOT BOOST_ROOT)
+		if (BOOST_INSTALL_PATH)
+			set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+		elseif ($ENV{BOOST_INSTALL_PATH})
+			set(BOOST_ROOT "$ENV{BOOST_INSTALL_PATH}")
+		else()
+			set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+		endif()
+	endif()
 endif(MSVC)
 
 HIDE_VARIABLE(BOOST_TEST_PATH)

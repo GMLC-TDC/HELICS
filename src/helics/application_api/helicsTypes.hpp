@@ -61,39 +61,39 @@ template <class BaseType, identifiers ID, BaseType invalidValue = (BaseType (-1)
 class identifier_id_t
 {
   private:
-    BaseType _value;  //!< the underlying index value
+    BaseType ivalue;  //!< the underlying index value
 
   public:
     static const identifiers identity{ID};  //!< the type of the identifier
     using underlyingType = BaseType;
     /** default constructor*/
-    constexpr identifier_id_t () noexcept : _value (invalidValue){};
+    constexpr identifier_id_t () noexcept : ivalue (invalidValue){};
     /** value based constructor*/
     // cppcheck-suppress noExplicitConstructor
-    /* implicit */ constexpr identifier_id_t (BaseType val) noexcept : _value (val){};
+    /* implicit */ constexpr identifier_id_t (BaseType val) noexcept : ivalue (val){};
     /** copy constructor*/
-    constexpr identifier_id_t (const identifier_id_t &id) noexcept : _value (id._value){};
+    constexpr identifier_id_t (const identifier_id_t &id) noexcept : ivalue (id.ivalue){};
     /** assignment from number*/
     identifier_id_t &operator= (BaseType val) noexcept
     {
-        _value = val;
+        ivalue = val;
         return *this;
     };
     /** copy assignment*/
     identifier_id_t &operator= (const identifier_id_t &id) noexcept
     {
-        _value = id._value;
+        ivalue = id.ivalue;
         return *this;
     };
 
     /** get the underlying value*/
-    BaseType value () const noexcept { return _value; };
+    BaseType value () const noexcept { return ivalue; };
     /** equality operator*/
-    bool operator== (identifier_id_t id) const noexcept { return (_value == id._value); };
+    bool operator== (identifier_id_t id) const noexcept { return (ivalue == id.ivalue); };
     /** inequality operator*/
-    bool operator!= (identifier_id_t id) const noexcept { return (_value != id._value); };
+    bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
     /** less than operator for sorting*/
-    bool operator< (identifier_id_t id) const noexcept { return (_value < id._value); };
+    bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
 };
 
 using publication_id_t = identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
@@ -378,13 +378,13 @@ constexpr bool isConvertableType<int> ()
 }
 
 template <>
-constexpr bool isConvertableType<short> ()
+constexpr bool isConvertableType<int16_t> ()
 {
     return true;
 }
 
 template <>
-constexpr bool isConvertableType<unsigned short> ()
+constexpr bool isConvertableType<uint16_t> ()
 {
     return true;
 }
@@ -435,7 +435,7 @@ inline named_point invalidValue<named_point> ()
 template <>
 constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
-    return std::complex<double> (-1e48, 0.0);
+    return {-1e48, 0.0};
 }
 
 }  // namespace helics

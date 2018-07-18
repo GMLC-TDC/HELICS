@@ -98,7 +98,7 @@ App::App (const std::shared_ptr<Core> &core, const FederateInfo &fi)
 
 }
 
-App::App (const std::string &name, const std::string &jsonString) : fed ( std::make_shared<CombinationFederate> (name,jsonString))
+App::App (const std::string &appName, const std::string &jsonString) : fed ( std::make_shared<CombinationFederate> (appName,jsonString))
 {
     
     if (jsonString.size () < 200)
@@ -123,10 +123,10 @@ void App::loadFile (const std::string &filename)
     }
 }
 
-void App::loadTextFile (const std::string &filename)
+void App::loadTextFile (const std::string &textFile)
 {
     using namespace stringOps;
-    std::ifstream infile (filename);
+    std::ifstream infile (textFile);
     std::string str;
 
     // count the lines
@@ -231,7 +231,7 @@ void App::run ()
 int App::loadArguments(boost::program_options::variables_map &vm_map)
 {
 
-    if (vm_map.count("local"))
+    if (vm_map.count("local")!=0u)
     {
         useLocal = true;
     }

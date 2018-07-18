@@ -729,18 +729,18 @@ void Player::addPublication (const std::string &key, helics_type_t type, const s
     }
     if (!useLocal)
     {
-        publications.push_back (Publication (GLOBAL, fed.get (), key, type, pubUnits));
+        publications.emplace_back (GLOBAL, fed.get (), key, type, pubUnits);
     }
     else
     {
         auto kp = key.find_first_of ("./");
         if (kp == std::string::npos)
         {
-            publications.push_back (Publication (fed.get (), key, type, pubUnits));
+            publications.emplace_back (fed.get (), key, type, pubUnits);
         }
         else
         {
-            publications.push_back (Publication (GLOBAL, fed.get (), key, type, pubUnits));
+            publications.emplace_back (GLOBAL, fed.get (), key, type, pubUnits);
         }
     }
     pubids[key] = static_cast<int> (publications.size ()) - 1;
@@ -755,18 +755,18 @@ void Player::addEndpoint (const std::string &endpointName, const std::string &en
     }
     if (!useLocal)
     {
-        endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+        endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
     }
     else
     {
         auto kp = endpointName.find_first_of ("./");
         if (kp == std::string::npos)
         {
-            endpoints.push_back (Endpoint (fed.get (), endpointName, endpointType));
+            endpoints.emplace_back (fed.get (), endpointName, endpointType);
         }
         else
         {
-            endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+            endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
         }
     }
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
@@ -784,7 +784,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
             return -3;
         }
     }
-    if (vm_map.count ("timeunits"))
+    if (vm_map.count ("timeunits")>0)
     {
         try
         {

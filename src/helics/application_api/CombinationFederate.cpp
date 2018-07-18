@@ -20,13 +20,13 @@ CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, con
 CombinationFederate::CombinationFederate (const std::string &jsonString)
     : Federate (loadFederateInfo (jsonString)), ValueFederate (true), MessageFederate (true)
 {
-    registerInterfaces (jsonString);
+    CombinationFederate::registerInterfaces (jsonString);
 }
 
 CombinationFederate::CombinationFederate (const std::string &name, const std::string &jsonString)
     : Federate (loadFederateInfo (name, jsonString)), ValueFederate (true), MessageFederate (true)
 {
-    registerInterfaces (jsonString);
+    CombinationFederate::registerInterfaces (jsonString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;

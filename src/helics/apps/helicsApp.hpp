@@ -12,8 +12,8 @@ namespace boost
 namespace program_options
 {
 class variables_map;
-}
-}
+} //namespace program_options
+} //namespace boost
 
 namespace helics
 {

@@ -782,7 +782,7 @@ void helicsCloseLibrary ()
 
 helics_query helicsCreateQuery (const char *target, const char *query)
 {
-    auto queryObj = new helics::queryObject;
+    auto queryObj = new helics::QueryObject;
     queryObj->query = (query != nullptr) ? std::string (query) : std::string ();
     queryObj->target = (target != nullptr) ? std::string (target) : std::string ();
     return reinterpret_cast<void *> (queryObj);
@@ -806,7 +806,7 @@ const char *helicsQueryExecute (helics_query query, helics_federate fed)
         return invalidStringConst;
     }
 
-    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
     if (queryObj->target.empty ())
     {
         queryObj->response = fedObj->query (queryObj->query);
@@ -835,7 +835,7 @@ const char *helicsQueryCoreExecute(helics_query query, helics_core core)
         return invalidStringConst;
     }
 
-    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
     queryObj->response = coreObj->query(queryObj->target,queryObj->query);
 
     return queryObj->response.c_str();
@@ -857,7 +857,7 @@ const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
         return invalidStringConst;
     }
 
-    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
     queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
 
     return queryObj->response.c_str();
@@ -881,7 +881,7 @@ helics_status helicsQueryExecuteAsync (helics_query query, helics_federate fed)
 
     try
     {
-        auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+        auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
         if (queryObj->target.empty ())
         {
             queryObj->asyncIndexCode = fedObj->queryAsync (queryObj->query);
@@ -907,7 +907,7 @@ const char *helicsQueryExecuteComplete (helics_query query)
         return invalidStringConst;
     }
 
-    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
     if (queryObj->asyncIndexCode != helics::invalid_id_value)
     {
         queryObj->response = queryObj->activeFed->queryComplete (queryObj->asyncIndexCode);
@@ -925,7 +925,7 @@ helics_bool_t helicsQueryIsCompleted (helics_query query)
         return helics_false;
     }
 
-    auto queryObj = reinterpret_cast<helics::queryObject *> (query);
+    auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
     if (queryObj->asyncIndexCode != helics::invalid_id_value)
     {
         auto res = queryObj->activeFed->isQueryCompleted (queryObj->asyncIndexCode);
@@ -934,7 +934,7 @@ helics_bool_t helicsQueryIsCompleted (helics_query query)
     return helics_false;
 }
 
-void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::queryObject *> (query); }
+void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::QueryObject *> (query); }
 
 void helicsCleanupHelicsLibrary ()
 {

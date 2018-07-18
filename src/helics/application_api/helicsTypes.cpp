@@ -127,7 +127,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
 {
     if (val.empty ())
     {
-        return std::complex<double> (-1e49, -1e49);
+        return {-1e49, -1e49};
     }
     std::smatch m;
     double re = -1e49;
@@ -294,8 +294,6 @@ named_point helicsGetNamedPoint (const std::string &val)
         {
             return {val, std::nan ("0")};
         }
-        else
-        {
             auto V = helicsGetComplex (val);
             if (V.real () < -1e48)
             {
@@ -306,7 +304,6 @@ named_point helicsGetNamedPoint (const std::string &val)
                 return {"value", std::abs (V)};
             }
             return {val, V.real ()};
-        }
     }
     auto locsep = val.find_last_of (':');
     auto locend = val.find_last_of ('}');
@@ -348,7 +345,7 @@ std::complex<double> getComplexFromString (const std::string &val)
         }
         return std::complex<double> (V[0], V[1]);
     }
-    else if (val.front () == 'c')
+   if (val.front () == 'c')
     {
         auto cv = helicsGetComplexVector (val);
         if (cv.empty ())
@@ -371,7 +368,7 @@ double getDoubleFromString (const std::string &val)
         auto V = helicsGetVector (val);
         return vectorNorm (V);
     }
-    else if (val.front () == 'c')
+    if (val.front () == 'c')
     {
         auto cv = helicsGetComplexVector (val);
         return vectorNorm (cv);
@@ -438,7 +435,6 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
             data[1] = V.imag ();
         }
     }
-    return;
 }
 
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data)
@@ -469,7 +465,7 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
             }
             catch (const boost::bad_lexical_cast &)
             {
-                data.push_back (-1e49);
+                data.emplace_back (-1e49);
             }
             fb = nc;
         }
