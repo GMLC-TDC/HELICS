@@ -11,7 +11,7 @@ before_cache:
 
 env:
   global:
-    - MAKEFLAGS="-j 1"
+    - MAKEFLAGS="-j 2"
 
 # Create aliases for some of shared build configuration
 _basic_env:
