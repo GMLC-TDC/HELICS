@@ -178,7 +178,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             {
                 val = static_cast<X> (std::stod (dv.string ()));
             }
-            catch (const std::invalid_argument &ble)
+            catch (const std::invalid_argument &)
             {  // well lets try a vector conversion
                 auto V = ValueConverter<std::vector<double>>::interpret (dv);
                 val = static_cast<X> (vectorNorm (V));

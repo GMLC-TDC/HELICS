@@ -426,4 +426,44 @@ BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label("ci"))
     BOOST_CHECK (val1 == tvec);
     vFed->finalize ();
 }
+
+
+BOOST_AUTO_TEST_CASE(subscriptionDefaults_test, *utf::label("ci"))
+{
+    helics::FederateInfo fi("test1");
+    fi.coreType = CORE_TYPE_TO_TEST;
+    fi.coreInitString = "1";
+
+    auto vFed = std::make_shared<helics::ValueFederate>(fi);
+    // register the publications
+    helics::Subscription subObj1(helics::interface_availability::optional, vFed, "pub1");
+    helics::Subscription subObj2(helics::interface_availability::optional, vFed, "pub2");
+    subObj1.setDefault(45.3);
+    subObj2.setDefault(67.4);
+    vFed->enterExecutionState();
+    auto gtime = vFed->requestTime(1.0);
+
+    BOOST_CHECK_EQUAL(gtime, 1.0);
+    BOOST_CHECK(!subObj1.isUpdated());
+    BOOST_CHECK(!subObj2.isUpdated());
+    
+    auto val1 = subObj1.getValue<double>();
+    auto val2 = subObj2.getValue<double>();
+
+    BOOST_CHECK_EQUAL(val1,45.3);
+    BOOST_CHECK_EQUAL(val2, 67.4);
+    
+    // advance time
+    gtime = vFed->requestTime(2.0);
+
+    BOOST_CHECK(!subObj1.isUpdated());
+    BOOST_CHECK(!subObj2.isUpdated());
+    val1 = subObj1.getValue<double>();
+    val2 = subObj2.getValue<double>();
+
+    BOOST_CHECK_EQUAL(val1, 45.3);
+    BOOST_CHECK_EQUAL(val2, 67.4);
+    vFed->finalize();
+}
+
 BOOST_AUTO_TEST_SUITE_END ()
