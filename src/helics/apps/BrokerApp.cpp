@@ -10,7 +10,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/CoreBroker.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
-#include "helics/helics-config.h"
 #include <fstream>
 #include <iostream>
 
