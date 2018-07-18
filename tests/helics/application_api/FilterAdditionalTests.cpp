@@ -3,10 +3,8 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
-#include "helics/application_api/Federate.hpp"
-#include "helics/application_api/FilterOperations.hpp"
 #include "helics/application_api/Filters.hpp"
+#include "helics/application_api/FilterOperations.hpp"
 #include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
@@ -198,7 +196,6 @@ This test case sets random drop filter on a source endpoint with a particular
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-
 BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -259,7 +256,6 @@ This test case sets random drop filter on a source endpoint with a particular
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-
 BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
