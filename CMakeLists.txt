@@ -532,6 +532,11 @@ else (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 endif(WIN32)
 
+if (APPLE)
+    set(CPACK_BUNDLE_NAME "libhelics")
+    set(CPACK_BUNDLE_PLIST Info.plist)
+    set(CPACK_BUNDLE_ICON HELICS.ico)
+endif (APPLE)
 
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST
