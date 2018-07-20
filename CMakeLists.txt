@@ -534,8 +534,8 @@ endif(WIN32)
 
 if (APPLE)
     set(CPACK_BUNDLE_NAME "libhelics")
-    set(CPACK_BUNDLE_PLIST Info.plist)
-    set(CPACK_BUNDLE_ICON HELICS.ico)
+    set(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/config/Info.plist")
+    set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
 endif (APPLE)
 
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
