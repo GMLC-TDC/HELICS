@@ -28,6 +28,7 @@ set (HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 include(extraMacros)
 include(CMakeDependentOption)
+#include(BuildType)
 #-----------------------------------------------------------------------------
 # set the install path to a local directory
 #-----------------------------------------------------------------------------
