@@ -91,9 +91,9 @@ class SubscriptionBase
     @param[in] callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void registerCallback (std::function<void(Time)> callback)
+    void registerNotificationCallback (std::function<void(Time)> callback)
     {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
+        fed->registerSubscriptionNotificationCallback (id, [this,callback](subscription_id_t, Time time) { if (isUpdated()){callback (time);} });
     }
     /** get the key for the subscription*/
     const std::string &getKey () const { return key_; }
@@ -116,8 +116,10 @@ class Subscription : public SubscriptionBase
                    std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>,
-                   std::function<void(const std::vector<std::complex<double>> &, Time)>>
+                   std::function<void(const std::vector<double> &, Time)>, 
+		std::function<void(const std::vector<std::complex<double>> &, Time)>,
+		std::function<void(const named_point &, Time)>,
+		std::function<void(const bool &, Time)> >
       value_callback;  //!< callback function for the federate
 
     mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
@@ -199,18 +201,19 @@ class Subscription : public SubscriptionBase
     /** check if the value has been updated and load the value into buffer*/
     bool getAndCheckForUpdate();
 
-    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, void>
-    registerCallback (std::function<void(const X &, Time)> callback)
+    void registerCallback (std::function<void(const X &, Time)> callback)
     {
+        static_assert (helicsType<X> () != helics_type_t::helicsInvalid,
+                       "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
+                       "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+        fed->registerSubscriptionNotificationCallback (id, [this](subscription_id_t, Time time) {
             handleCallback (time);
         });
     }
@@ -409,7 +412,6 @@ class SubscriptionT : public SubscriptionBase
     */
     void getValue (X &out) const { fed->getValue (id, out); }
 
-    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)

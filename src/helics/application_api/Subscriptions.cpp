@@ -25,55 +25,60 @@ SubscriptionBase::SubscriptionBase (ValueFederate *valueFed, int subIndex) : fed
 
 void Subscription::handleCallback (Time time)
 {
-    auto dv = fed->getValueRaw (id);
-    if (type == helics_type_t::helicsInvalid)
-    {
-        type = getTypeFromString (fed->getPublicationType (id));
-    }
+	if (!isUpdated())
+	{
+        return;
+	}
     switch (value_callback.index ())
     {
     case doubleLoc:
     {
-        double val;
-        valueExtract (dv, type, val);
+        auto val = getValue<double> ();
         mpark::get<std::function<void(const double &, Time)>> (value_callback) (val, time);
     }
     break;
     case intLoc:
     {
-        int64_t val;
-        valueExtract (dv, type, val);
+        auto val = getValue<int64_t> ();
         mpark::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
     }
     break;
     case stringLoc:
     default:
     {
-        std::string val;
-        valueExtract (dv, type, val);
+        auto val = getValue<std::string> ();
         mpark::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
     }
     break;
     case complexLoc:
     {
-        std::complex<double> val;
-        valueExtract (dv, type, val);
+        auto val = getValue<std::complex<double>> ();
         mpark::get<std::function<void(const std::complex<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case vectorLoc:
     {
-        std::vector<double> val;
-        valueExtract (dv, type, val);
+        auto val = getValue<std::vector<double>> ();
         mpark::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case complexVectorLoc:
     {
-        std::vector<std::complex<double>> val;
-        valueExtract (dv, type, val);
+        auto val = getValue<std::vector<std::complex<double>>> ();
         mpark::get<std::function<void(const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
-                                                                                                           time);
+                                                                                                  time);
+    }
+    break;
+    case namedPointLoc:
+    {
+        auto val = getValue<named_point> ();
+        mpark::get<std::function<void(const named_point &, Time)>> (value_callback) (val,time);
+    }
+    break;
+    case 7: //bool loc
+    {
+        auto val = getValue<bool> ();
+        mpark::get<std::function<void(const bool &, Time)>> (value_callback) (val, time);
     }
     break;
     }
