@@ -23,9 +23,9 @@ static const ArgDescriptors InfoArgs{{"delay", "the delay with which the echo ap
 
 Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
-        variable_map vm_map;
         argumentParser(argc, argv, vm_map, InfoArgs);
         loadArguments(vm_map);
         if (!masterFileName.empty())
@@ -33,6 +33,10 @@ Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
             loadFile(masterFileName);
         }
     }
+	else
+	{
+        argumentParser (argc, argv, vm_map, InfoArgs);
+	}
 }
 
 Echo::Echo (const FederateInfo &fi) : App (fi) {}

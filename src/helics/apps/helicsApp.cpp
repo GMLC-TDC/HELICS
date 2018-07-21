@@ -73,6 +73,7 @@ App::App (const std::string &appName,int argc, char *argv[])
     {
         if (!quietMode)
         {
+			//this is just to run the help output
             FederateInfo helpTemp(argc, argv);
         }
     }

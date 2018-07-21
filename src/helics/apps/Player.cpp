@@ -3,8 +3,8 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "Player.hpp"
 #include "../common/argParser.h"
+#include "Player.hpp"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -57,16 +57,20 @@ static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data 
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (SOURCE_ONLY_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 
@@ -181,7 +185,7 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-               
+               
 
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
@@ -784,7 +788,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
             return -3;
         }
     }
-    if (vm_map.count ("timeunits")>0)
+    if (vm_map.count ("timeunits") > 0)
     {
         try
         {
@@ -804,29 +808,29 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
 
 static int hasB64Wrapper (const std::string &str)
 {
-    if (str.front() == '\"')
+    if (str.front () == '\"')
     {
-        if ((str.compare(2, 3, "64[") == 0) && (str[str.size()-2] == ']'))
+        if ((str.compare (2, 3, "64[") == 0) && (str[str.size () - 2] == ']'))
         {
             return 5;
         }
-        if ((str.compare(5, 3, "64[") == 0) && (str[str.size() - 2] == ']'))
+        if ((str.compare (5, 3, "64[") == 0) && (str[str.size () - 2] == ']'))
         {
             return 8;
         }
     }
     else
     {
-        if ((str.compare(1, 3, "64[") == 0) && (str.back() == ']'))
+        if ((str.compare (1, 3, "64[") == 0) && (str.back () == ']'))
         {
             return 4;
         }
-        if ((str.compare(4, 3, "64[") == 0) && (str.back() == ']'))
+        if ((str.compare (4, 3, "64[") == 0) && (str.back () == ']'))
         {
             return 7;
         }
     }
-    
+
     return 0;
 }
 
@@ -839,9 +843,9 @@ static std::string decode (std::string &&stringToDecode)
     auto offset = hasB64Wrapper (stringToDecode);
     if (offset != 0)
     {
-        if (stringToDecode.back() == '\"')
+        if (stringToDecode.back () == '\"')
         {
-            stringToDecode.pop_back();
+            stringToDecode.pop_back ();
         }
 
         stringToDecode.pop_back ();

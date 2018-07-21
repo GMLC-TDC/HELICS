@@ -53,10 +53,10 @@ static const ArgDescriptors InfoArgs{
 
 Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (OBSERVER_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -64,6 +64,10 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
             loadFile (masterFileName);
         }
     }
+	else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
+	}
 }
 
 Tracer::Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
