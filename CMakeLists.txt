@@ -534,7 +534,8 @@ endif(WIN32)
 
 if (APPLE)
     set(CPACK_BUNDLE_NAME "libhelics")
-    set(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/config/Info.plist")
+    configure_file("${PROJECT_SOURCE_DIR}/config/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY)
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
     set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
 endif (APPLE)
 

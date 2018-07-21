@@ -5,9 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>X-Moto</string>
+	<string>HELICS</string>
 	<key>CFBundleName</key>
-	<string>X-Moto</string>
+	<string>HELICS</string>
 	<key>CFBundleExecutable</key>
 	<string>helics</string>
 	<key>CFBundleIconFile</key>
@@ -19,11 +19,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>%VERS%</string>
+	<string>@HELICS_VERSION@</string>
 	<key>CFBundleVersion</key>
-	<string>%VERS%</string>
+	<string>@HELICS_VERSION@</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2017 HELICS</string>
+	<string>Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
