@@ -46,11 +46,10 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
             loadFile (masterFileName);
         }
     }
-	else
-	{
+    else
+    {
         argumentParser (argc, argv, vm_map, InfoArgs);
-	}
-    
+    }
 }
 
 Source::Source (const FederateInfo &fi) : App (fi) { fed->setFlag (SOURCE_ONLY_FLAG); }

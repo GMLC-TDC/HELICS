@@ -64,10 +64,10 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
             loadFile (masterFileName);
         }
     }
-	else
+    else
     {
         argumentParser (argc, argv, vm_map, InfoArgs);
-	}
+    }
 }
 
 Tracer::Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)

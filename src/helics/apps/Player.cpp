@@ -3,8 +3,8 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "../common/argParser.h"
 #include "Player.hpp"
+#include "../common/argParser.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -185,7 +185,7 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-               
+               
 
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {

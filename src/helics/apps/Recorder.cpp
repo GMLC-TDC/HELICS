@@ -64,10 +64,10 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
             loadFile (masterFileName);
         }
     }
-	else
-	{
+    else
+    {
         argumentParser (argc, argv, vm_map, InfoArgs);
-	}
+    }
 }
 
 Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
@@ -467,7 +467,7 @@ std::string Recorder::encode (const std::string &str2encode)
 {
     return std::string ("b64[") +
            utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
-                                     static_cast<int>(str2encode.size ())) +
+                                     static_cast<int> (str2encode.size ())) +
            ']';
 }
 

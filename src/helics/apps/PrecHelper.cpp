@@ -63,10 +63,8 @@ helics_type_t getType (const std::string &typeString)
 
     std::transform (tstr.begin (), tstr.end (), tstr.begin (), ::tolower);
 
-    return getTypeFromString(tstr);
-
+    return getTypeFromString (tstr);
 }
-
 
 char typeCharacter (helics_type_t type)
 {
@@ -90,7 +88,8 @@ char typeCharacter (helics_type_t type)
     }
 }
 
-bool isBinaryData(helics::data_block &data)
+bool isBinaryData (helics::data_block &data)
 {
-    return std::any_of(data.begin(), data.end(), [](const auto &c) {return ((c < 32) || (c == 34) || (c > 126)); });
+    return std::any_of (data.begin (), data.end (),
+                        [](const auto &c) { return ((c < 32) || (c == 34) || (c > 126)); });
 }
