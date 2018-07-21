@@ -185,7 +185,9 @@ void Player::loadTextFile (const std::string &filename)
             if (str[fc + 1] == '!')
             {
                 /*  //allow configuration inside the regular text file
-               
+               
+
+
 
                 if (playerConfig.find("timeunits") != playerConfig.end())
                 {
