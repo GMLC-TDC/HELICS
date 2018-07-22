@@ -112,10 +112,7 @@ void MessageFederate::registerMessageInterfaces(const std::string &configString)
 
 void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
-    }
+    
     auto doc = loadJson (jsonString);
 
     if (doc.isMember ("endpoints"))
@@ -191,11 +188,16 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
 
 void MessageFederate::registerMessageInterfacesToml (const std::string &tomlString)
 {
-    if (state != op_states::startup)
+    
+    toml::Value doc;
+    try
     {
-        throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
+        doc = loadToml (tomlString);
     }
-    auto doc = loadToml (tomlString);
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
 
    auto epts = doc.find ("endpoints");
     if (epts != nullptr)

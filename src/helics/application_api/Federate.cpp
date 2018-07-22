@@ -819,7 +819,15 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
 
 void Federate::registerFilterInterfacesToml (const std::string &tomlString)
 {
-    auto doc = loadToml (tomlString);
+    toml::Value doc;
+    try
+    {
+        doc = loadToml (tomlString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
 
     auto filts = doc.find ("filters");
     if (filts != nullptr)
@@ -905,41 +913,41 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
 						auto &propArray = props->as<toml::Array> ();
                         for (const auto &prop : propArray)
                         {
-                            auto name = prop.find ("name");
-                            auto val = prop.find ("value");
+                            auto propname = prop.find ("name");
+                            auto propval = prop.find ("value");
 
-                            if ((name == nullptr) || (val==nullptr))
+                            if ((propname == nullptr) || (propval==nullptr))
                             {
                                 std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                                 continue;
                             }
-                            if (val->isNumber())
+                            if (propval->isNumber ())
                             {
-                                filter->set (name->as<std::string> (), val->as<double> ());
+                                filter->set (propname->as<std::string> (), propval->as<double> ());
                             }
                             else
                             {
-                                filter->setString (name->as<std::string> (), val->as<std::string> ());
+                                filter->setString (propname->as<std::string> (), propval->as<std::string> ());
                             }
                         }
                     }
                     else
                     {
-                        auto name = props->find ("name");
-                        auto val = props->find ("value");
+                        auto propname = props->find ("name");
+                        auto propval = props->find ("value");
 
-                        if ((name == nullptr) || (val == nullptr))
+                        if ((propname == nullptr) || (propval == nullptr))
                         {
                             std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                             continue;
                         }
-                        if (val->isNumber ())
+                        if (propval->isNumber ())
                         {
-                            filter->set (name->as<std::string> (), val->as<double> ());
+                            filter->set (propname->as<std::string> (), propval->as<double> ());
                         }
                         else
                         {
-                            filter->setString (name->as<std::string> (), val->as<std::string> ());
+                            filter->setString (propname->as<std::string> (), propval->as<std::string> ());
                         }
                     }
                 }

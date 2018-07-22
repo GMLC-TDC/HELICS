@@ -287,4 +287,20 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
     cFed.disconnect ();
 }
+
+BOOST_AUTO_TEST_CASE (test_file_load_toml)
+{
+    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/test_files/example_combo_fed.toml");
+
+    BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
+
+    BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
+    auto id = cFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
+
+    BOOST_CHECK_EQUAL (cFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
+
+    cFed.disconnect ();
+}
 BOOST_AUTO_TEST_SUITE_END ()

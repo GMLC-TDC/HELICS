@@ -193,9 +193,17 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
     }
 }
 
-void ValueFederate::registerValueInterfacesToml(const std::string &configString)
+void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
 {
-    auto doc = loadToml(configString);
+    toml::Value doc;
+    try
+    {
+        doc = loadToml (tomlString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
 
 	auto pubs = doc.find ("publications");
     if (pubs!=nullptr)

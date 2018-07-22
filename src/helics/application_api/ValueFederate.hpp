@@ -282,8 +282,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void registerValueInterfaces (const std::string &configString);
 
   private:
-    void registerValueInterfacesJson (const std::string &configString);
-    void registerValueInterfacesToml (const std::string &configString);
+    void registerValueInterfacesJson (const std::string &jsonString);
+    void registerValueInterfacesToml (const std::string &tomlString);
 
   public:
     /** get a value as raw data block from the system
