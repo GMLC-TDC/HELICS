@@ -15,6 +15,7 @@ DelayedObjects.hpp
 searchableObjectHolder.hpp
 argParser.h
 JsonProcessingFunctions.hpp
+TomlProcessingFunctions.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
@@ -35,6 +36,7 @@ set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
 JsonProcessingFunctions.cpp
+TomlProcessingFunctions.cpp
 logger.cpp
 stringOps.cpp
 charMapper.cpp
