@@ -3,8 +3,9 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "Player.hpp"
+
 #include "../common/argParser.h"
+#include "Player.hpp"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -143,6 +144,7 @@ void Player::loadTextFile (const std::string &filename)
 
     int mcnt = 0;
     int pcnt = 0;
+    bool mlineComment = false;
     // count the lines
     while (std::getline (infile, str))
     {
@@ -151,8 +153,30 @@ void Player::loadTextFile (const std::string &filename)
             continue;
         }
         auto fc = str.find_first_not_of (" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
+        if (fc == std::string::npos)
         {
+            continue;
+        }
+        if (mlineComment)
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']'))
+                {
+                    mlineComment = false;
+                }
+            }
+            continue;
+        }
+        else if (str[fc] == '#')
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '['))
+                {
+                    mlineComment = true;
+                }
+            }
             continue;
         }
         if ((str[fc] == 'm') || (str[fc] == 'M'))
@@ -180,23 +204,47 @@ void Player::loadTextFile (const std::string &filename)
             continue;
         }
         auto fc = str.find_first_not_of (" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
+        if (fc == std::string::npos)
         {
-            if (str[fc + 1] == '!')
+            continue;
+        }
+        if (mlineComment)
+        {
+            if (fc + 2 < str.size ())
             {
-                /*  //allow configuration inside the regular text file
-               
-
-
-
-                if (playerConfig.find("timeunits") != playerConfig.end())
+                if ((str[fc] == '#') && (str[fc+1] == '#') && (str[fc+2] == ']'))
                 {
-                    if (playerConfig["timeunits"] == "ns")
-                    {
-                        timeMultiplier = 1e-9;
-                    }
+                    mlineComment = false;
                 }
-                */
+            }
+            continue;
+        }
+        else if (str[fc] == '#')
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '['))
+                {
+                    mlineComment = true;
+                }
+                else if (str[fc + 1] == '!')
+                {
+                    /*  //allow configuration inside the regular text file
+
+
+
+
+
+
+                    if (playerConfig.find("timeunits") != playerConfig.end())
+                    {
+                        if (playerConfig["timeunits"] == "ns")
+                        {
+                            timeMultiplier = 1e-9;
+                        }
+                    }
+                    */
+                }
             }
             continue;
         }
@@ -242,8 +290,8 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-            if (blk.size () == 3)
-            {
+			if (blk.size() == 2)
+			{
                 auto cloc = blk[0].find_last_of (':');
                 if (cloc == std::string::npos)
                 {
@@ -261,39 +309,83 @@ void Player::loadTextFile (const std::string &filename)
                     }
                     points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
                 }
+                if (pIndex > 0)
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+				else
+				{
+                    std::cerr << "lines without publication name but follow one with a publication line " << lcount << '\n';
+				}
+                points[pIndex].value = blk[1];
+                ++pIndex;
+			}
+                else if (blk.size () == 3)
+                {
+                    auto cloc = blk[0].find_last_of (':');
+                    if (cloc == std::string::npos)
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                            Time::minVal ())
+                        {
+                            continue;
+                        }
+                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    }
+                    if ((blk[1].empty ()) && (pIndex > 0))
+                    {
+                        points[pIndex].pubName = points[pIndex - 1].pubName;
+                    }
+                    else
+                    {
+                        points[pIndex].pubName = blk[1];
+                    }
 
-                points[pIndex].pubName = blk[1];
-                points[pIndex].value = blk[2];
-                ++pIndex;
-            }
-            else if (blk.size () == 4)
-            {
-                auto cloc = blk[0].find_last_of (':');
-                if (cloc == std::string::npos)
+                    points[pIndex].value = blk[2];
+                    ++pIndex;
+                }
+                else if (blk.size () == 4)
                 {
-                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                    auto cloc = blk[0].find_last_of (':');
+                    if (cloc == std::string::npos)
                     {
-                        continue;
+                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                        {
+                            continue;
+                        }
                     }
+                    else
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                            Time::minVal ())
+                        {
+                            continue;
+                        }
+                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    }
+                    if ((blk[1].empty ()) && (pIndex > 0))
+                    {
+                        points[pIndex].pubName = points[pIndex - 1].pubName;
+                    }
+                    else
+                    {
+                        points[pIndex].pubName = blk[1];
+                    }
+                    points[pIndex].type = blk[2];
+                    points[pIndex].value = blk[3];
+                    ++pIndex;
                 }
                 else
                 {
-                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                        Time::minVal ())
-                    {
-                        continue;
-                    }
-                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    std::cerr << "unknown publish format line " << lcount << '\n';
                 }
-                points[pIndex].pubName = blk[1];
-                points[pIndex].type = blk[2];
-                points[pIndex].value = blk[3];
-                ++pIndex;
-            }
-            else
-            {
-                std::cerr << "unknown publish format line " << lcount << '\n';
-            }
         }
     }
 }
