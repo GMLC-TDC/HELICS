@@ -53,7 +53,7 @@ bool changeDetected (const defV &prevValue, const named_point &val, double delta
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
 /** directly convert the boolean to integer*/
-inline int64_t make_valid (bool obj) { return (obj) ? 1 : 0; }
+inline int64_t make_valid (bool obj) { return (obj) ? 1ll : 0ll; }
 
 /** this template should do nothing for most classes the specific overloads are the important ones*/
 template <class X>

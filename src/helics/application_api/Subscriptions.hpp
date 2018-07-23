@@ -314,13 +314,16 @@ class Subscription : public SubscriptionBase
     }
 
   public:
+    int getValue (double *data, int maxsize);
+    int getValue (char *str, int maxsize);
     /** get the latest value for the subscription
     @param[out] out the location to store the value
     */
     template <class X>
-    typename std::enable_if_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ()))>
-    getValue (X &out)
+    void getValue (X &out)
     {
+        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+                       "requested types must be one of the primary helics types or convertible to one");
         getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid), std::true_type,
                                              std::false_type> (),
                           out);
@@ -328,18 +331,22 @@ class Subscription : public SubscriptionBase
     /** get the most recent value
     @return the value*/
     template <class X>
-    typename std::enable_if_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())), X>
-    getValue ()
+    X getValue ()
     {
+        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+                       "requested types must be one of the primary helics types or convertible to one");
         return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid),
                                                     std::true_type, std::false_type> ());
     }
+
     /** get the size of the raw data*/
     size_t getRawSize();
     /** get the size of the data if it were a string*/
     size_t getStringSize();
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize();
+
+	//TODO:: add a getValueByReference function that gets the data by reference but may force a copy and will only work on the primary types
 
 };
 

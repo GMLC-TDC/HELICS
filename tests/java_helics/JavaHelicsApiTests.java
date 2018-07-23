@@ -3,7 +3,7 @@ import java.util.List;
 
 import com.java.helics.*;
 public class JavaHelicsApiTests {
-	
+
 	public List<AssertionError> failedHelicsTests = new ArrayList<AssertionError>();
 	public int numberOfPassingTests = 0;
 	public int numberOfFailedTests = 0;
@@ -14,11 +14,11 @@ public class JavaHelicsApiTests {
 		--numberOfPassingTests;
 		++numberOfFailedTests;
 	}
-	
+
 	JavaHelicsApiTests(int numberOfTests) {
 		numberOfPassingTests = numberOfTests;
 	}
-	
+
 	public static void main(String[] args) {
 		JavaHelicsApiTests javaHelicsApiTests = new JavaHelicsApiTests(94);
 		try {
@@ -304,7 +304,16 @@ public class JavaHelicsApiTests {
 			rv = helics.helicsFederateEnterInitializationModeAsync(fed1);
 			int rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
 			if(rs != 0) {
-				javaHelicsApiTests.helicsAssert("rs != 0");
+				Thread.sleep(500);
+				rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
+				if(rs != 0) {
+					Thread.sleep(500);
+					rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
+					if(rs != 0) {
+						/* this operation should have completed by  now*/
+						javaHelicsApiTests.helicsAssert("rs != 0");
+					}
+				}
 			}
 			rv = helics.helicsFederateEnterInitializationModeComplete(fed1);
 			rv = helics.helicsFederateEnterExecutionModeAsync(fed1);
@@ -549,4 +558,3 @@ public class JavaHelicsApiTests {
 		}
 	}
 }
-
