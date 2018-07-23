@@ -583,7 +583,7 @@ void runFederateTestVectorD (const char *core,
     std::string buf;
     buf.resize(actualLen + 2);
     CE(helicsSubscriptionGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen));
-    buf.resize(actualLen);
+    buf.resize(actualLen-1);
     BOOST_CHECK_EQUAL(buf[0], 'v');
     BOOST_CHECK_EQUAL(buf.back(), ']');
 
@@ -836,7 +836,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     // make sure the value is still what we expect
     CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (len, strlen ("string1"));
+    BOOST_CHECK_EQUAL (len-1, strlen ("string1"));
 
     // advance time
     CE (helicsFederateRequestTime (vFed, 2.0, &gtime));

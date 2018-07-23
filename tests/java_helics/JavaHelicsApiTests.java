@@ -522,8 +522,9 @@ public class JavaHelicsApiTests {
 			if(!sub3ValueString.contains("Mayhem")) {
 				javaHelicsApiTests.helicsAssert("!sub3ValueString.contains(\"Mayhem\")");
 			}
-			if(sub3Length[0] != 6) {
-				javaHelicsApiTests.helicsAssert("sub3Length[0] != 6");
+			/*string contains a null terminator*/
+			if(sub3Length[0] != 7) {
+				javaHelicsApiTests.helicsAssert("sub3Length[0] != 7");
 			}
 			int sub3ValueSize = helics.helicsSubscriptionGetValueSize(sub3);
 			if(sub3ValueSize != 6) {
