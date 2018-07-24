@@ -23,15 +23,19 @@ static const ArgDescriptors InfoArgs{{"delay", "the delay with which the echo ap
 
 Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
-        variable_map vm_map;
-        argumentParser(argc, argv, vm_map, InfoArgs);
-        loadArguments(vm_map);
-        if (!masterFileName.empty())
+        argumentParser (argc, argv, vm_map, InfoArgs);
+        loadArguments (vm_map);
+        if (!masterFileName.empty ())
         {
-            loadFile(masterFileName);
+            loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 
@@ -39,7 +43,10 @@ Echo::Echo (const FederateInfo &fi) : App (fi) {}
 
 Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi) {}
 
-Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString) { loadJsonFile (jsonString); }
+Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+{
+    loadJsonFile (jsonString);
+}
 
 void Echo::runTo (Time stopTime_input)
 {
