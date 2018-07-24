@@ -317,6 +317,7 @@ if (NOT Boost_USE_STATIC_LIBS)
 	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
+
 #add the local directory to the rpath
 #list(APPEND CMAKE_INSTALL_RPATH "./")
 
@@ -329,7 +330,11 @@ if (NOT WIN32)
 	#	message(STATUS "zmqlib file =${zmqlibfile}")
 	#	get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 	#	message(STATUS "zmqdir path =${zmqdir}")
-#
+        if (APPLE)
+            # TODO: Make sure it works for building ZMQ from source automatically using CMake
+            list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_ROOT_DIR}/lib)
+            list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_ROOT_DIR}/lib)
+        endif()
 #		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
 #		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
