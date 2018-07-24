@@ -112,9 +112,10 @@ class SubscriptionBase
 class Subscription : public SubscriptionBase
 {
   private:
-    mpark::variant<std::function<void(const std::string &, Time)>,
-                   std::function<void(const double &, Time)>,
-                   std::function<void(const int64_t &, Time)>,
+	//this needs to match the defV type
+      mpark::variant<std::function<void(const double &, Time)>,
+                     std::function<void(const int64_t &, Time)>,
+                     std::function<void(const std::string &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
                    std::function<void(const std::vector<double> &, Time)>, 
 		std::function<void(const std::vector<std::complex<double>> &, Time)>,
