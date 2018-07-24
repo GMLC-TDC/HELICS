@@ -46,21 +46,11 @@ add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 	target_link_libraries(helics_player helics_apps-static )
 	set_target_properties (helics_player PROPERTIES FOLDER apps)
 	install(TARGETS helics_player DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-    if (APPLE)
-        execute_process(COMMAND install_name_tool -add_rpath ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_player)
-        execute_process(COMMAND install_name_tool -add_rpath ${ZeroMQ_ROOT_DIR}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_player)
-        execute_process(COMMAND install_name_tool -add_rpath ${Boost_LIBRARY_DIR_RELEASE}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_player)
-    endif (APPLE)
 
 	add_executable(helics_recorder recorderMain.cpp)
 	target_link_libraries(helics_recorder helics_apps-static)
 	set_target_properties (helics_recorder PROPERTIES FOLDER apps)
 	install(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-    if (APPLE)
-        execute_process(COMMAND install_name_tool -add_rpath ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_recorder)
-        execute_process(COMMAND install_name_tool -add_rpath ${ZeroMQ_ROOT_DIR}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_recorder)
-        execute_process(COMMAND install_name_tool -add_rpath ${Boost_LIBRARY_DIR_RELEASE}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_recorder)
-    endif (APPLE)
 
 
 if (BUILD_BROKER)
@@ -69,12 +59,6 @@ if (BUILD_BROKER)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    install(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-   if (APPLE)
-        execute_process(COMMAND install_name_tool -add_rpath ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_broker)
-        execute_process(COMMAND install_name_tool -add_rpath ${ZeroMQ_ROOT_DIR}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_broker)
-        execute_process(COMMAND install_name_tool -add_rpath ${Boost_LIBRARY_DIR_RELEASE}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_broker)
-    endif (APPLE)
-
 endif()
 
 	add_executable(helics_app appMain.cpp)
@@ -82,13 +66,6 @@ endif()
 	set_target_properties (helics_app PROPERTIES FOLDER apps)
 	install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
-    if (APPLE)
-        execute_process(COMMAND install_name_tool -add_rpath ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_app)
-        execute_process(COMMAND install_name_tool -add_rpath ${ZeroMQ_ROOT_DIR}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_app)
-        execute_process(COMMAND install_name_tool -add_rpath ${Boost_LIBRARY_DIR_RELEASE}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics_app)
-    endif (APPLE)
-
-	if (WIN32)
 		foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 			add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event to core tests
 				COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
@@ -111,12 +88,6 @@ endif()  #if build any app
 
 configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 add_executable(helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
-if (APPLE)
-    execute_process(COMMAND install_name_tool -add_rpath ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics-config)
-    execute_process(COMMAND install_name_tool -add_rpath ${ZeroMQ_ROOT_DIR}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics-config)
-    execute_process(COMMAND install_name_tool -add_rpath ${Boost_LIBRARY_DIR_RELEASE}/lib ${CMAKE_INSTALL_PREFIX}/bin/helics-config)
-endif (APPLE)
-
 target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 set_target_properties (helics-config PROPERTIES FOLDER apps)
 
