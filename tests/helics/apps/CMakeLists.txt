@@ -28,7 +28,7 @@ target_link_libraries(helics_apps-tests helics_apps-static helics_test_base)
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
-target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
+target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics\")
 
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --report_level=short)
 set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Daily)
