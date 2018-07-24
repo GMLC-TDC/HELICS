@@ -3,6 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+
 #include "../common/argParser.h"
 #include "Player.hpp"
 #include "PrecHelper.hpp"
@@ -57,16 +58,20 @@ static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data 
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (SOURCE_ONLY_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 

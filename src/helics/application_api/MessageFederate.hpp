@@ -26,14 +26,14 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
-    @param[in] jsonString can be either a json file or a string containing json code
+    @param[in] configString can be either a json file, toml file or a string containing json code
     */
-    explicit MessageFederate (const std::string &jsonString);
+    explicit MessageFederate (const std::string &configString);
     /**constructor taking a string with the required information
     @param[in] name the name of the federate
-    @param[in] jsonString can be either a json file or a string containing json code
+    @param[in] configString can be either a json file, toml file or a string containing json code
     */
-    MessageFederate (const std::string &name, const std::string &jsonString);
+    MessageFederate (const std::string &name, const std::string &configString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** default constructor*/
@@ -66,13 +66,28 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
     endpoint_id_t registerGlobalEndpoint (const std::string &name, const std::string &type = "");
-    virtual void registerInterfaces (const std::string &jsonString) override;
+    virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set Message interfaces
     @details call is only valid in startup mode it is a protected call to add an
-    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    @param[in] configString  the location of the file or json String to load to generate the interfaces
     */
-    void registerMessageInterfaces (const std::string &jsonString);
+    void registerMessageInterfaces (const std::string &configString);
+
+  private:
+    /** register a set Message interfaces
+ @details call is only valid in startup mode it is a protected call to add an
+ @param[in] configString  the location of the file or json String to load to generate the interfaces
+ */
+    void registerMessageInterfacesJson (const std::string &jsonString);
+
+	 /** register a set Message interfaces
+   @details call is only valid in startup mode it is a protected call to add an
+   @param[in] configString  the location of the toml to load to generate the interfaces
+   */
+    void registerMessageInterfacesToml (const std::string &tomlString);
+
+  public:
 
     /** give the core a hint for known communication paths
     @details the function will generate an error in the core if a communication path is not present once the
