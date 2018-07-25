@@ -255,9 +255,10 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    exeTestRunner playerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_player");
+    exeTestRunner playerExe (std::string(HELICS_INSTALL_LOC),std::string (HELICS_BUILD_LOC) + "/apps/", "helics_player");
 
-    exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_broker");
+    exeTestRunner brokerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
+                             "helics_broker");
 
     BOOST_REQUIRE (playerExe.isActive ());
     BOOST_REQUIRE (brokerExe.isActive ());
