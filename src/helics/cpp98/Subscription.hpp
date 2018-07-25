@@ -98,9 +98,13 @@ public:
         result.resize(size+1);
         //this function results in a null terminated string
         helicsSubscriptionGetString(sub, &result[0], size+1, &size);
-        if (!(result.empty())&&(result.back() == '\0'))
+        if (!(result.empty())&&(result[size-1] == '\0'))
         {
-            result.pop_back();
+            result.resize(size - 1);
+        }
+        else
+        {
+            result.resize(size);
         }
         return result;
     }
