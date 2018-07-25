@@ -8,7 +8,7 @@ CURRENT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
 
 DEPENDENCIES = os.path.abspath(os.path.join(CURRENT_DIRECTORY, "../dependencies/"))
 BUILD_DIRECTORY = os.path.abspath(os.path.join(CURRENT_DIRECTORY, "../build"))
-APPS = os.path.abspath(os.path.join(BUILD_DIRECTORY, "/src/helics/apps"))
+APPS = os.path.abspath(os.path.join(BUILD_DIRECTORY, "src/helics/apps"))
 
 BOOST_LIBRARIES = [
     "libboost_program_options.dylib",
