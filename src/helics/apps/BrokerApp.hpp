@@ -57,7 +57,6 @@ public:
 
     /** forceably disconnect the broker*/
     void forceTerminate();
-
     /** overload the -> operator so broker functions can be called if needed
     */
     auto *operator->() const { return broker.operator->(); }
