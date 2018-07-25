@@ -29,11 +29,11 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
-    explicit CombinationFederate (const std::string &jsonString);
+    explicit CombinationFederate (const std::string &configString);
     /**constructor taking a federate name and a file with the required information
     @param[in] file a file defining the federate information
     */
-    CombinationFederate (const std::string &name, const std::string &jsonString);
+    CombinationFederate (const std::string &name, const std::string &configString);
 
     /** move construction*/
     CombinationFederate (CombinationFederate &&fed) noexcept;

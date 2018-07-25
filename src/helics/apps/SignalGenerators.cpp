@@ -172,5 +172,5 @@ defV PhasorGenerator::generate (Time signalTime)
     lastTime = signalTime;
     return Amplitude * state + std::complex<double> (bias_real, bias_imag);
 }
-} //namespace apps
-} //namespace helics
+}  // namespace apps
+}  // namespace helics

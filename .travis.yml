@@ -60,6 +60,10 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
+    - <<: *osx_base
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - HOMEBREW_NO_AUTO_UPDATE=1
     # Built without errors on my clone from one of the changes made
     # Possibly local dependencies, or removing Linux-only commands fixed it
     # XCode 8.3, OS X 10.12
@@ -173,7 +177,9 @@ script:
   - HELICS_OPTION_FLAGS+="-DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=${PYTHON_LIB_PATH} -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}"
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j
-  - ctest --output-on-failure --timeout 240 -L Continuous
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make -j install ; fi
+  - ctest --output-on-failure --timeout 600 -L Continuous
 
 notifications:
     email: false

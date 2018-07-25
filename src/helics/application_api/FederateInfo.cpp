@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "Federate.hpp"
 
+#include "../common/TomlProcessingFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
@@ -27,7 +28,7 @@ static const ArgDescriptors InfoArgs{{"broker,b"s, "address of the broker to con
                                      {"offset"s, "the offset of the time steps"s},
                                      {"period"s, "the period of the federate"s},
                                      {"timedelta"s, "the time delta of the federate"s},
-                                     { "rttolerance"s, "the time tolerance of the real time mode"s },
+                                     {"rttolerance"s, "the time tolerance of the real time mode"s},
                                      {"coreinit,i"s, "the core initialization string"s},
                                      {"separator"s, "separator character for local federates"s},
                                      {"inputdelay"s, "the input delay on incoming communication of the federate"s},
@@ -85,18 +86,18 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         timeDelta = loadTimeFromString (vm["inputdelay"].as<std::string> ());
     }
-    if (vm.count("rttolerance") > 0)
+    if (vm.count ("rttolerance") > 0)
     {
-        rt_lead = loadTimeFromString(vm["rttolerance"].as<std::string>());
+        rt_lead = loadTimeFromString (vm["rttolerance"].as<std::string> ());
         rt_lag = rt_lead;
     }
-    if (vm.count("rtlag") > 0)
+    if (vm.count ("rtlag") > 0)
     {
-        rt_lag = loadTimeFromString(vm["rtlag"].as<std::string>());
+        rt_lag = loadTimeFromString (vm["rtlag"].as<std::string> ());
     }
-    if (vm.count("rtlead") > 0)
+    if (vm.count ("rtlead") > 0)
     {
-        rt_lead = loadTimeFromString(vm["rtlead"].as<std::string>());
+        rt_lead = loadTimeFromString (vm["rtlead"].as<std::string> ());
     }
     if (vm.count ("outputdelay") > 0)
     {
@@ -167,7 +168,7 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
             }
             else if (flag == "delayed_update")
             {
-               wait_for_current_time_updates = true;
+                wait_for_current_time_updates = true;
             }
             else
             {
@@ -177,12 +178,29 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     }
 }
 
-FederateInfo loadFederateInfo (const std::string &jsonString)
+FederateInfo loadFederateInfo (const std::string &configString)
 {
-    return loadFederateInfo (std::string (), jsonString);
+    return loadFederateInfo (std::string (), configString);
 }
 
-FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonString)
+static FederateInfo loadFederateInfoJson (const std::string &name, const std::string &jsonString);
+static FederateInfo loadFederateInfoToml (const std::string &name, const std::string &tomlString);
+
+FederateInfo loadFederateInfo(const std::string &name, const std::string &configString)
+{
+    FederateInfo ret;
+    if (hasTomlExtension (configString))
+    {
+        ret=loadFederateInfoToml (name,configString);
+    }
+    else
+    {
+        ret=loadFederateInfoJson (name, configString);
+    }
+    return ret;
+}
+
+FederateInfo loadFederateInfoJson (const std::string &name, const std::string &jsonString)
 {
     FederateInfo fi (name);
     Json_helics::Value doc;
@@ -195,31 +213,13 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-    if (doc.isMember ("name"))
-    {
-        fi.name = doc["name"].asString ();
-    }
+    jsonReplaceIfMember (doc, "name", fi.name);
 
-    if (doc.isMember ("observer"))
-    {
-        fi.observer = doc["observer"].asBool ();
-    }
-    if (doc.isMember ("rollback"))
-    {
-        fi.rollback = doc["rollback"].asBool ();
-    }
-    if (doc.isMember ("only_update_on_change"))
-    {
-        fi.only_update_on_change = doc["only_update_on_change"].asBool ();
-    }
-    if (doc.isMember ("only_transmit_on_change"))
-    {
-        fi.only_transmit_on_change = doc["only_transmit_on_change"].asBool ();
-    }
-    if (doc.isMember ("source_only"))
-    {
-        fi.source_only = doc["sourc_only"].asBool ();
-    }
+    jsonReplaceIfMember (doc, "observer", fi.observer);
+    jsonReplaceIfMember (doc, "rollback", fi.rollback);
+    jsonReplaceIfMember (doc, "only_update_on_change", fi.only_update_on_change);
+    jsonReplaceIfMember (doc, "only_transmit_on_change", fi.only_transmit_on_change);
+    jsonReplaceIfMember (doc, "source_only", fi.source_only);
     if (doc.isMember ("uninterruptible"))
     {
         fi.uninterruptible = doc["uninterruptible"].asBool ();
@@ -228,27 +228,15 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
     {
         fi.uninterruptible = !doc["uninterruptible"].asBool ();
     }
-    if (doc.isMember ("forward_compute"))
+    jsonReplaceIfMember (doc, "forward_compute", fi.forwardCompute);
+    jsonReplaceIfMember (doc, "realtime", fi.realtime);
+    if (doc.isMember ("rttolerance"))
     {
-        fi.forwardCompute = doc["forward_compute"].asBool ();
-    }
-    if (doc.isMember("realtime"))
-    {
-        fi.realtime= doc["realtime"].asBool();
-    }
-    if (doc.isMember("rttolerance"))
-    {
-        fi.rt_lag = loadJsonTime(doc["rttolerance"]);
+        fi.rt_lag = loadJsonTime (doc["rttolerance"]);
         fi.rt_lead = fi.rt_lag;
     }
-    if (doc.isMember("rtlag"))
-    {
-        fi.rt_lag = loadJsonTime(doc["rtlag"]);
-    }
-    if (doc.isMember("rtlead"))
-    {
-        fi.rt_lead = loadJsonTime(doc["rtlead"]);
-    }
+   jsonReplaceIfMember (doc, "rtlead", fi.rt_lead);
+    jsonReplaceIfMember (doc, "rt_lag", fi.rt_lag);
     if (doc.isMember ("separator"))
     {
         auto sep = doc["separator"].asString ();
@@ -268,45 +256,103 @@ FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonS
             std::cerr << "Unrecognized core type\n";
         }
     }
-    if (doc.isMember ("coreName"))
-    {
-        fi.coreName = doc["coreName"].asString ();
-    }
-    if (doc.isMember ("coreInit"))
-    {
-        fi.coreInitString = doc["coreInit"].asString ();
-    }
-    if (doc.isMember("delayed_update"))
-    {
-        fi.wait_for_current_time_updates= doc["delayed_update"].asBool();
-    }
+   jsonReplaceIfMember (doc, "coreName", fi.coreName);
+    jsonReplaceIfMember (doc, "coreInit", fi.coreInitString);
+    jsonReplaceIfMember (doc, "delayed_update", fi.wait_for_current_time_updates);
     if (doc.isMember ("maxIterations"))
     {
         fi.maxIterations = static_cast<int16_t> (doc["maxIterations"].asInt ());
     }
-    if (doc.isMember ("period"))
+    if (doc.isMember ("log_level"))
     {
-        fi.period = loadJsonTime (doc["period"]);
+        fi.logLevel= doc["log_level"].asInt ();
     }
+    jsonReplaceIfMember (doc, "period", fi.period);
 
-    if (doc.isMember ("offset"))
-    {
-        fi.offset = loadJsonTime (doc["offset"]);
-    }
+    jsonReplaceIfMember (doc, "offset", fi.offset);
+    jsonReplaceIfMember (doc, "timeDelta", fi.timeDelta);
+    jsonReplaceIfMember (doc, "outputDelay", fi.outputDelay);
+    jsonReplaceIfMember (doc, "inputDelay", fi.inputDelay);
+    return fi;
+}
 
-    if (doc.isMember ("timeDelta"))
+FederateInfo loadFederateInfoToml (const std::string &name, const std::string &tomlString)
+{
+    FederateInfo fi (name);
+    toml::Value doc;
+    try
     {
-        fi.timeDelta = loadJsonTime (doc["timeDelta"]);
+        doc = loadToml (tomlString);
     }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
+    tomlReplaceIfMember (doc, "name", fi.name);
+    tomlReplaceIfMember (doc, "observer", fi.observer);
+    tomlReplaceIfMember (doc, "rollback", fi.rollback);
+    tomlReplaceIfMember (doc, "only_update_on_change", fi.only_update_on_change);
+    tomlReplaceIfMember (doc, "only_transmit_on_change", fi.only_transmit_on_change);
+    tomlReplaceIfMember (doc, "source_only", fi.source_only);
+    tomlReplaceIfMember (doc, "uninterruptible", fi.uninterruptible);
+   
+	auto inter = doc.find ("interruptible");
+    if (inter!=nullptr)  // can use either flag
+    {
+        fi.uninterruptible = !(inter->as<bool>());
+    }
+    tomlReplaceIfMember (doc, "forward_compute", fi.forwardCompute);
+    tomlReplaceIfMember (doc, "realtime", fi.realtime);
+    if (isMember(doc,"rttolerance"))
+    {
+        fi.rt_lag = loadTomlTime (doc["rttolerance"]);
+        fi.rt_lead = fi.rt_lag;
+    }
+    tomlReplaceIfMember (doc, "rtlead", fi.rt_lead);
+    tomlReplaceIfMember (doc, "rt_lag", fi.rt_lag);
 
-    if (doc.isMember ("outputDelay"))
+    if (isMember (doc, "separator"))
     {
-        fi.outputDelay = loadJsonTime (doc["outputDelay"]);
+        auto sep = doc["separator"].as<std::string> ();
+        if (!sep.empty ())
+        {
+            fi.separator = sep[0];
+        }
     }
-    if (doc.isMember ("inputDelay"))
+    if (isMember (doc, "coreType"))
     {
-        fi.inputDelay = loadJsonTime (doc["inputDelay"]);
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["coreType"].as<std::string> ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
     }
+    else if (isMember (doc, "coretype"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["coretype"].as<std::string> ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
+    tomlReplaceIfMember (doc, "coreName", fi.coreName);
+    tomlReplaceIfMember (doc, "coreInit", fi.coreInitString);
+    tomlReplaceIfMember (doc, "delayed_update", fi.wait_for_current_time_updates);
+    fi.maxIterations=static_cast<int16_t>(tomlGetOrDefault<int32_t> (doc, "maxIterations", fi.maxIterations));
+    tomlReplaceIfMember (doc, "log_level", fi.logLevel);
+    tomlReplaceIfMember (doc, "period", fi.period);
+   
+	tomlReplaceIfMember (doc, "offset", fi.offset);
+    tomlReplaceIfMember (doc, "timeDelta", fi.timeDelta);
+    tomlReplaceIfMember (doc, "outputDelay", fi.outputDelay);
+    tomlReplaceIfMember (doc, "inputDelay", fi.inputDelay);
+    
     return fi;
 }
 }  // namespace helics

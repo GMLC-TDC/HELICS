@@ -53,16 +53,20 @@ static const ArgDescriptors InfoArgs{
 
 Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (OBSERVER_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 
@@ -463,7 +467,7 @@ std::string Recorder::encode (const std::string &str2encode)
 {
     return std::string ("b64[") +
            utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
-                                     static_cast<int>(str2encode.size ())) +
+                                     static_cast<int> (str2encode.size ())) +
            ']';
 }
 

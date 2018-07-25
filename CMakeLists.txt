@@ -251,7 +251,7 @@ if (ZeroMQ_ENABLE)
 		set(HELICS_HAVE_ZEROMQ TRUE)
 		if (ZMQ_USE_STATIC_LIBRARY)
 			set(ZeroMQ_DEPENDENCY libzmq-static)
-			target_add_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
+			target_compile_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
 		else()
 			set(ZeroMQ_DEPENDENCY libzmq)
 		endif()
@@ -294,7 +294,7 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_MACOSX_RPATH ON)
 set(CMAKE_BUILD_RPATH "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
 
 # add the automatically determined parts of the RPATH
@@ -317,6 +317,7 @@ if (NOT Boost_USE_STATIC_LIBS)
 	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
 
+
 #add the local directory to the rpath
 #list(APPEND CMAKE_INSTALL_RPATH "./")
 
@@ -329,7 +330,11 @@ if (NOT WIN32)
 	#	message(STATUS "zmqlib file =${zmqlibfile}")
 	#	get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 	#	message(STATUS "zmqdir path =${zmqdir}")
-#
+        if (APPLE)
+            # TODO: Make sure it works for building ZMQ from source automatically using CMake
+            list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
+            list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
+        endif()
 #		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
 #		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
@@ -551,6 +556,12 @@ else (WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
 endif(WIN32)
 
+if (APPLE)
+    set(CPACK_BUNDLE_NAME "libhelics")
+    configure_file("${PROJECT_SOURCE_DIR}/config/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY)
+    set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
+    set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
+endif (APPLE)
 
 set(CPACK_SOURCE_IGNORE_FILES  "/Build*/;/build*/;/.git/")
 #THIS LINE MUST BE LAST

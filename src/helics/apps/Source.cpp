@@ -35,16 +35,20 @@ static const ArgDescriptors InfoArgs{{"default_period", "the default period publ
 
 Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (SOURCE_ONLY_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs, "input"s);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 

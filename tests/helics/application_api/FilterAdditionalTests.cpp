@@ -242,7 +242,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto iterations = static_cast<double> (max_iterations);
     double pest = static_cast<double> (dropped) / iterations;
     // this should result in an expected error of 1 in 10K tests
-    double ebar = 4.0 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
+    double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
     BOOST_CHECK_GE (pest, drop_prob - ebar);
     BOOST_CHECK_LE (pest, drop_prob + ebar);
@@ -300,7 +300,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     auto iterations = static_cast<double> (max_iterations);
     double pest = 1.0 - static_cast<double> (count) / iterations;
     // this should result in an expected error of 1 in 10K tests
-    double ebar = 4.0 * std::sqrt (prob * (1.0 - prob) / iterations);
+    double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
     BOOST_CHECK_GE (pest, prob - ebar);
     BOOST_CHECK_LE (pest, prob + ebar);
@@ -362,7 +362,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto iterations = static_cast<double> (max_iterations);
     double pest = static_cast<double> (dropped) / iterations;
     // this should result in an expected error of 1 in 10K tests
-    double ebar = 4.0 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
+    double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
     BOOST_CHECK_GE (pest, drop_prob - ebar);
     BOOST_CHECK_LE (pest, drop_prob + ebar);
@@ -418,7 +418,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     auto iterations = static_cast<double> (max_iterations);
     double pest = 1.0 - static_cast<double> (count) / iterations;
     // this should result in an expected error of 1 in 10K tests
-    double ebar = 4.0 * std::sqrt (prob * (1.0 - prob) / iterations);
+    double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
     BOOST_CHECK_GE (pest, prob - ebar);
     BOOST_CHECK_LE (pest, prob + ebar);
