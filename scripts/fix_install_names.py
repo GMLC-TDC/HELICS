@@ -18,26 +18,37 @@ BOOST_LIBRARIES = [
     "libboost_timer.dylib",
     "libboost_chrono.dylib"
 ]
+
 ZMQ_LIBRARIES = [
 "libzmq.5.1.3.dylib"
 ]
 
-def fix_install_name(executable):
+def fix_install_name(executable, with_rpath=True):
 
     for library in BOOST_LIBRARIES:
-        cmd = "install_name_tool -change {} {} {}".format(
+        cmd = "install_name_tool -change {} @rpath/{} {}".format(
             library,
-            os.path.join(DEPENDENCIES, "boost/lib", library),
+            library, # os.path.join(DEPENDENCIES, "boost/lib", library),
             executable
         )
         subprocess.call(shlex.split(cmd))
 
     for library in ZMQ_LIBRARIES:
-        cmd = "install_name_tool -change {} {} {}".format(
+        cmd = "install_name_tool -change {} @rpath/{} {}".format(
             library,
-            os.path.join(DEPENDENCIES, "zmq/lib", library),
+            library, # os.path.join(DEPENDENCIES, "zmq/lib", library),
             executable
         )
+        subprocess.call(shlex.split(cmd))
+
+    if with_rpath is True:
+
+        rpaths = []
+        for d in ["zmq", "boost"]:
+            rpaths.append("{}".format(os.path.abspath(os.path.join(DEPENDENCIES, d, "lib"))))
+
+        cmd = "install_name_tool -add_rpath {} {}".format(" -add_rpath ".join(rpaths), executable)
+
         subprocess.call(shlex.split(cmd))
 
 
@@ -50,6 +61,7 @@ def main():
 
             print("Fixing for {}".format(filename))
             fix_install_name(os.path.abspath(os.path.join(APPS, filename)))
+
 
 if __name__ == "__main__":
 
