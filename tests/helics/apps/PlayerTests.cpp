@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
 }
 
 const std::vector<std::string> simple_files{"example1.player", "example2.player", "example3.player",
-                                            "example4.player", "example5.json"};
+                                            "example4.player", "example5.json", "example5.player"};
 
 BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
 {
@@ -198,6 +198,56 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
     BOOST_CHECK_EQUAL (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
+}
+
+BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
+{
+    static char indx = 'a';
+    helics::FederateInfo fi ("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core3";
+    fi.coreName.push_back (indx++);
+    fi.coreInitString = "2";
+    helics::apps::Player play1 (fi);
+    fi.name = "block1";
+    play1.loadFile (std::string (TEST_DIR) + "/test_files/example_comments.player");
+
+	
+    BOOST_CHECK_EQUAL (play1.pointCount (), 7);
+    helics::ValueFederate vfed (fi);
+    helics::Subscription sub1 (&vfed, "pub1");
+    helics::Subscription sub2 (&vfed, "pub2");
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    vfed.enterExecutionState ();
+    auto val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.3);
+
+    auto retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 1.0);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.5);
+    val = sub2.getValue<double> ();
+    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 2.0);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.7);
+    val = sub2.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.6);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 3.0);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.8);
+    val = sub2.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.9);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 5.0);
+    vfed.finalize ();
+    fut.get ();
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 2);
 }
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)

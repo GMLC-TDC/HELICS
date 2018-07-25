@@ -482,6 +482,19 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     mFed.disconnect ();
 }
 
+BOOST_AUTO_TEST_CASE (test_file_load_toml)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.toml");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    mFed.disconnect ();
+}
+
 BOOST_AUTO_TEST_CASE (test_file_load_filter)
 {
     helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
@@ -500,4 +513,24 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
     BOOST_CHECK (cloneFilt);
     mFed.disconnect ();
 }
+
+BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.toml");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
+
+    auto filt = mFed.getFilterObject (2);
+
+    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
+    BOOST_CHECK (cloneFilt);
+    mFed.disconnect ();
+}
+
 BOOST_AUTO_TEST_SUITE_END ()
