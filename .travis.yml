@@ -179,7 +179,7 @@ script:
   - make -j
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make -j install ; fi
-  - ctest --output-on-failure --timeout 240 -L Continuous
+  - ctest --output-on-failure --timeout 600 -L Continuous
 
 notifications:
     email: false
