@@ -53,6 +53,7 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
 static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data type to use"},
+  {"marker", "print a statement indicating time advancement argument is the period of the marker"},
                                      {"timeunits",
                                       "the default units on the timestamps used in file based input"}};
 
@@ -770,7 +771,7 @@ void Player::runTo (Time stopTime_input)
         }
     }
 
-    helics::Time nextPrintTime = 10.0;
+     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     bool moreToSend = true;
     Time nextSendTime = timeZero;
     int nextIteration = 0;
@@ -805,8 +806,8 @@ void Player::runTo (Time stopTime_input)
 
             if (newTime >= nextPrintTime)
             {
-                std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-                nextPrintTime += 10.0;
+                std::cout << "processed for time " << static_cast<double> (newTime) << "\n";
+                nextPrintTime += nextPrintTimeStep;
             }
         }
         else
@@ -815,6 +816,7 @@ void Player::runTo (Time stopTime_input)
             ++currentIteration;
             sendInformation (nextSendTime, currentIteration);
         }
+       
     }
 }
 
@@ -893,6 +895,10 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
         {
             std::cerr << vm_map["timeunits"].as<std::string> () << " is not recognized as a valid unit of time \n";
         }
+    }
+    if (vm_map.count ("marker") > 0)
+    {
+        nextPrintTimeStep = loadTimeFromString (vm_map["marker"].as<std::string> ());
     }
     return 0;
 }
