@@ -37,7 +37,7 @@ def fix_install_name(executable, with_rpath=True):
         )
         subprocess.call(shlex.split(cmd))
 
-    ZMQ_LIBRARIES = get_libraries(executable, "boost")
+    ZMQ_LIBRARIES = get_libraries(executable, "zmq")
 
     for library in ZMQ_LIBRARIES:
         cmd = "install_name_tool -change {} @rpath/{} {}".format(
