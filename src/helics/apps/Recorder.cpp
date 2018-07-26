@@ -15,20 +15,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/argParser.h"
 #include "../common/base64.h"
 #include "../common/logger.h"
-#include "../core/fmt_wrapper.h"
-
-#pragma once
-#ifdef _MSC_VER
-#pragma warning(push, 0)
-#include <fmt/ostream.h>
-#pragma warning(pop)
-#else
-#ifdef __GNUC__
-#pragma GCC system_header
-#endif
-#include <fmt/ostream.h>
-#endif
-
+#include "../common/fmt_format.h"
+#include "../common/fmt_ostream.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>

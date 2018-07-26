@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "BrokerFactory.hpp"
 
 #include "../common/argParser.h"
-#include "fmt_wrapper.h"
+#include "../common/fmt_format.h"
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"

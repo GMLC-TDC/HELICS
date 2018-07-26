@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/core-exceptions.hpp"
 #include "BrokerApp.hpp"
 #include <iostream>
+#include <thread>
 #include <boost/algorithm/string.hpp>
 
 void terminalFunction (int argc, char *argv[]);

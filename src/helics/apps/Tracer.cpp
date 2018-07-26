@@ -21,7 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/logger.h"
-#include "../core/fmt_wrapper.h"
+#include "../common/fmt_format.h"
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
