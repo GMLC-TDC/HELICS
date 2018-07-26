@@ -302,6 +302,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -356,6 +357,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     // out = 0;
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
 {
@@ -610,6 +612,7 @@ BOOST_AUTO_TEST_CASE(player_test_help)
 
     BOOST_CHECK(!play2.isActive());
 }
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
@@ -628,4 +631,6 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     BOOST_CHECK (val.compare (0, compareString.size (), compareString) == 0);
 }
 */
+#endif
+
 BOOST_AUTO_TEST_SUITE_END ()

@@ -31,6 +31,10 @@ target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURREN
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
 target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_INSTALL_LOC=\"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\")
 
+if (DISABLE_SYSTEM_CALL_TESTS)
+	target_compile_definitions(helics_apps-tests PRIVATE -DDISABLE_SYSTEM_CALL_TESTS=1)
+endif()
+
 add_test(NAME helics_apps-tests COMMAND helics_apps-tests --report_level=short)
 set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Daily)
 

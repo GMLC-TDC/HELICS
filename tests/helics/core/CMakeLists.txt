@@ -53,7 +53,7 @@ add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=s
 set_property(TEST core-tests PROPERTY LABELS Core Daily)
 
 # Tests for Continuous Integration builds
-add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=test_suite --report_level=short)
+add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=message --report_level=short)
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
