@@ -112,11 +112,14 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
-    - <<: *daily_linux
+        - BUILD_TYPE=RelWithDebInfo
+   - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
-        - RUN_COVERAGE=true
+        - USE_SWIG=true 
+        - BUILD_TYPE=Coverage
+        - GCOV_TOOL=gcov-6
+        - USE_MPI=mpich
     - <<: *daily_linux
       addons:
         apt:
@@ -158,21 +161,39 @@ before_install:
 
 install:
   - source scripts/install-ci-dependencies.sh
-  - export HELICS_DEPENDENCY_FLAGS=""
-  - export HELICS_OPTION_FLAGS="${OPTION_FLAGS}"
+  #- if [[ "$BUILD_TYPE" == "Coverage" ]]; then pip install --user cpp-coveralls ; fi
+
+  - OPTION_FLAGS_ARR=()
+  - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_CXX_SHARED_LIB=ON" "-DBUILD_PYTHON_INTERFACE=ON" "-DBUILD_JAVA_INTERFACE=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
+  - OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
+
+  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=("-DDISABLE_SWIG=ON") ; fi
+  - if [[ "$BUILD_TYPE" ]]; then OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}") ; fi
+  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON") ; fi
+  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=("-DENABLE_CXX_17=ON") ; fi
+  - if [[ "$USE_MPI" ]]; then OPTION_FLAGS_ARR+=("-DMPI_ENABLE=ON") ; fi
+  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
+  - export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
+
+  - TEST_FLAGS_ARR=()
+  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind") ; fi
+  - if [[ "$RUN_CACHEGRIND" ]]; then TEST_FLAGS_ARR+=("--cachegrind") ; fi
+  - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
+  - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
+  - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
+  - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
+  - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
+  - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
 
 script:
   - mkdir build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
-  - HELICS_OPTION_FLAGS+="-DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=${PYTHON_LIB_PATH} -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}"
-  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
-  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
-  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
-    # - echo "$HELICS_OPTION_FLAGS"
-    # - echo "$HELICS_DEPENDENCY_FLAGS"
-  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make -j2
+
+  # Setup counters for coverage
+  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
+
   # For controlling which tests get run:
   # ctest -I <start>,<end>,<stride>,<list of test numbers>
   # 1 = common_tests
@@ -195,6 +216,9 @@ script:
     # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
   - python3 -m helics
   - python3 -m pytest -sv ../tests/python_helics
+
+  # Gather coverage results
+  #- if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --coveralls --codecov && popd ; fi
 
 notifications:
     email: false
