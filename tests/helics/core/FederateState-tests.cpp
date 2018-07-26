@@ -231,7 +231,8 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     cmd.setAction (helics::CMD_ERROR);
     fs_process2 = std::async (std::launch::async,
                               [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
+    auto st = fs->getState();
+    BOOST_CHECK ((st==federate_state_t::HELICS_INITIALIZING)|| (st == federate_state_t::HELICS_EXECUTING));
     fs->addAction (cmd);
     auto res = fs_process2.get ();
     if (res != iteration_result::error)
