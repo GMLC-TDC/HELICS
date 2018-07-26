@@ -624,6 +624,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     }
 }
 
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       boost::unit_test::data::make (simple_message_files),
                       file)
@@ -691,5 +692,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     BOOST_CHECK_EQUAL (mcount, 2);
     BOOST_CHECK_EQUAL (valcount, 4);
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END ()
