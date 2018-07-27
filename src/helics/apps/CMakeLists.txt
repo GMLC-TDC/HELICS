@@ -52,20 +52,19 @@ add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 	set_target_properties (helics_recorder PROPERTIES FOLDER apps)
 	install(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
-
 if (BUILD_BROKER)
 	add_executable(helics_broker helics-broker.cpp)
    target_link_libraries(helics_broker helics_apps-static)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    install(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-
 endif()
 
 	add_executable(helics_app appMain.cpp)
 	target_link_libraries(helics_app helics_apps-static)
 	set_target_properties (helics_app PROPERTIES FOLDER apps)
 	install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
+
 	if (WIN32)
 		foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 			add_custom_command(TARGET helics_app POST_BUILD        # Adds a post-build event to core tests
@@ -80,7 +79,7 @@ endif()
 		DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		COMPONENT libs)
 
-	install(FILES ${helics_apps_public_headers} 
+	install(FILES ${helics_apps_public_headers}
 		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps COMPONENT headers)
 
 endif()  #if build any app

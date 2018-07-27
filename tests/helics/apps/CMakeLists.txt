@@ -27,10 +27,20 @@ target_link_libraries(helics_apps-tests helics_apps-static helics_test_base)
 
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
-add_test(NAME helics_apps-tests COMMAND helics_apps-tests --log_level=test_suite --report_level=short)
-
 target_compile_definitions(helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
-target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BIN_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
+target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\")
+target_compile_definitions(helics_apps-tests PRIVATE -DHELICS_INSTALL_LOC=\"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\")
+
+if (DISABLE_SYSTEM_CALL_TESTS)
+	target_compile_definitions(helics_apps-tests PRIVATE -DDISABLE_SYSTEM_CALL_TESTS=1)
+endif()
+
+add_test(NAME helics_apps-tests COMMAND helics_apps-tests --report_level=short)
+set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Daily)
+
+# Tests for Continous Integration builds
+add_test(NAME helics_apps-ci-tests COMMAND helics_apps-tests --run_test=@ci --report_level=short)
+set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
 
 if(WIN32)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)

@@ -22,7 +22,6 @@ CoreFactory-tests.cpp
 MessageTimerTests.cpp
 #CommonCore-tests.cpp
 TestCore-tests.cpp
-Node_Core-tests.cpp
 testFixtures.cpp
 IPCcore_tests.cpp
 data-block-tests.cpp
@@ -48,9 +47,14 @@ add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+set_target_properties (core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
-set_target_properties (core-tests PROPERTIES FOLDER tests)
+set_property(TEST core-tests PROPERTY LABELS Core Daily)
+
+# Tests for Continuous Integration builds
+add_test(NAME core-ci-tests COMMAND core-tests --run_test=@ci --log_level=message --report_level=short)
+set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 	add_custom_command(TARGET core-tests POST_BUILD        # Adds a post-build event to core tests

@@ -60,6 +60,10 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
+    - <<: *osx_base
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - HOMEBREW_NO_AUTO_UPDATE=1
     # Built without errors on my clone from one of the changes made
     # Possibly local dependencies, or removing Linux-only commands fixed it
     # XCode 8.3, OS X 10.12
@@ -157,44 +161,26 @@ before_install:
   - $CXX --version
 
 install:
-  - source scripts/install-ci-dependencies.sh
   - export HELICS_DEPENDENCY_FLAGS=""
   - export HELICS_OPTION_FLAGS="${OPTION_FLAGS}"
+  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
+  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
+  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
+
+  - source scripts/install-ci-dependencies.sh
+  - HELICS_DEPENDENCY_FLAGS+=" -DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
 
 script:
   - mkdir build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
   - HELICS_OPTION_FLAGS+="-DBUILD_C_SHARED_LIB=ON -DBUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DEXAMPLES_WARNINGS_AS_ERROR=ON -DPYTHON_LIBRARY=${PYTHON_LIB_PATH} -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}"
-  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=" -DDISABLE_SWIG=ON" ; fi
-  - if [[ "$USE_MPI" ]]; then HELICS_OPTION_FLAGS+=" -DMPI_ENABLE=ON" ; fi
-  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=" -DENABLE_CXX_17=ON" ; fi
-    # - echo "$HELICS_OPTION_FLAGS"
-    # - echo "$HELICS_DEPENDENCY_FLAGS"
-  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then HELICS_OPTION_FLAGS+=" -DDISABLE_SYSTEM_CALL_TESTS=ON" ; fi
   - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-  - make -j2
-  # For controlling which tests get run:
-  # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = common_tests
-  # 2 = core tests
-  # 3 = key_tests
-  # 4 = application api tests
-  # 5 = extended_api tests
-  # 6 = shared_library tests
-  # 7 = helics-apps tests
-  - ctest --verbose --timeout 220 -I 0,0,0,1
-  # - ctest --verbose --timeout 120 -I 0,0,0,2
-  - ctest --verbose --timeout 240 -I 0,0,0,6
-  # - ctest --verbose --timeout 240 -I 0,0,0,7
-  - ctest --verbose --timeout 240 -I 0,0,0,3
-  - ctest --verbose -L Java
-  - ctest -L Examples
-
-  - export PYTHONPATH="$(pwd)/swig/python"
-    # - echo "$LD_LIBRARY_PATH"
-    # - echo "$DYLD_FALLBACK_LIBRARY_PATH"
-  - python3 -m helics
-  - python3 -m pytest -sv ../tests/python_helics
+  - make -j
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make -j install ; fi
+  - ctest -V --timeout 240 -L Continuous
 
 notifications:
     email: false

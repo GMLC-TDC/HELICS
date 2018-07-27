@@ -16,8 +16,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 BOOST_FIXTURE_TEST_SUITE (timing_tests2, FederateTestFixture)
 
-
-
 /** just a check that in the simple case we do actually get the time back we requested*/
 
 
@@ -74,7 +72,7 @@ BOOST_AUTO_TEST_CASE (small_time_test)
         else
         {
             BOOST_CHECK(grantedTime == requestedTime - helics::Time(9, timeUnits::ns));
-            printf("grantedTime=%e\n", static_cast<double>(grantedTime));
+           // printf("grantedTime=%e\n", static_cast<double>(grantedTime));
             if (sub2_a.isUpdated())
             {
                 BOOST_CHECK_EQUAL(sub2_a.getValue<double>(), 10.3);

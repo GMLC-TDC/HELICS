@@ -19,7 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
 
-namespace helics
+namespace helics98
 {
 class FederateInfo
 {
@@ -111,7 +111,7 @@ class Federate
 {
   public:
     // Default constructor, not meant to be used
-    Federate () : fed (NULL), exec_async_iterate (false){};
+      Federate() : fed(NULL), exec_async_iterate(false) {};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {

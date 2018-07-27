@@ -376,7 +376,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
             if (check == iteration_result::halted)
             {
                 throw (HelicsTerminated ());
-        }
+            }
             generateFederateException (fed);
         }
         return;

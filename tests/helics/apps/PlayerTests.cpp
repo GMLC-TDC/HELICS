@@ -15,7 +15,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (player_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (player_tests, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
@@ -250,6 +252,7 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
@@ -296,13 +299,17 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     vfed.finalize ();
     fut.get ();
     brk = nullptr;
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
-    exeTestRunner playerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_player");
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    exeTestRunner playerExe (std::string(HELICS_INSTALL_LOC),std::string (HELICS_BUILD_LOC) + "/apps/", "helics_player");
 
-    exeTestRunner brokerExe (std::string (HELICS_BIN_LOC) + "/apps/", "helics_broker");
+    exeTestRunner brokerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
+                             "helics_broker");
 
     BOOST_REQUIRE (playerExe.isActive ());
     BOOST_REQUIRE (brokerExe.isActive ());
@@ -348,7 +355,9 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     auto out2 = res2.get ();
     res.get ();
     // out = 0;
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
 {
@@ -603,6 +612,7 @@ BOOST_AUTO_TEST_CASE(player_test_help)
 
     BOOST_CHECK(!play2.isActive());
 }
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 /*
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
@@ -621,4 +631,6 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     BOOST_CHECK (val.compare (0, compareString.size (), compareString) == 0);
 }
 */
+#endif
+
 BOOST_AUTO_TEST_SUITE_END ()

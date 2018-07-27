@@ -91,9 +91,9 @@ class SubscriptionBase
     @param[in] callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void registerCallback (std::function<void(Time)> callback)
+    void registerNotificationCallback (std::function<void(Time)> callback)
     {
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) { callback (time); });
+        fed->registerSubscriptionNotificationCallback (id, [this,callback](subscription_id_t, Time time) { if (isUpdated()){callback (time);} });
     }
     /** get the key for the subscription*/
     const std::string &getKey () const { return key_; }
@@ -112,12 +112,15 @@ class SubscriptionBase
 class Subscription : public SubscriptionBase
 {
   private:
-    mpark::variant<std::function<void(const std::string &, Time)>,
-                   std::function<void(const double &, Time)>,
-                   std::function<void(const int64_t &, Time)>,
+	//this needs to match the defV type
+      mpark::variant<std::function<void(const double &, Time)>,
+                     std::function<void(const int64_t &, Time)>,
+                     std::function<void(const std::string &, Time)>,
                    std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>,
-                   std::function<void(const std::vector<std::complex<double>> &, Time)>>
+                   std::function<void(const std::vector<double> &, Time)>, 
+		std::function<void(const std::vector<std::complex<double>> &, Time)>,
+		std::function<void(const named_point &, Time)>,
+		std::function<void(const bool &, Time)> >
       value_callback;  //!< callback function for the federate
 
     mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
@@ -199,18 +202,19 @@ class Subscription : public SubscriptionBase
     /** check if the value has been updated and load the value into buffer*/
     bool getAndCheckForUpdate();
 
-    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, void>
-    registerCallback (std::function<void(const X &, Time)> callback)
+    void registerCallback (std::function<void(const X &, Time)> callback)
     {
+        static_assert (helicsType<X> () != helics_type_t::helicsInvalid,
+                       "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
+                       "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](subscription_id_t, Time time) {
+        fed->registerSubscriptionNotificationCallback (id, [this](subscription_id_t, Time time) {
             handleCallback (time);
         });
     }
@@ -311,13 +315,16 @@ class Subscription : public SubscriptionBase
     }
 
   public:
+    int getValue (double *data, int maxsize);
+    int getValue (char *str, int maxsize);
     /** get the latest value for the subscription
     @param[out] out the location to store the value
     */
     template <class X>
-    typename std::enable_if_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ()))>
-    getValue (X &out)
+    void getValue (X &out)
     {
+        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+                       "requested types must be one of the primary helics types or convertible to one");
         getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid), std::true_type,
                                              std::false_type> (),
                           out);
@@ -325,18 +332,22 @@ class Subscription : public SubscriptionBase
     /** get the most recent value
     @return the value*/
     template <class X>
-    typename std::enable_if_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())), X>
-    getValue ()
+    X getValue ()
     {
+        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+                       "requested types must be one of the primary helics types or convertible to one");
         return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid),
                                                     std::true_type, std::false_type> ());
     }
+
     /** get the size of the raw data*/
     size_t getRawSize();
     /** get the size of the data if it were a string*/
     size_t getStringSize();
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize();
+
+	//TODO:: add a getValueByReference function that gets the data by reference but may force a copy and will only work on the primary types
 
 };
 
@@ -409,7 +420,6 @@ class SubscriptionT : public SubscriptionBase
     */
     void getValue (X &out) const { fed->getValue (id, out); }
 
-    using SubscriptionBase::registerCallback;
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)

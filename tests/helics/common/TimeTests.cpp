@@ -11,6 +11,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/core/helics-time.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_AUTO_TEST_SUITE (time_tests)
 
 using namespace helics;

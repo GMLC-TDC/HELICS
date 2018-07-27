@@ -595,11 +595,17 @@ helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data
         if (maxDatalen > static_cast<int> (str.size ()))
         {
             memcpy (data, str.data (), static_cast<int> (str.size ()));
-            *actualSize = static_cast<int> (str.size ());
+            if (actualSize != nullptr)
+            {
+				*actualSize = static_cast<int> (str.size ());
+			}
             return helics_ok;
         }
         memcpy (data, str.data (), maxDatalen);
-        *actualSize = maxDatalen;
+        if (actualSize != nullptr)
+        {
+			*actualSize = maxDatalen;
+		}
         return helics_warning;
     }
     catch (...)
@@ -621,15 +627,35 @@ helics_status helicsSubscriptionGetString (helics_subscription sub, char *output
     }
     try
     {
-        auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, actualLength);
-        // make sure we have a null terminator
-        if (*actualLength == maxlen)
+        auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+        int length;
+        if (subObj->rawOnly)
         {
-            outputString[maxlen - 1] = '\0';
-            return helics_warning;
+            auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen,&length);
+            // make sure we have a null terminator
+            if (length == maxlen)
+            {
+                outputString[maxlen - 1] = '\0';
+				if (actualLength != nullptr)
+				{
+                    *actualLength = length;
+				}
+                return helics_warning;
+            }
+            outputString[length] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = length+1;
+            }
+            return res;
         }
-        outputString[*actualLength] = '\0';
-        return res;
+        length = subObj->subptr->getValue (outputString, maxlen);
+        if (actualLength != nullptr)
+        {
+            *actualLength = length;
+        }
+        return (length <= maxlen) ? helics_ok : helics_warning;
+ 
     }
     catch (...)
     {
@@ -829,10 +855,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
             }
             return (length <= maxlen) ? helics_ok : helics_warning;
         }
-
-        auto V = subObj->subptr->getValue<std::vector<double>> ();
-        int length = std::min (static_cast<int> (V.size ()), maxlen);
-        std::copy (V.data (), V.data () + length, data);
+        int length = subObj->subptr->getValue (data, maxlen);
         if (actualSize != nullptr)
         {
             *actualSize = length;

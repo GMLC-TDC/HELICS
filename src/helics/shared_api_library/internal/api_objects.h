@@ -6,12 +6,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include "../api-data.h"
 #include "../../application_api/helicsTypes.hpp"
 #include "../../core/core-data.hpp"
 #include "../../common/GuardedTypes.hpp"
 #include "../../common/TripWire.hpp"
-#include <mutex>
+
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int coreValidationIdentifier = 0x378424EC;

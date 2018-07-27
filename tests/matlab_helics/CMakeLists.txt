@@ -14,4 +14,5 @@ else()
 	add_test(NAME matlab_tests COMMAND ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r "\"run('${CMAKE_CURRENT_BINARY_DIR}/runTests.m');quit;\"")
 endif()
 	
+set_property(TEST matlab_tests PROPERTY LABELS Matlab Continuous Daily)
 

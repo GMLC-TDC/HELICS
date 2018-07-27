@@ -7,11 +7,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "MessageFilters.h"
-#include "helics.h"
 #include "internal/api_objects.h"
 #include <memory>
 #include <mutex>
-#include <vector>
 
 static const std::string nullstr;
 
