@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/ValueFederate.h"
 
-namespace helics
+namespace helics98
 {
 class Publication
 {

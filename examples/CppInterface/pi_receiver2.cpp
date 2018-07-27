@@ -18,8 +18,8 @@ int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics::Subscription sub;
-  helics::Publication  pub;
+  helics98::Subscription sub;
+  helics98::Publication  pub;
 
   printf("PI RECEIVER: Helics version = %s\n", helicsGetVersion());
   printf("%s",help);
@@ -27,7 +27,7 @@ int main(int /*argc*/,char ** /*argv*/)
   /* Create Federate Info object that describes the federate properties
    * Set federate name and core type from string
    */
-  helics::FederateInfo fi("Test receiver Federate", "zmq");
+  helics98::FederateInfo fi("Test receiver Federate", "zmq");
 
   /* Federate init string */
   fi.setCoreInitString(fedinitstring);
@@ -42,7 +42,7 @@ int main(int /*argc*/,char ** /*argv*/)
   fi.setLoggingLevel(1);
 
   /* Create value federate */
-  helics::ValueFederate* vfed = new helics::ValueFederate(fi);
+  helics98::ValueFederate* vfed = new helics98::ValueFederate(fi);
   printf("PI RECEIVER: Value federate created\n");
 
   /* Subscribe to PI SENDER's publication */
@@ -55,11 +55,11 @@ int main(int /*argc*/,char ** /*argv*/)
 
   fflush(NULL);
   /* Enter initialization state */
-  vfed->enterInitializationMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterInitializationMode(); // can throw helics98::InvalidStateTransition exception
   printf("PI RECEIVER: Entered initialization state\n");
 
   /* Enter execution state */
-  vfed->enterExecutionMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterExecutionMode(); // can throw helics98::InvalidStateTransition exception
   printf("PI RECEIVER: Entered execution state\n");
 
   helics_time_t currenttime=0.0;

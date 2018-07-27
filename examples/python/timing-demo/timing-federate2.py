@@ -1,5 +1,4 @@
 import helics as h
-import random
 
 def get_input(grantedtime):
 
@@ -65,9 +64,10 @@ def create_value_federate(deltat=1.0, fedinitstring="--federates=1"):
 
 def destroy_value_federate(fed):
     status = h.helicsFederateFinalize(fed)
-
+    assert status == 0
     status, state = h.helicsFederateGetState(fed)
     assert state == 3
+    assert status == 0
 
     h.helicsFederateFree(fed)
 
@@ -125,4 +125,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

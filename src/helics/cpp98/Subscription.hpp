@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/ValueFederate.h"
 
-namespace helics
+namespace helics98
 {
 class Subscription
 {
@@ -98,7 +98,14 @@ public:
         result.resize(size+1);
         //this function results in a null terminated string
         helicsSubscriptionGetString(sub, &result[0], size+1, &size);
-        result.resize(size);
+        if (!(result.empty())&&(result[size-1] == '\0'))
+        {
+            result.resize(size - 1);
+        }
+        else
+        {
+            result.resize(size);
+        }
         return result;
     }
 

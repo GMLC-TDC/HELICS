@@ -1,13 +1,12 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
-#include "helics/application_api/Federate.hpp"
-#include "helics/application_api/FilterOperations.hpp"
 #include "helics/application_api/Filters.hpp"
+#include "helics/application_api/FilterOperations.hpp"
 #include "helics/application_api/MessageOperators.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -29,7 +28,8 @@ This test case sets reroute filter on a source endpoint. Ths means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), core_type)
+BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -82,8 +82,8 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 Ths means message sent from this endpoint will be rerouted to a new destination
 endpoint only if condition matches.
 */
-
-BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), core_type)
+BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -197,7 +197,6 @@ This test case sets random drop filter on a source endpoint with a particular
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-
 BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -258,7 +257,6 @@ This test case sets random drop filter on a source endpoint with a particular
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-
 BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -426,6 +424,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     BOOST_CHECK_LE (pest, prob + ebar);
     mFed->finalize ();
     fFed->finalize ();
+
 }
 
 /**

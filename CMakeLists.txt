@@ -28,6 +28,7 @@ set (HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 include(extraMacros)
 include(CMakeDependentOption)
+#include(BuildType)
 #-----------------------------------------------------------------------------
 # set the install path to a local directory
 #-----------------------------------------------------------------------------
@@ -293,29 +294,52 @@ set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_BUILD_RPATH "${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
+set(CMAKE_MACOSX_RPATH ON)
+set(CMAKE_BUILD_RPATH "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64")
 
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
    list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
-endif("${isSystemDir}" STREQUAL "-1")
+endif()
 
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
     list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif("${isSystemDir}" STREQUAL "-1")
+endif()
 
 if (NOT Boost_USE_STATIC_LIBS)
 	list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
 	list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
 endif()
+
+
+#add the local directory to the rpath
+#list(APPEND CMAKE_INSTALL_RPATH "./")
+
+if (NOT WIN32)
+	if (HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
+	#	get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
+	#	if (NOT zmqlibfile)
+	#		get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
+	#	endif()
+	#	message(STATUS "zmqlib file =${zmqlibfile}")
+	#	get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
+	#	message(STATUS "zmqdir path =${zmqdir}")
+        if (APPLE)
+            # TODO: Make sure it works for building ZMQ from source automatically using CMake
+            list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
+            list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
+        endif()
+#		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
+#		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
+	endif()
+endif()
+
 
 option(BUILD_BROKER "Build a helics Broker executable" ON)
 option(BUILD_APPS "Build helics applications to run various apps, including player, recorder, and helics_apps" ON)

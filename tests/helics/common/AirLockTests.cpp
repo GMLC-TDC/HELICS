@@ -16,6 +16,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/common/AirLock.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_AUTO_TEST_SUITE (airlock_tests)
 
 /** test basic operations */

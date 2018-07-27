@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ValueFederate.hpp"
 #include "MessageFederate.hpp"
 
-namespace helics
+namespace helics98
 {
 class CombinationFederate : public ValueFederate, public MessageFederate
 {

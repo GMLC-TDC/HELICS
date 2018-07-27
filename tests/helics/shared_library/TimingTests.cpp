@@ -14,11 +14,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics.hpp"
 #include "testFixtures.hpp"
 #include "test_configuration.h"
-
-BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
+
+BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture, *utf::label("ci"))
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 #if ENABLE_TEST_TIMEOUTS > 0

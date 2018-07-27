@@ -3,22 +3,26 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "../common/TripWire.hpp"
+
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <vector>
+#include "../common/TripWire.hpp"
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int fedValidationIdentifier = 0x2352188;
 
 helics::Federate *getFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -29,6 +33,10 @@ helics::Federate *getFed (helics_federate fed)
 
 helics::ValueFederate *getValueFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -42,6 +50,10 @@ helics::ValueFederate *getValueFed (helics_federate fed)
 
 helics::MessageFederate *getMessageFed (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -55,6 +67,10 @@ helics::MessageFederate *getMessageFed (helics_federate fed)
 
 std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -65,6 +81,10 @@ std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
 
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -78,6 +98,10 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed
 
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed)
 {
+    if (fed == nullptr)
+    {
+        return nullptr;
+    }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     if (fedObj->valid == fedValidationIdentifier)
     {
@@ -179,7 +203,7 @@ helics_federate helicsCreateMessageFederateFromJson (const char *json)
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateCombinationFederate (helics_federate_info_t const fi)
+helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,15 +8,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "testFixtures.hpp"
 #include <complex>
 #include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value converters
  */
+#include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueConverter.hpp"
 #include <future>
+
+namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
@@ -75,7 +76,6 @@ BOOST_AUTO_TEST_CASE(already_init_core)
     broker->disconnect();
 
 }
-
 
 BOOST_AUTO_TEST_CASE(duplicate_publication_names)
 {
@@ -207,4 +207,5 @@ BOOST_AUTO_TEST_CASE(missing_required_pub)
     fed2->finalize();
     broker->disconnect();
 }
+
 BOOST_AUTO_TEST_SUITE_END ()

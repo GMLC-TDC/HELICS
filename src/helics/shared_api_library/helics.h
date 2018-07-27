@@ -180,7 +180,7 @@ helics_federate, helics_message_federate or helics_federate object as an argumen
 @param fi the federate info object that contains details on the federate
 @return an opaque value federate object nullptr if the object creation failed
 */
-HELICS_EXPORT helics_federate helicsCreateCombinationFederate (helics_federate_info_t const fi);
+HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);
 
 /** create a combination federate from a JSON file or JSON string
 @details combination federates are both value federates and message federates, objects can be used in all functions that take a

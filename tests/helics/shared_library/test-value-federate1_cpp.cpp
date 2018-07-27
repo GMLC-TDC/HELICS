@@ -15,10 +15,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests1_cpp, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests1_cpp, FederateTestFixture, *utf::label("ci"))
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)

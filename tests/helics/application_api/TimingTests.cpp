@@ -15,10 +15,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics.hpp"
 #include "testFixtures.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-BOOST_AUTO_TEST_CASE (simple_timing_test)
+BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -46,7 +48,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
 }
 
 
-BOOST_AUTO_TEST_CASE (simple_timing_test2)
+BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -77,7 +79,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
 }
 
 
-BOOST_AUTO_TEST_CASE (simple_timing_test_message)
+BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label("ci"))
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -111,7 +113,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 }
 
 
-BOOST_AUTO_TEST_CASE (timing_with_impact_window)
+BOOST_AUTO_TEST_CASE (timing_with_impact_window, *utf::label("ci"))
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -145,7 +147,7 @@ BOOST_AUTO_TEST_CASE (timing_with_impact_window)
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE(timing_with_minDelta_change)
+BOOST_AUTO_TEST_CASE(timing_with_minDelta_change, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate>("test", 1,1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -167,7 +169,7 @@ BOOST_AUTO_TEST_CASE(timing_with_minDelta_change)
     vFed1->finalize();
 }
 
-BOOST_AUTO_TEST_CASE(timing_with_period_change)
+BOOST_AUTO_TEST_CASE(timing_with_period_change, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -189,7 +191,7 @@ BOOST_AUTO_TEST_CASE(timing_with_period_change)
     vFed1->finalize();
 }
 
-BOOST_AUTO_TEST_CASE(sender_finalize_timing_result)
+BOOST_AUTO_TEST_CASE(sender_finalize_timing_result, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -252,7 +254,7 @@ BOOST_AUTO_TEST_CASE(sender_finalize_timing_result)
 }
 
 
-BOOST_AUTO_TEST_CASE(sender_finalize_timing_result2)
+BOOST_AUTO_TEST_CASE(sender_finalize_timing_result2, *utf::label("ci"))
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);

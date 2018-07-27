@@ -67,6 +67,21 @@ add_custom_command(
 	VERBATIM
 )
 
+if (WIN32)
+foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+add_custom_command(TARGET JNIhelics POST_BUILD        # Adds a post-build event to api tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "${keyfile}"      # <--this is in-file
+        "$<TARGET_FILE_DIR:JNIhelics>/")                 # <--this is out-file path
+endforeach(keyfile)
+
+add_custom_command(TARGET JNIhelics POST_BUILD        # Adds a post-build event to api tests
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+        "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
+        "$<TARGET_FILE_DIR:JNIhelics>/")                 # <--this is out-file path
+
+endif (WIN32)
+
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar DESTINATION java COMPONENT java)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar DESTINATION java COMPONENT java OPTIONAL)
 install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java COMPONENT java)

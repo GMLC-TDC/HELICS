@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <exception>
 
-namespace helics
+namespace helics98
 {
 
 class Broker
@@ -25,6 +25,10 @@ class Broker
     {
         broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
         if (broker == NULL)
+        {
+            throw(std::runtime_error("broker creation failed"));
+        }
+        if (helicsBrokerIsConnected(broker) != helics_true)
         {
             throw(std::runtime_error("broker creation failed"));
         }

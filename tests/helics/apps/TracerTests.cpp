@@ -19,7 +19,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (tracer_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (tracer_tests, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (simple_tracer_test)
 {
@@ -250,6 +252,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
@@ -297,6 +300,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     fut.get ();
     BOOST_CHECK_EQUAL (counter.load (), 4);
     trace1.finalize ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
 
 BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
@@ -620,16 +624,18 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     }
 }
 
+#ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
     std::string cmdArg ("--name=tracer --broker=ipc_broker --core=ipc --stop=5 " + exampleFile);
-    exeTestRunner tracerExe (HELICS_BIN_LOC "apps/", "helics_app");
+    exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
 
@@ -686,5 +692,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     BOOST_CHECK_EQUAL (mcount, 2);
     BOOST_CHECK_EQUAL (valcount, 4);
 }
+
+#endif
 
 BOOST_AUTO_TEST_SUITE_END ()
