@@ -26,6 +26,7 @@ _basic_env:
       packages:
         - g++-6
         - valgrind
+        - lcov
 - &daily_osx
   if: type = cron
   os: osx
