@@ -113,7 +113,7 @@ jobs:
         - USE_SWIG=true
         - RUN_VALGRIND=true
         - BUILD_TYPE=RelWithDebInfo
-   - <<: *daily_linux
+    - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true 
