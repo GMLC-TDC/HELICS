@@ -111,6 +111,7 @@ void terminalFunction (int argc, char *argv[])
         stringOps::trimString (cmd1);
         if ((cmd1 == "quit") || (cmd1 == "q"))
         {
+            cmdcont = false;
             break;
         }
         else if (cmd1 == "terminate")
@@ -123,6 +124,9 @@ void terminalFunction (int argc, char *argv[])
             std::cout << "terminate >> force the broker to stop\n";
             std::cout << "help >> this help window\n";
             std::cout << "restart >> restart a completed broker\n";
+            std::cout << "force restart >> will force terminate a broker and restart it\n";
+            std::cout << "query <queryString> >> will query a broker for <queryString>\n";
+            std::cout << "query <queryTarget> <queryString> >> will query <queryTarget> for <queryString>\n";
         }
         else if (cmd1 == "restart")
         {
@@ -134,6 +138,7 @@ void terminalFunction (int argc, char *argv[])
             {
                 broker = nullptr;
                 broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
+                std::cout << "broker has restarted\n";
             }
         }
         else if (cmd1 == "force")
