@@ -18,12 +18,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 /** these test cases test out the message federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
-
+BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture, *utf::label("ci"))
 
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -238,7 +236,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 }
 
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);

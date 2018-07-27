@@ -53,7 +53,7 @@ bool changeDetected (const defV &prevValue, const named_point &val, double delta
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
 /** directly convert the boolean to integer*/
-inline int64_t make_valid (bool obj) { return (obj) ? 1 : 0; }
+inline int64_t make_valid (bool obj) { return (obj) ? 1ll : 0ll; }
 
 /** this template should do nothing for most classes the specific overloads are the important ones*/
 template <class X>
@@ -178,7 +178,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             {
                 val = static_cast<X> (std::stod (dv.string ()));
             }
-            catch (const std::invalid_argument &ble)
+            catch (const std::invalid_argument &)
             {  // well lets try a vector conversion
                 auto V = ValueConverter<std::vector<double>>::interpret (dv);
                 val = static_cast<X> (vectorNorm (V));
@@ -190,7 +190,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         val = static_cast<X> (getDoubleFromString (dv.string ()));
         break;
     case helics_type_t::helicsBool:
-        val = static_cast<X> ((dv.string () == "0") ? false : true);
+        val = static_cast<X> ((dv.string () != "0"));
         break;
     case helics_type_t::helicsNamedPoint:
     {

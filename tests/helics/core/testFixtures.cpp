@@ -22,10 +22,10 @@ federateStateTestFixture::federateStateTestFixture ()
 
 federateStateTestFixture::~federateStateTestFixture () = default;
 
-coreBrokerTestFixture::coreBrokerTestFixture () = default;
+//coreBrokerTestFixture::coreBrokerTestFixture () = default;
 
-coreBrokerTestFixture::~coreBrokerTestFixture () = default;
+//coreBrokerTestFixture::~coreBrokerTestFixture () = default;
 
-commonCoreTestFixture::commonCoreTestFixture () = default;
+//commonCoreTestFixture::commonCoreTestFixture () = default;
 
-commonCoreTestFixture::~commonCoreTestFixture () = default;
+//commonCoreTestFixture::~commonCoreTestFixture () = default;

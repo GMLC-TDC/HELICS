@@ -6,7 +6,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "helics/helics-config.h"
-#include <string>
 
 /** @file
 file linking with version info and containing some convenience functions

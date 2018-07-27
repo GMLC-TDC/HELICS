@@ -4,13 +4,12 @@ import helics as h
 
 @pt.fixture
 def vFed():
-    import helics as h
 
     initstring = "1 --name=mainbroker"
     fedinitstring = "--broker=mainbroker --federates=1"
     deltat = 0.01
-
-    helicsversion = h.helicsGetVersion()
+    #TODO: should add an assert here about helicsGetVersion
+    h.helicsGetVersion()
 
     # Create broker #
     broker = h.helicsCreateBroker("zmq", "", initstring)
@@ -239,25 +238,41 @@ def test_value_federate_publisher_registration(vFed):
     assert status == 0
     assert publication_type == 'int64'
 
-def test_value_federate_subscription_registration(vFed):
-    subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V")
-    subid2 = h.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
-    subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "double", "V")
-    h.helicsFederateEnterExecutionMode(vFed)
-
-    # h.helicsSubscriptionGetKey(subid1)
 
 def test_value_federate_subscription_and_publication_registration(vFed):
-
-    pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
-    pubid2 = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", h.HELICS_DATA_TYPE_INT, "")
-
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
 
-    subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "double", "V")
+    subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "int64", "V")
     subid2 = h.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
 
-    subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "double", "V")
+    subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "vector", "V")
+    h.helicsFederateEnterExecutionMode(vFed)
+    status, publication_type = h.helicsPublicationGetType(pubid3)
+    assert status == 0
+    assert publication_type == 'double'
+
+    status, sub_key = h.helicsSubscriptionGetKey(subid1)
+    assert status == 0
+    assert sub_key == 'sub1'
+    status, sub_type = h.helicsSubscriptionGetType(subid1)
+    assert status == 0
+    assert sub_type == 'int64'
+    status, sub_key = h.helicsSubscriptionGetKey(subid2)
+    assert status == 0
+    assert sub_key == 'sub2'
+    status, sub_key = h.helicsSubscriptionGetKey(subid3)
+    assert status == 0
+    assert sub_key == 'sub3'
+    status, sub_type = h.helicsSubscriptionGetType(subid3)
+    assert status == 0
+    assert sub_type == 'double_vector'
+    status, sub_units = h.helicsSubscriptionGetUnits(subid3)
+    assert status == 0
+    assert sub_units == 'V'
+    status, sub_type = h.helicsSubscriptionGetType(subid2)
+    assert status == 0
+    assert sub_type == 'int64'
+
 
 def test_value_federate_single_transfer(vFed):
 
@@ -289,21 +304,26 @@ def test_value_federate_runFederateTestDouble(vFed):
     h.helicsPublicationPublishDouble(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetDouble(subid)
+    assert status == 0
     assert value == defaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    assert status == 0
     assert grantedtime == 0.01
 
     status, value = h.helicsSubscriptionGetDouble(subid)
+    assert status == 0
     assert value == testValue
 
     # publish string1 at time=0.0;
     h.helicsPublicationPublishDouble(pubid, testValue + 1)
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
+    assert status == 0
     assert grantedtime == 0.02
 
     status, value = h.helicsSubscriptionGetDouble(subid)
+    assert status == 0
     assert value == testValue + 1
 
 def test_value_federate_runFederateTestComplex(vFed):
@@ -321,13 +341,16 @@ def test_value_federate_runFederateTestComplex(vFed):
     h.helicsPublicationPublishComplex(pubid, rTestValue, iTestValue)
 
     status, value1, value2 = h.helicsSubscriptionGetComplex(subid)
+    assert status == 0
     assert value1 == rDefaultValue
     assert value2 == iDefaultValue
 
     status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
+    assert status == 0
     assert grantedtime == 0.01
 
     status, value1, value2 = h.helicsSubscriptionGetComplex(subid)
+    assert status == 0
     assert value1 == rTestValue
     assert value2 == iTestValue
 
@@ -375,7 +398,6 @@ def test_value_federate_runFederateTestString(vFed):
 
     h.helicsFederateEnterExecutionMode(vFed)
 
-    # TODO: Fix error with the following function
     h.helicsPublicationPublishString(pubid, testValue)
 
     status, value = h.helicsSubscriptionGetString(subid)

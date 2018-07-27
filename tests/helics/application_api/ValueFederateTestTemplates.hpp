@@ -11,7 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "testFixtures.hpp"
 #include <future>
 #include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
 
 template <class X>
 void runFederateTest (const std::string &core_type_str,

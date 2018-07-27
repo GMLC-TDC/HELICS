@@ -147,13 +147,13 @@ export ZMQ_LIB=${zmq_install_path}/lib
 if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
 elif [[ "$os_name" == "Darwin" ]]; then
-    export DYLD_FALLBACK_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_FALLBACK_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_LIBRARY_PATH
 fi
 
 if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
 elif [[ "$os_name" == "Darwin" ]]; then
-    export DYLD_FALLBACK_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_FALLBACK_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_LIBRARY_PATH
 fi
 
 if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then

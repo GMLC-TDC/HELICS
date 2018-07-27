@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <map>
 #include <memory>
-#include <string>
 #include <thread>
 #include <unordered_map>
 

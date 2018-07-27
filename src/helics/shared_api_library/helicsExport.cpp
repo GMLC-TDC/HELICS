@@ -358,6 +358,10 @@ helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int
 
 helics::Core *getCore (helics_core core)
 {
+    if (core == nullptr)
+    {
+        return nullptr;
+    }
     auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (CoreObj->valid == coreValidationIdentifier)
     {
@@ -368,6 +372,10 @@ helics::Core *getCore (helics_core core)
 
 std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core)
 {
+    if (core == nullptr)
+    {
+        return nullptr;
+    }
     auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
     if (CoreObj->valid == coreValidationIdentifier)
     {
@@ -378,6 +386,10 @@ std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core)
 
 helics::Broker *getBroker (helics_broker broker)
 {
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
     auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (BrokerObj->valid == brokerValidationIdentifier)
     {
@@ -388,6 +400,10 @@ helics::Broker *getBroker (helics_broker broker)
 
 std::shared_ptr<helics::Broker> getBrokerSharedPtr (helics_broker broker)
 {
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
     auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     if (BrokerObj->valid == brokerValidationIdentifier)
     {
@@ -805,7 +821,7 @@ const char *helicsQueryExecute (helics_query query, helics_federate fed)
 
 const char *helicsQueryCoreExecute(helics_query query, helics_core core)
 {
-    if (core == nullptr)
+    if (query == nullptr)
     {
         return invalidStringConst;
     }
@@ -831,7 +847,7 @@ const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
     {
         return invalidStringConst;
     }
-    if (broker == nullptr)
+    if (query == nullptr)
     {
         return invalidStringConst;
     }

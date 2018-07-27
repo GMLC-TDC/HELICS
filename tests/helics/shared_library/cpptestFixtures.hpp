@@ -14,18 +14,28 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include "../src/helics/cpp98/Broker.hpp"
 #include "../src/helics/cpp98/Core.hpp"
 #include "../src/helics/cpp98/Federate.hpp"
+#include "helics/helics-config.h"
 #include <memory>
 
 #define HELICS_SIZE_MAX 512
 
 #ifndef DISABLE_TCP_CORE
+#ifdef HELICS_HAVE_ZEROMQ
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
 const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
-const std::string core_types[] = {"test",  "ipc",    "zmq",   "udp",   "test_2", "ipc_2", "zmq_2",
-                                  "udp_2", "test_3", "zmq_3", "udp_3", "test_4", "zmq_4", "udp_4"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3", "udp_3"};
+const std::string core_types[] = {"test", "ipc", "udp", "tcp", "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "udp"};
+#endif
+#else
+#ifdef HELICS_HAVE_ZEROMQ
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+#else
+const std::string core_types[] = {"test", "ipc", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "udp"};
+#endif
 #endif
 
 struct FederateTestFixture_cpp
@@ -33,8 +43,8 @@ struct FederateTestFixture_cpp
     FederateTestFixture_cpp () = default;
     ~FederateTestFixture_cpp ();
 
-    std::shared_ptr<helics::Broker> AddBroker (const std::string &core_type_name, int count);
-    std::shared_ptr<helics::Broker>
+    std::shared_ptr<helics98::Broker> AddBroker (const std::string &core_type_name, int count);
+    std::shared_ptr<helics98::Broker>
     AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <class FedType>
@@ -48,9 +58,9 @@ struct FederateTestFixture_cpp
     }
 
     template <class FedType>
-    std::vector<std::shared_ptr<helics::Federate>> AddFederates (std::string core_type_name,
+    std::vector<std::shared_ptr<helics98::Federate>> AddFederates (std::string core_type_name,
                                                                  int count,
-                                                                 helics::Broker &broker,
+                                                                 helics98::Broker &broker,
                                                                  helics_time_t time_delta = helics_time_zero,
                                                                  const std::string &name_prefix = "fed")
     {
@@ -73,21 +83,19 @@ struct FederateTestFixture_cpp
             initString.append (extraCoreArgs);
         }
 
-        helics::FederateInfo fi;
+        helics98::FederateInfo fi;
         fi.setFederateName ("");
 
         fi.setCoreTypeFromString (core_type_name);
         fi.setTimeDelta (time_delta);
-        std::vector<std::shared_ptr<helics::Federate>> federates_added;
-
+        std::vector<std::shared_ptr<helics98::Federate>> federates_added;
         switch (setup)
         {
         case 1:
         default:
         {
             auto init = initString + " --federates " + std::to_string (count);
-            helics::Core core (core_type_name, std::string (), init);
-
+            helics98::Core core (core_type_name, std::string (), init);
             fi.setCoreName (core.getIdentifier ());
             size_t offset = federates.size ();
             federates.resize (count + offset);
@@ -108,7 +116,7 @@ struct FederateTestFixture_cpp
             for (int ii = 0; ii < count; ++ii)
             {
                 auto init = initString + " --federates 1";
-                helics::Core core (core_type_name, std::string (), init);
+                helics98::Core core (core_type_name, std::string (), init);
                 fi.setCoreName (core.getIdentifier ());
 
                 auto name = name_prefix + std::to_string (ii + offset);
@@ -154,8 +162,8 @@ struct FederateTestFixture_cpp
         return std::dynamic_pointer_cast<FedType> (federates[index]);
     }
 
-    std::vector<std::shared_ptr<helics::Broker>> brokers;
-    std::vector<std::shared_ptr<helics::Federate>> federates;
+    std::vector<std::shared_ptr<helics98::Broker>> brokers;
+    std::vector<std::shared_ptr<helics98::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
 
