@@ -124,6 +124,15 @@ else()
 	ucm_set_runtime(DYNAMIC)
 endif()
 
+if (MSVC)
+	option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
+	mark_as_advanced(EMBEDDED_DEBUG_INFO)
+	if (EMBEDDED_DEBUG_INFO)
+		ucm_set_embedded_debug(EMBEDDED)
+	else()
+		ucm_set_embedded_debug(EXTERNAL)
+	endif()
+endif(MSVC)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
