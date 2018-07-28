@@ -21,3 +21,7 @@ endif()
 if (BUILD_MATLAB_INTERFACE)
 	add_subdirectory(matlab_helics)
 endif()
+
+if (BUILD_OCTAVE_INTERFACE)
+# add_subdirectory(octave_helics)
+endif()

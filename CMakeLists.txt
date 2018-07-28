@@ -328,31 +328,28 @@ endif()
 
 
 #add the local directory to the rpath
-#list(APPEND CMAKE_INSTALL_RPATH "./")
+list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if (NOT WIN32)
 	if (HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
-	#	get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
-	#	if (NOT zmqlibfile)
-	#		get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
-	#	endif()
+		get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
+		if (NOT zmqlibfile)
+			get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
+		endif()
 	#	message(STATUS "zmqlib file =${zmqlibfile}")
-	#	get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
+		get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 	#	message(STATUS "zmqdir path =${zmqdir}")
         if (APPLE)
             # TODO: Make sure it works for building ZMQ from source automatically using CMake
             list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
             list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
         endif()
-#		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
-#		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
+		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
+		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
 endif()
 
-
-option(BUILD_BROKER "Build a helics Broker executable" ON)
-option(BUILD_APPS "Build helics applications to run various apps, including player, recorder, and helics_apps" ON)
-
+option(BUILD_APPS "Build helics applications to run various apps, including broker, player, recorder, and helics_apps" ON)
 
 FILE(GLOB KEY_LIBRARY_FILES  ${AUTOBUILD_INSTALL_PATH}/bin/*)
 #message(STATUS "key files ${KEY_LIBRARY_FILES}")
@@ -390,7 +387,9 @@ add_subdirectory (src)
 if(BUILD_HELICS_TESTS)
 	include (CTest)
 	mark_as_advanced(BUILD_TESTING)
-	add_subdirectory (tests)
+	if (BUILD_TESTING)
+		add_subdirectory (tests)
+	endif()
 endif(BUILD_HELICS_TESTS)
 
 #-----------------------------------------------------------------------------
