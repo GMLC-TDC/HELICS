@@ -53,7 +53,7 @@ static const ArgDescriptors InfoArgs{
   {"output,o", "the output file for recording the data"},
   {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
   {"verbose", ArgDescriptor::arg_type_t::flag_type, "print all value results to the screen"},
-  {"marker","print a statement indicating time advancement argument is the period of the marker"},
+  {"marker","print a statement indicating time advancement every <arg> period during the simulation"},
   {"mapfile", "write progress to a map file for concurrent progress monitoring"}};
 
 Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)

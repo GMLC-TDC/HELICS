@@ -17,7 +17,34 @@ command line only:
   --config-file arg      specify a configuration file to use
 
 configuration:
-  --stop arg             the time to stop recording
+  --local                specify otherwise unspecified endpoints and
+                         publications as local( i.e.the keys will be prepended
+                         with the player name
+  --stop arg             the time to stop the player
+  --quiet                turn off most display output
+
+allowed options:
+
+configuration:
+  -b [ --broker ] arg    address of the broker to connect
+  -n [ --name ] arg      name of the player federate
+  --corename arg         the name of the core to create or find
+  -c [ --core ] arg      type of the core to connect to
+  --offset arg           the offset of the time steps
+  --period arg           the period of the federate
+  --timedelta arg        the time delta of the federate
+  --rttolerance arg      the time tolerance of the real time mode
+  -i [ --coreinit ] arg  the core initialization string
+  --separator arg        separator character for local federates
+  --inputdelay arg       the input delay on incoming communication of the
+                         federate
+  --outputdelay arg      the output delay for outgoing communication of the
+                         federate
+  -f [ --flags ] arg     named flag for the federate
+
+allowed options:
+
+configuration:
   --tags arg             tags to record, this argument may be specified any
                          number of times
   --endpoints arg        endpoints to capture, this argument may be specified
@@ -32,23 +59,12 @@ configuration:
                          capture="fed1;fed2"  supports multiple arguments or a
                          comma separated list
   -o [ --output ] arg    the output file for recording the data
-  --mapfile arg          write progress to a memory mapped file
-
-
-federate configuration
-  -b [ --broker ] arg    address of the broker to connect
-  -n [ --name ] arg      name of the player federate
-  --corename arg         the name of the core to create or find
-  -c [ --core ] arg      type of the core to connect to
-  --offset arg           the offset of the time steps
-  --period arg           the period of the federate
-  --timedelta arg        the time delta of the federate
-  -i [ --coreinit ] arg  the core initialization string
-  --inputdelay arg       the input delay on incoming communication of the
-                         federate
-  --outputdelay arg      the output delay for outgoing communication of the
-                         federate
-  -f [ --flags ] arg     named flags for the federate
+  --allow_iteration      allow iteration on values
+  --verbose              print all value results to the screen
+  --marker arg           print a statement indicating time advancement     every <arg> seconds of the simulation
+                         is the period of the marker
+  --mapfile arg          write progress to a map file for concurrent progress
+                         monitoring
 
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
@@ -84,7 +100,7 @@ arguments with spaces should be enclosed in quotes
 | interface       | description         |
 | ------------- |:-------------:|
 | s, sub, subscription     | subscribe to a particular publication |
-| endpoint, ept, e     | generate an endpoint to capture all targetd packets    |
+| endpoint, ept, e     | generate an endpoint to capture all targeted packets    |
 | source, sourceclone,src | capture all messages coming from a particular endpoint     |
 | dest, destination, destclone | capture all message going to a particular endpoint     |
 | capture | capture all data coming from a particular federate     |
@@ -129,6 +145,7 @@ and file elements can be used to load up additional files
 
 ### output
 Recorders capture files in a format the Player can read see [Player](Player)
+the `--verbose` option will also print the values to the screen.
 
 ## Map file output
 the recorder can generate a live file that can be used in process to see the progress of the Federation

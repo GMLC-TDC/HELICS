@@ -53,7 +53,7 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
 static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data type to use"},
-  {"marker", "print a statement indicating time advancement argument is the period of the marker"},
+  {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
                                      {"timeunits",
                                       "the default units on the timestamps used in file based input"}};
 

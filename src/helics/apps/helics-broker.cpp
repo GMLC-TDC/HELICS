@@ -104,7 +104,7 @@ void terminalFunction (int argc, char *argv[])
     {
         std::string cmdin;
         std::cout << "helics>>";
-        std::cin >> cmdin;
+        std::getline (std::cin, cmdin);
         auto cmdVec = stringOps::splitlineQuotes (cmdin, " ", stringOps::default_quote_chars,
                                                   stringOps::delimiter_compression::on);
         auto cmd1 = convertToLowerCase (cmdVec[0]);
@@ -112,7 +112,6 @@ void terminalFunction (int argc, char *argv[])
         if ((cmd1 == "quit") || (cmd1 == "q"))
         {
             cmdcont = false;
-            break;
         }
         else if (cmd1 == "terminate")
         {
@@ -126,11 +125,25 @@ void terminalFunction (int argc, char *argv[])
                 std::cout << "Broker has terminated\n";
             }
         }
+        else if (cmd1 == "terminate*")
+        {
+            broker->forceTerminate ();
+            while (broker->isActive ())
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+            }
+            if (!broker->isActive ())
+            {
+                std::cout << "Broker has terminated\n";
+            }
+            cmdcont = false;
+        }
         else if ((cmd1 == "help")
             || (cmd1 == "?"))
         {
             std::cout << "`quit` -> close the terminal application and wait for broker to finish\n";
             std::cout << "`terminate` -> force the broker to stop\n";
+            std::cout << "`terminate*` -> force the broker to stop and exit the terminal application\n";
             std::cout << "`help`,`?` -> this help display\n";
             std::cout << "`restart` -> restart a completed broker\n";
             std::cout << "`status` -> will display the current status of the broker\n";
@@ -204,7 +217,7 @@ void terminalFunction (int argc, char *argv[])
                 std::cout << "Broker (" << id << ") is connected and " << ((accepting) ?
                   "is" :
                   "is not")
-                    << "accepting new federates\naddress=" << address << '\n';
+                    << " accepting new federates\naddress=" << address << '\n';
 			}
 			else
 			{

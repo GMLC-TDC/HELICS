@@ -1309,6 +1309,18 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     {
         return (brokerState >= broker_state_t::operating) ? std::string("true") : std::string("false");
     }
+    if (request == "isconnected")
+    {
+        return (isConnected()) ? std::string ("true") : std::string ("false");
+    }
+	if (request == "name")
+	{
+        return getIdentifier ();
+	}
+    if (request == "address")
+    {
+        return getAddress ();
+    }
     if (request == "counts")
     {
         std::string cnts = "{\"brokers\":";
