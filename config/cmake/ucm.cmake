@@ -257,6 +257,38 @@ macro(ucm_set_runtime)
     endif()
 endmacro()
 
+
+# ucm_set_embedded_debug on MSVC
+# Sets the runtime (static/dynamic) for msvc
+macro(ucm_set_embedded_debug)
+    cmake_parse_arguments(ARG "EMBEDDED/EXTERNAL" "" "" ${ARGN})
+
+    if(ARG_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
+    endif()
+     
+	 if (MSVC)
+		ucm_gather_flags(0 flags_configs)
+    
+		# add/replace the flags
+		# note that if the user has messed with the flags directly this function might fail
+		# - for example if with MSVC and the user has removed the flags - here we just switch/replace them
+		if("${EMBEDDED}")
+			foreach(flags ${flags_configs})
+					if(${flags} MATCHES "/Zi")
+						string(REGEX REPLACE "/Zi" "/Z7" ${flags} "${${flags}}")
+					endif()
+			endforeach()
+		elseif("${EXTERNAL}")
+			foreach(flags ${flags_configs})
+					if(${flags} MATCHES "/Z7")
+						string(REGEX REPLACE "/Z7" "/Zi" ${flags} "${${flags}}")
+					endif()
+			endforeach()
+		endif()
+	endif()
+endmacro()
+
 # ucm_print_flags
 # Prints all compiler flags for all configurations
 macro(ucm_print_flags)
