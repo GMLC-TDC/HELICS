@@ -3,8 +3,8 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "../application_api/queryFunctions.hpp"
 #include "../application_api/Federate.hpp"
+#include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
 #include "../core/Broker.hpp"
 #include "../core/core-exceptions.hpp"
@@ -117,16 +117,27 @@ void terminalFunction (int argc, char *argv[])
         else if (cmd1 == "terminate")
         {
             broker->forceTerminate ();
+            while (broker->isActive ())
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+            }
+            if (!broker->isActive ())
+            {
+                std::cout << "Broker has terminated\n";
+            }
         }
-        else if (cmd1 == "help")
+        else if ((cmd1 == "help")
+            || (cmd1 == "?"))
         {
-            std::cout << "quit >>close the terminal application and wait for broker to finish\n";
-            std::cout << "terminate >> force the broker to stop\n";
-            std::cout << "help >> this help window\n";
-            std::cout << "restart >> restart a completed broker\n";
-            std::cout << "force restart >> will force terminate a broker and restart it\n";
-            std::cout << "query <queryString> >> will query a broker for <queryString>\n";
-            std::cout << "query <queryTarget> <queryString> >> will query <queryTarget> for <queryString>\n";
+            std::cout << "`quit` -> close the terminal application and wait for broker to finish\n";
+            std::cout << "`terminate` -> force the broker to stop\n";
+            std::cout << "`help`,`?` -> this help display\n";
+            std::cout << "`restart` -> restart a completed broker\n";
+            std::cout << "`status` -> will display the current status of the broker\n";
+            std::cout << "`info` -> will display info about the broker\n";
+            std::cout << "`force restart` -> will force terminate a broker and restart it\n";
+            std::cout << "`query` <queryString> -> will query a broker for <queryString>\n";
+            std::cout << "`query` <queryTarget> <queryString> -> will query <queryTarget> for <queryString>\n";
         }
         else if (cmd1 == "restart")
         {
@@ -158,23 +169,65 @@ void terminalFunction (int argc, char *argv[])
                 }
             }
         }
-        else if (cmd1 == "query")
-        {
-            std::string res;
-            if (cmdVec.size () == 2)
+		else if (cmd1 == "status")
+		{
+            if (!broker)
             {
-                res = (*broker)->query ("broker", cmdVec[1]);
+                std::cout << "Broker is not available\n";
             }
-            else if (cmdVec.size () >= 3)
+            auto accepting = (*broker)->isOpenToNewFederates ();
+            auto connected = (*broker)->isConnected ();
+            auto id = (*broker)->getIdentifier ();
+            if (connected)
             {
-                res = (*broker)->query (cmdVec[1], cmdVec[2]);
+                auto cts = (*broker)->query ("broker","counts");
+                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
+                          << "accepting new federates\n" << cts << '\n';
             }
-            auto qvec = vectorizeQueryResult (std::move (res));
-            std::cout << "results: ";
-            for (const auto &vres : qvec)
+            else
             {
-                std::cout << vres << '\n';
+                std::cout << "Broker (" << id << ") is not connected \n";
             }
-        }
+		}
+		else if (cmd1 == "info")
+		{
+			if (!broker)
+			{
+                std::cout << "Broker is not available\n";
+			}
+            auto accepting = (*broker)->isOpenToNewFederates ();
+            auto connected = (*broker)->isConnected();
+            auto id = (*broker)->getIdentifier ();
+			if (connected)
+			{
+                auto address = (*broker)->getAddress ();
+                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ?
+                  "is" :
+                  "is not")
+                    << "accepting new federates\naddress=" << address << '\n';
+			}
+			else
+			{
+                std::cout << "Broker (" << id << ") is not connected \n";
+			}
+		}
+            else if (cmd1 == "query")
+            {
+                std::string res;
+                if (cmdVec.size () == 2)
+                {
+                    res = (*broker)->query ("broker", cmdVec[1]);
+                }
+                else if (cmdVec.size () >= 3)
+                {
+                    res = (*broker)->query (cmdVec[1], cmdVec[2]);
+                }
+                auto qvec = vectorizeQueryResult (std::move (res));
+                std::cout << "results: ";
+                for (const auto &vres : qvec)
+                {
+                    std::cout << vres << '\n';
+                }
+            }
     }
 }

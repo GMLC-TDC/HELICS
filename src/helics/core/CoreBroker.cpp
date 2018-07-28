@@ -1307,7 +1307,20 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
 {
     if (request == "isinit")
     {
-        return (brokerState >= broker_state_t::operating) ? "true" : "false";
+        return (brokerState >= broker_state_t::operating) ? std::string("true") : std::string("false");
+    }
+    if (request == "counts")
+    {
+        std::string cnts = "{\"brokers\":";
+        cnts += std::to_string (_brokers.size ());
+        cnts += ",\n";
+        cnts +="\"federates\":";
+        cnts += std::to_string (_federates.size ());
+        cnts += ",\n";
+        cnts += "\"handles\":";
+        cnts += std::to_string (handles.size ());
+        cnts += '}';
+        return cnts;
     }
     if (request == "federates")
     {
@@ -1512,6 +1525,10 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
             fedMapRequestors.push_back (queryRep);
         }
     }
+	else if (queryRep.dest_id == global_broker_id)
+	{
+        ActiveQueries.setDelayedValue (m.index, queryRep.payload);
+	}
     else
     {
         routeMessage (queryRep, m.source_id);

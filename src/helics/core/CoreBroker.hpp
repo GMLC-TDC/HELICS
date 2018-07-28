@@ -156,6 +156,7 @@ class CoreBroker : public Broker, public BrokerBase
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
 	virtual void waitForDisconnect () const override final;
+
   private:
     /** implementation details of the connection process
      */
