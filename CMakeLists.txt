@@ -52,7 +52,7 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 option(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
-	enable_testing ()
+	include(CTest)
 endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -384,13 +384,11 @@ add_subdirectory (src)
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-if(BUILD_HELICS_TESTS)
-	include (CTest)
+
+if(BUILD_HELICS_TESTS AND BUILD_TESTING)
 	mark_as_advanced(BUILD_TESTING)
-	if (BUILD_TESTING)
-		add_subdirectory (tests)
-	endif()
-endif(BUILD_HELICS_TESTS)
+	add_subdirectory (tests)
+endif()
 
 #-----------------------------------------------------------------------------
 # Setup Examples
