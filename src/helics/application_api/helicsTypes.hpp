@@ -372,7 +372,7 @@ constexpr bool isConvertableType<long double> ()
 }
 
 template <>
-constexpr bool isConvertableType<int> ()
+constexpr bool isConvertableType<int32_t> ()
 {
     return true;
 }
@@ -390,7 +390,7 @@ constexpr bool isConvertableType<uint16_t> ()
 }
 
 template <>
-constexpr bool isConvertableType<unsigned int> ()
+constexpr bool isConvertableType<unsigned char> ()
 {
     return true;
 }
