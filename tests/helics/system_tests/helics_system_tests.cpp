@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define BOOST_TEST_DYN_LINK
 #endif
 
-#define BOOST_TEST_MODULE application_api_tests
+#define BOOST_TEST_MODULE helics_system_tests
 #define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include <boost/test/unit_test.hpp>

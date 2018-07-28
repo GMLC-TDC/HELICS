@@ -28,11 +28,11 @@ target_compile_definitions(system-tests  PRIVATE "-DHELICS_BROKER_LOCATION=\"${H
 target_compile_definitions(system-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\"")
 target_compile_definitions(system-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME system-tests COMMAND system-tests --log_level=test_suite --report_level=short)
+add_test(NAME system-tests COMMAND system-tests --log_level=message --report_level=short)
 set_property(TEST system-tests PROPERTY LABELS System Daily)
 
 # Tests for Continuous Integration builds
-add_test(NAME system-ci-tests COMMAND system-tests --run_test=@ci --log_level=test_suite --report_level=short)
+add_test(NAME system-ci-tests COMMAND system-tests --run_test=@ci --log_level=message --report_level=short)
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
