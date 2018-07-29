@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label("ci"))
 }
 
 
-BOOST_AUTO_TEST_CASE (timing_with_impact_window, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label("ci"))
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
