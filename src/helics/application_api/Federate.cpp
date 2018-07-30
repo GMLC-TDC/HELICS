@@ -976,11 +976,15 @@ std::string Federate::query (const std::string &queryStr)
     {
         return getName ();
     }
-    return coreObject->query ("federation", queryStr);
+    return coreObject->query (getName(), queryStr);
 }
 
 std::string Federate::query (const std::string &target, const std::string &queryStr)
 {
+	if ((target.empty())||(target=="federate"))
+	{
+        return query (queryStr);
+	}
     return coreObject->query (target, queryStr);
 }
 

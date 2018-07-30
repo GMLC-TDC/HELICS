@@ -219,6 +219,7 @@ class Player : public App
     size_t messageIndex = 0;  //!< the current message index
     timeUnits units = timeUnits::sec;
     double timeMultiplier = 1.0;  //!< specify the time multiplier for different time specifications
+    Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
 };
 }  // namespace apps
 }  // namespace helics

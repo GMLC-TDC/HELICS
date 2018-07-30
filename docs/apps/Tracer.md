@@ -61,9 +61,9 @@ the tracer executable also takes an untagged argument of a file name for example
 helics_app tracer tracer_file.txt --stop 5
 ```
 
-Tracers support both delimited text files and JSON files some examples can be found in
+Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.  
 
-[Player configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Tracer configuration Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
 
 ## Config File Detail
 
@@ -85,7 +85,7 @@ arguments with spaces should be enclosed in quotes
 | interface       | description         |
 | ------------- |:-------------:|
 | s, sub, subscription     | subscribe to a particular publication |
-| endpoint, ept, e     | generate an endpoint to capture all targetd packets    |
+| endpoint, ept, e     | generate an endpoint to capture all targeted packets    |
 | source, sourceclone,src | capture all messages coming from a particular endpoint     |
 | dest, destination, destclone | capture all message going to a particular endpoint     |
 | capture | capture all data coming from a particular federate     |

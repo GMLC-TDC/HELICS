@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** these test cases test out the value converters
  */
 #include "helics/helics.hpp"
-#include "testFixtures.hpp"
+#include "../application_api/testFixtures.hpp"
 
 namespace utf = boost::unit_test;
 
