@@ -3,11 +3,32 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [unreleased] - 2018-07-29
+## [1.3.0] - 2018-07-31
+### Changed
+ - some CMake options have been removed (BUILD_BROKER)
+ - major changes to the build of the CTest testing Framework
+
+### Fixed
+ - potential segmentation fault in C shared library when calling free with invalid object.
+ - autobuild recognizes build configuration
+
+### Added
+ - working octave interface for Linux
+ - some additional tests for the shared library
+ - TOML readers for interface description in Federates
+ - interactive command line for helics_broker
+ - a few new queries on brokers see [Queries](docs/user_guide/Queries.md)
+ - CPACK can now build a dmg files
+ - Players can have multiline comments and omit the tag for repeated messages
+ - marker option on player, recorder, tracer to print time advancement message
 
 ### changed
  - added better code for allowing static runtime builds
  - use the cmake version numbers instead of independent variables
+ - Environment variables are recognized in CMAKE find options
+ - split API tests from system wide tests
+ - added options on MSVC to build with embedded system libraries and embedded debug info.
+
 ## [1.2.1] - 2018-06-30
 ### Fixed
  - bug in the conversion of named points from strings
