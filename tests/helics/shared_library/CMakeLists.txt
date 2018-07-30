@@ -19,6 +19,7 @@ test-message-federate.cpp
 #TimingTests.cpp
 #iterationTests.cpp
 QueryTests.cpp
+badInputTests.cpp
 )
 
 set(cpp_shared_library_test_sources
