@@ -15,8 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/common/BlockingPriorityQueue.hpp"
 
-namespace utf = boost::unit_test;
-
 BOOST_AUTO_TEST_SUITE (blocking_priority_queue_tests)
 
 /** test basic operations */
@@ -51,7 +49,7 @@ BOOST_AUTO_TEST_CASE (basic_tests)
 }
 
 /** test with a move only element*/
-BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (move_only_tests)
 {
     BlockingPriorityQueue<std::unique_ptr<double>> sq;
 
@@ -78,7 +76,7 @@ BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
 
 /** test the ordering with a larger number of inputs*/
 
-BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (ordering_tests)
 {
     BlockingPriorityQueue<int> sq;
 
@@ -110,7 +108,7 @@ BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
     BOOST_CHECK (sq.empty ());
 }
 
-BOOST_AUTO_TEST_CASE (emplace_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (emplace_tests)
 {
     BlockingPriorityQueue<std::pair<int, double>> sq;
 
@@ -353,7 +351,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3_pop)
 }
 
 /** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (pop_callback_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (pop_callback_tests)
 {
     BlockingPriorityQueue<int64_t> sq;
     int pushcnt = 0;
