@@ -265,14 +265,14 @@ helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helic
     return helics_ok;
 }
 
-helics_status helicsFederateInfoSetSeparator(helics_federate_info_t fi, char separator)
+helics_status helicsFederateInfoSetSeparator (helics_federate_info_t fi, char separator)
 {
     if (fi == nullptr)
     {
         return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->separator=separator;
+    hfi->separator = separator;
     return helics_ok;
 }
 
@@ -355,61 +355,75 @@ helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int
     hfi->maxIterations = maxIterations;
     return helics_ok;
 }
-
-helics::Core *getCore (helics_core core)
+namespace helics
+{
+CoreObject *getCoreObject (helics_core core)
 {
     if (core == nullptr)
     {
         return nullptr;
     }
-    auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
-    if (CoreObj->valid == coreValidationIdentifier)
+    auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    if (coreObj->valid == coreValidationIdentifier)
     {
-        return CoreObj->coreptr.get ();
+        return coreObj;
     }
     return nullptr;
+}
+
+BrokerObject *getBrokerObject (helics_broker broker)
+{
+    if (broker == nullptr)
+    {
+        return nullptr;
+    }
+    auto brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    if (brokerObj->valid == brokerValidationIdentifier)
+    {
+        return brokerObj;
+    }
+    return nullptr;
+}
+
+}  // namespace helics
+helics::Core *getCore (helics_core core)
+{
+    auto coreObj = helics::getCoreObject (core);
+    if (coreObj == nullptr)
+    {
+        return nullptr;
+    }
+    return coreObj->coreptr.get ();
 }
 
 std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core)
 {
-    if (core == nullptr)
+    auto coreObj = helics::getCoreObject (core);
+    if (coreObj == nullptr)
     {
         return nullptr;
     }
-    auto CoreObj = reinterpret_cast<helics::CoreObject *> (core);
-    if (CoreObj->valid == coreValidationIdentifier)
-    {
-        return CoreObj->coreptr;
-    }
-    return nullptr;
+    return coreObj->coreptr;
 }
 
 helics::Broker *getBroker (helics_broker broker)
 {
-    if (broker == nullptr)
+    auto brokerObj = helics::getBrokerObject (broker);
+    if (brokerObj == nullptr)
     {
         return nullptr;
     }
-    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (BrokerObj->valid == brokerValidationIdentifier)
-    {
-        return BrokerObj->brokerptr.get ();
-    }
-    return nullptr;
+    return brokerObj->brokerptr.get ();
 }
 
 std::shared_ptr<helics::Broker> getBrokerSharedPtr (helics_broker broker)
 {
-    if (broker == nullptr)
+    auto brokerObj = helics::getBrokerObject (broker);
+    if (brokerObj == nullptr)
     {
         return nullptr;
     }
-    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    if (BrokerObj->valid == brokerValidationIdentifier)
-    {
-        return BrokerObj->brokerptr;
-    }
-    return nullptr;
+    return brokerObj->brokerptr;
 }
 
 helics_core helicsCreateCore (const char *type, const char *name, const char *initString)
@@ -521,11 +535,11 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
 
 helics_broker helicsBrokerClone (helics_broker broker)
 {
-    if (broker == nullptr)
+    auto brokerObj = helics::getBrokerObject (broker);
+    if (brokerObj == nullptr)
     {
         return nullptr;
     }
-    auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
     auto brokerClone = std::make_unique<helics::BrokerObject> ();
     brokerClone->valid = brokerValidationIdentifier;
     brokerClone->brokerptr = brokerObj->brokerptr;
@@ -718,7 +732,7 @@ helics_status helicsBrokerDisconnect (helics_broker broker)
 
 void helicsCoreFree (helics_core core)
 {
-    auto *coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    auto coreObj = helics::getCoreObject (core);
     if (coreObj != nullptr)
     {
         getMasterHolder ()->clearCore (coreObj->index);
@@ -728,7 +742,7 @@ void helicsCoreFree (helics_core core)
 
 void helicsBrokerFree (helics_broker broker)
 {
-    auto *brokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
+    auto brokerObj = helics::getBrokerObject (broker);
     if (brokerObj != nullptr)
     {
         getMasterHolder ()->clearBroker (brokerObj->index);
@@ -738,7 +752,7 @@ void helicsBrokerFree (helics_broker broker)
 
 void helicsFederateFree (helics_federate fed)
 {
-    auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    auto fedObj = helics::getFedObject (fed);
     if (fedObj != nullptr)
     {
         getMasterHolder ()->clearFed (fedObj->index);
@@ -749,18 +763,18 @@ void helicsFederateFree (helics_federate fed)
 
 helics::FedObject::~FedObject ()
 {
-    //we want to remove the values in the arrays before deleting the fedptr
+    // we want to remove the values in the arrays before deleting the fedptr
     // and we want to do it inside this function to ensure it does so in a consistent manner
-    subs.clear();
-    pubs.clear();
-    epts.clear();
-    filters.clear();
+    subs.clear ();
+    pubs.clear ();
+    epts.clear ();
+    filters.clear ();
     fedptr = nullptr;
 }
 
 helics::CoreObject::~CoreObject ()
 {
-    filters.clear();
+    filters.clear ();
     coreptr = nullptr;
 }
 
@@ -819,7 +833,7 @@ const char *helicsQueryExecute (helics_query query, helics_federate fed)
     return queryObj->response.c_str ();
 }
 
-const char *helicsQueryCoreExecute(helics_query query, helics_core core)
+const char *helicsQueryCoreExecute (helics_query query, helics_core core)
 {
     if (query == nullptr)
     {
@@ -829,19 +843,19 @@ const char *helicsQueryCoreExecute(helics_query query, helics_core core)
     {
         return invalidStringConst;
     }
-    auto coreObj = getCore(core);
+    auto coreObj = getCore (core);
     if (coreObj == nullptr)
     {
         return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
-    queryObj->response = coreObj->query(queryObj->target,queryObj->query);
+    queryObj->response = coreObj->query (queryObj->target, queryObj->query);
 
-    return queryObj->response.c_str();
+    return queryObj->response.c_str ();
 }
 
-const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
+const char *helicsQueryBrokerExecute (helics_query query, helics_broker broker)
 {
     if (broker == nullptr)
     {
@@ -851,16 +865,16 @@ const char *helicsQueryBrokerExecute(helics_query query, helics_broker broker)
     {
         return invalidStringConst;
     }
-    auto brokerObj = getCore(broker);
+    auto brokerObj = getCore (broker);
     if (brokerObj == nullptr)
     {
         return invalidStringConst;
     }
 
     auto queryObj = reinterpret_cast<helics::QueryObject *> (query);
-    queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
+    queryObj->response = brokerObj->query (queryObj->target, queryObj->query);
 
-    return queryObj->response.c_str();
+    return queryObj->response.c_str ();
 }
 
 helics_status helicsQueryExecuteAsync (helics_query query, helics_federate fed)
@@ -990,7 +1004,7 @@ helics::FedObject *MasterObjectHolder::findFed (const std::string &fedName)
     auto handle = feds.lock ();
     for (auto &fed : (*handle))
     {
-        if (fed->fedptr)
+        if ((fed)&&(fed->fedptr))
         {
             if (fed->fedptr->getName () == fedName)
             {
@@ -1004,7 +1018,7 @@ helics::FedObject *MasterObjectHolder::findFed (const std::string &fedName)
 void MasterObjectHolder::clearBroker (int index)
 {
     auto broker = brokers.lock ();
-    if (index < static_cast<int> (broker->size ()))
+    if ((index < static_cast<int> (broker->size ())) && (index >= 0))
     {
         (*broker)[index] = nullptr;
     }
@@ -1013,7 +1027,7 @@ void MasterObjectHolder::clearBroker (int index)
 void MasterObjectHolder::clearCore (int index)
 {
     auto core = cores.lock ();
-    if (index < static_cast<int> (core->size ()))
+    if ((index < static_cast<int> (core->size ())) && (index >= 0))
     {
         (*core)[index] = nullptr;
     }
@@ -1022,7 +1036,7 @@ void MasterObjectHolder::clearCore (int index)
 void MasterObjectHolder::clearFed (int index)
 {
     auto fed = feds.lock ();
-    if (index < static_cast<int> (fed->size ()))
+    if ((index < static_cast<int> (fed->size ())) && (index >= 0))
     {
         (*fed)[index] = nullptr;
     }
