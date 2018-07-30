@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include "fmt_wrapper.h"
+#include "../common/fmt_format.h"
 #include <random>
 #include <boost/program_options.hpp>
 

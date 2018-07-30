@@ -45,6 +45,7 @@ if (WIN32)
 
 #message(STATUS "win32 octave search")
 set (octave_versions
+Octave-4.4.0
 Octave-4.2.1
 Octave-4.2.0
 Octave-4.0.3

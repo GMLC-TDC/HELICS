@@ -52,7 +52,7 @@ file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 option(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
 # enable testing
 if (BUILD_HELICS_TESTS)
-	enable_testing ()
+	include(CTest)
 endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -124,6 +124,15 @@ else()
 	ucm_set_runtime(DYNAMIC)
 endif()
 
+if (MSVC)
+	option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
+	mark_as_advanced(EMBEDDED_DEBUG_INFO)
+	if (EMBEDDED_DEBUG_INFO)
+		ucm_set_embedded_debug(EMBEDDED)
+	else()
+		ucm_set_embedded_debug(EXTERNAL)
+	endif()
+endif(MSVC)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
@@ -319,31 +328,28 @@ endif()
 
 
 #add the local directory to the rpath
-#list(APPEND CMAKE_INSTALL_RPATH "./")
+list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if (NOT WIN32)
 	if (HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
-	#	get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
-	#	if (NOT zmqlibfile)
-	#		get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
-	#	endif()
+		get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
+		if (NOT zmqlibfile)
+			get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
+		endif()
 	#	message(STATUS "zmqlib file =${zmqlibfile}")
-	#	get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
+		get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
 	#	message(STATUS "zmqdir path =${zmqdir}")
         if (APPLE)
             # TODO: Make sure it works for building ZMQ from source automatically using CMake
             list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
             list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
         endif()
-#		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
-#		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
+		list(APPEND CMAKE_INSTALL_RPATH "${zmqdir}")
+		list(APPEND CMAKE_BUILD_RPATH  "${zmqdir}")
 	endif()
 endif()
 
-
-option(BUILD_BROKER "Build a helics Broker executable" ON)
-option(BUILD_APPS "Build helics applications to run various apps, including player, recorder, and helics_apps" ON)
-
+option(BUILD_APPS "Build helics applications to run various apps, including broker, player, recorder, and helics_apps" ON)
 
 FILE(GLOB KEY_LIBRARY_FILES  ${AUTOBUILD_INSTALL_PATH}/bin/*)
 #message(STATUS "key files ${KEY_LIBRARY_FILES}")
@@ -378,11 +384,11 @@ add_subdirectory (src)
 #-----------------------------------------------------------------------------
 # Setup CTEST environment
 #-----------------------------------------------------------------------------
-if(BUILD_HELICS_TESTS)
-	include (CTest)
+
+if(BUILD_HELICS_TESTS AND BUILD_TESTING)
 	mark_as_advanced(BUILD_TESTING)
 	add_subdirectory (tests)
-endif(BUILD_HELICS_TESTS)
+endif()
 
 #-----------------------------------------------------------------------------
 # Setup Examples

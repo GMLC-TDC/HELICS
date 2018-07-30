@@ -4,44 +4,31 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-
-set(key_test_files
-MessageFederateKeyTests.cpp
-ValueFederateKeyTests.cpp
-FilterTests.cpp
-testFixtures.cpp
-PrimaryTypeConversionTests.cpp
-FilterAdditionalTests.cpp
-)
-
 set(application_api_test_headers
 testFixtures.hpp
 ValueFederateTestTemplates.hpp
 )
 
 set(application_api_test_sources
+MessageFederateKeyTests.cpp
+ValueFederateKeyTests.cpp
+FilterTests.cpp
+testFixtures.cpp
+PrimaryTypeConversionTests.cpp
+FilterAdditionalTests.cpp
 ValueConverterTests.cpp
 application-api-tests.cpp
 data_viewTests.cpp
 MessageFederateAdditionalTests.cpp
 FederateTests.cpp
-TimingTests.cpp
-iterationTests.cpp
 subPubObjectTests.cpp
 ValueFederateAdditionalTests.cpp
-ErrorTests.cpp
-federateRealTimeTests.cpp
-TimingTests2.cpp
 CombinationFederateTests.cpp
-)
-
-set(extended_test_sources
-QueryTests.cpp
-heat-transfer-tests.cpp
 ValueFederateExtendedTests.cpp
 )
 
-add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers} ${key_test_files} ${extended_test_sources})
+
+add_executable(application-api-tests ${application_api_test_sources} ${application_api_test_headers})
 target_link_libraries(application-api-tests helics-static helics_test_base)
 
 set_target_properties (application-api-tests PROPERTIES FOLDER tests)

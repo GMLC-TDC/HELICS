@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** these test cases test out the value converters
  */
 #include "helics/helics.hpp"
-#include "testFixtures.hpp"
+#include "../application_api/testFixtures.hpp"
 #include <future>
 BOOST_FIXTURE_TEST_SUITE (timing_tests2, FederateTestFixture)
 

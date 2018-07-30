@@ -19,7 +19,7 @@ This is useful for testing communication pathways and in combination with filter
 The [player](Player.md) app will generate signals through specified interfaces from prescribed data
 This is used for generating test signals into a federate
 
-#### Recorder 
+#### Recorder
 The [Recorder](Recorder.md) app captures signals and data on specified interfaces and can record then to various file formats including text files and json files
 The files saved can then be used by the Player app at a later time
 
@@ -28,10 +28,9 @@ The [Tracer](Tracer.md) app functions much like the recorder when run as a stand
 The additional purpose is used as a library object as the basis for additional display purposes and interfaces
 
 #### Source
-
 The [Source](Source.md) app is a signal generator like the player except that is can generate signals from defined patterns including some random signals in value and timing, and other patterns like sine, square wave, ramps
 and others.  Used much like the player in situations some test signals are needed.
 
 #### Broker
 
-The [Broker](Broker.md) executes a broker like the stand alone Broker app.
+The [Broker](Broker.md) executes a broker like the stand alone Broker app, it does not include the broker terminal application.
