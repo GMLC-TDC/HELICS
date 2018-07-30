@@ -414,7 +414,7 @@ class Core
     /**
      * Returns vector of subscription handles that received an update during the last
      * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
-     *@param federateID the identification code of the federate to query
+     *@param federateID the identification code of the federate to get which interfaces have been updated
      @return a reference to the location of an array of handles that have been updated
      */
     virtual const std::vector<handle_id_t> &getValueUpdates (federate_id_t federateID) = 0;

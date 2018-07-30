@@ -130,6 +130,8 @@ namespace apps
         std::string encode(const std::string &str2encode);
     protected:
         bool allow_iteration = false; //!< trigger to allow Iteration
+      bool verbose = false;  //!< print all captured values to the screen
+        Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
         std::vector<Subscription> subscriptions;    //!< the actual subscription objects

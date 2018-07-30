@@ -10,25 +10,20 @@ into other components
 Command line arguments
 ----------
 ```
-allowed options:
-
 command line only:
   -? [ --help ]          produce help message
   -v [ --version ]       display a version string
   --config-file arg      specify a configuration file to use
 
 configuration:
-  --datatype arg         type of the publication data type to use
   --local                specify otherwise unspecified endpoints and
                          publications as local( i.e.the keys will be prepended
                          with the player name
-  --separator arg        specify the separator for local publications and
-                         endpoints
-  --timeunits arg        the default units on the timestamps used in file based
-                         input
   --stop arg             the time to stop the player
+  --quiet                turn off most display output
 
-federate configuration
+
+configuration:
   -b [ --broker ] arg    address of the broker to connect
   -n [ --name ] arg      name of the player federate
   --corename arg         the name of the core to create or find
@@ -36,12 +31,24 @@ federate configuration
   --offset arg           the offset of the time steps
   --period arg           the period of the federate
   --timedelta arg        the time delta of the federate
+  --rttolerance arg      the time tolerance of the real time mode
   -i [ --coreinit ] arg  the core initialization string
+  --separator arg        separator character for local federates
   --inputdelay arg       the input delay on incoming communication of the
                          federate
   --outputdelay arg      the output delay for outgoing communication of the
                          federate
-  -f [ --flags ] arg     named flags for the federate
+  -f [ --flags ] arg     named flag for the federate
+
+allowed options:
+
+configuration:
+  --datatype arg         type of the publication data type to use
+  --marker arg           print a statement indicating time advancement every  arg seconds
+                         is the period of the marker
+  --timeunits arg        the default units on the timestamps used in file based
+                         input
+
 
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
@@ -71,6 +78,7 @@ a simple example of a player file publishing values
 1, pub2, d, 0.4
 2, pub2, 0.6
 3, pub2, 0.9
+4, 0.7  # this statement is assumed to refer to pub 2
 ```
 `#` signifies a comment
 the first column is time in seconds unless otherwise specified via the `--timeunits` flag or other configuration means

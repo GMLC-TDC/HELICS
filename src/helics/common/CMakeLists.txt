@@ -30,6 +30,8 @@ DualMappedVector.hpp
 MappedPointerVector.hpp
 DualMappedPointerVector.hpp
 TripWire.hpp
+fmt_format.h
+fmt_ostream.h
 )
 
 set(common_sources
