@@ -51,7 +51,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m
 )
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helics.oct
-  COMMAND ${OCTAVE_EXECUTABLE} "\"${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m\""
+  COMMAND ${OCTAVE_EXECUTABLE} "-q" "run(\"${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m\")"
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m helicsSharedLib ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp
 )
 
