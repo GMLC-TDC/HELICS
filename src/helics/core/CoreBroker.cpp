@@ -1300,7 +1300,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
-    return "#invalid";
+  //  return "#invalid";
 }
 
 std::string CoreBroker::generateQueryAnswer (const std::string &request)
