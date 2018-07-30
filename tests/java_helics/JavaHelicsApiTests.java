@@ -303,15 +303,15 @@ public class JavaHelicsApiTests {
 			rv = helics.helicsEndpointSubscribe(ep2, "fed1/pub3", "string");
 			rv = helics.helicsFederateEnterInitializationModeAsync(fed1);
 			int rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
-			if(rs != 0) {
+			if(rs == 0) {
 				Thread.sleep(500);
 				rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
-				if(rs != 0) {
+				if(rs == 0) {
 					Thread.sleep(500);
 					rs = helics.helicsFederateIsAsyncOperationCompleted(fed1);
-					if(rs != 0) {
+					if(rs == 0) {
 						/* this operation should have completed by  now*/
-						javaHelicsApiTests.helicsAssert("rs != 0");
+						javaHelicsApiTests.helicsAssert("rs == 0 rs=="+Integer.toString(rs));
 					}
 				}
 			}

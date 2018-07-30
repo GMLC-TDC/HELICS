@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "testFixtures.hpp"
+#include "../application_api/testFixtures.hpp"
 #include <complex>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
