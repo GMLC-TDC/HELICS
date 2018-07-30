@@ -188,5 +188,5 @@ ans = 1.3.0 (07-31-18)
 
 #### Notes
 At present the interface to octave is experimental,  the testing is limited and not all functions are likely to have a clean interface, this will improve over time.   
-Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require the develop branch of swig.  It has built and run smoothly on Linux systems.  
-Windows systems usually require pointing CMAKE towards the octave installation.  and while it has worked it hasn't been that smooth of process and has required some hacks to get it to work smoothly.  
+Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require the develop branch of swig.  The Octave interface has built and run smoothly on Linux systems, and run through some limited trials.    
+On windows system the octave interface is not that reliable to build, while it has worked it hasn't been that smooth of process and has required some hacks to get it to work.  More work is likely needed.
