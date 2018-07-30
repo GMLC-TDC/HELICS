@@ -166,7 +166,6 @@ before_install:
 
 install:
   - source scripts/install-ci-dependencies.sh
-  #- if [[ "$BUILD_TYPE" == "Coverage" ]]; then pip install --user cpp-coveralls ; fi
 
   - OPTION_FLAGS_ARR=()
   - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_CXX_SHARED_LIB=ON" "-DBUILD_PYTHON_INTERFACE=ON" "-DBUILD_JAVA_INTERFACE=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
@@ -206,7 +205,7 @@ script:
   - ctest -V --timeout 240 -L Continuous
 
   # Gather coverage results
-  #- if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --coveralls --codecov && popd ; fi
+  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
 
 notifications:
     email: false
