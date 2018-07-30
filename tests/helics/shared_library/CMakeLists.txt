@@ -16,7 +16,7 @@ FilterTests.cpp
 test-message-federate.cpp
 #test-message-federate_cpp.cpp
 #FederateTests.cpp
-#TimingTests.cpp
+TimingTests.cpp
 #iterationTests.cpp
 QueryTests.cpp
 badInputTests.cpp
