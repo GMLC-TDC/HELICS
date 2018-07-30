@@ -139,15 +139,17 @@ endif(MSVC)
 if(BUILD_HELICS_TESTS)
 	cmake_dependent_option (TEST_CODE_COVERAGE "Build a target for testing code coverage" OFF "BUILD_HELICS_TESTS" OFF)
 	if (TEST_CODE_COVERAGE)
-		include(CodeCoverage)
+        if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
+		    include(CodeCoverage)
 
-		set(COVERAGE_EXCLUDES 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*' 'build*/*')
-		add_compile_options(${COVERAGE_COMPILER_FLAGS})
-		SETUP_TARGET_FOR_COVERAGE(
-			NAME helics_coverage                    # New target name
-			EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
-		)
-
+		    set(COVERAGE_EXCLUDES 'usr/*' 'dependencies/*' 'ThirdParty/*' 'tests/*' 'swig/*' 'examples/*')
+		    SETUP_TARGET_FOR_COVERAGE(
+			    NAME helics_coverage                    # New target name
+			    EXECUTABLE CTest # Executable in PROJECT_BINARY_DIR
+		    )
+        else()
+            message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Coverage for testing code coverage")
+        endif()
 	endif(TEST_CODE_COVERAGE)
  endif(BUILD_HELICS_TESTS)
 mark_as_advanced(TEST_CODE_COVERAGE)
