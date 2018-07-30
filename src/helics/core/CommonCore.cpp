@@ -30,7 +30,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 
 #include "../common/DelayedObjects.hpp"
-#include "fmt_wrapper.h"
+#include "../common/fmt_format.h"
 #include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
@@ -1861,7 +1861,7 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     {
         return generateStringVector_if(handles.lock_shared(), [](auto &handle) {return handle->key; }, [](const auto &handle) {return (handle->handle_type == handle_type_t::endpoint); });
     }
-    if (queryStr == "dependencies")
+    if (queryStr == "dependson")
     {
         return generateStringVector(timeCoord->getDependencies(), [](auto &dep) {return std::to_string(dep); });
     }
@@ -1873,9 +1873,31 @@ std::string  CommonCore::coreQuery(const std::string &queryStr) const
     {
         return (allInitReady()) ? "true" : "false";
     }
+    if (queryStr == "name")
+    {
+        return getIdentifier();
+    }
     if (queryStr == "address")
     {
         return getAddress();
+    }
+    if (queryStr == "dependencies")
+    {
+        Json_helics::Value base;
+        base["name"] = getIdentifier ();
+        base["id"] = static_cast<int> (global_broker_id);
+        base["parent"] = static_cast<int> (higher_broker_id);
+        base["dependents"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependents ())
+        {
+            base["dependents"].append (dep);
+        }
+        base["dependencies"] = Json_helics::arrayValue;
+        for (auto &dep : timeCoord->getDependencies ())
+        {
+            base["dependencies"].append (dep);
+        }
+        return generateJsonString (base);
     }
     if (queryStr == "federate_map")
     {
@@ -1938,6 +1960,14 @@ std::string CommonCore::query (const std::string &target, const std::string &que
 {
     if ((target == "core") || (target == getIdentifier()))
     {
+		if (queryStr == "name")
+		{
+            return getIdentifier ();
+		}
+		if (queryStr == "address")
+		{
+            return getAddress ();
+		}
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = global_broker_id;
         querycmd.dest_id = global_broker_id;
@@ -1986,7 +2016,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     }
     else
     {
-        auto fed = getFederate (target);
+        auto fed = (target != "federate") ? getFederate (target) : getFederateAt (0);
         if (fed != nullptr)
         {
             return federateQuery (fed, queryStr);

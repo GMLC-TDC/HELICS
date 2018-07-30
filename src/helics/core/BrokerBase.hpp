@@ -45,6 +45,7 @@ class BrokerBase
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
