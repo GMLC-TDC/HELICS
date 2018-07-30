@@ -16,9 +16,10 @@ FilterTests.cpp
 test-message-federate.cpp
 #test-message-federate_cpp.cpp
 #FederateTests.cpp
-#TimingTests.cpp
+TimingTests.cpp
 #iterationTests.cpp
 QueryTests.cpp
+badInputTests.cpp
 )
 
 set(cpp_shared_library_test_sources
