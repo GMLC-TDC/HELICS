@@ -203,7 +203,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             }
             catch (const std::invalid_argument &)
             {
-                val = static_cast<X> (invalidValue<double> ());
+                val = static_cast<X> (invalidValue<std::conditional_t<std::is_integral<X>::value,int64_t,double>> ());
             }
         }
         else
