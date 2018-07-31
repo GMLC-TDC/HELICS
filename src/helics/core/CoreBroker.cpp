@@ -946,7 +946,7 @@ bool CoreBroker::isConnected () const { return ((brokerState == operating) || (b
 
 void CoreBroker::waitForDisconnect () const
 {
-	//TODO:: this should really be a future that gets triggered when isConnected changes
+    // TODO:: this should really be a future that gets triggered when isConnected changes
     bool sleep_toggle = false;
     while (isConnected ())
     {
@@ -1300,23 +1300,23 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
-    return "#invalid";
+    //  return "#invalid";
 }
 
 std::string CoreBroker::generateQueryAnswer (const std::string &request)
 {
     if (request == "isinit")
     {
-        return (brokerState >= broker_state_t::operating) ? std::string("true") : std::string("false");
+        return (brokerState >= broker_state_t::operating) ? std::string ("true") : std::string ("false");
     }
     if (request == "isconnected")
     {
-        return (isConnected()) ? std::string ("true") : std::string ("false");
+        return (isConnected ()) ? std::string ("true") : std::string ("false");
     }
-	if (request == "name")
-	{
+    if (request == "name")
+    {
         return getIdentifier ();
-	}
+    }
     if (request == "address")
     {
         return getAddress ();
@@ -1326,7 +1326,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         std::string cnts = "{\"brokers\":";
         cnts += std::to_string (_brokers.size ());
         cnts += ",\n";
-        cnts +="\"federates\":";
+        cnts += "\"federates\":";
         cnts += std::to_string (_federates.size ());
         cnts += ",\n";
         cnts += "\"handles\":";
@@ -1362,19 +1362,16 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         {
             return fedMap.generate ();
         }
-        else if (fedMap.isActive ())
+        if (fedMap.isActive ())
         {
             return "#wait";
         }
-        else
+        initializeFederateMap ();
+        if (fedMap.isCompleted ())
         {
-            initializeFederateMap ();
-            if (fedMap.isCompleted ())
-            {
-                return fedMap.generate ();
-            }
-            return "#wait";
+            return fedMap.generate ();
         }
+        return "#wait";
     }
     if (request == "dependency_graph")
     {
@@ -1382,19 +1379,16 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         {
             return depMap.generate ();
         }
-        else if (depMap.isActive ())
+        if (depMap.isActive ())
         {
             return "#wait";
         }
-        else
+        initializeDependencyGraph ();
+        if (depMap.isCompleted ())
         {
-            initializeDependencyGraph ();
-            if (depMap.isCompleted ())
-            {
-                return depMap.generate ();
-            }
-            return "#wait";
+            return depMap.generate ();
         }
+        return "#wait";
     }
     if (request == "dependson")
     {
@@ -1537,10 +1531,10 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
             fedMapRequestors.push_back (queryRep);
         }
     }
-	else if (queryRep.dest_id == global_broker_id)
-	{
+    else if (queryRep.dest_id == global_broker_id)
+    {
         ActiveQueries.setDelayedValue (m.index, queryRep.payload);
-	}
+    }
     else
     {
         routeMessage (queryRep, m.source_id);

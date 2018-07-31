@@ -68,7 +68,7 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     sub_low.setDefault (static_cast<double> (2 * index));
     sub_high.setDefault (static_cast<double> (2 * index + 1));
     vfed->enterInitializationState ();
-    double cval = static_cast<double> (2 * index) + 0.5;
+    auto cval = static_cast<double> (2 * index) + 0.5;
 
     auto itres = iteration_result::iterating;
     int itcount = 0;
@@ -76,8 +76,8 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     {
         pub.publish (cval);
         itres = vfed->enterExecutionState (iteration_request::iterate_if_needed);
-        double val1 = sub_high.getValue<double> ();
-        double val2 = sub_low.getValue<double> ();
+        auto val1 = sub_high.getValue<double> ();
+        auto val2 = sub_low.getValue<double> ();
         cval = (val1 + val2) / 2.0;
         ++itcount;
         //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 : index -
@@ -89,7 +89,7 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
 std::vector<std::pair<double, int>>
 run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &fedVec)
 {
-    int N = static_cast<int> (fedVec.size ());
+    auto N = static_cast<int> (fedVec.size ());
     std::vector<std::future<std::pair<double, int>>> futures;
     for (decltype (N) ii = 0; ii < N; ++ii)
     {

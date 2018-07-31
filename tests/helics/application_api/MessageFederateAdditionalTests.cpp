@@ -77,8 +77,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = epid.getName ();
-    auto sv2 = epid2.getName ();
+    auto const &sv = epid.getName ();
+    auto const &sv2 = epid2.getName ();
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
@@ -317,7 +317,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
 //#define ENABLE_OUTPUT
 /**trivial Federate that sends Messages and echoes a ping with a pong
  */
-class pingpongFed
+class PingPongFed
 {
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
@@ -332,7 +332,7 @@ class pingpongFed
     int pings = 0;  //!< the number of pings received
     int pongs = 0;  //!< the number of pongs received
   public:
-    pingpongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
+    PingPongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
         : delta (tDelta), name (fname), coreType (ctype)
     {
         if (delta <= 0.0)
@@ -443,9 +443,9 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     AddBroker (core_type, "3");
 
     auto ctype = helics::coreTypeFromString (core_type);
-    pingpongFed p1 ("fedA", 0.5, ctype);
-    pingpongFed p2 ("fedB", 0.5, ctype);
-    pingpongFed p3 ("fedC", 0.5, ctype);
+    PingPongFed p1 ("fedA", 0.5, ctype);
+    PingPongFed p2 ("fedB", 0.5, ctype);
+    PingPongFed p3 ("fedC", 0.5, ctype);
 
     p1.addTrigger (0.5, "fedB/port");
     p1.addTrigger (0.5, "fedC/port");

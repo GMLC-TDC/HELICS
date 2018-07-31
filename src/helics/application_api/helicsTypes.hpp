@@ -421,9 +421,15 @@ constexpr double invalidValue<double> ()
 }
 
 template <>
-constexpr uint64_t invalidValue<uint64_t> ()
+constexpr int64_t invalidValue<int64_t> ()
 {
-    return std::numeric_limits<uint64_t>::max ();
+    return std::numeric_limits<int64_t>::min ();
+}
+
+template <>
+constexpr uint64_t invalidValue<uint64_t>()
+{
+    return std::numeric_limits<uint64_t>::max();
 }
 
 template <>
@@ -435,7 +441,7 @@ inline named_point invalidValue<named_point> ()
 template <>
 constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
-    return {-1e48, 0.0};
+    return {invalidValue<double>(), 0.0};
 }
 
 }  // namespace helics

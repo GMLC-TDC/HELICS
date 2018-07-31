@@ -15,8 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/common/BlockingQueue.hpp"
 //#include "helics/common/blocking_queue.h"
 
-namespace utf = boost::unit_test;
-
 BOOST_AUTO_TEST_SUITE (blocking_queue_tests)
 
 /** test basic operations */
@@ -333,7 +331,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3_pop)
 }
 
 /** test with multiple producer/multiple consumer*/
-BOOST_AUTO_TEST_CASE (pop_callback_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (pop_callback_tests)
 {
     BlockingQueue<int64_t> sq;
     int pushcnt = 0;
