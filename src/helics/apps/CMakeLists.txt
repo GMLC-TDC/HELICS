@@ -4,7 +4,7 @@
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
 
-if(BUILD_APPS OR BUILD_BROKER)
+if(BUILD_APPS)
 
 set(helics_apps_public_headers
 	Player.hpp
@@ -52,13 +52,11 @@ add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
 	set_target_properties (helics_recorder PROPERTIES FOLDER apps)
 	install(TARGETS helics_recorder DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
-if (BUILD_BROKER)
 	add_executable(helics_broker helics-broker.cpp)
    target_link_libraries(helics_broker helics_apps-static)
    set_target_properties (helics_broker PROPERTIES FOLDER apps)
    set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "build folder location of the broker")
    install(TARGETS helics_broker DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
-endif()
 
 	add_executable(helics_app appMain.cpp)
 	target_link_libraries(helics_app helics_apps-static)

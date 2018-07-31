@@ -38,20 +38,6 @@ if(BUILD_CXX_SHARED_LIB)
 			set_target_properties(helics-shared PROPERTIES
 		WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
-	#	IF(MINGW)
-	#	set_target_properties(helics-shared PROPERTIES
-  #      LINK_FLAGS "-Wl,--whole-archive")
-	#	ELSE(MINGW)
-	#		set_target_properties(helics-shared PROPERTIES
-	#		LINK_FLAGS "/WHOLEARCHIVE")
-	#	endif()
-	#
-	#elseif (APPLE)
-	#	set_target_properties(helics-shared PROPERTIES
-    #    LINK_FLAGS "-Wl,-all_load")
-	#else ()
-	#	set_target_properties(helics-shared PROPERTIES
-  #      LINK_FLAGS "-Wl,--whole-archive")
 	endif ()
 
 endif()

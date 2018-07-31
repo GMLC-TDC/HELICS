@@ -132,7 +132,7 @@ display(helics.helicsGetVersion())
 
 ![](./../img/matlab-success.png)
 
-Alternatively, you can load the HELICS library manually, depending on which operating system you use.
+The helics Startup usually isn't required on Windows systems.  Alternatively, you can load the HELICS library manually, depending on which operating system you use.
 
 ```matlab
 loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
@@ -164,3 +164,29 @@ mv helicsMEX.* matlab/
 ```
 
 The above instructions will have to be modified slightly to support Windows,  CMAKE is the recommended process for creating the MATLAB interface.  
+
+## HELICS with Octave
+
+To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.
+
+```
+git clone https://github.com/GMLC-TDC/HELICS-src
+cd HELICS-src
+mkdir build
+cd build
+cmake -DBUILD_OCTAVE_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
+make -j8
+make install
+```
+
+add the octave folder in the install directory to the octave path
+```
+>>helics
+>> helicsGetVersion()
+ans = 1.3.0 (07-31-18)
+```
+
+#### Notes
+At present the interface to octave is experimental,  the testing is limited and not all functions are likely to have a clean interface, this will improve over time.   
+Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require the develop branch of swig.  The Octave interface has built and run smoothly on Linux systems, and run through some limited trials.    
+On windows system the octave interface is not that reliable to build, while it has worked it hasn't been that smooth of process and has required some hacks to get it to work.  More work is likely needed.

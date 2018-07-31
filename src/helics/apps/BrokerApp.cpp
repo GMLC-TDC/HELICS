@@ -43,19 +43,8 @@ BrokerApp::~BrokerApp ()
     {
         return;
     }
-    bool sleep_toggle = false;
-    while (broker->isConnected ())
-    {
-        if (!sleep_toggle)
-        {
-            std::this_thread::yield ();
-        }
-        else
-        {
-            std::this_thread::sleep_for (std::chrono::milliseconds (200));
-        }
-        sleep_toggle = !sleep_toggle;
-    }
+	//this sleeps until disconnected
+    broker->waitForDisconnect ();
     broker = nullptr;
     helics::BrokerFactory::cleanUpBrokers (500);
 }
