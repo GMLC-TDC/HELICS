@@ -15,8 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/common/simpleQueue.hpp"
 
-namespace utf = boost::unit_test;
-
 BOOST_AUTO_TEST_SUITE (simple_queue_tests)
 
 /** test basic operations */
@@ -41,7 +39,7 @@ BOOST_AUTO_TEST_CASE (basic_tests)
 }
 
 /** test with a move only element*/
-BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (move_only_tests)
 {
     SimpleQueue<std::unique_ptr<double>> sq;
 
@@ -65,7 +63,7 @@ BOOST_AUTO_TEST_CASE (move_only_tests, *utf::label("ci"))
 
 /** test the ordering with a larger number of inputs*/
 
-BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (ordering_tests)
 {
     SimpleQueue<int> sq;
 
@@ -94,7 +92,7 @@ BOOST_AUTO_TEST_CASE (ordering_tests, *utf::label("ci"))
     BOOST_CHECK (sq.empty ());
 }
 
-BOOST_AUTO_TEST_CASE (emplace_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (emplace_tests)
 {
     SimpleQueue<std::pair<int, double>> sq;
 
@@ -112,7 +110,7 @@ BOOST_AUTO_TEST_CASE (emplace_tests, *utf::label("ci"))
 }
 
 /** test with single consumer/single producer*/
-BOOST_AUTO_TEST_CASE (multithreaded_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (multithreaded_tests)
 {
     SimpleQueue<int64_t> sq (1010000);
 

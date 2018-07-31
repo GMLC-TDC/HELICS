@@ -59,10 +59,7 @@ std::string ZmqCore::getAddress () const
     {
         return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
     }
-    else
-    {
-        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
-    }
+    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
 }  // namespace zeromq

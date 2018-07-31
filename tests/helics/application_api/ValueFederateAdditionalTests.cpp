@@ -438,6 +438,7 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
 
     helics::ValueFederate vFedMoved (std::move (vFed));
     BOOST_CHECK_EQUAL (vFedMoved.getName (), "test1");
+    //verify that this was moved so this does produce a warning on some systems about use after move
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 

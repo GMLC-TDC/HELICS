@@ -52,11 +52,11 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
         else
         {
             localTarget_ = generateMatchingInterfaceAddress(brokerTarget_);
-            if (brokerTarget_.compare(0, 3, "tcp"))
+            if (brokerTarget_.compare(0, 3, "tcp")==0)
             {
                 localTarget_ = "tcp://" + localTarget_;
             }
-            else if (brokerTarget_.compare(0, 3, "udp"))
+            else if (brokerTarget_.compare(0, 3, "udp")==0)
             {
                 localTarget_ = "udp://" + localTarget_;
             }
@@ -810,10 +810,7 @@ std::string ZmqComms::getAddress () const
     {
         return makePortAddress ("tcp://127.0.0.1", repPortNumber);
     }
-    else
-    {
-        return makePortAddress (localTarget_, repPortNumber);
-    }
+    return makePortAddress (localTarget_, repPortNumber);
 }
 
 std::string ZmqComms::getPushAddress () const
@@ -822,10 +819,7 @@ std::string ZmqComms::getPushAddress () const
     {
         return makePortAddress ("tcp://127.0.0.1", pullPortNumber);
     }
-    else
-    {
-        return makePortAddress (localTarget_, pullPortNumber);
-    }
+    return makePortAddress (localTarget_, pullPortNumber);
 }
 
 }  // namespace zeromq

@@ -16,8 +16,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using helics::operator"" _t ;
 helics::Time tend = 3600.0_t;  // simulation end time
 
-
-
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock
 {

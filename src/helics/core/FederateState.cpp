@@ -150,11 +150,11 @@ void FederateState::updateFederateInfo (const ActionMessage &cmd)
     if (state == HELICS_CREATED)
     {
         bool expected = false;
-        while (!processing.compare_exchange_weak(expected, true))
+        while (!processing.compare_exchange_weak (expected, true))
         {
             ;
         }
-        processConfigUpdate(cmd);
+        processConfigUpdate (cmd);
         processing = false;
     }
     else
@@ -170,15 +170,15 @@ bool FederateState::checkAndSetValue (Core::handle_id_t pub_id, const char *data
         return true;
     }
     bool expected = false;
-    while (!processing.compare_exchange_weak(expected, true))
+    while (!processing.compare_exchange_weak (expected, true))
     {
         ;
     }
     // this function could be called externally in a multi-threaded context
-        auto pub = interfaceInformation.getPublication(pub_id);
-        auto res= pub->CheckSetValue(data, len);
-        processing = false;
-        return res;
+    auto pub = interfaceInformation.getPublication (pub_id);
+    auto res = pub->CheckSetValue (data, len);
+    processing = false;
+    return res;
 }
 
 uint64_t FederateState::getQueueSize (Core::handle_id_t handle_) const
@@ -287,9 +287,9 @@ iteration_result FederateState::waitSetup ()
     switch (getState ())
     {
     case HELICS_CREATED:
-    { //we are still in the created state
+    {  // we are still in the created state
         processing = false;
-        return waitSetup();
+        return waitSetup ();
     }
     case HELICS_ERROR:
         ret = iteration_result::error;
@@ -337,7 +337,7 @@ iteration_result FederateState::enterInitializationState ()
     case HELICS_CREATED:
     {
         processing = false;
-        return enterInitializationState();
+        return enterInitializationState ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
@@ -650,31 +650,28 @@ message_processing_result FederateState::processDelayQueue ()
         {
             auto &tempQueue = dQ.second;
             ret_code = message_processing_result::continue_processing;
-            //we specifically want to stop the loop on a delay_message return
-            while ((ret_code == message_processing_result::continue_processing) && (!tempQueue.empty()))
+            // we specifically want to stop the loop on a delay_message return
+            while ((ret_code == message_processing_result::continue_processing) && (!tempQueue.empty ()))
             {
-                auto &cmd = tempQueue.front();
-                if (messageShouldBeDelayed(cmd))
+                auto &cmd = tempQueue.front ();
+                if (messageShouldBeDelayed (cmd))
                 {
                     ret_code = message_processing_result::delay_message;
                     continue;
                 }
-                else
+
+                ret_code = processActionMessage (cmd);
+                if (ret_code == message_processing_result::delay_message)
                 {
-                    ret_code = processActionMessage(cmd);
-                    if (ret_code == message_processing_result::delay_message)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
-                tempQueue.pop_front();
+                tempQueue.pop_front ();
             }
-            if (returnableResult(ret_code))
+            if (returnableResult (ret_code))
             {
                 break;
             }
         }
-        
     }
     return ret_code;
 }
@@ -700,21 +697,20 @@ void FederateState::addFederateToDelay (Core::federate_id_t id)
 
 bool FederateState::messageShouldBeDelayed (const ActionMessage &cmd) const
 {
-    switch (delayedFederates.size())
+    switch (delayedFederates.size ())
     {
     case 0:
         return false;
     case 1:
-        return (cmd.source_id == delayedFederates.front());
+        return (cmd.source_id == delayedFederates.front ());
     case 2:
-        return ((cmd.source_id == delayedFederates.front())|| (cmd.source_id == delayedFederates.back()));
+        return ((cmd.source_id == delayedFederates.front ()) || (cmd.source_id == delayedFederates.back ()));
     default:
     {
-        auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), cmd.source_id);
-        return ((res != delayedFederates.end()) && (*res == cmd.source_id));
+        auto res = std::lower_bound (delayedFederates.begin (), delayedFederates.end (), cmd.source_id);
+        return ((res != delayedFederates.end ()) && (*res == cmd.source_id));
     }
     }
-    
 }
 
 message_processing_result FederateState::processQueue ()
@@ -730,7 +726,7 @@ message_processing_result FederateState::processQueue ()
     // process the delay Queue first
     auto ret_code = processDelayQueue ();
 
-    while (!(returnableResult(ret_code)))
+    while (!(returnableResult (ret_code)))
     {
         auto cmd = queue.pop ();
         if (messageShouldBeDelayed (cmd))
@@ -742,7 +738,7 @@ message_processing_result FederateState::processQueue ()
         ret_code = processActionMessage (cmd);
         if (ret_code == message_processing_result::delay_message)
         {
-            delayQueues[cmd.source_id].push_back(cmd);
+            delayQueues[cmd.source_id].push_back (cmd);
         }
     }
     return ret_code;
@@ -769,7 +765,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                     cmd.setAction (CMD_EXEC_CHECK);
                     return processActionMessage (cmd);
                 }
-                else if (state == HELICS_EXECUTING)
+                if (state == HELICS_EXECUTING)
                 {
                     cmd.setAction (CMD_TIME_CHECK);
                     return processActionMessage (cmd);
@@ -799,7 +795,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             timeCoord->enteringExecMode (iterate);
             timeGranted_mode = false;
             auto ret = processDelayQueue ();
-            if (returnableResult(ret))
+            if (returnableResult (ret))
             {
                 return ret;
             }
@@ -888,7 +884,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             if (!timeGranted_mode)
             {
                 auto ret = timeCoord->checkTimeGrant ();
-                if (returnableResult(ret))
+                if (returnableResult (ret))
                 {
                     time_granted = timeCoord->getGrantedTime ();
                     allowed_send_time = timeCoord->allowedSendTime ();
@@ -910,7 +906,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             timeCoord->timeRequest (cmd.actionTime, iterate, nextValueTime (), nextMessageTime ());
             timeGranted_mode = false;
             auto ret = processDelayQueue ();
-            if (returnableResult(ret))
+            if (returnableResult (ret))
             {
                 return ret;
             }
@@ -941,7 +937,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (!timeGranted_mode)
         {
             auto ret = timeCoord->checkTimeGrant ();
-            if (returnableResult(ret))
+            if (returnableResult (ret))
             {
                 time_granted = timeCoord->getGrantedTime ();
                 allowed_send_time = timeCoord->allowedSendTime ();
@@ -971,8 +967,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            epi->addMessage (createMessageFromCommand (std::move (cmd)));
             LOG_DEBUG ("receive_message " + prettyPrintString (cmd));
+            epi->addMessage (createMessageFromCommand (std::move (cmd)));
         }
     }
     break;
@@ -1111,15 +1107,9 @@ void FederateState::processConfigUpdate (const ActionMessage &m)
     }
 }
 
-std::vector<Core::federate_id_t> FederateState::getDependencies() const
-{
-    return timeCoord->getDependencies();
-}
+std::vector<Core::federate_id_t> FederateState::getDependencies () const { return timeCoord->getDependencies (); }
 
-std::vector<Core::federate_id_t> FederateState::getDependents () const
-{
-    return timeCoord->getDependents ();
-}
+std::vector<Core::federate_id_t> FederateState::getDependents () const { return timeCoord->getDependents (); }
 
 void FederateState::addDependency (Core::federate_id_t fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
 
@@ -1166,7 +1156,7 @@ Time FederateState::nextMessageTime () const
 void FederateState::setCoreObject (CommonCore *parent)
 {
     bool expected = false;
-    while (!processing.compare_exchange_weak(expected, true))
+    while (!processing.compare_exchange_weak (expected, true))
     {
         ;
     }
@@ -1193,7 +1183,7 @@ std::string FederateState::processQuery (const std::string &query) const
     }
     if (query == "subscriptions")
     {
-        return generateStringVector(interfaceInformation.getSubscriptions(), [](auto &sub) {return sub->key; });
+        return generateStringVector (interfaceInformation.getSubscriptions (), [](auto &sub) { return sub->key; });
     }
     if (query == "endpoints")
     {
@@ -1201,11 +1191,12 @@ std::string FederateState::processQuery (const std::string &query) const
     }
     if (query == "dependencies")
     {
-        return generateStringVector(timeCoord->getDependencies(), [](auto &dep) {return std::to_string(dep); });
+        return generateStringVector (timeCoord->getDependencies (),
+                                     [](auto &dep) { return std::to_string (dep); });
     }
     if (query == "dependents")
     {
-        return generateStringVector(timeCoord->getDependents(), [](auto &dep) {return std::to_string(dep); });
+        return generateStringVector (timeCoord->getDependents (), [](auto &dep) { return std::to_string (dep); });
     }
     if (queryCallback)
     {
