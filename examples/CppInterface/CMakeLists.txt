@@ -27,6 +27,12 @@ set_target_properties (nonlings_fed1_cpp PROPERTIES
 set_target_properties (nonlings_fed2_cpp PROPERTIES
     FOLDER examples)
 
+if (BUILD_HELICS_TESTS AND NOT MSVC)
+    add_test(NAME nonlings_example
+        COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10 $<TARGET_FILE:nonlings_fed1_cpp> $<TARGET_FILE:nonlings_fed2_cpp>)
+    set_property(TEST nonlings_example PROPERTY LABELS Continuous)
+endif()
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
 add_custom_command(TARGET nonlings_fed1_cpp POST_BUILD        # Adds a post-build event to api tests
     COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
