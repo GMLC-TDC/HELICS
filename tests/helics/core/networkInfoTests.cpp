@@ -9,7 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/NetworkBrokerData.hpp"
 #include "helics/common/stringToCmdLine.h"
 
-BOOST_AUTO_TEST_SUITE(networkData_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE(networkData_tests, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE(basic_test)
 {
@@ -49,11 +51,18 @@ BOOST_AUTO_TEST_CASE(local_address_test)
 
 BOOST_AUTO_TEST_CASE(local_address_testv6)
 {
-    auto netw = helics::getLocalExternalAddressV6();
-    BOOST_CHECK(!netw.empty());
-    BOOST_CHECK(helics::isipv6(netw));
-    auto netw2 = helics::getLocalExternalAddressV6("2001:db8::1");
-    BOOST_CHECK(helics::isipv6(netw2));
-    BOOST_CHECK(!netw2.empty());
+    try
+    {
+        auto netw = helics::getLocalExternalAddressV6();
+        BOOST_CHECK(!netw.empty());
+        BOOST_CHECK(helics::isipv6(netw));
+        auto netw2 = helics::getLocalExternalAddressV6("2001:db8::1");
+        BOOST_CHECK(helics::isipv6(netw2));
+        BOOST_CHECK(!netw2.empty());
+    }
+    catch (...)
+    {
+        BOOST_TEST_MESSAGE("ipv6 not supported");
+    }
 }
 BOOST_AUTO_TEST_SUITE_END()

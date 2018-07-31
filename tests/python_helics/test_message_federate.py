@@ -8,7 +8,7 @@ def mFed():
     fedinitstring = "--broker=mainbroker --federates=1"
     deltat = 0.01
 
-    helicsversion = h.helicsGetVersion()
+    h.helicsGetVersion()
 
     # Create broker #
     broker = h.helicsCreateBroker("zmq", "", initstring)
@@ -22,13 +22,13 @@ def mFed():
     fedinfo = h.helicsFederateInfoCreate()
 
     # Set Federate name #
-    status = h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
 
     # Set core type from string #
-    status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 
     # Federate init string #
-    status = h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+    h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
 
     # Set the message interval (timedelta) for federate. Note th#
     # HELICS minimum message time interval is 1 ns and by default
@@ -36,19 +36,19 @@ def mFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    status = h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
 
-    status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
     mFed = h.helicsCreateMessageFederate(fedinfo)
 
     yield mFed
 
     status = h.helicsFederateFinalize(mFed)
-
+    assert status == h.helics_ok
     status, state = h.helicsFederateGetState(mFed)
     assert state == 3
-
+    assert status == h.helics_ok
     while (h.helicsBrokerIsConnected(broker)):
         time.sleep(1)
 
@@ -59,7 +59,7 @@ def mFed():
 def test_message_federate_initialize(mFed):
     status, state = h.helicsFederateGetState(mFed)
     assert state == 0
-
+    assert status == 0
     h.helicsFederateEnterExecutionMode(mFed)
 
     status, state = h.helicsFederateGetState(mFed)
@@ -71,24 +71,24 @@ def test_message_federate_endpoint_registration(mFed):
 
     h.helicsFederateEnterExecutionMode(mFed)
 
-    status, endpoint_name = h.helicsEndpointGetName(epid1, 100)
+    status, endpoint_name = h.helicsEndpointGetName(epid1)
     assert status == 0
     assert endpoint_name == "TestA Federate/ep1"
 
-    status, endpoint_name = h.helicsEndpointGetName(epid2, 100)
+    status, endpoint_name = h.helicsEndpointGetName(epid2)
     assert status == 0
     assert endpoint_name == "ep2"
 
-    status, endpoint_name = h.helicsEndpointGetType(epid1, 100)
+    status, endpoint_name = h.helicsEndpointGetType(epid1)
     assert status == 0
     assert endpoint_name == ""
 
-    status, endpoint_name = h.helicsEndpointGetType(epid2, 100)
+    status, endpoint_name = h.helicsEndpointGetType(epid2)
     assert status == 0
     assert endpoint_name == "random"
 
 
-def test_message_federate_endpoint_registration(mFed):
+def test_message_federate_send(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
     epid2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "ep2", "random")
 
@@ -99,7 +99,7 @@ def test_message_federate_endpoint_registration(mFed):
 
     status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1.0)
 
-    status, granted_time = h.helicsFederateRequestTime(mFed, 1.0)
+    status, granted_time = h.helicsFederateRequestTime(mFed, 2.0)
     assert status == 0
     assert granted_time == 1.0
 
@@ -107,13 +107,11 @@ def test_message_federate_endpoint_registration(mFed):
     assert res == 1
 
     res = h.helicsEndpointHasMessage(epid1)
-    # TODO: Figure out why this is returning zero
     assert res == 0
 
-    res = h.helicsEndpointHasMessage (epid2)
+    res = h.helicsEndpointHasMessage(epid2)
     assert res == 1
 
-    # This causes a segfault
     message = h.helicsEndpointGetMessage(epid2)
 
     assert message.data == 'random-data'

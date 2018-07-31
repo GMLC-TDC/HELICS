@@ -42,7 +42,7 @@ private:
     std::mutex runningLoopLock;  //lock protecting the nullwork object the return future
 
     std::future<void> loopRet;
-	AsioServiceManager(const std::string &contextName);
+	AsioServiceManager(const std::string &serviceName);
 
 	/** servicing helper class to manage lifetimes of a service loop*/
 	class servicer
@@ -117,9 +117,9 @@ private:
     */
     void haltServiceLoop();
 
-    friend void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
+    friend void serviceProcessingLoop(const std::shared_ptr<AsioServiceManager> &ptr);
 };
 
-void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
+void serviceProcessingLoop(const std::shared_ptr<AsioServiceManager> &ptr);
 
 

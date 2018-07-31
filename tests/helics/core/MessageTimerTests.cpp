@@ -11,8 +11,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 BOOST_AUTO_TEST_SUITE (messageTimer_tests)
 
 using namespace helics;
+namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_CASE (basic_test)
+BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
 {
     std::mutex mlock;
     ActionMessage M;

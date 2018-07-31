@@ -4,13 +4,14 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "helicsTypes.hpp"
+#include "../common/stringOps.h"
 #include "ValueConverter.hpp"
+#include "helicsTypes.hpp"
 #include <map>
 #include <numeric>
+#include <algorithm>
 #include <regex>
 #include <boost/lexical_cast.hpp>
-#include "../common/stringOps.h"
 
 namespace helics
 {
@@ -127,7 +128,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
 {
     if (val.empty ())
     {
-        return std::complex<double> (-1e49, -1e49);
+        return {-1e49, -1e49};
     }
     std::smatch m;
     double re = -1e49;
@@ -158,7 +159,7 @@ std::complex<double> helicsGetComplex (const std::string &val)
             else
             {
                 auto strval = val;
-                stringOps::trimString(strval);
+                stringOps::trimString (strval);
                 re = boost::lexical_cast<double> (strval);
             }
         }
@@ -294,39 +295,49 @@ named_point helicsGetNamedPoint (const std::string &val)
         {
             return {val, std::nan ("0")};
         }
-        else
+        auto V = helicsGetComplex (val);
+        if (V.real () < -1e48)
         {
-            auto V = helicsGetComplex (val);
-            if (V.real () < -1e48)
-            {
-                return {val, std::nan ("0")};
-            }
-            if (V.imag () == 0)
-            {
-                return {"value", std::abs (V)};
-            }
-            return {val, V.real ()};
+            return {val, std::nan ("0")};
         }
+        if (V.imag () == 0)
+        {
+            return {"value", std::abs (V)};
+        }
+        return {val, V.real ()};
     }
     auto locsep = val.find_last_of (':');
     auto locend = val.find_last_of ('}');
     auto str1 = val.substr (loc + 1, locsep - loc);
-    stringOps::trimString(str1);
+    stringOps::trimString (str1);
     str1.pop_back ();
 
     named_point point;
-    point.name = stringOps::removeQuotes(str1);
+    point.name = stringOps::removeQuotes (str1);
     auto vstr = val.substr (locsep + 1, locend - locsep - 1);
-    stringOps::trimString(vstr);
+    stringOps::trimString (vstr);
     point.value = boost::lexical_cast<double> (vstr);
     return point;
 }
 
-static auto readSize (const std::string &val)
+static int readSize (const std::string &val)
 {
     auto fb = val.find_first_of ('[');
-    auto size = std::stoull (val.substr (1, fb - 1));
-    return size;
+	if (fb > 1)
+	{
+		try
+		{
+            auto size = std::stoi (val.substr (1, fb - 1));
+            return size;
+		}
+		catch (const std::invalid_argument &)
+		{
+			//go to the alternative path if this fails
+		}
+       
+	}
+    return std::count_if (val.begin ()+fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); })+1;
+        
 }
 
 std::complex<double> getComplexFromString (const std::string &val)
@@ -348,7 +359,7 @@ std::complex<double> getComplexFromString (const std::string &val)
         }
         return std::complex<double> (V[0], V[1]);
     }
-    else if (val.front () == 'c')
+    if (val.front () == 'c')
     {
         auto cv = helicsGetComplexVector (val);
         if (cv.empty ())
@@ -371,7 +382,7 @@ double getDoubleFromString (const std::string &val)
         auto V = helicsGetVector (val);
         return vectorNorm (V);
     }
-    else if (val.front () == 'c')
+    if (val.front () == 'c')
     {
         auto cv = helicsGetComplexVector (val);
         return vectorNorm (cv);
@@ -388,7 +399,10 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
     if (val.front () == 'v')
     {
         auto sz = readSize (val);
-        data.reserve (sz);
+		if (sz > 0)
+		{
+            data.reserve (sz);
+		}
         data.resize (0);
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz; ++ii)
@@ -397,7 +411,7 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
             try
             {
                 std::string vstr = val.substr (fb + 1, nc - fb - 1);
-                stringOps::trimString(vstr);
+                stringOps::trimString (vstr);
                 auto V = boost::lexical_cast<double> (vstr);
                 data.push_back (V);
             }
@@ -438,7 +452,6 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
             data[1] = V.imag ();
         }
     }
-    return;
 }
 
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data)
@@ -460,16 +473,16 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
             try
             {
                 std::string vstr1 = val.substr (fb + 1, nc - fb - 1);
-                stringOps::trimString(vstr1);
+                stringOps::trimString (vstr1);
                 std::string vstr2 = val.substr (nc + 1, nc2 - nc - 1);
-                stringOps::trimString(vstr2);
+                stringOps::trimString (vstr2);
                 auto V1 = boost::lexical_cast<double> (vstr1);
                 auto V2 = boost::lexical_cast<double> (vstr2);
                 data.emplace_back (V1, V2);
             }
             catch (const boost::bad_lexical_cast &)
             {
-                data.push_back (-1e49);
+                data.emplace_back (-1e49);
             }
             fb = nc;
         }
@@ -605,9 +618,9 @@ data_block typeConvert (helics_type_t type, const char *val)
     switch (type)
     {
     case helics_type_t::helicsDouble:
-        return ValueConverter<double>::convert (boost::lexical_cast<double> (val));
+        return ValueConverter<double>::convert (getDoubleFromString (val));
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (getDoubleFromString (val)));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
     case helics_type_t::helicsBool:
@@ -634,9 +647,9 @@ data_block typeConvert (helics_type_t type, const std::string &val)
     switch (type)
     {
     case helics_type_t::helicsDouble:
-        return ValueConverter<double>::convert (boost::lexical_cast<double> (val));
+        return ValueConverter<double>::convert (getDoubleFromString (val));
     case helics_type_t::helicsInt:
-        return ValueConverter<int64_t>::convert (boost::lexical_cast<int64_t> (val));
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (getDoubleFromString (val)));
     case helics_type_t::helicsComplex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
     case helics_type_t::helicsBool:

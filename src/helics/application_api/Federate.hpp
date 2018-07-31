@@ -20,8 +20,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace libguarded
 {
-    template<class T, class M>
-    class shared_guarded;
+template <class T, class M>
+class shared_guarded;
 }
 
 /**
@@ -31,8 +31,6 @@ namespace helics
 {
 class Core;
 class AsyncFedCallInfo;
-
-
 
 class MessageOperator;
 class Filter;
@@ -47,14 +45,14 @@ class FederateInfo : public CoreFederateInfo
     bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
                                   //! support rollback at least in a limited sense if set to true]
     char separator = '/';  //!< separator for global name of localFederates
-    core_type coreType;  //!< the type of the core
+    core_type coreType = core_type::ZMQ;  //!< the type of the core
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/
     FederateInfo () = default;
     /** construct from the federate name*/
-    explicit FederateInfo (std::string fedname) : name (std::move(fedname)){};
+    explicit FederateInfo (std::string fedname) : name (std::move (fedname)){};
     /** construct from the name and type*/
     FederateInfo (std::string fedname, core_type cType) : name (std::move (fedname)), coreType (cType){};
     /** load a federateInfo object from command line arguments
@@ -69,13 +67,13 @@ class FederateInfo : public CoreFederateInfo
     void loadInfoFromArgs (int argc, const char *const *argv);
 };
 
-/** generate a FederateInfo object from a JSON file
+/** generate a FederateInfo object from a config file (json, toml)
  */
-FederateInfo loadFederateInfo (const std::string &jsonString);
+FederateInfo loadFederateInfo (const std::string &configString);
 
-/** generate a FederateInfo object from a JSON file
+/** generate a FederateInfo object from a config file (json, toml)
  */
-FederateInfo loadFederateInfo (const std::string &name, const std::string &jsonString);
+FederateInfo loadFederateInfo (const std::string &name, const std::string &configString);
 
 class Core;
 
@@ -110,7 +108,8 @@ class Federate
     Time currentTime;  //!< the current simulation time
     FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
-    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo,std::mutex>> asyncCallInfo;  //!< pointer to a class defining the async call information
+    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
+      asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
   public:
@@ -130,12 +129,12 @@ class Federate
     /**constructor taking a file with the required information
     @param[in] jsonString can be either a JSON file or a string containing JSON code
     */
-    explicit Federate (const std::string &jsonString);
+    explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] jsonString can be either a JSON file or a string containing JSON code
+    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with extension (.TOML, .toml)
     */
-    Federate (const std::string &name, const std::string &jsonString);
+    Federate (const std::string &name, const std::string &configString);
     /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
@@ -475,14 +474,14 @@ class Federate
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
-    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    @param[in] jsonString  the location of the file or config String to load to generate the interfaces
     */
-    virtual void registerInterfaces (const std::string &jsonString);
+    virtual void registerInterfaces (const std::string &configString);
     /** register filter interfaces defined in  file or string
     @details call is only valid in startup mode
-    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    @param[in] configString  the location of the file or config String to load to generate the interfaces
     */
-    void registerFilterInterfaces (const std::string &jsonString);
+    void registerFilterInterfaces (const std::string &configString);
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
@@ -505,6 +504,18 @@ class Federate
     void addFilterObject (std::shared_ptr<Filter> obj);
     /** get a count of the number of filter objects stored in the federate*/
     int filterObjectCount () const;
+
+  private:
+    /** register filter interfaces defined in  file or string
+  @details call is only valid in startup mode
+  @param[in] configString  the location of the file or config String to load to generate the interfaces
+  */
+    void registerFilterInterfacesJson (const std::string &jsonString);
+    /** register filter interfaces defined in  file or string
+    @details call is only valid in startup mode
+    @param[in] configString  the location of the file or config String to load to generate the interfaces
+    */
+    void registerFilterInterfacesToml (const std::string &tomlString);
 };
 
 /** function to do some housekeeping work

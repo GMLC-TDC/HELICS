@@ -67,10 +67,7 @@ helics::Time loadJsonTime (const Json_helics::Value &timeElement, timeUnits defa
             {
                 return helics::Time (timeElement["value"].asInt64 (), defaultUnits);
             }
-            else
-            {
-                return helics::Time (timeElement["value"].asDouble () * toSecondMultiplier (defaultUnits));
-            }
+            return helics::Time (timeElement["value"].asDouble () * toSecondMultiplier (defaultUnits));
         }
     }
     else if (timeElement.isInt64 ())

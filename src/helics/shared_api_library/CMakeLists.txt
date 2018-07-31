@@ -45,27 +45,6 @@ endif()
 
 set_target_properties (helicsSharedLib PROPERTIES FOLDER interfaces)
 
-option(STATIC_STANDARD_LIB "Link against a static standard lib" OFF)
-mark_as_advanced(STATIC_STANDARD_LIB)
-if (STATIC_STANDARD_LIB)
-	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		if (USE_LIBCXX)
-			message("static linking against libc++ is not currently supported")
-		else(USE_LIBCXX)
-			target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
-		endif(USE_LIBCXX)
-	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
-	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-		target_link_libraries(helicsSharedLib -static-libgcc -static-libstdc++)
-	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-		# using Visual Studio C++
-		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-	endif()
-
-endif(STATIC_STANDARD_LIB)
-
 install(TARGETS helicsSharedLib EXPORT helics-targets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -81,8 +60,8 @@ endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 
-if (MSVC)
+if (MSVC AND NOT EMBEDDED_DEBUG_INFO)
 	install(FILES $<TARGET_PDB_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL COMPONENT libs)
-endif(MSVC)
+endif()
 install(FILES ${helicsShared_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 

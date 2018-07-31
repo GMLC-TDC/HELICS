@@ -16,11 +16,10 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (filter_tests_cpp, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
-
 namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (filter_tests_cpp, FederateTestFixture, *utf::label("ci"))
 
 /** test registration of filters*/
 

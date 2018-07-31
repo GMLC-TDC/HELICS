@@ -2,7 +2,6 @@
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
-
 */
 #ifndef HELICS_CPP98_VALUE_FEDERATE_HPP_
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
@@ -12,10 +11,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/ValueFederate.h"
 #include "Publication.hpp"
 #include "Subscription.hpp"
-
 #include <sstream>
+#include <exception>
 
-namespace helics
+namespace helics98
 {
 enum PubSubTypes
 {
@@ -29,17 +28,28 @@ enum PubSubTypes
 
 class ValueFederate : public virtual Federate
 {
+private:
+    std::vector<helics_subscription> subs;
+    std::vector<helics_publication> pubs;
   public:
-    friend class helics::FederateInfo;
+    friend class helics98::FederateInfo;
 
     explicit ValueFederate (FederateInfo &fi)
     {
         fed = helicsCreateValueFederate (fi.getInfo());
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr constructor"));
+        }
     }
 
     explicit ValueFederate (const std::string &jsonString)
     {
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr create from json"));
+        }
     }
 
     ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
@@ -50,28 +60,44 @@ class ValueFederate : public virtual Federate
         Federate::operator=(fedObj);
         subs = fedObj.subs;
         pubs = fedObj.pubs;
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr assignment"));
+        }
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate(ValueFederate &&fedObj) :Federate(std::move(fedObj)),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
+    ValueFederate(ValueFederate &&fedObj) :Federate(),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
     {
-
+        Federate::operator=(std::move(fedObj));
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr move constructor"));
+        }
     }
     ValueFederate &operator=(ValueFederate &&fedObj)
     {
-        Federate::operator=(std::move(fedObj));
         subs = std::move(fedObj.subs);
         pubs = std::move(fedObj.pubs);
+        Federate::operator=(std::move(fedObj));
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr move assignment"));
+        }
         return *this;
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate () {}
+    ValueFederate () { }
 
     /** Methods to register publications **/
     Publication
     registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
+        if (fed == NULL)
+        {
+            throw(std::runtime_error("fed==nullptr reg pub"));
+        }
         helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
         pubs.push_back(pub);
         return Publication(pub);
@@ -173,9 +199,6 @@ class ValueFederate : public virtual Federate
     std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
     // call helicsSubscriptionIsUpdated for each sub
   private:
-    std::vector<helics_subscription> subs;
-    std::vector<helics_publication> pubs;
-
     // Utility function for converting numbers to string
     template <typename T> std::string toStr (T num)
     {

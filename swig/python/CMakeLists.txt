@@ -16,6 +16,10 @@ message("Building without swig")
 
 add_custom_target("helicsPYTHON" ALL)
 
+# Set directories to use as defaults in setup.py for the location of ZeroMQ
+set(ZMQ_INCLUDE_DIR ${ZeroMQ_INCLUDE_DIR})
+get_filename_component(ZMQ_LIB_DIR ${ZeroMQ_LIBRARY} DIRECTORY)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
@@ -24,8 +28,8 @@ add_custom_target("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
 
 add_custom_command(
     TARGET "helicsPYTHONEXT" POST_BUILD
-    COMMAND "pip" #
-    ARGS "install" "-e" "."
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS "-m" "pip" "install" "-e" "."
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Building Python extension"
 )

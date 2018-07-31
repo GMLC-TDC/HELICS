@@ -4,11 +4,11 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
+#include "ValueFederateTestTemplates.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <future>
-#include "ValueFederateTestTemplates.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
@@ -18,10 +18,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value federates
  */
+namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (value_federate_extended_tests, FederateTestFixture)
-
-namespace bdata = boost::unit_test::data;
 
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), core_type)

@@ -22,7 +22,7 @@ bool changeDetected (const defV &prevValue, const char *val, double /*deltaV*/)
 {
     if (prevValue.index () == stringLoc)
     {
-        return (mpark::get<std::string> (prevValue).compare (val) != 0);
+        return (mpark::get<std::string> (prevValue)!=val);
     }
     return true;
 }
@@ -35,7 +35,7 @@ bool changeDetected (const defV &prevValue, bool val, double /*deltaV*/)
         {
             return (mpark::get<std::string> (prevValue) == "0");
         }
-        else if (prevValue.index () == intLoc)
+        if (prevValue.index () == intLoc)
         {
             return (mpark::get<int64_t> (prevValue) == 0);
         }
@@ -46,7 +46,7 @@ bool changeDetected (const defV &prevValue, bool val, double /*deltaV*/)
         {
             return (mpark::get<std::string> (prevValue) != "0");
         }
-        else if (prevValue.index () == intLoc)
+        if (prevValue.index () == intLoc)
         {
             return (mpark::get<int64_t> (prevValue) != 0);
         }
@@ -154,7 +154,7 @@ bool changeDetected (const defV &prevValue, const named_point &val, double delta
     {
         return (std::abs (mpark::get<double> (prevValue) - val.value) > deltaV);
     }
-    else if (prevValue.index () == namedPointLoc)
+   if (prevValue.index () == namedPointLoc)
     {
         if ((mpark::get<named_point> (prevValue).name == val.name) && (!std::isnan (val.value)))
         {

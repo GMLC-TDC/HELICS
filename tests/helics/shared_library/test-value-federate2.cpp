@@ -14,10 +14,11 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 
 /** these test cases test out the value converters and some of the other functions
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture, *utf::label("ci"))
+
 // const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/

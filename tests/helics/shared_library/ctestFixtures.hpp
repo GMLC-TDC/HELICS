@@ -9,18 +9,28 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "helics/chelics.h"
+#include "helics/helics-config.h"
 
 #define CE(status) BOOST_CHECK_EQUAL (status, helics_ok)
 #define HELICS_SIZE_MAX 512
 
 #ifndef DISABLE_TCP_CORE
+#ifdef HELICS_HAVE_ZEROMQ
 const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
                                   "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
 const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
-const std::string core_types[] = {"test",  "ipc",    "zmq",   "udp",   "test_2", "ipc_2", "zmq_2",
-                                  "udp_2", "test_3", "zmq_3", "udp_3", "test_4", "zmq_4", "udp_4"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3", "udp_3"};
+const std::string core_types[] = {"test", "ipc", "udp", "tcp", "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "udp"};
+#endif
+#else
+#ifdef HELICS_HAVE_ZEROMQ
+const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
+#else
+const std::string core_types[] = {"test", "ipc", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
+const std::string core_types_single[] = {"test", "ipc", "udp"};
+#endif
 #endif
 
 typedef helics_federate (*FedCreator) (helics_federate_info_t);
@@ -147,7 +157,7 @@ struct FederateTestFixture
         }
         break;
         }
-        helicsFederateInfoFree(fi);
+        helicsFederateInfoFree (fi);
         return federates_added;
     }
 
