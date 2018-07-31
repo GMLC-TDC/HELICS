@@ -17,14 +17,9 @@ if (EXAMPLES_WARNINGS_AS_ERROR)
 	endif(WIN32)
 endif()
 
-add_subdirectory (ipcTest)
-add_subdirectory (valueFederates1)
-add_subdirectory (messageFederates1)
-add_subdirectory (FilterFederate1)
 add_subdirectory (comboFederates1)
 
 if(BUILD_C_SHARED_LIB)
-	add_subdirectory (CInterface)
 	add_subdirectory (CppInterface)
 endif(BUILD_C_SHARED_LIB)
 
