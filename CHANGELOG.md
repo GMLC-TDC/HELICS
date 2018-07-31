@@ -3,6 +3,7 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [1.3.0] - 2018-07-31
 ### Changed
  - some CMake options have been removed (BUILD_BROKER)
@@ -19,10 +20,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
  - interactive command line for helics_broker
  - a few new queries on brokers see [Queries](docs/user_guide/Queries.md)
  - CPACK can now build a dmg files
- - Players can have multiline comments and omit the tag for repeated messages
+ - Players can have multiline comments in input file and omit the tag for repeated messages
  - marker option on player, recorder, tracer to print time advancement message
 
-### changed
+### Changed
  - added better code for allowing static runtime builds
  - use the cmake version numbers instead of independent variables
  - Environment variables are recognized in CMAKE find options
@@ -32,7 +33,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [1.2.1] - 2018-06-30
 ### Fixed
  - bug in the conversion of named points from strings
- - MATLAB helicsSubscriptionGetVector function was producing a seg fault, now this is fixed
+ - MATLAB helicsSubscriptionGetVector function was producing a segmentation fault, now this is fixed
  - performance issue in the delay buffers of federateState
  - findMPI for MPI libraries with multiple libraries
  - federates will now error on missing required publications
@@ -50,7 +51,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.2.0] - 2018-06-18
 ### Fixed
- - issue with various filter tyes and random drop filters
+ - issue with various filter types and random drop filters
  - a few minor issues with C API (helicsFederateSetMaxIterations)
  - potential threading issues when updating the logger on an executing federate
  - federates will now propagate errors properly for duplicate publications and endpoints
