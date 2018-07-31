@@ -258,8 +258,8 @@ is not recognized
 */
 HELICS_EXPORT helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value);
 
-/** set the separator charactor in the info structure
-@details the separator character is the separation charactor for local publications/endpoints in creating their global name
+/** set the separator character in the info structure
+@details the separator character is the separation character for local publications/endpoints in creating their global name
 for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
 @param fi the federate info object to alter
 @param separator the character to use as a separator
@@ -514,8 +514,8 @@ HELICS_EXPORT helics_status helicsFederateSetPeriod (helics_federate fed, helics
 */
 HELICS_EXPORT helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_t flagValue);
 
-/** set the separator charactor in the info structure
-@details the separator character is the separation charactor for local publications/endpoints in creating their global name
+/** set the separator character in the info structure
+@details the separator character is the separation character for local publications/endpoints in creating their global name
 for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
 @param fi the federate info object to alter
 @param separator the character to use as a separator

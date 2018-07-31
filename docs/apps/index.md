@@ -15,6 +15,7 @@ Included with HELICS are a number of apps that provide useful utilities and test
   cmdArgs
   Echo
   Tracer
+  Broker
 ```
 
 <!--

@@ -60,8 +60,8 @@ endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 
-if (MSVC)
+if (MSVC AND NOT EMBEDDED_DEBUG_INFO)
 	install(FILES $<TARGET_PDB_FILE:helicsSharedLib> DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL COMPONENT libs)
-endif(MSVC)
+endif()
 install(FILES ${helicsShared_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library COMPONENT headers)
 
