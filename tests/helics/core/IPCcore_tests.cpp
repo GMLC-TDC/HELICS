@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         ++counter3;
         act3 = m;
     });
-
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     // need to launch the connection commands at the same time since they depend on eachother in this case
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
-
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     comm.transmit (0, helics::CMD_ACK);
 
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (4, localLoc);
-
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
     comm2.transmit (4, helics::CMD_ACK);
 
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
