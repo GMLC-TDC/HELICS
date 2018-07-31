@@ -69,4 +69,4 @@ helics::Time loadTimeFromString (const std::string &timeString, timeUnits defUni
     std::string units = stringOps::trim (timeString.substr (pos));
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
-}
+} //namespace helics

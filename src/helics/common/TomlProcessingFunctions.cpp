@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TomlProcessingFunctions.hpp"
 #include <fstream>
 
-bool hasTomlExtension(const std::string &tomlString)
+bool hasTomlExtension (const std::string &tomlString)
 {
     auto ext = tomlString.substr (tomlString.length () - 4);
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
@@ -15,34 +15,33 @@ bool hasTomlExtension(const std::string &tomlString)
 
 toml::Value loadToml (const std::string &tomlString)
 {
-    if (tomlString.size() > 128)
+    if (tomlString.size () > 128)
     {
-		try
-		{
+        try
+        {
             return loadTomlStr (tomlString);
-		}
-		catch (const std::invalid_argument &)
-		{
-			//just pass through this was an assumption
-		}
+        }
+        catch (const std::invalid_argument &)
+        {
+            // just pass through this was an assumption
+        }
     }
     std::ifstream file (tomlString);
-    
 
     if (file.is_open ())
     {
-        toml::ParseResult pr=toml::parse(file);
-		if (!pr.valid())
-		{
+        toml::ParseResult pr = toml::parse (file);
+        if (!pr.valid ())
+        {
             throw (std::invalid_argument (pr.errorReason));
-		}
-      
+        }
+
         return pr.value;
     }
-    return loadTomlStr(tomlString);
+    return loadTomlStr (tomlString);
 }
 
-toml::Value loadTomlStr(const std::string &tomlString)
+toml::Value loadTomlStr (const std::string &tomlString)
 {
     std::istringstream tstring (tomlString);
     toml::ParseResult pr = toml::parse (tstring);
@@ -51,30 +50,26 @@ toml::Value loadTomlStr(const std::string &tomlString)
         return pr.value;
     }
     throw (std::invalid_argument (pr.errorReason));
-
 }
 
 /** read a time from a JSON value element*/
 helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits)
 {
-    if (timeElement.is<toml::Table>())
+    if (timeElement.is<toml::Table> ())
     {
         auto units = timeElement.find ("units");
-        if (units!=nullptr)
+        if (units != nullptr)
         {
             defaultUnits = helics::timeUnitsFromString (units->as<std::string> ());
         }
-        auto val= timeElement.find ("value");
-        if (val!=nullptr)
+        auto val = timeElement.find ("value");
+        if (val != nullptr)
         {
-            if (val->is<int64_t>())
+            if (val->is<int64_t> ())
             {
                 return helics::Time (val->as<int64_t> (), defaultUnits);
             }
-            else
-            {
-                return helics::Time (val->as<double> () * toSecondMultiplier (defaultUnits));
-            }
+            return helics::Time (val->as<double> () * toSecondMultiplier (defaultUnits));
         }
     }
     else if (timeElement.is<int64_t> ())
@@ -85,10 +80,11 @@ helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnit
     {
         return helics::Time (timeElement.as<double> () * toSecondMultiplier (defaultUnits));
     }
-	else if (timeElement.is<toml::Time>())
-	{
-        return helics::Time (static_cast<std::chrono::nanoseconds>(timeElement.as<toml::Time> ().time_since_epoch()));
-	}
+    else if (timeElement.is<toml::Time> ())
+    {
+        return helics::Time (
+          static_cast<std::chrono::nanoseconds> (timeElement.as<toml::Time> ().time_since_epoch ()));
+    }
     else
     {
         return helics::loadTimeFromString (timeElement.as<std::string> ());
@@ -102,15 +98,15 @@ std::string getKey (const toml::Value &element)
     auto mem = element.find ("key");
     if (mem != nullptr)
     {
-        retval=mem->as<std::string> ();
-	}
-	else
-	{
-		auto name=element.find("name");
-		if (name != nullptr)
-		{
+        retval = mem->as<std::string> ();
+    }
+    else
+    {
+        auto name = element.find ("name");
+        if (name != nullptr)
+        {
             retval = name->as<std::string> ();
-		}
-	}
+        }
+    }
     return retval;
 }

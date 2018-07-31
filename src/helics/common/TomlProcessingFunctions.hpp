@@ -27,7 +27,7 @@ toml::Value loadTomlStr (const std::string &tomlString);
 helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);
 
 /** get a name or key from the element*/
-std::string getKey (const toml::Value &Element);
+std::string getKey (const toml::Value &element);
 
 template<class X>
 inline X tomlGetOrDefault(const toml::Value &element, const std::string &key, const X &defVal)
