@@ -28,13 +28,14 @@ TimeTests.cpp
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers} )
 target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
-
-add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
 set_target_properties (common-tests PROPERTIES FOLDER tests)
 
+add_test(NAME common-tests COMMAND common-tests --log_level=message --report_level=short)
+set_property(TEST common-tests PROPERTY LABELS Common Daily Continuous)
+
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build event to core tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+	add_custom_command(TARGET common-tests POST_BUILD        # Adds a post-build event to core tests
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:common-tests>/")                 # <--this is out-file path
 endforeach(keyfile)

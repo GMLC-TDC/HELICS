@@ -231,6 +231,8 @@ class observer
     }
 };
 
+namespace utf = boost::unit_test;
+
 BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
 BOOST_AUTO_TEST_CASE (linear_tests)

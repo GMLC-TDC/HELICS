@@ -5,11 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-
-#include "testFixtures.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "testFixtures.hpp"
+#include <future>
+#include <boost/test/unit_test.hpp>
 
 template <class X>
 void runFederateTest (const std::string &core_type_str,
@@ -156,49 +157,49 @@ void runFederateTestv2 (const std::string &core_type_str,
 }
 
 template <class X>
-void runFederateTestObjv2(const std::string &core_type_str,
-    const X &defaultValue,
-    const X &testValue1,
-    const X &testValue2)
+void runFederateTestObjv2 (const std::string &core_type_str,
+                           const X &defaultValue,
+                           const X &testValue1,
+                           const X &testValue2)
 {
     FederateTestFixture fixture;
 
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
-    auto vFed = fixture.GetFederateAs<helics::ValueFederate>(0);
+    fixture.SetupTest<helics::ValueFederate> (core_type_str, 1);
+    auto vFed = fixture.GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
-    helics::PublicationT<X> pubid(helics::GLOBAL, vFed.get(), "pub1");
+    helics::PublicationT<X> pubid (helics::GLOBAL, vFed.get (), "pub1");
 
-    helics::SubscriptionT<X> subid(vFed.get(), "pub1");
-    vFed->setTimeDelta(1.0);
-    subid.setDefault(defaultValue);
-    vFed->enterExecutionState();
+    helics::SubscriptionT<X> subid (vFed.get (), "pub1");
+    vFed->setTimeDelta (1.0);
+    subid.setDefault (defaultValue);
+    vFed->enterExecutionState ();
     // publish string1 at time=0.0;
-    pubid.publish(testValue1);
+    pubid.publish (testValue1);
     X val;
-    subid.getValue(val);
-    BOOST_CHECK(val==defaultValue);
+    subid.getValue (val);
+    BOOST_CHECK (val == defaultValue);
 
-    auto gtime = vFed->requestTime(1.0);
-    BOOST_CHECK_EQUAL(gtime, 1.0);
+    auto gtime = vFed->requestTime (1.0);
+    BOOST_CHECK_EQUAL (gtime, 1.0);
     // get the value
-    subid.getValue(val);
+    subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK(val==testValue1);
+    BOOST_CHECK (val == testValue1);
     // publish a second string
-    pubid.publish(testValue2);
+    pubid.publish (testValue2);
     // make sure the value is still what we expect
-    val = subid.getValue();
-    BOOST_CHECK(val==testValue1);
+    val = subid.getValue ();
+    BOOST_CHECK (val == testValue1);
 
     // advance time
-    gtime = vFed->requestTime(2.0);
+    gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL(gtime, 2.0);
-    val = subid.getValue();
-    BOOST_CHECK(val==testValue2);
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    val = subid.getValue ();
+    BOOST_CHECK (val == testValue2);
 
-    vFed->finalize();
+    vFed->finalize ();
 }
 
 template <class X>
@@ -387,63 +388,63 @@ void runDualFederateTestObj (const std::string &core_type_str,
 }
 
 template <class X>
-void runDualFederateTestObjv2(const std::string &core_type_str,
-    const X &defaultValue,
-    const X &testValue1,
-    const X &testValue2)
+void runDualFederateTestObjv2 (const std::string &core_type_str,
+                               const X &defaultValue,
+                               const X &testValue1,
+                               const X &testValue2)
 {
     FederateTestFixture fixture;
     using namespace helics;
-    fixture.SetupTest<helics::ValueFederate>(core_type_str, 2);
-    auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
-    auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
+    fixture.SetupTest<helics::ValueFederate> (core_type_str, 2);
+    auto fedA = fixture.GetFederateAs<helics::ValueFederate> (0);
+    auto fedB = fixture.GetFederateAs<helics::ValueFederate> (1);
 
     // register the publications
-    PublicationT<X> pubid(GLOBAL, fedA.get(), "pub1");
+    PublicationT<X> pubid (GLOBAL, fedA.get (), "pub1");
 
-    SubscriptionT<X> subid(fedB.get(), "pub1");
-    fedA->setTimeDelta(1.0);
-    fedB->setTimeDelta(1.0);
+    SubscriptionT<X> subid (fedB.get (), "pub1");
+    fedA->setTimeDelta (1.0);
+    fedB->setTimeDelta (1.0);
 
-    subid.setDefault(defaultValue);
+    subid.setDefault (defaultValue);
 
-    auto f1finish = std::async(std::launch::async, [&]() { fedA->enterExecutionState(); });
-    fedB->enterExecutionState();
-    f1finish.wait();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
+    fedB->enterExecutionState ();
+    f1finish.wait ();
     // publish string1 at time=0.0;
-    pubid.publish(testValue1);
+    pubid.publish (testValue1);
 
-    X val = subid.getValue();
+    X val = subid.getValue ();
 
-    BOOST_CHECK(val==defaultValue);
+    BOOST_CHECK (val == defaultValue);
 
-    auto f1time = std::async(std::launch::async, [&]() { return fedA->requestTime(1.0); });
-    auto gtime = fedB->requestTime(1.0);
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL(gtime, 1.0);
-    BOOST_CHECK_EQUAL(f1time.get(), 1.0);
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
     // get the value
-    subid.getValue(val);
+    subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK(val==testValue1);
+    BOOST_CHECK (val == testValue1);
 
     // publish a second string
-    pubid.publish(testValue2);
+    pubid.publish (testValue2);
 
-    subid.getValue(val);
-    BOOST_CHECK(val==testValue1);
+    subid.getValue (val);
+    BOOST_CHECK (val == testValue1);
 
     // advance time
-    f1time = std::async(std::launch::async, [&]() { return fedA->requestTime(2.0); });
-    gtime = fedB->requestTime(2.0);
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    gtime = fedB->requestTime (2.0);
 
-    BOOST_CHECK_EQUAL(gtime, 2.0);
-    BOOST_CHECK_EQUAL(f1time.get(), 2.0);
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
 
     // make sure the value was updated
-    fedB->getValue(subid.getID(), val);
-    BOOST_CHECK(val==testValue2);
-    fedA->finalize();
-    fedB->finalize();
-    helics::cleanupHelicsLibrary();
+    fedB->getValue (subid.getID (), val);
+    BOOST_CHECK (val == testValue2);
+    fedA->finalize ();
+    fedB->finalize ();
+    helics::cleanupHelicsLibrary ();
 }

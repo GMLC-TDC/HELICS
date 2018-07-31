@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../cpp98/Filter.hpp"
 #include <exception>
 
-namespace helics
+namespace helics98
 {
 
 class Core

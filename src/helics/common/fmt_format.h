@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -14,3 +14,4 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 #include <fmt/format.h>
 #endif
+

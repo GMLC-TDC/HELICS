@@ -228,7 +228,7 @@ HELICS_EXPORT helics_status helicsPublicationPublishNamedPoint(helics_publicatio
 and vice versa,  not all translations make that much sense but they do work.
 * @{
 */
-/** get the size of a value for subscription,  this is useful for strings and raw data
+/** get the size of the raw value for subscription
 @returns the size of the raw data/string in bytes
 */
 HELICS_EXPORT int helicsSubscriptionGetValueSize (helics_subscription sub);
@@ -241,6 +241,11 @@ HELICS_EXPORT int helicsSubscriptionGetValueSize (helics_subscription sub);
 @return a helics_status value, helics_ok if everything went fine
 */
 HELICS_EXPORT helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data, int maxlen, int *actualLength);
+
+/** get the size of a value for subscription assuming return as a string
+@returns the size of the string
+*/
+HELICS_EXPORT int helicsSubscriptionGetStringSize(helics_subscription sub);
 
 /** get a string value from a subscription
 @param sub the subscription to get the data for

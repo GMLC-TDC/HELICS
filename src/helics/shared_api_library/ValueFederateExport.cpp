@@ -325,11 +325,11 @@ helics_status helicsPublicationPublishRaw (helics_publication pub, const void *d
         auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
         if (pubObj->rawOnly)
         {
-            pubObj->fedptr->publish (pubObj->id, (const char *)data, datalen);
+            pubObj->fedptr->publish (pubObj->id, reinterpret_cast<const char *>(data), datalen);
         }
         else
         {
-            pubObj->fedptr->publish (pubObj->pubptr->getID (), (const char *)data, datalen);
+            pubObj->fedptr->publish (pubObj->pubptr->getID (), reinterpret_cast<const char *> (data), datalen);
         }
         return helics_ok;
     }
@@ -404,7 +404,7 @@ helics_status helicsPublicationPublishBoolean (helics_publication pub, helics_bo
         }
         else
         {
-            pubObj->pubptr->publish ((val != helics_false) ? true : false);
+            pubObj->pubptr->publish ((val != helics_false));
         }
         return helics_ok;
     }
@@ -595,11 +595,17 @@ helics_status helicsSubscriptionGetRawValue (helics_subscription sub, void *data
         if (maxDatalen > static_cast<int> (str.size ()))
         {
             memcpy (data, str.data (), static_cast<int> (str.size ()));
-            *actualSize = static_cast<int> (str.size ());
+            if (actualSize != nullptr)
+            {
+				*actualSize = static_cast<int> (str.size ());
+			}
             return helics_ok;
         }
         memcpy (data, str.data (), maxDatalen);
-        *actualSize = maxDatalen;
+        if (actualSize != nullptr)
+        {
+			*actualSize = maxDatalen;
+		}
         return helics_warning;
     }
     catch (...)
@@ -621,15 +627,35 @@ helics_status helicsSubscriptionGetString (helics_subscription sub, char *output
     }
     try
     {
-        auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen, actualLength);
-        // make sure we have a null terminator
-        if (*actualLength == maxlen)
+        auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+        int length;
+        if (subObj->rawOnly)
         {
-            outputString[maxlen - 1] = '\0';
-            return helics_warning;
+            auto res = helicsSubscriptionGetRawValue (sub, outputString, maxlen,&length);
+            // make sure we have a null terminator
+            if (length == maxlen)
+            {
+                outputString[maxlen - 1] = '\0';
+				if (actualLength != nullptr)
+				{
+                    *actualLength = length;
+				}
+                return helics_warning;
+            }
+            outputString[length] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = length+1;
+            }
+            return res;
         }
-        outputString[*actualLength] = '\0';
-        return res;
+        length = subObj->subptr->getValue (outputString, maxlen);
+        if (actualLength != nullptr)
+        {
+            *actualLength = length;
+        }
+        return (length <= maxlen) ? helics_ok : helics_warning;
+ 
     }
     catch (...)
     {
@@ -788,6 +814,23 @@ int helicsSubscriptionGetVectorSize (helics_subscription sub)
     return static_cast<int> (subObj->subptr->getVectorSize());
 }
 
+int helicsSubscriptionGetStringSize(helics_subscription sub)
+{
+    if (sub == nullptr)
+    {
+        return 0;
+    }
+    auto subObj = reinterpret_cast<helics::SubscriptionObject *> (sub);
+    if (subObj->rawOnly)
+    {
+        auto str = subObj->fedptr->getValue<std::string>(subObj->id);
+        return static_cast<int> (str.size())+1;
+    }
+
+    return static_cast<int> (subObj->subptr->getStringSize())+1;
+}
+
+
 helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[], int maxlen, int *actualSize)
 {
     if (sub == nullptr)
@@ -812,10 +855,7 @@ helics_status helicsSubscriptionGetVector (helics_subscription sub, double data[
             }
             return (length <= maxlen) ? helics_ok : helics_warning;
         }
-
-        auto V = subObj->subptr->getValue<std::vector<double>> ();
-        int length = std::min (static_cast<int> (V.size ()), maxlen);
-        std::copy (V.data (), V.data () + length, data);
+        int length = subObj->subptr->getValue (data, maxlen);
         if (actualSize != nullptr)
         {
             *actualSize = length;
@@ -894,7 +934,7 @@ helics_status helicsSubscriptionSetDefaultRaw (helics_subscription sub, const vo
         }
         else
         {
-            subObj->fedptr->setDefaultValue (subObj->id, helics::data_view ((const char *)data, dataLen));
+            subObj->fedptr->setDefaultValue (subObj->id, helics::data_view (static_cast<const char *>(data), dataLen));
         }
 
         return helics_ok;
@@ -970,7 +1010,7 @@ helics_status helicsSubscriptionSetDefaultBoolean (helics_subscription sub, heli
         }
         else
         {
-            subObj->subptr->setDefault ((val != helics_false) ? true : false);
+            subObj->subptr->setDefault ((val != helics_false));
         }
         return helics_ok;
     }
@@ -1340,11 +1380,8 @@ helics_bool_t helicsSubscriptionIsUpdated (helics_subscription sub)
         auto val = subObj->fedptr->isUpdated (subObj->id);
         return (val) ? 1 : 0;
     }
-    else
-    {
-        auto val = subObj->subptr->isUpdated ();
-        return (val) ? helics_true : helics_false;
-    }
+    auto val = subObj->subptr->isUpdated ();
+    return (val) ? helics_true : helics_false;
 }
 
 helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
@@ -1357,13 +1394,10 @@ helics_time_t helicsSubscriptionLastUpdateTime (helics_subscription sub)
     if (subObj->rawOnly)
     {
         auto time = subObj->fedptr->getLastUpdateTime (subObj->id);
-        return time.getBaseTimeCode ();
+        return time;
     }
-    else
-    {
-        auto time = subObj->subptr->getLastUpdate ();
-        return time.getBaseTimeCode ();
-    }
+    auto time = subObj->subptr->getLastUpdate ();
+    return time;
 }
 
 int helicsFederateGetPublicationCount (helics_federate fed)

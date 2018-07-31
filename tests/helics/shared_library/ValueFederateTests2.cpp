@@ -14,13 +14,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 /** these test cases test out the value converters and some of the other functions
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture, *utf::label("ci"))
 
 /** test block send and receive*/
 #if ENABLE_TEST_TIMEOUTS > 0

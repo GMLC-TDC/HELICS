@@ -9,6 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/ForwardingTimeCoordinator.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_AUTO_TEST_SUITE (ftc_tests)
 using namespace helics;
 
@@ -139,21 +141,21 @@ BOOST_AUTO_TEST_CASE (execMode_entry)
     ftc.addDependency (2);
     ftc.addDependency (3);
     ftc.enteringExecMode ();
-    // iteration_state
+    // message_processing_result
     auto ret = ftc.checkExecEntry ();
-    BOOST_CHECK (ret == iteration_state::continue_processing);
+    BOOST_CHECK (ret == message_processing_result::continue_processing);
 
     ActionMessage execReady (CMD_EXEC_REQUEST);
     execReady.source_id = 2;
     auto modified = ftc.processTimeMessage (execReady);
     BOOST_CHECK (modified);
     ret = ftc.checkExecEntry ();
-    BOOST_CHECK (ret == iteration_state::continue_processing);
+    BOOST_CHECK (ret == message_processing_result::continue_processing);
     execReady.source_id = 3;
     modified = ftc.processTimeMessage (execReady);
     BOOST_CHECK (modified);
     ret = ftc.checkExecEntry ();
-    BOOST_CHECK (ret == iteration_state::next_step);
+    BOOST_CHECK (ret == message_processing_result::next_step);
 }
 
 void getFTCtoExecMode (ForwardingTimeCoordinator &ftc)
@@ -166,7 +168,7 @@ void getFTCtoExecMode (ForwardingTimeCoordinator &ftc)
         ftc.processTimeMessage (execReady);
     }
     auto ret = ftc.checkExecEntry ();
-    BOOST_CHECK (ret == iteration_state::next_step);
+    BOOST_CHECK (ret == message_processing_result::next_step);
 
     ActionMessage execGrant (CMD_EXEC_GRANT);
     for (auto dep : depList)

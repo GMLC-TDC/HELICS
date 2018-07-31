@@ -5,27 +5,34 @@
 ##############################################################################
 
 if (NOT DISABLE_SWIG)
-	FIND_PACKAGE(SWIG REQUIRED 3.0)
-	INCLUDE(${SWIG_USE_FILE})
+	if (WIN32 AND NOT MSYS)
+		if (NOT CMAKE_PROGRAM_PATH)
+			set(CMAKE_PROGRAM_PATH "C:/local/swigwin-3.0.12" "C:/local/swigwin-3.0.11" "C:/local/swigwin-3.0.10")
+		else()
+			set(CMAKE_PROGRAM_PATH "${CMAKE_PROGRAM_PATH}" "C:/local/swigwin-3.0.12" "C:/local/swigwin-3.0.11" "C:/local/swigwin-3.0.10")
+		endif()
+	endif()
+	find_package(SWIG REQUIRED 3.0)
+	include(${SWIG_USE_FILE})
 endif()
 
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
-INCLUDE_DIRECTORIES("${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
+include_directories("${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
 	
 
 if (BUILD_PYTHON_INTERFACE)
-    ADD_SUBDIRECTORY(python)
+    add_subdirectory(python)
 	if( BUILD_PYTHON2_INTERFACE)
 		message(WARNING "PYTHON2 interface will not be built since python 3 build is active")
 	endif()
 elseif (BUILD_PYTHON2_INTERFACE)
-    ADD_SUBDIRECTORY(python2)
+    add_subdirectory(python2)
 endif()
 
 if (BUILD_JAVA_INTERFACE)
-    ADD_SUBDIRECTORY(java)
+    add_subdirectory(java)
 endif ()
 
 if(BUILD_MATLAB_INTERFACE)
@@ -34,4 +41,8 @@ endif()
 
 if (BUILD_OCTAVE_INTERFACE)
 	add_subdirectory(octave)
+endif()
+
+if (BUILD_CSHARP_INTERFACE)
+	#add_subdirectory(csharp)
 endif()

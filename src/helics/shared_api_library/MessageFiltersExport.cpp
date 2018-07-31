@@ -7,11 +7,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "MessageFilters.h"
-#include "helics.h"
 #include "internal/api_objects.h"
 #include <memory>
 #include <mutex>
-#include <vector>
 
 static const std::string nullstr;
 
@@ -247,7 +245,7 @@ helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int
     }
     try
     {
-        auto target = filter->getTarget ();
+        const auto &target = filter->getTarget ();
         if (static_cast<int> (target.size ()) > maxlen)
         {
             strncpy (outputString, target.c_str (), maxlen);
@@ -273,7 +271,7 @@ helics_status helicsFilterGetName (helics_filter filt, char *outputString, int m
     }
     try
     {
-        auto name = filter->getName ();
+        const auto &name = filter->getName ();
         if (static_cast<int> (name.size ()) > maxlen)
         {
             strncpy (outputString, name.c_str (), maxlen);

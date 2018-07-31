@@ -4,36 +4,32 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-
-#include "Recorder.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Recorder.hpp"
 #include <iostream>
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
     int ret = 0;
     try
     {
-        helics::apps::Recorder Recorder(argc, argv);
-        if (Recorder.isActive())
+        helics::apps::Recorder Recorder (argc, argv);
+        if (Recorder.isActive ())
         {
-            Recorder.run();
+            Recorder.run ();
         }
-
     }
-    catch (const std::invalid_argument &ia) 
+    catch (const std::invalid_argument &ia)
     {
-        std::cerr << ia.what() << std::endl;
+        std::cerr << ia.what () << std::endl;
         ret = -2;
     }
     catch (const helics::HelicsException &he)
     {
-        std::cerr << he.what() << std::endl;
+        std::cerr << he.what () << std::endl;
         ret = -4;
     }
 
-    helics::cleanupHelicsLibrary();
+    helics::cleanupHelicsLibrary ();
     return ret;
-
 }
-

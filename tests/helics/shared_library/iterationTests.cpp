@@ -15,11 +15,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueConverter.hpp"
 
-#if ENABLE_TEST_TIMEOUTS > 0
 namespace utf = boost::unit_test;
-#endif
 
-BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture, *utf::label("ci"))
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 #if ENABLE_TEST_TIMEOUTS > 0

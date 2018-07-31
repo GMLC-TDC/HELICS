@@ -41,10 +41,11 @@
 # OCTAVE_LIBRARY_DEBUG - the debug version
 # OCTAVE_LIBRARY - a default library, with priority debug.
 
-IF (WIN32)
+if (WIN32)
 
 #message(STATUS "win32 octave search")
 set (octave_versions
+Octave-4.4.0
 Octave-4.2.1
 Octave-4.2.0
 Octave-4.0.3
@@ -71,15 +72,15 @@ list(APPEND octave_paths "")
 
 foreach( dir ${poss_prefixes})
 	foreach( octver ${octave_versions})
-		IF (IS_DIRECTORY ${dir}/${octver})
+		if (IS_DIRECTORY ${dir}/${octver})
 			list(APPEND oct_paths ${dir}/${octver})
 			message(STATUS "found oct path ${dir}/${octver}")
-		ENDIF()
+		endif()
 	endforeach()
 endforeach()
 
 
-ENDIF(WIN32)
+endif(WIN32)
 
 # use mkoctfile
 if (NOT MKOCTFILE_EXECUTABLE)

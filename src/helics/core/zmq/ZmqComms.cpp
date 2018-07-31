@@ -456,12 +456,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (connectionTimeout));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with broker\n";
+                    std::cerr << "unable to connect with zmq broker\n";
                     tx_status = connection_status::error;
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "broker connection timed out\n";
+                    std::cerr << "zmq broker connection timed out\n";
                     tx_status = connection_status::error;
                 }
                 if (tx_status == connection_status::error)
@@ -522,12 +522,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with broker (2)\n";
+                    std::cerr << "unable to connect with zmq broker (2)\n";
                     tx_status = connection_status::error;
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "broker connection timed out (2)\n";
+                    std::cerr << "zmq broker connection timed out (2)\n";
                     tx_status = connection_status::error;
                 }
                 if (tx_status == connection_status::error)

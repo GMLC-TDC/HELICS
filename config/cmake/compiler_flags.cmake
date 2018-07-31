@@ -1,12 +1,15 @@
 
-OPTION(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON)
-OPTION(ENABLE_ERROR_ON_WARNINGS "generate a compiler error for any warning encountered" OFF)
+option(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON)
+option(ENABLE_ERROR_ON_WARNINGS "generate a compiler error for any warning encountered" OFF)
+
+mark_as_advanced(ENABLE_EXTRA_COMPILER_WARNINGS)
+mark_as_advanced(ENABLE_ERROR_ON_WARNINGS)
 
 # -------------------------------------------------------------
 # Setup compiler options and configurations
 # -------------------------------------------------------------
 message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID}")
-IF(UNIX)
+if(UNIX)
   # Since default builds of boost library under Unix don't use
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
@@ -24,11 +27,13 @@ IF(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing=1>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
+  if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+      add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
+      add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
+  endif()
   #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wpadded>)
   # add some gnu specific options if the compiler is newer
@@ -47,12 +52,13 @@ IF(UNIX)
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
   option (USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
-  IF(USE_LIBCXX)
+  mark_as_advanced(USE_LIBCXX)
+  if(USE_LIBCXX)
       add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
       link_libraries("-stdlib=libc++")
-     ENDIF(USE_LIBCXX)
-ELSE(UNIX)
-  IF(MINGW)
+     endif(USE_LIBCXX)
+else(UNIX)
+  if(MINGW)
     if (ENABLE_ERROR_ON_WARNINGS)
   add_compile_options(-Werror)
   endif(ENABLE_ERROR_ON_WARNINGS)
@@ -85,34 +91,35 @@ ELSE(UNIX)
   endif()
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
   option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  ELSE(MINGW)
+  else(MINGW)
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
 # -------------------------------------------------------------
 # Extra definitions for visual studio
 # -------------------------------------------------------------
-IF(MSVC)
+if(MSVC)
   if (ENABLE_ERROR_ON_WARNINGS)
   add_compile_options(/WX)
   endif(ENABLE_ERROR_ON_WARNINGS)
 
-  ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-  ADD_DEFINITIONS(-D_SCL_SECURE_NO_WARNINGS)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
   add_compile_options(/MP /EHsc)
   add_compile_options(/sdl)
   if (ENABLE_EXTRA_COMPILER_WARNINGS)
-  add_compile_options(-W4  /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
-  endif(ENABLE_EXTRA_COMPILER_WARNINGS)
-  ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
-ENDIF(MSVC)
-  ENDIF(MINGW)
-ENDIF(UNIX)
+	add_compile_options(-W4  /wd4065 /wd4101 /wd4102 /wd4244 /wd4297 /wd4355 /wd4800 /wd4484 /wd4702 /wd4996 )
+	endif(ENABLE_EXTRA_COMPILER_WARNINGS)
+	add_definitions(-D_WIN32_WINNT=0x0601)
+  endif(MSVC)
+  endif(MINGW)
+endif(UNIX)
 
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
-OPTION(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
+option(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
-IF (NOT VERSION_OPTION)
+if (NOT VERSION_OPTION)
 	set(CMAKE_CXX_STANDARD 14)
-ENDIF ()
+endif ()
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)

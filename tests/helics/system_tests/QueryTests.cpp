@@ -4,19 +4,19 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "testFixtures.hpp"
-
+#include "../application_api/testFixtures.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include "helics/common/JsonProcessingFunctions.hpp"
 
+namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
 BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture)
 
-namespace bdata = boost::unit_test::data;
-
 /** test simple creation and destruction*/
-
 BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2, 1.0);

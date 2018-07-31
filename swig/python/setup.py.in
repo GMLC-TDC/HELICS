@@ -26,15 +26,15 @@ else:
     os_specific_ldflags = ''
     extra_compile_args = ['-std=c++11']
 
-HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${CMAKE_CURRENT_BINARY_DIR}'))
-HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "../../src/")))
-helics_src_path = os.path.join(HELICS_INCLUDE_DIR, "../../src")
+HELICS_INSTALL = os.path.abspath(os.getenv("HELICS_INSTALL", '${PROJECT_BINARY_DIR}'))
+HELICS_INCLUDE_DIR = os.path.abspath(os.getenv("HELICS_INCLUDE", os.path.join(HELICS_INSTALL, "${PROJECT_BINARY_DIR}/src/")))
+helics_src_path = os.path.join(HELICS_INCLUDE_DIR, "${PROJECT_SOURCE_DIR}/src")
 HELICS_CFLAGS = os.getenv("HELICS_CFLAGS", "-I{} -I{}".format(os.path.abspath(os.path.join(helics_src_path, "helics")), os.path.abspath(os.path.join(helics_src_path, "helics/shared_api_library"))))
 HELICS_LIB_DIR = os.path.abspath(os.getenv("HELICS_LIB", "${PROJECT_BINARY_DIR}/src/"))
 HELICS_LDFLAGS = os.getenv("HELICS_LDFLAGS", "-L{}".format(os.path.abspath(os.path.join(HELICS_INCLUDE_DIR, "helics/shared_api_library"))))
 HELICS_LIBS = os.getenv("HELICS_LIBS", "")
-ZMQ_INCLUDE_DIR = os.path.abspath(os.getenv("ZMQ_INCLUDE", os.path.join(HELICS_INSTALL, ".")))
-ZMQ_LIB_DIR = os.path.abspath(os.getenv("ZMQ_LIB", os.path.join(HELICS_INSTALL, ".")))
+ZMQ_INCLUDE_DIR = os.path.abspath(os.getenv("ZMQ_INCLUDE", "${ZMQ_INCLUDE_DIR}"))
+ZMQ_LIB_DIR = os.path.abspath(os.getenv("ZMQ_LIB", "${ZMQ_LIB_DIR}"))
 
 if HELICS_INSTALL is None or "CMAKE_INSTALL_PREFIX" in HELICS_INSTALL:
 

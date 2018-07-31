@@ -6,31 +6,35 @@
 
 SHOW_VARIABLE(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
 
-IF(UNIX)
+if(UNIX)
   # Since default builds of boost library under Unix don't use
   # CMake, turn off using CMake build and find include/libs the
   # regular way.
   set(Boost_NO_BOOST_CMAKE ON)
   set(Boost_USE_MULTITHREADED OFF)   # Needed if MT libraries not built
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-ELSE(UNIX)
-  IF(MSYS)
+else(UNIX)
+  if(MSYS)
 	option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-  ELSE(MSYS)
+  else(MSYS)
   #this will be MSYS or stand alone Mingw
    option (USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-  ENDIF(MSYS)
-ENDIF(UNIX)
+  endif(MSYS)
+endif(UNIX)
 
-IF (USE_BOOST_STATIC_LIBS)
+mark_as_advanced(USE_BOOST_STATIC_LIBS)
+
+if (USE_BOOST_STATIC_LIBS)
   set(Boost_USE_STATIC_LIBS ON)
   set(BOOST_STATIC ON)
-ENDIF ()
+endif ()
 
+mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
-IF (MSVC)
+if (MSVC)
 
 set (boost_versions
+boost_1_68_0
 boost_1_67_0
 boost_1_66_0
 boost_1_65_1
@@ -58,29 +62,40 @@ list(APPEND boost_paths "")
 mark_as_advanced(BOOST_INSTALL_PATH)
 foreach( dir ${poss_prefixes})
 	foreach( boostver ${boost_versions})
-		IF (IS_DIRECTORY ${dir}/${boostver})
-			IF (EXISTS ${dir}/${boostver}/boost/version.hpp)
+		if (IS_DIRECTORY ${dir}/${boostver})
+			if (EXISTS ${dir}/${boostver}/boost/version.hpp)
 				list(APPEND boost_paths ${dir}/${boostver})
-			ENDIF()
-		ENDIF()
+			endif()
+		endif()
 	endforeach()
 endforeach()
 
 find_path(BOOST_TEST_PATH
 			NAMES 			boost/version.hpp
+			HINTS	ENV BOOST_INSTALL_PATH
 			PATHS		${BOOST_INSTALL_PATH}
 						${boost_paths}
 		)
 
 		if (BOOST_TEST_PATH)
-		set(BOOST_ROOT ${BOOST_TEST_PATH})
+			set(BOOST_ROOT ${BOOST_TEST_PATH})
 		endif(BOOST_TEST_PATH)
-ELSE(MSVC)
-set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
-ENDIF(MSVC)
+else(MSVC)
+	if (NOT BOOST_ROOT)
+		if (BOOST_INSTALL_PATH)
+			set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
+		elseif ($ENV{BOOST_INSTALL_PATH})
+			set(BOOST_ROOT "$ENV{BOOST_INSTALL_PATH}")
+		else()
+			set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+		endif()
+	endif()
+endif(MSVC)
+
+HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
-set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)
+	set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)
 endif()
 
 # Minimum version of Boost required for building HELICS
@@ -96,9 +111,8 @@ elseif (Boost_VERSION GREATER 106599)
 	set(BOOST_VERSION_LEVEL 2)
 else()
 	set(BOOST_VERSION_LEVEL 1)
-ENDIF()
+endif()
 
-#mark_as_advanced(CLEAR BOOST_ROOT)
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")

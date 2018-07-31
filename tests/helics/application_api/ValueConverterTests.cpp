@@ -18,6 +18,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/data_view.hpp"
 #include "helics/core/core-data.hpp"
 
+namespace utf = boost::unit_test;
+
 using namespace std::string_literals;
 
 BOOST_AUTO_TEST_SUITE (value_converter_tests)

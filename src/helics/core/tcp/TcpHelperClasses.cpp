@@ -29,9 +29,9 @@ void TcpRxConnection::start ()
     connection_state_t exp = connection_state_t::halted;
     if (state.compare_exchange_strong (exp, connection_state_t::receiving))
     {
-        if (receiving == false)
+        if (!receiving.load())
         {
-            receiving = true;
+            receiving.store(true);
         }
         socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
                                                     data.size () - residBufferSize),

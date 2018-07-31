@@ -1,6 +1,6 @@
 shallow_clone: true
 
-version: 1.2.0.{build}
+version: 1.2.1.{build}
 
 image: Visual Studio 2015
 
@@ -35,20 +35,7 @@ after_build:
 
 test_script:
   - cd build
-  # For controlling which tests get run:
-  # ctest -I <start>,<end>,<stride>,<list of test numbers>
-  # 1 = common_tests
-  # 2 = core tests
-  # 3 = key_tests
-  # 4 = application api tests
-  # 5 = extended_api tests
-  # 6 = shared_library tests
-  # 7 = helics-apps tests
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,1
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,2
-  - ctest -C Release --verbose --timeout 240 -I 0,0,0,4
-  - ctest -C Release --verbose --timeout 120 -I 0,0,0,8
-  - ctest --verbose -L Java
+  - ctest --output-on-failure --timeout 480 -C Release -L Continuous
   - cd ..
 
 artifacts:

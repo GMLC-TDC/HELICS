@@ -10,13 +10,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/CoreBroker.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
-#include "helics/helics-config.h"
 #include <fstream>
 #include <iostream>
 
 static const helics::ArgDescriptors InfoArgs{
   {"name,n", "name of the broker"},
-  {"type,t", "type of the broker (\"(zmq)\", \"ipc\", \"test\", \"mpi\", \"test\", \"tcp\", \"udp\")"}};
+  {"type,t", R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp"))lit"}};
 
 namespace helics
 {
@@ -44,19 +43,8 @@ BrokerApp::~BrokerApp ()
     {
         return;
     }
-    bool sleep_toggle = false;
-    while (broker->isConnected ())
-    {
-        if (!sleep_toggle)
-        {
-            std::this_thread::yield ();
-        }
-        else
-        {
-            std::this_thread::sleep_for (std::chrono::milliseconds (200));
-        }
-        sleep_toggle = !sleep_toggle;
-    }
+	//this sleeps until disconnected
+    broker->waitForDisconnect ();
     broker = nullptr;
     helics::BrokerFactory::cleanUpBrokers (500);
 }

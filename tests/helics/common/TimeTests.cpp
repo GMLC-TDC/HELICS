@@ -11,6 +11,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/core/helics-time.hpp"
 
+namespace utf = boost::unit_test;
+
 BOOST_AUTO_TEST_SUITE (time_tests)
 
 using namespace helics;
@@ -100,6 +102,14 @@ BOOST_AUTO_TEST_CASE (test_math)
     BOOST_CHECK_EQUAL (time3, Time (2.0));
 }
 
+BOOST_AUTO_TEST_CASE(rounding_tests)
+{
+    BOOST_CHECK(Time(1.25e-9) == Time(1, timeUnits::ns));
+    BOOST_CHECK(Time(0.99e-9) == Time(1, timeUnits::ns));
+    BOOST_CHECK(Time(1.49e-9) == Time(1, timeUnits::ns));
+    BOOST_CHECK(Time(1.51e-9) == Time(2, timeUnits::ns));
+}
+
 BOOST_AUTO_TEST_CASE (comparison_tests)
 {
     BOOST_CHECK (Time (1.1) > Time (1.0));
@@ -173,4 +183,6 @@ BOOST_AUTO_TEST_CASE (test_string_conversions)
 
     BOOST_CHECK_THROW (loadTimeFromString ("happy"), std::invalid_argument);
 }
+
+
 BOOST_AUTO_TEST_SUITE_END ()

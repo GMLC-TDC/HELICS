@@ -81,3 +81,9 @@ int helicsBrokerIsConnected (helics_broker broker);
 
 const char *helicsGetVersion ();
 ```
+
+8) All cmake commmands (those defined in cmake itself) should be lower case
+```
+if as opposed to IF
+install vs INSTALL
+```

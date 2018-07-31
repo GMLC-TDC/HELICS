@@ -23,7 +23,7 @@ set(ZeroMQ_FOUND 0)
 if ("${ZeroMQ_INSTALL_PATH}" STREQUAL "")
 set(ZeroMQ_PATH2 "")
 else()
-STRING(REPLACE "?" "" ZeroMQ_PATH2 ${ZeroMQ_INSTALL_PATH})
+string(REPLACE "?" "" ZeroMQ_PATH2 ${ZeroMQ_INSTALL_PATH})
 endif()
 
 find_path(ZeroMQ_ROOT_DIR

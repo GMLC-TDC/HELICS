@@ -6,45 +6,43 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include <memory>
-
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+#include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/Core.hpp"
 
-#ifdef KEY_TESTS
 #ifndef DISABLE_TCP_CORE
-const std::string core_types[] = {"test",  "ipc",    "tcp",   "zmq",   "udp",   "test_2", "zmq_4",
-                                  "ipc_2", "test_4", "tcp_2", "zmq_2", "udp_2", "test_3", "zmq_3"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp", "test_3", "zmq_3"};
-#else
-const std::string core_types[] = {"test",  "ipc",    "zmq",   "udp",   "test_2", "zmq_4",
-                                  "ipc_2", "test_4", "zmq_2", "udp_2", "test_3", "zmq_3"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3"};
-#endif
-#else  // KEY_TESTS
-#ifdef QUICK_TESTS_ONLY
-#ifndef DISABLE_TCP_CORE
+#ifdef HELICS_HAVE_ZEROMQ
 const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp", "test_3", "zmq_3"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp", "test_3", "zmq_3"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp", "test_3", "zmq_3", "udp_3", "tcp_3"};
+const std::string core_types_all[] = {"test",   "ipc_2", "tcp",    "test_2", "zmq",   "udp",
+                                      "test_3", "zmq_3", "ipc",    "zmq_2",  "udp_2", "tcp_2",
+                                      "udp_3",  "tcp_3", "test_4", "zmq_4",  "udp_4", "tcp_4"};
+const std::string core_types_extended[] = {"ipc",   "zmq_2",  "udp_2", "tcp_2", "udp_3",
+                                           "tcp_3", "test_4", "zmq_4", "udp_4", "tcp_4"};
 #else
+const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "udp", "test_3"};
+const std::string core_types_single[] = {"test", "ipc", "tcp", "udp", "test_3", "udp_3", "tcp_3"};
+const std::string core_types_all[] = {"test",  "ipc_2", "tcp",   "test_2", "udp",    "test_3", "ipc",
+                                      "udp_2", "tcp_2", "udp_3", "tcp_3",  "test_4", "udp_4",  "tcp_4"};
+const std::string core_types_extended[] = {"ipc", "udp_2", "tcp_2", "udp_3", "tcp_3", "test_4", "udp_4", "tcp_4"};
+#endif
+
+#else
+#ifdef HELICS_HAVE_ZEROMQ
 const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp", "test_3", "zmq_3"};
 const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3"};
-#endif
-#else  // QUICK_TESTS_ONLY
-#ifndef DISABLE_TCP_CORE
-const std::string core_types[] = {"test",  "ipc",   "zmq",    "udp",   "tcp",    "test_2",
-                                  "ipc_2", "zmq_2", "udp_2",  "tcp_2", "test_3", "zmq_3",
-                                  "udp_3", "tcp_3", "test_4", "zmq_4", "udp_4",  "tcp_4"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp", "test_3", "zmq_3", "udp_3", "tcp_3"};
+const std::string core_types_all[] = {"test",  "ipc_2", "test_2", "zmq",   "udp",    "test_3", "zmq_3", "ipc",
+                                      "zmq_2", "udp_2", "test_3", "udp_3", "test_4", "zmq_4",  "udp_4"};
+const std::string core_types_extended[] = {"ipc", "zmq_2", "udp_2", "test_3", "udp_3", "test_4", "zmq_4", "udp_4"};
 #else
-const std::string core_types[] = {"test",  "ipc",    "zmq",   "udp",   "test_2", "ipc_2", "zmq_2",
-                                  "udp_2", "test_3", "zmq_3", "udp_3", "test_4", "zmq_4", "udp_4"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3", "udp_3"};
+const std::string core_types[] = {"test", "ipc_2", "test_2", "udp", "test_3"};
+const std::string core_types_single[] = {"test", "ipc", "udp", "test_3", "udp_3"};
+const std::string core_types_all[] = {"test",  "ipc_2",  "test_2", "udp",    "test_3", "ipc",
+                                      "udp_2", "test_3", "udp_3",  "test_4", "udp_4"};
+const std::string core_types_extended[] = {"ipc", "udp_2", "test_3", "udp_3", "test_4", "udp_4"};
 #endif
-#endif  // QUICK_TESTS_ONLY
-
-#endif  // KEY_TESTS
+#endif
 
 const std::string defaultNamePrefix = "fed";
 

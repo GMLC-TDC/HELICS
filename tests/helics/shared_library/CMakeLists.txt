@@ -16,9 +16,10 @@ FilterTests.cpp
 test-message-federate.cpp
 #test-message-federate_cpp.cpp
 #FederateTests.cpp
-#TimingTests.cpp
+TimingTests.cpp
 #iterationTests.cpp
 QueryTests.cpp
+badInputTests.cpp
 )
 
 set(cpp_shared_library_test_sources
@@ -56,20 +57,32 @@ target_compile_definitions(shared-library-tests-cpp PRIVATE "-DHELICS_INSTALL_LO
 
 target_compile_definitions(shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
 
-add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_level=test_suite --report_level=short)
+add_test(NAME shared-library-tests-cpp COMMAND shared-library-tests-cpp --log_level=message --report_level=short)
+
+set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Daily)
+# Setting a different label, because the test fixture for the C++ shared library tests doesn't work
+# push_back for vector causes a segfault for unknown reasons (Boost UTF related?)
+set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Daily)
+
+# Tests used for Continuous Integration builds
+add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --run_test=@ci --log_level=message --report_level=short)
+add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp --run_test=@ci --log_level=message --report_level=short)
+
+set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
 
 if (WIN32)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
+	add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
         "${keyfile}"      # <--this is in-file
         "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endforeach(keyfile)
 
     add_custom_command(TARGET shared-library-tests POST_BUILD        # Adds a post-build event to api tests
         COMMAND ${CMAKE_COMMAND} -E copy_if_different  # which executes "cmake - E copy_if_different..."
-            "$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
-            "$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
+		"$<TARGET_FILE:helicsSharedLib>"      # <--this is in-file
+		"$<TARGET_FILE_DIR:shared-library-tests>/")                 # <--this is out-file path
 endif(WIN32)
 
