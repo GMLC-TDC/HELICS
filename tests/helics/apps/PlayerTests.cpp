@@ -57,6 +57,44 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     fut.get ();
 }
 
+BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
+{
+    helics::FederateInfo fi ("player1");
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = "core1";
+    fi.coreInitString = "2";
+    helics::apps::Player play1 (fi);
+    fi.name = "block1";
+    play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
+    play1.addPoint (1.0, "pub1", "v[3.0,4.0]");
+    play1.addPoint (2.0, "pub1", "0.7");
+    play1.addPoint (3.0, "pub1", std::complex<double>(0.0,0.8));
+
+    helics::ValueFederate vfed (fi);
+    helics::Subscription sub1 (&vfed, "pub1");
+    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    vfed.enterExecutionState ();
+    auto retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 1.0);
+    auto val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 5,0);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 2.0);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.7);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 3.0);
+    val = sub1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 0.8);
+
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 5.0);
+    vfed.finalize ();
+    fut.get ();
+}
+
 BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 {
     helics::FederateInfo fi ("player1");
