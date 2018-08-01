@@ -15,7 +15,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 **Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.  It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
-# Install Instructions
+# Installation Instructions
 
 [Windows](https://gmlc-tdc.github.io/HELICS-src/installation/windows.html)
 
@@ -28,6 +28,8 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).   
 
 The [Introduction to the HELICS documentation](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html) steps through a series of examples that step through the basic usage and concepts of HELICS.
+
+Several Examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples).  This repo provides a number of examples using the different libraries and interfaces.
 
 The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) provides a series of tutorials using HELICS to build a co-simulation using domain-specific external modeling tools that is built around an electric power system use case with integrated transmission-distribution-market-communication quasi-steady-state-timeseries (QSTS) simulation.
 
