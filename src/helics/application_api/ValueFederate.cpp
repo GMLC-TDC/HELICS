@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "ValueFederateManager.hpp"
@@ -22,17 +23,17 @@ ValueFederate::ValueFederate (const std::shared_ptr<Core> &core, const FederateI
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
-ValueFederate::ValueFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
+ValueFederate::ValueFederate (const std::string &configString) : Federate (loadFederateInfo (configString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    ValueFederate::registerInterfaces (configString);
 }
 
-ValueFederate::ValueFederate (const std::string &name, const std::string &jsonString)
-    : Federate (loadFederateInfo (name, jsonString))
+ValueFederate::ValueFederate (const std::string &name, const std::string &configString)
+    : Federate (loadFederateInfo (name, configString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    ValueFederate::registerInterfaces (configString);
 }
 
 ValueFederate::ValueFederate () = default;
@@ -54,11 +55,11 @@ void ValueFederate::disconnect ()
 
 ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 {
+    vfManager = std::move (fed.vfManager);
     if (getID () != fed.getID ())
     {  // the id won't be moved, as it is copied so use it as a test if it has moved already
         Federate::operator= (std::move (fed));
     }
-    vfManager = std::move (fed.vfManager);
     return *this;
 }
 
@@ -101,19 +102,31 @@ void ValueFederate::setDefaultValue (input_id_t id, data_view block)
     vfManager->setDefaultValue (id, block);
 }
 
-void ValueFederate::registerInterfaces (const std::string &jsonString)
+void ValueFederate::registerInterfaces (const std::string &configString)
 {
-    registerValueInterfaces (jsonString);
-    Federate::registerInterfaces (jsonString);
+    registerValueInterfaces (configString);
+    Federate::registerInterfaces (configString);
 }
 
-void ValueFederate::registerValueInterfaces (const std::string &jsonString)
+void ValueFederate::registerValueInterfaces (const std::string &configString)
 {
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
-    auto doc = loadJson (jsonString);
+    if (hasTomlExtension (configString))
+	{
+        registerValueInterfacesToml (configString);
+	}
+	else
+	{
+        registerValueInterfacesJson (configString);
+	}
+}
+
+void ValueFederate::registerValueInterfacesJson(const std::string &configString)
+{
+    auto doc = loadJson (configString);
 
     if (doc.isMember ("publications"))
     {
@@ -169,6 +182,126 @@ void ValueFederate::registerValueInterfaces (const std::string &jsonString)
             }
         }
     }
+    if (doc.isMember ("inputs"))
+    {
+        auto ipts = doc["inputs"];
+        for (const auto &ipt : ipts)
+        {
+            auto key = getKey (ipt);
+
+            auto id = vfManager->getInputId (key);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
+            auto type = (ipt.isMember ("type")) ? ipt["type"].asString () : std ::string ();
+            auto units = (ipt.isMember ("units")) ? ipt["units"].asString () : std::string ();
+            bool global = (ipt.isMember ("global")) ? (ipt["global"].asBool ()) : false;
+            if (global)
+            {
+                registerGlobalInput (key, type, units);
+            }
+            else
+            {
+                registerInput (key, type, units);
+            }
+        }
+    }
+}
+
+void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
+{
+    toml::Value doc;
+    try
+    {
+        doc = loadToml (tomlString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
+
+	auto pubs = doc.find ("publications");
+    if (pubs!=nullptr)
+    {
+        auto &pubArray = pubs->as<toml::Array> ();
+        for (const auto &pub : pubArray)
+        {
+            auto key = getKey (pub);
+
+            auto id = vfManager->getPublicationId (key);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
+            auto type = tomlGetOrDefault (pub, "type", std::string ());
+            auto units = tomlGetOrDefault (pub, "units", std::string ());
+            bool global = tomlGetOrDefault (pub, "global", false);
+            if (global)
+            {
+                registerGlobalPublication (key, type, units);
+            }
+            else
+            {
+                registerPublication (key, type, units);
+            }
+        }
+    }
+    auto subs = doc.find ("subscriptions");
+    if (subs != nullptr)
+    {
+        auto &subArray = subs->as<toml::Array> ();
+        for (const auto &sub : subArray)
+        {
+            auto key = getKey (sub);
+            auto id = vfManager->getSubscriptionId (key);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
+            auto type = tomlGetOrDefault (sub, "type", std::string ());
+            auto units = tomlGetOrDefault (sub, "units", std::string ());
+            bool optional = tomlGetOrDefault (sub, "optional", false);
+            bool required = tomlGetOrDefault (sub, "required", !optional);
+            id = registerSubscription (key, type, units);
+            if (required)
+            {
+               
+            }
+            
+            auto shortcut = sub.find ("shortcut");
+            if (shortcut!=nullptr)
+            {
+                addShortcut (id, shortcut->as<std::string> ());
+            }
+        }
+    }
+    auto ipts = doc.find ("inputs");
+    if (ipts != nullptr)
+    {
+        auto &iptArray = ipts->as<toml::Array> ();
+        for (const auto &ipt : iptArray)
+        {
+            auto key = getKey (ipt);
+
+            auto id = vfManager->getPublicationId (key);
+            if (id != invalid_id_value)
+            {
+                continue;
+            }
+            auto type = tomlGetOrDefault (ipt, "type", std::string ());
+            auto units = tomlGetOrDefault (ipt, "units", std::string ());
+            bool global = tomlGetOrDefault (ipt, "global", false);
+            if (global)
+            {
+                registerGlobalInput(key, type, units);
+            }
+            else
+            {
+                registerInput (key, type, units);
+            }
+        }
+    }
 }
 
 data_view ValueFederate::getValueRaw (input_id_t id) { return vfManager->getValue (id); }
@@ -199,9 +332,9 @@ void ValueFederate::initializeToExecuteStateTransition () { vfManager->initializ
 
 std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
-std::string ValueFederate::getInputKey (input_id_t sub_id) const
+std::string ValueFederate::getInputKey (input_id_t ipt_id) const
 {
-    return vfManager->getInputKey (sub_id);
+    return vfManager->getInputKey (ipt_id);
 }
 
 input_id_t ValueFederate::getInputId (const std::string &key) const

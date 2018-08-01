@@ -15,6 +15,7 @@ DelayedObjects.hpp
 searchableObjectHolder.hpp
 argParser.h
 JsonProcessingFunctions.hpp
+TomlProcessingFunctions.hpp
 stringToCmdLine.h
 AsioServiceManager.h
 logger.h
@@ -29,12 +30,15 @@ DualMappedVector.hpp
 MappedPointerVector.hpp
 DualMappedPointerVector.hpp
 TripWire.hpp
+fmt_format.h
+fmt_ostream.h
 )
 
 set(common_sources
 stringToCmdLine.cpp
 AsioServiceManager.cpp
 JsonProcessingFunctions.cpp
+TomlProcessingFunctions.cpp
 logger.cpp
 stringOps.cpp
 charMapper.cpp

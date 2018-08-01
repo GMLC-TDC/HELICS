@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "Broker.hpp"
@@ -41,7 +40,7 @@ std::shared_ptr<Broker> findBroker (const std::string &brokerName);
 cleanUpBrokers earlier if desired
 @param broker a pointer to a Broker object that should be able to be found globally
 @return true if the registration was successful false otherwise*/
-bool registerBroker (std::shared_ptr<Broker> broker);
+bool registerBroker (const std::shared_ptr<Broker> &broker);
 /** remove a broker from the registry
 @param name the name of the broker to unregister
 */

@@ -222,12 +222,12 @@ helics_bool_t helicsFederateHasMessage (helics_federate fed)
 {
     if (fed == nullptr)
     {
-        return false;
+        return helics_false;
     }
     auto mFed = getMessageFed (fed);
     if (mFed == nullptr)
     {
-        return false;
+        return helics_false;
     }
     return (mFed->hasMessage ()) ? helics_true : helics_false;
 }
@@ -236,7 +236,7 @@ helics_bool_t helicsEndpointHasMessage (helics_endpoint endpoint)
 {
     if (endpoint == nullptr)
     {
-        return false;
+        return helics_false;
     }
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);

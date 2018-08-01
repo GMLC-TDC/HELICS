@@ -13,18 +13,18 @@ int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics::Subscription sub;
-  helics::Publication  pub;
+  helics98::Subscription sub;
+  helics98::Publication  pub;
 
 
-  std::string helicsversion = helics::getHelicsVersionString();
+  std::string helicsversion = helics98::getHelicsVersionString();
 
   printf(" Helics version = %s\n",helicsversion.c_str());
 
   /* Create Federate Info object that describes the federate properties
    * Set federate name and core type from string
    */
-  helics::FederateInfo fi ("TestB Federate", "zmq");
+  helics98::FederateInfo fi ("TestB Federate", "zmq");
 
   /* Federate init string */
   fi.setCoreInitString (fedinitstring);
@@ -36,7 +36,7 @@ int main(int /*argc*/,char ** /*argv*/)
   fi.setLoggingLevel (1);
 
   /* Create value federate */
-  helics::ValueFederate* vfed = new helics::ValueFederate (fi);
+  helics98::ValueFederate* vfed = new helics98::ValueFederate (fi);
   printf(" Value federate created\n");
 
   sub = vfed->registerSubscription("testA","double");
@@ -48,19 +48,19 @@ int main(int /*argc*/,char ** /*argv*/)
 
 
   /* Enter initialization state */
-  vfed->enterInitializationMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterInitializationMode(); // can throw helics98::InvalidStateTransition exception
   printf(" Entered initialization state\n");
   double y = 1.0, /*xprv = 100,*/yprv=100;
 
   pub.publish(y);
   fflush(NULL);
   /* Enter execution state */
-  vfed->enterExecutionMode(); // can throw helics::InvalidStateTransition exception
+  vfed->enterExecutionMode(); // can throw helics98::InvalidStateTransition exception
   printf(" Entered execution state\n");
 
   fflush(NULL);
   helics_time_t currenttime=0.0;
-  helics::helics_iteration_time currenttimeiter;
+  helics98::helics_iteration_time currenttimeiter;
   currenttimeiter.status = iterating;
 
  // int           isupdated;

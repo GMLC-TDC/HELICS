@@ -373,7 +373,9 @@ class Core
      * Returns the name or identifier for a specified handle
      */
     virtual const std::string &getHandleName (interface_handle handle) const = 0;
-    /** remove a target from a handles operation*/
+    /** remove a target from a handles operation
+	@param handle the handle to remove the target on
+	@param targetToRemove the name of the target to remove*/
     virtual void removeTarget(interface_handle handle, const std::string &targetToRemove) = 0;
     /**
     * Returns the target of a specified handle
@@ -442,7 +444,7 @@ class Core
     /**
      * Returns vector of input handles that received an update during the last
      * time request.  The data remains valid until the next call to getValueUpdates for the given federateID
-     *@param federateID the identification code of the federate to query
+     *@param federateID the identification code of the federate to get which interfaces have been updated
      @return a reference to the location of an array of handles that have been updated
      */
     virtual const std::vector<interface_handle> &getValueUpdates (federate_id_t federateID) = 0;
@@ -460,14 +462,14 @@ class Core
     virtual interface_handle
     registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) = 0;
 
-    /** get a endpoint Handle from its name or target(this may not be unique so it will only find the first one)
+    /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
     virtual interface_handle getEndpoint (federate_id_t federateID, const std::string &name) const = 0;
 
     /**
-    * Register a cloning source filter, a cloning filter operates on a copy of the message vs the actual message
+    * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual message
     *
     @param filterName the name of the filter (may be left blank and one will be automatically assigned)
     @param type_in the input type of the filter

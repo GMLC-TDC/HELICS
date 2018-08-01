@@ -107,5 +107,5 @@ public:
 private:
     helics_endpoint ep;
 };
-}
+} //namespace helics98
 #endif

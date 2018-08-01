@@ -1,6 +1,9 @@
-message(STATUS "CMake version: ${CMAKE_VERSION}")
+if (NOT FMT_SILENT)
+	message(STATUS "CMake version: ${CMAKE_VERSION}")
+endif()
 
 cmake_minimum_required(VERSION 2.8.12)
+
 
 # Determine if fmt is built as a subproject (using add_subdirectory)
 # or if it is the master project.
@@ -35,7 +38,7 @@ option(FMT_INSTALL "Generate the install target." ${MASTER_PROJECT})
 option(FMT_TEST "Generate the test target." ${MASTER_PROJECT})
 option(FMT_USE_CPP14 "Enable the addition of C++14 compiler flags." ON)
 
-project(FMT)
+
 
 # Get version from core.h
 file(READ include/fmt/core.h core_h)
@@ -48,9 +51,19 @@ math(EXPR CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
 math(EXPR CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
 join(FMT_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.
                  ${CPACK_PACKAGE_VERSION_PATCH})
-message(STATUS "Version: ${FMT_VERSION}")
+				 
+if (NOT FMT_SILENT)
+	message(STATUS "Version: ${FMT_VERSION}")
 
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+	message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+endif()
+
+if (CMAKE_VERSION VERSION_LESS 3.0)
+project(FMT)
+else()
+ cmake_policy(SET CMP0048 NEW)
+project(FMT VERSION "${FMT_VERSION}")
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 

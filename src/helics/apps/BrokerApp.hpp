@@ -57,7 +57,6 @@ public:
 
     /** forceably disconnect the broker*/
     void forceTerminate();
-
     /** overload the -> operator so broker functions can be called if needed
     */
     auto *operator->() const { return broker.operator->(); }
@@ -67,5 +66,5 @@ private:
     core_type type = core_type::ZMQ;
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
 };
-}
-}
+} //namespace apps
+} //namespace helics

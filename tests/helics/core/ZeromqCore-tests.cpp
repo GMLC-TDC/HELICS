@@ -21,7 +21,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 //#include "boost/process.hpp"
 #include <future>
 
-BOOST_AUTO_TEST_SUITE (ZMQCore_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (ZMQCore_tests, *utf::label("ci"))
 
 using helics::Core;
 const std::string defServer ("tcp://127.0.0.1:23405");
@@ -58,11 +60,14 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
+    
 }
 
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -126,6 +131,8 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -161,6 +168,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
+    
     // make sure the check receives all messages
     reqset.checkForMessages (std::chrono::milliseconds (50));
     if (reqset.waiting ())
@@ -173,6 +181,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
         reqset.checkForMessages(std::chrono::milliseconds(50));
     }
     BOOST_REQUIRE (!reqset.waiting ());
+    std::this_thread::yield();
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);
@@ -182,14 +191,15 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     reqset.transmit (1, M);
     reqset.transmit (2, M);
     reqset.transmit (3, M);
-
+    std::this_thread::yield();
     repSocket1.recv (&msg);
 
     repSocket1.send (msg);
-
+    std::this_thread::yield();
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
+    std::this_thread::yield();
     repSocket3.recv (&msg);
 
     repSocket3.send (msg);
@@ -200,6 +210,22 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
         if ((res + res2 == 6) || (res2 == 6))
         {
             res = 6;
+        }
+        if (res != 6)
+        {
+            res2 = reqset.checkForMessages(std::chrono::milliseconds(400));
+            if ((res + res2 == 6) || (res2 == 6))
+            {
+                res = 6;
+            }
+        }
+        if (res != 6)
+        {
+            res2 = reqset.checkForMessages(std::chrono::milliseconds(400));
+            if ((res + res2 == 6) || (res2 == 6))
+            {
+                res = 6;
+            }
         }
     }
     BOOST_CHECK_EQUAL (res, 6);
@@ -212,6 +238,8 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 
 BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     helics::zeromq::ZmqComms comm (host, host);
 
@@ -264,6 +292,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
 
 BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
     helics::zeromq::ZmqComms comm (host, host);
@@ -331,6 +361,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -379,6 +411,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
@@ -487,6 +521,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 
 BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString =
       "1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
@@ -547,6 +583,8 @@ also tests the automatic port determination for cores
 */
 BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 {
+    //sleep to clear any residual from the previous test
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ, initializationString);

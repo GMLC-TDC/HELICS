@@ -97,13 +97,20 @@ class CommonCore : public Core, public BrokerBase
     virtual interface_handle getInput(federate_id_t federateID, const std::string &key) const override final;
 
     virtual const std::string &getHandleName (interface_handle handle) const override final;
+
+    virtual void setHandleOption (interface_handle handle, int32_t option, bool option_value) override final;
+
+    virtual bool getHandleOption (interface_handle handle, int32_t option) const override final;
     virtual const std::string &getTarget (interface_handle handle, int32_t index) const override final;
+    virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) override final;
+    virtual void addDestinationTarget (interface_handle handle, const std::string &dest) override final;
+    virtual void addSourceTarget (interface_handle handle, const std::string &name) override final;
     virtual const std::string &getUnits (interface_handle handle) const override final;
     virtual const std::string &getType (interface_handle handle) const override final;
     virtual const std::string &getOutputType (interface_handle handle) const override final;
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) override final;
     virtual std::shared_ptr<const data_block> getValue (interface_handle handle) override final;
-
+    virtual std::vector<std::shared_ptr<const data_block>> getValues (interface_handle handle) override final;
     virtual const std::vector<interface_handle> &getValueUpdates (federate_id_t federateID) override final;
     virtual interface_handle
     registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
@@ -118,6 +125,9 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
+    virtual void dataConnect (const std::string &source, const std::string &target) override final;
+    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) override final;
+    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) override final;
     virtual void send (interface_handle sourceHandle,
                        const std::string &destination,
                        const char *data,

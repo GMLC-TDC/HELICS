@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Filters.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
@@ -625,9 +626,21 @@ void Federate::initializeToExecuteStateTransition ()
     // child classes may do something with this
 }
 
-void Federate::registerInterfaces (const std::string &jsonString) { registerFilterInterfaces (jsonString); }
+void Federate::registerInterfaces (const std::string &configString) { registerFilterInterfaces (configString); }
 
-void Federate::registerFilterInterfaces (const std::string &jsonString)
+void Federate::registerFilterInterfaces (const std::string &configString)
+{
+    if (hasTomlExtension (configString))
+    {
+        registerFilterInterfacesToml (configString);
+    }
+    else
+    {
+        registerFilterInterfacesJson (configString);
+    }
+}
+
+void Federate::registerFilterInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
 
@@ -735,7 +748,7 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
                         {
                             if ((!prop.isMember ("name")) && (!prop.isMember ("value")))
                             {
-                                std::cerr << "properties must be specified with name and value fields\n";
+                                std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                                 continue;
                             }
                             if (prop["value"].isDouble ())
@@ -752,7 +765,7 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
                     {
                         if ((!props.isMember ("name")) && (!props.isMember ("value")))
                         {
-                            std::cerr << "properties must be specified with name and value fields\n";
+                            std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                             continue;
                         }
                         if (props["value"].isDouble ())
@@ -762,6 +775,146 @@ void Federate::registerFilterInterfaces (const std::string &jsonString)
                         else
                         {
                             filter->setString (props["name"].asString (), props["value"].asString ());
+                        }
+                    }
+                }
+                addFilterObject (std::move (filter));
+            }
+        }
+    }
+}
+
+void Federate::registerFilterInterfacesToml (const std::string &tomlString)
+{
+    toml::Value doc;
+    try
+    {
+        doc = loadToml (tomlString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
+
+    auto filts = doc.find ("filters");
+    if (filts != nullptr)
+    {
+        auto &filtArray = filts->as<toml::Array> ();
+        for (const auto &filt : filtArray)
+        {
+            std::string name = tomlGetOrDefault (filt, "name", std::string ());
+			std::string target = tomlGetOrDefault (filt, "target", std::string ());
+            std::string inputType = tomlGetOrDefault (filt, "target", std::string ());
+            std::string outputType = tomlGetOrDefault (filt, "target", std::string ());
+            bool useTypes = ((inputType.empty ()) && (outputType.empty ()));
+
+            std::string mode =tomlGetOrDefault (filt, "mode", std::string ("source"));
+          
+            std::string operation ("custom");
+            auto op = filt.find ("operation");
+            if (op!=nullptr)
+            {
+                operation = op->as<std::string>();
+                if ((mode == "clone") || (mode == "cloning"))
+                {
+                    if (operation != "clone")
+                    {
+                        std::cerr << "the only valid operation with cloning filter is \"clone\"\n";
+                        continue;
+                    }
+                }
+            }
+            if ((useTypes) && (operation != "custom"))
+            {
+                std::cerr << "input and output types may only be specified for custom filters\n";
+                continue;
+            }
+            if (useTypes)
+            {
+                if (mode == "source")
+                {
+                    registerSourceFilter (name, target, inputType, outputType);
+                }
+                else if ((mode == "dest") || (mode == "destination"))
+                {
+                    registerDestinationFilter (name, target, inputType, outputType);
+                }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
+            }
+            else
+            {
+                std::shared_ptr<Filter> filter;
+                auto type = filterTypeFromString (operation);
+                if (type == defined_filter_types::unrecognized)
+                {
+                    std::cerr << "unrecognized filter operation:" << operation << '\n';
+                    continue;
+                }
+                if (mode == "source")
+                {
+                    filter = make_source_filter (type, this, target, name);
+                }
+                else if ((mode == "dest") || (mode == "destination"))
+                {
+                    filter = make_destination_filter (type, this, target, name);
+                }
+                else if ((mode == "clone") || (mode == "cloning"))
+                {
+                    // TODO:: do something with the name
+                    auto clonefilt = std::make_shared<CloningFilter> (this);
+                    clonefilt->addDeliveryEndpoint (target);
+                    filter = std::move (clonefilt);
+                }
+                else
+                {
+                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                }
+                auto props = filt.find ("properties");
+                if (props!=nullptr)
+                {
+                    if (props->is<toml::Array> ())
+                    {
+						auto &propArray = props->as<toml::Array> ();
+                        for (const auto &prop : propArray)
+                        {
+                            auto propname = prop.find ("name");
+                            auto propval = prop.find ("value");
+
+                            if ((propname == nullptr) || (propval==nullptr))
+                            {
+                                std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
+                                continue;
+                            }
+                            if (propval->isNumber ())
+                            {
+                                filter->set (propname->as<std::string> (), propval->as<double> ());
+                            }
+                            else
+                            {
+                                filter->setString (propname->as<std::string> (), propval->as<std::string> ());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        auto propname = props->find ("name");
+                        auto propval = props->find ("value");
+
+                        if ((propname == nullptr) || (propval == nullptr))
+                        {
+                            std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
+                            continue;
+                        }
+                        if (propval->isNumber ())
+                        {
+                            filter->set (propname->as<std::string> (), propval->as<double> ());
+                        }
+                        else
+                        {
+                            filter->setString (propname->as<std::string> (), propval->as<std::string> ());
                         }
                     }
                 }
@@ -790,11 +943,15 @@ std::string Federate::query (const std::string &queryStr)
     {
         return getName ();
     }
-    return coreObject->query ("federation", queryStr);
+    return coreObject->query (getName(), queryStr);
 }
 
 std::string Federate::query (const std::string &target, const std::string &queryStr)
 {
+	if ((target.empty())||(target=="federate"))
+	{
+        return query (queryStr);
+	}
     return coreObject->query (target, queryStr);
 }
 

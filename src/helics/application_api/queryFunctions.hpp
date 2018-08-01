@@ -4,21 +4,19 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-
 /** @file
 functions for dealing with query results*/
 
-
-
+#include <chrono>
 #include <string>
 #include <vector>
-#include <chrono>
 
 // forward declare Federate
 namespace helics
 {
 class Federate;
-}
+}  // namespace helics
+
 /** function takes a query result and vectorizes it if the query is a vector result, if not the results go into the
  * first element of the vector
  */
@@ -45,7 +43,9 @@ interface
 @param timeout the time to wait for the fed to initialize
 @return true if the federate is now trying to enter initialization false if the timeout was reached
 */
-bool waitForInit(helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
+bool waitForInit (helics::Federate *fed,
+                  const std::string &fedName,
+                  std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
 
 /** helper function to wait for a particular federate to be created
 @details this is useful if some reason we need to make sure a federate is created before proceeding
@@ -54,4 +54,6 @@ bool waitForInit(helics::Federate *fed, const std::string &fedName, std::chrono:
 @param timeout the amount of time in ms to wait before returning false
 @return true if the federate exists, false if the timeout occurred
 */
-bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
+bool waitForFed (helics::Federate *fed,
+                 const std::string &fedName,
+                 std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));

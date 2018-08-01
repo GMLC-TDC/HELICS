@@ -52,11 +52,11 @@ ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTar
         else
         {
             localTarget_ = generateMatchingInterfaceAddress(brokerTarget_);
-            if (brokerTarget_.compare(0, 3, "tcp"))
+            if (brokerTarget_.compare(0, 3, "tcp")==0)
             {
                 localTarget_ = "tcp://" + localTarget_;
             }
-            else if (brokerTarget_.compare(0, 3, "udp"))
+            else if (brokerTarget_.compare(0, 3, "udp")==0)
             {
                 localTarget_ = "udp://" + localTarget_;
             }
@@ -457,12 +457,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (connectionTimeout));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with broker\n";
+                    std::cerr << "unable to connect with zmq broker\n";
                     tx_status = connection_status::error;
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "broker connection timed out\n";
+                    std::cerr << "zmq broker connection timed out\n";
                     tx_status = connection_status::error;
                 }
                 if (tx_status == connection_status::error)
@@ -523,12 +523,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with broker (2)\n";
+                    std::cerr << "unable to connect with zmq broker (2)\n";
                     tx_status = connection_status::error;
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "broker connection timed out (2)\n";
+                    std::cerr << "zmq broker connection timed out (2)\n";
                     tx_status = connection_status::error;
                 }
                 if (tx_status == connection_status::error)
@@ -819,10 +819,7 @@ std::string ZmqComms::getAddress () const
     {
         return makePortAddress ("tcp://127.0.0.1", repPortNumber);
     }
-    else
-    {
-        return makePortAddress (localTarget_, repPortNumber);
-    }
+    return makePortAddress (localTarget_, repPortNumber);
 }
 
 std::string ZmqComms::getPushAddress () const
@@ -831,10 +828,7 @@ std::string ZmqComms::getPushAddress () const
     {
         return makePortAddress ("tcp://127.0.0.1", pullPortNumber);
     }
-    else
-    {
-        return makePortAddress (localTarget_, pullPortNumber);
-    }
+    return makePortAddress (localTarget_, pullPortNumber);
 }
 
 }  // namespace zeromq

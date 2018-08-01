@@ -293,10 +293,10 @@ std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
     return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
-bool registerCore (std::shared_ptr<Core> core)
+bool registerCore (const std::shared_ptr<Core> &core)
 {
     bool res = false;
-    auto tcore = std::dynamic_pointer_cast<CommonCore> (std::move (core));
+    auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
     if (tcore)
     {
         res = searchableObjects.addObject (tcore->getIdentifier (), tcore);

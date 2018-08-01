@@ -196,7 +196,7 @@ void AsioServiceManager::haltServiceLoop ()
     }
 }
 
-void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
+void serviceProcessingLoop (const std::shared_ptr<AsioServiceManager> &ptr)
 {
     try
     {

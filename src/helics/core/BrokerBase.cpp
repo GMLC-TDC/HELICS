@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/guarded.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include "fmt_wrapper.h"
+#include "../common/fmt_format.h"
 #include <random>
 #include <boost/program_options.hpp>
 
@@ -25,7 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static constexpr auto chars= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-static inline std::string gen_id ()
+static inline std::string genId ()
 {
     std::string nm = std::string(23, ' ');
     std::random_device rd;     // only used once to initialize (seed) engine
@@ -60,10 +60,10 @@ BrokerBase::~BrokerBase () { joinAllThreads (); }
 
 void BrokerBase::joinAllThreads ()
 {
-    if (_queue_processing_thread.joinable ())
+    if (queueProcessingThread.joinable ())
     {
         actionQueue.push (CMD_TERMINATE_IMMEDIATELY);
-        _queue_processing_thread.join ();
+        queueProcessingThread.join ();
     }
 }
 
@@ -162,7 +162,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         if (identifier.empty ())
         {
-            identifier = gen_id ();
+            identifier = genId ();
         }
     }
 
@@ -175,7 +175,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         loggingObj->openFile (logFile);
     }
     loggingObj->startLogging (maxLogLevel, maxLogLevel);
-    _queue_processing_thread = std::thread (&BrokerBase::queueProcessingLoop, this);
+    queueProcessingThread = std::thread (&BrokerBase::queueProcessingLoop, this);
 }
 
 bool BrokerBase::sendToLogger (global_federate_id_t federateID,
@@ -203,7 +203,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
     return false;
 }
 
-void BrokerBase::generateNewIdentifier () { identifier = gen_id (); }
+void BrokerBase::generateNewIdentifier () { identifier = genId (); }
 
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)

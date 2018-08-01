@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <map>
 #include <memory>
-#include <string>
 #include <thread>
 #include <unordered_map>
 
@@ -148,6 +147,8 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
+	virtual void waitForDisconnect () const override final;
+
   private:
     /** implementation details of the connection process
      */
@@ -175,9 +176,9 @@ class CoreBroker : public Broker, public BrokerBase
   public:
     /**default constructor
     @param setAsRootBroker  set to true to indicate this object is a root broker*/
-    CoreBroker (bool setAsRootBroker = false) noexcept;
+    explicit CoreBroker (bool setAsRootBroker = false) noexcept;
     /** constructor to set the name of the broker*/
-    CoreBroker (const std::string &broker_name);
+    explicit CoreBroker (const std::string &broker_name);
     /** destructor*/
     virtual ~CoreBroker ();
     /** start up the broker with an initialization string containing commands and parameters*/
@@ -196,6 +197,11 @@ class CoreBroker : public Broker, public BrokerBase
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
+    virtual void dataConnect (const std::string &source, const std::string &target) override final;
+
+    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) override final;
+
+    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) override final;
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();

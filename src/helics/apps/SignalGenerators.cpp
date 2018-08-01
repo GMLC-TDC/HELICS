@@ -12,7 +12,7 @@ namespace helics
 {
 namespace apps
 {
-void  RampGenerator::set(const std::string &parameter, double val)
+void RampGenerator::set (const std::string &parameter, double val)
 {
     if (parameter == "level")
     {
@@ -32,21 +32,20 @@ void  RampGenerator::set(const std::string &parameter, double val)
     }
     else
     {
-        SignalGenerator::set(parameter, val);
+        SignalGenerator::set (parameter, val);
     }
 }
 
-defV RampGenerator::generate(Time signalTime)
+defV RampGenerator::generate (Time signalTime)
 {
     double newVal = level + ramp * (signalTime - keyTime);
     lastTime = signalTime;
     return newVal;
 }
 
-
-void  SineGenerator::set(const std::string &parameter, double val)
+void SineGenerator::set (const std::string &parameter, double val)
 {
-    if ((parameter == "frequency") || (parameter == "freq")||(parameter=="f"))
+    if ((parameter == "frequency") || (parameter == "freq") || (parameter == "f"))
     {
         frequency = val;
     }
@@ -62,7 +61,7 @@ void  SineGenerator::set(const std::string &parameter, double val)
     {
         dAdt = val;
     }
-    else if ((parameter == "amplitude") || (parameter == "amp")||(parameter=="a"))
+    else if ((parameter == "amplitude") || (parameter == "amp") || (parameter == "a"))
     {
         Amplitude = val;
     }
@@ -76,11 +75,11 @@ void  SineGenerator::set(const std::string &parameter, double val)
     }
     else
     {
-        SignalGenerator::set(parameter, val);
+        SignalGenerator::set (parameter, val);
     }
 }
 
-defV SineGenerator::generate(Time signalTime)
+defV SineGenerator::generate (Time signalTime)
 {
     auto dt = signalTime - lastTime;
     auto tdiff = signalTime - lastCycle;
@@ -88,7 +87,7 @@ defV SineGenerator::generate(Time signalTime)
     frequency += dfdt * dt;
     Amplitude += dAdt * dt;
     // compute the sine wave component
-    double newValue = level+Amplitude * sin(2.0 * pi * (frequency * tdiff) + offset);
+    double newValue = level + Amplitude * sin (2.0 * pi * (frequency * tdiff) + offset);
     period = (frequency > 0.0) ? 1.0 / frequency : 1e36;
     while (tdiff > period)
     {
@@ -99,9 +98,9 @@ defV SineGenerator::generate(Time signalTime)
     return newValue;
 }
 
-void  PhasorGenerator::set(const std::string &parameter, double val)
+void PhasorGenerator::set (const std::string &parameter, double val)
 {
-    if ((parameter == "frequency")||(parameter=="freq") || (parameter == "f"))
+    if ((parameter == "frequency") || (parameter == "freq") || (parameter == "f"))
     {
         frequency = val;
     }
@@ -117,7 +116,7 @@ void  PhasorGenerator::set(const std::string &parameter, double val)
     {
         dAdt = val;
     }
-    else if ((parameter == "amplitude")||(parameter=="amp") || (parameter == "a"))
+    else if ((parameter == "amplitude") || (parameter == "amp") || (parameter == "a"))
     {
         Amplitude = val;
     }
@@ -131,48 +130,47 @@ void  PhasorGenerator::set(const std::string &parameter, double val)
     }
     else if (parameter == "offset")
     {
-        state *= std::polar(1.0, (val - offset));
+        state *= std::polar (1.0, (val - offset));
         offset = val;
     }
     else
     {
-        SignalGenerator::set(parameter, val);
+        SignalGenerator::set (parameter, val);
     }
 }
 
-void PhasorGenerator::set(const std::string &parameter, std::complex<double> val)
+void PhasorGenerator::set (const std::string &parameter, std::complex<double> val)
 {
     if ((parameter == "bias") || (parameter == "level"))
     {
-        bias_real = val.real();
-        bias_imag = val.imag();
+        bias_real = val.real ();
+        bias_imag = val.imag ();
     }
 }
 
-void PhasorGenerator::setString(const std::string &parameter, const std::string &val)
+void PhasorGenerator::setString (const std::string &parameter, const std::string &val)
 {
-    auto valc = helicsGetComplex(val);
-    if (std::abs(valc) < 1e12)
+    auto valc = helicsGetComplex (val);
+    if (std::abs (valc) < 1e12)
     {
-        set(parameter, valc);
+        set (parameter, valc);
     }
     else
     {
-        SignalGenerator::setString(parameter, val);
+        SignalGenerator::setString (parameter, val);
     }
 }
 
-defV PhasorGenerator::generate(Time signalTime)
+defV PhasorGenerator::generate (Time signalTime)
 {
     auto dt = signalTime - lastTime;
 
     frequency += dfdt * dt;
     Amplitude += dAdt * dt;
-    rotation = std::polar(1.0, frequency*dt * (2.0 * pi));
+    rotation = std::polar (1.0, frequency * dt * (2.0 * pi));
     state *= rotation;
     lastTime = signalTime;
-    return Amplitude*state+std::complex<double>(bias_real,bias_imag);
+    return Amplitude * state + std::complex<double> (bias_real, bias_imag);
 }
-
-}
-}
+}  // namespace apps
+}  // namespace helics

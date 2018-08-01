@@ -18,6 +18,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/data_view.hpp"
 #include "helics/core/core-data.hpp"
 
+namespace utf = boost::unit_test;
+
 using namespace std::string_literals;
 
 BOOST_AUTO_TEST_SUITE (value_converter_tests)
@@ -138,21 +140,21 @@ we are testing vectors of strings
 BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
 {
     using vecstr = std::vector<std::string>;
-    auto converter = helics::ValueConverter<vecstr> ();
+    using converter = helics::ValueConverter<vecstr>;
 
     vecstr testValue1 = {"test1", "test45", "this is a longer string to test", ""};
     // check the type
-    auto type = converter.type ();
+    auto type = converter::type ();
     BOOST_CHECK_EQUAL (type, "string_vector");
 
     // convert to a data view
-    auto dv = converter.convert (testValue1);
+    auto dv = converter::convert (testValue1);
     // convert back to a vector
-    auto val = converter.interpret (dv);
+    auto val = converter::interpret (dv);
     BOOST_CHECK (val == testValue1);
     // convert back to a string in a different way
     vecstr val2;
-    converter.interpret (dv, val2);
+    converter::interpret (dv, val2);
     BOOST_CHECK (val2 == testValue1);
 
     vecstr test2{
@@ -160,16 +162,16 @@ BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
       "*SDFSDF*JJ\nSSFSDsdkjflsdjflsdkfjlskdbnowhfoihfoai\0shfoaishfoasifhaofsihaoifhaosifhaosfihaosfihaosfihaohoaihsfiohoh"s};
     helics::data_block db;
 
-    converter.convert (test2, db);
+    converter::convert (test2, db);
 
-    auto val3 = converter.interpret (db);
+    auto val3 = converter::interpret (db);
     BOOST_CHECK (val3 == test2);
 }
 
 BOOST_AUTO_TEST_CASE (test_block_vectors)
 {
     using vecblock = std::vector<helics::data_block>;
-    auto converter = helics::ValueConverter<vecblock> ();
+    using converter = helics::ValueConverter<vecblock>;
 
     vecblock vb (4);
     vb[0] = helics::data_block (437, '<');
@@ -178,7 +180,7 @@ BOOST_AUTO_TEST_CASE (test_block_vectors)
     vb[2] = helics::ValueConverter<double>::convert (3.1415);
     vb[3] = helics::ValueConverter<int>::convert (9999);
 
-    auto rb = converter.convert (vb);
+    auto rb = converter::convert (vb);
 
     auto res = helics::ValueConverter<std::vector<helics::data_view>>::interpret (rb);
 

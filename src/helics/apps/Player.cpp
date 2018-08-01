@@ -3,8 +3,9 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "Player.hpp"
+
 #include "../common/argParser.h"
+#include "Player.hpp"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -52,21 +53,26 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
 static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data type to use"},
+  {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
                                      {"timeunits",
                                       "the default units on the timestamps used in file based input"}};
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (SOURCE_ONLY_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 
@@ -139,6 +145,7 @@ void Player::loadTextFile (const std::string &filename)
 
     int mcnt = 0;
     int pcnt = 0;
+    bool mlineComment = false;
     // count the lines
     while (std::getline (infile, str))
     {
@@ -147,8 +154,30 @@ void Player::loadTextFile (const std::string &filename)
             continue;
         }
         auto fc = str.find_first_not_of (" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
+        if (fc == std::string::npos)
         {
+            continue;
+        }
+        if (mlineComment)
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']'))
+                {
+                    mlineComment = false;
+                }
+            }
+            continue;
+        }
+        else if (str[fc] == '#')
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '['))
+                {
+                    mlineComment = true;
+                }
+            }
             continue;
         }
         if ((str[fc] == 'm') || (str[fc] == 'M'))
@@ -176,21 +205,47 @@ void Player::loadTextFile (const std::string &filename)
             continue;
         }
         auto fc = str.find_first_not_of (" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#'))
+        if (fc == std::string::npos)
         {
-            if (str[fc + 1] == '!')
+            continue;
+        }
+        if (mlineComment)
+        {
+            if (fc + 2 < str.size ())
             {
-                /*  //allow configuration inside the regular text file
-               
-
-                if (playerConfig.find("timeunits") != playerConfig.end())
+                if ((str[fc] == '#') && (str[fc+1] == '#') && (str[fc+2] == ']'))
                 {
-                    if (playerConfig["timeunits"] == "ns")
-                    {
-                        timeMultiplier = 1e-9;
-                    }
+                    mlineComment = false;
                 }
-                */
+            }
+            continue;
+        }
+        else if (str[fc] == '#')
+        {
+            if (fc + 2 < str.size ())
+            {
+                if ((str[fc + 1] == '#') && (str[fc + 2] == '['))
+                {
+                    mlineComment = true;
+                }
+                else if (str[fc + 1] == '!')
+                {
+                    /*  //allow configuration inside the regular text file
+
+
+
+
+
+
+                    if (playerConfig.find("timeunits") != playerConfig.end())
+                    {
+                        if (playerConfig["timeunits"] == "ns")
+                        {
+                            timeMultiplier = 1e-9;
+                        }
+                    }
+                    */
+                }
             }
             continue;
         }
@@ -236,8 +291,8 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-            if (blk.size () == 3)
-            {
+			if (blk.size() == 2)
+			{
                 auto cloc = blk[0].find_last_of (':');
                 if (cloc == std::string::npos)
                 {
@@ -255,39 +310,83 @@ void Player::loadTextFile (const std::string &filename)
                     }
                     points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
                 }
+                if (pIndex > 0)
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+				else
+				{
+                    std::cerr << "lines without publication name but follow one with a publication line " << lcount << '\n';
+				}
+                points[pIndex].value = blk[1];
+                ++pIndex;
+			}
+                else if (blk.size () == 3)
+                {
+                    auto cloc = blk[0].find_last_of (':');
+                    if (cloc == std::string::npos)
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                            Time::minVal ())
+                        {
+                            continue;
+                        }
+                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    }
+                    if ((blk[1].empty ()) && (pIndex > 0))
+                    {
+                        points[pIndex].pubName = points[pIndex - 1].pubName;
+                    }
+                    else
+                    {
+                        points[pIndex].pubName = blk[1];
+                    }
 
-                points[pIndex].pubName = blk[1];
-                points[pIndex].value = blk[2];
-                ++pIndex;
-            }
-            else if (blk.size () == 4)
-            {
-                auto cloc = blk[0].find_last_of (':');
-                if (cloc == std::string::npos)
+                    points[pIndex].value = blk[2];
+                    ++pIndex;
+                }
+                else if (blk.size () == 4)
                 {
-                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                    auto cloc = blk[0].find_last_of (':');
+                    if (cloc == std::string::npos)
                     {
-                        continue;
+                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                        {
+                            continue;
+                        }
                     }
+                    else
+                    {
+                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                            Time::minVal ())
+                        {
+                            continue;
+                        }
+                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    }
+                    if ((blk[1].empty ()) && (pIndex > 0))
+                    {
+                        points[pIndex].pubName = points[pIndex - 1].pubName;
+                    }
+                    else
+                    {
+                        points[pIndex].pubName = blk[1];
+                    }
+                    points[pIndex].type = blk[2];
+                    points[pIndex].value = blk[3];
+                    ++pIndex;
                 }
                 else
                 {
-                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                        Time::minVal ())
-                    {
-                        continue;
-                    }
-                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                    std::cerr << "unknown publish format line " << lcount << '\n';
                 }
-                points[pIndex].pubName = blk[1];
-                points[pIndex].type = blk[2];
-                points[pIndex].value = blk[3];
-                ++pIndex;
-            }
-            else
-            {
-                std::cerr << "unknown publish format line " << lcount << '\n';
-            }
         }
     }
 }
@@ -672,7 +771,7 @@ void Player::runTo (Time stopTime_input)
         }
     }
 
-    helics::Time nextPrintTime = 10.0;
+     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     bool moreToSend = true;
     Time nextSendTime = timeZero;
     int nextIteration = 0;
@@ -707,8 +806,8 @@ void Player::runTo (Time stopTime_input)
 
             if (newTime >= nextPrintTime)
             {
-                std::cout << "processed time " << static_cast<double> (newTime) << "\n";
-                nextPrintTime += 10.0;
+                std::cout << "processed for time " << static_cast<double> (newTime) << "\n";
+                nextPrintTime += nextPrintTimeStep;
             }
         }
         else
@@ -717,6 +816,7 @@ void Player::runTo (Time stopTime_input)
             ++currentIteration;
             sendInformation (nextSendTime, currentIteration);
         }
+       
     }
 }
 
@@ -729,18 +829,18 @@ void Player::addPublication (const std::string &key, helics_type_t type, const s
     }
     if (!useLocal)
     {
-        publications.push_back (Publication (GLOBAL, fed.get (), key, type, pubUnits));
+        publications.emplace_back (GLOBAL, fed.get (), key, type, pubUnits);
     }
     else
     {
         auto kp = key.find_first_of ("./");
         if (kp == std::string::npos)
         {
-            publications.push_back (Publication (fed.get (), key, type, pubUnits));
+            publications.emplace_back (fed.get (), key, type, pubUnits);
         }
         else
         {
-            publications.push_back (Publication (GLOBAL, fed.get (), key, type, pubUnits));
+            publications.emplace_back (GLOBAL, fed.get (), key, type, pubUnits);
         }
     }
     pubids[key] = static_cast<int> (publications.size ()) - 1;
@@ -755,18 +855,18 @@ void Player::addEndpoint (const std::string &endpointName, const std::string &en
     }
     if (!useLocal)
     {
-        endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+        endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
     }
     else
     {
         auto kp = endpointName.find_first_of ("./");
         if (kp == std::string::npos)
         {
-            endpoints.push_back (Endpoint (fed.get (), endpointName, endpointType));
+            endpoints.emplace_back (fed.get (), endpointName, endpointType);
         }
         else
         {
-            endpoints.push_back (Endpoint (GLOBAL, fed.get (), endpointName, endpointType));
+            endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
         }
     }
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
@@ -784,7 +884,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
             return -3;
         }
     }
-    if (vm_map.count ("timeunits"))
+    if (vm_map.count ("timeunits") > 0)
     {
         try
         {
@@ -796,6 +896,10 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
             std::cerr << vm_map["timeunits"].as<std::string> () << " is not recognized as a valid unit of time \n";
         }
     }
+    if (vm_map.count ("marker") > 0)
+    {
+        nextPrintTimeStep = loadTimeFromString (vm_map["marker"].as<std::string> ());
+    }
     return 0;
 }
 
@@ -804,29 +908,29 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
 
 static int hasB64Wrapper (const std::string &str)
 {
-    if (str.front() == '\"')
+    if (str.front () == '\"')
     {
-        if ((str.compare(2, 3, "64[") == 0) && (str[str.size()-2] == ']'))
+        if ((str.compare (2, 3, "64[") == 0) && (str[str.size () - 2] == ']'))
         {
             return 5;
         }
-        if ((str.compare(5, 3, "64[") == 0) && (str[str.size() - 2] == ']'))
+        if ((str.compare (5, 3, "64[") == 0) && (str[str.size () - 2] == ']'))
         {
             return 8;
         }
     }
     else
     {
-        if ((str.compare(1, 3, "64[") == 0) && (str.back() == ']'))
+        if ((str.compare (1, 3, "64[") == 0) && (str.back () == ']'))
         {
             return 4;
         }
-        if ((str.compare(4, 3, "64[") == 0) && (str.back() == ']'))
+        if ((str.compare (4, 3, "64[") == 0) && (str.back () == ']'))
         {
             return 7;
         }
     }
-    
+
     return 0;
 }
 
@@ -839,9 +943,9 @@ static std::string decode (std::string &&stringToDecode)
     auto offset = hasB64Wrapper (stringToDecode);
     if (offset != 0)
     {
-        if (stringToDecode.back() == '\"')
+        if (stringToDecode.back () == '\"')
         {
-            stringToDecode.pop_back();
+            stringToDecode.pop_back ();
         }
 
         stringToDecode.pop_back ();

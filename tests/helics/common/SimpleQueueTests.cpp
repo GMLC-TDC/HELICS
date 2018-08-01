@@ -164,7 +164,6 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests)
     BOOST_CHECK_EQUAL (V, 1'010'000);
 }
 
-#ifndef QUICK_TESTS_ONLY
 /** test with multiple consumer/single producer*/
 BOOST_AUTO_TEST_CASE (multithreaded_tests2)
 {
@@ -259,5 +258,4 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests3)
     BOOST_CHECK_EQUAL (V1 + V2 + V3, 3'010'000);
 }
 
-#endif
 BOOST_AUTO_TEST_SUITE_END ()

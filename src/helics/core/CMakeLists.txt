@@ -104,7 +104,6 @@ set(INCLUDE_FILES
 	NamedInputInfo.hpp
 	EndpointInfo.hpp
 	FilterInfo.hpp
-	fmt_wrapper.h
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp

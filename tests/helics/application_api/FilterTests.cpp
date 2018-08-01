@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageOperators.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "testFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -15,13 +16,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 /** these test cases test out the message federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture,*utf::label("ci"))
 
 /** test registration of filters*/
-BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 2, broker, helics::timeZero, "filter");
@@ -49,7 +50,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -232,7 +233,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_all), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 2, broker, 0.5, "message");
@@ -349,7 +350,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 */
 
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types_all), core_type)
 {
     auto broker = AddBroker (core_type, 3);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");

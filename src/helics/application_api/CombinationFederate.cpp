@@ -17,16 +17,16 @@ CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, con
 {
 }
 
-CombinationFederate::CombinationFederate (const std::string &jsonString)
-    : Federate (loadFederateInfo (jsonString)), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &configString)
+    : Federate (loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
-    registerInterfaces (jsonString);
+    CombinationFederate::registerInterfaces (configString);
 }
 
-CombinationFederate::CombinationFederate (const std::string &name, const std::string &jsonString)
-    : Federate (loadFederateInfo (name, jsonString)), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &name, const std::string &configString)
+    : Federate (loadFederateInfo (name, configString)), ValueFederate (true), MessageFederate (true)
 {
-    registerInterfaces (jsonString);
+    CombinationFederate::registerInterfaces (configString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
@@ -58,10 +58,10 @@ void CombinationFederate::initializeToExecuteStateTransition ()
     MessageFederate::initializeToExecuteStateTransition ();
 }
 
-void CombinationFederate::registerInterfaces (const std::string &jsonString)
+void CombinationFederate::registerInterfaces (const std::string &configString)
 {
-    ValueFederate::registerValueInterfaces (jsonString);
-    MessageFederate::registerMessageInterfaces (jsonString);
-    Federate::registerFilterInterfaces (jsonString);
+    ValueFederate::registerValueInterfaces (configString);
+    MessageFederate::registerMessageInterfaces (configString);
+    Federate::registerFilterInterfaces (configString);
 }
 }  // namespace helics

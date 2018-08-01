@@ -42,9 +42,10 @@ class BrokerBase
 
     std::unique_ptr<Logger>
       loggingObj;  //!< default logging object to use if the logging callback is not specified
-    std::thread _queue_processing_thread;  //!< thread for running the broker
+    std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running

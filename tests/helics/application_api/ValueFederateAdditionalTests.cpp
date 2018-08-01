@@ -21,10 +21,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value federates with some additional tests
  */
+namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture)
-
-namespace bdata = boost::unit_test::data;
 
 
 /** test simple creation and destruction*/
@@ -226,7 +226,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types_all), core_type)
 {
     // this one is going to test really ugly strings
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
@@ -270,7 +270,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core
 }
 
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types_all), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
@@ -438,6 +438,7 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
 
     helics::ValueFederate vFedMoved (std::move (vFed));
     BOOST_CHECK_EQUAL (vFedMoved.getName (), "test1");
+    //verify that this was moved so this does produce a warning on some systems about use after move
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 
@@ -449,6 +450,30 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
     BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
+    auto id = vFed.getSubscriptionId ("pubshortcut");
+    auto key = vFed.getSubscriptionKey (id);
+    BOOST_CHECK_EQUAL (key, "fedName/pub2");
+
+    auto pub2name = vFed.getPublicationKey (1);
+    BOOST_CHECK_EQUAL (key, "fedName/pub2");
+    vFed.disconnect ();
+}
+
+BOOST_AUTO_TEST_CASE (test_file_load_toml)
+{
+    helics::ValueFederate vFed (std::string (TEST_DIR) + "/test_files/example_value_fed.toml");
+
+    BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
+
+    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
+
+	auto id = vFed.getSubscriptionId ("pubshortcut");
+    auto key = vFed.getSubscriptionKey (id);
+    BOOST_CHECK_EQUAL (key, "fedName:pub2");
+
+	auto pub2name = vFed.getPublicationKey (1);
+    BOOST_CHECK_EQUAL (key, "fedName:pub2");
     vFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

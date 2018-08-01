@@ -14,7 +14,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/SubscriptionInfo.hpp"
 
-BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture)
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (constructor_test)
 {
@@ -229,7 +231,8 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     cmd.setAction (helics::CMD_ERROR);
     fs_process2 = std::async (std::launch::async,
                               [&]() { return fs->enterExecutingState (iteration_request::no_iterations); });
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
+    auto st = fs->getState();
+    BOOST_CHECK ((st==federate_state_t::HELICS_INITIALIZING)|| (st == federate_state_t::HELICS_EXECUTING));
     fs->addAction (cmd);
     auto res = fs_process2.get ();
     if (res != iteration_result::error)

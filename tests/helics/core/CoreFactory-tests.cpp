@@ -9,7 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
 
-BOOST_AUTO_TEST_SUITE (CoreFactory_tests)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("ci"))
 
 #if HELICS_HAVE_ZEROMQ
 BOOST_AUTO_TEST_CASE (ZmqCore_test)

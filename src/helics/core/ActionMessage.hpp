@@ -212,6 +212,11 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
+inline bool operator<(const ActionMessage &cmd, const ActionMessage &cmd2)
+{
+    return (cmd.actionTime < cmd2.actionTime);
+}
+
 inline constexpr uint16_t make_flags(int flag)
 {
     return static_cast<uint16_t>(1) << (flag);

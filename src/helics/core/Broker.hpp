@@ -58,26 +58,30 @@ class Broker
     virtual void
     setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 
+    /** waits in the current thread until the broker is disconnected
+*/
+    virtual void waitForDisconnect () const= 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", or the name of a specific object
     query is a broken
     @param target the specific target of the query
     @param queryStr the actual query
-    @return a string containing the response to the query.  Query is a blocking call and will not return until the
-    query is answered so use with caution
+      @return a string containing the response to the query.  Query is a blocking call and will not return until
+      the query is answered so use with caution
     */
-    virtual std::string query(const std::string &target, const std::string &queryStr) = 0;
+      virtual std::string
+      query (const std::string &target, const std::string &queryStr) = 0;
 
     /** create a data connection between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/
     virtual void dataConnect(const std::string &source, const std::string &target) = 0;
-    /** create a filter connection between a named publication and a named input
+    /** create a source filter connection between a named filter and a named endpoint
     @param source the name of the filter
     @param target the name of the source target*/
     virtual void filterAddSourceTarget(const std::string &filter, const std::string &target) = 0;
-    /** create a filter connection between a named publication and a named input
+    /** create a destination filter connection between a named filter and an endpoint
     @param source the name of the filter
     @param target the name of the source target*/
     virtual void filterAddDestinationTarget(const std::string &filter, const std::string &target) = 0;

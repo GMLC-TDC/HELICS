@@ -15,10 +15,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** these test cases test out the value federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests1, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
+
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests1, FederateTestFixture, *utf::label("ci"))
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type)
@@ -583,7 +583,7 @@ void runFederateTestVectorD (const char *core,
     std::string buf;
     buf.resize(actualLen + 2);
     CE(helicsSubscriptionGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen));
-    buf.resize(actualLen);
+    buf.resize(actualLen-1);
     BOOST_CHECK_EQUAL(buf[0], 'v');
     BOOST_CHECK_EQUAL(buf.back(), ']');
 
@@ -836,7 +836,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     // make sure the value is still what we expect
     CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (len, strlen ("string1"));
+    BOOST_CHECK_EQUAL (len-1, strlen ("string1"));
 
     // advance time
     CE (helicsFederateRequestTime (vFed, 2.0, &gtime));

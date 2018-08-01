@@ -12,7 +12,12 @@ namespace boost
 namespace program_options
 {
 class variables_map;
-}
+} //namespace program_options
+} //namespace boost
+
+namespace Json_helics
+{
+class Value;
 }
 
 namespace helics

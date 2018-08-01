@@ -18,12 +18,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 /** these test cases test out the message federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture)
-
 namespace bdata = boost::unit_test::data;
+namespace utf = boost::unit_test;
 
-
+BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture, *utf::label("ci"))
 
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -79,8 +77,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = epid.getName ();
-    auto sv2 = epid2.getName ();
+    auto const &sv = epid.getName ();
+    auto const &sv2 = epid2.getName ();
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
@@ -238,7 +236,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 }
 
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -319,7 +317,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
 //#define ENABLE_OUTPUT
 /**trivial Federate that sends Messages and echoes a ping with a pong
  */
-class pingpongFed
+class PingPongFed
 {
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
@@ -334,7 +332,7 @@ class pingpongFed
     int pings = 0;  //!< the number of pings received
     int pongs = 0;  //!< the number of pongs received
   public:
-    pingpongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
+    PingPongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
         : delta (tDelta), name (fname), coreType (ctype)
     {
         if (delta <= 0.0)
@@ -445,9 +443,9 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     AddBroker (core_type, "3");
 
     auto ctype = helics::coreTypeFromString (core_type);
-    pingpongFed p1 ("fedA", 0.5, ctype);
-    pingpongFed p2 ("fedB", 0.5, ctype);
-    pingpongFed p3 ("fedC", 0.5, ctype);
+    PingPongFed p1 ("fedA", 0.5, ctype);
+    PingPongFed p2 ("fedB", 0.5, ctype);
+    PingPongFed p3 ("fedC", 0.5, ctype);
 
     p1.addTrigger (0.5, "fedB/port");
     p1.addTrigger (0.5, "fedC/port");
@@ -484,6 +482,19 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     mFed.disconnect ();
 }
 
+BOOST_AUTO_TEST_CASE (test_file_load_toml)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.toml");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    mFed.disconnect ();
+}
+
 BOOST_AUTO_TEST_CASE (test_file_load_filter)
 {
     helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
@@ -502,4 +513,24 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
     BOOST_CHECK (cloneFilt);
     mFed.disconnect ();
 }
+
+BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.toml");
+
+    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
+
+    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
+    auto id = mFed.getEndpointId ("ept1");
+    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+
+    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
+
+    auto filt = mFed.getFilterObject (2);
+
+    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
+    BOOST_CHECK (cloneFilt);
+    mFed.disconnect ();
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

@@ -10,9 +10,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
 
+
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/argParser.h"
 #include "../common/base64.h"
+#include "../common/logger.h"
+#include "../common/fmt_format.h"
+#include "../common/fmt_ostream.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -21,9 +25,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include "boost/filesystem.hpp"
-
 #include <thread>
+#include "boost/filesystem.hpp"
 
 namespace filesystem = boost::filesystem;
 
@@ -49,20 +52,26 @@ static const ArgDescriptors InfoArgs{
    "comma separated list"},
   {"output,o", "the output file for recording the data"},
   {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
-  {"mapfile", "write progress to a memory mapped file"}};
+  {"verbose", ArgDescriptor::arg_type_t::flag_type, "print all value results to the screen"},
+  {"marker","print a statement indicating time advancement every <arg> period during the simulation"},
+  {"mapfile", "write progress to a map file for concurrent progress monitoring"}};
 
 Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
 {
+    variable_map vm_map;
     if (!deactivated)
     {
         fed->setFlag (OBSERVER_FLAG);
-        variable_map vm_map;
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+    }
+    else
+    {
+        argumentParser (argc, argv, vm_map, InfoArgs);
     }
 }
 
@@ -420,6 +429,7 @@ void Recorder::loadCaptureInterfaces ()
 
 void Recorder::captureForCurrentTime (Time currentTime, int iteration)
 {
+    static auto logger = LoggerManager::getLoggerCore ();
     for (auto &sub : subscriptions)
     {
         if (sub.isUpdated ())
@@ -431,7 +441,34 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
             {
                 points.back ().iteration = iteration;
             }
-
+            if (verbose)
+            {
+                std::string valstr;
+                if (val.size () < 150)
+                {
+                    if (iteration > 0)
+                    {
+                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getKey (), val);
+                    }
+                    else
+                    {
+                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getKey (), val);
+                    }
+                }
+                else
+                {
+                    if (iteration > 0)
+                    {
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getKey (),
+                                              val.size ());
+                    }
+                    else
+                    {
+                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getKey (), val.size ());
+                    }
+                }
+                logger->addMessage (std::move (valstr));
+            }
             if (vStat[ii].cnt == 0)
             {
                 points.back ().first = true;
@@ -446,7 +483,23 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
     {
         while (ept.hasMessage ())
         {
-            messages.push_back (ept.getMessage ());
+            auto mess = ept.getMessage ();
+            if (verbose)
+            {
+                std::string messstr;
+                if (mess->data.size () < 50)
+                {
+                    messstr = fmt::format ("[{}]message from {} to {}::{}", currentTime, mess->source, mess->dest,
+                                           mess->data.to_string ());
+                }
+                else
+                {
+                    messstr = fmt::format ("[{}]message from {} to {}:: size {}", currentTime, mess->source,
+                                           mess->dest, mess->data.size ());
+                }
+                logger->addMessage (std::move (messstr));
+            }
+            messages.push_back (std::move (mess));
         }
     }
     // get the clone endpoints
@@ -463,7 +516,7 @@ std::string Recorder::encode (const std::string &str2encode)
 {
     return std::string ("b64[") +
            utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
-                                     static_cast<int>(str2encode.size ())) +
+                                     static_cast<int> (str2encode.size ())) +
            ']';
 }
 
@@ -476,12 +529,14 @@ void Recorder::runTo (Time runToTime)
         std::ofstream out (mapfile);
         for (auto &stat : vStat)
         {
-            out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
-                << '\n';
+        //    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
+        //        << '\n';
+            fmt::print (out, "{}\t{}\t{}\t{}\n", stat.key, stat.cnt, static_cast<double> (stat.time),
+                        stat.lastVal);
         }
         out.flush ();
     }
-    Time nextPrintTime = 10.0;
+    Time nextPrintTime = (nextPrintTimeStep>timeZero)?nextPrintTimeStep:Time::maxVal();
     try
     {
         while (true)
@@ -509,8 +564,8 @@ void Recorder::runTo (Time runToTime)
                 std::ofstream out (mapfile);
                 for (auto &stat : vStat)
                 {
-                    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t'
-                        << stat.lastVal << '\n';
+                    fmt::print (out, "{}\t{}\t{}\t{}\n", stat.key, stat.cnt, static_cast<double> (stat.time),
+                                stat.lastVal);
                 }
                 out.flush ();
             }
@@ -518,10 +573,10 @@ void Recorder::runTo (Time runToTime)
             {
                 break;
             }
-            if (T >= nextPrintTime)
+            if ((T >= nextPrintTime)&&(nextPrintTimeStep>timeZero))
             {
                 std::cout << "processed for time " << static_cast<double> (T) << "\n";
-                nextPrintTime += 10.0;
+                nextPrintTime += nextPrintTimeStep;
             }
         }
     }
@@ -686,6 +741,14 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("allow_iteration") > 0)
     {
         allow_iteration = true;
+    }
+    if (vm_map.count ("verbose") > 0)
+    {
+        verbose = true;
+    }
+    if (vm_map.count ("marker") > 0)
+    {
+        nextPrintTimeStep = loadTimeFromString(vm_map["marker"].as<std::string> ());
     }
     if (vm_map.count ("mapfile") > 0)
     {

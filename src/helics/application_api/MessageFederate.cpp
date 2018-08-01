@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -9,6 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
+#include "../common/TomlProcessingFunctions.hpp"
+
 
 namespace helics
 {
@@ -93,12 +94,25 @@ void MessageFederate::registerInterfaces (const std::string &jsonString)
     Federate::registerFilterInterfaces (jsonString);
 }
 
-void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
+void MessageFederate::registerMessageInterfaces(const std::string &configString)
 {
     if (state != op_states::startup)
     {
         throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
     }
+    if (hasTomlExtension(configString))
+    {
+        registerMessageInterfacesToml (configString);
+    }
+    else
+    {
+        registerMessageInterfacesJson (configString);
+    }
+}
+
+void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
+{
+    
     auto doc = loadJson (jsonString);
 
     if (doc.isMember ("endpoints"))
@@ -172,11 +186,98 @@ void MessageFederate::registerMessageInterfaces (const std::string &jsonString)
     */
 }
 
+void MessageFederate::registerMessageInterfacesToml (const std::string &tomlString)
+{
+    
+    toml::Value doc;
+    try
+    {
+        doc = loadToml (tomlString);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter (ia.what ()));
+    }
+
+   auto epts = doc.find ("endpoints");
+    if (epts != nullptr)
+    {
+        auto &eptArray = epts->as<toml::Array> ();
+        for (auto &ept:eptArray)
+        {
+            auto name = getKey (ept);
+            auto type = tomlGetOrDefault (ept, "type", std::string ());
+            bool global = tomlGetOrDefault(ept,"global",false);
+            endpoint_id_t epid;
+            if (global)
+            {
+                epid = registerGlobalEndpoint (name, type);
+            }
+            else
+            {
+                epid = registerEndpoint (name, type);
+            }
+
+            // retrieve the known paths
+            auto kp = ept.find("knownDestinations");
+            if (kp!=nullptr)
+            {
+                if (kp->is<toml::Array> ())
+                {
+                    for (const auto &path : kp->as<toml::Array>())
+                    {
+                        registerKnownCommunicationPath (epid, path.as<std::string> ());
+                    }
+                    
+                }
+                else if (kp->is<std::string>())
+                {
+                    registerKnownCommunicationPath (epid, kp->as<std::string> ());
+                }
+            }
+            auto subs = ept.find ("subscriptions");
+            // endpoints can subscribe to publications
+            if (subs!=nullptr)
+            {
+                if (subs->is<std::string> ())
+                {
+                    subscribe (epid, subs->as<std::string> (), std::string ());
+                }
+                else if (subs->is<toml::Array> ())
+                {
+                    for (const auto &sub : subs->as<toml::Array>())
+                    {
+                        subscribe (epid, sub.as<std::string> (), std::string ());
+                    }
+                }
+            }
+        }
+    }
+    /*
+    // retrieve the known paths
+    if (doc.isMember("knownDestinations"))
+    {
+        auto kp = doc["knownDestinations"];
+        if (kp.isString())
+        {
+           // registerKnownCommunicationPath(epid, kp.asString());
+        }
+        else if (kp.isArray())
+        {
+           for (const auto &path : kp)
+            {
+           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
+            }
+        }
+    }
+    */
+}
+
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)
 {
     if (state == op_states::startup)
     {
-        mfManager->subscribe (endpoint, name, type);
+        mfManager->subscribe (endpoint, name);
         return;
     }
     throw (InvalidFunctionCall ("subscriptions can only be created in startup mode"));
@@ -214,11 +315,11 @@ bool MessageFederate::hasMessage (endpoint_id_t id) const
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-uint64_t MessageFederate::receiveCount (endpoint_id_t id) const
+uint64_t MessageFederate::pendingMessages (endpoint_id_t id) const
 {
     if (state == op_states::execution)
     {
-        return mfManager->receiveCount (id);
+        return mfManager->pendingMessages (id);
     }
     return 0;
 }
@@ -227,11 +328,11 @@ uint64_t MessageFederate::receiveCount (endpoint_id_t id) const
 @details this function is not preferred in multithreaded contexts due to the required locking
 prefer to just use getMessage until it returns an invalid Message.
 */
-uint64_t MessageFederate::receiveCount () const
+uint64_t MessageFederate::pendingMessages () const
 {
     if (state == op_states::execution)
     {
-        return mfManager->receiveCount ();
+        return mfManager->pendingMessages ();
     }
     return 0;
 }

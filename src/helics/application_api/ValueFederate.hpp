@@ -29,13 +29,13 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
-    @param[in] jsonString can be either a json file or a string containing json code
+    @param[in] configString can be either a json file a toml file (with extension toml) or a string containing json code
     */
-    explicit ValueFederate (const std::string &jsonString);
+    explicit ValueFederate (const std::string &configString);
     /**constructor taking a string with the required information
-    @param[in] jsonString can be either a json file or a string containing json code
+    @param[in] configString can be either a json file a toml file (with extension toml) or a string containing json code
     */
-    ValueFederate (const std::string &name, const std::string &jsonString);
+    ValueFederate (const std::string &name, const std::string &configString);
 
     /** default constructor*/
     explicit ValueFederate ();
@@ -283,17 +283,22 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
         setDefaultValue (id, data_view (ValueConverter<X>::convert (val)));
     }
     /** register a set of interfaces defined in a file
-    @details call is only valid in startup mode
-    @param[in] jsonString  the location of the file to load to generate the interfaces
+    @details call is only valid in startup mode to add an toml files must have extension .toml or .TOML
+    @param[in] configString  the location of the file(json or toml) or json String to load to generate the interfaces
     */
-    virtual void registerInterfaces (const std::string &jsonString) override;
+    virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set of value interfaces (publications and subscriptions)
-    @details call is only valid in startup mode it is a protected call to add an
-    @param[in] jsonString  the location of the file or json String to load to generate the interfaces
+    @details call is only valid in startup mode it is a protected call to add an toml files must have extension .toml or .TOML
+    @param[in] configString  the location of the file(json or toml) or json String to load to generate the interfaces
     */
-    void registerValueInterfaces (const std::string &jsonString);
+    void registerValueInterfaces (const std::string &configString);
 
+  private:
+    void registerValueInterfacesJson (const std::string &jsonString);
+    void registerValueInterfacesToml (const std::string &tomlString);
+
+  public:
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
     @return a constant data block
@@ -387,7 +392,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     std::vector<input_id_t> queryUpdates ();
 
-    /** get the key or the string identifier of a subscription from its id
+    /** get the key or the string identifier of an from its id
     @return empty string if an invalid id is passed*/
     std::string getTarget (input_id_t id) const;
     /** get the id of a subscription
@@ -427,8 +432,13 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return the units or empty string on unrecognized id*/
     std::string getPublicationUnits (publication_id_t id) const;
 
-    /** get the type of a subscription from its id
-    @param[in] id the subscription id to query
+	/** get the key of an input from its id
+    @param[in] id the input id to query
+    @return the type or empty string on unrecognized id*/
+    std::string getInputKey (input_id_t id) const;
+
+    /** get the type of a input from its id
+    @param[in] id the input id to query
     @return the type or empty string on unrecognized id*/
     std::string getInputType (input_id_t id) const;
 
@@ -468,6 +478,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
   private:
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;
+
+
 };
 
 /** publish directly from the publication key name

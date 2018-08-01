@@ -32,7 +32,7 @@ Json files can also contain information for the FederateInfo structure including
 The specific different kinds of Federates define the patterns for different elements.  ValueFederates define the interfaces for publish and Subscribe mechanisms.
 MessageFederates define interfaces for endpoints and the basic Federate contains API's for interacting with Filters
 
-Filters can be configured via files the following is an example
+Filters can be configured via files the following is an example of a JSON file.  TOML configuration files are also supported.  [Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/examples/example_files)
 ```
 "filters":[
 {
