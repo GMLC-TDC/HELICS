@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 if(BUILD_APPS)
@@ -70,9 +70,7 @@ if(BUILD_APPS)
   add_executable(helics_app appMain.cpp)
   target_link_libraries(helics_app helics_apps-static)
   set_target_properties(helics_app PROPERTIES FOLDER apps)
-  install(TARGETS helics_app
-          DESTINATION ${CMAKE_INSTALL_BINDIR}
-          COMPONENT applications)
+  install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
   if(WIN32)
     foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
@@ -84,8 +82,7 @@ if(BUILD_APPS)
                                  copy_if_different # which executes "cmake - E
                                                    # copy_if_different..."
                                  "${keyfile}" # <--this is in-file
-                                 "$<TARGET_FILE_DIR:helics_app>/") # <--this is
-                                                                   # out-file
+                                 "$<TARGET_FILE_DIR:helics_app>/") # <--this is out-file
                                                                    # path
     endforeach(keyfile)
 
@@ -104,8 +101,7 @@ endif() # if build any app
 
 # configure executable app
 
-configure_file(helicsConfigMain.h.in
-               ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
+configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 add_executable(helics-config helicsConfigMain.cpp
                ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 

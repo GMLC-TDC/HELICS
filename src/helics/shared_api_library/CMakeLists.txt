@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 set(helicsShared_headers
@@ -23,17 +23,13 @@ set(helicsShared_sources
 
 include(GenerateExportHeader)
 
-add_library(helicsSharedLib
-            SHARED
-            ${helicsShared_sources}
-            ${helicsShared_headers})
+add_library(helicsSharedLib SHARED ${helicsShared_sources} ${helicsShared_headers})
 
 add_library(HELICS::helicsSharedLib ALIAS helicsSharedLib)
 generate_export_header(helicsSharedLib BASE_NAME helics)
 
-target_include_directories(
-  helicsSharedLib
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+target_include_directories(helicsSharedLib
+                           PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
 set_target_properties(helicsSharedLib
                       PROPERTIES CXX_VISIBILITY_PRESET

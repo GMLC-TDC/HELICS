@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 set(common_headers
@@ -88,9 +88,7 @@ target_include_directories(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>)
 target_include_directories(
   helics_common SYSTEM
-  PRIVATE
-    $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-  )
+  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 target_compile_definitions(
   helics_common PRIVATE
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
@@ -102,8 +100,7 @@ target_compile_options(
 if(HELICS_HAVE_ZEROMQ)
   target_include_directories(
     helics_common SYSTEM
-    PRIVATE
-      $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
+    PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
 endif(HELICS_HAVE_ZEROMQ)
 
 if(APPLE)

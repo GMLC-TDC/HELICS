@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 set(SRC_FILES
     CoreFactory.cpp
@@ -101,23 +101,11 @@ set(INCLUDE_FILES
 
 set(TESTCORE_HEADER_FILES TestCore.h TestBroker.h)
 
-set(IPC_HEADER_FILES
-    ipc/IpcCore.h
-    ipc/IpcBroker.h
-    ipc/IpcComms.h
-    ipc/IpcQueueHelper.h)
+set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h)
 
-set(ZMQ_HEADER_FILES
-    zmq/ZmqCore.h
-    zmq/ZmqBroker.h
-    zmq/ZmqComms.h
-    zmq/ZmqRequestSets.h)
+set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqRequestSets.h)
 
-set(MPI_HEADER_FILES
-    mpi/MpiCore.h
-    mpi/MpiBroker.h
-    mpi/MpiComms.h
-    mpi/MpiService.h)
+set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
 
 set(UDP_HEADER_FILES udp/UdpCore.h udp/UdpBroker.h udp/UdpComms.h)
 
@@ -151,20 +139,14 @@ if(HELICS_HAVE_MPI)
   list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 endif(HELICS_HAVE_MPI)
 
-add_library(helics_core
-            OBJECT
-            ${SRC_FILES}
-            ${INCLUDE_FILES}
-            ${PUBLIC_INCLUDE_FILES})
+add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 target_include_directories(
   helics_core
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>)
 target_include_directories(
   helics_core SYSTEM
-  PRIVATE
-    $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-  )
+  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 target_compile_definitions(
   helics_core PRIVATE
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
@@ -176,8 +158,7 @@ target_include_directories(
   helics_core SYSTEM
   PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>)
 target_compile_definitions(
-  helics_core PRIVATE
-  $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>)
+  helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>)
 
 if(APPLE)
   target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
@@ -190,8 +171,7 @@ endif(HELICS_HAVE_MPI)
 if(HELICS_HAVE_ZEROMQ)
   target_include_directories(
     helics_core SYSTEM
-    PRIVATE
-      $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
+    PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
   source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(HELICS_HAVE_ZEROMQ)
 
@@ -205,8 +185,7 @@ endif()
 
 if(HELICS_HAVE_MPI)
   target_include_directories(helics_core
-                             PRIVATE "${MPI_C_INCLUDE_DIR}"
-                                     "${MPI_C_HEADER_DIR}"
+                             PRIVATE "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}"
                                      "${MPI_C_ADDITIONAL_INCLUDE_DIRS}")
 endif(HELICS_HAVE_MPI)
 

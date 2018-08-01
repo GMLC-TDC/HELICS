@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 if(BUILD_PYTHON_INTERFACE)
@@ -44,8 +44,7 @@ else()
     # Update if necessary
     set(
       CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
-      )
+      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
   endif()
 
   include_directories(${PYTHON_INCLUDE_PATH})
@@ -64,18 +63,16 @@ else()
   swig_link_libraries(helics helicsSharedLib)
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot
-    # jBCQAJ
-    set_target_properties(_helics
-                          PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
+    set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   else()
     swig_link_libraries(helics ${PYTHON_LIBRARIES})
   endif()
 
   set_target_properties(_helics PROPERTIES FOLDER interfaces)
 
-  # execute_process(COMMAND python -c "from distutils.sysconfig import
-  # get_python_lib; print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+  # execute_process(COMMAND python -c "from distutils.sysconfig import get_python_lib;
+  # print get_python_lib()" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
   # OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   install(TARGETS _helics DESTINATION python COMPONENT python)
@@ -89,8 +86,8 @@ else()
                                copy_if_different # which executes "cmake - E
                                                  # copy_if_different..."
                                "${keyfile}" # <--this is in-file
-                               "$<TARGET_FILE_DIR:_helics>/") # <--this is out-
-                                                              # file path
+                               "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file
+                                                              # path
   endforeach(keyfile)
 
   add_custom_command(TARGET
@@ -100,17 +97,11 @@ else()
                              -E
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
-                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in-
-                                                              # file
-                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out-
-                                                            # file path
+                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file path
 
 endif()
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py
-        DESTINATION python
-        COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib>
-        DESTINATION python
-        COMPONENT python)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
+install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)

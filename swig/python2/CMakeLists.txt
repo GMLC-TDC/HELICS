@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
@@ -13,10 +13,8 @@ endif()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(
-    CMAKE_C_FLAGS
-    "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
-    )
+  set(CMAKE_C_FLAGS
+      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
 endif()
 
 find_package(PythonLibs 2 REQUIRED)
@@ -37,10 +35,8 @@ endif()
 swig_link_libraries(helics helicsSharedLib)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6OtjB
-  # CQAJ
-  set_target_properties(_helics
-                        PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+  # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6OtjB CQAJ
+  set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 else()
   swig_link_libraries(helics ${PYTHON_LIBRARIES})
 endif()
@@ -58,14 +54,9 @@ foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
                              "${keyfile}" # <--this is in-file
-                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out-
-                                                            # file path
+                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file path
 endforeach(keyfile)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py
-        DESTINATION python
-        COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib>
-        DESTINATION python
-        COMPONENT python)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
+install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)

@@ -1,12 +1,12 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 if(EXAMPLES_WARNINGS_AS_ERROR)
-  # the examples had better compile without warnings otherwise they should not
-  # be allowed
+  # the examples had better compile without warnings otherwise they should not be
+  # allowed
   if(WIN32)
     if(MSVC)
       add_compile_options(/WX)

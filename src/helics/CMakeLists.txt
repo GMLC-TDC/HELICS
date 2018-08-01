@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 add_subdirectory(common)
@@ -33,8 +33,7 @@ if(BUILD_CXX_SHARED_LIB)
   target_link_libraries(helics-shared PRIVATE helics_base)
 
   if(WIN32)
-    set_target_properties(helics-shared
-                          PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
   endif()
 

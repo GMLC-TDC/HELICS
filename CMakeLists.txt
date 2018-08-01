@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 cmake_minimum_required(VERSION 3.4)
@@ -19,16 +19,14 @@ set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}")
 if(HELICS_VERSION_BUILD)
   set(HELICS_VERSION "${HELICS_VERSION}-${HELICS_VERSION_BUILD}")
-  set(HELICS_VERSION_UNDERSCORE
-      "${HELICS_VERSION_UNDERSCORE}-${HELICS_VERSION_BUILD}")
+  set(HELICS_VERSION_UNDERSCORE "${HELICS_VERSION_UNDERSCORE}-${HELICS_VERSION_BUILD}")
 endif()
 set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
-set(
-  CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/")
 include(extraMacros)
 include(CMakeDependentOption)
 # include(BuildType)
@@ -140,9 +138,8 @@ if(VERSION_OPTION)
   if(MSVC)
     target_compile_options(helics_base_includes INTERFACE ${VERSION_OPTION})
   else()
-    target_compile_options(
-      helics_base_includes
-      INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
+    target_compile_options(helics_base_includes
+                           INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>)
   endif(MSVC)
 endif(VERSION_OPTION)
 
@@ -195,8 +192,8 @@ if(BUILD_HELICS_TESTS)
                                 )
     else()
       message(
-        FATAL_ERROR
-          "CMAKE_BUILD_TYPE must be set to Coverage for testing code coverage")
+        FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Coverage for testing code coverage"
+        )
     endif()
   endif(TEST_CODE_COVERAGE)
 endif(BUILD_HELICS_TESTS)
@@ -221,8 +218,7 @@ if(GENERATE_DOXYGEN_DOC)
                   "${PROJECT_BINARY_DIR}/docs")
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in
                    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    add_custom_target(doc ${DOXYGEN_EXECUTABLE}
-                      ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
                       WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
                       COMMENT "Generating API documentation with Doxygen"
                       VERBATIM)
@@ -347,10 +343,9 @@ target_include_directories(
             $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-target_include_directories(
-  helics_base_includes SYSTEM
-  INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-            $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
+target_include_directories(helics_base_includes SYSTEM
+                           INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+                                     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
 
 include(GNUInstallDirs)
 
@@ -360,8 +355,7 @@ include(GNUInstallDirs)
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
-# when building, don't use the install RPATH already (but later on when
-# installing)
+# when building, don't use the install RPATH already (but later on when installing)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_MACOSX_RPATH ON)
@@ -370,8 +364,8 @@ set(
   "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64"
   )
 
-# add the automatically determined parts of the RPATH which point to directories
-# outside the build tree to the install RPATH
+# add the automatically determined parts of the RPATH which point to directories outside
+# the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
@@ -385,8 +379,7 @@ endif()
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
           "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
-  list(APPEND CMAKE_INSTALL_RPATH
-              "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+  list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT Boost_USE_STATIC_LIBS)
@@ -407,8 +400,7 @@ if(NOT WIN32)
     get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
     # message(STATUS "zmqdir path =${zmqdir}")
     if(APPLE)
-      # TODO: Make sure it works for building ZMQ from source automatically
-      # using CMake
+      # TODO: Make sure it works for building ZMQ from source automatically using CMake
       list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
       list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
     endif()
@@ -425,8 +417,7 @@ option(
 file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
 # message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
-option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS"
-       OFF)
+option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
 
 cmake_dependent_option(DISABLE_TRACE_LOGGING
                        "disable trace logging"
@@ -501,10 +492,8 @@ endif()
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
 
-option(
-  ENABLE_CLANG_TOOLS
-  "if clang is found enable some custom targets for clang formatting and tidy"
-  OFF)
+option(ENABLE_CLANG_TOOLS
+       "if clang is found enable some custom targets for clang formatting and tidy" OFF)
 mark_as_advanced(ENABLE_CLANG_TOOLS)
 if(ENABLE_CLANG_TOOLS)
   include(clang-cxx-dev-tools)
@@ -526,9 +515,8 @@ set(
   "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
   )
 if(BUILD_CXX_SHARED_LIB)
-  set(
-    helics_cxx_shared_file
-    "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  set(helics_cxx_shared_file
+      "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}")
   set(
     helics_cxx_shared_file_debug
     "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -539,10 +527,8 @@ else(BUILD_CXX_SHARED_LIB)
 endif(BUILD_CXX_SHARED_LIB)
 
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
-  set(
-    helics_c_shared_file
-    "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    )
+  set(helics_c_shared_file
+      "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_SHARED_LIBRARY_SUFFIX}")
   set(
     helics_c_shared_file_debug
     "${CMAKE_SHARED_LIBRARY_PREFIX}helicsSharedLib${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -552,8 +538,7 @@ else()
   set(helics_c_shared_file_debug)
 endif()
 
-set(HELICS_CMAKECONFIG_INSTALL_DIR
-    "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+set(HELICS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING "install path for HELICSConfig.cmake")
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
 
@@ -583,11 +568,10 @@ install(DIRECTORY ThirdParty/helics_includes
 
 include(CMakePackageConfigHelpers)
 
-configure_package_config_file(
-  config/${PROJECT_NAME}Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-  INSTALL_DESTINATION
-  ${HELICS_CMAKECONFIG_INSTALL_DIR})
+configure_package_config_file(config/${PROJECT_NAME}Config.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+                              INSTALL_DESTINATION
+                              ${HELICS_CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION
@@ -610,8 +594,8 @@ install(FILES config/cmake/addMPI.cmake
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------
-option(ENABLE_PACKAGE_BUILD
-       "Add projects for making packages and installers for HELICS" OFF)
+option(ENABLE_PACKAGE_BUILD "Add projects for making packages and installers for HELICS"
+       OFF)
 
 if(ENABLE_PACKAGE_BUILD)
   set(CPACK_PACKAGE_NAME "Helics")
@@ -623,15 +607,7 @@ if(ENABLE_PACKAGE_BUILD)
   set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
 
-  set(CPACK_COMPONENTS_ALL
-      applications
-      headers
-      libs
-      runtime
-      matlab
-      python
-      java
-      octave)
+  set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave)
   if(WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
   else(WIN32)
@@ -650,8 +626,8 @@ if(ENABLE_PACKAGE_BUILD)
 
   set(CPACK_COMPONENT_APPLICATION_DESCRIPTION
       "Executables and helper applications for HELICS")
-  set(CPACK_COMPONENT_LIBS_DESCRIPTION
-      "Libraries for compiling and linking with HELICS")
+  set(
+    CPACK_COMPONENT_LIBS_DESCRIPTION "Libraries for compiling and linking with HELICS")
   set(CPACK_COMPONENT_HEADERS_DESCRIPTION
       "Headers for linking and compiling with HELICS")
   set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")

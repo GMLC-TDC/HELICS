@@ -1,7 +1,7 @@
 #
-# Copyright (c) 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright (c) 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 find_package(Java REQUIRED)
@@ -42,17 +42,15 @@ else(DISABLE_SWIG)
 
 endif() # DISABLE_SWIG
 
-configure_file(MakeJarCMakeLists.txt.in
-               ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
+configure_file(
+  MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY)
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/buildjar/)
 
-# -D
-# ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:JNIhelics>
-add_custom_command(
-  TARGET "JNIhelics" POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_FILE:JNIhelics> -P
-          ${CMAKE_CURRENT_SOURCE_DIR}/addLoadLibraryCommand.cmake)
+# -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:JNIhelics>
+add_custom_command(TARGET "JNIhelics" POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_FILE:JNIhelics> -P
+                           ${CMAKE_CURRENT_SOURCE_DIR}/addLoadLibraryCommand.cmake)
 
 add_custom_command(TARGET "JNIhelics" POST_BUILD
                    COMMAND ${CMAKE_COMMAND} ARGS ..
@@ -78,8 +76,8 @@ if(WIN32)
                                copy_if_different # which executes "cmake - E
                                                  # copy_if_different..."
                                "${keyfile}" # <--this is in-file
-                               "$<TARGET_FILE_DIR:JNIhelics>/") # <--this is
-                                                                # out-file path
+                               "$<TARGET_FILE_DIR:JNIhelics>/") # <--this is out-file
+                                                                # path
   endforeach(keyfile)
 
   add_custom_command(TARGET
@@ -89,10 +87,9 @@ if(WIN32)
                              -E
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
-                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in-
-                                                              # file
-                             "$<TARGET_FILE_DIR:JNIhelics>/") # <--this is out-
-                                                              # file path
+                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+                             "$<TARGET_FILE_DIR:JNIhelics>/") # <--this is out- file
+                                                              # path
 
 endif(WIN32)
 

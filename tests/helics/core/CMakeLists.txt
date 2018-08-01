@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 # -----------------------------------------------------------------------------
@@ -45,8 +45,7 @@ target_link_libraries(core-tests helics-static helics_test_base)
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
-add_test(NAME core-tests
-         COMMAND core-tests --log_level=message --report_level=short)
+add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
 set_property(TEST core-tests PROPERTY LABELS Core Daily)
 
 # Tests for Continuous Integration builds
@@ -66,6 +65,6 @@ foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
                              "${keyfile}" # <--this is in-file
-                             "$<TARGET_FILE_DIR:core-tests>/") # <--this is out-
-                                                               # file path
+                             "$<TARGET_FILE_DIR:core-tests>/") # <--this is out- file
+                                                               # path
 endforeach(keyfile)

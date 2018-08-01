@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 # -----------------------------------------------------------------------------
@@ -43,6 +43,6 @@ foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
                              "${keyfile}" # <--this is in-file
-                             "$<TARGET_FILE_DIR:common-tests>/") # <--this is
-                                                                 # out-file path
+                             "$<TARGET_FILE_DIR:common-tests>/") # <--this is out-file
+                                                                 # path
 endforeach(keyfile)

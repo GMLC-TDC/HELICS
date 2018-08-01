@@ -1,7 +1,7 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC All rights
-# reserved. See LICENSE file and DISCLAIMER for more details.
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
 #
 
 include_directories("${PROJECT_SOURCE_DIR}/src/helics")
@@ -28,8 +28,7 @@ set_target_properties(nonlings_fed2_cpp PROPERTIES FOLDER examples)
 if(BUILD_HELICS_TESTS AND NOT MSVC)
   add_test(NAME nonlings_example
            COMMAND ${PROJECT_SOURCE_DIR}/scripts/test_example.sh 10
-                   $<TARGET_FILE:nonlings_fed1_cpp>
-                   $<TARGET_FILE:nonlings_fed2_cpp>)
+                   $<TARGET_FILE:nonlings_fed1_cpp> $<TARGET_FILE:nonlings_fed2_cpp>)
   set_property(TEST nonlings_example PROPERTY LABELS Continuous)
 endif()
 
@@ -54,6 +53,5 @@ add_custom_command(TARGET
                            copy_if_different # which executes "cmake - E
                                              # copy_if_different..."
                            "$<TARGET_FILE:helicsSharedLib>" # <--this is in-file
-                           "$<TARGET_FILE_DIR:nonlings_fed1_cpp>/") # <--this is
-                                                                    # out-file
-                                                                    # path
+                           "$<TARGET_FILE_DIR:nonlings_fed1_cpp>/") # <--this is out-
+                                                                    # file path

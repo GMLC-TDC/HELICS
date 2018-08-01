@@ -4,8 +4,8 @@ endif()
 
 cmake_minimum_required(VERSION 2.8.12)
 
-# Determine if fmt is built as a subproject (using add_subdirectory) or if it is
-# the master project.
+# Determine if fmt is built as a subproject (using add_subdirectory) or if it is the
+# master project.
 set(MASTER_PROJECT OFF)
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   set(MASTER_PROJECT ON)
@@ -20,9 +20,8 @@ function(join result_var)
   set(${result_var} "${result}" PARENT_SCOPE)
 endfunction()
 
-# Set the default CMAKE_BUILD_TYPE to Release. This should be done before the
-# project command since the latter can set CMAKE_BUILD_TYPE itself (it does so
-# for nmake).
+# Set the default CMAKE_BUILD_TYPE to Release. This should be done before the project
+# command since the latter can set CMAKE_BUILD_TYPE itself (it does so for nmake).
 if(NOT CMAKE_BUILD_TYPE)
   join(doc "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or "
        "CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
@@ -64,8 +63,7 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${CMAKE_CURRENT_SOURCE_DIR}/support/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/support/cmake")
 
 include(cxx14)
 
@@ -74,10 +72,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 endif()
 
 if(MASTER_PROJECT AND CMAKE_GENERATOR MATCHES "Visual Studio")
-  # If Microsoft SDK is installed create script run-msbuild.bat that calls
-  # SetEnv.cmd to set up build environment and runs msbuild. It is useful when
-  # building Visual Studio projects with the SDK toolchain rather than Visual
-  # Studio.
+  # If Microsoft SDK is installed create script run-msbuild.bat that calls SetEnv.cmd to
+  # set up build environment and runs msbuild. It is useful when building Visual Studio
+  # projects with the SDK toolchain rather than Visual Studio.
   include(FindSetEnv)
   if(WINSDK_SETENV)
     set(MSBUILD_SETUP "call \"${WINSDK_SETENV}\"")
@@ -108,14 +105,7 @@ function(add_headers VAR)
 endfunction()
 
 # Define the fmt library, its includes and the needed defines.
-add_headers(FMT_HEADERS
-            core.h
-            format.h
-            format-inl.h
-            ostream.h
-            printf.h
-            time.h
-            ranges.h)
+add_headers(FMT_HEADERS core.h format.h format-inl.h ostream.h printf.h time.h ranges.h)
 set(FMT_SOURCES src/format.cc)
 if(HAVE_OPEN)
   add_headers(FMT_HEADERS posix.h)
@@ -125,8 +115,8 @@ endif()
 add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst ChangeLog.rst)
 add_library(fmt::fmt ALIAS fmt)
 
-# Starting with CMake 3.1 the CXX_STANDARD property can be used instead. Don't
-# export -std since it may break projects that use other standards.
+# Starting with CMake 3.1 the CXX_STANDARD property can be used instead. Don't export
+# -std since it may break projects that use other standards.
 target_compile_options(fmt PRIVATE ${CPP14_FLAG})
 if(FMT_PEDANTIC)
   target_compile_options(fmt PRIVATE ${PEDANTIC_COMPILE_FLAGS})
@@ -136,10 +126,9 @@ if(MSVC)
   target_compile_options(fmt PRIVATE /W4)
 endif()
 
-target_include_directories(
-  fmt
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include>)
+target_include_directories(fmt
+                           PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                                  $<INSTALL_INTERFACE:include>)
 
 set_target_properties(fmt
                       PROPERTIES VERSION
@@ -151,8 +140,8 @@ set_target_properties(fmt
 
 if(BUILD_SHARED_LIBS)
   if(UNIX AND NOT APPLE)
-    # Fix rpmlint warning: unused-direct-shlib-dependency
-    # /usr/lib/libformat.so.1.1.0 /lib/libm.so.6.
+    # Fix rpmlint warning: unused-direct-shlib-dependency /usr/lib/libformat.so.1.1.0
+    # /lib/libm.so.6.
     target_link_libraries(fmt -Wl,--as-needed)
   endif()
   target_compile_definitions(fmt PRIVATE FMT_EXPORT INTERFACE FMT_SHARED)
@@ -165,10 +154,9 @@ if(CMAKE_VERSION VERSION_GREATER 3.1.0 OR CMAKE_VERSION VERSION_EQUAL 3.1.0)
 
   target_compile_definitions(fmt-header-only INTERFACE FMT_HEADER_ONLY=1)
 
-  target_include_directories(
-    fmt-header-only
-    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-              $<INSTALL_INTERFACE:include>)
+  target_include_directories(fmt-header-only
+                             INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                                       $<INSTALL_INTERFACE:include>)
 endif()
 
 # Install targets.
@@ -177,9 +165,8 @@ if(FMT_INSTALL)
   include(CMakePackageConfigHelpers)
   set(
     FMT_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/fmt
-    CACHE
-      STRING
-      "Installation directory for cmake files, relative to ${CMAKE_INSTALL_PREFIX}."
+    CACHE STRING
+          "Installation directory for cmake files, relative to ${CMAKE_INSTALL_PREFIX}."
     )
   set(version_config ${PROJECT_BINARY_DIR}/fmt-config-version.cmake)
   set(project_config ${PROJECT_BINARY_DIR}/fmt-config.cmake)
@@ -192,17 +179,14 @@ if(FMT_INSTALL)
 
   set(
     FMT_LIB_DIR ${CMAKE_INSTALL_LIBDIR}
-    CACHE
-      STRING
-      "Installation directory for libraries, relative to ${CMAKE_INSTALL_PREFIX}."
-    )
+    CACHE STRING
+          "Installation directory for libraries, relative to ${CMAKE_INSTALL_PREFIX}.")
 
   set(
     FMT_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR}/fmt
     CACHE
       STRING
-      "Installation directory for include files, relative to ${CMAKE_INSTALL_PREFIX}."
-    )
+      "Installation directory for include files, relative to ${CMAKE_INSTALL_PREFIX}.")
 
   # Generate the version, config and target files into the build directory.
   write_basic_package_version_file(${version_config}
@@ -210,23 +194,19 @@ if(FMT_INSTALL)
                                    ${FMT_VERSION}
                                    COMPATIBILITY
                                    AnyNewerVersion)
-  configure_package_config_file(
-    ${PROJECT_SOURCE_DIR}/support/cmake/fmt-config.cmake.in
-    ${project_config}
-    INSTALL_DESTINATION
-    ${FMT_CMAKE_DIR})
-  # Use a namespace because CMake provides better diagnostics for namespaced
-  # imported targets.
+  configure_package_config_file(${PROJECT_SOURCE_DIR}/support/cmake/fmt-config.cmake.in
+                                ${project_config}
+                                INSTALL_DESTINATION
+                                ${FMT_CMAKE_DIR})
+  # Use a namespace because CMake provides better diagnostics for namespaced imported
+  # targets.
   export(TARGETS ${INSTALL_TARGETS}
          NAMESPACE fmt::
          FILE ${PROJECT_BINARY_DIR}/${targets_export_name}.cmake)
 
   # Install version, config and target files.
-  install(FILES ${project_config} ${version_config}
-          DESTINATION ${FMT_CMAKE_DIR})
-  install(EXPORT ${targets_export_name}
-          DESTINATION ${FMT_CMAKE_DIR}
-          NAMESPACE fmt::)
+  install(FILES ${project_config} ${version_config} DESTINATION ${FMT_CMAKE_DIR})
+  install(EXPORT ${targets_export_name} DESTINATION ${FMT_CMAKE_DIR} NAMESPACE fmt::)
 
   # Install the library and headers.
   install(TARGETS ${INSTALL_TARGETS}

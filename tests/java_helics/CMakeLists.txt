@@ -2,8 +2,7 @@ find_package(Java REQUIRED)
 find_package(JNI REQUIRED)
 include(UseJava)
 
-set(helicsJar
-    ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar)
+set(helicsJar ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar)
 
 add_custom_target(
   Java_hello_world
@@ -14,8 +13,7 @@ add_custom_target(
   -d
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
-  DEPENDS JNIhelics
-          ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
+  DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
   COMMENT "Building HelloWorld.java"
   VERBATIM)
 
@@ -28,8 +26,7 @@ add_custom_target(
   -d
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/JavaHelicsApiTests.java
-  DEPENDS JNIhelics
-          ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
+  DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
   COMMENT "Building JavaHelicsApiTests.java"
   VERBATIM)
 
@@ -42,8 +39,7 @@ add_custom_target(
   -d
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/TestMessageFederate.java
-  DEPENDS JNIhelics
-          ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
+  DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
   COMMENT "Building MessageFederate.java"
   VERBATIM)
 
@@ -56,8 +52,7 @@ add_custom_target(
   -d
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/TestMessageFilter.java
-  DEPENDS JNIhelics
-          ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
+  DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
   COMMENT "Building MessageFilter.java"
   VERBATIM)
 
@@ -70,8 +65,7 @@ add_custom_target(
   -d
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/TestValueFederate.java
-  DEPENDS JNIhelics
-          ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
+  DEPENDS JNIhelics ${CMAKE_BINARY_DIR}/swig/java/buildjar/helics-${HELICS_VERSION}.jar
   COMMENT "Building ValueFederate.java"
   VERBATIM)
 
@@ -136,8 +130,8 @@ if(WIN32)
                                copy_if_different # which executes "cmake - E
                                                  # copy_if_different..."
                                "${keyfile}" # <--this is in-file
-                               "${CMAKE_CURRENT_BINARY_DIR}/") # <--this is out-
-                                                               # file path
+                               "${CMAKE_CURRENT_BINARY_DIR}/") # <--this is out- file
+                                                               # path
   endforeach(keyfile)
 
   add_custom_command(TARGET
@@ -147,9 +141,7 @@ if(WIN32)
                              -E
                              copy_if_different # which executes "cmake - E
                                                # copy_if_different..."
-                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in-
-                                                              # file
-                             "${CMAKE_CURRENT_BINARY_DIR}/") # <--this is out-
-                                                             # file path
+                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+                             "${CMAKE_CURRENT_BINARY_DIR}/") # <--this is out- file path
 
 endif(WIN32)
