@@ -769,10 +769,10 @@ interface_handle CommonCore::registerInput(federate_id_t federateID,
         throw (InvalidFunctionCall("control Inputs must be registered before calling enterInitializationMode"));
     }
     LOG_DEBUG(parent_broker_id, fed->getIdentifier(), fmt::format("registering CONTROL INPUT {}", key));
-    auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
+    auto ci = handles.read([&key](auto &hand) { return hand.getInput(key); });
     if (ci != nullptr)  // this key is already found
     {
-        throw (RegistrationFailure("control input already exists"));
+        throw (RegistrationFailure("named Input already exists"));
     }
     auto &handle = createBasicHandle(fed->global_id, fed->local_id, handle_type_t::input, key, type, units);
 
@@ -792,12 +792,12 @@ interface_handle CommonCore::registerInput(federate_id_t federateID,
 
 interface_handle CommonCore::getInput(federate_id_t federateID, const std::string &key) const
 {
-    auto ci = handles.read([&key](auto &hand) { return hand.getNamedInput(key); });
+    auto ci = handles.read([&key](auto &hand) { return hand.getInput(key); });
     if (ci->local_fed_id != federateID)
     {
         return interface_handle();
     }
-    return ci->handle;
+    return ci->getInterfaceHandle();
 }
 
 const std::string nullStr;
@@ -830,12 +830,12 @@ const std::string &CommonCore::getType (interface_handle handle) const
         if (handleInfo->handle_type == handle_type_t::input)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto subInfo = fed->interfaces ().getInput (handleInfo->handle);
+            auto subInfo = fed->interfaces ().getInput (handle);
             if (subInfo != nullptr)
             {
-                if (!subInfo->pubType.empty ())
+                if (!subInfo->inputType.empty ())
                 {
-                    return subInfo->pubType;
+                    return subInfo->inputType;
                 }
             }
         }
@@ -868,19 +868,7 @@ const std::string &CommonCore::getTarget (interface_handle handle,int32_t index)
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-        switch (handleInfo->handle_type)
-        {
-        case handle_type_t::subscription:
-        case handle_type_t::publication:
-        case handle_type_t::control_input:
-            return handleInfo->key;
-        case handle_type_t::destination_filter:
-        case handle_type_t::source_filter:
-            return handleInfo->target;
-        case handle_type_t::endpoint:
-        default:
-            return nullStr;
-        }
+        return handleInfo->target;
     }
     return nullStr;
 }
@@ -907,7 +895,7 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
         LOG_DEBUG (parent_broker_id, fed->getIdentifier (),
                    fmt::format ("setting Value for {} size {}", handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
-        mv.source_id = handleInfo->fed_id;
+        mv.source_id = handleInfo->getFederateId();
         mv.source_handle = handle;
         mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
         mv.payload = std::string (data, len);
@@ -925,13 +913,9 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-    if (handleInfo->handle_type == handle_type_t::subscription)
+	if (handleInfo->handle_type == handle_type_t::input)
     {
-        return getFederateAt(handleInfo->local_fed_id)->interfaces().getSubscription(handle)->getData();
-    }
-    else if (handleInfo->handle_type == handle_type_t::control_input)
-    {
-        return getFederateAt(handleInfo->local_fed_id)->interfaces().getNamedInput(handle)->getData().front();
+        return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData().front();
     }
     else
     {
@@ -969,7 +953,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     auto &handle =
       createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, std::string ());
 
-    auto id = handle.handle;
+    auto id = handle.getInterfaceHandle();
     fed->interfaces ().createEndpoint (id, name, type);
     fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_END);
@@ -2469,8 +2453,8 @@ void CommonCore::localFilterCreation(ActionMessage &command)
                 setActionFlag(*epthand, has_non_cloning_dest_filter_flag);
             }
             setActionFlag(command, processing_complete_flag);
-            command.dest_handle = epthand->handle;
-            command.dest_id = epthand->fed_id;
+            command.dest_handle = epthand->getInterfaceHandle();
+            command.dest_id = epthand->getFederateId();
             routeMessage(command);
             command.dest_id = 0;
             command.dest_handle = 0;
