@@ -3,19 +3,21 @@
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
-set(helicsCpp98_headers
-    Broker.hpp
-    Core.hpp
-    CombinationFederate.hpp
-    Federate.hpp
-    MessageFederate.hpp
-    ValueFederate.hpp
-    helics.hpp
-    Publication.hpp
-    Subscription.hpp
-    Endpoint.hpp
-    Filter.hpp
-    config.hpp)
+set(
+  helicsCpp98_headers
+  Broker.hpp
+  Core.hpp
+  CombinationFederate.hpp
+  Federate.hpp
+  MessageFederate.hpp
+  ValueFederate.hpp
+  helics.hpp
+  Publication.hpp
+  Subscription.hpp
+  Endpoint.hpp
+  Filter.hpp
+  config.hpp
+)
 
 add_library(helicsCpp98 INTERFACE)
 target_include_directories(helicsCpp98 INTERFACE "${PROJECT_SOURCE_DIR}/src/helics")
@@ -31,6 +33,8 @@ if(MSVC)
   set_target_properties(helicsCpp98_ide PROPERTIES FOLDER interfaces)
 endif(MSVC)
 
-install(FILES ${helicsCpp98_headers}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpp98
-        COMPONENT headers)
+install(
+  FILES ${helicsCpp98_headers}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cpp98
+  COMPONENT headers
+)

@@ -20,31 +20,40 @@ if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
   set(ZMQ_INCLUDE_DIR ${ZeroMQ_INCLUDE_DIR})
   get_filename_component(ZMQ_LIB_DIR ${ZeroMQ_LIBRARY} DIRECTORY)
 
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c
-                 ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
-                 ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
+  )
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c
+    COPYONLY
+  )
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY
+  )
 
   add_custom_target("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
 
-  add_custom_command(TARGET "helicsPYTHONEXT" POST_BUILD
-                     COMMAND ${PYTHON_EXECUTABLE}
-                             ARGS "-m"
-                                  "pip"
-                                  "install"
-                                  "-e"
-                                  "."
-                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-                     COMMENT "Building Python extension")
+  add_custom_command(
+    TARGET "helicsPYTHONEXT" POST_BUILD
+    COMMAND
+      ${PYTHON_EXECUTABLE}
+      ARGS
+        "-m"
+        "pip"
+        "install"
+        "-e"
+        "."
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Building Python extension"
+  )
 else()
   # https://stackoverflow.com/a/3818084/5451769
   if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     # Update if necessary
     set(
       CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
+      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
+    )
   endif()
 
   include_directories(${PYTHON_INCLUDE_PATH})
@@ -78,27 +87,30 @@ else()
   install(TARGETS _helics DESTINATION python COMPONENT python)
 
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(TARGET
-                       _helics
-                       POST_BUILD # Adds a post-build event to api tests
-                       COMMAND ${CMAKE_COMMAND}
-                               -E
-                               copy_if_different # which executes "cmake - E
-                                                 # copy_if_different..."
-                               "${keyfile}" # <--this is in-file
-                               "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file
-                                                              # path
+    add_custom_command(
+      TARGET
+      _helics
+      POST_BUILD # Adds a post-build event to api tests
+      COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy_if_different # which executes "cmake - E copy_if_different..."
+        "${keyfile}" # <--this is in-file
+        "$<TARGET_FILE_DIR:_helics>/"
+    ) # <--this is out- file path
   endforeach(keyfile)
 
-  add_custom_command(TARGET
-                     _helics
-                     POST_BUILD # Adds a post-build event to api tests
-                     COMMAND ${CMAKE_COMMAND}
-                             -E
-                             copy_if_different # which executes "cmake - E
-                                               # copy_if_different..."
-                             "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file path
+  add_custom_command(
+    TARGET
+    _helics
+    POST_BUILD # Adds a post-build event to api tests
+    COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      copy_if_different # which executes "cmake - E copy_if_different..."
+      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+      "$<TARGET_FILE_DIR:_helics>/"
+  ) # <--this is out- file path
 
 endif()
 

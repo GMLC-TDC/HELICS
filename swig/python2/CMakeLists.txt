@@ -13,8 +13,10 @@ endif()
 # https://stackoverflow.com/a/3818084/5451769
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   # Update if necessary
-  set(CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes")
+  set(
+    CMAKE_C_FLAGS
+    "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
+  )
 endif()
 
 find_package(PythonLibs 2 REQUIRED)
@@ -46,15 +48,17 @@ set_target_properties(_helics PROPERTIES FOLDER interfaces)
 install(TARGETS _helics DESTINATION python COMPONENT python)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(TARGET
-                     _helics
-                     POST_BUILD # Adds a post-build event to api tests
-                     COMMAND ${CMAKE_COMMAND}
-                             -E
-                             copy_if_different # which executes "cmake - E
-                                               # copy_if_different..."
-                             "${keyfile}" # <--this is in-file
-                             "$<TARGET_FILE_DIR:_helics>/") # <--this is out- file path
+  add_custom_command(
+    TARGET
+    _helics
+    POST_BUILD # Adds a post-build event to api tests
+    COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      copy_if_different # which executes "cmake - E copy_if_different..."
+      "${keyfile}" # <--this is in-file
+      "$<TARGET_FILE_DIR:_helics>/"
+  ) # <--this is out- file path
 endforeach(keyfile)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)

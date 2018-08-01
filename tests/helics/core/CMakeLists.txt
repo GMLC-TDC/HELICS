@@ -10,22 +10,24 @@
 
 set(core_test_headers testFixtures.h)
 
-set(core_test_sources
-    core-tests.cpp
-    InfoClass-tests.cpp
-    FederateState-tests.cpp
-    ActionMessage-tests.cpp
-    # CoreBroker-tests.cpp
-    CoreFactory-tests.cpp MessageTimerTests.cpp
-    # CommonCore-tests.cpp
-    TestCore-tests.cpp
-    testFixtures.cpp
-    IPCcore_tests.cpp
-    data-block-tests.cpp
-    UdpCore-tests.cpp
-    ForwardingTimeCoordinatorTests.cpp
-    TimeCoordinatorTests.cpp
-    networkInfoTests.cpp)
+set(
+  core_test_sources
+  core-tests.cpp
+  InfoClass-tests.cpp
+  FederateState-tests.cpp
+  ActionMessage-tests.cpp
+  # CoreBroker-tests.cpp
+  CoreFactory-tests.cpp MessageTimerTests.cpp
+  # CommonCore-tests.cpp
+  TestCore-tests.cpp
+  testFixtures.cpp
+  IPCcore_tests.cpp
+  data-block-tests.cpp
+  UdpCore-tests.cpp
+  ForwardingTimeCoordinatorTests.cpp
+  TimeCoordinatorTests.cpp
+  networkInfoTests.cpp
+)
 
 if(HELICS_HAVE_ZEROMQ)
   list(APPEND core_test_sources ZeromqCore-tests.cpp)
@@ -49,22 +51,26 @@ add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=s
 set_property(TEST core-tests PROPERTY LABELS Core Daily)
 
 # Tests for Continuous Integration builds
-add_test(NAME core-ci-tests
-         COMMAND core-tests
-                 --run_test=@ci
-                 --log_level=message
-                 --report_level=short)
+add_test(
+  NAME core-ci-tests
+  COMMAND
+    core-tests
+    --run_test=@ci
+    --log_level=message
+    --report_level=short
+)
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(TARGET
-                     core-tests
-                     POST_BUILD # Adds a post-build event to core tests
-                     COMMAND ${CMAKE_COMMAND}
-                             -E
-                             copy_if_different # which executes "cmake - E
-                                               # copy_if_different..."
-                             "${keyfile}" # <--this is in-file
-                             "$<TARGET_FILE_DIR:core-tests>/") # <--this is out- file
-                                                               # path
+  add_custom_command(
+    TARGET
+    core-tests
+    POST_BUILD # Adds a post-build event to core tests
+    COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      copy_if_different # which executes "cmake - E copy_if_different..."
+      "${keyfile}" # <--this is in-file
+      "$<TARGET_FILE_DIR:core-tests>/"
+  ) # <--this is out- file path
 endforeach(keyfile)

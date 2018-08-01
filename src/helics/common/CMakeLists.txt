@@ -4,74 +4,83 @@
 # file and DISCLAIMER for more details.
 #
 
-set(common_headers
-    AirLock.hpp
-    simpleQueue.hpp
-    BlockingQueue.hpp
-    BlockingPriorityQueue.hpp
-    timeRepresentation.hpp
-    delayedDestructor.hpp
-    DelayedObjects.hpp
-    searchableObjectHolder.hpp
-    argParser.h
-    JsonProcessingFunctions.hpp
-    TomlProcessingFunctions.hpp
-    stringToCmdLine.h
-    AsioServiceManager.h
-    logger.h
-    stringOps.h
-    MapTraits.hpp
-    GuardedTypes.hpp
-    generic_string_ops.hpp
-    charMapper.h
-    base64.h
-    MappedVector.hpp
-    DualMappedVector.hpp
-    MappedPointerVector.hpp
-    DualMappedPointerVector.hpp
-    TripWire.hpp
-    fmt_format.h
-    fmt_ostream.h)
+set(
+  common_headers
+  AirLock.hpp
+  simpleQueue.hpp
+  BlockingQueue.hpp
+  BlockingPriorityQueue.hpp
+  timeRepresentation.hpp
+  delayedDestructor.hpp
+  DelayedObjects.hpp
+  searchableObjectHolder.hpp
+  argParser.h
+  JsonProcessingFunctions.hpp
+  TomlProcessingFunctions.hpp
+  stringToCmdLine.h
+  AsioServiceManager.h
+  logger.h
+  stringOps.h
+  MapTraits.hpp
+  GuardedTypes.hpp
+  generic_string_ops.hpp
+  charMapper.h
+  base64.h
+  MappedVector.hpp
+  DualMappedVector.hpp
+  MappedPointerVector.hpp
+  DualMappedPointerVector.hpp
+  TripWire.hpp
+  fmt_format.h
+  fmt_ostream.h
+)
 
-set(common_sources
-    stringToCmdLine.cpp
-    AsioServiceManager.cpp
-    JsonProcessingFunctions.cpp
-    TomlProcessingFunctions.cpp
-    logger.cpp
-    stringOps.cpp
-    charMapper.cpp
-    base64.cpp
-    argParser.cpp
-    TripWire.cpp)
+set(
+  common_sources
+  stringToCmdLine.cpp
+  AsioServiceManager.cpp
+  JsonProcessingFunctions.cpp
+  TomlProcessingFunctions.cpp
+  logger.cpp
+  stringOps.cpp
+  charMapper.cpp
+  base64.cpp
+  argParser.cpp
+  TripWire.cpp
+)
 
-set(zmq_headers
-    # zmqReactor.h
-    zmqContextManager.h zmqHelper.h
-    # zmqSocketDescriptor.h
-    # zmqProxyHub.h
-    cppzmq/zmq.hpp cppzmq/zmq_addon.hpp)
+set(
+  zmq_headers
+  # zmqReactor.h
+  zmqContextManager.h zmqHelper.h
+  # zmqSocketDescriptor.h
+  # zmqProxyHub.h
+  cppzmq/zmq.hpp cppzmq/zmq_addon.hpp
+)
 
-set(zmq_sources
-    # zmqReactor.cpp
-    zmqContextManager.cpp
-    # zmqSocketDescriptor.cpp
-    zmqHelper.cpp
-    # zmqProxyHub.cpp
-    )
+set(
+  zmq_sources
+  # zmqReactor.cpp
+  zmqContextManager.cpp
+  # zmqSocketDescriptor.cpp
+  zmqHelper.cpp
+  # zmqProxyHub.cpp
+)
 
 # headers that are part of the public interface
-set(helics_public_common
-    timeRepresentation.hpp
-    argParser.h
-    JsonProcessingFunctions.hpp
-    stringToCmdLine.h
-    AsioServiceManager.h
-    logger.h
-    stringOps.h
-    MapTraits.hpp
-    GuardedTypes.hpp
-    generic_string_ops.hpp)
+set(
+  helics_public_common
+  timeRepresentation.hpp
+  argParser.h
+  JsonProcessingFunctions.hpp
+  stringToCmdLine.h
+  AsioServiceManager.h
+  logger.h
+  stringOps.h
+  MapTraits.hpp
+  GuardedTypes.hpp
+  generic_string_ops.hpp
+)
 
 if(HELICS_HAVE_ZEROMQ)
   list(APPEND common_headers ${zmq_headers})
@@ -85,28 +94,35 @@ set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
   helics_common
-  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
+)
 target_include_directories(
   helics_common SYSTEM
-  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
+  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+)
 target_compile_definitions(
   helics_common PRIVATE
-  $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>)
+  $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
+)
 
 target_compile_options(
   helics_common
-  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>)
+  PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
+)
 
 if(HELICS_HAVE_ZEROMQ)
   target_include_directories(
     helics_common SYSTEM
-    PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>)
+    PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif(HELICS_HAVE_ZEROMQ)
 
 if(APPLE)
   target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
-install(FILES ${helics_public_common}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
-        COMPONENT headers)
+install(
+  FILES ${helics_public_common}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
+  COMPONENT headers
+)

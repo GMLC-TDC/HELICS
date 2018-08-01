@@ -7,16 +7,20 @@
 if(NOT DISABLE_SWIG)
   if(WIN32 AND NOT MSYS)
     if(NOT CMAKE_PROGRAM_PATH)
-      set(CMAKE_PROGRAM_PATH
-          "C:/local/swigwin-3.0.12"
-          "C:/local/swigwin-3.0.11"
-          "C:/local/swigwin-3.0.10")
+      set(
+        CMAKE_PROGRAM_PATH
+        "C:/local/swigwin-3.0.12"
+        "C:/local/swigwin-3.0.11"
+        "C:/local/swigwin-3.0.10"
+      )
     else()
-      set(CMAKE_PROGRAM_PATH
-          "${CMAKE_PROGRAM_PATH}"
-          "C:/local/swigwin-3.0.12"
-          "C:/local/swigwin-3.0.11"
-          "C:/local/swigwin-3.0.10")
+      set(
+        CMAKE_PROGRAM_PATH
+        "${CMAKE_PROGRAM_PATH}"
+        "C:/local/swigwin-3.0.12"
+        "C:/local/swigwin-3.0.11"
+        "C:/local/swigwin-3.0.10"
+      )
     endif()
   endif()
   find_package(SWIG REQUIRED 3.0)
@@ -31,7 +35,8 @@ if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
   if(BUILD_PYTHON2_INTERFACE)
     message(
-      WARNING "PYTHON2 interface will not be built since python 3 build is active")
+      WARNING "PYTHON2 interface will not be built since python 3 build is active"
+    )
   endif()
 elseif(BUILD_PYTHON2_INTERFACE)
   add_subdirectory(python2)
