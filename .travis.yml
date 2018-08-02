@@ -202,7 +202,7 @@ script:
 
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make ${MAKEFLAGS} install ; fi
-  - ctest -V --timeout 220 -L Continuous
+  - ctest --output-on-failure --timeout 220 -L Continuous
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
