@@ -64,7 +64,7 @@ class SubscriptionBase
     */
     void registerNotificationCallback (std::function<void(Time)> callback)
     {
-        fed->registerSubscriptionNotificationCallback (id, [this,callback](input_id_t, Time time) { if (isUpdated()){callback (time);} });
+        fed->registerInputNotificationCallback (id, [this,callback](input_id_t, Time time) { if (isUpdated()){callback (time);} });
     }
     /** get the key for the subscription*/
     const std::string &getKey () const { return target_; }

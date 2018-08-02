@@ -146,7 +146,7 @@ class Endpoint
     /** check if there is a message available*/
     bool hasMessage () const { return fed->hasMessage (id); }
     /** check if there is a message available*/
-    auto receiveCount () const { return fed->receiveCount (id); }
+    auto pendingMessages () const { return fed->pendingMessages (id); }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(endpoint_id_t, Time)

@@ -372,6 +372,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     {
         publish (id, data_view (ValueConverter<X>::convert (value)));
     }
+    /** add a destination target to a publication
+	@param id the identifier of the input
+	target the name of the input to send the data to
+	*/
+	void addTarget (publication_id_t id, const std::string &target);
+    /** add a source target to an input/subscription
+    @param id the identifier of the publication
+    target the name of the input to send the data to
+    */
+    void addTarget (input_id_t id, const std::string &target);
 
     /** check if a given subscription has an update
     @return true if the subscription id is valid and has an update*/

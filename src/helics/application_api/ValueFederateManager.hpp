@@ -71,6 +71,16 @@ class ValueFederateManager
     @param[in] shortcutName the name of the shortcut
     */
     void addShortcut (input_id_t subid, const std::string &shortcutName);
+    /** add a destination target to a publication
+   @param id the identifier of the input
+   target the name of the input to send the data to
+   */
+    void addTarget (publication_id_t id, const std::string &target);
+    /** add a source target to an input/subscription
+    @param id the identifier of the publication
+    target the name of the input to send the data to
+    */
+    void addTarget (input_id_t id, const std::string &target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications

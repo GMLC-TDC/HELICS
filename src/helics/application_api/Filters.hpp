@@ -41,9 +41,9 @@ class Filter
     /** default constructor*/
     Filter () = default;
     /** construct through a federate*/
-    explicit Filter (Federate *fed);
+    Filter (Federate *fed, const std::string &name);
     /** construct through a core object*/
-    explicit Filter (Core *cr);
+    Filter (Core *cr, const std::string &name);
 
     /** virtual destructor*/
     virtual ~Filter () = default;
@@ -81,9 +81,8 @@ class Filter
     virtual void addDestinationTarget (const std::string &destinationName);
 
     /** remove a sourceEndpoint to the list of endpoint to clone*/
-    virtual void removeSourceTarget (const std::string &sourceName);
-    /** remove a destination endpoint to the list of endpoints to clone*/
-    virtual void removeDestinationTarget (const std::string &destinationName);
+    virtual void removeTarget (const std::string &sourceName);
+
   protected:
     /** set a filter operations object */
     void setFilterOperations (std::shared_ptr<FilterOperations> filterOps);
@@ -98,12 +97,14 @@ class Filter
 class CloningFilter : public Filter
 {
   public:
+    /** default constructor*/
+    CloningFilter () = default;
     /** construct from a core object
      */
-    explicit CloningFilter (Core *cr);
+    CloningFilter (Core *cr, const std::string &name);
     /** construct from a Federate
      */
-    explicit CloningFilter (Federate *fed);
+    CloningFilter (Federate *fed, const std::string &name);
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);

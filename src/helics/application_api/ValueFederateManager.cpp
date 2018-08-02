@@ -83,7 +83,33 @@ void ValueFederateManager::addShortcut (input_id_t subid, const std::string &sho
     }
 }
 
-void ValueFederateManager::setDefaultValue (input_id_t id, const data_view &block)
+void ValueFederateManager::addTarget(publication_id_t id, const std::string &target)
+{
+    if (id.value () < publicationCount)
+    {
+        auto pubHandle = publications.lock ();
+        coreObject->addDestinationTarget ((*pubHandle)[id.value ()].coreID, target);
+    }
+    else
+    {
+        throw (std::invalid_argument ("publication id is invalid"));
+    }
+ }
+
+void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
+{
+    if (id.value () < inputCount)
+    {
+        auto inpHandle = inputs.lock ();
+        coreObject->addSourceTarget ((*inpHandle)[id.value ()].coreID, target);
+    }
+    else
+    {
+        throw (std::invalid_argument ("subscription id is invalid"));
+    }
+ }
+
+ void ValueFederateManager::setDefaultValue (input_id_t id, const data_view &block)
 {
     if (id.value () < inputCount)
     {

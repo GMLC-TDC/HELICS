@@ -2202,7 +2202,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
-    case CMD_REG_SUB:
+    case CMD_REG_INPUT:
         // for these registration filters any processing is already done in the
         // registration functions so this is just a router
         if (command.dest_id != 0)
@@ -2225,7 +2225,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         else
         {
-            auto sub = getHandleInfo(command.source_handle);
+            auto sub = getHandleInfo(interface_handle(command.source_handle));
             if (sub != nullptr)
             {
                 loopHandles.addHandleAtIndex(*sub, command.source_handle);
@@ -2257,7 +2257,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         else
         {
             transmit (0, command);
-            auto ept = getHandleInfo(command.source_handle);
+            auto ept = getHandleInfo(interface_handle(command.source_handle));
             if (ept != nullptr)
             {
                 loopHandles.addHandleAtIndex(*ept, command.source_handle);
@@ -2290,7 +2290,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_PUB:
         if (command.dest_id == 0)
         {
-            auto pub = getHandleInfo(command.source_handle);
+            auto pub = getHandleInfo(interface_handle(command.source_handle));
             if (pub != nullptr)
             {
                 loopHandles.addHandleAtIndex(*pub, command.source_handle);

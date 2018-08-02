@@ -352,6 +352,17 @@ class Federate
         return registerCloningFilter (std::string (), std::string (), std::string ());
     }
     
+    /** add a source target to a filter
+   @param id the identifier of the filter
+   target the name of the endpoint to filter the data from
+   */
+    void addSourceTarget (filter_id_t, const std::string &targetEndpoint);
+    /** add a destination target to a filter
+  @param id the identifier of the filter
+  target the name of the endpoint to filter the data going to
+  */
+    void addDestinationTarget (filter_id_t, const std::string &targetEndpoint);
+
     /** get the name of a filter
     @param[in] id the filter to query
     @return empty string if an invalid id is passed*/

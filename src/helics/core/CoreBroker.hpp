@@ -89,6 +89,8 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
     JsonMapBuilder depMap; //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
+    JsonMapBuilder dataflowMap;  //!< builder for the dependency graph
+    std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
   private:
     /** function that processes all the messages
@@ -243,6 +245,8 @@ class CoreBroker : public Broker, public BrokerBase
     void initializeFederateMap ();
     /** generate a json string containing the dependency information for all federation object*/
     void initializeDependencyGraph();
+    /** generate a json string containing the data flow information for all federation object*/
+    void initializeDataFlowGraph ();
 };
 
 }  // namespace helics

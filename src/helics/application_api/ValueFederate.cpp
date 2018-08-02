@@ -83,13 +83,42 @@ publication_id_t ValueFederate::registerGlobalPublication (const std::string &ke
     }
     return vfManager->registerPublication (key, type, units);
 }
+
+input_id_t
+ValueFederate::registerInput(const std::string &key, const std::string &type, const std::string &units)
+{
+    if (state != op_states::startup)
+    {
+        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
+    }
+    return vfManager->registerInput (getName () + separator_ + key, type, units);
+}
+
+input_id_t ValueFederate::registerGlobalInput(const std::string &key, const std::string &type, const std::string &units)
+{
+    if (state != op_states::startup)
+    {
+        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
+    }
+    return vfManager->registerInput (key, type, units);
+}
+
 input_id_t ValueFederate::registerSubscription (const std::string &key,
                                                                const std::string &type,
                                                                const std::string &units)
 {
-    auto id=vfManager->registerInput ("", type, units);
+    auto id=vfManager->registerInput (std::string(), type, units);
     vfManager->addTarget (id, key);
 }
+
+
+void ValueFederate::addTarget(publication_id_t id, const std::string &target)
+{
+    vfManager->addTarget (id, target);
+}
+
+void ValueFederate::addTarget(input_id_t id, const std::string &target)
+{ vfManager->addTarget (id, target); }
 
 
 void ValueFederate::addShortcut (input_id_t subid, const std::string &shortcutName)

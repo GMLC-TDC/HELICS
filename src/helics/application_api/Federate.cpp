@@ -699,11 +699,11 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             {
                 if (mode == "source")
                 {
-                    registerSourceFilter (name, target, inputType, outputType);
+                 //   registerSourceFilter (name, target, inputType, outputType);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                    registerDestinationFilter (name, target, inputType, outputType);
+                  //  registerDestinationFilter (name, target, inputType, outputType);
                 }
                 else
                 {
@@ -721,11 +721,11 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                 }
                 if (mode == "source")
                 {
-                    filter = make_source_filter (type, this, target, name);
+                  //  filter = make_source_filter (type, this, target, name);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                    filter = make_destination_filter (type, this, target, name);
+                  //  filter = make_destination_filter (type, this, target, name);
                 }
                 else if ((mode == "clone") || (mode == "cloning"))
                 {
@@ -804,8 +804,8 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         {
             std::string name = tomlGetOrDefault (filt, "name", std::string ());
 			std::string target = tomlGetOrDefault (filt, "target", std::string ());
-            std::string inputType = tomlGetOrDefault (filt, "target", std::string ());
-            std::string outputType = tomlGetOrDefault (filt, "target", std::string ());
+            std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
+            std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
             bool useTypes = ((inputType.empty ()) && (outputType.empty ()));
 
             std::string mode =tomlGetOrDefault (filt, "mode", std::string ("source"));
@@ -833,11 +833,11 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             {
                 if (mode == "source")
                 {
-                    registerSourceFilter (name, target, inputType, outputType);
+                   // registerSourceFilter (name, target, inputType, outputType);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                    registerDestinationFilter (name, target, inputType, outputType);
+                  //  registerDestinationFilter (name, target, inputType, outputType);
                 }
                 else
                 {
@@ -1011,6 +1011,16 @@ filter_id_t Federate::registerCloningFilter (const std::string &filterName,
                                                    const std::string &outputType)
 {
     return filter_id_t(coreObject->registerCloningFilter (filterName, inputType, outputType));
+}
+
+void Federate::addSourceTarget (filter_id_t id, const std::string &targetEndpoint)
+{
+    coreObject->addSourceTarget (interface_handle(id.value()), targetEndpoint);
+}
+
+void Federate::addDestinationTarget (filter_id_t id, const std::string &targetEndpoint)
+{
+    coreObject->addDestinationTarget (interface_handle(id.value()), targetEndpoint);
 }
 
 std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (interface_handle(id.value ())); }

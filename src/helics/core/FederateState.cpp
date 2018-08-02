@@ -979,14 +979,18 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         {
             break;
         }
-        if (cmd.source_id == subI->target.first)
-        {
-            subI->addData (cmd.actionTime, cmd.counter,
-                           std::make_shared<const data_block> (std::move (cmd.payload)));
-            timeCoord->updateValueTime (cmd.actionTime);
-            LOG_DEBUG ("receive publication " + prettyPrintString (cmd));
-            LOG_TRACE (timeCoord->printTimeStatus ());
-        }
+		for (auto &src : subI->input_sources)
+		{
+            if ((cmd.source_id == src.fed_id)&&(cmd.source_handle==src.handle))
+            {
+                subI->addData (src,cmd.actionTime, cmd.counter,
+                               std::make_shared<const data_block> (std::move (cmd.payload)));
+                timeCoord->updateValueTime (cmd.actionTime);
+                LOG_DEBUG ("receive publication " + prettyPrintString (cmd));
+                LOG_TRACE (timeCoord->printTimeStatus ());
+            }
+		}
+       
     }
     break;
     case CMD_ERROR:
@@ -1001,29 +1005,20 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
         errorCode = cmd.counter;
         return message_processing_result::error;
-    case CMD_REG_PUB:
+    case CMD_ADD_PUBLISHER:
     {
-        auto subI = interfaceInformation.getSubscription (interface_handle(cmd.dest_handle));
+        auto subI = interfaceInformation.getInput (interface_handle(cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->target = {global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle)};
-            subI->pubType = cmd.info ().type;
+            subI->input_sources.emplace_back(global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle));
+			if (subI->inputType.empty())
+			{
+                subI->inputType = cmd.info ().type;
+			}
             addDependency (global_federate_id_t(cmd.source_id));
         }
     }
     break;
-    case CMD_SET_PUBLISHER:
-    {
-        auto subI = interfaceInformation.getSubscription (interface_handle(cmd.dest_handle));
-        if (subI != nullptr)
-        {
-            subI->target = {global_federate_id_t(cmd.source_id), interface_handle(cmd.source_handle)};
-            subI->pubType = cmd.payload;
-            addDependency (global_federate_id_t(cmd.source_id));
-        }
-    }
-    break;
-    case CMD_REG_SUB:
     case CMD_ADD_SUBSCRIBER:
     {
         auto pubI = interfaceInformation.getPublication (interface_handle(cmd.dest_handle));
@@ -1126,9 +1121,9 @@ void FederateState::addDependent (global_federate_id_t fedThatDependsOnThis)
 Time FederateState::nextValueTime () const
 {
     auto firstValueTime = Time::maxVal ();
-    for (auto &sub : interfaceInformation.getSubscriptions ())
+    for (auto &inp : interfaceInformation.getInputs ())
     {
-        auto nvt = sub->nextValueTime ();
+        auto nvt = inp->nextValueTime ();
         if (nvt >= time_granted)
         {
             if (nvt < firstValueTime)
@@ -1186,9 +1181,9 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
             }
-    if (query == "subscriptions")
+    if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getSubscriptions (), [](auto &sub) { return sub->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [](auto &sub) { return sub->key; });
     }
     if (query == "endpoints")
     {

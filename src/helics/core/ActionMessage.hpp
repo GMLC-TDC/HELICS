@@ -115,6 +115,27 @@ class ActionMessage
     @param message the message to move.
     */
     void moveInfo (std::unique_ptr<Message> message);
+    /** set the source from a global handle*/
+	void setSource(global_handle hand)
+	{ source_id = hand.fed_id;
+        source_handle = hand.handle;
+	}
+    /** set the destination from a global handle*/
+    void setDestination (global_handle hand)
+    {
+        dest_id = hand.fed_id;
+        dest_handle = hand.handle;
+    }
+    /** get the source global_handle*/
+    global_handle getSource () const
+    {
+        return global_handle (global_federate_id_t (source_id), interface_handle (source_handle));
+	}
+    /** get the global destination handle*/
+    global_handle getDest () const
+    {
+        return global_handle (global_federate_id_t (dest_id), interface_handle (dest_handle));
+    }
     /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
