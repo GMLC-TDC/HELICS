@@ -682,12 +682,12 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
         for (const auto &filt : doc["filters"])
         {
 
-            bool useTypes = false;
+
             std::string name = jsonGetOrDefault(filt, "name", std::string());
             std::string target = jsonGetOrDefault(filt, "target", std::string());
             std::string inputType = jsonGetOrDefault(filt, "inputType", std::string());
             std::string outputType = jsonGetOrDefault(filt, "outputType", std::string());
-
+            bool useTypes = !((inputType.empty()) && (outputType.empty()));
             std::string mode = jsonGetOrDefault(filt, "mode", "source");
 
             std::string operation ("custom");
@@ -819,7 +819,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
 			std::string target = tomlGetOrDefault (filt, "target", std::string ());
             std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
-            bool useTypes = ((inputType.empty ()) && (outputType.empty ()));
+            bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
             std::string mode =tomlGetOrDefault (filt, "mode", std::string ("source"));
           

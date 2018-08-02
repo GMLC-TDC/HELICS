@@ -296,7 +296,6 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(400));
     bool connected = comm2.connect();
     BOOST_REQUIRE(connected);
     connected = connected_fut.get ();
