@@ -384,27 +384,22 @@ class VectorSubscription
     std::vector<X> vals;  //!< storage for the values
   public:
     VectorSubscription () noexcept {};
-
     /**constructor to build a subscription object
-    @param[in] required a flag indicating that the subscription is required to have a matching publication
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication to subscribe to
-    @param[in] startIndex the index to start with
-    @param[in] count the number of values to subscribe to
-    @param[in] defValue the default value
-    @param[in] units the units associated with the Subscription
-    */
-    template <class FedPtr>
-    VectorSubscription (FedPtr valueFed,
+   @param[in] valueFed  the ValueFederate to use
+   @param[in] key the identifier for the publication to subscribe to
+   @param[in] startIndex the index to start with
+   @param[in] count the number of values to subscribe to
+   @param[in] defValue the default value
+   @param[in] units the units associated with the Subscription
+   */
+    VectorSubscription (ValueFederate *valueFed,
                         const std::string &key,
                         int startIndex,
                         int count,
                         const X &defValue,
                         const std::string &units = std::string ())
-        : fed (std::addressof (*valueFed)), m_key (key), m_units (units)
+        : fed (*valueFed), m_key (key), m_units (units)
     {
-        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
-                       "first argument must be a pointer to a ValueFederate");
         ids.reserve (count);
         vals.resize (count, defValue);
         if (required == interface_availability::required)
@@ -442,9 +437,12 @@ class VectorSubscription
                         int count,
                         const X &defValue,
                         const std::string &units = std::string ())
-        : VectorSubscription (false, valueFed, key, startIndex, count, defValue, units)
+        :VectorSubscription(std::addressof (*valueFed),key,startIndex,count,defValue,units)
     {
+        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
+                       "first argument must be a pointer to a ValueFederate");
     }
+
     /** move constructor*/
     VectorSubscription (VectorSubscription &&vs) noexcept
         : fed (vs.fed), m_key (std::move (vs.m_key)), m_units (std::move (vs.m_units)), ids (std::move (vs.ids)),

@@ -302,12 +302,12 @@ class CommonCore : public Core, public BrokerBase
     DelayedObjects<std::string> ActiveQueries; //holder for active queries
 
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
-    using fed_handle_pair = std::pair<global_federate_id_t, interface_handle>;
+
     //shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
      //                       fed_handle_pair>> filters;  //!< storage for all the filters
 
     DualMappedPointerVector<FilterInfo, std::string,
-        fed_handle_pair> filters;  //!< storage for all the filters
+        global_handle> filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators

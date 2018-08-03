@@ -433,7 +433,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
   {action_message_def::action_t::cmd_add_src_filter, "add_src_filter"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
-  {action_message_def::action_t::cmd_notify_end, "notify_end"},
+  {action_message_def::action_t::cmd_add_source_endpoint, "add_source_endpoint"},
+  {action_message_def::action_t::cmd_add_destination_endpoint, "add_destination_endpoint"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
   {action_message_def::action_t::cmd_protocol, "protocol"},

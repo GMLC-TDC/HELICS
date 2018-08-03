@@ -284,6 +284,9 @@ input_id_t ValueFederateManager::getInputId (const std::string &key) const
     return invalid_id_value;
 }
 
+input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
+{ return invalid_id_value; }
+
 std::string ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();

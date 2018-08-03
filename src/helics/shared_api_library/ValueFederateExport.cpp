@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-static inline void addSubscription (helics_federate fed, std::unique_ptr<helics::SubscriptionObject> sub)
+static inline void addInput (helics_federate fed, std::unique_ptr<helics::InputObject> sub)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
     fedObj->subs.push_back (std::move (sub));
@@ -38,11 +38,11 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
         }
         try
         {
-            auto sub = std::make_unique<helics::SubscriptionObject> ();
+            auto sub = std::make_unique<helics::InputObject> ();
             sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
             sub->fedptr = std::move (fedObj);
             auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-            addSubscription (fed, std::move (sub));
+            addInput (fed, std::move (sub));
             return ret;
         }
         catch (const helics::InvalidFunctionCall &)
@@ -63,12 +63,12 @@ helics_subscription helicsFederateRegisterSubscription (helics_federate fed, con
     }
     try
     {
-        auto sub = std::make_unique<helics::SubscriptionObject> ();
-        sub->id = fedObj->registerRequiredSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
+        auto sub = std::make_unique<helics::InputObject> ();
+        sub->id = fedObj->registerSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-        addSubscription (fed, std::move (sub));
+        addInput(fed, std::move (sub));
         return ret;
     }
     catch (const helics::InvalidFunctionCall &)
@@ -94,12 +94,12 @@ helics_subscription helicsFederateRegisterTypeSubscription (helics_federate fed,
 
     try
     {
-        auto sub = std::make_unique<helics::SubscriptionObject> ();
+        auto sub = std::make_unique<helics::InputObject> ();
         sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-        addSubscription (fed, std::move (sub));
+        addInput (fed, std::move (sub));
         return ret;
     }
     catch (const helics::InvalidFunctionCall &)
@@ -120,12 +120,12 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
         }
         try
         {
-            auto sub = std::make_unique<helics::SubscriptionObject> ();
-            sub->subptr = std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj.get (), key,
+            auto sub = std::make_unique<helics::InputObject> ();
+            sub->subptr = std::make_unique<helics::Subscription> ( fedObj.get (), key,
                                                                   (units == nullptr) ? nullStr : std::string (units));
             sub->fedptr = std::move (fedObj);
             auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-            addSubscription (fed, std::move (sub));
+            addInput (fed, std::move (sub));
             return ret;
         }
         catch (const helics::InvalidFunctionCall &)
@@ -146,12 +146,12 @@ helics_subscription helicsFederateRegisterOptionalSubscription (helics_federate 
     }
     try
     {
-        auto sub = std::make_unique<helics::SubscriptionObject> ();
-        sub->id = fedObj->registerOptionalSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
+        auto sub = std::make_unique<helics::InputObject> ();
+        sub->id = fedObj->registerSubscription (key, type, (units == nullptr) ? nullStr : std::string (units));
         sub->rawOnly = true;
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-        addSubscription (fed, std::move (sub));
+        addInput (fed, std::move (sub));
         return ret;
     }
     catch (const helics::InvalidFunctionCall &)
@@ -178,12 +178,12 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
 
     try
     {
-        auto sub = std::make_unique<helics::SubscriptionObject> ();
+        auto sub = std::make_unique<helics::InputObject> ();
         sub->subptr = std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj, key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_subscription> (sub.get ());
-        addSubscription (fed, std::move (sub));
+        addInput (fed, std::move (sub));
         return ret;
     }
     catch (const helics::InvalidFunctionCall &)

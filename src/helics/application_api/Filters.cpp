@@ -296,7 +296,7 @@ std::unique_ptr<Filter> make_filter (defined_filter_types type,
 
 
 std::unique_ptr<Filter>
-make_destination_filter (defined_filter_types type, Core *cr, const std::string &name)
+make_filter (defined_filter_types type, Core *cr, const std::string &name)
 
 {
     if (type == defined_filter_types::clone)

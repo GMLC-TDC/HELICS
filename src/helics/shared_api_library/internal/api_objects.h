@@ -26,7 +26,7 @@ class Broker;
 class ValueFederate;
 class MessageFederate;
 class Subscription;
-class Publication;
+class Input;
 class Endpoint;
 class Filter;
 
@@ -66,7 +66,7 @@ class CoreObject
 /** get the CoreObject from a helics_core and verify it is valid*/
 CoreObject *getCoreObject (helics_core core);
 
-class SubscriptionObject;
+class InputObject;
 class PublicationObject;
 class EndpointObject;
 
@@ -79,7 +79,7 @@ class FedObject
     int index = -2;
     std::shared_ptr<Federate> fedptr;
     std::unique_ptr<Message> lastMessage;
-    std::vector<std::unique_ptr<SubscriptionObject>> subs;
+    std::vector<std::unique_ptr<InputObject>> subs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;
@@ -91,15 +91,16 @@ class FedObject
 FedObject *getFedObject (helics_federate fed);
 
 /** object wrapping a subscription*/
-class SubscriptionObject
+class InputObject
 {
   public:
-    std::unique_ptr<Subscription> subptr;
-    subscription_id_t id;
+    std::unique_ptr<Input> subptr;
+    input_id_t id;
     int valid = 0;
     bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
 };
+
 /** object wrapping a publication*/
 class PublicationObject
 {

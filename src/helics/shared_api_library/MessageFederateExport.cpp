@@ -243,7 +243,7 @@ helics_bool_t helicsEndpointHasMessage (helics_endpoint endpoint)
     return (endObj->endptr->hasMessage ()) ? helics_true : helics_false;
 }
 
-int helicsFederateReceiveCount (helics_federate fed)
+int helicsFederatePendingMessages (helics_federate fed)
 {
     if (fed == nullptr)
     {
@@ -254,10 +254,10 @@ int helicsFederateReceiveCount (helics_federate fed)
     {
         return 0;
     }
-    return mFed->receiveCount ();
+    return mFed->pendingMessages ();
 }
 
-int helicsEndpointReceiveCount (helics_endpoint endpoint)
+int helicsEndpointPendingMessages (helics_endpoint endpoint)
 {
     if (endpoint == nullptr)
     {
@@ -265,12 +265,12 @@ int helicsEndpointReceiveCount (helics_endpoint endpoint)
     }
 
     auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
-    return endObj->endptr->receiveCount ();
+    return endObj->endptr->pendingMessages ();
 }
 
 static message_t emptyMessage ()
 {
-    message_t empty{};
+    message_t empty;
     empty.time = 0;
     empty.data = nullptr;
     empty.length = 0;

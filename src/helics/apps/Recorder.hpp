@@ -138,7 +138,7 @@ namespace apps
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages; //!< list of messages
-        std::map<helics::subscription_id_t, int> subids; //!< map of the subscription ids
+        std::map<helics::input_id_t, int> subids; //!< map of the subscription ids
         std::map<std::string, int> subkeys;  //!< translate subscription names to an index
         std::map<helics::endpoint_id_t, int> eptids; //translate subscription id to index
         std::map<std::string, int> eptNames;    //!< translate endpoint name to index

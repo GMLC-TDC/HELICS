@@ -1100,7 +1100,7 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
                 // pubInfo->type << ENDL;
             }
             // notify the filter about its endpoint
-            ActionMessage m (CMD_NOTIFY_END);
+            ActionMessage m (CMD_ADD_SOURCE_ENDPOINT);
             m.setSource (endHandle->handle);
             m.setDestination (handleInfo.handle);
 
@@ -1122,42 +1122,46 @@ bool CoreBroker::FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo)
 
 void CoreBroker::FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo)
 {
-    auto filtHandles = handles.getFilter (handleInfo.target);
-    for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
-    {
-        auto &filtInfo = handles[filt->second];
+   // auto filtHandles = handles.getFilter (handleInfo.target);
+    //for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
+    //{
+       // auto &filtInfo = handles[filt->second];
+        auto filtInfop = handles.getFilter (handleInfo.target);
+		if (filtInfop == nullptr)
+		{
+            return;
+		}
+        auto &filtInfo = *filtInfop;
         if (checkActionFlag (filtInfo, processing_complete_flag))
         {
-            continue;
+            return;
         }
         if (!matchingTypes (filtInfo.type, handleInfo.type))
         {
-            ActionMessage mismatch (CMD_WARNING, global_broker_id_local, filtInfo.fed_id);
-            mismatch.dest_handle = filtInfo.handle;
+            ActionMessage mismatch (CMD_WARNING);
+            mismatch.source_id = global_broker_id_local;
+			mismatch.setDestination (filtInfo.handle);
+
             mismatch.payload = fmt::format ("filter type mismatch for {}: {} does not match {} for endpoint {}",
                                             filtInfo.key, filtInfo.type, handleInfo.type, handleInfo.key);
-            transmit (getRoute (filtInfo.fed_id), mismatch);
+            transmit (getRoute (filtInfo.handle.fed_id), mismatch);
         }
         // notify the endpoint about a filter
         ActionMessage m ((handleInfo.handle_type == handle_type_t::filter) ? CMD_ADD_SRC_FILTER :
                                                                      CMD_ADD_DEST_FILTER);
-        m.source_id = filtInfo.fed_id;
-        m.source_handle = filtInfo.handle;
-        m.dest_id = handleInfo.fed_id;
-        m.dest_handle = handleInfo.handle;
+        m.setSource (filtInfo.handle);
+        m.setDestination (handleInfo.handle);
         m.flags = handleInfo.flags;
         transmit (getRoute (global_federate_id_t(m.dest_id)), m);
 
-        // notify the publisher about its subscription
-        m.setAction (CMD_NOTIFY_END);
-        m.source_id = handleInfo.fed_id;
-        m.source_handle = handleInfo.handle;
-        m.dest_id = filtInfo.fed_id;
-        m.dest_handle = filtInfo.handle;
+        // notify the filter about its endpoint
+        m.setAction (CMD_ADD_SOURCE_ENDPOINT);
+        m.setSource (handleInfo.handle);
+        m.setDestination (filtInfo.handle);
 
         transmit (getRoute (global_federate_id_t(m.dest_id)), m);
         setActionFlag (filtInfo, processing_complete_flag);
-    }
+   // }
 }
 
 void CoreBroker::checkSubscriptions ()
@@ -1175,11 +1179,11 @@ void CoreBroker::checkSubscriptions ()
                 {
                     auto str = fmt::format ("subscription {} has no corresponding publication", hndl.key);
                     LOG_WARNING (global_broker_id_local, getIdentifier (), str);
-                    ActionMessage missing (CMD_ERROR, global_broker_id_local, hndl.fed_id);
-                    missing.counter = ERROR_CODE_REGISTRATION_FAILURE;
-                    missing.dest_handle = hndl.handle;
-                    missing.payload = std::move (str);
-                    transmit (getRoute (hndl.fed_id), missing);
+                  //  ActionMessage missing (CMD_ERROR, global_broker_id_local, hndl.fed_id);
+                  //  missing.counter = ERROR_CODE_REGISTRATION_FAILURE;
+                 //   missing.dest_handle = hndl.handle;
+                 //   missing.payload = std::move (str);
+                 //   transmit (getRoute (hndl.fed_id), missing);
                 }
             }
         }
@@ -1704,11 +1708,11 @@ void CoreBroker::checkFilters ()
             {
                 auto str = fmt::format ("Filter {} has no corresponding Endpoint {}", hndl.key, hndl.target);
                 LOG_WARNING (global_broker_id_local, getIdentifier (), str);
-                ActionMessage missing (CMD_ERROR, global_broker_id_local, hndl.fed_id);
-                missing.counter = ERROR_CODE_REGISTRATION_FAILURE;
-                missing.dest_handle = hndl.handle;
-                missing.payload = std::move (str);
-                transmit (getRoute (hndl.fed_id), missing);
+                //ActionMessage missing (CMD_ERROR, global_broker_id_local, hndl.fed_id);
+                //missing.counter = ERROR_CODE_REGISTRATION_FAILURE;
+               // missing.dest_handle = hndl.handle;
+               // missing.payload = std::move (str);
+               // transmit (getRoute (hndl.fed_id), missing);
             }
         }
     }

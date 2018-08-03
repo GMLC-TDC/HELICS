@@ -125,7 +125,8 @@ enum class action_t : int32_t
     cmd_add_subscriber = 70,  //!< notify of a subscription
     cmd_add_src_filter = cmd_info_basis + 82,  //!< notify of a source
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
-    cmd_notify_end = 90,  //!< notify of an endpoint
+    cmd_add_source_endpoint = 90,  //!< notify of a source endpoint
+	cmd_add_destination_endpoint=91, //!< notify of a destination endpoint
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
@@ -184,9 +185,8 @@ enum class action_t : int32_t
 #define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
 
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
-#define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
-#define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst_filter
-#define CMD_NOTIFY_DST_FILTER action_message_def::action_t::cmd_notify_dst_filter
+#define CMD_ADD_SOURCE_ENDPOINT action_message_def::action_t::cmd_add_source_endpoint
+#define CMD_ADD_DESTINATION_ENDPOINT action_message_def::action_t::cmd_add_destination_endpoint
 
 #define CMD_REG_FILTER action_message_def::action_t::cmd_reg_filter
 #define CMD_ADD_SRC_FILTER action_message_def::action_t::cmd_add_src_filter

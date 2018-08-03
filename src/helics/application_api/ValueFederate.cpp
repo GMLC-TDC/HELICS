@@ -109,6 +109,7 @@ input_id_t ValueFederate::registerSubscription (const std::string &key,
 {
     auto id=vfManager->registerInput (std::string(), type, units);
     vfManager->addTarget (id, key);
+    return id;
 }
 
 

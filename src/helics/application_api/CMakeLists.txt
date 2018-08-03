@@ -19,6 +19,7 @@ ValueConverter_impl.hpp
 ValueFederate.hpp
 HelicsPrimaryTypes.hpp
 queryFunctions.hpp
+Inputs.hpp
 )
 
 set(private_application_api_headers
@@ -46,6 +47,7 @@ Endpoints.cpp
 helicsTypes.cpp
 queryFunctions.cpp
 FederateInfo.cpp
+Inputs.cpp
 )
 
 add_library(application_api OBJECT ${application_api_sources} ${public_application_api_headers} ${private_application_api_headers})

@@ -121,9 +121,15 @@ class ValueFederateManager
     /** get the key of a subscription from its id
     @return empty string if an invalid id is passed*/
     std::string getInputKey (input_id_t id) const;
-    /** get the id of a subscription
+    /** get the id of an input
+	@param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
     input_id_t getInputId (const std::string &name) const;
+
+	 /** get the id of a subscription
+	 @param key the target of a subscription
+   @return ivalid_input_id if name is not a recognized*/
+    input_id_t getSubscriptionId (const std::string &key) const;
 
     /** get the key of a publication from its id
     @return empty string if an invalid id is passed*/

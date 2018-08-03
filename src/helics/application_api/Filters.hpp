@@ -26,6 +26,8 @@ enum class defined_filter_types
 
 };
 
+#define EMPTY_STRING std::string ()
+
 /** get the filter type from a string*/
 defined_filter_types filterTypeFromString (const std::string &filterType) noexcept;
 
@@ -41,9 +43,9 @@ class Filter
     /** default constructor*/
     Filter () = default;
     /** construct through a federate*/
-    Filter (Federate *fed, const std::string &name);
+    explicit Filter (Federate *fed, const std::string &name = EMPTY_STRING);
     /** construct through a core object*/
-    Filter (Core *cr, const std::string &name);
+    explicit Filter (Core *cr, const std::string &name = EMPTY_STRING);
 
     /** virtual destructor*/
     virtual ~Filter () = default;
@@ -89,8 +91,7 @@ class Filter
     friend void addOperations (Filter *filt, defined_filter_types type, Core *cptr);
 };
 
-#define EMPTY_STRING std::string ()
-/** class wrapping a source filter*/
+
 
 
 /** class used to clone message for delivery to other endpoints*/
@@ -101,10 +102,10 @@ class CloningFilter : public Filter
     CloningFilter () = default;
     /** construct from a core object
      */
-    CloningFilter (Core *cr, const std::string &name);
+    explicit CloningFilter (Core *cr, const std::string &name = EMPTY_STRING);
     /** construct from a Federate
      */
-    CloningFilter (Federate *fed, const std::string &name);
+    explicit CloningFilter (Federate *fed, const std::string &name = EMPTY_STRING);
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
