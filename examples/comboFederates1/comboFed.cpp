@@ -72,7 +72,7 @@ int main (int argc, char *argv[])
 
     auto pubid = cFed->registerPublication("pub", "double");
 
-    auto subid = cFed->registerOptionalSubscription(vtarget + "/pub", "double");
+    auto subid = cFed->registerSubscription(vtarget + "/pub", "double");
     std::cout << "entering init State\n";
     cFed->enterInitializationState ();
     std::cout << "entered init State\n";
@@ -94,7 +94,7 @@ int main (int argc, char *argv[])
         if (cFed->isUpdated(subid))
         {
             auto val = cFed->getValue<double>(subid);
-            std::cout << "received updated value of "<<val<<" at " << newTime << " from " << cFed->getSubscriptionKey(subid) << '\n';
+            std::cout << "received updated value of "<<val<<" at " << newTime << " from " << cFed->getTarget(subid) << '\n';
         }
 
     }

@@ -42,8 +42,8 @@ int main (int /*argc*/, char ** /*argv*/)
 
     /* Federate init string */
     fi.setCoreInitString (fedinitstring);
-    fi.setTimeDelta (deltat);
-    fi.setMaxIterations (100);
+    fi.setTimeProperty (TIME_DELTA_PROPERTY, deltat);
+    fi.setIntegerProperty (MAX_ITERATIONS_PROPERTY, 100);
 
     //fi.setLoggingLevel(5);
 

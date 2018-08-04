@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerRequiredSubscription<double> ("pub1");
-    vFed1->setTimeDelta (1.0);
+    auto subid = vFed1->registerSubscription<double> ("pub1");
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterInitializationState ();
     vFed1->publish (pubid, 27.0);
 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<double> ("pub1");
+    auto subid = vFed2->registerSubscription<double> ("pub1");
 
     vFed1->enterInitializationStateAsync ();
     vFed2->enterInitializationState ();
@@ -183,9 +183,9 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerRequiredSubscription<double> ("pub1");
-    vFed1->setPeriod (1.0);
-    vFed1->setTimeDelta (1.0);
+    auto subid = vFed1->registerSubscription<double> ("pub1");
+    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutionState ();
     vFed1->publish (pubid, 27.0);
 
@@ -214,10 +214,10 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<double> ("pub1");
+    auto subid = vFed2->registerSubscription<double> ("pub1");
 
-    vFed1->setPeriod (1.0);
-    vFed2->setPeriod (1.0);
+    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
 
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
@@ -252,10 +252,10 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
     auto sub1 = helics::Subscription (vFed2.get (), "pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
-    vFed1->setPeriod (1.0);
-    vFed2->setPeriod (1.0);
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY,1.0);
+    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
 
     vFed1->enterExecutionStateAsync ();
     vFed2->enterExecutionState ();
@@ -297,8 +297,8 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
 
     auto sub2 = helics::Subscription (vFed1.get (), "pub2");
-    vFed1->setPeriod (1.0);
-    vFed2->setPeriod (1.0);
+    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
     // vFed1->setLoggingLevel(5);
     // vFed2->setLoggingLevel(5);
     vFed1->enterInitializationStateAsync ();

@@ -101,7 +101,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] name the name of the publication to subscribe
     @param[in] type the type of publication
     */
-    void subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type);
+    void subscribe (endpoint_id_t endpoint, const std::string &name);
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/

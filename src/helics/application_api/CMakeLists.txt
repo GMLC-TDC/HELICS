@@ -39,7 +39,6 @@ ValueFederate.cpp
 ValueConverter.cpp
 ValueFederateManager.cpp
 helicsPrimaryTypes.cpp
-Subscriptions.cpp
 Publications.cpp
 Filters.cpp
 FilterOperations.cpp

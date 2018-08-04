@@ -25,9 +25,9 @@ static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const 
 };
 
 void NamedInputInfo::addData (global_handle source_id,
-                                Time valueTime,
-                                unsigned int iteration,
-                                std::shared_ptr<const data_block> data)
+                              Time valueTime,
+                              unsigned int iteration,
+                              std::shared_ptr<const data_block> data)
 {
     int index;
     bool found = false;
@@ -56,15 +56,16 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
+void NamedInputInfo::addSource (global_handle newSource) { input_sources.push_back (newSource); }
 bool NamedInputInfo::updateTimeUpTo (Time newTime)
 {
     int index = 0;
     bool updated = false;
     for (auto &data_queue : data_queues)
     {
-        auto currentValue = data_queue.begin();
+        auto currentValue = data_queue.begin ();
 
-        auto it_final = data_queue.end();
+        auto it_final = data_queue.end ();
         if (currentValue == it_final)
         {
             return false;
@@ -81,8 +82,8 @@ bool NamedInputInfo::updateTimeUpTo (Time newTime)
             ++currentValue;
         }
 
-        auto res = updateData(std::move(*last),index);
-        data_queue.erase(data_queue.begin(), currentValue);
+        auto res = updateData (std::move (*last), index);
+        data_queue.erase (data_queue.begin (), currentValue);
         ++index;
         if (res)
         {
@@ -98,8 +99,8 @@ bool NamedInputInfo::updateTimeNextIteration (Time newTime)
     bool updated = false;
     for (auto &data_queue : data_queues)
     {
-        auto currentValue = data_queue.begin();
-        auto it_final = data_queue.end();
+        auto currentValue = data_queue.begin ();
+        auto it_final = data_queue.end ();
         if (currentValue == it_final)
         {
             return false;
@@ -121,7 +122,7 @@ bool NamedInputInfo::updateTimeNextIteration (Time newTime)
             {
                 auto cindex = last->iteration;
                 while ((currentValue != it_final) && (currentValue->time == newTime) &&
-                    (currentValue->iteration == cindex))
+                       (currentValue->iteration == cindex))
                 {
                     last = currentValue;
                     ++currentValue;
@@ -129,8 +130,8 @@ bool NamedInputInfo::updateTimeNextIteration (Time newTime)
             }
         }
 
-        auto res = updateData(std::move(*last),index);
-        data_queue.erase(data_queue.begin(), currentValue);
+        auto res = updateData (std::move (*last), index);
+        data_queue.erase (data_queue.begin (), currentValue);
         ++index;
         if (res)
         {
@@ -146,8 +147,8 @@ bool NamedInputInfo::updateTimeInclusive (Time newTime)
     bool updated = false;
     for (auto &data_queue : data_queues)
     {
-        auto currentValue = data_queue.begin();
-        auto it_final = data_queue.end();
+        auto currentValue = data_queue.begin ();
+        auto it_final = data_queue.end ();
         if (currentValue == it_final)
         {
             return false;
@@ -164,8 +165,8 @@ bool NamedInputInfo::updateTimeInclusive (Time newTime)
             ++currentValue;
         }
 
-        auto res = updateData(std::move(*last),index);
-        data_queue.erase(data_queue.begin(), currentValue);
+        auto res = updateData (std::move (*last), index);
+        data_queue.erase (data_queue.begin (), currentValue);
         ++index;
         if (res)
         {

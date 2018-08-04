@@ -154,13 +154,13 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                 auto subs = ept["subscriptions"];
                 if (subs.isString ())
                 {
-                    subscribe (epid, subs.asString (), std::string ());
+                    subscribe (epid, subs.asString ());
                 }
                 else if (subs.isArray ())
                 {
                     for (const auto &sub : subs)
                     {
-                        subscribe (epid, sub.asString (), std::string ());
+                        subscribe (epid, sub.asString ());
                     }
                 }
             }
@@ -241,13 +241,13 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             {
                 if (subs->is<std::string> ())
                 {
-                    subscribe (epid, subs->as<std::string> (), std::string ());
+                    subscribe (epid, subs->as<std::string> ());
                 }
                 else if (subs->is<toml::Array> ())
                 {
                     for (const auto &sub : subs->as<toml::Array>())
                     {
-                        subscribe (epid, sub.as<std::string> (), std::string ());
+                        subscribe (epid, sub.as<std::string> ());
                     }
                 }
             }
@@ -273,7 +273,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
     */
 }
 
-void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)
+void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name)
 {
     if (state == op_states::startup)
     {

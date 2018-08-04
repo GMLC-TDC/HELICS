@@ -195,7 +195,8 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
 
     fed1->registerGlobalPublication ("t1", "");
-    fed2->registerRequiredSubscription ("abcd", "");
+    fed2->registerSubscription ("abcd", "");
+	//TODO:: add required flag back
     fed1->enterInitializationStateAsync ();
     BOOST_CHECK_THROW (fed2->enterInitializationState (), helics::RegistrationFailure);
     fed1->finalize ();

@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/FederateState.hpp"
 #include "helics/core/FilterInfo.hpp"
 #include "helics/core/PublicationInfo.hpp"
-#include "helics/core/SubscriptionInfo.hpp"
+#include "helics/core/NamedInputInfo.hpp"
 
 federateStateTestFixture::federateStateTestFixture ()
     : fs (std::make_unique<helics::FederateState> ("fed_name", helics::CoreFederateInfo ()))

@@ -29,7 +29,7 @@ enum PubSubTypes
 class ValueFederate : public virtual Federate
 {
 private:
-    std::vector<helics_subscription> subs;
+    std::vector<helics_input> subs;
     std::vector<helics_publication> pubs;
   public:
     friend class helics98::FederateInfo;
@@ -145,7 +145,7 @@ private:
     Subscription
     registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_subscription sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
         subs.push_back(sub);
         return Subscription(sub);
     }
@@ -154,7 +154,7 @@ private:
     Subscription
         registerOptionalSubscription(const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_subscription sub = helicsFederateRegisterOptionalSubscription(fed, name.c_str(), type.c_str(), units.c_str());
+        helics_input sub = helicsFederateRegisterOptionalSubscription(fed, name.c_str(), type.c_str(), units.c_str());
         subs.push_back(sub);
         return Subscription(sub);
     }
@@ -162,7 +162,7 @@ private:
     Subscription
     registerTypeSubscription (const std::string &name, int type, const std::string &units = "")
     {
-        helics_subscription sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
+        helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
         subs.push_back(sub);
         return Subscription(sub);
     }
@@ -196,8 +196,8 @@ private:
     }
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
-    std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
-    // call helicsSubscriptionIsUpdated for each sub
+    std::vector<helics_input> queryUpdates () { return std::vector<helics_input>(); }
+    // call helicsInputIsUpdated for each sub
   private:
     // Utility function for converting numbers to string
     template <typename T> std::string toStr (T num)

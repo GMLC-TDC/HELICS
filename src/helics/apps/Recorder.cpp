@@ -92,8 +92,8 @@ void Recorder::loadJsonFile (const std::string &jsonString)
 {
     loadJsonFileConfiguration ("recorder", jsonString);
 
-    auto pubCount = fed->getSubscriptionCount ();
-    for (int ii = 0; ii < pubCount; ++ii)
+    auto subCount = fed->getInputCount ();
+    for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back (fed.get (), ii);
         subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
@@ -267,7 +267,7 @@ void Recorder::writeJsonFile (const std::string &filename)
         for (auto &v : points)
         {
             Json_helics::Value point;
-            point["key"] = subscriptions[v.index].getKey ();
+            point["key"] = subscriptions[v.index].getTarget ();
             point["value"] = v.value;
             point["time"] = static_cast<double> (v.time);
             if (v.iteration > 0)
@@ -331,7 +331,7 @@ void Recorder::writeTextFile (const std::string &filename)
     {
         if (v.first)
         {
-            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
+            outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getTarget () << '\t'
                     << v.value << '\t' << subscriptions[v.index].getType () << '\n';
         }
         else
@@ -339,11 +339,11 @@ void Recorder::writeTextFile (const std::string &filename)
             if (v.iteration > 0)
             {
                 outFile << static_cast<double> (v.time) << ':' << v.iteration << "\t\t"
-                        << subscriptions[v.index].getKey () << '\t' << v.value << '\n';
+                        << subscriptions[v.index].getTarget () << '\t' << v.value << '\n';
             }
             else
             {
-                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getKey () << '\t'
+                outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getTarget () << '\t'
                         << v.value << '\n';
             }
         }
@@ -448,23 +448,23 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getKey (), val);
+                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getTarget (), val);
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getKey (), val);
+                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getTarget (), val);
                     }
                 }
                 else
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getKey (),
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getTarget (),
                                               val.size ());
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getKey (), val.size ());
+                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
                 logger->addMessage (std::move (valstr));
@@ -639,7 +639,7 @@ std::pair<std::string, std::string> Recorder::getValue (int index) const
 {
     if (isValidIndex (index, points))
     {
-        return {subscriptions[points[index].index].getKey (), points[index].value};
+        return {subscriptions[points[index].index].getTarget (), points[index].value};
     }
     return {std::string (), std::string ()};
 }

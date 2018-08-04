@@ -184,8 +184,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 
     Endpoint epid2 (GLOBAL, mFed2.get (), "ep2", "random");
 
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -242,8 +242,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -471,8 +471,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (0.5);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 0.5);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();

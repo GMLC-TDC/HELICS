@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-	CE (helicsFederateSetPeriod (vFed1, 0.5,0.0));
-    CE (helicsFederateSetPeriod (vFed2, 0.5, 0.0));
+	CE (helicsFederateSetTimeProperty (vFed1,PERIOD_PROPERTY, 0.5));
+    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5));
 
     auto pub=helicsFederateRegisterGlobalPublication (vFed1, "pub1", "double", "");
     helicsFederateRegisterSubscription (vFed2, "pub1", "", "");
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-    CE (helicsFederateSetPeriod (vFed1, 0.5, 0.0));
-    CE (helicsFederateSetPeriod (vFed1, 0.5, 0.0));
+   CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.5));
+    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5));
 
    auto pub = helicsFederateRegisterGlobalPublication (vFed1, "pub1", "double", "");
     helicsFederateRegisterSubscription (vFed2, "pub1", "", "");
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-    CE (helicsFederateSetPeriod (vFed1, 0.6, 0.0));
-    CE (helicsFederateSetPeriod (vFed2, 0.45, 0.0));
+	CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.6));
+    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.45));
 
 	auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "");
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "");
@@ -125,10 +125,10 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-    CE (helicsFederateSetPeriod (vFed1, 0.1, 0.0));
-    CE (helicsFederateSetPeriod (vFed2, 0.1, 0.0));
+    CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.1));
+    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.1));
 
-	CE (helicsFederateSetInputDelay (vFed2, 0.1));
+	CE (helicsFederateSetTimeProperty (vFed2, INPUT_DELAY_PROPERTY, 0.1));
 
    auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "");
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "");
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change)
     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-	CE (helicsFederateSetTimeDelta (vFed, 0.1));
+    CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 0.1));
     CE (helicsFederateRequestTime (vFed, gtime, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.1);
     CE (helicsFederateFinalize (vFed));
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
 	 SetupTest (helicsCreateValueFederate, "test",1);
     auto vFed = GetFederateAt (0);
 
-    CE (helicsFederateSetPeriod (vFed, 1.0, 0.0));
+    CE (helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 1.0));
     CE (helicsFederateEnterExecutionMode (vFed));
 
      helics_time_t gtime;
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsFederateSetPeriod (vFed, 0.1, 0.0));
+    CE (helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 0.1));
     CE (helicsFederateRequestTime (vFed, gtime, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.1);
     CE (helicsFederateFinalize (vFed));

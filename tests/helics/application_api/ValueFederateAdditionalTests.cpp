@@ -109,25 +109,25 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    auto subid = vFed1->registerOptionalSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerOptionalSubscription<int> ("sub2");
+    auto subid = vFed1->registerSubscription ("sub1", "double", "V");
+    auto subid2 = vFed1->registerSubscription<int> ("sub2");
 
-    auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
+    auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
     vFed1->enterExecutionState ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = vFed1->getSubscriptionKey (subid);
-    auto sv2 = vFed1->getSubscriptionKey (subid2);
+    auto sv = vFed1->getTarget (subid);
+    auto sv2 = vFed1->getTarget (subid2);
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name = vFed1->getSubscriptionKey (subid3);
+    auto sub3name = vFed1->getTarget (subid3);
 
-    vFed1->addSubscriptionShortcut (subid, "Shortcut");
+    vFed1->addShortcut (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionUnits (subid3), "V");
+    BOOST_CHECK_EQUAL (vFed1->getInputType (subid3), "double");
+    BOOST_CHECK_EQUAL (vFed1->getInputUnits (subid3), "V");
 
     BOOST_CHECK (vFed1->getSubscriptionId ("sub1") == subid);
     BOOST_CHECK (vFed1->getSubscriptionId ("sub2") == subid2);
@@ -153,10 +153,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
 
-    auto subid = vFed1->registerOptionalSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerOptionalSubscription<int> ("sub2");
+	//optional
+    auto subid = vFed1->registerSubscription ("sub1", "double", "V");
+    auto subid2 = vFed1->registerSubscription<int> ("sub2");
 
-    auto subid3 = vFed1->registerOptionalSubscription ("sub3", "double", "V");
+    auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
     // enter execution
     vFed1->enterExecutionState ();
 
@@ -198,8 +199,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed1->registerRequiredSubscription<std::string> ("pub1");
-    vFed1->setTimeDelta (1.0);
+    auto subid = vFed1->registerSubscription<std::string> ("pub1");
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutionState ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -305,15 +306,15 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
 
     auto pubid3 = vFed1->registerPublication ("pub3", "");
 
-    auto sub1 = vFed1->registerOptionalSubscription ("fed0/pub1", "");
-    auto sub2 = vFed1->registerOptionalSubscription ("pub2", "");
-    auto sub3 = vFed1->registerOptionalSubscription ("fed0/pub3", "");
+    auto sub1 = vFed1->registerSubscription ("fed0/pub1", "");
+    auto sub2 = vFed1->registerSubscription ("pub2", "");
+    auto sub3 = vFed1->registerSubscription ("fed0/pub3", "");
 
     helics::data_block db (547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->registerSubscriptionNotificationCallback ({sub1, sub2},
-                                                     [&](helics::subscription_id_t, helics::Time) { ++ccnt; });
+    vFed1->registerInputNotificationCallback ({sub1, sub2},
+                                                     [&](helics::input_id_t, helics::Time) { ++ccnt; });
     vFed1->enterExecutionState ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
@@ -348,9 +349,9 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
 
     auto pubid3 = vFed1->registerPublicationIndexed<double> ("pub1", 2);
 
-    auto sub1 = vFed1->registerOptionalSubscriptionIndexed<double> ("pub1", 0);
-    auto sub2 = vFed1->registerOptionalSubscriptionIndexed<double> ("pub1", 1);
-    auto sub3 = vFed1->registerOptionalSubscriptionIndexed<double> ("pub1", 2);
+    auto sub1 = vFed1->registerSubscriptionIndexed<double> ("pub1", 0);
+    auto sub2 = vFed1->registerSubscriptionIndexed<double> ("pub1", 1);
+    auto sub3 = vFed1->registerSubscriptionIndexed<double> ("pub1", 2);
     vFed1->enterExecutionState ();
 
     vFed1->publish (pubid1, 10.0);
@@ -378,9 +379,9 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed2->registerRequiredSubscription<std::string> ("pub1");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+    auto subid = vFed2->registerSubscription<std::string> ("pub1");
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     vFed1->enterExecutionStateAsync ();
     BOOST_CHECK (!vFed1->isAsyncOperationCompleted ());
@@ -448,10 +449,10 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
     BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
 
-    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
-    auto id = vFed.getSubscriptionId ("pubshortcut");
-    auto key = vFed.getSubscriptionKey (id);
+    auto id = vFed.getInputId ("pubshortcut");
+    auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
 
     auto pub2name = vFed.getPublicationKey (1);
@@ -465,11 +466,11 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
 
     BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
 
-    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
 
-	auto id = vFed.getSubscriptionId ("pubshortcut");
-    auto key = vFed.getSubscriptionKey (id);
+	auto id = vFed.getInputId ("pubshortcut");
+    auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
 
 	auto pub2name = vFed.getPublicationKey (1);

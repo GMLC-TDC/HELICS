@@ -31,7 +31,7 @@ public:
 private:
     std::unique_ptr<helics::ValueFederate> vFed;
     std::vector<helics::publication_id_t> pubs;
-    std::vector<helics::subscription_id_t> subs;
+    std::vector<helics::input_id_t> subs;
     int cnt_ = 10;
     bool initialized = false;
 
@@ -61,7 +61,7 @@ public:
         for (int ii = 0; ii < cnt_; ++ii)
         {
             pubs.push_back(vFed->registerPublicationIndexed < std::string > ("leafrx", ii));
-            subs.push_back(vFed->registerRequiredSubscriptionIndexed<std::string>("leafsend", ii));
+            subs.push_back(vFed->registerSubscriptionIndexed<std::string>("leafsend", ii));
         }
         initialized = true;
     }
@@ -93,7 +93,7 @@ public:
 private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::publication_id_t pub;
-    helics::subscription_id_t sub;
+    helics::input_id_t sub;
     
     int index_ = 0;
     bool initialized = false;
@@ -119,7 +119,7 @@ public:
         fi.coreName = coreName;
         vFed = std::make_unique<helics::ValueFederate>(fi);
         pub = vFed->registerPublicationIndexed<std::string>("leafsend",index_);
-        sub = vFed->registerRequiredSubscriptionIndexed<std::string>("leafrx", index_);
+        sub = vFed->registerSubscriptionIndexed<std::string>("leafrx", index_);
         initialized = true;
     }
 
@@ -156,7 +156,7 @@ BOOST_DATA_TEST_CASE(echo_test_single_core,bdata::make(fedCount),feds)
 {
     auto wcore = helics::CoreFactory::FindOrCreate(CORE_TYPE_TO_TEST, "mcore", std::to_string(feds+1));
     //this is to delay until the threads are ready
-    wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, DELAY_INIT_ENTRY,true);
     EchoHub hub;
     hub.initialize("mcore",feds);
     std::vector<EchoLeaf> leafs(feds);
@@ -174,7 +174,7 @@ BOOST_DATA_TEST_CASE(echo_test_single_core,bdata::make(fedCount),feds)
     std::this_thread::yield();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     auto startTime = std::chrono::high_resolution_clock::now();
-    wcore->setFlag(helics::invalid_fed_id, ENABLE_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, ENABLE_INIT_ENTRY,true);
     for (auto &thrd : threads)
     {
         thrd.join();
@@ -193,7 +193,7 @@ BOOST_DATA_TEST_CASE(echo_test_multicores, bdata::make(fedCountB), feds)
     auto broker = helics::BrokerFactory::create(cType,"brokerb", std::to_string(feds+1));
     auto wcore = helics::CoreFactory::FindOrCreate(cType, "mcore", "1");
     //this is to delay until the threads are ready
-    wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, DELAY_INIT_ENTRY,true);
     EchoHub hub;
     hub.initialize("mcore", feds);
     std::vector<EchoLeaf> leafs(feds);
@@ -215,7 +215,7 @@ BOOST_DATA_TEST_CASE(echo_test_multicores, bdata::make(fedCountB), feds)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::this_thread::yield();
     auto startTime = std::chrono::high_resolution_clock::now();
-    wcore->setFlag(helics::invalid_fed_id, ENABLE_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, ENABLE_INIT_ENTRY,true);
     for (auto &thrd : threads)
     {
         thrd.join();

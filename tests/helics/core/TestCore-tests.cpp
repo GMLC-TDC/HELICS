@@ -62,11 +62,11 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
     BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
 
-    core->setTimeDelta (id, 1.0);
+    core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
 
     auto sub1 =
-      core->registerSubscription (id, "sim1_pub", "type", "units", helics::handle_check_mode::optional);
-    BOOST_CHECK_EQUAL (core->getSubscription (id, "sim1_pub"), sub1);
+      core->registerInput (id, "", "type", "units");
+    core->addSourceTarget (sub1, "sim1_pub");
     BOOST_CHECK_EQUAL (core->getType (sub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (sub1), "units");
 
@@ -131,12 +131,12 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
     BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
 
-    core->setTimeDelta (id, 1.0);
+    core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
 
-    helics::interface_handle end1 = core->registerEndpoint (id, "end1", "type");
+    auto end1 = core->registerEndpoint (id, "end1", "type");
     BOOST_CHECK_EQUAL (core->getType (end1), "type");
 
-    helics::interface_handle end2 = core->registerEndpoint (id, "end2", "type");
+    auto end2 = core->registerEndpoint (id, "end2", "type");
     BOOST_CHECK_EQUAL (core->getType (end2), "type");
 
     core->enterInitializingState (id);
@@ -196,8 +196,10 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     auto end1 = core->registerEndpoint (id, "end1", "type");
     auto end2 = core->registerEndpoint (id, "end2", "type");
 
-    auto srcFilter = core->registerSourceFilter ("srcFilter", "end1", "type", "type");
-    auto dstFilter = core->registerDestinationFilter ("dstFilter", "end2", "type", "type");
+    auto srcFilter = core->registerFilter ("srcFilter", "type", "type");
+    core->addSourceTarget (srcFilter, "end1");
+    auto dstFilter = core->registerFilter ("dstFilter", "type", "type");
+    core->addDestinationTarget (dstFilter, "end2");
 
     auto testSrcFilter = std::make_shared<TestOperator> ("sourceFilter");
     BOOST_CHECK_EQUAL (testSrcFilter->filterName, "sourceFilter");

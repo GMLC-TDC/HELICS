@@ -199,7 +199,7 @@ helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *me
     }
 }
 
-helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, const char *type)
+helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key)
 {
     if (endpoint == nullptr)
     {
@@ -209,7 +209,7 @@ helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key
     {
         auto endObj = reinterpret_cast<helics::EndpointObject *> (endpoint);
 
-        endObj->endptr->subscribe (key, (type == nullptr) ? nullStr : std::string (type));
+        endObj->endptr->subscribe (key);
         return helics_ok;
     }
     catch (...)

@@ -34,7 +34,7 @@ typedef enum {
 } helics_status;
 
 /** opaque object representing a subscription*/
-typedef void *helics_subscription;
+typedef void *helics_input;
 /** opaque object representing a publication*/
 typedef void *helics_publication;
 /** opaque object representing an endpoint*/

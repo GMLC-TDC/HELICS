@@ -487,26 +487,8 @@ HELICS_EXPORT helics_status helicsFederateGetName (helics_federate fed, char *ou
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
 */
-HELICS_EXPORT helics_status helicsFederateSetTimeDelta (helics_federate fed, helics_time_t time);
-/** set the look ahead time
-@details the look ahead is the propagation time for messages/event to propagate from the Federate
-the federate
-@param[in] lookAhead the look ahead time
-*/
-HELICS_EXPORT helics_status helicsFederateSetOutputDelay (helics_federate fed, helics_time_t outputDelay);
+HELICS_EXPORT helics_status helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time);
 
-/** set the impact Window time
-@details the impact window is the time window around the time request in which other federates cannot affect
-the federate
-@param[in] lookAhead the look ahead time
-*/
-HELICS_EXPORT helics_status helicsFederateSetInputDelay (helics_federate fed, helics_time_t inputDelay);
-/** set the period and offset of the federate
-@details the federate will on grant time on N*period+offset interval
-@param[in] period the length of time between each subsequent grants
-@param[in] offset the shift of the period from 0  offset must be < period
-*/
-HELICS_EXPORT helics_status helicsFederateSetPeriod (helics_federate fed, helics_time_t period, helics_time_t offset);
 /** set a flag for the federate
 @param fed the federate to alter a flag for
 @param flag the flag to change
@@ -528,16 +510,7 @@ HELICS_EXPORT helics_status helicsFederateSetSeparator(helics_federate fed, char
 @ details debug and trace only do anything if they were enabled in the compilation
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
 */
-HELICS_EXPORT helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLevel);
-
-/** set the max iteration count to use in federate in the info object
-@details a federate will iterate for at most min(maxIterations,core maxIterations)
-@param fi the federateInfo object to alter
-@param maxIterations the maximum number of iterations a federate is allowed per timestep
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fed is not a valid reference helics_discard if the
-specified offset is invalid
-*/
-HELICS_EXPORT helics_status helicsFederateSetMaxIterations (helics_federate fi, int maxIterations);
+HELICS_EXPORT helics_status helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int propertyVal);
 
 /** get the current time of the federate
 @param fed the federate object to query

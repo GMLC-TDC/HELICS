@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/FederateState.hpp"
 #include "helics/core/FilterInfo.hpp"
 #include "helics/core/PublicationInfo.hpp"
-#include "helics/core/SubscriptionInfo.hpp"
+#include "helics/core/NamedInputInfo.hpp"
 
 namespace utf = boost::unit_test;
 
@@ -55,42 +55,42 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getInfo ().maxIterations, 50);
 }
 
-BOOST_AUTO_TEST_CASE (create_subscription_test)
+BOOST_AUTO_TEST_CASE (create_input_test)
 {
     using namespace helics;
-    fs->interfaces().createSubscription (interface_handle(0), "first!", "type", "units", handle_check_mode::required);
-    fs->interfaces().createSubscription (interface_handle(1), "second", "type", "units", handle_check_mode::required);
-    fs->interfaces().createSubscription (interface_handle(3), "last", "type", "units", handle_check_mode::optional);
-    fs->interfaces().createSubscription (interface_handle(2), "cut-in-line", "type", "units", handle_check_mode::optional);
+    fs->interfaces().createInput (interface_handle(0), "first!", "type", "units");
+    fs->interfaces().createInput (interface_handle(1), "second", "type", "units");
+    fs->interfaces().createInput (interface_handle(3), "last", "type", "units");
+    fs->interfaces().createInput (interface_handle(2), "cut-in-line", "type", "units");
 
-    helics::SubscriptionInfo *info;
+    helics::NamedInputInfo *info;
 
     // Check first subscription
-    info = fs->interfaces().getSubscription ("first!");
+    info = fs->interfaces().getInput ("first!");
     BOOST_CHECK_EQUAL (info->id, 0);
 
-    info = fs->interfaces().getSubscription (interface_handle(0));
+    info = fs->interfaces().getInput (interface_handle(0));
     BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second subscription
-    info = fs->interfaces().getSubscription ("second");
+    info = fs->interfaces().getInput ("second");
     BOOST_CHECK_EQUAL (info->id, 1);
 
-    info = fs->interfaces().getSubscription (interface_handle(1));
+    info = fs->interfaces().getInput (interface_handle(1));
     BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order subscription
-    info = fs->interfaces().getSubscription ("cut-in-line");
+    info = fs->interfaces().getInput ("cut-in-line");
     BOOST_CHECK_EQUAL (info->id, 2);
 
-    info = fs->interfaces().getSubscription (interface_handle(2));
+    info = fs->interfaces().getInput (interface_handle(2));
     BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) subscription
-    info = fs->interfaces().getSubscription ("last");
+    info = fs->interfaces().getInput ("last");
     BOOST_CHECK_EQUAL (info->id, 3);
 
-    info = fs->interfaces().getSubscription (interface_handle(3));
+    info = fs->interfaces().getInput (interface_handle(3));
     BOOST_CHECK_EQUAL (info->key, "last");
 }
 

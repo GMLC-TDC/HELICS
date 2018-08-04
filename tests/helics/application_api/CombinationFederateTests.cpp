@@ -76,8 +76,8 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed1->registerRequiredSubscription<std::string> ("pub1");
-    vFed1->setTimeDelta (1.0);
+    auto subid = vFed1->registerSubscription<std::string> ("pub1");
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutionState ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -141,8 +141,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -198,10 +198,10 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // register the publications
     auto pubid = cFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = cFed2->registerRequiredSubscription<std::string> ("pub1");
+    auto subid = cFed2->registerSubscription<std::string> ("pub1");
 
-    cFed1->setTimeDelta (1.0);
-    cFed2->setTimeDelta (1.0);
+    cFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    cFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutionState (); });
     cFed2->enterExecutionState ();
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto id = cFed.getEndpointId ("ept1");
     BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
 
-    BOOST_CHECK_EQUAL (cFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
 
     cFed.disconnect ();
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     auto id = cFed.getEndpointId ("ept1");
     BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
 
-    BOOST_CHECK_EQUAL (cFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
 
     cFed.disconnect ();

@@ -121,7 +121,7 @@ class Source:public App
     /** set the start time for a publication */
     void setStartTime(const std::string &key, Time startTime);
     /** set the start time for a publication */
-    void setPeriod(const std::string &key, Time period);
+    void setPeriod (const std::string &key, Time period);
     /** tie a publication to a signal generator*/
     void linkPublicationToGenerator(const std::string &key, const std::string &generator);
     /** tie a publication to a signal generator*/

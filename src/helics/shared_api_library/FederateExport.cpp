@@ -670,7 +670,7 @@ helics_status helicsFederateGetName (helics_federate fed, char *outputString, in
     }
 }
 
-helics_status helicsFederateSetTimeDelta (helics_federate fed, helics_time_t time)
+helics_status helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -679,7 +679,7 @@ helics_status helicsFederateSetTimeDelta (helics_federate fed, helics_time_t tim
     }
     try
     {
-        fedObj->setTimeDelta (time);
+        fedObj->setTimeProperty (timeProperty, time);
         return helics_ok;
     }
     catch (...)
@@ -688,58 +688,6 @@ helics_status helicsFederateSetTimeDelta (helics_federate fed, helics_time_t tim
     }
 }
 
-helics_status helicsFederateSetOutputDelay (helics_federate fed, helics_time_t outputDelay)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    try
-    {
-        fedObj->setOutputDelay (outputDelay);
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
-
-helics_status helicsFederateSetInputDelay (helics_federate fed, helics_time_t inputDelay)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    try
-    {
-        fedObj->setInputDelay (inputDelay);
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
-helics_status helicsFederateSetPeriod (helics_federate fed, helics_time_t period, helics_time_t offset)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    try
-    {
-        fedObj->setPeriod (period, offset);
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
 helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_t flagValue)
 {
     auto fedObj = getFed (fed);
@@ -758,7 +706,7 @@ helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_
     }
 }
 
-helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLevel)
+helics_status helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int loggingLevel)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -767,7 +715,7 @@ helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLev
     }
     try
     {
-        fedObj->setLoggingLevel (loggingLevel);
+        fedObj->setIntegerProperty (intProperty, loggingLevel);
         return helics_ok;
     }
     catch (...)
@@ -776,23 +724,6 @@ helics_status helicsFederateSetLoggingLevel (helics_federate fed, int loggingLev
     }
 }
 
-helics_status helicsFederateSetMaxIterations (helics_federate fed, int maxIterations)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    try
-    {
-        fedObj->setMaxIterations (maxIterations);
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
 
 helics_status helicsFederateSetSeparator (helics_federate fed, char separator)
 {

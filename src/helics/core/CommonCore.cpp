@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -16,8 +16,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "FilterFunctions.hpp"
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
-#include "PublicationInfo.hpp"
 #include "NamedInputInfo.hpp"
+#include "PublicationInfo.hpp"
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -555,7 +555,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setIntegerProperty (federate_id_t federateID,int32_t property, int16_t iterations)
+void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t iterations)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -568,7 +568,7 @@ void CommonCore::setIntegerProperty (federate_id_t federateID,int32_t property, 
     fed->updateFederateInfo (cmd);
 }
 
-void CommonCore::setTimeProperty (federate_id_t federateID,int32_t property, Time time)
+void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Time time)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -579,13 +579,43 @@ void CommonCore::setTimeProperty (federate_id_t federateID,int32_t property, Tim
     {
         throw (InvalidParameter ("time properties must be greater than or equal to zero"));
     }
-   
+
     ActionMessage cmd (CMD_FED_CONFIGURE);
     cmd.messageID = property;
     cmd.actionTime = time;
     fed->updateFederateInfo (cmd);
 }
 
+Time CommonCore::getTimeProperty (federate_id_t federateID, int32_t /*property*/) const
+{
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
+    {
+        throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
+    }
+    // return fed->getTimeProperty (property);
+    // TODO:: add getTimeProperty function to federateState
+    return timeZero;
+}
+
+int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t /*property*/) const
+{
+    if (federateID == local_core_id)
+    {
+        return 0;
+    }
+    else
+    {
+        auto fed = getFederateAt (federateID);
+        if (fed == nullptr)
+        {
+            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
+        }
+        // return fed->getTimeProperty (property);
+        // TODO:: add getTimeProperty function to federateState
+        return 0;
+    }
+}
 
 void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool flagValue)
 {
@@ -630,15 +660,34 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
     fed->updateFederateInfo (cmd);
 }
 
+bool CommonCore::getFlagOption (federate_id_t federateID, int32_t /*flag*/) const
+{
+    if (federateID == local_core_id)
+    {
+        return false;
+    }
+	else
+	{
+        auto fed = getFederateAt (federateID);
+        if (fed == nullptr)
+        {
+            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
+        }
+        // return fed->getFlagOption (flag);
+        // TODO:: add getTimeProperty function to federateState
+        return false;
+	}
+}
+
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
-                                                federate_id_t local_federateId,
-                                                handle_type_t HandleType,
-                                                const std::string &key,
-                                                const std::string &type,
-                                                const std::string &units,
+                                                      federate_id_t local_federateId,
+                                                      handle_type_t HandleType,
+                                                      const std::string &key,
+                                                      const std::string &type,
+                                                      const std::string &units,
                                                       uint16_t flags)
 {
-    return handles.modify ([&](auto &hand)->const BasicHandleInfo &{
+    return handles.modify ([&](auto &hand) -> const BasicHandleInfo & {
         auto &hndl = hand.addHandle (global_federateId, HandleType, key, type, units);
         hndl.local_fed_id = local_federateId;
         hndl.flags = flags;
@@ -647,15 +696,15 @@ const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t globa
 }
 
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
-                                                federate_id_t local_federateId,
-                                                handle_type_t HandleType,
-                                                const std::string &key,
-                                                const std::string &target,
-                                                const std::string &type_in,
+                                                      federate_id_t local_federateId,
+                                                      handle_type_t HandleType,
+                                                      const std::string &key,
+                                                      const std::string &target,
+                                                      const std::string &type_in,
                                                       const std::string &type_out,
                                                       uint16_t flags)
 {
-    return handles.modify ([&](auto &hand)->const BasicHandleInfo &{
+    return handles.modify ([&](auto &hand) -> const BasicHandleInfo & {
         auto &hndl = hand.addHandle (global_federateId, HandleType, key, target, type_in, type_out);
         hndl.local_fed_id = local_federateId;
         hndl.flags = flags;
@@ -664,7 +713,6 @@ const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t globa
 }
 
 static const std::string emptyString;
-
 
 interface_handle CommonCore::registerInput (federate_id_t federateID,
                                             const std::string &key,
@@ -713,9 +761,9 @@ interface_handle CommonCore::getInput (federate_id_t federateID, const std::stri
 }
 
 interface_handle CommonCore::registerPublication (federate_id_t federateID,
-                                             const std::string &key,
-                                             const std::string &type,
-                                             const std::string &units)
+                                                  const std::string &key,
+                                                  const std::string &type,
+                                                  const std::string &units)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -744,7 +792,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     m.info ().type = type;
     m.info ().units = units;
 
-    actionQueue.push (std::move(m));
+    actionQueue.push (std::move (m));
     return id;
 }
 
@@ -755,11 +803,8 @@ interface_handle CommonCore::getPublication (federate_id_t federateID, const std
     {
         return interface_handle ();
     }
-    return pub->getInterfaceHandle();
+    return pub->getInterfaceHandle ();
 }
-
-
-
 
 const std::string nullStr;
 
@@ -824,7 +869,48 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
     return nullStr;
 }
 
-const std::string &CommonCore::getTarget (interface_handle handle,int32_t index) const
+
+void CommonCore::setHandleOption (interface_handle handle, int32_t /*option*/, bool /*option_value*/) {
+    auto handleInfo = getHandleInfo (handle);
+	if (handleInfo == nullptr)
+	{
+        throw (InvalidIdentifier ("invalid handle"));
+	}
+
+}
+
+bool CommonCore::getHandleOption (interface_handle handle, int32_t /*option*/) const {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        throw (InvalidIdentifier ("invalid handle"));
+    }
+    return false;
+}
+
+void CommonCore::removeTarget (interface_handle handle, const std::string &/*targetToRemove*/) {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        throw (InvalidIdentifier ("invalid handle"));
+    }
+}
+void CommonCore::addDestinationTarget (interface_handle handle, const std::string & /*dest*/) {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        throw (InvalidIdentifier ("invalid handle"));
+    }
+}
+void CommonCore::addSourceTarget (interface_handle handle, const std::string & /*name*/) {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        throw (InvalidIdentifier ("invalid handle"));
+    }
+}
+
+const std::string &CommonCore::getTarget (interface_handle handle, int32_t /*index*/) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -856,7 +942,7 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
         LOG_DEBUG (parent_broker_id, fed->getIdentifier (),
                    fmt::format ("setting Value for {} size {}", handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
-        mv.source_id = handleInfo->getFederateId();
+        mv.source_id = handleInfo->getFederateId ();
         mv.source_handle = handle;
         mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
         mv.payload = std::string (data, len);
@@ -874,16 +960,34 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-	if (handleInfo->handle_type == handle_type_t::input)
+    if (handleInfo->handle_type == handle_type_t::input)
     {
-        return getFederateAt(handleInfo->local_fed_id)->interfaces().getInput(handle)->getData().front();
+        return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ().front ();
     }
     else
     {
-        throw (InvalidIdentifier("Handle does not identify a subscription or control input"));
+        throw (InvalidIdentifier ("Handle does not identify an input"));
     }
 }
 
+
+std::vector<std::shared_ptr<const data_block>> CommonCore::getValues (interface_handle handle) 
+{
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        throw (InvalidIdentifier ("Handle is invalid (getValue)"));
+    }
+    // todo:: this is a long chain should be refactored
+    if (handleInfo->handle_type == handle_type_t::input)
+    {
+        return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ();
+    }
+    else
+    {
+        throw (InvalidIdentifier ("Handle does not identify an input"));
+    }
+}
 const std::vector<interface_handle> &CommonCore::getValueUpdates (federate_id_t federateID)
 {
     auto fed = getFederateAt (federateID);
@@ -914,7 +1018,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     auto &handle =
       createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, std::string ());
 
-    auto id = handle.getInterfaceHandle();
+    auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createEndpoint (id, name, type);
     fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_END);
@@ -923,7 +1027,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     m.name = name;
     m.info ().type = type;
 
-    actionQueue.push(std::move(m));
+    actionQueue.push (std::move (m));
 
     return id;
 }
@@ -938,44 +1042,8 @@ interface_handle CommonCore::getEndpoint (federate_id_t federateID, const std::s
     return ept->handle.handle;
 }
 
-interface_handle CommonCore::registerFilter (const std::string &filterName,
-                                              const std::string &type_in,
-                                              const std::string &type_out)
-{
-    if (brokerState == operating)
-    {
-        throw (InvalidFunctionCall ("Core has already entered initialization state"));
-    }
-    // check to make sure the name isn't already used
-    if (!filterName.empty ())
-    {
-        if (handles.read ([&filterName](auto &hand) {
-                auto *res = hand.getFilter(filterName);
-                return (res!=nullptr);
-            }))
-        {
-            throw (RegistrationFailure ("there already exists a filter with this name"));
-        }
-    }
-
-    auto brkid = global_broker_id.load ();
-    auto handle = createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName,
-                                     type_in, type_out);
-    auto id = handle.getInterfaceHandle();
-
-    ActionMessage m (CMD_REG_FILTER);
-    m.source_id = brkid;
-    m.source_handle = id;
-    m.name = handle.key;
-    m.info ().type = type_in;
-    m.info ().type_out = type_out;
-    actionQueue.push(std::move(m));
-    return id;
-}
-
-interface_handle CommonCore::registerCloningFilter (const std::string &filterName,
-                                                     const std::string &type_in,
-                                                     const std::string &type_out)
+interface_handle
+CommonCore::registerFilter (const std::string &filterName, const std::string &type_in, const std::string &type_out)
 {
     if (brokerState == operating)
     {
@@ -986,7 +1054,42 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
     {
         if (handles.read ([&filterName](auto &hand) {
                 auto *res = hand.getFilter (filterName);
-                return (res!=nullptr);
+                return (res != nullptr);
+            }))
+        {
+            throw (RegistrationFailure ("there already exists a filter with this name"));
+        }
+    }
+
+    auto brkid = global_broker_id.load ();
+    auto handle =
+      createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName, type_in, type_out);
+    auto id = handle.getInterfaceHandle ();
+
+    ActionMessage m (CMD_REG_FILTER);
+    m.source_id = brkid;
+    m.source_handle = id;
+    m.name = handle.key;
+    m.info ().type = type_in;
+    m.info ().type_out = type_out;
+    actionQueue.push (std::move (m));
+    return id;
+}
+
+interface_handle CommonCore::registerCloningFilter (const std::string &filterName,
+                                                    const std::string &type_in,
+                                                    const std::string &type_out)
+{
+    if (brokerState == operating)
+    {
+        throw (InvalidFunctionCall ("Core has already entered initialization state"));
+    }
+    // check to make sure the name isn't already used
+    if (!filterName.empty ())
+    {
+        if (handles.read ([&filterName](auto &hand) {
+                auto *res = hand.getFilter (filterName);
+                return (res != nullptr);
             }))
         {
             throw (RegistrationFailure ("there already exists a filter with this name"));
@@ -994,10 +1097,10 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
     }
     auto brkId = global_broker_id.load ();
 
-    auto &handle = createBasicHandle (brkId, federate_id_t(), handle_type_t::filter, filterName,
-                                      type_in, type_out, make_flags (clone_flag));
+    auto &handle = createBasicHandle (brkId, federate_id_t (), handle_type_t::filter, filterName, type_in,
+                                      type_out, make_flags (clone_flag));
 
-    auto id = handle.getInterfaceHandle();
+    auto id = handle.getInterfaceHandle ();
 
     ActionMessage m (CMD_REG_FILTER);
     m.source_id = brkId;
@@ -1006,31 +1109,29 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
     setActionFlag (m, clone_flag);
     m.info ().type = type_in;
     m.info ().type_out = type_out;
-    actionQueue.push(std::move(m));
+    actionQueue.push (std::move (m));
     return id;
 }
 
 interface_handle CommonCore::getFilter (const std::string &name) const
 {
-    auto filt = handles.read([&name](auto &hand) { return hand.getFilter(name); });
-    if ((filt != nullptr)&&(filt->handle_type==handle_type_t::filter))
+    auto filt = handles.read ([&name](auto &hand) { return hand.getFilter (name); });
+    if ((filt != nullptr) && (filt->handle_type == handle_type_t::filter))
     {
-        return filt->getInterfaceHandle();
+        return filt->getInterfaceHandle ();
     }
     return interface_handle ();
 }
 
-
-
 FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
-                                            interface_handle handle,
-                                            const std::string &key,
-                                            const std::string &type_in,
-                                            const std::string &type_out,
-                                            bool cloning)
+                                      interface_handle handle,
+                                      const std::string &key,
+                                      const std::string &type_in,
+                                      const std::string &type_out,
+                                      bool cloning)
 {
-    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key,
-                                              type_in, type_out, false);
+    auto filt = std::make_unique<FilterInfo> ((dest == 0) ? global_broker_id.load () : dest, handle, key, type_in,
+                                              type_out, false);
 
     auto retTarget = filt.get ();
     auto actualKey = key;
@@ -1042,7 +1143,7 @@ FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
     }
     if (filt->core_id == global_broker_id.load ())
     {
-        filters.insert (actualKey, global_handle(dest,filt->handle), std::move (filt));
+        filters.insert (actualKey, global_handle (dest, filt->handle), std::move (filt));
     }
     else
     {
@@ -1059,6 +1160,19 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
+
+void CommonCore::dataConnect (const std::string & /*source*/, const std::string & /*target*/) {
+
+}
+
+void CommonCore::filterAddSourceTarget (const std::string & /*filter*/, const std::string & /*target*/) {
+
+}
+
+void CommonCore::filterAddDestinationTarget (const std::string & /*filter*/, const std::string & /*target*/) {
+
+}
+
 void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName)
 {
     auto fed = getFederateAt (federateID);
@@ -1072,7 +1186,10 @@ void CommonCore::addDependency (federate_id_t federateID, const std::string &fed
     addActionMessage (std::move (search));
 }
 
-void CommonCore::send (interface_handle sourceHandle, const std::string &destination, const char *data, uint64_t length)
+void CommonCore::send (interface_handle sourceHandle,
+                       const std::string &destination,
+                       const char *data,
+                       uint64_t length)
 {
     auto hndl = getHandleInfo (sourceHandle);
     if (hndl == nullptr)
@@ -1091,7 +1208,7 @@ void CommonCore::send (interface_handle sourceHandle, const std::string &destina
     m.info ().source = hndl->key;
     m.messageID = ++messageCounter;
     m.source_handle = sourceHandle;
-    m.source_id = hndl->getFederateId();
+    m.source_id = hndl->getFederateId ();
 
     m.payload = std::string (data, length);
     m.info ().target = destination;
@@ -1116,7 +1233,7 @@ void CommonCore::sendEvent (Time time,
     }
     ActionMessage m (CMD_SEND_MESSAGE);
     m.source_handle = sourceHandle;
-    m.source_id = hndl->getFederateId();
+    m.source_id = hndl->getFederateId ();
     auto minTime = getFederateAt (hndl->local_fed_id)->nextAllowedSendTime ();
     m.actionTime = std::max (time, minTime);
     m.payload = std::string (data, length);
@@ -1149,7 +1266,7 @@ void CommonCore::sendMessage (interface_handle sourceHandle, std::unique_ptr<Mes
     ActionMessage m (std::move (message));
 
     m.info ().source = hndl->key;
-    m.source_id = hndl->getFederateId();
+    m.source_id = hndl->getFederateId ();
     m.source_handle = sourceHandle;
     if (m.messageID == 0)
     {
@@ -1188,7 +1305,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
         // now we deal with local processing
         if (checkActionFlag (*localP, has_dest_filter_flag))
         {
-            auto ffunc = getFilterCoordinator (localP->getInterfaceHandle());
+            auto ffunc = getFilterCoordinator (localP->getInterfaceHandle ());
             if (ffunc->destFilter != nullptr)
             {
                 if (ffunc->destFilter->core_id != global_broker_id.load ())
@@ -1204,7 +1321,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
                     message.setAction (CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                     message.messageID = mid;
                     message.source_id = fed_id;
-                    message.source_handle = localP->getInterfaceHandle();
+                    message.source_handle = localP->getInterfaceHandle ();
                     message.dest_id = ffunc->destFilter->core_id;
                     message.dest_handle = ffunc->destFilter->handle;
                     ongoingDestFilterProcesses[fed_id].emplace (mid);
@@ -1250,8 +1367,8 @@ void CommonCore::deliverMessage (ActionMessage &message)
                 }
             }
         }
-        message.dest_id = localP->getFederateId();
-        message.dest_handle = localP->getInterfaceHandle();
+        message.dest_id = localP->getFederateId ();
+        message.dest_handle = localP->getInterfaceHandle ();
 
         timeCoord->processTimeMessage (message);
 
@@ -1567,12 +1684,12 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
         base["dependents"] = Json_helics::arrayValue;
         for (auto &dep : timeCoord->getDependents ())
         {
-            base["dependents"].append (static_cast<int>(dep));
+            base["dependents"].append (static_cast<int> (dep));
         }
         base["dependencies"] = Json_helics::arrayValue;
         for (auto &dep : timeCoord->getDependencies ())
         {
-            base["dependencies"].append (static_cast<int>(dep));
+            base["dependencies"].append (static_cast<int> (dep));
         }
         return generateJsonString (base);
     }
@@ -1587,7 +1704,7 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
         {
             Json_helics::Value fedBlock;
             fedBlock["name"] = fed->getIdentifier ();
-            fedBlock["id"] = static_cast<int>(fed->global_id.load ());
+            fedBlock["id"] = static_cast<int> (fed->global_id.load ());
             fedBlock["parent"] = static_cast<int> (global_broker_id_local);
             block["federates"].append (fedBlock);
         }
@@ -1603,28 +1720,28 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
         block["dependents"] = Json_helics::arrayValue;
         for (auto &dep : timeCoord->getDependents ())
         {
-            block["dependents"].append (static_cast<int>(dep));
+            block["dependents"].append (static_cast<int> (dep));
         }
         block["dependencies"] = Json_helics::arrayValue;
         for (auto &dep : timeCoord->getDependencies ())
         {
-            block["dependencies"].append (static_cast<int>(dep));
+            block["dependencies"].append (static_cast<int> (dep));
         }
         for (auto fed : loopFederates)
         {
             Json_helics::Value fedBlock;
             fedBlock["name"] = fed->getIdentifier ();
-            fedBlock["id"] = static_cast<int>(fed->global_id.load ());
+            fedBlock["id"] = static_cast<int> (fed->global_id.load ());
             fedBlock["parent"] = static_cast<int> (global_broker_id_local);
             fedBlock["dependencies"] = Json_helics::arrayValue;
             for (auto &dep : fed->getDependencies ())
             {
-                fedBlock["dependencies"].append(static_cast<int>(dep));
+                fedBlock["dependencies"].append (static_cast<int> (dep));
             }
             fedBlock["dependents"] = Json_helics::arrayValue;
             for (auto &dep : fed->getDependents ())
             {
-                fedBlock["dependents"].append (static_cast<int>(dep));
+                fedBlock["dependents"].append (static_cast<int> (dep));
             }
             block["federates"].append (fedBlock);
         }
@@ -1646,8 +1763,8 @@ std::string CommonCore::query (const std::string &target, const std::string &que
             return getAddress ();
         }
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load();
-        querycmd.dest_id = global_broker_id.load();
+        querycmd.source_id = global_broker_id.load ();
+        querycmd.dest_id = global_broker_id.load ();
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
@@ -1660,26 +1777,26 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     if ((target == "parent") || (target == "broker"))
     {
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load();
+        querycmd.source_id = global_broker_id.load ();
         querycmd.dest_id = higher_broker_id;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.messageID);
-        addActionMessage(querycmd);
-        auto ret = fut.get();
-        ActiveQueries.finishedWithValue(querycmd.messageID);
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
+        addActionMessage (querycmd);
+        auto ret = fut.get ();
+        ActiveQueries.finishedWithValue (querycmd.messageID);
         return ret;
     }
     if ((target == "root") || (target == "rootbroker"))
     {
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load();
+        querycmd.source_id = global_broker_id.load ();
         querycmd.dest_id = 0;
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture(querycmd.messageID);
-        if (!global_broker_id.load().isValid())
+        auto fut = ActiveQueries.getFuture (querycmd.messageID);
+        if (!global_broker_id.load ().isValid ())
         {
             delayTransmitQueue.push (std::move (querycmd));
         }
@@ -1691,31 +1808,31 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
-    //default into a federate query
-    auto fed = (target != "federate") ? getFederate (target) : getFederateAt (federate_id_t(0));
-        if (fed != nullptr)
-        {
-            return federateQuery (fed, queryStr);
-        }
-        ActionMessage querycmd (CMD_QUERY);
-        querycmd.source_id = global_broker_id.load ();
-        auto index = ++queryCounter;
-        querycmd.messageID = index;
-        querycmd.payload = queryStr;
-        querycmd.info ().target = target;
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
-        if (!global_broker_id.load().isValid())
-        {
-            delayTransmitQueue.push (std::move (querycmd));
-        }
-        else
-        {
-            transmit (0, querycmd);
-        }
+    // default into a federate query
+    auto fed = (target != "federate") ? getFederate (target) : getFederateAt (federate_id_t (0));
+    if (fed != nullptr)
+    {
+        return federateQuery (fed, queryStr);
+    }
+    ActionMessage querycmd (CMD_QUERY);
+    querycmd.source_id = global_broker_id.load ();
+    auto index = ++queryCounter;
+    querycmd.messageID = index;
+    querycmd.payload = queryStr;
+    querycmd.info ().target = target;
+    auto fut = ActiveQueries.getFuture (querycmd.messageID);
+    if (!global_broker_id.load ().isValid ())
+    {
+        delayTransmitQueue.push (std::move (querycmd));
+    }
+    else
+    {
+        transmit (0, querycmd);
+    }
 
-        auto ret = fut.get ();
-        ActiveQueries.finishedWithValue (index);
-        return ret;
+    auto ret = fut.get ();
+    ActiveQueries.finishedWithValue (index);
+    return ret;
 }
 
 void CommonCore::processPriorityCommand (ActionMessage &&command)
@@ -1775,7 +1892,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             {
                 LOG_ERROR (parent_broker_id, identifier,
                            fmt::format ("broker responded with error for registration of {}::{}\n", command.name,
-                             commandErrorString (command.messageID)));
+                                        commandErrorString (command.messageID)));
             }
             else
             {
@@ -1808,7 +1925,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             std::string repStr = coreQuery (command.payload);
             if (command.source_id == global_broker_id_local)
             {
-                ActiveQueries.setDelayedValue(command.messageID, std::move(repStr));
+                ActiveQueries.setDelayedValue (command.messageID, std::move (repStr));
             }
             else
             {
@@ -1818,7 +1935,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
                 queryResp.messageID = command.messageID;
                 queryResp.payload = std::move (repStr);
                 queryResp.counter = command.counter;
-                transmit (getRoute (global_federate_id_t(queryResp.dest_id)), queryResp);
+                transmit (getRoute (global_federate_id_t (queryResp.dest_id)), queryResp);
             }
         }
         else
@@ -2157,26 +2274,26 @@ void CommonCore::processCommand (ActionMessage &&command)
             if (fed != nullptr)
             {
                 fed->addAction (command);
-                auto pubhandle = loopHandles.getPublication(command.dest_handle);
+                auto pubhandle = loopHandles.getPublication (command.dest_handle);
                 if (pubhandle != nullptr)
                 {
                     if (!pubhandle->used)
                     {
-                    pubhandle->used = true;
-                        handles.modify([&](auto &hand) {hand.getPublication(command.dest_handle)->used = true; });
+                        pubhandle->used = true;
+                        handles.modify (
+                          [&](auto &hand) { hand.getPublication (command.dest_handle)->used = true; });
+                    }
                 }
-                    
             }
-        }
         }
         else
         {
-            auto sub = getHandleInfo(interface_handle(command.source_handle));
+            auto sub = getHandleInfo (interface_handle (command.source_handle));
             if (sub != nullptr)
             {
-                loopHandles.addHandleAtIndex(*sub, command.source_handle);
+                loopHandles.addHandleAtIndex (*sub, command.source_handle);
             }
-            
+
             if (checkForLocalPublication (command))
             {
                 setActionFlag (command, processing_complete_flag);
@@ -2188,27 +2305,29 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_END:
         if (command.dest_id == global_broker_id_local)
         {  // in this branch the message came from somewhere else and is targeted at a filter
-            auto filtI = filters.find (global_handle (global_broker_id_local, interface_handle(command.dest_handle)));
+            auto filtI =
+              filters.find (global_handle (global_broker_id_local, interface_handle (command.dest_handle)));
             if (filtI != nullptr)
             {
-                filtI->sourceTargets.emplace_back(global_federate_id_t (command.source_id), interface_handle (command.source_handle));
+                filtI->sourceTargets.emplace_back (global_federate_id_t (command.source_id),
+                                                   interface_handle (command.source_handle));
                 timeCoord->addDependency (global_federate_id_t (command.source_id));
             }
-            auto filthandle = loopHandles.getFilter(command.dest_handle);
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
             if (filthandle != nullptr)
             {
-                    filthandle->used = true;
-                }
+                filthandle->used = true;
             }
+        }
         else
         {
             transmit (0, command);
-            auto ept = getHandleInfo(interface_handle(command.source_handle));
+            auto ept = getHandleInfo (interface_handle (command.source_handle));
             if (ept != nullptr)
             {
-                loopHandles.addHandleAtIndex(*ept, command.source_handle);
+                loopHandles.addHandleAtIndex (*ept, command.source_handle);
             }
-           
+
             bool added = timeCoord->addDependency (global_federate_id_t (command.source_id));
             if (added)
             {
@@ -2236,10 +2355,10 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_PUB:
         if (command.dest_id == 0)
         {
-            auto pub = getHandleInfo(interface_handle(command.source_handle));
+            auto pub = getHandleInfo (interface_handle (command.source_handle));
             if (pub != nullptr)
             {
-                loopHandles.addHandleAtIndex(*pub, command.source_handle);
+                loopHandles.addHandleAtIndex (*pub, command.source_handle);
             }
         }
         routeMessage (command);
@@ -2247,7 +2366,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_FILTER:
         if (command.dest_id == 0)
         {
-            localFilterCreation(command);
+            localFilterCreation (command);
             if (!hasFilters)
             {
                 hasFilters = true;
@@ -2286,21 +2405,22 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             helics::FilterInfo *filtI = nullptr;
             {  // scope for the lock_guard
-                filtI = filters.find (global_handle(global_broker_id_local, interface_handle(command.dest_handle)));
+                filtI =
+                  filters.find (global_handle (global_broker_id_local, interface_handle (command.dest_handle)));
                 if (filtI != nullptr)
                 {
-                    filtI->sourceTargets.emplace_back(command.getSource());
+                    filtI->sourceTargets.emplace_back (command.getSource ());
                     timeCoord->addDependency (global_federate_id_t (command.source_id));
                 }
             }
 
-            auto filthandle =loopHandles.getFilter (command.dest_handle);
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
             if (filthandle != nullptr)
             {
-                    filthandle->used = true;
-                }
+                filthandle->used = true;
             }
         }
+    }
     break;
     case CMD_ADD_PUBLISHER:
         routeMessage (command);
@@ -2308,10 +2428,10 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ADD_SRC_FILTER:
     {
         auto endhandle = loopHandles.getEndpoint (command.dest_handle);
-if (endhandle != nullptr)
-{
-    setActionFlag(*endhandle, has_source_filter_flag);
-}
+        if (endhandle != nullptr)
+        {
+            setActionFlag (*endhandle, has_source_filter_flag);
+        }
 
         processFilterInfo (command);
         if (command.source_id != global_broker_id_local)
@@ -2319,28 +2439,28 @@ if (endhandle != nullptr)
             auto fed = getFederateCore (global_federate_id_t (command.dest_id));
             if (fed != nullptr)
             {
-        command.setAction(CMD_ADD_DEPENDENT);
-        fed->addAction(command);
+                command.setAction (CMD_ADD_DEPENDENT);
+                fed->addAction (command);
             }
-}
         }
+    }
     break;
     case CMD_ADD_DEST_FILTER:
     {
-        processFilterInfo(command);
+        processFilterInfo (command);
         if (command.source_id != global_broker_id_local)
         {
             auto fed = getFederateCore (global_federate_id_t (command.dest_id));
             if (fed != nullptr)
             {
-                command.setAction(CMD_ADD_DEPENDENT);
-                fed->addAction(command);
+                command.setAction (CMD_ADD_DEPENDENT);
+                fed->addAction (command);
             }
         }
     }
     break;
     case CMD_CORE_CONFIGURE:
-        processCoreConfigureCommands(command);
+        processCoreConfigureCommands (command);
         break;
     case CMD_INIT:
     {
@@ -2348,14 +2468,14 @@ if (endhandle != nullptr)
         if (fed != nullptr)
         {
             fed->init_transmitted = true;
-            if (allInitReady())
+            if (allInitReady ())
             {
                 broker_state_t exp = connected;
-                if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
+                if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
-                    checkDependencies();
+                    checkDependencies ();
                     command.source_id = global_broker_id_local;
-                    transmit(0, command);
+                    transmit (0, command);
                 }
             }
         }
@@ -2364,15 +2484,15 @@ if (endhandle != nullptr)
     case CMD_INIT_GRANT:
     {
         broker_state_t exp = initializing;
-        if (brokerState.compare_exchange_strong(exp, broker_state_t::operating))
+        if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
-            organizeFilterOperations();
+            organizeFilterOperations ();
             for (auto &fed : loopFederates)
             {
-                fed->addAction(command);
+                fed->addAction (command);
             }
-            timeCoord->enteringExecMode();
-            auto res = timeCoord->checkExecEntry();
+            timeCoord->enteringExecMode ();
+            auto res = timeCoord->checkExecEntry ();
             if (res == message_processing_result::next_step)
             {
                 enteredExecutionMode = true;
@@ -2384,71 +2504,74 @@ if (endhandle != nullptr)
     case CMD_SEND_MESSAGE:
         if ((command.dest_id == 0) && (isLocal (global_federate_id_t (command.source_id))))
         {
-            deliverMessage(processMessage(command));
+            deliverMessage (processMessage (command));
         }
         else
         {
-            deliverMessage(command);
+            deliverMessage (command);
         }
 
         break;
     default:
-        if (isPriorityCommand(command))
+        if (isPriorityCommand (command))
         {  // this is a backup if somehow one of these message got here
-            processPriorityCommand(std::move(command));
+            processPriorityCommand (std::move (command));
         }
         break;
     }
 }
 
-void CommonCore::localFilterCreation(ActionMessage &command)
+void CommonCore::localFilterCreation (ActionMessage &command)
 {
-    //add the local handle from the global one
-    auto filt = getHandleInfo(interface_handle(command.source_handle));
+    // add the local handle from the global one
+    auto filt = getHandleInfo (interface_handle (command.source_handle));
     if (filt != nullptr)
     {
-        loopHandles.addHandleAtIndex(*filt, command.source_handle);
+        loopHandles.addHandleAtIndex (*filt, command.source_handle);
     }
-    if (command.action() == CMD_REG_FILTER)
+    if (command.action () == CMD_REG_FILTER)
     {
-        auto filtInfo = createFilter(global_broker_id_local, interface_handle(command.source_handle), command.name, command.info().type, command.info().type_out, checkActionFlag(command,clone_flag));
+        auto filtInfo =
+          createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
+                        command.info ().type, command.info ().type_out, checkActionFlag (command, clone_flag));
         if (filtInfo->key != command.name)
         {
             command.name = filtInfo->key;
         }
-        auto epthand = loopHandles.getEndpoint(command.info().target);
+        auto epthand = loopHandles.getEndpoint (command.info ().target);
         if (epthand != nullptr)
         {
-            setActionFlag(*epthand, has_dest_filter_flag);
-            if (!checkActionFlag(command, clone_flag))
+            setActionFlag (*epthand, has_dest_filter_flag);
+            if (!checkActionFlag (command, clone_flag))
             {
-                setActionFlag(*epthand, has_non_cloning_dest_filter_flag);
+                setActionFlag (*epthand, has_non_cloning_dest_filter_flag);
             }
-            setActionFlag(command, processing_complete_flag);
-            command.dest_handle = epthand->getInterfaceHandle();
-            command.dest_id = epthand->getFederateId();
-            routeMessage(command);
+            setActionFlag (command, processing_complete_flag);
+            command.dest_handle = epthand->getInterfaceHandle ();
+            command.dest_id = epthand->getFederateId ();
+            routeMessage (command);
             command.dest_id = 0;
             command.dest_handle = 0;
-            
         }
     }
-    else if (command.action() == CMD_REG_FILTER)
+    else if (command.action () == CMD_REG_FILTER)
     {
-        auto filtInfo = createFilter(global_broker_id_local, interface_handle(command.source_handle), command.name, command.info().type, command.info().type_out, checkActionFlag(command, clone_flag));
+        auto filtInfo =
+          createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
+                        command.info ().type, command.info ().type_out, checkActionFlag (command, clone_flag));
         if (filtInfo->key != command.name)
         {
             command.name = filtInfo->key;
         }
-        auto ept = loopHandles.getEndpoint(command.info().target);
+        auto ept = loopHandles.getEndpoint (command.info ().target);
         if (ept != nullptr)
         {
-            setActionFlag(*ept, has_source_filter_flag);
-            setActionFlag(command, processing_complete_flag); 
+            setActionFlag (*ept, has_source_filter_flag);
+            setActionFlag (command, processing_complete_flag);
             // now send the same command to the endpoint
-            command.dest_handle = ept->getInterfaceHandle();
-            command.dest_id = ept->getFederateId();
-            routeMessage(command);
+            command.dest_handle = ept->getInterfaceHandle ();
+            command.dest_id = ept->getFederateId ();
+            routeMessage (command);
             command.dest_id = 0;
             command.dest_handle = 0;
         }
@@ -2509,15 +2632,14 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     return;
                 }
             }
-			*/
-            auto filter =
-              filters.find (command.getSource());
+            */
+            auto filter = filters.find (command.getSource ());
             if (filter == nullptr)
             {
                 filter =
                   createFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
-                                    command.payload, command.info ().type,
-                                    command.info ().type_out, checkActionFlag (command, clone_flag));
+                                command.payload, command.info ().type, command.info ().type_out,
+                                checkActionFlag (command, clone_flag));
             }
 
             filterInfo->hasDestFilters = true;
@@ -2546,14 +2668,13 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         }
         if (!FilterAlreadyPresent)
         {
-            auto newFilter =
-              filters.find (command.getSource());
+            auto newFilter = filters.find (command.getSource ());
             if (newFilter == nullptr)
             {
                 newFilter =
                   createFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
-                                      command.name, command.info ().type,
-                                      command.info ().type_out, checkActionFlag (command, clone_flag));
+                                command.name, command.info ().type, command.info ().type_out,
+                                checkActionFlag (command, clone_flag));
             }
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
@@ -2786,7 +2907,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
                     if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                     {  // make sure we only do this once
                         checkDependencies ();
-                        cmd.setAction(CMD_INIT);
+                        cmd.setAction (CMD_INIT);
                         cmd.source_id = global_broker_id_local;
                         cmd.dest_id = 0;
                         transmit (0, cmd);
@@ -2820,7 +2941,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         break;
     case UPDATE_FILTER_OPERATOR:
     {
-        auto FiltI = filters.find (global_handle(global_broker_id_local, interface_handle(cmd.source_handle)));
+        auto FiltI = filters.find (global_handle (global_broker_id_local, interface_handle (cmd.source_handle)));
         int ii = cmd.counter;
         auto op = dataAirlocks[ii].try_unload ();
         if (op)
@@ -2881,12 +3002,12 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
     if (pub != nullptr)
     {
         // now send the same command to the publication
-        cmd.dest_handle = pub->getInterfaceHandle();
-        cmd.dest_id = pub->getFederateId();
+        cmd.dest_handle = pub->getInterfaceHandle ();
+        cmd.dest_id = pub->getFederateId ();
         if (!pub->used)
         {
-        pub->used = true;
-            handles.modify([&](auto &hand) {hand.getPublication(cmd.dest_handle)->used = true; });
+            pub->used = true;
+            handles.modify ([&](auto &hand) { hand.getPublication (cmd.dest_handle)->used = true; });
         }
         // send to
         routeMessage (cmd);
@@ -2894,8 +3015,8 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
         ActionMessage notice (CMD_ADD_PUBLISHER);
         notice.dest_id = cmd.source_id;
         notice.dest_handle = cmd.source_handle;
-        notice.source_id = pub->getFederateId();
-        notice.source_handle = pub->getInterfaceHandle();
+        notice.source_id = pub->getFederateId ();
+        notice.source_handle = pub->getInterfaceHandle ();
         notice.payload = pub->type;
         routeMessage (notice);
         return true;
@@ -3016,7 +3137,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
     }
     if (checkActionFlag (*handle, has_source_filter_flag))
     {
-        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle());
+        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle ());
         if (filtFunc->hasSourceFilters)
         {
             //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
@@ -3063,7 +3184,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                     if (ii < filtFunc->sourceFilters.size () - 1)
                     {
                         m.setAction (CMD_SEND_FOR_FILTER_AND_RETURN);
-                        ongoingFilterProcesses[handle->getFederateId()].insert (m.messageID);
+                        ongoingFilterProcesses[handle->getFederateId ()].insert (m.messageID);
                     }
                     else
                     {
@@ -3098,14 +3219,15 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
             routeMessage (removeTimeBlock);
             return;
         }
-        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle());
+        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle ());
 
         // now go to the cloning filters
         for (auto &clFilter : filtFunc->cloningDestFilters)
         {
             if (clFilter->core_id == global_broker_id)
             {
-                auto FiltI = filters.find (global_handle (global_broker_id_local, interface_handle(clFilter->handle)));
+                auto FiltI =
+                  filters.find (global_handle (global_broker_id_local, interface_handle (clFilter->handle)));
                 if (FiltI != nullptr)
                 {
                     if (FiltI->filterOp != nullptr)
@@ -3131,7 +3253,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
         command.setAction (CMD_SEND_MESSAGE);
         routeMessage (std::move (command));
         // now unblock the time
-        ActionMessage removeTimeBlock (CMD_TIME_UNBLOCK, global_broker_id_local, handle->getFederateId());
+        ActionMessage removeTimeBlock (CMD_TIME_UNBLOCK, global_broker_id_local, handle->getFederateId ());
         removeTimeBlock.messageID = messID;
         routeMessage (removeTimeBlock);
     }
@@ -3157,7 +3279,7 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
                 transmitDelayedMessages (fid);
             }
         }
-        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle());
+        auto filtFunc = getFilterCoordinator (handle->getInterfaceHandle ());
         if (filtFunc->hasSourceFilters)
         {
             for (decltype (cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size (); ++ii)
@@ -3224,7 +3346,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     {
         // deal with local source filters
 
-        auto FiltI = filters.find (cmd.getDest());
+        auto FiltI = filters.find (cmd.getDest ());
         if (FiltI != nullptr)
         {
             if (FiltI->filterOp != nullptr)

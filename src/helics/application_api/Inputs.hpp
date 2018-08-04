@@ -73,6 +73,7 @@ class InputBase
     std::string getType () const { return fed->getInputType (id); }
     /** get the units associated with a subscription*/
     const std::string &getUnits () const { return units_; }
+    void addTarget (const std::string &newTarget) { fed->addTarget (id,newTarget);}
 };
 
 /** primary subscription object class
@@ -359,6 +360,13 @@ class InputT : public InputBase
     }
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
+	 /** get the most recent value
+   @return the value*/
+    const std::vector<X> &getVals () const { return fed->getValues<X> (id); }
+    /** store the value in the given variable
+    @param[out] out the location to store the value
+    */
+    const X &operator[] (int index) const { return fed->getValue<X> (id, index); }
   private:
     void handleCallback (Time time)
     {

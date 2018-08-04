@@ -110,7 +110,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     mFed1->registerEndpointCallback (mend);
 
-    mFed1->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     mFed1->enterExecutionState ();
 
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     mFed1->enterExecutionState ();
 
@@ -206,7 +206,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     mFed1->enterExecutionState ();
 
@@ -249,8 +249,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
     mFed1->registerEndpointCallback (epid, [&](helics::endpoint_id_t, helics::Time) { ++e1cnt; });
     mFed2->registerEndpointCallback (epid2, [&](helics::endpoint_id_t, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -277,7 +277,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
     BOOST_CHECK (!mFed1->hasMessage ());
 
     BOOST_CHECK (!mFed1->hasMessage (epid));
-    auto cnt = mFed2->receiveCount (epid2);
+    auto cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 4);
 
     auto M1 = mFed2->getMessage (epid2);
@@ -286,13 +286,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
 
     BOOST_CHECK_EQUAL (M1->data[245], data1[245]);
     // check the count decremented
-    cnt = mFed2->receiveCount (epid2);
+    cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 3);
     auto M2 = mFed2->getMessage ();
     BOOST_REQUIRE (M2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data2.size ());
     BOOST_CHECK_EQUAL (M2->data[245], data2[245]);
-    cnt = mFed2->receiveCount (epid2);
+    cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 2);
 
     auto M3 = mFed2->getMessage ();

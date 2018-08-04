@@ -93,6 +93,24 @@ void CoreBroker::setLoggingCallback (
     BrokerBase::setLoggerFunction (logFunction);
 }
 
+
+void CoreBroker::dataConnect(const std::string & /*source*/, const std::string & /*target*/)
+{
+
+}
+
+void
+CoreBroker::filterAddSourceTarget(const std::string & /*filter*/, const std::string & /*target*/)
+{
+
+}
+
+void
+CoreBroker::filterAddDestinationTarget(const std::string & /*filter*/, const std::string & /*target*/)
+{
+
+}
+
 int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 {
     auto &endpointName = mess.info ().target;

@@ -57,21 +57,12 @@ class FederateInfo
 
     void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype); }
 
-    void setFlag (int flag, int value) { helicsFederateInfoSetFlag (fi, flag, value); }
+    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value); }
 
-    void setOutputDelay (helics_time_t outputDelay) { helicsFederateInfoSetOutputDelay (fi, outputDelay); }
+    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue); }
 
-    void setTimeDelta (helics_time_t timeDelta) { helicsFederateInfoSetTimeDelta (fi, timeDelta); }
-
-    void setInputDelay (helics_time_t inputDelay) { helicsFederateInfoSetInputDelay (fi, inputDelay); }
-
-    void setTimeOffset (helics_time_t timeOffset) { helicsFederateInfoSetTimeOffset (fi, timeOffset); }
-
-    void setPeriod (helics_time_t period) { helicsFederateInfoSetPeriod (fi, period); }
-
-    void setMaxIterations (int max_iterations) { helicsFederateInfoSetMaxIterations (fi, max_iterations); }
-
-    void setLoggingLevel (int logLevel) { helicsFederateInfoSetLoggingLevel (fi, logLevel); }
+    
+    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue); }
 
     helics_federate_info_t getInfo () { return fi; }
 
@@ -147,19 +138,13 @@ class Federate
     operator helics_federate () const { return fed; }
 
     helics_federate baseObject () const { return fed; }
+
     void setFlag (int flag, int value) { helicsFederateSetFlag (fed, flag, value); }
 
-    void setOutputDelay (helics_time_t outputDelay) { helicsFederateSetOutputDelay (fed, outputDelay); }
+    void setTimeProperty (int tProperty, helics_time_t timeDelta) { helicsFederateSetTimeProperty (fed,tProperty, timeDelta); }
 
-    void setTimeDelta (helics_time_t timeDelta) { helicsFederateSetTimeDelta (fed, timeDelta); }
 
-    void setInputDelay (helics_time_t inputDelay) { helicsFederateSetInputDelay (fed, inputDelay); }
-
-    void setPeriod (helics_time_t period, helics_time_t offset) { helicsFederateSetPeriod (fed, period, offset); }
-
-    void setMaxIterations (int max_iterations) { helicsFederateSetMaxIterations (fed, max_iterations); }
-
-    void setLoggingLevel (int logLevel) { helicsFederateInfoSetLoggingLevel (fed, logLevel); }
+    void setIntegerProperty (int intProperty, int value) { helicsFederateSetIntegerProperty(fed, intProperty, value); }
 
     federate_state getState() const
     {

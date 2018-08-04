@@ -87,7 +87,7 @@ void Tracer::loadJsonFile (const std::string &jsonString)
 {
     loadJsonFileConfiguration ("tracer", jsonString);
 
-    auto subCount = fed->getSubscriptionCount ();
+    auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back (fed.get (), ii);
@@ -308,30 +308,30 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getKey (), val);
+                        valstr = fmt::format ("[{}:{}]value {}={}", currentTime, iteration, sub.getTarget (), val);
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getKey (), val);
+                        valstr = fmt::format ("[{}]value {}={}", currentTime, sub.getTarget (), val);
                     }
                 }
                 else
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getKey (),
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getTarget (),
                                               val.size ());
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getKey (), val.size ());
+                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
                 logger->addMessage (std::move (valstr));
             }
             if (valueCallback)
             {
-                valueCallback (currentTime, sub.getKey (), val);
+                valueCallback (currentTime, sub.getTarget (), val);
             }
         }
     }

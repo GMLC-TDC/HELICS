@@ -258,7 +258,7 @@ class Core
      *
      * @param time
      */
- //   virtual void setTimeDelta (federate_id_t federateID, Time time) = 0;
+ //   virtual void setTimeProperty (TIME_DELTA_PROPERTY, federate_id_t federateID, Time time) = 0;
 
     /**
      * Set the outputDelay time for the specified federate.
@@ -277,7 +277,7 @@ class Core
      * @param federateID  the identifier for the federate
      * @param timeoutputDelay
      */
-  //  virtual void setPeriod (federate_id_t federateID, Time timePeriod) = 0;
+  //  virtual void setTimeProperty (PERIOD_PROPERTY, federate_id_t federateID, Time timePeriod) = 0;
     /**
     * Set the periodic offset for a specified federate.
     *

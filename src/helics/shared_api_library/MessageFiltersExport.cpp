@@ -28,12 +28,8 @@ static inline void coreAddFilter (helics_core core, std::unique_ptr<helics::Filt
     coreObj->filters.push_back (std::move(filt));
 }
 
-helics_filter helicsFederateRegisterSourceFilter (helics_federate fed, helics_filter_type_t type, const char *target, const char *name)
+helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type_t type, const char *name)
 {
-    if (target == nullptr)
-    {
-        return nullptr;
-    }
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed);
     if (!fedObj)
@@ -44,7 +40,7 @@ helics_filter helicsFederateRegisterSourceFilter (helics_federate fed, helics_fi
     try
     {
         auto filt = std::make_unique<helics::FilterObject> ();
-        filt->filtptr = helics::make_source_filter (static_cast<helics::defined_filter_types> (type), fedObj.get (), std::string (target),
+        filt->filtptr = helics::make_filter (static_cast<helics::defined_filter_types> (type), fedObj.get (),
                                                     (name != nullptr) ? std::string (name) : nullstr);
         filt->fedptr = std::move (fedObj);
         filt->type = helics::ftype::source;
@@ -59,38 +55,8 @@ helics_filter helicsFederateRegisterSourceFilter (helics_federate fed, helics_fi
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterDestinationFilter (helics_federate fed, helics_filter_type_t type, const char *target, const char *name)
+helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name)
 {
-    // now generate a generic subscription
-    auto fedObj = getFedSharedPtr (fed);
-    if (!fedObj)
-    {
-        return nullptr;
-    }
-    try
-    {
-        auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtptr = helics::make_destination_filter (static_cast<helics::defined_filter_types> (type), fedObj.get (),
-                                                         std::string (target), (name != nullptr) ? std::string (name) : nullstr);
-        filt->fedptr = std::move (fedObj);
-        filt->type = helics::ftype::dest;
-        filt->valid = filterValidationIdentifier;
-        auto ret = reinterpret_cast<helics_filter> (filt.get());
-        federateAddFilter (fed, std::move(filt));
-        return ret;
-    }
-    catch (const helics::InvalidFunctionCall &)
-    {
-    }
-    return nullptr;
-}
-
-helics_filter helicsCoreRegisterSourceFilter (helics_core cr, helics_filter_type_t type, const char *target, const char *name)
-{
-    if (target == nullptr)
-    {
-        return nullptr;
-    }
     auto core = getCoreSharedPtr (cr);
     if (!core)
     {
@@ -99,40 +65,10 @@ helics_filter helicsCoreRegisterSourceFilter (helics_core cr, helics_filter_type
     try
     {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtptr = helics::make_source_filter (static_cast<helics::defined_filter_types> (type), core.get (), std::string (target),
+        filt->filtptr = helics::make_filter (static_cast<helics::defined_filter_types> (type), core.get (),
                                                     (name != nullptr) ? std::string (name) : nullstr);
         filt->corePtr = std::move (core);
         filt->type = helics::ftype::source;
-        filt->valid = filterValidationIdentifier;
-        auto ret = reinterpret_cast<helics_filter> (filt.get());
-        coreAddFilter (cr, std::move(filt));
-        return ret;
-    }
-    catch (const helics::InvalidFunctionCall &)
-    {
-    }
-    return nullptr;
-}
-
-helics_filter helicsCoreRegisterDestinationFilter (helics_core cr, helics_filter_type_t type, const char *target, const char *name)
-{
-    if (target == nullptr)
-    {
-        return nullptr;
-    }
-    auto core = getCoreSharedPtr (cr);
-    if (!core)
-    {
-        return nullptr;
-    }
-
-    try
-    {
-        auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtptr = helics::make_destination_filter (static_cast<helics::defined_filter_types> (type), core.get (),
-                                                         std::string (target), (name != nullptr) ? std::string (name) : nullstr);
-        filt->corePtr = std::move (core);
-        filt->type = helics::ftype::dest;
         filt->valid = filterValidationIdentifier;
         auto ret = reinterpret_cast<helics_filter> (filt.get());
         coreAddFilter (cr, std::move(filt));
@@ -397,7 +333,7 @@ helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *d
     }
 }
 
-helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest)
+helics_status helicsFilterRemoveTarget (helics_filter filt, const char *dest)
 {
     auto cfilt = getCloningFilter (filt);
     if (cfilt == nullptr)
@@ -410,29 +346,7 @@ helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const cha
     }
     try
     {
-        cfilt->removeDestinationTarget (dest);
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
-
-helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source)
-{
-    auto cfilt = getCloningFilter (filt);
-    if (cfilt == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    if (source == nullptr)
-    {
-        return helics_invalid_argument;
-    }
-    try
-    {
-        cfilt->removeSourceTarget (source);
+        cfilt->removeTarget (dest);
         return helics_ok;
     }
     catch (...)

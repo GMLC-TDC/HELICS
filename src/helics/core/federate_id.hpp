@@ -181,6 +181,8 @@ class global_handle
     bool operator!= (global_handle id) const noexcept { return ((fed_id != id.fed_id)||(handle!=id.handle)); };
     /** less than operator for sorting*/
     bool operator< (global_handle id) const noexcept { return (fed_id < id.fed_id)?true:((fed_id!=id.fed_id)?false:(handle<id.handle)); };
+    /** check if the handle points to a validly specified interface*/
+    bool isValid () const { return fed_id.isValid () && handle.isValid (); };
 };
 
 

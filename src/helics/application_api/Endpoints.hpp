@@ -78,7 +78,7 @@ class Endpoint
     }
 
     /** subscribe the endpoint to a particular publication*/
-    void subscribe (const std::string &key, const std::string &type) { fed->subscribe (id, key, type); }
+    void subscribe (const std::string &key) { fed->subscribe (id, key); }
     /** send a data block and length
     @param[in] dest string name of the destination
     @param[in] data pointer to data location

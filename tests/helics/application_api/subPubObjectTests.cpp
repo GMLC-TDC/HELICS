@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label("ci"))
     auto pubObj = helics::PublicationT<std::string> (helics::GLOBAL, vFed.get (), "pub1");
 
     auto subObj = helics::SubscriptionT<std::string> (vFed.get (), "pub1");
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     pubObj.publish ("string1");
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_tests, *utf::label("ci"))
     auto pubObj = helics::make_publication<std::string> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
     auto subObj = helics::Subscription (vFed.get (), "pub1");
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     pubObj->publish ("string1");
@@ -111,7 +111,7 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     auto pubObj = helics::make_publication<TX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
     auto subObj = helics::Subscription (vFed.get (), "pub1");
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     pubObj->publish (valtx);
@@ -137,7 +137,7 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
     auto pubObj = helics::make_publication<IX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
     auto subObj = helics::Subscription (vFed.get (), "pub1");
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     pubObj->publish (valtx);
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
     auto subObj1 = helics::Subscription (vFed.get (), "pub1");
     auto subObj2 = helics::Subscription (vFed.get (), "pub1");
     subObj2.setMinimumChange (0.1);
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY,1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     pubObj->publish (23.7);
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label("ci"))
 
     auto subObj = helics::Subscription (vFed.get (), "pub1");
 
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     std::string str ("this is a string test");
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label("ci"))
 
     auto subObj = helics::Subscription (vFed.get (), "pub1");
 
-    vFed->setTimeDelta (1.0);
+    vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutionState ();
     // publish string1 at time=0.0;
     std::vector<double> tvec{5, 7, 234.23, 99.1, 1e7, 0.0};
@@ -436,8 +436,8 @@ BOOST_AUTO_TEST_CASE(subscriptionDefaults_test, *utf::label("ci"))
 
     auto vFed = std::make_shared<helics::ValueFederate>(fi);
     // register the publications
-    helics::Subscription subObj1(helics::interface_availability::optional, vFed, "pub1");
-    helics::Subscription subObj2(helics::interface_availability::optional, vFed, "pub2");
+    helics::Subscription subObj1(vFed, "pub1");
+    helics::Subscription subObj2(vFed, "pub2");
     subObj1.setDefault(45.3);
     subObj2.setDefault(67.4);
     vFed->enterExecutionState();

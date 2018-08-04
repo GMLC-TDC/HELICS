@@ -43,7 +43,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     BOOST_CHECK (pubid3.baseObject () != nullptr);
     auto sub1 = vFed1->registerOptionalSubscription ("fed0/pub3", "", "");
     BOOST_TEST_CHECKPOINT("reg opt1");
-    vFed1->setTimeDelta (1.0);
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     BOOST_TEST_CHECKPOINT("set Delta");
     vFed1->enterExecutionMode ();
     BOOST_TEST_CHECKPOINT("publish");
@@ -81,8 +81,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = vFed1->registerGlobalTypePublication ("pub1", HELICS_DATA_TYPE_STRING, "");
     auto subid = vFed2->registerSubscription ("pub1", "string", "");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     vFed1->enterExecutionModeAsync ();
     vFed2->enterExecutionModeAsync ();

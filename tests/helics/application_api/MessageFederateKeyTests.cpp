@@ -32,7 +32,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
-    mFed1->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     mFed1->enterExecutionState ();
 
@@ -71,7 +71,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types
     Endpoint epid (mFed1.get (), "ep1");
 
     Endpoint epid2 (GLOBAL, mFed1.get (), "ep2", "random");
-    mFed1->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     mFed1->enterExecutionState ();
 
@@ -112,8 +112,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -161,7 +161,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
 {
-    // extraBrokerArgs = "--logleve=4";
+    // extraBrokerArgs = "--loglevel=4";
     SetupTest<helics::MessageFederate>("test_7", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
@@ -170,8 +170,8 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
-    mFed1->setTimeDelta(1.0);
-    mFed2->setTimeDelta(1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutionState(); });
     mFed2->enterExecutionState();
@@ -228,8 +228,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
 
     Endpoint epid2 (GLOBAL, mFed2.get (), "ep2", "random");
 
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -285,8 +285,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (1.0);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();
@@ -313,7 +313,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK (!mFed1->hasMessage ());
 
     BOOST_CHECK (!mFed1->hasMessage (epid));
-    auto cnt = mFed2->receiveCount (epid2);
+    auto cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 4);
 
     auto M1 = mFed2->getMessage (epid2);
@@ -322,13 +322,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
 
     BOOST_CHECK_EQUAL (M1->data[245], data1[245]);
     // check the count decremented
-    cnt = mFed2->receiveCount (epid2);
+    cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 3);
     auto M2 = mFed2->getMessage ();
     BOOST_REQUIRE (M2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data2.size ());
     BOOST_CHECK_EQUAL (M2->data[245], data2[245]);
-    cnt = mFed2->receiveCount (epid2);
+    cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 2);
 
     auto M3 = mFed2->getMessage ();
@@ -358,8 +358,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types_all), cor
 
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
-    mFed1->setTimeDelta (1.0);
-    mFed2->setTimeDelta (0.5);
+    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 0.5);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
     mFed2->enterExecutionState ();

@@ -29,7 +29,7 @@ public:
 private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::publication_id_t pub;
-    helics::subscription_id_t sub;
+    helics::input_id_t sub;
 
     int index_ = 0;
     int maxIndex_ = 0;
@@ -59,11 +59,11 @@ public:
         pub = vFed->registerPublicationIndexed<std::string>("pub", index_);
         if (index_ == 0)
         {
-            sub = vFed->registerRequiredSubscriptionIndexed<std::string>("pub", maxIndex_-1);
+            sub = vFed->registerSubscriptionIndexed<std::string>("pub", maxIndex_-1);
         }
         else
         {
-            sub = vFed->registerRequiredSubscriptionIndexed<std::string>("pub", index_-1);
+            sub = vFed->registerSubscriptionIndexed<std::string>("pub", index_-1);
         }
         initialized = true;
     }
@@ -101,7 +101,7 @@ BOOST_DATA_TEST_CASE(ring_test_single_core, bdata::make(fedCount), feds)
 {
     auto wcore = helics::CoreFactory::FindOrCreate(CORE_TYPE_TO_TEST, "mcore", std::to_string(feds));
     //this is to delay until the threads are ready
-    wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, DELAY_INIT_ENTRY,true);
     std::vector<RingTransmit> links(feds);
     for (int ii = 0; ii < feds; ++ii)
     {
@@ -116,7 +116,7 @@ BOOST_DATA_TEST_CASE(ring_test_single_core, bdata::make(fedCount), feds)
     std::this_thread::yield();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     auto startTime = std::chrono::high_resolution_clock::now();
-    wcore->setFlag(helics::invalid_fed_id, ENABLE_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, ENABLE_INIT_ENTRY,true);
     for (auto &thrd : threads)
     {
         thrd.join();
@@ -135,7 +135,7 @@ BOOST_DATA_TEST_CASE(ring_test_multicores, bdata::make(fedCountB), feds)
     auto broker = helics::BrokerFactory::create(cType, "brokerb", std::to_string(feds + 1));
     auto wcore = helics::CoreFactory::FindOrCreate(cType, "mcore", "1");
     //this is to delay until the threads are ready
-    wcore->setFlag(helics::invalid_fed_id, DELAY_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, DELAY_INIT_ENTRY,true);
     
     std::vector<RingTransmit> links(feds);
    links[0].initialize("mcore", 0, feds);
@@ -156,7 +156,7 @@ BOOST_DATA_TEST_CASE(ring_test_multicores, bdata::make(fedCountB), feds)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::this_thread::yield();
     auto startTime = std::chrono::high_resolution_clock::now();
-    wcore->setFlag(helics::invalid_fed_id, ENABLE_INIT_ENTRY);
+    wcore->setFlagOption(helics::local_core_id, ENABLE_INIT_ENTRY,true);
     for (auto &thrd : threads)
     {
         thrd.join();

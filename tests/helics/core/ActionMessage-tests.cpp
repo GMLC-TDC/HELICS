@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
 
 BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
 {
-    helics::ActionMessage m (CMD_REG_SUB);
+    helics::ActionMessage m (CMD_REG_INPUT);
     /*
     auto b = sizeof(m);
     BOOST_CHECK_LT(b, 64);

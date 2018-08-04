@@ -40,26 +40,26 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "", "");
     BOOST_CHECK (pubid3 != nullptr);
     auto sub1 = helicsFederateRegisterOptionalSubscription (vFed1, "fed0/pub3", "", "");
-    CE (helicsFederateSetTimeDelta (vFed1, 1.0));
+    CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
 
     CE (helicsFederateEnterExecutionMode (vFed1));
     CE (helicsPublicationPublishRaw (pubid3, s.data (), len));
 
     CE (helicsFederateRequestTime (vFed1, 1.0, &gtime));
 
-    BOOST_CHECK (helicsSubscriptionIsUpdated (sub1));
+    BOOST_CHECK (helicsInputIsUpdated (sub1));
 
-    int len1 = helicsSubscriptionGetValueSize (sub1);
+    int len1 = helicsInputGetValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
-    CE (helicsSubscriptionGetRawValue (sub1, val, 600, &actualLen));
+    CE (helicsInputGetRawValue (sub1, val, 600, &actualLen));
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    len1 = helicsSubscriptionGetValueSize (sub1);
+    len1 = helicsInputGetValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
 
-    BOOST_CHECK (helicsSubscriptionIsUpdated (sub1) == false);
+    BOOST_CHECK (helicsInputIsUpdated (sub1) == false);
 
     CE (helicsFederateFinalize (vFed1));
 }
@@ -80,8 +80,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, nullptr);
     auto subid = helicsFederateRegisterSubscription (vFed2, "pub1", "string", "");
-    CE (helicsFederateSetTimeDelta (vFed1, 1.0));
-    CE (helicsFederateSetTimeDelta (vFed2, 1.0));
+    CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
+    CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 1.0));
 
     CE (helicsFederateEnterExecutionModeAsync (vFed1));
     CE (helicsFederateEnterExecutionModeAsync (vFed2));
@@ -100,7 +100,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
+    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
@@ -109,7 +109,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     CE (helicsPublicationPublishString (pubid, "string2"));
 
     // make sure the value is still what we expect
-    CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
+    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
     BOOST_CHECK_EQUAL (s, "string1");
 
     // advance time
@@ -122,7 +122,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
     // make sure the value was updated
-    CE (helicsSubscriptionGetString (subid, s, STRINGLEN, &len));
+    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
     BOOST_CHECK_EQUAL (s, "string2");
 
     CE (helicsFederateFinalize (vFed1));

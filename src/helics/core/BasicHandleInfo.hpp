@@ -76,5 +76,6 @@ class BasicHandleInfo
 
 	interface_handle getInterfaceHandle () const { return handle.handle; }
     global_federate_id_t getFederateId () const { return handle.fed_id; }
+
 };
 }  // namespace helics

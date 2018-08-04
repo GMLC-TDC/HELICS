@@ -22,7 +22,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ONLY_TRANSMIT_ON_CHANGE_FLAG 3
 /** flag indicating a federate should only trigger an update if a value has changed (binary equivalence)*/
 #define ONLY_UPDATE_ON_CHANGE_FLAG 4
-/** flag indicating a federate should only grant time if all other federates have already passed the requested time*/
+/** flag indicating a federate should only grant time if all other federates have already passed the requested
+ * time*/
 #define WAIT_FOR_CURRENT_TIME_UPDATE_FLAG 5
 
 /** flag indicating that a federate has rollback capability*/
@@ -47,5 +48,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ERROR_CODE_INVALID_STATE_TRANSITION 12
 #define ERROR_CODE_INVALID_FUNCTION_CALL 15
 
-#endif
+/** property definitions for time properties **/
+#define TIME_DELTA_PROPERTY 137
+#define PERIOD_PROPERTY 140
+#define OFFSET_PROPERTY 141
+#define RT_LAG_PROPERTY 143
+#define RT_LEAD_PROPERTY 144
+#define INPUT_DELAY_PROPERTY 148
+#define OUTPUT_DELAY_PROPERTY 150
 
+/** property definitions for integer properties **/
+#define MAX_ITERATIONS_PROPERTY 259
+#define LOG_LEVEL_PROPERTY 271
+
+
+
+#endif
