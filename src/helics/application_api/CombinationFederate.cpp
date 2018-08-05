@@ -8,23 +8,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 CombinationFederate::CombinationFederate () = default;
-CombinationFederate::CombinationFederate (const FederateInfo &fi)
-    : Federate (fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &name, const FederateInfo &fi)
+    : Federate (name,fi), ValueFederate (true), MessageFederate (true)
 {
 }
-CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : Federate (core, fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &name,
+                                          const std::shared_ptr<Core> &core,
+                                          const FederateInfo &fi)
+    : Federate (name,core, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 
 CombinationFederate::CombinationFederate (const std::string &configString)
-    : Federate (loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+    : Federate (std::string(),loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }
 
 CombinationFederate::CombinationFederate (const std::string &name, const std::string &configString)
-    : Federate (loadFederateInfo (name, configString)), ValueFederate (true), MessageFederate (true)
+    : Federate (name,loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }

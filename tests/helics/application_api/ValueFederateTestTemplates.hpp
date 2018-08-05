@@ -281,7 +281,7 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     // register the publications
     auto pubid = fedA->registerGlobalPublication<X> ("pub1");
 
-    auto subid = fedB->registerRequiredSubscription<X> ("pub1");
+    auto subid = fedB->registerSubscription<X> ("pub1");
     fedA->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     fedB->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 

@@ -163,15 +163,15 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
     // check subscriptions
-    auto sv = vFed1->getSubscriptionKey (subid);
-    auto sv2 = vFed1->getSubscriptionKey (subid2);
+    auto sv = vFed1->getTarget (subid);
+    auto sv2 = vFed1->getTarget (subid2);
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name = vFed1->getSubscriptionKey (subid3);
+    auto sub3name = vFed1->getTarget (subid3);
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionType (subid3), "double");
-    BOOST_CHECK_EQUAL (vFed1->getSubscriptionUnits (subid3), "V");
+    BOOST_CHECK_EQUAL (vFed1->getInputType (subid3), "double");
+    BOOST_CHECK_EQUAL (vFed1->getInputUnits (subid3), "V");
 
     // check publications
 

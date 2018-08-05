@@ -347,7 +347,7 @@ iteration_result FederateState::enterInitializationState ()
     return ret;
 }
 
-iteration_result FederateState::enterExecutingState (iteration_request iterate)
+iteration_result FederateState::enterExecutingMode (iteration_request iterate)
 {
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))

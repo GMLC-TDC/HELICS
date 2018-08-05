@@ -256,7 +256,7 @@ HELICS_EXPORT helics_status helicsFederateInfoSetCoreType (helics_federate_info_
 @return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
 is not recognized
 */
-HELICS_EXPORT helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value);
+HELICS_EXPORT helics_status helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int flag, helics_bool_t value);
 
 /** set the separator character in the info structure
 @details the separator character is the separation character for local publications/endpoints in creating their global name
@@ -275,52 +275,7 @@ HELICS_EXPORT helics_status helicsFederateInfoSetSeparator(helics_federate_info_
 specified outputdelay is invalid
 */
 
-HELICS_EXPORT helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay);
-/** set the minimum time delta between returns for a federate info object
-@param fi the federate info object to alter
-@param timeDelta the desired output delay of the federate
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
-specified time_delta is invalid
-*/
-
-HELICS_EXPORT helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta);
-/** set the input delay for a federate info object
-@param fi the federate info object to alter
-@param inputDelay the desired output delay of the federate
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
-specified inputDelay is invalid
-*/
-HELICS_EXPORT helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay);
-
-/** set the time offset for federate in the info object
-@details a federate will grant time only on integer periods if the period is specified>0
-the offset will shift this return by some amount of time such that the federate will only grant times such as \f$ N*period+offset \f$
-@param fi the federateInfo object to alter
-@param timeOffset the desired timeOffset
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
-specified offset is invalid
-*/
-HELICS_EXPORT helics_status helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset);
-
-/** set the period for federate in the info object
-@details a federate will grant time only on integer periods if the period is specified>0
-the offset will shift this return by some amount of time such that the federate will only grant times such as \f$ N*period+offset \f$
-period must be strictly greater than 0, though setting to 0 implies a period of the timeEpsilon used in HELICS
-@param fi the federateInfo object to alter
-@param period the desired period
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
-specified period is invalid
-*/
-HELICS_EXPORT helics_status helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period);
-
-/** set the max iteration count to use in federate in the info object
-@details a federate will iterate for at most min(maxIterations,core maxIterations)
-@param fi the federateInfo object to alter
-@param maxIterations the maximum number of iterations a federate is allowed per timestep
-@return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
-specified offset is invalid
-*/
-HELICS_EXPORT helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations);
+HELICS_EXPORT helics_status helicsFederateInfoSetTimeProperty (helics_federate_info_t fi, int timeProperty, helics_time_t propertyValue);
 
 /** set the logging level of a federate
 @details<0 none, 0, errors only, 1+warnings, 2+summary, 3+debug, 4+trace
@@ -328,7 +283,7 @@ HELICS_EXPORT helics_status helicsFederateInfoSetMaxIterations (helics_federate_
 @param logLevel the specified log level for a federate
 @return a helics_status enumeration helics_ok on success helics_invalid_object if fi is not a valid reference
 */
-HELICS_EXPORT helics_status helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel);
+HELICS_EXPORT helics_status helicsFederateInfoSetIntegerProperty (helics_federate_info_t fi, int intProperty, int propertyValue);
 
 /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
@@ -494,7 +449,7 @@ HELICS_EXPORT helics_status helicsFederateSetTimeProperty (helics_federate fed, 
 @param flag the flag to change
 @param flagValue the new value of the flag 0 for false !=0 for true
 */
-HELICS_EXPORT helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_t flagValue);
+HELICS_EXPORT helics_status helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue);
 
 /** set the separator character in the info structure
 @details the separator character is the separation character for local publications/endpoints in creating their global name

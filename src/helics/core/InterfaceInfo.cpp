@@ -22,7 +22,7 @@ void InterfaceInfo::createInput(interface_handle handle,
     const std::string &units)
 {
     auto ciHandle = inputs.lock();
-    ciHandle->insert(key, handle, handle, global_id, key, type, units);
+    ciHandle->insert(key, handle, global_handle(global_id,handle), key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
 }
 

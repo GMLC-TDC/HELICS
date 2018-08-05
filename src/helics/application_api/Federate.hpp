@@ -39,22 +39,16 @@ class Filter;
 class FederateInfo : public CoreFederateInfo
 {
   public:
-    std::string name;  //!< federate name
-
-    bool rollback = false;  //!< indicator that the federate has rollback features
-    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //! support rollback at least in a limited sense if set to true]
     char separator = '/';  //!< separator for global name of localFederates
     core_type coreType = core_type::ZMQ;  //!< the type of the core
+    std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
 
     /** default constructor*/
     FederateInfo () = default;
-    /** construct from the federate name*/
-    explicit FederateInfo (std::string fedname) : name (std::move (fedname)){};
     /** construct from the name and type*/
-    FederateInfo (std::string fedname, core_type cType) : name (std::move (fedname)), coreType (cType){};
+    FederateInfo ( core_type cType) : coreType (cType){};
     /** load a federateInfo object from command line arguments
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
@@ -71,10 +65,6 @@ class FederateInfo : public CoreFederateInfo
  */
 FederateInfo loadFederateInfo (const std::string &configString);
 
-/** generate a FederateInfo object from a config file (json, toml)
- */
-FederateInfo loadFederateInfo (const std::string &name, const std::string &configString);
-
 class Core;
 
 /** base class for a federate in the application API
@@ -86,7 +76,7 @@ class Federate
     enum class op_states : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization = 1,  //!< entered after the enterInitializationState call has returned
+        initialization = 1,  //!< entered after the enterInitializationMode call has returned
         execution = 2,  //!< entered after the enterExectuationState call has returned
         finalize = 3,  //!< the federate has finished executing normally final values may be retrieved
         error = 4,  //!< error state no core communication is possible but values can be retrieved
@@ -111,29 +101,26 @@ class Federate
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::vector<std::shared_ptr<Filter>>
       localFilters;  //!< vector of filters created through the register interfaces function
+    std::string name; //!< the name of the federate
   public:
     /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
-    explicit Federate (const FederateInfo &fi);
-    /**constructor taking a federate information structure
-    @param[in] fi  a federate information structure
-    */
-    Federate (const std::string &name, const FederateInfo &fi);
+    Federate (const std::string &fedname, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
     @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
     */
-    Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Federate (const std::string &fedname, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] jsonString can be either a JSON file or a string containing JSON code
+    @param[in] configString can be either a JSON file or a string containing JSON code or a TOML file
     */
     explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with extension (.TOML, .toml)
+    @param[in] configString can be either a JSON file or a string containing JSON code or a TOML file with extension (.TOML, .toml, .ini)
     */
-    Federate (const std::string &name, const std::string &configString);
+    Federate (const std::string &fedname, const std::string &configString);
     /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
@@ -147,33 +134,33 @@ class Federate
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will block until all federates have entered initialization mode
     */
-    void enterInitializationState ();
+    void enterInitializingMode ();
 
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will not block
     */
-    void enterInitializationStateAsync ();
+    void enterInitializingModeAsync ();
     /** called after one of the async calls and will indicate true if an async operation has completed
     @details only call from the same thread as the one that called the initial async call and will return false
     if called when no aysnc operation is in flight*/
     bool isAsyncOperationCompleted () const;
     /** second part of the async process for entering initializationState call after a call to
-    enterInitializationStateAsync if call any other time it will throw an InvalidFunctionCall exception*/
-    void enterInitializationStateComplete ();
+    enterInitializationModeAsync if call any other time it will throw an InvalidFunctionCall exception*/
+    void enterInitializingModeComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
+    iteration_result enterExecutingMode (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
+    void enterExecutingModeAsync (iteration_request iterate = iteration_request::no_iterations);
     /** complete the async call for entering Execution state
-    @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
+    @details call will not block but will return quickly.  The enterInitializingModeComplete must be called
     before doing other operations
     */
-    iteration_result enterExecutionStateComplete ();
+    iteration_result enterExecutingModeComplete ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
     asynchronous call sequence, no core calling commands may be called after completion of this function */
@@ -234,9 +221,9 @@ class Federate
 
     /** set a flag for the federate
     @param[in] flag an index into the flag /ref flag-definitions.h
-    @param[in] flagvalue the value of the flag defaults to true
+    @param[in] flagValue the value of the flag defaults to true
     */
-    virtual void setFlag (int flag, bool flagValue = true);
+    virtual void setFlagOption (int flag, bool flagValue = true);
     /**  set an integer option for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
@@ -426,7 +413,7 @@ class Federate
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
     /** get the federate name*/
-    const std::string &getName () const { return FedInfo.name; }
+    const std::string &getName () const { return name; }
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
     // interface for filter objects

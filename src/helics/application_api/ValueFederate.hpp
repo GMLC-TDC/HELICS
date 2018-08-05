@@ -22,12 +22,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /**constructor taking a federate information structure and using the default core
     @param[in] fi  a federate information structure
     */
-    explicit ValueFederate (const FederateInfo &fi);
+    explicit ValueFederate (const std::string &name, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
-    ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    ValueFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] configString can be either a json file a toml file (with extension toml) or a string containing json code
     */
@@ -172,7 +172,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                                                            int index1,
                                                            const std::string &units = std::string ())
     {
-        return registerInput<X> (key + '_' + std::to_string (index1), units);
+        return registerGlobalInput<X> (key + '_' + std::to_string (index1), units);
     }
 
 	 /** register a publication as part of a 2 dimensional indexed structure
@@ -185,12 +185,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
    @return an identifier for use with this publication
    */
     template <typename X>
-    publication_id_t registerInputIndexed (const std::string &key,
+    input_id_t registerInputIndexed (const std::string &key,
                                                  int index1,
                                                  int index2,
                                                  const std::string &units = std::string ())
     {
-        return registerInput<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
+        return registerGlobalInput<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
                                              units);
     }
     
@@ -328,6 +328,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     {
         return ValueConverter<X>::interpret (getValueRaw (id));
     }
+  
     /** publish a value
     @param[in] id the publication identifier
     @param[in] a data block containing the data
@@ -382,6 +383,35 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     target the name of the input to send the data to
     */
     void addTarget (input_id_t id, const std::string &target);
+    /** register an optional subscription
+   @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+   @param[in] target the name of the target
+   @param[in] index1 the index into a 1 dimensional array of values
+   @param[in] units the optional units on the subscription
+   */
+    template <class iType>
+    void 
+    addTargetIndexed (iType id,const std::string &target, int index1, const std::string &units = std::string ())
+    {
+        return addTarget (id, target + '_' + std::to_string (index1), units);
+    }
+
+    /** register an optional subscription for a 2-D array of values
+    @details call is only valid in startup mode
+    @param[in] key the name of the subscription
+    @param[in] index1 the first index of a 2-D value structure
+    @param[in] index2 the 2nd index of a 2-D value structure
+    @param[in] units the optional units on the subscription
+    */
+    template <class iType>
+    input_id_t addTargetIndexed (iType id, const std::string &target,
+                                            int index1,
+                                            int index2,
+                                            const std::string &units = std::string ())
+    {
+        return addTarget(id, target + '_' + std::to_string (index1) + '_' + std::to_string (index2),
+                                        units);
+    }
 
     /** check if a given subscription has an update
     @return true if the subscription id is valid and has an update*/
@@ -407,13 +437,18 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     std::string getTarget (input_id_t id) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &key) const;
+    input_id_t getInputId (const std::string &name) const;
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &key, int index1) const;
+    input_id_t getInputId (const std::string &name, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &key, int index1, int index2) const;
+    input_id_t getInputId (const std::string &name, int index1, int index2) const;
+
+	/** get the input id based on target
+	@return an input_id_t from the object, or invalid_id if no input was found
+	*/
+    input_id_t getSubscriptionId (const std::string &key) const;
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
     std::string getPublicationKey (publication_id_t id) const;

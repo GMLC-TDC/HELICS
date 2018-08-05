@@ -13,25 +13,28 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
+MessageFederate::MessageFederate (const std::string &name, const FederateInfo &fi) : Federate (name,fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
-MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
+MessageFederate::MessageFederate (const std::string &name,
+                                  const std::shared_ptr<Core> &core,
+                                  const FederateInfo &fi)
+    : Federate (name,core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
-MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
+MessageFederate::MessageFederate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    MessageFederate::registerInterfaces (jsonString);
+    MessageFederate::registerInterfaces (configString);
 }
 
-MessageFederate::MessageFederate (const std::string &name, const std::string &jsonString)
-    : Federate (loadFederateInfo (name, jsonString))
+MessageFederate::MessageFederate (const std::string &name, const std::string &configString)
+    : Federate (name,loadFederateInfo (configString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    MessageFederate::registerInterfaces (jsonString);
+    MessageFederate::registerInterfaces (configString);
 }
 
 MessageFederate::MessageFederate ()

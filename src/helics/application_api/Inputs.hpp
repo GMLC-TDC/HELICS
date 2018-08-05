@@ -124,7 +124,7 @@ class Input : public InputBase
                   const std::string &name,
                   helics_type_t defType,
                   const std::string &units = std::string ())
-        : InputBase (valueFed, key, typeNameStringRef (defType), units)
+        : InputBase (valueFed, name, typeNameStringRef (defType), units)
     {
     }
 
@@ -360,9 +360,6 @@ class InputT : public InputBase
     }
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
-	 /** get the most recent value
-   @return the value*/
-    const std::vector<X> &getVals () const { return fed->getValues<X> (id); }
     /** store the value in the given variable
     @param[out] out the location to store the value
     */

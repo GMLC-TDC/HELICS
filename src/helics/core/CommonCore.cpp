@@ -341,7 +341,7 @@ static void generateFederateException (const FederateState *fed)
         throw (HelicsException (fed->lastErrorString ()));
     }
 }
-void CommonCore::enterInitializingState (federate_id_t federateID)
+void CommonCore::enterInitializingMode (federate_id_t federateID)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -380,7 +380,7 @@ void CommonCore::enterInitializingState (federate_id_t federateID)
     throw (InvalidFunctionCall ("federate already has requested entry to initializing State"));
 }
 
-iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iteration_request iterate)
+iteration_result CommonCore::enterExecutingMode (federate_id_t federateID, iteration_request iterate)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -399,7 +399,7 @@ iteration_result CommonCore::enterExecutingState (federate_id_t federateID, iter
     ActionMessage exec (CMD_EXEC_CHECK);
     fed->addAction (exec);
     // TODO:: check for error conditions?
-    return fed->enterExecutingState (iterate);
+    return fed->enterExecutingMode (iterate);
 }
 
 federate_id_t CommonCore::registerFederate (const std::string &name, const CoreFederateInfo &info)

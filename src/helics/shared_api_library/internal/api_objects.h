@@ -25,8 +25,8 @@ class Federate;
 class Broker;
 class ValueFederate;
 class MessageFederate;
-class Subscription;
 class Input;
+class Publication;
 class Endpoint;
 class Filter;
 

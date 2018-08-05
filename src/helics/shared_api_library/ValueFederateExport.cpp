@@ -179,7 +179,7 @@ helics_input helicsFederateRegisterOptionalTypeSubscription (helics_federate fed
     try
     {
         auto sub = std::make_unique<helics::InputObject> ();
-        sub->subptr = std::make_unique<helics::Subscription> (helics::OPTIONAL, fedObj, key, static_cast<helics::helics_type_t> (type),
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, static_cast<helics::helics_type_t> (type),
                                                               (units == nullptr) ? nullStr : std::string (units));
         sub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (sub.get ());

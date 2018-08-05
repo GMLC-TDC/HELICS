@@ -98,18 +98,16 @@ class Core
     virtual void finalize (federate_id_t federateID) = 0;
 
     /**
-     * Federates may be in four states.
-     *
-     * Federates are in three Modes.
+     * Federates may be in four Modes.
      *    -# Startup
      *       Configuration of the federate.
-     *       State begins when registerFederate() is invoked and ends when enterInitializingState() is invoked.
+     *       State begins when registerFederate() is invoked and ends when enterInitializingMode() is invoked.
      *    -# Initializing
      *       Configure of the simulation state prior to the start of time stepping.
-     *       State begins when enterInitializingState() is invoked and ends when enterExecutingState(true) is
+     *       State begins when enterInitializingMode() is invoked and ends when enterExecutingMode(true) is
      *       invoked.
      *    -# Executing
-     *       State begins when enterExecutingState() is invoked and ends when finalize() is invoked.
+     *       State begins when enterExecutingMode() is invoked and ends when finalize() is invoked.
      *    -# Finalized
      *       state after finalize is invoked.
      */
@@ -119,7 +117,7 @@ class Core
      *
      * May only be invoked in Created state otherwise an error is thrown
      */
-    virtual void enterInitializingState (federate_id_t federateID) = 0;
+    virtual void enterInitializingMode (federate_id_t federateID) = 0;
 
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may
@@ -137,7 +135,7 @@ class Core
      simulation is ready to move on to the executing state
      */
     virtual iteration_result
-    enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
+    enterExecutingMode (federate_id_t federateID, iteration_request iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.

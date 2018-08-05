@@ -128,7 +128,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     auto p2 = mFed->registerGlobalEndpoint ("port2");
 
     auto Filt = helics::make_filter (helics::defined_filter_types::delay, fFed.get ());
-    Filt1->addSourceTarget ("port1");
+    Filt->addSourceTarget ("port1");
     Filt->set ("delay", 2.5);
 
     fFed->enterExecutionStateAsync ();

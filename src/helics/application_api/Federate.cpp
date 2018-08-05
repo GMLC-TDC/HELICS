@@ -27,9 +27,7 @@ void cleanupHelicsLibrary ()
     CoreFactory::cleanUpCores (200);
 }
 
-Federate::Federate (const FederateInfo &fi) : Federate (fi.name, fi) {}
-
-Federate::Federate (const std::string &name, const FederateInfo &fi) : FedInfo (fi)
+Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (fedName)
 {
     if (fi.coreName.empty ())
     {
@@ -67,7 +65,10 @@ Federate::Federate (const std::string &name, const FederateInfo &fi) : FedInfo (
             throw (RegistrationFailure ("Unable to connect to broker->unable to register federate"));
         }
     }
-
+	if (name.empty())
+	{
+        name = fi.defName;
+	}
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (name, fi);
     separator_ = fi.separator;
@@ -75,7 +76,8 @@ Federate::Federate (const std::string &name, const FederateInfo &fi) : FedInfo (
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
 }
 
-Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : coreObject (core), FedInfo (fi)
+Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : coreObject (core), name (fedName)
 {
     if (!coreObject)
     {
@@ -103,7 +105,11 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) :
     {
         coreObject->connect ();
     }
-    fedID = coreObject->registerFederate (fi.name, fi);
+    if (name.empty ())
+    {
+        name = fi.defName;
+    }
+    fedID = coreObject->registerFederate (name, fi);
     if (!fedID.isValid())
     {
         state = op_states::error;
@@ -114,15 +120,15 @@ Federate::Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi) :
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
 }
 
-Federate::Federate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
+Federate::Federate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
 {
-    registerFilterInterfaces (jsonString);
+    registerFilterInterfaces (configString);
 }
 
-Federate::Federate (const std::string &name, const std::string &jsonString)
-    : Federate (loadFederateInfo (name, jsonString))
+Federate::Federate (const std::string &name, const std::string &configString)
+    : Federate (name,loadFederateInfo (configString))
 {
-    registerFilterInterfaces (jsonString);
+    registerFilterInterfaces (configString);
 }
 
 Federate::Federate () noexcept
@@ -163,19 +169,19 @@ Federate::~Federate ()
     }
 }
 
-void Federate::enterInitializationState ()
+void Federate::enterInitializingMode ()
 {
     auto currentState = state.load();
     if (currentState == op_states::startup)
     {
-        coreObject->enterInitializingState (fedID);
+        coreObject->enterInitializingMode (fedID);
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
     else if (currentState == op_states::pending_init)
     {
-        enterInitializationStateComplete ();
+        enterInitializingModeComplete ();
     }
     else if (currentState != op_states::initialization)  // if we are already in initialization do nothing
     {
@@ -183,14 +189,14 @@ void Federate::enterInitializationState ()
     }
 }
 
-void Federate::enterInitializationStateAsync ()
+void Federate::enterInitializingModeAsync ()
 {
     auto asyncInfo = asyncCallInfo->lock();
     if (state == op_states::startup)
     {
         state = op_states::pending_init;
         asyncInfo->initFuture =
-          std::async (std::launch::async, [this]() { coreObject->enterInitializingState (fedID); });
+          std::async (std::launch::async, [this]() { coreObject->enterInitializingMode (fedID); });
     }
     else if (state == op_states::pending_init)
     {
@@ -221,7 +227,7 @@ bool Federate::isAsyncOperationCompleted () const
     }
 }
 
-void Federate::enterInitializationStateComplete ()
+void Federate::enterInitializingModeComplete ()
 {
     
     switch (state)
@@ -238,7 +244,7 @@ void Federate::enterInitializationStateComplete ()
     case op_states::initialization:
         break;
     case op_states::startup:
-        enterInitializationState ();
+        enterInitializingMode ();
         break;
     default:
         throw (InvalidFunctionCall ("cannot call Initialization Complete function without first calling "
@@ -246,19 +252,19 @@ void Federate::enterInitializationStateComplete ()
     }
 }
 
-iteration_result Federate::enterExecutionState (iteration_request iterate)
+iteration_result Federate::enterExecutingMode (iteration_request iterate)
 {
     iteration_result res = iteration_result::next_step;
     switch (state)
     {
     case op_states::startup:
     case op_states::pending_init:
-        enterInitializationState ();
+        enterInitializingMode ();
         FALLTHROUGH
         /* FALLTHROUGH */
     case op_states::initialization:
     {
-        res = coreObject->enterExecutingState (fedID, iterate);
+        res = coreObject->enterExecutingMode (fedID, iterate);
         switch (res)
         {
         case iteration_result::next_step:
@@ -280,7 +286,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
         break;
     }
     case op_states::pending_exec:
-        return enterExecutionStateComplete ();
+        return enterExecutingModeComplete ();
     case op_states::execution:
         // already in this state --> do nothing
         break;
@@ -296,7 +302,7 @@ iteration_result Federate::enterExecutionState (iteration_request iterate)
     return res;
 }
 
-void Federate::enterExecutionStateAsync (iteration_request iterate)
+void Federate::enterExecutingModeAsync (iteration_request iterate)
 {
     
     switch (state)
@@ -304,9 +310,9 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     case op_states::startup:
     {
         auto eExecFunc = [this, iterate]() {
-            coreObject->enterInitializingState (fedID);
+            coreObject->enterInitializingMode (fedID);
             startupToInitializeStateTransition ();
-            return coreObject->enterExecutingState (fedID, iterate);
+            return coreObject->enterExecutingMode (fedID, iterate);
         };
         auto asyncInfo = asyncCallInfo->lock();
         state = op_states::pending_exec;
@@ -314,12 +320,12 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     }
     break;
     case op_states::pending_init:
-        enterInitializationStateComplete ();
+        enterInitializingModeComplete ();
         FALLTHROUGH
         /* FALLTHROUGH */
     case op_states::initialization:
     {
-        auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingState (fedID, iterate); };
+        auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingMode (fedID, iterate); };
         auto asyncInfo = asyncCallInfo->lock();
         state = op_states::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -336,7 +342,7 @@ void Federate::enterExecutionStateAsync (iteration_request iterate)
     }
 }
 
-iteration_result Federate::enterExecutionStateComplete ()
+iteration_result Federate::enterExecutingModeComplete ()
 {
     
     if (state != op_states::pending_exec)
@@ -381,25 +387,11 @@ void Federate::setLoggingCallback (
     coreObject->setLoggingCallback (fedID, logFunction);
 }
 
-void Federate::setFlag (int flag, bool flagValue)
+void Federate::setFlagOption (int flag, bool flagValue)
 {
-    if ((flag > 12) || (flag < 0))
-    {
-        throw (InvalidParameter ("flag must be between 0 and 12"));
-    }
-    switch (flag)
-    {
-    case ROLLBACK_FLAG:
-        FedInfo.rollback = flagValue;
-        break;
-    case FORWARD_COMPUTE_FLAG:
-        FedInfo.forwardCompute = flagValue;
-        break;
-    default:
-        coreObject->setFlagOption (fedID, flag, flagValue);
-        break;
-    }
+    coreObject->setFlagOption (fedID, flag, flagValue);
 }
+
 void Federate::finalize ()
 {
     switch (state)
@@ -407,12 +399,12 @@ void Federate::finalize ()
     case op_states::startup:
         break;
     case op_states::pending_init:
-        enterInitializationStateComplete ();
+        enterInitializingModeComplete ();
         break;
     case op_states::initialization:
         break;
     case op_states::pending_exec:
-        enterExecutionStateComplete ();
+        enterExecutingModeComplete ();
         break;
     case op_states::pending_time:
         requestTimeComplete ();
@@ -446,7 +438,7 @@ void Federate::disconnect ()
 void Federate::error (int errorcode)
 {
     state = op_states::error;
-    std::string errorString = "error " + std::to_string (errorcode) + " in federate " + FedInfo.name;
+    std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
 }
 

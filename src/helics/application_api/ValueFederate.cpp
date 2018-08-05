@@ -14,23 +14,24 @@ namespace helics
 {
 /**constructor taking a core engine and federate info structure
  */
-ValueFederate::ValueFederate (const FederateInfo &fi) : Federate (fi)
+ValueFederate::ValueFederate (const std::string &name, const FederateInfo &fi) : Federate (name,fi)
 {
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
-ValueFederate::ValueFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
+ValueFederate::ValueFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (name,core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
-ValueFederate::ValueFederate (const std::string &configString) : Federate (loadFederateInfo (configString))
+ValueFederate::ValueFederate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
     ValueFederate::registerInterfaces (configString);
 }
 
 ValueFederate::ValueFederate (const std::string &name, const std::string &configString)
-    : Federate (loadFederateInfo (name, configString))
+    : Federate (name,loadFederateInfo (configString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
     ValueFederate::registerInterfaces (configString);
@@ -380,6 +381,11 @@ input_id_t ValueFederate::getInputId (const std::string &key, int index1) const
 input_id_t ValueFederate::getInputId (const std::string &key, int index1, int index2) const
 {
     return vfManager->getInputId (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
+}
+
+input_id_t ValueFederate::getSubscriptionId(const std::string &key) const
+{
+    return vfManager->getSubscriptionId (key);
 }
 
 std::string ValueFederate::getPublicationKey (publication_id_t pub_id) const

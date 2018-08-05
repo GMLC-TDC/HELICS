@@ -224,7 +224,7 @@ class FederateState
     @param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (iteration_request iterate);
+    iteration_result enterExecutingMode (iteration_request iterate);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need

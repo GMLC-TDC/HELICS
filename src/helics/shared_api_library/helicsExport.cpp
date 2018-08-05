@@ -209,7 +209,7 @@ helics_status helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi
     }
 }
 
-helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, helics_bool_t value)
+helics_status helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int flag, helics_bool_t value)
 {
     if (fi == nullptr)
     {
@@ -250,18 +250,14 @@ helics_status helicsFederateInfoSetFlag (helics_federate_info_t fi, int flag, he
     }
     return helics_ok;
 }
-helics_status helicsFederateInfoSetOutputDelay (helics_federate_info_t fi, helics_time_t outputDelay)
+helics_status helicsFederateInfoSetTimeOption (helics_federate_info_t fi, int timeProperty, helics_time_t propertyValue)
 {
     if (fi == nullptr)
     {
         return helics_invalid_object;
     }
-    if (outputDelay < helics_time_zero)
-    {
-        return helics_invalid_argument;
-    }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->outputDelay = outputDelay;
+    hfi->setTimeProperty (timeProperty, propertyValue);
     return helics_ok;
 }
 
@@ -276,85 +272,17 @@ helics_status helicsFederateInfoSetSeparator (helics_federate_info_t fi, char se
     return helics_ok;
 }
 
-helics_status helicsFederateInfoSetTimeDelta (helics_federate_info_t fi, helics_time_t timeDelta)
+helics_status helicsFederateInfoSetIntegerProperty (helics_federate_info_t fi, int integerProperty, int propertyValue)
 {
     if (fi == nullptr)
     {
         return helics_invalid_object;
     }
-    if (timeDelta < helics_time_zero)
-    {
-        return helics_invalid_argument;
-    }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->timeDelta = timeDelta;
+    hfi->setIntegerProperty (integerProperty, propertyValue);
     return helics_ok;
 }
 
-helics_status helicsFederateInfoSetInputDelay (helics_federate_info_t fi, helics_time_t inputDelay)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    if (inputDelay < helics_time_zero)
-    {
-        return helics_invalid_argument;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->inputDelay = inputDelay;
-    return helics_ok;
-}
-helics_status helicsFederateInfoSetTimeOffset (helics_federate_info_t fi, helics_time_t timeOffset)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->offset = timeOffset;
-    return helics_ok;
-}
-helics_status helicsFederateInfoSetPeriod (helics_federate_info_t fi, helics_time_t period)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    if (period < helics_time_zero)
-    {
-        return helics_invalid_argument;
-    }
-    hfi->period = period;
-    return helics_ok;
-}
-
-helics_status helicsFederateInfoSetLoggingLevel (helics_federate_info_t fi, int logLevel)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->logLevel = logLevel;
-    return helics_ok;
-}
-
-helics_status helicsFederateInfoSetMaxIterations (helics_federate_info_t fi, int maxIterations)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    if (maxIterations < 0)
-    {
-        maxIterations = 10'000'000;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    hfi->maxIterations = maxIterations;
-    return helics_ok;
-}
 namespace helics
 {
 CoreObject *getCoreObject (helics_core core)

@@ -86,7 +86,7 @@ struct FederateTestFixture
         helics_federate_info_t fi = helicsFederateInfoCreate ();
         CE (helicsFederateInfoSetFederateName (fi, ""));
         CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str ()));
-        CE (helicsFederateInfoSetTimeDelta (fi, time_delta));
+        CE (helicsFederateInfoSetTimeProperty (fi,TIME_DELTA_PROPERTY, time_delta));
 
         std::vector<helics_federate> federates_added;
 

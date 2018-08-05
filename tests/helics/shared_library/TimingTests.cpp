@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change)
     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 0.1));
+    CE (helicsFederateSetTimeProperty (vFed, TIME_DELTA_PROPERTY, 0.1));
     CE (helicsFederateRequestTime (vFed, gtime, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.1);
     CE (helicsFederateFinalize (vFed));

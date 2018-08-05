@@ -303,7 +303,7 @@ helics_status helicsFederateEnterInitializationMode (helics_federate fed)
     }
     try
     {
-        fedObj->enterInitializationState ();
+        fedObj->enterInitializationMode ();
         return helics_ok;
     }
     catch (...)
@@ -321,7 +321,7 @@ helics_status helicsFederateEnterInitializationModeAsync (helics_federate fed)
     }
     try
     {
-        fedObj->enterInitializationStateAsync ();
+        fedObj->enterInitializationModeAsync ();
         return helics_ok;
     }
     catch (...)
@@ -349,7 +349,7 @@ helics_status helicsFederateEnterInitializationModeComplete (helics_federate fed
     }
     try
     {
-        fedObj->enterInitializationStateComplete ();
+        fedObj->enterInitializationModeComplete ();
         return helics_ok;
     }
     catch (...)
@@ -368,7 +368,7 @@ helics_status helicsFederateEnterExecutionMode (helics_federate fed)
     try
     {
         // printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
-        fedObj->enterExecutionState ();
+        fedObj->enterExecutionMode ();
         return helics_ok;
     }
     catch (...)
@@ -418,7 +418,7 @@ helicsFederateEnterExecutionModeIterative (helics_federate fed, helics_iteration
     }
     try
     {
-        auto val = fedObj->enterExecutionState (getIterationRequest (iterate));
+        auto val = fedObj->enterExecutionMode (getIterationRequest (iterate));
         if (outIterate != nullptr)
         {
             *outIterate = getIterationStatus (val);
@@ -440,7 +440,7 @@ helics_status helicsFederateEnterExecutionModeAsync (helics_federate fed)
     }
     try
     {
-        fedObj->enterExecutionStateAsync ();
+        fedObj->enterExecutionModeAsync ();
         return helics_ok;
     }
     catch (...)
@@ -458,7 +458,7 @@ helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fe
     }
     try
     {
-        fedObj->enterExecutionStateAsync (getIterationRequest (iterate));
+        fedObj->enterExecutionModeAsync (getIterationRequest (iterate));
         return helics_ok;
     }
     catch (...)
@@ -476,7 +476,7 @@ helics_status helicsFederateEnterExecutionModeComplete (helics_federate fed)
     }
     try
     {
-        fedObj->enterExecutionStateComplete ();
+        fedObj->enterExecutionModeComplete ();
         return helics_ok;
     }
     catch (...)
@@ -493,7 +493,7 @@ helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate
     }
     try
     {
-        auto val = fedObj->enterExecutionStateComplete ();
+        auto val = fedObj->enterExecutionModeComplete ();
         if (outConverged != nullptr)
         {
             *outConverged = getIterationStatus (val);
@@ -688,7 +688,7 @@ helics_status helicsFederateSetTimeProperty (helics_federate fed, int32_t timePr
     }
 }
 
-helics_status helicsFederateSetFlag (helics_federate fed, int flag, helics_bool_t flagValue)
+helics_status helicsFederateSetFlagProperty (helics_federate fed, int flag, helics_bool_t flagValue)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)

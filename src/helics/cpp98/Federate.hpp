@@ -139,7 +139,7 @@ class Federate
 
     helics_federate baseObject () const { return fed; }
 
-    void setFlag (int flag, int value) { helicsFederateSetFlag (fed, flag, value); }
+    void setFlag (int flag, int value) { helicsFederateSetFlagOption (fed, flag, value); }
 
     void setTimeProperty (int tProperty, helics_time_t timeDelta) { helicsFederateSetTimeProperty (fed,tProperty, timeDelta); }
 

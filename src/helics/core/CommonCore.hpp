@@ -64,10 +64,10 @@ class CommonCore : public Core, public BrokerBase
     virtual bool isOpenToNewFederates () const override final;
     virtual void error (federate_id_t federateID, int errorCode = -1) override final;
     virtual void finalize (federate_id_t federateID) override final;
-    virtual void enterInitializingState (federate_id_t federateID) override final;
+    virtual void enterInitializingMode (federate_id_t federateID) override final;
     virtual void setCoreReadyToInit () override final;
     virtual iteration_result
-    enterExecutingState (federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
+    enterExecutingMode (federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
     virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
     virtual const std::string &getFederateName (federate_id_t federateID) const override final;
     virtual federate_id_t getFederateId (const std::string &name) const override final;

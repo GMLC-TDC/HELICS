@@ -46,7 +46,7 @@ class Subscription : public Input
                   std::string key,
                   helics_type_t defType,
                   const std::string &units = std::string ())
-        : SubscriptionBase (valueFed, key, typeNameStringRef (defType), units), target_ (key)
+        : Input (valueFed, std::string(), defType, units), target_ (std::move(key))
     {
         addTarget (target_);
     }
@@ -65,7 +65,6 @@ class Subscription : public Input
 template <class X>
 class SubscriptionT : public InputT<X>
 {
-  public:
   private:
     std::string target_;
 
@@ -77,7 +76,7 @@ class SubscriptionT : public InputT<X>
     @param[in] units the units associated with a Federate
     */
     SubscriptionT (ValueFederate *valueFed, std::string target, const std::string &units = std::string ())
-        : InputT<X> (valueFed, std::string (), units), target_ (std::move (target))
+        : InputT(valueFed, std::string (), units), target_ (std::move (target))
     {
         addTarget (target_);
     }
@@ -88,7 +87,7 @@ class SubscriptionT : public InputT<X>
     */
     template <class FedPtr>
     SubscriptionT (FedPtr &valueFed, std::string target, const std::string &units = std::string ())
-        : InputT<X> (valueFed, std::string, units), target_ (std::move (target))
+        : InputT(valueFed, std::string(), units), target_ (std::move (target))
     {
         addTarget (target_);
     }
@@ -124,10 +123,10 @@ class VectorSubscription : public InputT<X>
     {
         for (auto ind = startIndex; ind < startIndex + count; ++ind)
         {
-            fed->addTarget (id, key, ind);
+            fed->addTargetIndexed (id, key, ind);
             ids.push_back (id);
         }
-
+        setDefault (defValue);
         fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
@@ -227,7 +226,7 @@ class VectorSubscription2d : public InputT<X>
                           int count_y,
                           const X &defValue,
                           const std::string &units = std::string ())
-        : InputT<X> (valueFed, std::string (), defValue, units), m_key (key)
+        : InputT<X> (valueFed, std::string (), units), m_key (key)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "Second argument must be a pointer to a ValueFederate");
@@ -236,33 +235,33 @@ class VectorSubscription2d : public InputT<X>
         {
             for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
             {
-                fed->addTarget (m_key, ind_x, ind_y);
+                fed->addTargetIndexed (id,m_key, ind_x, ind_y);
             }
         }
-
-        fed->registerSubscriptionNotificationCallback (id, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
+        setDefault (defValue);
+        fed->registerInputNotificationCallback (id, [this](input_id_t iid, Time tm) {
+            handleCallback (iid, tm);
         });
     }
 
     /** move constructor*/
     VectorSubscription2d (VectorSubscription2d &&vs) noexcept
-        : InputT<X> (std::move (vs)), target_ (std::move (vs.target))
+        : InputT<X> (std::move (vs)), m_key (std::move (vs.m_key))
     {
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (id, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
+        fed->registerInputNotificationCallback (id, [this](input_id_t iid, Time tm) {
+            handleCallback (iid, tm);
         });
     };
 
     /** move assignment*/
     VectorSubscription2d &operator= (VectorSubscription2d &&vs) noexcept
     {
-        target_ = std::move (vs.target);
+        m_key = std::move (vs.m_key);
         InputT<X>::operator= (std::move (vs));
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (id, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
+        fed->registerInputNotificationCallback (id, [this](input_id_t iid, Time tm) {
+            handleCallback (iid, tm);
         });
         return *this;
     }
@@ -282,15 +281,15 @@ class VectorSubscription2d : public InputT<X>
     void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (input_id_t id, Time time)
+    void handleCallback (input_id_t /*iid*/, Time /*time*/)
     {
-        auto res = std::lower_bound (ids.begin (), ids.end (), id);
-        int index = static_cast<int> (res - ids.begin ());
-        fed->getValue (ids[index], vals[index]);
-        if (update_callback)
-        {
-            update_callback (index, time);
-        }
+      //  auto res = std::lower_bound (ids.begin (), ids.end (), iid);
+      //  int index = static_cast<int> (res - ids.begin ());
+     //   fed->getValue (ids[index], vals[index]);
+      //  if (update_callback)
+      //  {
+      //      update_callback (index, time);
+      //  }
     }
 };
 
