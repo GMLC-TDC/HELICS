@@ -34,16 +34,16 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
 
     auto subid = vFed1->registerSubscription<double> ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterInitializationState ();
+    vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 27.0);
 
-    auto comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    auto comp = vFed1->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed1->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed1->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed1->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
@@ -67,7 +67,7 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     Subscription sub_high (vfed, high_target);
     sub_low.setDefault (static_cast<double> (2 * index));
     sub_high.setDefault (static_cast<double> (2 * index + 1));
-    vfed->enterInitializationState ();
+    vfed->enterInitializingMode ();
     auto cval = static_cast<double> (2 * index) + 0.5;
 
     auto itres = iteration_result::iterating;
@@ -75,7 +75,7 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     while (itres == iteration_result::iterating)
     {
         pub.publish (cval);
-        itres = vfed->enterExecutionState (iteration_request::iterate_if_needed);
+        itres = vfed->enterExecutingMode (iteration_request::iterate_if_needed);
         auto val1 = sub_high.getValue<double> ();
         auto val2 = sub_low.getValue<double> ();
         cval = (val1 + val2) / 2.0;
@@ -153,23 +153,23 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 
     auto subid = vFed2->registerSubscription<double> ("pub1");
 
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
     vFed1->publish (pubid, 27.0);
-    vFed1->enterExecutionStateAsync ();
-    auto comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    vFed1->enterExecutingModeAsync ();
+    auto comp = vFed2->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
     auto val = vFed2->getValue<double> (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
-    comp = vFed2->enterExecutionState (helics::iteration_request::iterate_if_needed);
+    comp = vFed2->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
     auto val2 = vFed2->getValue<double> (subid);
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeComplete ();
     BOOST_CHECK_EQUAL (val2, val);
 }
 
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     auto subid = vFed1->registerSubscription<double> ("pub1");
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     vFed1->publish (pubid, 27.0);
 
     auto comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
@@ -219,9 +219,9 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
 
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     vFed1->publish (pubid, 27.0);
 
     vFed1->requestTimeAsync (1.0);
@@ -257,9 +257,9 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
 
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     pub1.publish (27.0);
 
     vFed1->requestTimeAsync (1.0);
@@ -301,16 +301,16 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
     // vFed1->setLoggingLevel(5);
     // vFed2->setLoggingLevel(5);
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
     int64_t c1 = 0;
     int64_t c2 = 0;
     pub1.publish (c1);
     pub2.publish (c2);
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     while (c1 <= 10)
     {
         BOOST_CHECK_EQUAL (sub1.getValue<int64_t> (), c1);

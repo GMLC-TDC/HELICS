@@ -23,7 +23,7 @@ class Tracer: public App
 {
   public:
     /** construct from a FederateInfo structure*/
-    explicit Tracer (FederateInfo &fi);
+    explicit Tracer (const std::string &name, FederateInfo &fi);
     /** construct from command line arguments*/
     Tracer (int argc, char *argv[]);
 
@@ -31,7 +31,7 @@ class Tracer: public App
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Tracer (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] name the name of the app
     @param[in] file a file defining the federate information

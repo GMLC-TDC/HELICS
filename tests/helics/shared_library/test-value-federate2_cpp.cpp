@@ -45,7 +45,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     BOOST_TEST_CHECKPOINT("reg opt1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     BOOST_TEST_CHECKPOINT("set Delta");
-    vFed1->enterExecutionMode ();
+    vFed1->enterExecutingMode ();
     BOOST_TEST_CHECKPOINT("publish");
     pubid3.publish (s);
     BOOST_TEST_CHECKPOINT("reqtime");
@@ -84,10 +84,10 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    vFed1->enterExecutionModeAsync ();
-    vFed2->enterExecutionModeAsync ();
-    vFed1->enterExecutionModeComplete ();
-    vFed2->enterExecutionModeComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingModeAsync ();
+    vFed1->enterExecutingModeComplete ();
+    vFed2->enterExecutingModeComplete ();
 
     // publish string1 at time=0.0;
     pubid.publish ("string1");

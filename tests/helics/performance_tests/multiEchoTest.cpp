@@ -23,7 +23,7 @@ static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 namespace bdata = boost::unit_test::data;
 
 
-/** class implementing a single heat transfer block*/
+/** class implementing the hub for an echo test*/
 class EchoHub
 {
 public:
@@ -44,8 +44,8 @@ public:
         {
             throw("must initialize first");
         }
-        vFed->enterInitializationState();
-        vFed->enterExecutionState();
+        vFed->enterInitializingMode();
+        vFed->enterExecutingMode();
         mainLoop();
     };
 
@@ -53,9 +53,9 @@ public:
     {
         cnt_ = cnt;
         std::string name = "echohub";
-        helics::FederateInfo fi(name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(fi);
+        vFed = std::make_unique<helics::ValueFederate>(name,fi);
         pubs.reserve(cnt_);
         subs.reserve(cnt_);
         for (int ii = 0; ii < cnt_; ++ii)
@@ -107,17 +107,17 @@ public:
         {
             throw("must initialize first");
         }
-        vFed->enterInitializationState();
-        vFed->enterExecutionState();
+        vFed->enterInitializingMode();
+        vFed->enterExecutingMode();
         mainLoop();
     };
     void initialize(const std::string &coreName, int index)
     {
         std::string name = "echoleaf_"+std::to_string(index);
         index_ = index;
-        helics::FederateInfo fi(name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(fi);
+        vFed = std::make_unique<helics::ValueFederate>(name,fi);
         pub = vFed->registerPublicationIndexed<std::string>("leafsend",index_);
         sub = vFed->registerSubscriptionIndexed<std::string>("leafrx", index_);
         initialized = true;

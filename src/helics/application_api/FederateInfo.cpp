@@ -184,29 +184,28 @@ static void loadFlags(FederateInfo &fi, const std::string &flags)
     }
 }
 
-FederateInfo loadFederateInfo (const std::string &configString)
-{
-    return loadFederateInfo (std::string (), configString);
-}
+static FederateInfo loadFederateInfoJson ( const std::string &jsonString);
+static FederateInfo loadFederateInfoToml ( const std::string &tomlString);
 
-static FederateInfo loadFederateInfoJson (const std::string &name, const std::string &jsonString);
-static FederateInfo loadFederateInfoToml (const std::string &name, const std::string &tomlString);
-
-FederateInfo loadFederateInfo (const std::string &name, const std::string &configString)
+FederateInfo loadFederateInfo ( const std::string &configString)
 {
     FederateInfo ret;
     if (hasTomlExtension (configString))
     {
-        ret = loadFederateInfoToml (name, configString);
+        ret = loadFederateInfoToml (configString);
     }
-    else
+    else if ((hasJsonExtension (configString))||(configString.find_first_of('{')!=std::string::npos))
     {
-        ret = loadFederateInfoJson (name, configString);
+        ret = loadFederateInfoJson (configString);
     }
+	else
+	{
+        ret.defName = configString;
+	}
     return ret;
 }
 
-FederateInfo loadFederateInfoJson (const std::string &name, const std::string &jsonString)
+FederateInfo loadFederateInfoJson (const std::string &jsonString)
 {
     FederateInfo fi;
     Json_helics::Value doc;
@@ -297,7 +296,7 @@ FederateInfo loadFederateInfoJson (const std::string &name, const std::string &j
     return fi;
 }
 
-FederateInfo loadFederateInfoToml (const std::string &name, const std::string &tomlString)
+FederateInfo loadFederateInfoToml (const std::string &tomlString)
 {
     FederateInfo fi;
     toml::Value doc;

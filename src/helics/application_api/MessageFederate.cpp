@@ -73,28 +73,28 @@ void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updat
 void MessageFederate::startupToInitializeStateTransition () { mfManager->startupToInitializeStateTransition (); }
 void MessageFederate::initializeToExecuteStateTransition () { mfManager->initializeToExecuteStateTransition (); }
 
-endpoint_id_t MessageFederate::registerEndpoint (const std::string &name, const std::string &type)
+endpoint_id_t MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
     if (state == op_states::startup)
     {
-        return mfManager->registerEndpoint (getName () + separator_ + name, type);
+        return mfManager->registerEndpoint (getName () + separator_ + eptName, type);
     }
     throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }
 
-endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, const std::string &type)
+endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
 {
     if (state == op_states::startup)
     {
-        return mfManager->registerEndpoint (name, type);
+        return mfManager->registerEndpoint (eptName, type);
     }
     throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }
 
-void MessageFederate::registerInterfaces (const std::string &jsonString)
+void MessageFederate::registerInterfaces (const std::string &configString)
 {
-    registerMessageInterfaces (jsonString);
-    Federate::registerFilterInterfaces (jsonString);
+    registerMessageInterfaces (configString);
+    Federate::registerFilterInterfaces (configString);
 }
 
 void MessageFederate::registerMessageInterfaces(const std::string &configString)
@@ -122,17 +122,17 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
     {
         for (const auto &ept : doc["endpoints"])
         {
-            auto name = getKey (ept);
+            auto eptName = getKey (ept);
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
             endpoint_id_t epid;
             if (global)
             {
-                epid = registerGlobalEndpoint (name, type);
+                epid = registerGlobalEndpoint (eptName, type);
             }
             else
             {
-                epid = registerEndpoint (name, type);
+                epid = registerEndpoint (eptName, type);
             }
 
             // retrieve the known paths
@@ -208,17 +208,17 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         auto &eptArray = epts->as<toml::Array> ();
         for (auto &ept:eptArray)
         {
-            auto name = getKey (ept);
+            auto key = getKey (ept);
             auto type = tomlGetOrDefault (ept, "type", std::string ());
             bool global = tomlGetOrDefault(ept,"global",false);
             endpoint_id_t epid;
             if (global)
             {
-                epid = registerGlobalEndpoint (name, type);
+                epid = registerGlobalEndpoint (key, type);
             }
             else
             {
-                epid = registerEndpoint (name, type);
+                epid = registerEndpoint (key, type);
             }
 
             // retrieve the known paths
@@ -276,11 +276,11 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
     */
 }
 
-void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name)
+void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &key)
 {
     if (state == op_states::startup)
     {
-        mfManager->subscribe (endpoint, name);
+        mfManager->subscribe (endpoint, key);
         return;
     }
     throw (InvalidFunctionCall ("subscriptions can only be created in startup mode"));
@@ -401,12 +401,12 @@ void MessageFederate::sendMessage (endpoint_id_t source, const Message &message)
     throw (InvalidFunctionCall ("cannot send message outside of execution state"));
 }
 
-endpoint_id_t MessageFederate::getEndpointId (const std::string &name) const
+endpoint_id_t MessageFederate::getEndpointId (const std::string &eptName) const
 {
-    auto id = mfManager->getEndpointId (name);
+    auto id = mfManager->getEndpointId (eptName);
     if (id == invalid_id_value)
     {
-        id = mfManager->getEndpointId (getName () + '.' + name);
+        id = mfManager->getEndpointId (getName () + '.' + eptName);
     }
     return id;
 }

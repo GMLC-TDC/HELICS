@@ -153,7 +153,7 @@ class Federate
         return fedState;
     }
 
-    void enterInitializationMode ()
+    void enterInitializingMode ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
         {
@@ -161,7 +161,7 @@ class Federate
         }
     }
 
-    void enterInitializationModeAsync ()
+    void enterInitializingModeAsync ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
         {
@@ -175,7 +175,7 @@ class Federate
         return helicsFederateIsAsyncOperationCompleted (fed) > 0;
     }
 
-    void enterInitializationModeComplete ()
+    void enterInitializingModeComplete ()
     {
         if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
         {
@@ -183,44 +183,44 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutionMode (helics_iteration_request iterate = no_iteration)
+    helics_iteration_status enterExecutingMode (helics_iteration_request iterate = no_iteration)
     {
         helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
         {
-            helicsFederateEnterExecutionMode (fed);
+            helicsFederateEnterExecutingMode (fed);
         }
         else
         {
-            helicsFederateEnterExecutionModeIterative (fed, iterate, &out_iterate);
+            helicsFederateEnterExecutingModeIterative (fed, iterate, &out_iterate);
         }
         return out_iterate;
     }
 
-    void enterExecutionModeAsync (helics_iteration_request iterate = no_iteration)
+    void enterExecutingModeAsync (helics_iteration_request iterate = no_iteration)
     {
         if (iterate == no_iteration)
         {
-            helicsFederateEnterExecutionModeAsync (fed);
+            helicsFederateEnterExecutingModeAsync (fed);
             exec_async_iterate = false;
         }
         else
         {
-            helicsFederateEnterExecutionModeIterativeAsync (fed, iterate);
+            helicsFederateEnterExecutingModeIterativeAsync (fed, iterate);
             exec_async_iterate = true;
         }
     }
 
-    helics_iteration_status enterExecutionModeComplete ()
+    helics_iteration_status enterExecutingModeComplete ()
     {
         helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
-            helicsFederateEnterExecutionModeIterativeComplete (fed, &out_iterate);
+            helicsFederateEnterExecutingModeIterativeComplete (fed, &out_iterate);
         }
         else
         {
-            helicsFederateEnterExecutionModeComplete (fed);
+            helicsFederateEnterExecutingModeComplete (fed);
         }
         return out_iterate;
     }

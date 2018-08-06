@@ -89,8 +89,11 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics::FederateInfo fi (std::string (), helics::coreTypeFromString (core_type_name));
-        fi.timeDelta = time_delta;
+        helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
+		if (time_delta != helics::timeZero)
+		{
+            fi.setTimeProperty (TIME_DELTA_PROPERTY, time_delta);
+		}
 
         std::vector<std::shared_ptr<FedType>> federates_added;
 
@@ -107,8 +110,8 @@ struct FederateTestFixture
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
-                fi.name = name_prefix + std::to_string (ii + offset);
-                auto fed = std::make_shared<FedType> (fi);
+                auto fedname = name_prefix + std::to_string (ii + offset);
+                auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
@@ -124,8 +127,8 @@ struct FederateTestFixture
                 auto core = helics::CoreFactory::create (core_type, initString + " --federates 1");
                 fi.coreName = core->getIdentifier ();
 
-                fi.name = name_prefix + std::to_string (ii + offset);
-                auto fed = std::make_shared<FedType> (fi);
+                auto fedname = name_prefix + std::to_string (ii + offset);
+                auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
@@ -166,14 +169,14 @@ struct FederateTestFixture
                                                                       std::to_string ((ii < count - 1) ? 2 : 1));
                 fi.coreName = core->getIdentifier ();
 
-                fi.name = name_prefix + std::to_string (ii + offset);
-                auto fed = std::make_shared<FedType> (fi);
+                auto fedname = name_prefix + std::to_string (ii + offset);
+                auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
                 if (ii + 1 < count)
                 {
-                    fi.name = name_prefix + std::to_string (ii + offset + 1);
-                    auto fed2 = std::make_shared<FedType> (fi);
+                    auto fedname2 = name_prefix + std::to_string (ii + offset + 1);
+                    auto fed2 = std::make_shared<FedType> (fedname2, fi);
                     federates[ii + offset + 1] = fed2;
                     federates_added.push_back (fed2);
                 }

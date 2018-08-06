@@ -39,9 +39,9 @@ Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
     }
 }
 
-Echo::Echo (const FederateInfo &fi) : App (fi) {}
+Echo::Echo (const std::string &name, const FederateInfo &fi) : App (name,fi) {}
 
-Echo::Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi) {}
+Echo::Echo (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (name,core, fi) {}
 
 Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
@@ -57,7 +57,7 @@ void Echo::runTo (Time stopTime_input)
     }
     if (state < Federate::op_states::execution)
     {
-        fed->enterExecutionState ();
+        fed->enterExecutingMode ();
     }
     else if (state == Federate::op_states::finalize)
     {

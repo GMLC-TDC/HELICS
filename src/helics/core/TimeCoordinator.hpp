@@ -5,12 +5,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 #include <atomic>
 #include <functional>
-#include "../common/GuardedTypes.hpp"
 
 namespace helics
 {
@@ -20,6 +20,25 @@ enum class message_process_result
     no_effect = 0,  //!< the message did not result in an update
     processed,  //!< the message was used to update the current state
     delay_processing,  //!< the message should be delayed and reprocessed later
+};
+
+/** class for the controlling fields and options for a time coordinator*/
+class tcoptions
+{
+  public:
+    Time timeDelta = Time::epsilon ();
+    Time inputDelay = timeZero;
+    Time outputDelay = timeZero;
+    Time offset = timeZero;
+    Time period = timeZero;
+    Time rtLag = timeZero;
+    Time rtLead = timeZero;
+   // bool observer = false;
+    //bool realtime = false;
+    //bool source_only = false;
+    bool wait_for_current_time_updates = false;
+    bool uninterruptible = false;
+    int maxIterations = 50;
 };
 
 /** class managing the coordination of time in HELICS
@@ -41,17 +60,19 @@ class TimeCoordinator
     Time time_grantBase = Time::minVal ();  //!< time to use as a basis for calculating the next grantable
                                             //!< time(usually time granted unless values are changing)
     Time time_block = Time::maxVal ();  //!< a blocking time to not grant time >= the specified time
-    shared_guarded_m<std::vector<global_federate_id_t>> dependent_federates; //!<these are to maintain an accessible record of dependent federates 
-    shared_guarded_m<std::vector<global_federate_id_t>> dependency_federates; //!<these are to maintain an accessible record of dependency federates 
+    shared_guarded_m<std::vector<global_federate_id_t>>
+      dependent_federates;  //!< these are to maintain an accessible record of dependent federates
+    shared_guarded_m<std::vector<global_federate_id_t>>
+      dependency_federates;  //!< these are to maintain an accessible record of dependency federates
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id_t> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
-    CoreFederateInfo info;  //!< basic federate info the core uses
+    tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-      global_federate_id_t
-      source_id=global_federate_id_t(0);  //!< the identifier for inserting into the source id field of any generated messages;
+    global_federate_id_t source_id = global_federate_id_t (
+      0);  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
@@ -60,21 +81,23 @@ class TimeCoordinator
   private:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
   public:
-    bool forwarding = false;  // indicator that the time coordinator is a forwarding coordinator
-  public:
     /** default constructor*/
     TimeCoordinator ();
-    /** construct from a federate info */
-    explicit TimeCoordinator (const CoreFederateInfo &info_);
     /** construct from a federate info and message send function*/
-    TimeCoordinator (const CoreFederateInfo &info_,
-                     std::function<void(const ActionMessage &)> sendMessageFunction_);
-    /* get the federate info used by the Core that affects timing*/
-    CoreFederateInfo &getFedInfo () { return info; }
-    /** get the core federate info in const setting*/
-    const CoreFederateInfo &getFedInfo () const { return info; }
-    /** set the core information using for timing as a block*/
-    void setInfo (const CoreFederateInfo &info_) { info = info_; }
+    explicit TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_);
+
+    /** set a timeProperty for a the coordinator*/
+	void setTimeProperty (int timeProperty, Time propertyVal);
+    /** set a timeProperty for a the coordinator*/
+    void setIntegerProperty (int intProperty, int propertyVal);
+    /** set an option Flag for a the coordinator*/
+    void setOptionFlag (int optionFlag, bool value);
+    /** get a time Property*/
+	Time getTimeProperty (int timeProperty) const;
+    /** get an option flag value*/
+    bool getOptionFlag (int optionFlag) const;
+    /** get an option flag value*/
+    int getIntegerProperty (int intProperty) const;
     /** set the callback function used for the sending messages*/
     void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_);
 
@@ -85,7 +108,7 @@ class TimeCoordinator
     /** get a list of actual dependencies*/
     std::vector<global_federate_id_t> getDependencies () const;
     /** get a reference to the dependents vector*/
-    std::vector<global_federate_id_t> getDependents() const { return *dependent_federates.lock_shared(); }
+    std::vector<global_federate_id_t> getDependents () const { return *dependent_federates.lock_shared (); }
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
@@ -101,7 +124,6 @@ class TimeCoordinator
      */
     void updateMessageTime (Time messageUpdateTime);
 
-    
   private:
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
@@ -134,9 +156,8 @@ class TimeCoordinator
 
     /** process a message related to configuration
     @param cmd the update command
-    @param initMode set to true to allow initialization mode only updates
     */
-    void processConfigUpdateMessage (const ActionMessage &cmd, bool initMode = false);
+    void processConfigUpdateMessage (const ActionMessage &cmd);
     /** process a dependency update message*/
     void processDependencyUpdateMessage (const ActionMessage &cmd);
     /** add a federate dependency

@@ -28,7 +28,7 @@ BOOST_DATA_TEST_CASE (combo_federate_initialize_tests, bdata::make (core_types_s
     SetupTest<helics::CombinationFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -46,7 +46,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
 
     auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -78,7 +78,7 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
 
     auto subid = vFed1->registerSubscription<std::string> ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
     auto gtime = vFed1->requestTime (1.0);
@@ -112,7 +112,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -144,8 +144,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
-    mFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
+    mFed2->enterExecutingMode ();
     f1finish.wait ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
@@ -203,8 +203,8 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     cFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     cFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutionState (); });
-    cFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutingMode (); });
+    cFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     cFed1->publish (pubid, "string1");

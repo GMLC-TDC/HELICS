@@ -5,8 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include <cstdint>
 #include "../flag-definitions.h"
+#include <cstdint>
 namespace helics
 {
 /** flag definitions for the action Message Flag field*/
@@ -15,19 +15,19 @@ enum action_message_flags : uint16_t
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
     processing_complete_flag = 1,  //!< indicator that processing has been completed
     required_flag = 2,  //!< flag indicating that an action or match is required
-    core_flag=3, //!< flag indicating that message comes from a core vs a broker
+    core_flag = 3,  //!< flag indicating that message comes from a core vs a broker
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
-    empty_flag=6, //!< flag indicating that the message is empty
+    empty_flag = 6,  //!< flag indicating that the message is empty
     extra_flag1 = 7,  //!< extra flag
     forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
-    extra_flag2 = 8, //!< extra flag
+    extra_flag2 = 8,  //!< extra flag
     destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
     broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
-    extra_flag3 = 13, //!< extra flag
-    extra_flag4 = 14, //!< extra flag
-    nameless_interface_flag =15, //!< flag indicating the interface is nameless
+    extra_flag3 = 13,  //!< extra flag
+    extra_flag4 = 14,  //!< extra flag
+    nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 /** namespace for message definitions*/
 namespace action_message_def
@@ -50,7 +50,7 @@ enum class action_t : int32_t
     cmd_reg_fed = -105,  //!< register a federate
     cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
     cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
-    cmd_broker_query=-37, //!< send a query to a core
+    cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
 
@@ -94,10 +94,12 @@ enum class action_t : int32_t
     cmd_add_interdependency = 148,  //!< command to add a federate as both dependent and a dependency
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
-    cmd_fed_configure = 205,  //!< command to update the configuration of a federate
+    cmd_fed_configure_time = 202,  //!< command to update the configuration of a federate a time parameter
+    cmd_fed_configure_int = 203,  //!< command to update the configuration of a federate an int parameter
+    cmd_fed_configure_flag = 204,  //!< command to update the configuration of a federate a flag parameter 
     cmd_core_configure = 207,  //!< command to update the configuration of a core
-    cmd_interface_configure = 209, //!< command to update the configuration of an interface
-    cmd_broker_configure = 211, //!< command to update the configuration of a broker
+    cmd_interface_configure = 209,  //!< command to update the configuration of an interface
+    cmd_broker_configure = 211,  //!< command to update the configuration of a broker
 
     cmd_update_filter_op = 10427,  //!< command to update a filter op [should only used internal to a core]
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
@@ -105,7 +107,7 @@ enum class action_t : int32_t
     priority_null_info_command = -cmd_info_basis - 1,
     // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
-    cmd_force_time_grant = 525, //!< command to force grant a time regardless of other considerations
+    cmd_force_time_grant = 525,  //!< command to force grant a time regardless of other considerations
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -126,7 +128,7 @@ enum class action_t : int32_t
     cmd_add_src_filter = cmd_info_basis + 82,  //!< notify of a source
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
     cmd_add_source_endpoint = 90,  //!< notify of a source endpoint
-	cmd_add_destination_endpoint=91, //!< notify of a destination endpoint
+    cmd_add_destination_endpoint = 91,  //!< notify of a destination endpoint
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
@@ -207,7 +209,10 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL action_message_def::action_t::cmd_protocol
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
-#define CMD_FED_CONFIGURE action_message_def::action_t::cmd_fed_configure
+#define CMD_FED_CONFIGURE_TIME action_message_def::action_t::cmd_fed_configure_time
+#define CMD_FED_CONFIGURE_INT action_message_def::action_t::cmd_fed_configure_int
+#define CMD_FED_CONFIGURE_FLAG action_message_def::action_t::cmd_fed_configure_flag
+
 #define CMD_CORE_CONFIGURE action_message_def::action_t::cmd_core_configure
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
@@ -235,19 +240,7 @@ enum class action_t : int32_t
 #define SET_USED_PORTS 1457
 #define NULL_REPLY 0;
 
-// definitions for FED_CONFIGURE_COMMAND
-#define UPDATE_INPUT_DELAY 0
-#define UPDATE_OUTPUT_DELAY 1
-#define UPDATE_MINDELTA 2
-#define UPDATE_PERIOD 3
-#define UPDATE_OFFSET 4
-#define UPDATE_MAX_ITERATION 5
-#define UPDATE_LOG_LEVEL 6
-#define UPDATE_FLAG 7
-#define UPDATE_RTLAG 10
-#define UPDATE_RTLEAD 11
-
-//definitions related to Core Configure
+// definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592

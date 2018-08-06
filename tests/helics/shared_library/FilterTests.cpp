@@ -70,9 +70,9 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5));
 
-    CE (helicsFederateEnterExecutionModeAsync (fFed));
-    CE (helicsFederateEnterExecutionMode (mFed));
-    CE (helicsFederateEnterExecutionModeComplete (fFed));
+    CE (helicsFederateEnterExecutingModeAsync (fFed));
+    CE (helicsFederateEnterExecutingMode (mFed));
+    CE (helicsFederateEnterExecutingModeComplete (fFed));
 
     federate_state state;
     CE (helicsFederateGetState (fFed, &state));
@@ -138,11 +138,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 1.25));
 
-    CE (helicsFederateEnterExecutionModeAsync (fFed));
-    CE (helicsFederateEnterExecutionModeAsync (fFed2));
-    CE (helicsFederateEnterExecutionMode (mFed));
-    CE (helicsFederateEnterExecutionModeComplete (fFed));
-    CE (helicsFederateEnterExecutionModeComplete (fFed2));
+    CE (helicsFederateEnterExecutingModeAsync (fFed));
+    CE (helicsFederateEnterExecutingModeAsync (fFed2));
+    CE (helicsFederateEnterExecutingMode (mFed));
+    CE (helicsFederateEnterExecutingModeComplete (fFed));
+    CE (helicsFederateEnterExecutingModeComplete (fFed2));
 
     federate_state state;
     CE (helicsFederateGetState (fFed, &state));
@@ -216,9 +216,9 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 2.5));
 
-    CE (helicsFederateEnterExecutionModeAsync (fFed));
-    CE (helicsFederateEnterExecutionMode (mFed));
-    CE (helicsFederateEnterExecutionModeComplete (fFed));
+    CE (helicsFederateEnterExecutingModeAsync (fFed));
+    CE (helicsFederateEnterExecutingMode (mFed));
+    CE (helicsFederateEnterExecutingModeComplete (fFed));
 
     federate_state state;
     CE (helicsFederateGetState (fFed, &state));
@@ -279,11 +279,11 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm");
     CE (helicsFilterAddSourceTarget (f1, "src"));
 
-    CE (helicsFederateEnterExecutionModeAsync (sFed));
-    CE (helicsFederateEnterExecutionModeAsync (dcFed));
-    CE (helicsFederateEnterExecutionMode (dFed));
-    CE (helicsFederateEnterExecutionModeComplete (sFed));
-    CE (helicsFederateEnterExecutionModeComplete (dcFed));
+    CE (helicsFederateEnterExecutingModeAsync (sFed));
+    CE (helicsFederateEnterExecutingModeAsync (dcFed));
+    CE (helicsFederateEnterExecutingMode (dFed));
+    CE (helicsFederateEnterExecutingModeComplete (sFed));
+    CE (helicsFederateEnterExecutingModeComplete (dcFed));
 
     federate_state state;
     CE (helicsFederateGetState (sFed, &state));
@@ -352,13 +352,13 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE (helicsFilterAddSourceTarget (f1, "src"));
     CE (helicsFilterAddSourceTarget (f1, "src2"));
 
-    CE (helicsFederateEnterExecutionModeAsync (sFed));
-    CE (helicsFederateEnterExecutionModeAsync (sFed2));
-    CE (helicsFederateEnterExecutionModeAsync (dcFed));
-    CE (helicsFederateEnterExecutionMode (dFed));
-    CE (helicsFederateEnterExecutionModeComplete (sFed));
-    CE (helicsFederateEnterExecutionModeComplete (sFed2));
-    CE (helicsFederateEnterExecutionModeComplete (dcFed));
+    CE (helicsFederateEnterExecutingModeAsync (sFed));
+    CE (helicsFederateEnterExecutingModeAsync (sFed2));
+    CE (helicsFederateEnterExecutingModeAsync (dcFed));
+    CE (helicsFederateEnterExecutingMode (dFed));
+    CE (helicsFederateEnterExecutingModeComplete (sFed));
+    CE (helicsFederateEnterExecutingModeComplete (sFed2));
+    CE (helicsFederateEnterExecutingModeComplete (dcFed));
 
     federate_state state;
     CE (helicsFederateGetState (sFed, &state));

@@ -44,8 +44,8 @@ public:
         {
             throw("must initialize first");
         }
-        vFed->enterInitializationState();
-        vFed->enterExecutionState();
+        vFed->enterInitializingMode();
+        vFed->enterExecutingMode();
         mainLoop();
     };
     void initialize(const std::string &coreName, int index, int maxIndex)
@@ -53,9 +53,9 @@ public:
         std::string name = "ringlink_" + std::to_string(index);
         index_ = index;
         maxIndex_ = maxIndex;
-        helics::FederateInfo fi(name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(fi);
+        vFed = std::make_unique<helics::ValueFederate>(name,fi);
         pub = vFed->registerPublicationIndexed<std::string>("pub", index_);
         if (index_ == 0)
         {

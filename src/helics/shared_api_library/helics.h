@@ -149,7 +149,7 @@ HELICS_EXPORT void helicsBrokerFree (helics_broker broker);
 @param fi the federate info object that contains details on the federate
 @return an opaque value federate object
 */
-HELICS_EXPORT helics_federate helicsCreateValueFederate (const helics_federate_info_t fi);
+HELICS_EXPORT helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info_t fi);
 
 /** create a value federate from a JSON file or JSON string
 @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
@@ -164,7 +164,7 @@ argument
 @param fi the federate info object that contains details on the federate
 @return an opaque message federate object
 */
-HELICS_EXPORT helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi);
+HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, const helics_federate_info_t fi);
 
 /** create a message federate from a JSON file or JSON string
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
@@ -180,7 +180,7 @@ helics_federate, helics_message_federate or helics_federate object as an argumen
 @param fi the federate info object that contains details on the federate
 @return an opaque value federate object nullptr if the object creation failed
 */
-HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi);
+HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const char *fedName, const helics_federate_info_t fi);
 
 /** create a combination federate from a JSON file or JSON string
 @details combination federates are both value federates and message federates, objects can be used in all functions that take a
@@ -315,22 +315,22 @@ HELICS_EXPORT helics_status helicsFederateEnterInitializationModeComplete (helic
 
 /** request that the federate enter the Execution mode
 @details this call is blocking until granted entry by the core object for an asynchronous alternative call
-/ref helicsFederateEnterExecutionModeAsync  on return from this call the federate will be at time 0
+/ref helicsFederateEnterExecutingModeAsync  on return from this call the federate will be at time 0
 @param fed a federate to change modes
 @return a helics_status enumeration helics_error if something went wrong helicsInvalidReference if fed is invalid
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionMode (helics_federate fed);
+HELICS_EXPORT helics_status helicsFederateEnterExecutingMode (helics_federate fed);
 
 /** request that the federate enter the Execution mode
-@details this call is non-blocking and will return immediately call /ref helicsFederateEnterExecutionModeComplete to finish the call
+@details this call is non-blocking and will return immediately call /ref helicsFederateEnterExecutingModeComplete to finish the call
 sequence /ref
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionModeAsync (helics_federate fed);
+HELICS_EXPORT helics_status helicsFederateEnterExecutingModeAsync (helics_federate fed);
 
-/** complete the call to /ref EnterExecutionModeAsync
+/** complete the call to /ref EnterExecutingModeAsync
 @param fed the federate object to complete the call
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionModeComplete (helics_federate fed);
+HELICS_EXPORT helics_status helicsFederateEnterExecutingModeComplete (helics_federate fed);
 
 /** request an iterative time
 @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
@@ -340,7 +340,7 @@ iteration request and return a time and iteration status
 @param[out] outIterate  the iteration specification of the result
 @return a helics_status object with a return code of the result
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionModeIterative (helics_federate fed,
+HELICS_EXPORT helics_status helicsFederateEnterExecutingModeIterative (helics_federate fed,
                                                                        helics_iteration_request iterate,
                                                                        helics_iteration_status *outIterate);
 
@@ -351,14 +351,14 @@ iteration request and return a time and iteration status
 @param iterate the requested iteration mode
 @return a helics_status object with a return code of the result
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
+HELICS_EXPORT helics_status helicsFederateEnterExecutingModeIterativeAsync (helics_federate fed, helics_iteration_request iterate);
 
 /** complete the asynchronous iterative call into ExecutionModel
 @param fed the federate to make the request of
 @param[out] outIterate  the iteration specification of the result
 @return a helics_status object with a return code of the result helics_ok if there were no issues
 */
-HELICS_EXPORT helics_status helicsFederateEnterExecutionModeIterativeComplete (helics_federate fed, helics_iteration_status *outIterate);
+HELICS_EXPORT helics_status helicsFederateEnterExecutingModeIterativeComplete (helics_federate fed, helics_iteration_status *outIterate);
 
 /** get the current state of a federate
 @param fed the fed to query

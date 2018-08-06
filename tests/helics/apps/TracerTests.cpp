@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
     helics::ValueFederate vfed (fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     pub1.publish (3.4);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
     trace1.addEndpoint ("src1");
     trace1.setEndpointMessageCallback (cb);
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (1.0);
     e1.send ("src1", "this is a test message");
@@ -164,7 +164,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::helics_type_t::helicsDouble);
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     pub1.publish (3.4);
@@ -219,7 +219,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
-    cfed.enterExecutionState ();
+    cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     pub1.publish (3.4);
@@ -274,7 +274,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
-    cfed.enterExecutionState ();
+    cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     pub1.publish (3.4);
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     fi.coreName = "core2";
     fi.coreInitString = "3";
     helics::apps::Tracer trace1 (fi);
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
@@ -332,9 +332,9 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     trace1.addDestEndpointClone ("d2");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
-    mfed2.enterExecutionStateAsync ();
-    mfed.enterExecutionState ();
-    mfed2.enterExecutionStateComplete ();
+    mfed2.enterExecutingModeAsync ();
+    mfed.enterExecutingMode ();
+    mfed2.enterExecutingModeComplete ();
 
     mfed2.requestTimeAsync (1.0);
     auto retTime = mfed.requestTime (1.0);
@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -418,9 +418,9 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     trace1.addSourceEndpointClone ("d2");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
-    mfed2.enterExecutionStateAsync ();
-    mfed.enterExecutionState ();
-    mfed2.enterExecutionStateComplete ();
+    mfed2.enterExecutingModeAsync ();
+    mfed.enterExecutingMode ();
+    mfed2.enterExecutingModeComplete ();
 
     mfed2.requestTimeAsync (1.0);
     auto retTime = mfed.requestTime (1.0);
@@ -481,7 +481,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -496,9 +496,9 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     trace1.addSourceEndpointClone ("d1");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
-    mfed2.enterExecutionStateAsync ();
-    mfed.enterExecutionState ();
-    mfed2.enterExecutionStateComplete ();
+    mfed2.enterExecutingModeAsync ();
+    mfed.enterExecutingMode ();
+    mfed2.enterExecutingModeComplete ();
 
     mfed2.requestTimeAsync (1.0);
     auto retTime = mfed.requestTime (1.0);
@@ -559,7 +559,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     fi.coreName.push_back (indx++);
     fi.coreInitString = "3";
     helics::apps::Tracer trace1 (fi);
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     helics::MessageFederate mfed (fi);
@@ -577,9 +577,9 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     };
     trace1.setClonedMessageCallback (cb);
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
-    mfed2.enterExecutionStateAsync ();
-    mfed.enterExecutionState ();
-    mfed2.enterExecutionStateComplete ();
+    mfed2.enterExecutingModeAsync ();
+    mfed.enterExecutingMode ();
+    mfed2.enterExecutingModeComplete ();
 
     mfed2.requestTimeAsync (1.0);
     auto retTime = mfed.requestTime (1.0);
@@ -648,7 +648,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    cfed.enterExecutionState ();
+    cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     pub1.publish (3.4);

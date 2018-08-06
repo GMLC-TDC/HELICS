@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test )
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
 
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test2_file)
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -302,7 +302,7 @@ BOOST_AUTO_TEST_CASE (sine_source_test_file)
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
 
     BOOST_CHECK_EQUAL (retTime, 1.0);

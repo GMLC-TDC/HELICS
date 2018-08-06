@@ -119,23 +119,7 @@ helics_status helicsFederateInfoLoadFromArgs (helics_federate_info_t fi, int arg
     }
 }
 
-helics_status helicsFederateInfoSetFederateName (helics_federate_info_t fi, const char *name)
-{
-    if (fi == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    try
-    {
-        hfi->name = (name != nullptr) ? std::string (name) : nullstr;
-        return helics_ok;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler ();
-    }
-}
+
 helics_status helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename)
 {
     if (fi == nullptr)
@@ -216,38 +200,8 @@ helics_status helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int fl
         return helics_invalid_object;
     }
     auto hfi = reinterpret_cast<helics::FederateInfo *> (fi);
-    switch (flag)
-    {
-    case OBSERVER_FLAG:
-        hfi->observer = (value != helics_false);
-        break;
-    case UNINTERRUPTIBLE_FLAG:
-        hfi->uninterruptible = (value != helics_false);
-        break;
-    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-        hfi->only_transmit_on_change = (value != helics_false);
-        break;
-    case ONLY_UPDATE_ON_CHANGE_FLAG:
-        hfi->only_update_on_change = (value != helics_false);
-        break;
-    case SOURCE_ONLY_FLAG:
-        hfi->source_only = (value != helics_false);
-        break;
-    case ROLLBACK_FLAG:
-        hfi->rollback = (value != helics_false);
-        break;
-    case FORWARD_COMPUTE_FLAG:
-        hfi->forwardCompute = (value != helics_false);
-        break;
-    case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-        hfi->wait_for_current_time_updates = (value != helics_false);
-        break;
-    case REALTIME_FLAG:
-        hfi->realtime = (value != helics_false);
-        break;
-    default:
-        return helics_invalid_argument;
-    }
+    hfi->setFlagOption (flag, (value != helics_false));
+    
     return helics_ok;
 }
 helics_status helicsFederateInfoSetTimeOption (helics_federate_info_t fi, int timeProperty, helics_time_t propertyValue)

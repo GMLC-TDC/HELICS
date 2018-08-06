@@ -48,14 +48,14 @@ int main(int /*argc*/,char ** /*argv*/)
 
 
   /* Enter initialization state */
-  vfed->enterInitializationMode(); // can throw helics98::InvalidStateTransition exception
+  vfed->enterInitializingMode(); // can throw helics98::InvalidStateTransition exception
   printf(" Entered initialization state\n");
   double y = 1.0, /*xprv = 100,*/yprv=100;
 
   pub.publish(y);
   fflush(NULL);
   /* Enter execution state */
-  vfed->enterExecutionMode(); // can throw helics98::InvalidStateTransition exception
+  vfed->enterExecutingMode(); // can throw helics98::InvalidStateTransition exception
   printf(" Entered execution state\n");
 
   fflush(NULL);

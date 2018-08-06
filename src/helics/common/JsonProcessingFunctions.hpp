@@ -14,7 +14,10 @@ using the jsoncpp library
 #include <functional>
 
 #include "../core/helics-time.hpp"
-/** load a JSON string or filename that points to a JSON file and return a
+/** check if the file has a valid json extension*/
+bool hasJsonExtension (const std::string &jsonString);
+
+  /** load a JSON string or filename that points to a JSON file and return a
 json::Value to the root object
 */
 Json_helics::Value loadJson (const std::string &jsonString);

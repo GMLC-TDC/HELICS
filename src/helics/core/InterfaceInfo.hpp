@@ -55,7 +55,8 @@ namespace helics
     void setGlobalId (global_federate_id_t newglobalId) { global_id = newglobalId; }
     /** set the change update flag which controls when a subscription is updated*/
     void setChangeUpdateFlag (bool updateFlag);
-
+    /** get the current value of the change update flag*/
+    bool getChangeUpdateFlag () const { return only_update_on_change; }
     private:
         std::atomic<global_federate_id_t> global_id;
         bool only_update_on_change{ false };  //!< flag indicating that subscriptions values should only be updated on change

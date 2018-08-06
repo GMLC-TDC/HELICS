@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE (echo_test1)
     helics::MessageFederate mfed (fi);
     helics::Endpoint ep1 (&mfed, "src");
     auto fut = std::async (std::launch::async, [&echo1]() { echo1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
     ep1.send ("test", "hello world");
     auto retTime = mfed.requestTime (1.0);
     BOOST_CHECK (ep1.hasMessage ());
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (echo_test_delay)
     helics::MessageFederate mfed (fi);
     helics::Endpoint ep1 (&mfed, "src");
     auto fut = std::async (std::launch::async, [&echo1]() { echo1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
     ep1.send ("test", "hello world");
     mfed.requestTime (1.0);
     BOOST_CHECK (!ep1.hasMessage ());
@@ -81,16 +81,16 @@ BOOST_AUTO_TEST_CASE (echo_test_delay_period)
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core3";
     fi.coreInitString = "2";
-    fi.period = 1.1;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.1);
     helics::apps::Echo echo1 (fi);
-    fi.period = 0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 0);
     fi.name = "source";
     echo1.addEndpoint ("test");
     echo1.setEchoDelay (1.2);
     helics::MessageFederate mfed (fi);
     helics::Endpoint ep1 (&mfed, "src");
     auto fut = std::async (std::launch::async, [&echo1]() { echo1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
     ep1.send ("test", "hello world");
     mfed.requestTime (1.0);
     BOOST_CHECK (!ep1.hasMessage ());
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE (echo_test_multiendpoint)
     helics::MessageFederate mfed (fi);
     helics::Endpoint ep1 (&mfed, "src");
     auto fut = std::async (std::launch::async, [&echo1]() { echo1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
     ep1.send ("test", "hello world");
     mfed.requestTime (1.0);
     ep1.send ("test2", "hello again");
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE (echo_test_fileload)
     helics::MessageFederate mfed (fi);
     helics::Endpoint ep1 (&mfed, "src");
     auto fut = std::async (std::launch::async, [&echo1]() { echo1.runTo (5.0); });
-    mfed.enterExecutionState ();
+    mfed.enterExecutingMode ();
     ep1.send ("test", "hello world");
     mfed.requestTime (1.0);
     ep1.send ("test2", "hello again");

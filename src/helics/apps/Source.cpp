@@ -38,7 +38,7 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlag (SOURCE_ONLY_FLAG);
+        fed->setFlagOption (SOURCE_ONLY_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs, "input"s);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -52,16 +52,20 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
     }
 }
 
-Source::Source (const FederateInfo &fi) : App (fi) { fed->setFlag (SOURCE_ONLY_FLAG); }
-
-Source::Source (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
+Source::Source (const std::string &appName, const FederateInfo &fi) : App (appName,fi)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (SOURCE_ONLY_FLAG);
+}
+
+Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : App (appName,core, fi)
+{
+    fed->setFlagOption (SOURCE_ONLY_FLAG);
 }
 
 Source::Source (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (SOURCE_ONLY_FLAG);
 
     Source::loadJsonFile (jsonString);
 }
@@ -247,7 +251,7 @@ void Source::initialize ()
         }
     }
 
-    fed->enterInitializationState ();
+    fed->enterInitializingMode ();
 }
 
 void Source::runTo (Time stopTime_input)
@@ -265,7 +269,7 @@ void Source::runTo (Time stopTime_input)
 
         runSourceLoop (timeZero - timeEpsilon);
 
-        fed->enterExecutionState ();
+        fed->enterExecutingMode ();
         // send the stuff at timeZero
         nextRequestTime = runSourceLoop (timeZero);
         currentTime = timeZero;

@@ -82,16 +82,15 @@ App::App (const std::string &appName, int argc, char *argv[])
         deactivated = true;
         return;
     }
-    FederateInfo fi (appName);
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
+    FederateInfo fi (argc, argv);
+    fed = std::make_shared<CombinationFederate> (appName,fi);
     App::loadArguments (vm_map);
 }
 
-App::App (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi)) {}
+App::App (const std::string &appName, const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (appName,fi)) {}
 
-App::App (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
+App::App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName,core, fi))
 {
 }
 
@@ -198,7 +197,7 @@ void App::initialize ()
     auto state = fed->getCurrentState ();
     if (state == Federate::op_states::startup)
     {
-        fed->enterInitializationState ();
+        fed->enterInitializingMode ();
     }
 }
 

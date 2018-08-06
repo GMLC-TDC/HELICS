@@ -76,7 +76,7 @@ class Federate
     enum class op_states : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization = 1,  //!< entered after the enterInitializationMode call has returned
+        initialization = 1,  //!< entered after the enterInitializingMode call has returned
         execution = 2,  //!< entered after the enterExectuationState call has returned
         finalize = 3,  //!< the federate has finished executing normally final values may be retrieved
         error = 4,  //!< error state no core communication is possible but values can be retrieved
@@ -145,7 +145,7 @@ class Federate
     if called when no aysnc operation is in flight*/
     bool isAsyncOperationCompleted () const;
     /** second part of the async process for entering initializationState call after a call to
-    enterInitializationModeAsync if call any other time it will throw an InvalidFunctionCall exception*/
+    enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall exception*/
     void enterInitializingModeComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode

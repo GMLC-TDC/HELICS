@@ -58,6 +58,8 @@ class FederateState
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
+    bool observer{false};  //!< flag indicating the federate is an observer only
+    bool source_only{false}; //!< flag indicating the federate is a source_only
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -143,7 +145,24 @@ class FederateState
     std::unique_ptr<Message> receiveAny (interface_handle &id);
     /** set the CommonCore object that is managing this Federate*/
     void setParent (CommonCore *coreObject) { parent_ = coreObject; };
+    /** update the info structure
+   @details public call so it also calls the federate lock before calling private update function
+   the action Message should be CMD_FED_CONFIGURE
+   */
+    void setProperties (const ActionMessage &cmd);
 
+	/** set a timeProperty for a the coordinator*/
+    void setTimeProperty (int timeProperty, Time propertyVal);
+    /** set a timeProperty for a the coordinator*/
+    void setIntegerProperty (int intProperty, int propertyVal);
+    /** set an option Flag for a the coordinator*/
+    void setOptionFlag (int optionFlag, bool value);
+    /** get a time Property*/
+    Time getTimeProperty (int timeProperty) const;
+    /** get an option flag value*/
+    bool getOptionFlag (int optionFlag) const;
+    /** get an option flag value*/
+    int getIntegerProperty (int intProperty) const;
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -168,8 +187,6 @@ class FederateState
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     message_processing_result processActionMessage (ActionMessage &cmd);
-    /** process a message that updates the configuration of the federate for timing*/
-    void processConfigUpdate (const ActionMessage &m);
     /** fill event list
     @param the time of the update
     */
@@ -188,14 +205,6 @@ class FederateState
     void addDependent (global_federate_id_t fedThatDependsOnThis);
     /** specify the core object that manages this federate*/
   public:
-    /** get the info structure for the federate
-     */
-    CoreFederateInfo getInfo () const;
-    /** update the info structure
-    @details public call so it also calls the federate lock before calling private update function
-    the action Message should be CMD_FED_CONFIGURE
-    */
-    void updateFederateInfo (const ActionMessage &cmd);
     /** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
     /** get allowable message time*/
@@ -219,7 +228,7 @@ class FederateState
     /** process until the federate has verified its membership and assigned a global id number*/
     iteration_result waitSetup ();
     /** process until the initialization state has been entered or there is a failure*/
-    iteration_result enterInitializationState ();
+    iteration_result enterInitializingMode ();
     /** function to call when entering execution state
     @param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed

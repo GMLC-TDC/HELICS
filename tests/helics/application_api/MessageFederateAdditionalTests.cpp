@@ -28,7 +28,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -45,7 +45,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -73,7 +73,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
 
     helics::Endpoint epid (mFed1.get (), "ep1");
     helics::Endpoint epid2 (helics::GLOBAL, mFed1.get (), "ep2", "random");
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -112,7 +112,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -161,7 +161,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -208,7 +208,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    mFed1->enterExecutionState ();
+    mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -252,8 +252,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutionState (); });
-    mFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
+    mFed2->enterExecutingMode ();
     f1finish.wait ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
@@ -344,15 +344,14 @@ class PingPongFed
   private:
     void initialize ()
     {
-        helics::FederateInfo fi (name);
+        helics::FederateInfo fi (coreType);
         fi.coreName = "pptest";
-        fi.coreType = coreType;
         fi.coreInitString = "3";
-        fi.timeDelta = delta;
+        fi.setTimeProperty (TIME_DELTA_PROPERTY, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";
 #endif
-        mFed = std::make_unique<helics::MessageFederate> (fi);
+        mFed = std::make_unique<helics::MessageFederate> (name,fi);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("registering federate ") + name + "\n";
 #endif
@@ -422,7 +421,7 @@ class PingPongFed
     void run (helics::Time finish)
     {
         initialize ();
-        mFed->enterExecutionState ();
+        mFed->enterExecutingMode ();
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("entering Execute Mode ") + name + "\n";
 #endif

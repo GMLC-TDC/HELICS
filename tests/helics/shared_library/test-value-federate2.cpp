@@ -42,7 +42,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     auto sub1 = helicsFederateRegisterOptionalSubscription (vFed1, "fed0/pub3", "", "");
     CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
 
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    CE (helicsFederateEnterExecutingMode (vFed1));
     CE (helicsPublicationPublishRaw (pubid3, s.data (), len));
 
     CE (helicsFederateRequestTime (vFed1, 1.0, &gtime));
@@ -83,10 +83,10 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
     CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 1.0));
 
-    CE (helicsFederateEnterExecutionModeAsync (vFed1));
-    CE (helicsFederateEnterExecutionModeAsync (vFed2));
-    CE (helicsFederateEnterExecutionModeComplete (vFed1));
-    CE (helicsFederateEnterExecutionModeComplete (vFed2));
+    CE (helicsFederateEnterExecutingModeAsync (vFed1));
+    CE (helicsFederateEnterExecutingModeAsync (vFed2));
+    CE (helicsFederateEnterExecutingModeComplete (vFed1));
+    CE (helicsFederateEnterExecutingModeComplete (vFed2));
 
     // publish string1 at time=0.0;
     CE (helicsPublicationPublishString (pubid, "string1"));

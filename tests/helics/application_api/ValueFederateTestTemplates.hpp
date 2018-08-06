@@ -29,7 +29,7 @@ void runFederateTest (const std::string &core_type_str,
     auto subid = vFed->registerSubscription<X> ("pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->setDefaultValue<X> (subid, defaultValue);
-    vFed->enterExecutionState ();
+    vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed->publish<X> (pubid, testValue1);
 
@@ -79,7 +79,7 @@ void runFederateTestObj (const std::string &core_type_str,
     helics::SubscriptionT<X> subid (vFed.get (), "pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     subid.setDefault (defaultValue);
-    vFed->enterExecutionState ();
+    vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
     X val;
@@ -125,7 +125,7 @@ void runFederateTestv2 (const std::string &core_type_str,
     auto subid = vFed->registerSubscription<X> ("pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->setDefaultValue<X> (subid, defaultValue);
-    vFed->enterExecutionState ();
+    vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed->publish<X> (pubid, testValue1);
 
@@ -173,7 +173,7 @@ void runFederateTestObjv2 (const std::string &core_type_str,
     helics::SubscriptionT<X> subid (vFed.get (), "pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     subid.setDefault (defaultValue);
-    vFed->enterExecutionState ();
+    vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
     X val;
@@ -223,8 +223,8 @@ void runDualFederateTest (const std::string &core_type_str,
 
     fedB->setDefaultValue<X> (subid, defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
-    fedB->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     fedA->publish<X> (pubid, testValue1);
@@ -287,8 +287,8 @@ void runDualFederateTestv2 (const std::string &core_type_str,
 
     fedB->setDefaultValue<X> (subid, defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
-    fedB->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     fedA->publish<X> (pubid, testValue1);
@@ -346,8 +346,8 @@ void runDualFederateTestObj (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
-    fedB->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
@@ -408,8 +408,8 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutionState (); });
-    fedB->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);

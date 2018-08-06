@@ -29,14 +29,14 @@ enum PubSubTypes
 class ValueFederate : public virtual Federate
 {
 private:
-    std::vector<helics_input> subs;
+    std::vector<helics_input> ipts;
     std::vector<helics_publication> pubs;
   public:
     friend class helics98::FederateInfo;
 
-    explicit ValueFederate (FederateInfo &fi)
+    explicit ValueFederate (const std::string &fedname,FederateInfo &fi)
     {
-        fed = helicsCreateValueFederate (fi.getInfo());
+        fed = helicsCreateValueFederate (fedname.c_str(),fi.getInfo());
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr constructor"));
@@ -52,13 +52,13 @@ private:
         }
     }
 
-    ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
+    ValueFederate(const ValueFederate &vfed) :Federate(vfed),ipts(vfed.ipts),pubs(vfed.pubs)
     {
     }
     ValueFederate &operator=(const ValueFederate &fedObj)
     {
         Federate::operator=(fedObj);
-        subs = fedObj.subs;
+        ipts = fedObj.ipts;
         pubs = fedObj.pubs;
         if (fed == NULL)
         {
@@ -67,7 +67,7 @@ private:
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate(ValueFederate &&fedObj) :Federate(),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
+    ValueFederate(ValueFederate &&fedObj) :Federate(),ipts(std::move(fedObj.ipts)),pubs(std::move(fedObj.pubs))
     {
         Federate::operator=(std::move(fedObj));
         if (fed == NULL)
@@ -77,7 +77,7 @@ private:
     }
     ValueFederate &operator=(ValueFederate &&fedObj)
     {
-        subs = std::move(fedObj.subs);
+        ipts = std::move(fedObj.ipts);
         pubs = std::move(fedObj.pubs);
         Federate::operator=(std::move(fedObj));
         if (fed == NULL)

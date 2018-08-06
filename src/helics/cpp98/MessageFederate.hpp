@@ -17,9 +17,9 @@ namespace helics98
 class MessageFederate : public virtual Federate
 {
   public:
-    explicit MessageFederate (FederateInfo &fi)
+    explicit MessageFederate (const std::string &fedName, FederateInfo &fi)
     {
-        fed = helicsCreateMessageFederate (fi.getInfo ());
+        fed = helicsCreateMessageFederate (fedName.c_str(),fi.getInfo ());
     }
 
     explicit MessageFederate (const std::string &jsonString)

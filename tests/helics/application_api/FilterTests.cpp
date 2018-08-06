@@ -72,9 +72,9 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), cor
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
-    fFed->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -131,9 +131,9 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     Filt->addSourceTarget ("port1");
     Filt->set ("delay", 2.5);
 
-    fFed->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -193,9 +193,9 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
-    fFed->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -254,9 +254,9 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     mFed2->setFilterOperator (f1, timeOperator);
 
-    mFed1->enterExecutionStateAsync ();
-    mFed2->enterExecutionState ();
-    mFed1->enterExecutionStateComplete ();
+    mFed1->enterExecutingModeAsync ();
+    mFed2->enterExecutingMode ();
+    mFed1->enterExecutingModeComplete ();
 
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -309,9 +309,9 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
     f1->addDestinationTarget ("port2");
     f1->set ("delay", 2.5);
 
-    fFed->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -379,11 +379,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     fFed2->setFilterOperator (f2, timeOperator);
 
-    fFed->enterExecutionStateAsync ();
-    fFed2->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
-    fFed2->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    fFed2->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
+    fFed2->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -458,11 +458,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     f2->addSourceTarget ("port2");
     f2->set ("delay", 1.25);
 
-    fFed->enterExecutionStateAsync ();
-    fFed2->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
-    fFed2->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    fFed2->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
+    fFed2->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -533,9 +533,9 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator ({f1, f2}, timeOperator);
 
-    fFed->enterExecutionStateAsync ();
-    mFed->enterExecutionState ();
-    fFed->enterExecutionStateComplete ();
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -592,11 +592,11 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     cFilt.addSourceTarget ("src");
     cFilt.addDeliveryEndpoint ("cm");
 
-    sFed->enterExecutionStateAsync ();
-    dcFed->enterExecutionStateAsync ();
-    dFed->enterExecutionState ();
-    sFed->enterExecutionStateComplete ();
-    dcFed->enterExecutionStateComplete ();
+    sFed->enterExecutingModeAsync ();
+    dcFed->enterExecutingModeAsync ();
+    dFed->enterExecutingMode ();
+    sFed->enterExecutingModeComplete ();
+    dcFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');
@@ -662,13 +662,13 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     cFilt.addSourceTarget ("src2");
     cFilt.addDeliveryEndpoint ("cm");
 
-    sFed->enterExecutionStateAsync ();
-    sFed2->enterExecutionStateAsync ();
-    dcFed->enterExecutionStateAsync ();
-    dFed->enterExecutionState ();
-    sFed->enterExecutionStateComplete ();
-    sFed2->enterExecutionStateComplete ();
-    dcFed->enterExecutionStateComplete ();
+    sFed->enterExecutingModeAsync ();
+    sFed2->enterExecutingModeAsync ();
+    dcFed->enterExecutingModeAsync ();
+    dFed->enterExecutingMode ();
+    sFed->enterExecutingModeComplete ();
+    sFed2->enterExecutingModeComplete ();
+    dcFed->enterExecutingModeComplete ();
 
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::execution);
     helics::data_block data (500, 'a');

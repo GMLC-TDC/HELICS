@@ -32,7 +32,7 @@ namespace helics
 {
 namespace apps
 {
-Tracer::Tracer (FederateInfo &fi) : App (fi) { fed->setFlag (OBSERVER_FLAG); }
+Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName,fi) { fed->setFlagOption (OBSERVER_FLAG); }
 
 static const ArgDescriptors InfoArgs{
   {"tags", ArgDescriptor::arg_type_t::vector_string,
@@ -56,7 +56,7 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlag (OBSERVER_FLAG);
+        fed->setFlagOption (OBSERVER_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -70,14 +70,15 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
     }
 }
 
-Tracer::Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
+Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : App (appName,core, fi)
 {
-    fed->setFlag (OBSERVER_FLAG);
+    fed->setFlagOption (OBSERVER_FLAG);
 }
 
 Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlag (OBSERVER_FLAG);
+    fed->setFlagOption (OBSERVER_FLAG);
     loadJsonFile (jsonString);
 }
 
@@ -258,7 +259,7 @@ void Tracer::initialize ()
     {
         generateInterfaces ();
 
-        fed->enterInitializationState ();
+        fed->enterInitializingMode ();
         captureForCurrentTime (-1.0);
     }
 }
@@ -404,7 +405,7 @@ void Tracer::runTo (Time runToTime)
 
     if (state == Federate::op_states::initialization)
     {
-        fed->enterExecutionState ();
+        fed->enterExecutingMode ();
         captureForCurrentTime (0.0);
     }
 

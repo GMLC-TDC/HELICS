@@ -22,7 +22,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /**constructor taking a federate information structure and using the default core
     @param[in] fi  a federate information structure
     */
-    explicit ValueFederate (const std::string &name, const FederateInfo &fi);
+    ValueFederate (const std::string &name, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure

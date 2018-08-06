@@ -21,7 +21,7 @@ class CoreFederateInfo
   public:
     void setIntegerProperty (int propId, int propVal) { intProps.emplace_back (propId, propVal); }
     void setTimeProperty (int propId, Time propVal) {timeProps.emplace_back (propId, propVal); }
-    void setFlagOption(int flagId, bool propVal) { flagProps.emplace_back (flagId, propVal); }
+    void setFlagOption(int flagId, bool propVal=true) { flagProps.emplace_back (flagId, propVal); }
 };
 
 }  // namespace helics

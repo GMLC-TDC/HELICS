@@ -83,7 +83,7 @@ typedef enum {
 /** enumeration of possible federate states*/
 typedef enum {
     helics_startup_state = 0, /*!< when created the federate is in startup state */
-    helics_initialization_state, /*!< entered after the enterInitializationMode call has returned */
+    helics_initialization_state, /*!< entered after the enterInitializingMode call has returned */
     helics_execution_state, /*!< entered after the enterExectuationState call has returned */
     helics_finalize_state, /*!< the federate has finished executing normally final values may be retrieved */
     helics_error_state, /*!< error state no core communication is possible but values can be retrieved */

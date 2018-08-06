@@ -35,9 +35,9 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     auto sub1_b = helics::Subscription( vFed2, "pub1_b");
     auto sub2_a = helics::Subscription( vFed1, "pub2_a");
     auto sub2_b = helics::Subscription( vFed1, "pub2_b");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     auto echoRun = [&]() {helics::Time grantedTime = helics::timeZero;
     helics::Time stopTime(100, timeUnits::ns);
     while (grantedTime < stopTime)
@@ -102,11 +102,11 @@ BOOST_AUTO_TEST_CASE(ring_test3)
     auto sub1 = helics::Subscription(vFed1, "pub3");
     auto sub2 = helics::Subscription(vFed2, "pub1");
     auto sub3 = helics::Subscription(vFed3, "pub2");
-    vFed1->enterExecutionStateAsync();
-    vFed2->enterExecutionStateAsync();
-    vFed3->enterExecutionState();
-    vFed1->enterExecutionStateComplete();
-    vFed2->enterExecutionStateComplete();
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingModeAsync();
+    vFed3->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeComplete();
     pub1->publish(45.7);
     vFed1->requestTimeAsync(50.0);
     vFed2->requestTimeAsync(50.0);

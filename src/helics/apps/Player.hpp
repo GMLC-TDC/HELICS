@@ -55,12 +55,12 @@ class Player : public App
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    explicit Player (const FederateInfo &fi);
+    explicit Player (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Player (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] name the name of the app
     @param[in] jsonString file or JSON string defining the federate information and other configuration

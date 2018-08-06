@@ -31,9 +31,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label ("ci"))
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     auto sub = helics::Subscription (vFed2.get (), "pub1");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     pub->publish (0.27);
     auto res = vFed1->requestTime (2.0);
     BOOST_CHECK_EQUAL (res, 2.0);
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     auto sub = helics::Subscription (vFed2.get (), "pub1");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
 
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
@@ -88,9 +88,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
 
     auto ept1 = helics::Endpoint (helics::GLOBAL, vFed1.get (), "e1");
     auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     vFed2->requestTimeAsync (3.5);
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
@@ -122,9 +122,9 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label ("ci"))
 
     auto ept1 = helics::Endpoint (helics::GLOBAL, vFed1.get (), "e1");
     auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     vFed2->requestTimeAsync (2.0);
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change, *utf::label ("ci"))
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change, *utf::label ("ci"))
     SetupTest<helics::ValueFederate> ("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
@@ -197,9 +197,9 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
     helics::Subscription receiver (vFed2, "pub");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     auto granted1 = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (granted1, 1.0);
     sender.publish (1.0);
@@ -260,9 +260,9 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
     helics::Subscription receiver (vFed2, "pub");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     auto granted1 = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (granted1, 1.0);
     sender.publish (1.0);
@@ -328,9 +328,9 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
     helics::Subscription receiver (vFed2, "pub");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     const helics::Time endTime (8000.0);
     helics::Time currentTime = 0.0;
     while (currentTime <= endTime)
@@ -365,11 +365,11 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
     helics::Publication sender2 (helics::interface_visibility::global, vFed3, "pub2",
                                  helics::helics_type_t::helicsDouble);
     helics::Subscription receiver2 (vFed2, "pub2");
-    vFed1->enterExecutionStateAsync ();
-    vFed3->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
-    vFed3->enterExecutionStateComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed3->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
+    vFed3->enterExecutingModeComplete ();
     const helics::Time endTime (500.0);
     helics::Time currentTime = helics::timeZero;
     while (currentTime <= endTime)

@@ -365,7 +365,7 @@ void CommonCore::enterInitializingMode (federate_id_t federateID)
         m.source_id = fed->global_id.load ();
         addActionMessage (m);
 
-        auto check = fed->enterInitializationState ();
+        auto check = fed->enterInitializingMode ();
         if (check != iteration_result::next_step)
         {
             fed->init_requested = false;
@@ -562,10 +562,10 @@ void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property,
     {
         throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
     }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
+    ActionMessage cmd (CMD_FED_CONFIGURE_INT);
     cmd.messageID = property;
     cmd.counter = iterations;
-    fed->updateFederateInfo (cmd);
+    fed->setProperties (cmd);
 }
 
 void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Time time)
@@ -580,25 +580,23 @@ void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Ti
         throw (InvalidParameter ("time properties must be greater than or equal to zero"));
     }
 
-    ActionMessage cmd (CMD_FED_CONFIGURE);
+    ActionMessage cmd (CMD_FED_CONFIGURE_TIME);
     cmd.messageID = property;
     cmd.actionTime = time;
-    fed->updateFederateInfo (cmd);
+    fed->setProperties (cmd);
 }
 
-Time CommonCore::getTimeProperty (federate_id_t federateID, int32_t /*property*/) const
+Time CommonCore::getTimeProperty (federate_id_t federateID, int32_t property) const
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
-    // return fed->getTimeProperty (property);
-    // TODO:: add getTimeProperty function to federateState
-    return timeZero;
+    return fed->getTimeProperty (property);
 }
 
-int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t /*property*/) const
+int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t property) const
 {
     if (federateID == local_core_id)
     {
@@ -611,9 +609,7 @@ int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t /*prop
         {
             throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
         }
-        // return fed->getTimeProperty (property);
-        // TODO:: add getTimeProperty function to federateState
-        return 0;
+        return fed->getTimeProperty (property);
     }
 }
 
@@ -630,16 +626,22 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
             else
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
-                cmd.messageID = UPDATE_FLAG;
-                cmd.dest_id = ENABLE_INIT_ENTRY;
+                cmd.messageID = DELAY_INIT_ENTRY;
+				if (flagValue)
+				{
+                    setActionFlag (cmd, indicator_flag);
+				}
                 addActionMessage (cmd);
             }
         }
         else if (flag == ENABLE_INIT_ENTRY)
         {
             ActionMessage cmd (CMD_CORE_CONFIGURE);
-            cmd.messageID = UPDATE_FLAG;
-            cmd.dest_id = ENABLE_INIT_ENTRY;
+            cmd.messageID = ENABLE_INIT_ENTRY;
+            if (flagValue)
+            {
+                setActionFlag (cmd, indicator_flag);
+            }
             addActionMessage (cmd);
         }
         return;
@@ -650,17 +652,16 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
     {
         throw (InvalidIdentifier ("federateID not valid (setFlag)"));
     }
-    ActionMessage cmd (CMD_FED_CONFIGURE);
-    cmd.messageID = UPDATE_FLAG;
-    cmd.dest_id = flag;
+    ActionMessage cmd (CMD_FED_CONFIGURE_FLAG);
+    cmd.messageID = flag;
     if (flagValue)
     {
         setActionFlag (cmd, indicator_flag);
     }
-    fed->updateFederateInfo (cmd);
+    fed->setProperties (cmd);
 }
 
-bool CommonCore::getFlagOption (federate_id_t federateID, int32_t /*flag*/) const
+bool CommonCore::getFlagOption (federate_id_t federateID, int32_t flag) const
 {
     if (federateID == local_core_id)
     {
@@ -673,9 +674,7 @@ bool CommonCore::getFlagOption (federate_id_t federateID, int32_t /*flag*/) cons
         {
             throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
         }
-        // return fed->getFlagOption (flag);
-        // TODO:: add getTimeProperty function to federateState
-        return false;
+        return fed->getOptionFlag (flag);
 	}
 }
 
@@ -726,7 +725,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (InvalidFunctionCall ("control Inputs must be registered before calling enterInitializationMode"));
+        throw (InvalidFunctionCall ("control Inputs must be registered before calling enterInitializingMode"));
     }
     LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering CONTROL INPUT {}", key));
     auto ci = handles.read ([&key](auto &hand) { return hand.getInput (key); });
@@ -772,7 +771,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
+        throw (InvalidFunctionCall ("publications must be registered before calling enterInitializingMode"));
     }
     LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
@@ -1008,7 +1007,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     }
     if (fed->getState () != HELICS_CREATED)
     {
-        throw (InvalidFunctionCall ("endpoints must be registered before calling enterInitializationMode"));
+        throw (InvalidFunctionCall ("endpoints must be registered before calling enterInitializingMode"));
     }
     auto ept = handles.read ([&name](auto &hand) { return hand.getEndpoint (name); });
     if (ept != nullptr)
@@ -2695,8 +2694,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            auto fedInfo = fed->getInfo ();
-            if (fedInfo.observer)
+            if (fed->getOptionFlag(OBSERVER_FLAG))
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2706,7 +2704,7 @@ void CommonCore::checkDependencies ()
                 fed->addAction (rmdep);
                 isobs = true;
             }
-            else if (fed->getInfo ().source_only)
+            else if (fed->getOptionFlag (SOURCE_ONLY_FLAG))
             {
                 timeCoord->removeDependent (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENCY);
@@ -2895,9 +2893,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
 {
     switch (cmd.messageID)
     {
-    case UPDATE_FLAG:
-        if (cmd.dest_id == ENABLE_INIT_ENTRY)
-        {
+    case ENABLE_INIT_ENTRY:
             if (delayInitCounter <= 1)
             {
                 delayInitCounter = 0;
@@ -2918,10 +2914,9 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             {
                 --delayInitCounter;
             }
-        }
         break;
-    case UPDATE_LOG_LEVEL:
-        setLogLevel (cmd.dest_id);
+    case LOG_LEVEL_PROPERTY:
+        setLogLevel (cmd.counter);
         break;
     case UPDATE_LOGGING_CALLBACK:
         if (checkActionFlag (cmd, empty_flag))

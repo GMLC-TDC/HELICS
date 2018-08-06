@@ -13,16 +13,10 @@ namespace helics
 {
 static auto nullMessageFunction = [](const ActionMessage &) {};
 TimeCoordinator::TimeCoordinator () : sendMessageFunction (nullMessageFunction) {}
-TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_) : TimeCoordinator (info_, nullMessageFunction) {}
 
-TimeCoordinator::TimeCoordinator (const CoreFederateInfo &info_,
-                                  std::function<void(const ActionMessage &)> sendMessageFunction_)
-    : info (info_), sendMessageFunction (std::move (sendMessageFunction_))
+TimeCoordinator::TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_)
+    :  sendMessageFunction (std::move (sendMessageFunction_))
 {
-    if (info.timeDelta <= timeZero)
-    {
-        info.timeDelta = timeEpsilon;
-    }
     if (!sendMessageFunction)
     {
         sendMessageFunction = nullMessageFunction;
@@ -735,72 +729,118 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     }
 }
 
-void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd, bool initMode)
+/** set a timeProperty for a the coordinator*/
+void TimeCoordinator::setTimeProperty(int timeProperty, Time propertyVal)
 {
-    switch (cmd.messageID)
+    switch (timeProperty)
     {
-    case UPDATE_OUTPUT_DELAY:
-        info.outputDelay = cmd.actionTime;
+    case OUTPUT_DELAY_PROPERTY:
+        info.outputDelay = propertyVal;
         break;
-    case UPDATE_INPUT_DELAY:
-        info.inputDelay = cmd.actionTime;
+    case INPUT_DELAY_PROPERTY:
+        info.inputDelay = propertyVal;
         break;
-    case UPDATE_MINDELTA:
-        info.timeDelta = cmd.actionTime;
+    case TIME_DELTA_PROPERTY:
+        info.timeDelta = propertyVal;
         if (info.timeDelta <= timeZero)
         {
             info.timeDelta = timeEpsilon;
         }
         break;
-    case UPDATE_PERIOD:
-        info.period = cmd.actionTime;
+    case PERIOD_PROPERTY:
+        info.period = propertyVal;
         break;
-    case UPDATE_OFFSET:
-        info.offset = cmd.actionTime;
+    case OFFSET_PROPERTY:
+        info.offset = propertyVal;
         break;
-    case UPDATE_MAX_ITERATION:
-        info.maxIterations = static_cast<int16_t> (cmd.dest_id);
-        break;
-    case UPDATE_LOG_LEVEL:
-        info.logLevel = static_cast<int> (cmd.dest_id);
-        break;
-    case UPDATE_FLAG:
-        switch (cmd.dest_id)
-        {
-        case UNINTERRUPTIBLE_FLAG:
-            info.uninterruptible = checkActionFlag (cmd, indicator_flag);
-            break;
-        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
-            info.only_transmit_on_change = checkActionFlag (cmd, indicator_flag);
-            break;
-        case ONLY_UPDATE_ON_CHANGE_FLAG:
-            info.only_update_on_change = checkActionFlag (cmd, indicator_flag);
-            break;
-        case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
-            info.wait_for_current_time_updates = checkActionFlag (cmd, indicator_flag);
-            break;
-        case SOURCE_ONLY_FLAG:
-            if (initMode)
-            {
-                info.source_only = checkActionFlag (cmd, indicator_flag);
-            }
-            break;
-        case OBSERVER_FLAG:
-            if (initMode)
-            {
-                info.observer = checkActionFlag (cmd, indicator_flag);
-            }
-            break;
-        case REALTIME_FLAG:
-            if (initMode)
-            {
-                info.realtime = checkActionFlag(cmd, indicator_flag);
-            }
-            break;
-        default:
-            break;
-        }
     }
+}
+
+/** set a timeProperty for a the coordinator*/
+void TimeCoordinator::setIntegerProperty (int intProperty, int propertyVal)
+{
+	if (intProperty == MAX_ITERATIONS_PROPERTY)
+	{
+        info.maxIterations = propertyVal;
+	}
+}
+
+/** set an option Flag for a the coordinator*/
+void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
+{
+    switch (optionFlag)
+    {
+    case UNINTERRUPTIBLE_FLAG:
+        info.uninterruptible = value;
+        break;
+    case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+        info.wait_for_current_time_updates = value;
+        break;
+    default:
+        break;
+    }
+}
+/** get a time Property*/
+Time TimeCoordinator::getTimeProperty(int timeProperty) const
+{
+    switch (timeProperty)
+    {
+    case OUTPUT_DELAY_PROPERTY:
+        return info.outputDelay;
+    case INPUT_DELAY_PROPERTY:
+        return info.inputDelay;
+    case TIME_DELTA_PROPERTY:
+        return info.timeDelta;
+    case PERIOD_PROPERTY:
+        return info.period;
+    case OFFSET_PROPERTY:
+        return info.offset;
+    default:
+        return Time::minVal ();
+    }
+}
+
+/** get a time Property*/
+int TimeCoordinator::getIntegerProperty (int intProperty) const
+{
+    switch (intProperty)
+    {
+    case MAX_ITERATIONS_PROPERTY:
+        return info.maxIterations;
+    default:
+		//TODO: max this something consistent
+        return -972;
+    }
+}
+
+/** get an option flag value*/
+bool TimeCoordinator::getOptionFlag(int optionFlag) const
+{
+    switch (optionFlag)
+    {
+    case UNINTERRUPTIBLE_FLAG:
+        return info.uninterruptible;
+    case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+        return info.wait_for_current_time_updates;
+    }
+}
+
+void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
+{
+	switch (cmd.action())
+	{
+    case CMD_FED_CONFIGURE_TIME:
+        setTimeProperty (cmd.messageID, cmd.actionTime);
+        break;
+    case CMD_FED_CONFIGURE_INT:
+        setIntegerProperty (cmd.messageID, cmd.counter);
+		break;
+	case CMD_FED_CONFIGURE_FLAG:
+        setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
+        break;
+    default:
+        break;
+	}
 }
 
 }  // namespace helics

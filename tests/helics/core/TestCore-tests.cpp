@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     core->enterInitializingState (id);
 
-    core->enterExecutingState (id);
+    core->enterExecutingMode (id);
 
     core->timeRequest (id, 50.0);
     std::string str1 = "hello world";
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 
     core->enterInitializingState (id);
 
-    core->enterExecutingState (id);
+    core->enterExecutingMode (id);
 
     std::string str1 = "hello world";
     core->timeRequest (id, 50.0);
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     core->setFilterOperator (dstFilter, testDstFilter);
 
     core->enterInitializingState (id);
-    core->enterExecutingState (id);
+    core->enterExecutingMode (id);
 
     std::string msgData = "hello world";
     core->send (end1, "end2", msgData.data (), msgData.size () + 1);

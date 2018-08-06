@@ -7,6 +7,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "JsonProcessingFunctions.hpp"
 #include <fstream>
 
+bool hasJsonExtension (const std::string &jsonString)
+{
+    auto ext = jsonString.substr (jsonString.length () - 4);
+    return ((ext == "json") || (ext == "JSON") || (ext == ".jsn") || (ext == ".JSN"));
+}
+
 Json_helics::Value loadJson (const std::string &jsonString)
 {
     if (jsonString.size() > 128)
@@ -17,7 +23,7 @@ Json_helics::Value loadJson (const std::string &jsonString)
         }
         catch (const std::invalid_argument &)
         {
-            //this was an assumption lets try a file now, the same error will be generated again later as well
+            //this was a guess lets try a file now, the same error will be generated again later as well
         }
     }
     std::ifstream file (jsonString);

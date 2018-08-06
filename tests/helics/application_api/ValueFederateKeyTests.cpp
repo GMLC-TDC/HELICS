@@ -47,7 +47,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
 
     Subscription subid3 ( vFed1, "sub3", "V");
     // enter execution
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == Federate::op_states::execution);
     // check subscriptions
@@ -90,7 +90,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
 
     helics::Subscription subid (vFed1.get (), "pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish ("string1");
     auto gtime = vFed1->requestTime (1.0);
@@ -131,8 +131,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types_all)
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutionState (); });
-    vFed2->enterExecutionState ();
+    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    vFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -177,10 +177,10 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 
     auto subid = vFed1->registerSubscription<double> ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterInitializationState ();
+    vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 1.0);
 
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     // get the value set at initialization
     double val;
     vFed1->getValue (subid, val);
@@ -226,7 +226,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), 
 
     helics::data_block db (547, ';');
 
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
     BOOST_CHECK (vFed1->isUpdated (sub1));
@@ -259,7 +259,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
         lastTime = callTime;
         lastId = subid;
     });
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
     // the callback should have occurred here

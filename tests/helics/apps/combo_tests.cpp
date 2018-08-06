@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     fi.coreName = "core2";
     fi.coreInitString = "3";
     helics::apps::Recorder rec1 (fi);
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     helics::CombinationFederate mfed (fi);
@@ -48,9 +48,9 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::helics_type_t::helicsDouble);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
-    mfed2.enterExecutionStateAsync ();
-    mfed.enterExecutionState ();
-    mfed2.enterExecutionStateComplete ();
+    mfed2.enterExecutingModeAsync ();
+    mfed.enterExecutingMode ();
+    mfed2.enterExecutingModeComplete ();
     pub1.publish (3.4);
 
     mfed2.requestTimeAsync (1.0);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(save_load_file_binary)
     fi.coreName = "core3";
     fi.coreInitString = "3";
     helics::apps::Recorder rec1(fi);
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
     fi.name = "block1";
 
     helics::CombinationFederate mfed(fi); 
@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE(save_load_file_binary)
     helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::helics_type_t::helicsDouble);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
-    mfed2.enterExecutionStateAsync();
-    mfed.enterExecutionState();
-    mfed2.enterExecutionStateComplete();
+    mfed2.enterExecutingModeAsync();
+    mfed.enterExecutingMode();
+    mfed2.enterExecutingModeComplete();
     pub1.publish(3.4);
 
     mfed2.requestTimeAsync(1.0);
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core4";
     fi.coreInitString = "1";
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core5";
     fi.coreInitString = "1";
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 (fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on(
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core6";
     fi.coreInitString = "1";
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1(fi);
     auto filename = boost::filesystem::temp_directory_path() / "savefile_binary.txt";
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary2, *boost::unit_test::depends_on(
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core7";
     fi.coreInitString = "1";
-    fi.period = 1.0;
+    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1(fi);
     auto filename = boost::filesystem::temp_directory_path() / "savefile_binary.json";

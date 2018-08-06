@@ -248,7 +248,7 @@ void Federate::enterInitializingModeComplete ()
         break;
     default:
         throw (InvalidFunctionCall ("cannot call Initialization Complete function without first calling "
-                                    "enterInitializationStateAsync function"));
+                                    "enterInitializingModeAsync function"));
     }
 }
 
@@ -642,7 +642,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
         {
 
 
-            std::string name = jsonGetOrDefault(filt, "name", std::string());
+            std::string key = jsonGetOrDefault(filt, "name", std::string());
             std::string target = jsonGetOrDefault(filt, "target", std::string());
             std::string inputType = jsonGetOrDefault(filt, "inputType", std::string());
             std::string outputType = jsonGetOrDefault(filt, "outputType", std::string());
@@ -774,7 +774,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         auto &filtArray = filts->as<toml::Array> ();
         for (const auto &filt : filtArray)
         {
-            std::string name = tomlGetOrDefault (filt, "name", std::string ());
+            std::string key= tomlGetOrDefault (filt, "name", std::string ());
 			std::string target = tomlGetOrDefault (filt, "target", std::string ());
             std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());

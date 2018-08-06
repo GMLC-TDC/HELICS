@@ -33,7 +33,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -51,7 +51,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
 
     auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -82,7 +82,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     helics::PublicationT<int> pubid2 (helics::GLOBAL, vFed1.get (), "pub2");
 
     helics::Publication pubid3 (vFed1.get (), "pub3", helics::helicsType<double> (), "V");
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -113,7 +113,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     auto subid2 = vFed1->registerSubscription<int> ("sub2");
 
     auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
 
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
     // enter execution
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
     // check subscriptions
@@ -201,7 +201,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
 
     auto subid = vFed1->registerSubscription<std::string> ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
     auto gtime = vFed1->requestTime (1.0);
@@ -315,7 +315,7 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     // set subscriptions 1 and 2 to have callbacks
     vFed1->registerInputNotificationCallback ({sub1, sub2},
                                                      [&](helics::input_id_t, helics::Time) { ++ccnt; });
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
     // callbacks here
@@ -352,7 +352,7 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
     auto sub1 = vFed1->registerSubscriptionIndexed<double> ("pub1", 0);
     auto sub2 = vFed1->registerSubscriptionIndexed<double> ("pub1", 1);
     auto sub3 = vFed1->registerSubscriptionIndexed<double> ("pub1", 2);
-    vFed1->enterExecutionState ();
+    vFed1->enterExecutingMode ();
 
     vFed1->publish (pubid1, 10.0);
     vFed1->publish (pubid2, 20.0);
@@ -383,11 +383,11 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
-    vFed1->enterExecutionStateAsync ();
+    vFed1->enterExecutingModeAsync ();
     BOOST_CHECK (!vFed1->isAsyncOperationCompleted ());
-    vFed2->enterExecutionStateAsync ();
-    vFed1->enterExecutionStateComplete ();
-    vFed2->enterExecutionStateComplete ();
+    vFed2->enterExecutingModeAsync ();
+    vFed1->enterExecutingModeComplete ();
+    vFed2->enterExecutingModeComplete ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
     vFed1->requestTimeAsync (1.0);

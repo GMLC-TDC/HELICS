@@ -49,7 +49,7 @@ namespace apps
     {
     public:
         /** construct from a FederateInfo structure*/
-        explicit Recorder(FederateInfo &fi);
+      explicit Recorder (const std::string &name, FederateInfo & fi);
         /** construct from command line arguments*/
         Recorder(int argc, char *argv[]);
 
@@ -57,7 +57,7 @@ namespace apps
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
         */
-        Recorder(const std::shared_ptr<Core> &core, const FederateInfo &fi);
+        Recorder (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
         /**constructor taking a file with the required information
         @param[in] name the name of the app
         @param[in] file a file defining the federate information

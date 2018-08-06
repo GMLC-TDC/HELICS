@@ -34,7 +34,10 @@ namespace helics
 {
 namespace apps
 {
-Recorder::Recorder (FederateInfo &fi) : App (fi) { fed->setFlag (OBSERVER_FLAG); }
+Recorder::Recorder (const std::string &appName, FederateInfo &fi) : App (appName,fi)
+{
+    fed->setFlagOption (OBSERVER_FLAG);
+}
 
 static const ArgDescriptors InfoArgs{
   {"tags", ArgDescriptor::arg_type_t::vector_string,
@@ -61,7 +64,7 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlag (OBSERVER_FLAG);
+        fed->setFlagOption (OBSERVER_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -75,14 +78,15 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
     }
 }
 
-Recorder::Recorder (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
+Recorder::Recorder (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : App (appName,core, fi)
 {
-    fed->setFlag (OBSERVER_FLAG);
+    fed->setFlagOption (OBSERVER_FLAG);
 }
 
-Recorder::Recorder (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Recorder::Recorder (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
-    fed->setFlag (OBSERVER_FLAG);
+    fed->setFlagOption (OBSERVER_FLAG);
     Recorder::loadJsonFile (jsonString);
 }
 
@@ -385,10 +389,10 @@ void Recorder::initialize ()
         vStat.back ().key = val.first;
     }
 
-    fed->enterInitializationState ();
+    fed->enterInitializingMode ();
     captureForCurrentTime (-1.0);
 
-    fed->enterExecutionState ();
+    fed->enterExecutingMode ();
     captureForCurrentTime (0.0);
 }
 

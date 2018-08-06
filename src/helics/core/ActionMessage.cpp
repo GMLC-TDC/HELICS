@@ -386,7 +386,9 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_tick, "tick"},
   {action_message_def::action_t::cmd_ping, "ping"},
   {action_message_def::action_t::cmd_ping_reply, "ping reply"},
-  {action_message_def::action_t::cmd_fed_configure, "fed_configure"},
+  {action_message_def::action_t::cmd_fed_configure_time, "fed_configure_time"},
+  {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"}, 
+  {action_message_def::action_t::cmd_fed_configure_flag, "fed_configure_flag"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
   {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
@@ -519,7 +521,9 @@ std::string prettyPrintString (const ActionMessage &command)
                      static_cast<double> (command.actionTime), static_cast<double> (command.Te),
                      static_cast<double> (command.Tdemin)));
         break;
-    case CMD_FED_CONFIGURE:
+    case CMD_FED_CONFIGURE_TIME:
+    case CMD_FED_CONFIGURE_INT:
+    case CMD_FED_CONFIGURE_FLAG:
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
