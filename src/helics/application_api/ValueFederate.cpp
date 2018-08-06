@@ -368,6 +368,11 @@ std::string ValueFederate::getInputKey (input_id_t ipt_id) const
     return vfManager->getInputKey (ipt_id);
 }
 
+std::string ValueFederate::getTarget(input_id_t id) const
+{
+    return vfManager->getTarget(id);
+}
+
 input_id_t ValueFederate::getInputId (const std::string &key) const
 {
     return vfManager->getInputId (key);

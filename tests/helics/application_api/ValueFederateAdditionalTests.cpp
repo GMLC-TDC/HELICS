@@ -432,9 +432,9 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi ("test1", helics::core_type::TEST);
+    helics::FederateInfo fi ( helics::core_type::TEST);
     fi.coreInitString = "3";
-    vFed = helics::ValueFederate (fi);
+    vFed = helics::ValueFederate ("test1",fi);
     BOOST_CHECK_EQUAL (vFed.getName (), "test1");
 
     helics::ValueFederate vFedMoved (std::move (vFed));

@@ -102,6 +102,7 @@ void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
     {
         auto inpHandle = inputs.lock ();
         coreObject->addSourceTarget ((*inpHandle)[id.value ()].coreID, target);
+        //todo:: something with a multimap here
     }
     else
     {
@@ -266,6 +267,12 @@ std::vector<input_id_t> ValueFederateManager::queryUpdates ()
 }
 
 static const std::string nullStr;
+
+std::string ValueFederateManager::getTarget(input_id_t id) const
+{
+    auto inpHandle = inputs.lock_shared();
+    return (id.value() < inpHandle->size()) ? coreObject->getTarget(interface_handle(id.value()),0): nullStr;
+}
 
 std::string ValueFederateManager::getInputKey (input_id_t input_id) const
 {

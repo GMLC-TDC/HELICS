@@ -118,6 +118,9 @@ class ValueFederateManager
     */
     std::vector<input_id_t> queryUpdates ();
 
+    /** get the target of a input*/
+    std::string getTarget(input_id_t id) const;
+
     /** get the key of a subscription from its id
     @return empty string if an invalid id is passed*/
     std::string getInputKey (input_id_t id) const;

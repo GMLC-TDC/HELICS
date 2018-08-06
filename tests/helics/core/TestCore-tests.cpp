@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK_EQUAL (core->getType (pub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (pub1), "units");
 
-    core->enterInitializingState (id);
+    core->enterInitializingMode (id);
 
     core->enterExecutingMode (id);
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     auto end2 = core->registerEndpoint (id, "end2", "type");
     BOOST_CHECK_EQUAL (core->getType (end2), "type");
 
-    core->enterInitializingState (id);
+    core->enterInitializingMode (id);
 
     core->enterExecutingMode (id);
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     core->setFilterOperator (srcFilter, testSrcFilter);
     core->setFilterOperator (dstFilter, testDstFilter);
 
-    core->enterInitializingState (id);
+    core->enterInitializingMode (id);
     core->enterExecutingMode (id);
 
     std::string msgData = "hello world";

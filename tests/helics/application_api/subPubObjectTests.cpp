@@ -324,11 +324,10 @@ BOOST_AUTO_TEST_CASE(subscriptionObject_complex_vector_tests_ext)
 
 BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
 {
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate> (fi);
+    auto vFed = std::make_shared<helics::ValueFederate> ("test1",fi);
     // register the publications
     auto pubObj = helics::make_publication<double> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
@@ -367,11 +366,11 @@ BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label("ci"))
 {
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+
     fi.coreInitString = "1";
 
-    auto vFed = std::make_shared<helics::ValueFederate> (fi);
+    auto vFed = std::make_shared<helics::ValueFederate> ("test1",fi);
     // register the publications
     auto pubObj = helics::make_publication<std::string> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 

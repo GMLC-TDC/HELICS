@@ -822,6 +822,8 @@ bool TimeCoordinator::getOptionFlag(int optionFlag) const
         return info.uninterruptible;
     case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
         return info.wait_for_current_time_updates;
+    default:
+        throw(std::invalid_argument("flag not recognized"));
     }
 }
 
