@@ -33,7 +33,7 @@ const std::string core_types_single[] = {"test", "ipc", "udp"};
 #endif
 #endif
 
-typedef helics_federate (*FedCreator) (helics_federate_info_t);
+typedef helics_federate (*FedCreator) (const char *, helics_federate_info_t);
 
 struct FederateTestFixture
 {
@@ -84,7 +84,6 @@ struct FederateTestFixture
         }
 
         helics_federate_info_t fi = helicsFederateInfoCreate ();
-        CE (helicsFederateInfoSetFederateName (fi, ""));
         CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str ()));
         CE (helicsFederateInfoSetTimeProperty (fi,TIME_DELTA_PROPERTY, time_delta));
 
@@ -104,8 +103,7 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto name = name_prefix + std::to_string (ii + offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str ()));
-                auto fed = ctor (fi);
+                auto fed = ctor (name.c_str(),fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
@@ -124,8 +122,7 @@ struct FederateTestFixture
                 CE (helicsFederateInfoSetCoreName (fi, tmp));
 
                 auto name = name_prefix + std::to_string (ii + offset);
-                CE (helicsFederateInfoSetFederateName (fi, name.c_str ()));
-                auto fed = ctor (fi);
+                auto fed = ctor (name.c_str(),fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
                 helicsCoreFree (core);

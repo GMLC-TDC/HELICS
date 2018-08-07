@@ -24,7 +24,7 @@ int main(int /*argc*/,char ** /*argv*/)
   /* Create Federate Info object that describes the federate properties
    * Set federate name and core type from string
    */
-  helics98::FederateInfo fi ("TestB Federate", "zmq");
+  helics98::FederateInfo fi ("zmq");
 
   /* Federate init string */
   fi.setCoreInitString (fedinitstring);
@@ -36,7 +36,7 @@ int main(int /*argc*/,char ** /*argv*/)
   fi.setIntegerProperty (LOG_LEVEL_PROPERTY, 1);
 
   /* Create value federate */
-  helics98::ValueFederate* vfed = new helics98::ValueFederate (fi);
+  helics98::ValueFederate* vfed = new helics98::ValueFederate ("TestB Federate", fi);
   printf(" Value federate created\n");
 
   sub = vfed->registerSubscription("testA","double");

@@ -25,19 +25,16 @@ BOOST_AUTO_TEST_SUITE (combo_tests, *utf::label("ci"))
 // this is the same as another test in test recorders
 BOOST_AUTO_TEST_CASE (save_load_file1)
 {
-    helics::FederateInfo fi ("rec1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::apps::Recorder rec1 (fi);
+    helics::apps::Recorder rec1 ("rec1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
-    helics::CombinationFederate mfed (fi);
+    helics::CombinationFederate mfed ("block1",fi);
 
-    fi.name = "block2";
 
-    helics::MessageFederate mfed2 (fi);
+    helics::MessageFederate mfed2 ("block2",fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -90,18 +87,15 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
 
 BOOST_AUTO_TEST_CASE(save_load_file_binary)
 {
-    helics::FederateInfo fi("rec1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "core3";
     fi.coreInitString = "3";
-    helics::apps::Recorder rec1(fi);
+    helics::apps::Recorder rec1("rec1", fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
-    helics::CombinationFederate mfed(fi); 
-    fi.name = "block2";
+    helics::CombinationFederate mfed("block1",fi); 
 
-    helics::MessageFederate mfed2(fi);
+    helics::MessageFederate mfed2("block2",fi);
     helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
 
@@ -161,13 +155,12 @@ BOOST_AUTO_TEST_CASE(save_load_file_binary)
 
 BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
 {
-    helics::FederateInfo fi ("play1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core4";
     fi.coreInitString = "1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
-    helics::apps::Player play1 (fi);
+    helics::apps::Player play1 ("play1", fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
     play1.loadFile (filename.string ());
 
@@ -183,13 +176,12 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
 
 BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
 {
-    helics::FederateInfo fi ("play1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core5";
     fi.coreInitString = "1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
-    helics::apps::Player play1 (fi);
+    helics::apps::Player play1 ("play1",fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
     play1.loadFile (filename.string ());
 
@@ -206,13 +198,13 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
 
 BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on("combo_tests/save_load_file_binary"))
 {
-    helics::FederateInfo fi("play1");
+    helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core6";
     fi.coreInitString = "1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
-    helics::apps::Player play1(fi);
+    helics::apps::Player play1("play1",fi);
     auto filename = boost::filesystem::temp_directory_path() / "savefile_binary.txt";
     play1.loadFile(filename.string());
 
@@ -243,13 +235,13 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on(
 
 BOOST_AUTO_TEST_CASE(check_created_files_binary2, *boost::unit_test::depends_on("combo_tests/save_load_file_binary"))
 {
-    helics::FederateInfo fi("play1");
+    helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core7";
     fi.coreInitString = "1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
-    helics::apps::Player play1(fi);
+    helics::apps::Player play1("play1",fi);
     auto filename = boost::filesystem::temp_directory_path() / "savefile_binary.json";
     play1.loadFile(filename.string());
 

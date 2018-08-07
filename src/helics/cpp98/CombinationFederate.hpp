@@ -15,14 +15,14 @@ namespace helics98
 class CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
-    explicit CombinationFederate (FederateInfo &fi)
+    explicit CombinationFederate (const std::string &name, FederateInfo &fi)
     {
-        fed = helicsCreateCombinationFederate (fi.getInfo());
+        fed = helicsCreateCombinationFederate (name.c_str(),fi.getInfo());
     }
-
-    explicit CombinationFederate (const std::string &jsonString)
+    
+    explicit CombinationFederate (const std::string &configString)
     {
-        fed = helicsCreateCombinationFederateFromJson (jsonString.c_str());
+        fed = helicsCreateCombinationFederateFromJson (configString.c_str());
     }
 };
 } //namespace helics

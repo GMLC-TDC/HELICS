@@ -31,15 +31,14 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
         lastTime = static_cast<double> (tm);
         lastVal = std::stod (newval);
     };
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::apps::Tracer trace1 (fi);
-    fi.name = "block1";
+    helics::apps::Tracer trace1 ("trace1",fi);
+
     trace1.addSubscription ("pub1");
     trace1.setValueCallback (cb);
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -75,19 +74,18 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
 {
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::apps::Tracer trace1 (fi);
-    fi.name = "block1";
+    helics::apps::Tracer trace1 ("trace1",fi);
+
 
     auto cb = [&mguard, &lastTime](helics::Time tm, const std::string &, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
 
     trace1.addEndpoint ("src1");
@@ -146,20 +144,18 @@ const std::vector<std::string> simple_files{"example1.recorder", "example2.recor
 BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (simple_files), file)
 {
     static char indx = 'a';
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
 
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
     trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
-    fi.name = "block1";
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::helics_type_t::helicsDouble);
 
@@ -195,15 +191,13 @@ const std::vector<std::string> simple_message_files{"example4.recorder", "exampl
 BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::make (simple_message_files), file)
 {
     static char indx = 'a';
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1b";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
 
     trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
-    fi.name = "block1";
 
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
@@ -213,7 +207,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     auto cbm = [&mcounter](helics::Time, const std::string &, std::unique_ptr<helics::Message>) { ++mcounter; };
     trace1.setEndpointMessageCallback (cbm);
 
-    helics::CombinationFederate cfed (fi);
+    helics::CombinationFederate cfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
@@ -264,11 +258,11 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
 
-    helics::FederateInfo fi ("obj");
+    helics::FederateInfo fi;
     fi.coreType = helics::core_type::IPC;
     fi.coreInitString = "1 --broker=ipc_broker";
 
-    helics::CombinationFederate cfed (fi);
+    helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
@@ -307,24 +301,21 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
 {
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
     trace1.setClonedMessageCallback (cb);
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
 
-    fi.name = "block2";
 
-    helics::MessageFederate mfed2 (fi);
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -392,11 +383,10 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
 {
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
     fi.coreInitString = "3";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
@@ -404,13 +394,12 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     trace1.setClonedMessageCallback (cb);
 
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
 
-    fi.name = "block2";
 
-    helics::MessageFederate mfed2 (fi);
+
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -469,11 +458,10 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
 {
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core3";
     fi.coreInitString = "3";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
@@ -482,13 +470,12 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     trace1.setClonedMessageCallback (cb);
 
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
 
-    fi.name = "block2";
 
-    helics::MessageFederate mfed2 (fi);
+
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -553,20 +540,17 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     static char indx = 'a';
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
-    helics::FederateInfo fi ("trace1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core4";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "3";
-    helics::apps::Tracer trace1 (fi);
+    helics::apps::Tracer trace1 ("trace1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
-    fi.name = "block1";
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1",fi);
 
-    fi.name = "block2";
 
-    helics::MessageFederate mfed2 (fi);
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -639,11 +623,10 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
 
-    helics::FederateInfo fi ("obj");
-    fi.coreType = helics::core_type::IPC;
+    helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "1 --broker=ipc_broker";
 
-    helics::CombinationFederate cfed (fi);
+    helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");

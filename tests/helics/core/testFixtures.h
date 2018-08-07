@@ -19,18 +19,3 @@ struct federateStateTestFixture
     std::unique_ptr<helics::FederateState> fs;
 };
 
-struct coreBrokerTestFixture
-{
-    coreBrokerTestFixture ();
-    ~coreBrokerTestFixture ();
-
-    std::unique_ptr<helics::CoreBroker> broker;
-};
-
-struct commonCoreTestFixture
-{
-    commonCoreTestFixture ();
-    ~commonCoreTestFixture ();
-
-    std::unique_ptr<helics::CommonCore> core;
-};

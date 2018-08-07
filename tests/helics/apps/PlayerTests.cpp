@@ -21,18 +21,18 @@ BOOST_AUTO_TEST_SUITE (player_tests, *utf::label("ci"))
 
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
+
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1",fi);
+
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, "pub1", 0.5);
     play1.addPoint (2.0, "pub1", 0.7);
     play1.addPoint (3.0, "pub1", 0.8);
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
@@ -59,18 +59,17 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 
 BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
+
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, "pub1", "v[3.0,4.0]");
     play1.addPoint (2.0, "pub1", "0.7");
     play1.addPoint (3.0, "pub1", std::complex<double>(0.0,0.8));
     play1.addPoint (4.0, "pub1", "c[3.0+0j, 0.0-4.0j]");
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
@@ -102,18 +101,17 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 
 BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
+
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, 0, "pub1", 0.5);
     play1.addPoint (1.0, 1, "pub1", 0.7);
     play1.addPoint (1.0, 2, "pub1", 0.8);
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
@@ -144,12 +142,11 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 
 BOOST_AUTO_TEST_CASE (simple_player_test2)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
+
     play1.addPublication<double> ("pub1");
     play1.addPoint (1.0, "pub1", 0.5);
     play1.addPoint (2.0, "pub1", 0.7);
@@ -160,7 +157,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     play1.addPoint (2.0, "pub2", 0.6);
     play1.addPoint (3.0, "pub2", 0.9);
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -199,16 +196,15 @@ const std::vector<std::string> simple_files{"example1.player", "example2.player"
 BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
 {
     static char indx = 'a';
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core3";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
+
     play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -246,18 +242,16 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
 BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 {
     static char indx = 'a';
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core3";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
     play1.loadFile (std::string (TEST_DIR) + "/test_files/example_comments.player");
 
 	
     BOOST_CHECK_EQUAL (play1.pointCount (), 7);
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -304,11 +298,10 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 
     helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
-    helics::FederateInfo fi ("obj");
-    fi.coreType = helics::core_type::IPC;
+    helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "1 --broker=ipc_broker";
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("obj",fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -360,11 +353,10 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
     auto res2 = playerExe.runCaptureOutputAsync ("--name=player --core=zmq " + exampleFile);
 
-    helics::FederateInfo fi ("fed");
-    fi.coreType = helics::core_type::ZMQ;
+    helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "1";
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("fed",fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     vfed.enterExecutingMode ();
@@ -404,15 +396,13 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core7";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
     play1.loadFile (std::string (TEST_DIR) + "/test_files/example6.json");
 
-    helics::ValueFederate vfed (fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Subscription sub1 (&vfed, "pub1");
     helics::Subscription sub2 (&vfed, "pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -447,14 +437,12 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
 
 BOOST_AUTO_TEST_CASE (player_test_message)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core8";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
 
     play1.addMessage (1.0, "src", "dest", "this is a message");
@@ -478,14 +466,12 @@ BOOST_AUTO_TEST_CASE (player_test_message)
 
 BOOST_AUTO_TEST_CASE (player_test_message2)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core9";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
 
     play1.addMessage (1.0, "src", "dest", "this is a test message");
@@ -533,14 +519,12 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
 
 BOOST_AUTO_TEST_CASE (player_test_message3)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core10";
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
 
-    helics::MessageFederate mfed (fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
 
     play1.addMessage (1.0, "src", "dest", "this is a test message");
@@ -593,15 +577,14 @@ const std::vector<std::string> simple_message_files{"example_message1.player", "
 BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::make (simple_message_files), file)
 {
     static char indx = 'a';
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core11";
     fi.coreName.push_back (indx++);
     fi.coreInitString = "2";
-    helics::apps::Player play1 (fi);
-    fi.name = "block1";
+    helics::apps::Player play1 ("player1", fi);
 
-    helics::MessageFederate mfed (fi);
+
+    helics::MessageFederate mfed ("block1",fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
     play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });

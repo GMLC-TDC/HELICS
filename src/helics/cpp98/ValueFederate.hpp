@@ -142,24 +142,15 @@ private:
     }
 
     /** Methods to register subscriptions **/
-    Subscription
+    Input
     registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
     {
         helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
-        subs.push_back(sub);
+        ipts.push_back(sub);
         return Subscription(sub);
     }
 
-    /** Methods to register subscriptions **/
-    Subscription
-        registerOptionalSubscription(const std::string &name, const std::string &type, const std::string &units = "")
-    {
-        helics_input sub = helicsFederateRegisterOptionalSubscription(fed, name.c_str(), type.c_str(), units.c_str());
-        subs.push_back(sub);
-        return Subscription(sub);
-    }
-
-    Subscription
+    Input
     registerTypeSubscription (const std::string &name, int type, const std::string &units = "")
     {
         helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
@@ -167,14 +158,14 @@ private:
         return Subscription(sub);
     }
 
-    Subscription
+    Input
     registerSubscriptionIndexed (const std::string &name, int index1, int type, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
         return registerTypeSubscription (indexed_name, type, units);
     }
 
-    Subscription
+    Input
     registerSubscriptionIndexed (const std::string &name,
                                          int index1,
                                          int index2,
@@ -185,9 +176,9 @@ private:
         return registerTypeSubscription (indexed_name, type, units);
     }
 
-    int getSubscriptionCount() const
+    int getInputCount() const
     {
-        return helicsFederateGetSubscriptionCount(fed);
+        return helicsFederateGetInputCount(fed);
     }
 
     int getPublicationCount() const

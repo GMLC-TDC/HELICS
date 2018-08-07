@@ -33,7 +33,7 @@ typedef enum {
     helics_error /*!< the function produced an error */
 } helics_status;
 
-/** opaque object representing a subscription*/
+/** opaque object representing an input*/
 typedef void *helics_input;
 /** opaque object representing a publication*/
 typedef void *helics_publication;
