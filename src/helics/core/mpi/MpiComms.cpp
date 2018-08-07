@@ -35,7 +35,7 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case CLOSE_RECEIVER:
             return (-1);
@@ -65,7 +65,7 @@ void MpiComms::queue_rx_function ()
 
             if (isProtocolCommand (M.value ()))
             {
-                if (M->index == CLOSE_RECEIVER)
+                if (M->messageID == CLOSE_RECEIVER)
                 {
                     goto CLOSE_RX_LOOP;
                 }
@@ -97,7 +97,7 @@ void MpiComms::queue_tx_function ()
 
     std::map<int, std::string> routes;  // for all the other possible routes
 
-    if (brokerAddress != "")
+    if (!brokerAddress.empty())
     {
         hasBroker = true;
     }
@@ -113,7 +113,7 @@ void MpiComms::queue_tx_function ()
         {
             if (route_id == -1)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
@@ -183,7 +183,7 @@ void MpiComms::closeReceiver ()
 {
     shutdown = true;
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
+    cmd.messageID = CLOSE_RECEIVER;
     rxMessageQueue.push (cmd);
 }
 }  // namespace mpi

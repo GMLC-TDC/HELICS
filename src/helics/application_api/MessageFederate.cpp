@@ -13,14 +13,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-MessageFederate::MessageFederate (const std::string &name, const FederateInfo &fi) : Federate (name,fi)
+MessageFederate::MessageFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName,fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
-MessageFederate::MessageFederate (const std::string &name,
+MessageFederate::MessageFederate (const std::string &fedName,
                                   const std::shared_ptr<Core> &core,
                                   const FederateInfo &fi)
-    : Federate (name,core, fi)
+    : Federate (fedName,core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
 }
@@ -30,8 +30,8 @@ MessageFederate::MessageFederate (const std::string &configString) : Federate (s
     MessageFederate::registerInterfaces (configString);
 }
 
-MessageFederate::MessageFederate (const std::string &name, const std::string &configString)
-    : Federate (name,loadFederateInfo (configString))
+MessageFederate::MessageFederate (const std::string &fedName, const std::string &configString)
+    : Federate (fedName,loadFederateInfo (configString))
 {
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
     MessageFederate::registerInterfaces (configString);

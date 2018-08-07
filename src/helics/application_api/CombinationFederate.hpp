@@ -20,12 +20,12 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a federate information structure and using the default core
     @param fi  a federate information structure
     */
-    explicit CombinationFederate (const std::string &name, const FederateInfo &fi);
+    explicit CombinationFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    CombinationFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    CombinationFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */

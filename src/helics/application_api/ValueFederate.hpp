@@ -27,7 +27,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
-    ValueFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    ValueFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] configString can be either a json file a toml file (with extension toml) or a string containing json code
     */
@@ -35,7 +35,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /**constructor taking a string with the required information
     @param[in] configString can be either a json file a toml file (with extension toml) or a string containing json code
     */
-    ValueFederate (const std::string &name, const std::string &configString);
+    ValueFederate (const std::string &fedName, const std::string &configString);
 
     /** default constructor*/
     explicit ValueFederate ();
@@ -151,14 +151,21 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     input_id_t registerGlobalInput (const std::string &key,
                                                 const std::string &type,
                                                 const std::string &units = std::string ());
-    /** register a subscription
-    @details call is only valid in startup mode
+    /** register a named input
     */
     template <typename X>
     input_id_t
-    registerInput(const std::string &name, const std::string &units = std::string ())
+    registerInput(const std::string &key, const std::string &units = std::string ())
     {
-        return registerInput (name, ValueConverter<X>::type (), units);
+        return registerInput (key, ValueConverter<X>::type (), units);
+    }
+    /** register a global named input
+    */
+    template <typename X>
+    input_id_t
+        registerGlobalInput(const std::string &key, const std::string &units = std::string())
+    {
+        return registerGlobalInput(key, ValueConverter<X>::type(), units);
     }
 
     /** register a required subscription

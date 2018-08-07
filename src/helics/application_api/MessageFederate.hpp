@@ -19,12 +19,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /**constructor taking a federate information structure and using the default core
     @param[in] fi  a federate information structure
     */
-    explicit MessageFederate (const std::string &name, const FederateInfo &fi);
+    explicit MessageFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
-    MessageFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    MessageFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
     @param[in] configString can be either a json file, toml file or a string containing json code
     */
