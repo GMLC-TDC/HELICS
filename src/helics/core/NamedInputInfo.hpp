@@ -57,9 +57,11 @@ class NamedInputInfo
 
   public:
     /** get all the current data*/
-    std::vector<std::shared_ptr<const data_block>> getData ();
+    std::vector<std::shared_ptr<const data_block>> getAllData ();
     /** get a particular data input*/
     std::shared_ptr<const data_block> getData (int index);
+    /** get a the most recent data point*/
+    std::shared_ptr<const data_block> getData();
     /** add a data block into the queue*/
     void addData (global_handle source_handle,
                   Time valueTime,

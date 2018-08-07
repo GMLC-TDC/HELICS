@@ -84,7 +84,6 @@ struct FederateTestFixture_cpp
         }
 
         helics98::FederateInfo fi;
-        fi.setFederateName ("");
 
         fi.setCoreTypeFromString (core_type_name);
         fi.setTimeProperty (TIME_DELTA_PROPERTY, time_delta);
@@ -102,8 +101,7 @@ struct FederateTestFixture_cpp
             for (int ii = 0; ii < count; ++ii)
             {
                 auto name = name_prefix + std::to_string (ii + offset);
-                fi.setFederateName (name);
-                auto fed = std::make_shared<FedType> (fi);
+                auto fed = std::make_shared<FedType> (name,fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }
@@ -120,8 +118,7 @@ struct FederateTestFixture_cpp
                 fi.setCoreName (core.getIdentifier ());
 
                 auto name = name_prefix + std::to_string (ii + offset);
-                fi.setFederateName (name);
-                auto fed = std::make_shared<FedType> (fi);
+                auto fed = std::make_shared<FedType> (name,fi);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
             }

@@ -31,7 +31,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
-    helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
+    helicsFederateRegisterGlobalEndpoint (mFed, "port1","");
     helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL);
 
     auto f1 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter1");
@@ -42,7 +42,8 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     BOOST_CHECK (f2 != f1);
     auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "");
     BOOST_CHECK (ep1 != NULL);
-    auto f3 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "", "filter0/fout");
+    auto f3 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "");
+    helicsFilterAddSourceTarget(f3, "filter0/fout");
     BOOST_CHECK (f3 != f2);
     CE (helicsFederateFinalize (mFed));
     CE (helicsFederateFinalize (fFed));
@@ -65,10 +66,11 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", nullptr);
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
 
-    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
+    CE(helicsFilterAddSourceTarget(f1, "port1"));
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5));
 
@@ -132,11 +134,14 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
 
-    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
+    CE(helicsFilterAddSourceTarget(f1, "port1"));
+
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 1.25));
 
-    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter2");
+    auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter2");
+    CE(helicsFilterAddSourceTarget(f1, "port1"));
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 1.25));
 
@@ -210,11 +215,13 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
 
-    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port1", "filter1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
+    helicsFilterAddSourceTarget(f1, "port1");
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5));
 
-    auto f2 = helicsFederateRegisterSourceFilter (fFed, helics_delay_filter, "port2", "filter2");
+    auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter,"filter2");
+    helicsFilterAddSourceTarget(f2, "port2");
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 2.5));
 

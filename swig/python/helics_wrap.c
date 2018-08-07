@@ -5422,12 +5422,12 @@ SWIGINTERN PyObject *_wrap_helicsFederateEnterInitializationMode(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterInitializationMode",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateEnterInitializingMode",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationMode(arg1);
+  result = (helics_status)helicsFederateEnterInitializingMode(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -9912,7 +9912,7 @@ static PyMethodDef SwigMethods[] = {
 		"are closed properly if possible this should be the last call before exiting,\n"
 		"\n"
 		""},
-	 { (char *)"helicsFederateEnterInitializationMode", _wrap_helicsFederateEnterInitializationMode, METH_VARARGS, (char *)"\n"
+	 { (char *)"helicsFederateEnterInitializingMode", _wrap_helicsFederateEnterInitializationMode, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
 		"enter the initialization state of a federate\n"

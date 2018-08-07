@@ -1684,7 +1684,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateEnterInitia
   (void)jenv;
   (void)jcls;
   arg1 = *(helics_federate *)&jarg1; 
-  result = (helics_status)helicsFederateEnterInitializationMode(arg1);
+  result = (helics_status)helicsFederateEnterInitializingMode(arg1);
   jresult = (jint)result; 
   return jresult;
 }

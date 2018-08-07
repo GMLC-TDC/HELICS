@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Federate.hpp"
 #include "../shared_api_library/ValueFederate.h"
 #include "Publication.hpp"
-#include "Subscription.hpp"
+#include "Input.hpp"
 #include <sstream>
 #include <exception>
 
@@ -43,12 +43,12 @@ private:
         }
     }
 
-    explicit ValueFederate (const std::string &jsonString)
+    explicit ValueFederate (const std::string &configString)
     {
-        fed = helicsCreateValueFederateFromJson (jsonString.c_str());
+        fed = helicsCreateValueFederateFromConfig(configString.c_str());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr create from json"));
+            throw(std::runtime_error("fed==nullptr create from configuration file"));
         }
     }
 
@@ -92,37 +92,37 @@ private:
 
     /** Methods to register publications **/
     Publication
-    registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
+    registerTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr reg pub"));
         }
-        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type.c_str(), units.c_str());
         pubs.push_back(pub);
         return Publication(pub);
     }
 
     Publication
-    registerTypePublication (const std::string &name, int type, const std::string &units = "")
+    registerPublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type, units.c_str());
         pubs.push_back(pub);
         return Publication(pub);
     }
 
     Publication
-    registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "")
+    registerGlobalTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalPublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type.c_str(), units.c_str());
         pubs.push_back(pub);
         return Publication(pub);
     }
 
     Publication
-    registerGlobalTypePublication (const std::string &name, int type, const std::string &units = "")
+    registerGlobalPublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub = helicsFederateRegisterGlobalPublication (fed, name.c_str(), type, units.c_str());
         pubs.push_back(pub);
         return Publication(pub);
     }
@@ -131,14 +131,14 @@ private:
     registerPublicationIndexed (const std::string &name, int index1, int type, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
-        return registerGlobalTypePublication (indexed_name, type, units);
+        return registerGlobalPublication (indexed_name, type, units);
     }
 
     Publication
     registerPublicationIndexed (const std::string &name, int index1, int index2,int type, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
-        return registerGlobalTypePublication (indexed_name, type, units);
+        return registerGlobalPublication (indexed_name, type, units);
     }
 
     /** Methods to register subscriptions **/
@@ -147,22 +147,22 @@ private:
     {
         helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), units.c_str());
         ipts.push_back(sub);
-        return Subscription(sub);
+        return Input(sub);
     }
 
     Input
     registerTypeSubscription (const std::string &name, const std::string &type, const std::string &units = "")
     {
         helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type.c_str(), units.c_str());
-        subs.push_back(sub);
-        return Subscription(sub);
+        ipts.push_back(sub);
+        return Input(sub);
     }
 
     Input
     registerSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
-        return registerTypeSubscription (indexed_name, type, units);
+        return registerSubscription (indexed_name, units);
     }
 
     Input
@@ -172,7 +172,7 @@ private:
                                          const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
-        return registerTypeSubscription (indexed_name, units);
+        return registerSubscription (indexed_name, units);
     }
 
     int getInputCount() const

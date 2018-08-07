@@ -23,12 +23,12 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     
     // register the publications
 
-    helicsFederateRegisterGlobalPublication(vFed1, "pub1", "double", "");
-    helicsFederateRegisterTypePublication(vFed1, "pub2", "double");
-    helicsFederateRegisterTypePublication(vFed2, "pub3", "double");
-    CE(helicsFederateEnterInitializationModeAsync(vFed1));
-    CE(helicsFederateEnterInitializationMode(vFed2));
-    CE(helicsFederateEnterInitializationModeComplete(vFed1));
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "double", "");
+    helicsFederateRegisterTypePublication(vFed1, "pub2", "double","");
+    helicsFederateRegisterTypePublication(vFed2, "pub3", "double","");
+    CE(helicsFederateEnterInitializingModeAsync(vFed1));
+    CE(helicsFederateEnterInitializingMode(vFed2));
+    CE(helicsFederateEnterInitializingModeComplete(vFed1));
 
     auto core = helicsFederateGetCoreObject(vFed1);
 

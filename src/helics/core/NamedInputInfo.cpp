@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getData ()
+std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData ()
 {
     std::vector<std::shared_ptr<const data_block>> out;
     out.reserve (current_data.size ());
@@ -18,6 +18,36 @@ std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getData ()
         out.push_back (cd.data);
     }
     return out;
+}
+
+std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
+{
+    if (isValidIndex(index, current_data))
+    {
+        return current_data[index].data;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<const data_block> NamedInputInfo::getData()
+{
+    int ind = 0;
+    int mxind = -1;
+    Time mxTime = Time::minVal();
+    for (auto &cd : current_data)
+    {
+        if (cd.time < mxTime)
+        {
+            mxTime = cd.time;
+            mxind = ind;
+        }
+        ++ind;
+    }
+    if (mxind>=0)
+    {
+        return current_data[mxind].data;
+    }
+    return nullptr;
 }
 
 static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const NamedInputInfo::dataRecord &rec2) {

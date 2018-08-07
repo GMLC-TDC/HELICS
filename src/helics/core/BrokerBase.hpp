@@ -50,7 +50,7 @@ class BrokerBase
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
     bool dumplog = false;  //!< flag indicating the broker should capture a dump log
-
+    bool queueDisabled = false; //!< flag indicating that the message queue should not be used and all functions called directly instaed of distinct thread
   protected:
     std::string logFile;  //< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
@@ -76,11 +76,12 @@ class BrokerBase
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
+    
   public:
     /** display help messages for the broker*/
     static void displayHelp ();
-    BrokerBase () noexcept;
-    explicit BrokerBase (const std::string &broker_name);
+    explicit BrokerBase (bool DisableQueue=false) noexcept;
+    explicit BrokerBase (const std::string &broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase ();
 

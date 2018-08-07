@@ -33,13 +33,13 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     FederateTestFixture fixture;
     fixture.SetupTest (helicsCreateValueFederate, core_type.c_str (), 1);
     auto vFed1 = fixture.GetFederateAt (0);
-    auto pubid1 = helicsFederateRegisterPublication (vFed1, "pub1", "string", "");
+    auto pubid1 = helicsFederateRegisterTypePublication (vFed1, "pub1", "string", "");
     BOOST_CHECK (pubid1 != nullptr);
-    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", "integer", "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", "integer", "");
     BOOST_CHECK (pubid2 != nullptr);
-    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "", "");
+    auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", "", "");
     BOOST_CHECK (pubid3 != nullptr);
-    auto sub1 = helicsFederateRegisterOptionalSubscription (vFed1, "fed0/pub3", "", "");
+    auto sub1 = helicsFederateRegisterSubscription (vFed1, "fed0/pub3", "");
     CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
 
     CE (helicsFederateEnterExecutingMode (vFed1));
@@ -49,13 +49,13 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 
     BOOST_CHECK (helicsInputIsUpdated (sub1));
 
-    int len1 = helicsInputGetValueSize (sub1);
+    int len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
     CE (helicsInputGetRawValue (sub1, val, 600, &actualLen));
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    len1 = helicsInputGetValueSize (sub1);
+    len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
 
@@ -79,7 +79,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 
     // register the publications
     auto pubid = helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, nullptr);
-    auto subid = helicsFederateRegisterSubscription (vFed2, "pub1", "string", "");
+    auto subid = helicsFederateRegisterSubscription (vFed2, "pub1", "");
     CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
     CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 1.0));
 
@@ -137,11 +137,11 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     char s[100] = "";
     // fi = helicsCreateFederateInfo();
     // path of the json file is hardcoded for now
-    vFed = helicsCreateValueFederateFromJson (TEST_DIR "/test_files/example_value_fed.json");
+    vFed = helicsCreateValueFederateFromConfig (TEST_DIR "/test_files/example_value_fed.json");
     BOOST_REQUIRE (vFed != nullptr);
     CE (helicsFederateGetName (vFed, s, 100));
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (helicsFederateGetSubscriptionCount (vFed), 2);
+    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed), 2);
     BOOST_CHECK_EQUAL (helicsFederateGetPublicationCount (vFed), 2);
     //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     CE (helicsFederateFinalize (vFed));

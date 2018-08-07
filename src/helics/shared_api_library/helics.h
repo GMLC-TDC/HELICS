@@ -297,7 +297,7 @@ the execution state
 This is a blocking call and will block until the core allows it to proceed
 */
 HELICS_EXPORT helics_status helicsFederateEnterInitializingMode (helics_federate fed);
-/** non blocking alternative to @helicsFederateEnterInitializationMode
+/** non blocking alternative to @helicsFederateEnterInitializingMode
 the function helicsFederateEnterInitializationModeFinalize must be called to finish the operation
 */
 HELICS_EXPORT helics_status helicsFederateEnterInitializingModeAsync (helics_federate fed);

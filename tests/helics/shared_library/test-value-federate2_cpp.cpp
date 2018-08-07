@@ -35,13 +35,13 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     BOOST_TEST_CHECKPOINT("calling get federate");
     auto vFed1 = GetFederateAs<helics98::ValueFederate> (0);
     BOOST_REQUIRE((vFed1));
-    auto pubid1 = vFed1->registerPublication ("pub1", "string", "");
+    auto pubid1 = vFed1->registerTypePublication ("pub1", "string", "");
     BOOST_CHECK (pubid1.baseObject () != nullptr);
-    auto pubid2 = vFed1->registerGlobalPublication ("pub2", "integer", "");
+    auto pubid2 = vFed1->registerGlobalPublication ("pub2", HELICS_DATA_TYPE_INT, "");
     BOOST_CHECK (pubid2.baseObject () != nullptr);
-    auto pubid3 = vFed1->registerPublication ("pub3", "", "");
+    auto pubid3 = vFed1->registerTypePublication ("pub3", "");
     BOOST_CHECK (pubid3.baseObject () != nullptr);
-    auto sub1 = vFed1->registerOptionalSubscription ("fed0/pub3", "", "");
+    auto sub1 = vFed1->registerSubscription ("fed0/pub3");
     BOOST_TEST_CHECKPOINT("reg opt1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     BOOST_TEST_CHECKPOINT("set Delta");
@@ -53,14 +53,14 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK (sub1.isUpdated ());
 
-    int len1 = sub1.getValueSize ();
+    int len1 = sub1.getRawValueSize ();
 
     BOOST_CHECK_EQUAL (len1, len);
     std::vector<char> rawdata;
     int actualLen = sub1.getRawValue (rawdata);
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    len1 = sub1.getValueSize ();
+    len1 = sub1.getRawValueSize ();
 
     BOOST_CHECK_EQUAL (len1, len);
 
@@ -79,8 +79,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     auto vFed2 = GetFederateAs<helics98::ValueFederate> (1);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalTypePublication ("pub1", HELICS_DATA_TYPE_STRING, "");
-    auto subid = vFed2->registerSubscription ("pub1", "string", "");
+    auto pubid = vFed1->registerGlobalPublication ("pub1", HELICS_DATA_TYPE_STRING, "");
+    auto subid = vFed2->registerSubscription ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 

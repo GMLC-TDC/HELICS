@@ -22,9 +22,9 @@ class MessageFederate : public virtual Federate
         fed = helicsCreateMessageFederate (fedName.c_str(),fi.getInfo ());
     }
 
-    explicit MessageFederate (const std::string &jsonString)
+    explicit MessageFederate (const std::string &configString)
     {
-        fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
+        fed = helicsCreateMessageFederateFromConfig (configString.c_str());
     }
 
     // Default constructor, not meant to be used
@@ -53,9 +53,9 @@ class MessageFederate : public virtual Federate
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    uint64_t receiveCount () const
+    uint64_t pendingMessages () const
     {
-        return helicsFederateReceiveCount (fed);
+        return helicsFederatePendingMessages(fed);
     }
 
     /** Get a packet for any endpoints in the federate **/

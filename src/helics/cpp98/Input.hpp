@@ -92,7 +92,7 @@ public:
 
     std::string getString()
     {
-        int size = helicsInputGetValueSize(inp);
+        int size = helicsInputGetStringSize(inp);
         std::string result;
 
         result.resize(size+1);
@@ -111,7 +111,7 @@ public:
 
     void getNamedPoint(std::string &name,double *val)
     {
-        int size = helicsInputGetValueSize(inp);
+        int size = helicsInputGetStringSize(inp);
 
         name.resize(size + 1);
         //this function results in a null terminated string

@@ -22,7 +22,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     
     explicit CombinationFederate (const std::string &configString)
     {
-        fed = helicsCreateCombinationFederateFromJson (configString.c_str());
+        fed = helicsCreateCombinationFederateFromConfig (configString.c_str());
     }
 };
 } //namespace helics

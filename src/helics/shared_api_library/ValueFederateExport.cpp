@@ -450,7 +450,7 @@ helics_status helicsPublicationPublishNamedPoint (helics_publication pub, const 
     }
 }
 
-int helicsInputGetValueSize (helics_input inp)
+int helicsInputGetRawValueSize (helics_input inp)
 {
     if (inp == nullptr)
     {
@@ -1324,7 +1324,7 @@ int helicsFederateGetPublicationCount (helics_federate fed)
     return static_cast<int> (vfedObj->getPublicationCount ());
 }
 
-int helicsFederateGetSubscriptionCount (helics_federate fed)
+int helicsFederateGetInputCount (helics_federate fed)
 {
     if (fed == nullptr)
     {

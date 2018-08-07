@@ -271,7 +271,7 @@ class VectorSubscription2d
         {
             for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
             {
-                    auto id = fed->registerRequiredSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
+                    auto id = fed->registerSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
                     ids.push_back (id);
             }
         }
@@ -282,7 +282,7 @@ class VectorSubscription2d
             {
                 for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
                 {
-                    auto id = fed->registerOptionalSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
+                    auto id = fed->registerSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
                     ids.push_back (id);
                 }
             }
@@ -291,7 +291,7 @@ class VectorSubscription2d
         indices[1] = count_x;
         indices[2] = startIndex_y;
         indices[3] = count_y;
-        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     }
@@ -332,7 +332,7 @@ class VectorSubscription2d
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals)), indices (vs.indices)
     {
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
     };
@@ -347,7 +347,7 @@ class VectorSubscription2d
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerSubscriptionNotificationCallback (ids, [this](input_id_t id, Time tm) {
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
             handleCallback (id, tm);
         });
         indices = vs.indices;

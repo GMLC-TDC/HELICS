@@ -21,7 +21,7 @@ int main (int /*argc*/, char ** /*argv*/)
     std::string fedinitstring = "--broker=mainbroker --federates=1";
     double deltat = 0.01;
     helics98::Publication pub;
-    helics98::Subscription sub;
+    helics98::Input sub;
 
     std::string helicsversion = helics98::getHelicsVersionString();
 
@@ -52,10 +52,10 @@ int main (int /*argc*/, char ** /*argv*/)
     printf (" Value federate created\n");
 
     /* Register the publication */
-    pub = vfed->registerGlobalPublication ("testA", "double");
+    pub = vfed->registerGlobalTypePublication ("testA", "double");
     printf (" Publication registered\n");
 
-    sub = vfed->registerSubscription ("testB", "double");
+    sub = vfed->registerSubscription ("testB");
     printf (" Subscription registered\n");
 
     /* Register the subscription */

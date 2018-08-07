@@ -95,13 +95,6 @@ class Core
         return result;
     }
 
-    Filter registerSourceFilter(helics_filter_type_t type,
-        const std::string &target,
-        const std::string &name = std::string())
-    {
-        return Filter(helicsCoreRegisterSourceFilter(core, type, target.c_str(), name.c_str()));
-    }
-
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
     a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
@@ -111,11 +104,10 @@ class Core
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
     */
-    Filter registerDestinationFilter(helics_filter_type_t type,
-        const std::string &target,
+    Filter registerFilter(helics_filter_type_t type,
         const std::string &name = std::string())
     {
-        return Filter(helicsCoreRegisterDestinationFilter(core, type, target.c_str(), name.c_str()));
+        return Filter(helicsCoreRegisterFilter(core, type, name.c_str()));
     }
 
     /** create a cloning Filter on the specified federate
@@ -129,6 +121,7 @@ class Core
     {
         return CloningFilter(helicsCoreRegisterCloningFilter(core, deliveryEndpoint.c_str()));
     }
+
   protected:
     helics_core core;
 };

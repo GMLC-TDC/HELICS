@@ -52,15 +52,21 @@ static inline std::string genId ()
 
 namespace helics
 {
-BrokerBase::BrokerBase () noexcept {}
+BrokerBase::BrokerBase (bool DisableQueue) noexcept:queueDisabled(DisableQueue){}
 
-BrokerBase::BrokerBase (const std::string &broker_name) : identifier (broker_name) {}
+BrokerBase::BrokerBase (const std::string &broker_name, bool DisableQueue) : identifier (broker_name), queueDisabled(DisableQueue) {}
 
-BrokerBase::~BrokerBase () { joinAllThreads (); }
+BrokerBase::~BrokerBase() 
+{
+    if (!queueDisabled)
+    {
+        joinAllThreads();
+    }
+}
 
 void BrokerBase::joinAllThreads ()
 {
-    if (queueProcessingThread.joinable ())
+    if ((!queueDisabled) &&(queueProcessingThread.joinable ()))
     {
         actionQueue.push (CMD_TERMINATE_IMMEDIATELY);
         queueProcessingThread.join ();

@@ -43,10 +43,10 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
 
-    auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", "string", "");
-    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", "int", "");
+    auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", "int", "");
 
-    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
+    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V");
     CE (helicsFederateEnterExecutingMode (vFed1));
 
     federate_state state;
@@ -83,9 +83,9 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
 
-    auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "");
-    auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V");
+    auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
+    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "");
+    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V");
     CE (helicsFederateEnterExecutingMode (vFed1));
 
     federate_state state;
@@ -122,10 +122,10 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
 
-    auto subid = helicsFederateRegisterOptionalSubscription (vFed1, "sub1", "double", "V");
-    auto subid2 = helicsFederateRegisterOptionalTypeSubscription (vFed1, "sub2", HELICS_DATA_TYPE_INT, "");
+    auto subid = helicsFederateRegisterTypeSubscription (vFed1, "sub1", "double", "V");
+    auto subid2 = helicsFederateRegisterSubscription (vFed1, "sub2", "");
 
-    auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
+    auto subid3 = helicsFederateRegisterTypeSubscription (vFed1, "sub3", "double", "V");
     CE (helicsFederateEnterExecutingMode (vFed1));
 
     federate_state state;
@@ -169,15 +169,15 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto vFed1 = GetFederateAt (0);
 
     // register the publications
-    auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "");
+    auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
+    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "");
 
-    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
+    auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", "double", "V");
 
-    auto subid = helicsFederateRegisterOptionalSubscription (vFed1, "sub1", "double", "V");
-    auto subid2 = helicsFederateRegisterOptionalTypeSubscription (vFed1, "sub2", HELICS_DATA_TYPE_INT, "");
+    auto subid = helicsFederateRegisterTypeSubscription (vFed1, "sub1", "double", "V");
+    auto subid2 = helicsFederateRegisterSubscription (vFed1, "sub2", "");
 
-    auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
+    auto subid3 = helicsFederateRegisterTypeSubscription (vFed1, "sub3", "double", "V");
     // enter execution
     CE (helicsFederateEnterExecutingMode (vFed1));
 
@@ -233,8 +233,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     auto vFed = GetFederateAt (0);
 
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_STRING, "");
-    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "string", nullptr);
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_STRING, "");
+    auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "string", nullptr);
 
     CE (helicsFederateEnterExecutingMode (vFed));
 
@@ -285,7 +285,7 @@ void runFederateTestDouble (const char *core, double defaultValue, double testVa
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "");
     auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "double", "");
     CE (helicsInputSetDefaultDouble (subid, defaultValue));
 
@@ -338,8 +338,8 @@ void runFederateTestComplex (const char *core,
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_COMPLEX, "");
-    auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "double", "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_COMPLEX, "");
+    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "");
     CE (helicsInputSetDefaultComplex (subid, defaultValue_r, defaultValue_i));
 
     CE (helicsFederateEnterExecutingMode (vFed));
@@ -389,7 +389,7 @@ void runFederateTestInteger (const char *core, int64_t defaultValue, int64_t tes
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_INT, "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_INT, "");
     auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "int", "");
     CE (helicsInputSetDefaultDouble (subid, defaultValue));
     CE (helicsFederateEnterExecutingMode (vFed));
@@ -435,7 +435,7 @@ void runFederateTestBool (const char *core, bool defaultValue, bool testValue1, 
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_BOOLEAN, "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_BOOLEAN, "");
     auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "bool", "");
     CE (helicsInputSetDefaultDouble (subid, defaultValue ? helics_true : helics_false));
     CE (helicsFederateEnterExecutingMode (vFed));
@@ -543,7 +543,7 @@ void runFederateTestVectorD (const char *core,
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the interfaces
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_VECTOR, "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_VECTOR, "");
     auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "vector", "");
     CE (helicsInputSetDefaultVector (subid, defaultValue, len));
     CE (helicsFederateEnterExecutingMode (vFed));
@@ -634,7 +634,7 @@ void runFederateTestNamedPoint (const char *core,
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt (0);
     // register the publications
-    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", HELICS_DATA_TYPE_NAMEDPOINT, "");
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_NAMEDPOINT, "");
     auto subid = helicsFederateRegisterTypeSubscription (vFed, "pub1", "named_point", "");
     CE (helicsInputSetDefaultNamedPoint (subid, defaultValue, defVal));
 
@@ -753,14 +753,14 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     auto vFed = GetFederateAt (0);
 
     // register the publications
-    pubid = helicsFederateRegisterPublication (vFed, "pub1", "", "");
-    pubid2 = helicsFederateRegisterGlobalPublication (vFed, "pub2", "int", "");
-    pubid3 = helicsFederateRegisterPublication (vFed, "pub3", "double", "V");
+    pubid = helicsFederateRegisterTypePublication (vFed, "pub1", "", "");
+    pubid2 = helicsFederateRegisterGlobalTypePublication (vFed, "pub2", "int", "");
+    pubid3 = helicsFederateRegisterPublication (vFed, "pub3", HELICS_DATA_TYPE_DOUBLE, "V");
 
     // these aren't meant to match the publications
-    subid = helicsFederateRegisterOptionalSubscription (vFed, "sub1", "", "");
-    subid2 = helicsFederateRegisterOptionalSubscription (vFed, "sub2", "int", "");
-    subid3 = helicsFederateRegisterOptionalSubscription (vFed, "sub3", "", "V");
+    subid = helicsFederateRegisterSubscription (vFed, "sub1", "");
+    subid2 = helicsFederateRegisterTypeSubscription (vFed, "sub2", "int", "");
+    subid3 = helicsFederateRegisterSubscription (vFed, "sub3", "V");
 
     // enter execution
     CE (helicsFederateEnterExecutingMode (vFed));
@@ -816,8 +816,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
 
     // register the publications
 
-    auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", "string", "");
-    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "", "");
+    auto pubid = helicsFederateRegisterGlobalTypePublication (vFed, "pub1", "string", "");
+    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "");
     CE (helicsFederateEnterExecutingMode (vFed));
 
     // publish string1 at time=0.0;

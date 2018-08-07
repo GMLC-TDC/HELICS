@@ -110,7 +110,7 @@ class CommonCore : public Core, public BrokerBase
     virtual const std::string &getOutputType (interface_handle handle) const override final;
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) override final;
     virtual std::shared_ptr<const data_block> getValue (interface_handle handle) override final;
-    virtual std::vector<std::shared_ptr<const data_block>> getValues (interface_handle handle) override final;
+    virtual std::vector<std::shared_ptr<const data_block>> getAllValues (interface_handle handle) override final;
     virtual const std::vector<interface_handle> &getValueUpdates (federate_id_t federateID) override final;
     virtual interface_handle
     registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;

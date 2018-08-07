@@ -437,7 +437,7 @@ class Core
     * Return all the data for the specified handle or the latest input
     *
     */
-    virtual std::vector<std::shared_ptr<const data_block>> getValues(interface_handle handle) = 0;
+    virtual std::vector<std::shared_ptr<const data_block>> getAllValues(interface_handle handle) = 0;
 
     /**
      * Returns vector of input handles that received an update during the last

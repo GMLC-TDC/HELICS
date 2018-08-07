@@ -106,7 +106,7 @@ for subscriptions and publications
 */
 HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication (helics_federate fed,
                                                                           const char *key,
-                                                                          const char *type,
+                                                                          int type,
                                                                           const char *units);
 
 /** register a global publication with a defined type
@@ -121,7 +121,7 @@ HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN H
 */
 HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate fed,
                                                                               const char *key,
-                                                                              int type,
+                                                                              const char *type,
                                                                               const char *units);
 
 /** register a named input

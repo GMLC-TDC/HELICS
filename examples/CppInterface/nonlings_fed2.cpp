@@ -13,7 +13,7 @@ int main(int /*argc*/,char ** /*argv*/)
 {
   std::string    fedinitstring="--federates=1";
   double         deltat=0.01;
-  helics98::Subscription sub;
+  helics98::Input sub;
   helics98::Publication  pub;
 
 
@@ -39,11 +39,11 @@ int main(int /*argc*/,char ** /*argv*/)
   helics98::ValueFederate* vfed = new helics98::ValueFederate ("TestB Federate", fi);
   printf(" Value federate created\n");
 
-  sub = vfed->registerSubscription("testA","double");
+  sub = vfed->registerTypeSubscription("testA","double");
   printf(" Subscription registered\n");
 
   /* Register the publication */
-  pub = vfed->registerGlobalPublication("testB","double");
+  pub = vfed->registerGlobalPublication("testB",HELICS_DATA_TYPE_DOUBLE);
   printf(" Publication registered\n");
 
 
