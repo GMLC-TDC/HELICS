@@ -34,9 +34,11 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
     helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL);
 
-    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "filter1", "port1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter1");
+    helicsFilterAddSourceTarget(f1, "port1");
     BOOST_CHECK (f1 != NULL);
-    auto f2 = helicsFederateRegisterDestinationFilter (fFed, helics_custom_filter, "filter2", "port2");
+    auto f2 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter2");
+    helicsFilterAddDestinationTarget(f2, "port2");
     BOOST_CHECK (f2 != f1);
     auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "");
     BOOST_CHECK (ep1 != NULL);
@@ -377,7 +379,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE (helicsFederateRequestTimeComplete (sFed2, &timeOut));
     CE (helicsFederateRequestTimeComplete (dcFed, &timeOut));
 
-    auto mcnt = helicsEndpointReceiveCount (p3);
+    auto mcnt = helicsEndpointPendingMessages (p3);
     BOOST_CHECK_EQUAL (mcnt, 2);
     auto res = helicsFederateHasMessage (dFed);
     BOOST_CHECK (res);
@@ -403,7 +405,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = helicsEndpointReceiveCount (p4);
+    mcnt = helicsEndpointPendingMessages (p4);
     BOOST_CHECK_EQUAL (mcnt, 2);
     res = helicsFederateHasMessage (dcFed);
     BOOST_CHECK (res);
@@ -441,7 +443,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
     std::string filename = std::string (TEST_DIR) + "/test_files/example_filters.json";
-    auto mFed = helicsCreateMessageFederateFromJson (filename.c_str ());
+    auto mFed = helicsCreateMessageFederateFromConfig (filename.c_str ());
 
     char name[HELICS_SIZE_MAX];
     CE (helicsFederateGetName (mFed, name, HELICS_SIZE_MAX));

@@ -37,7 +37,7 @@ helics_bool_t helicsIsCoreTypeAvailable (const char *type)
     return (helics::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
 }
 
-helics_federate_info_t helicsFederateInfoCreate ()
+helics_federate_info_t helicsCreateFederateInfo()
 {
     auto *fi = new helics::FederateInfo;
     return reinterpret_cast<void *> (fi);
@@ -204,7 +204,7 @@ helics_status helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int fl
     
     return helics_ok;
 }
-helics_status helicsFederateInfoSetTimeOption (helics_federate_info_t fi, int timeProperty, helics_time_t propertyValue)
+helics_status helicsFederateInfoSetTimeProperty (helics_federate_info_t fi, int timeProperty, helics_time_t propertyValue)
 {
     if (fi == nullptr)
     {

@@ -24,8 +24,8 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     // register the publications
 
     helicsFederateRegisterGlobalPublication(vFed1, "pub1", "double", "");
-    helicsFederateRegisterPublication(vFed1, "pub2", "double", "");
-    helicsFederateRegisterPublication(vFed2, "pub3", "double", "");
+    helicsFederateRegisterTypePublication(vFed1, "pub2", "double");
+    helicsFederateRegisterTypePublication(vFed2, "pub3", "double");
     CE(helicsFederateEnterInitializationModeAsync(vFed1));
     CE(helicsFederateEnterInitializationMode(vFed2));
     CE(helicsFederateEnterInitializationModeComplete(vFed1));
@@ -86,9 +86,9 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 
     std::string res2 = helicsQueryExecute(q1, vFed1);
     BOOST_CHECK_EQUAL(res2, str);
-    CE(helicsFederateEnterInitializationModeAsync(vFed1));
-    CE(helicsFederateEnterInitializationMode(vFed2));
-    CE(helicsFederateEnterInitializationModeComplete(vFed1));
+    CE(helicsFederateEnterInitializingModeAsync(vFed1));
+    CE(helicsFederateEnterInitializingMode(vFed2));
+    CE(helicsFederateEnterInitializingModeComplete(vFed1));
     helicsQueryFree(q1);
     helicsCoreFree(core);
     CE(helicsFederateFinalize(vFed1));

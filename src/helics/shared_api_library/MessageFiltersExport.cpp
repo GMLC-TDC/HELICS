@@ -16,6 +16,20 @@ static const std::string nullstr;
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
+static helics::FilterObject *getFilterObj(helics_filter filt)
+{
+    if (filt == nullptr)
+    {
+        return nullptr;
+    }
+    auto fObj = reinterpret_cast<helics::FilterObject *> (filt);
+    if (fObj->valid != filterValidationIdentifier)
+    {
+        return nullptr;
+    }
+    return fObj;
+}
+
 static inline void federateAddFilter (helics_federate fed, std::unique_ptr<helics::FilterObject >filt)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -141,12 +155,8 @@ helics_filter helicsCoreRegisterCloningFilter (helics_core cr, const char *deliv
 
 static helics::Filter *getFilter (helics_filter filt)
 {
-    if (filt == nullptr)
-    {
-        return nullptr;
-    }
-    auto fObj = reinterpret_cast<helics::FilterObject *> (filt);
-    if (fObj->valid != filterValidationIdentifier)
+    auto fObj = getFilterObj(filt);
+    if (fObj == nullptr)
     {
         return nullptr;
     }
@@ -155,12 +165,8 @@ static helics::Filter *getFilter (helics_filter filt)
 
 static helics::CloningFilter *getCloningFilter (helics_filter filt)
 {
-    if (filt == nullptr)
-    {
-        return nullptr;
-    }
-    auto fObj = reinterpret_cast<helics::FilterObject *> (filt);
-    if (fObj->valid != filterValidationIdentifier)
+    auto fObj = getFilterObj(filt);
+    if (fObj == nullptr)
     {
         return nullptr;
     }
@@ -269,7 +275,7 @@ helics_status helicsFilterSetString (helics_filter filt, const char *property, c
 
 helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest)
 {
-    auto cfilt = getCloningFilter (filt);
+    auto cfilt = getFilter (filt);
     if (cfilt == nullptr)
     {
         return helics_invalid_object;
@@ -291,7 +297,7 @@ helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *
 
 helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *src)
 {
-    auto cfilt = getCloningFilter (filt);
+    auto cfilt = getFilter (filt);
     if (cfilt == nullptr)
     {
         return helics_invalid_object;
@@ -335,7 +341,7 @@ helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *d
 
 helics_status helicsFilterRemoveTarget (helics_filter filt, const char *dest)
 {
-    auto cfilt = getCloningFilter (filt);
+    auto cfilt = getFilter (filt);
     if (cfilt == nullptr)
     {
         return helics_invalid_object;

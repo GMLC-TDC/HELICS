@@ -134,13 +134,13 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 //
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    // fi = helicsFederateInfoCreate();
+    // fi = helicsCreateFederateInfo();
     // path of the json file is hardcoded for now
     helics98::ValueFederate vFed (TEST_DIR "/test_files/example_value_fed.json");
     BOOST_REQUIRE (vFed.baseObject () != nullptr);
     auto s = vFed.getName ();
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
     //	 helics98::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     vFed.finalize ();

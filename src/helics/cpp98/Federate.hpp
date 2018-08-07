@@ -24,17 +24,15 @@ namespace helics98
 class FederateInfo
 {
   public:
-    FederateInfo () { fi = helicsFederateInfoCreate (); }
+    FederateInfo () { fi = helicsCreateFederateInfo (); }
 
     FederateInfo ( const std::string &coretype)
     {
-        fi = helicsFederateInfoCreate ();
+        fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str ());
     }
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
-
-    void setFederateName (const std::string &name) { helicsFederateInfoSetFederateName (fi, name.c_str ()); }
 
     void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str ()); }
 
@@ -148,17 +146,17 @@ class Federate
 
     void enterInitializingMode ()
     {
-        if (helics_ok != helicsFederateEnterInitializationMode (fed))
+        if (helics_ok != helicsFederateEnterInitializingMode (fed))
         {
-            throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
+            throw (InvalidStateTransition ("cannot transition from current mode to initialization mode"));
         }
     }
 
     void enterInitializingModeAsync ()
     {
-        if (helics_ok != helicsFederateEnterInitializationModeAsync (fed))
+        if (helics_ok != helicsFederateEnterInitializingModeAsync (fed))
         {
-            throw (InvalidStateTransition ("cannot transition from current state to initialization state"));
+            throw (InvalidStateTransition ("cannot transition from current mode to initialization mode"));
         }
     }
 
@@ -170,7 +168,7 @@ class Federate
 
     void enterInitializingModeComplete ()
     {
-        if (helics_ok != helicsFederateEnterInitializationModeComplete (fed))
+        if (helics_ok != helicsFederateEnterInitializingModeComplete (fed))
         {
             throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
         }
@@ -287,28 +285,12 @@ class Federate
         return result;
     }
 
-    Filter registerSourceFilter (helics_filter_type_t type,
-                                 const std::string &target,
+    Filter registerFilter (helics_filter_type_t type,
                                  const std::string &name = std::string ())
     {
-        return Filter (helicsFederateRegisterSourceFilter (fed, type, target.c_str (), name.c_str ()));
+        return Filter (helicsFederateRegisterFilter (fed, type, name.c_str ()));
     }
 
-    /** create a destination Filter on the specified federate
-    @details filters can be created through a federate or a core , linking through a federate allows
-    a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-    @param fed the fed to register through
-    @param type the type of filter to create
-    @param target the name of endpoint to target
-    @param name the name of the filter (can be NULL)
-    @return a helics_filter object
-    */
-    Filter registerDestinationFilter (helics_filter_type_t type,
-                                      const std::string &target,
-                                      const std::string &name = std::string ())
-    {
-        return Filter (helicsFederateRegisterDestinationFilter (fed, type, target.c_str (), name.c_str ()));
-    }
 
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added

@@ -4858,8 +4858,8 @@ SWIGINTERN PyObject *_wrap_helicsFederateInfoCreate(PyObject *SWIGUNUSEDPARM(sel
   PyObject *resultobj = 0;
   helics_federate_info_t result;
   
-  if (!PyArg_ParseTuple(args,(char *)":helicsFederateInfoCreate")) SWIG_fail;
-  result = (helics_federate_info_t)helicsFederateInfoCreate();
+  if (!PyArg_ParseTuple(args,(char *)":helicsCreateFederateInfo")) SWIG_fail;
+  result = (helics_federate_info_t)helicsCreateFederateInfo();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   return resultobj;
 fail:
@@ -9747,7 +9747,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		""},
 	 { (char *)"helicsFederateClone", _wrap_helicsFederateClone, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateInfoCreate", _wrap_helicsFederateInfoCreate, METH_VARARGS, (char *)"\n"
+	 { (char *)"helicsCreateFederateInfo", _wrap_helicsFederateInfoCreate, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
 		"create a federate info object for specifying federate information when\n"

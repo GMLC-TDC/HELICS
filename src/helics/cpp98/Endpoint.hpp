@@ -39,9 +39,9 @@ public:
     }
 
     /** Returns the number of pending receives for endpoint **/
-    uint64_t receiveCount() const
+    uint64_t pendingMessages() const
     {
-        return helicsEndpointReceiveCount(ep);
+        return helicsEndpointPendingMessages(ep);
     }
 
     /** Get a packet from an endpoint **/

@@ -13,7 +13,7 @@ set(
   ValueFederate.hpp
   helics.hpp
   Publication.hpp
-  Subscription.hpp
+  Input.hpp
   Endpoint.hpp
   Filter.hpp
   config.hpp

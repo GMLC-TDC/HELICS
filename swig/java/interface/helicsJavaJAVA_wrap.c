@@ -1346,7 +1346,7 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoCreate
   
   (void)jenv;
   (void)jcls;
-  result = (helics_federate_info_t)helicsFederateInfoCreate();
+  result = (helics_federate_info_t)helicsCreateFederateInfo();
   *(helics_federate_info_t *)&jresult = result; 
   return jresult;
 }

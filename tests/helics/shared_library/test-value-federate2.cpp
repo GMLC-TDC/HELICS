@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 {
     helics_federate vFed;
     char s[100] = "";
-    // fi = helicsFederateInfoCreate();
+    // fi = helicsCreateFederateInfo();
     // path of the json file is hardcoded for now
     vFed = helicsCreateValueFederateFromJson (TEST_DIR "/test_files/example_value_fed.json");
     BOOST_REQUIRE (vFed != nullptr);

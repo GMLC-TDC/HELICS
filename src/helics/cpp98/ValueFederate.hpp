@@ -143,23 +143,23 @@ private:
 
     /** Methods to register subscriptions **/
     Input
-    registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
+    registerSubscription (const std::string &name,  const std::string &units = "")
     {
-        helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), units.c_str());
         ipts.push_back(sub);
         return Subscription(sub);
     }
 
     Input
-    registerTypeSubscription (const std::string &name, int type, const std::string &units = "")
+    registerTypeSubscription (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
+        helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type.c_str(), units.c_str());
         subs.push_back(sub);
         return Subscription(sub);
     }
 
     Input
-    registerSubscriptionIndexed (const std::string &name, int index1, int type, const std::string &units = "")
+    registerSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
         return registerTypeSubscription (indexed_name, type, units);
@@ -169,11 +169,10 @@ private:
     registerSubscriptionIndexed (const std::string &name,
                                          int index1,
                                          int index2,
-                                         int type,
                                          const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
-        return registerTypeSubscription (indexed_name, type, units);
+        return registerTypeSubscription (indexed_name, units);
     }
 
     int getInputCount() const

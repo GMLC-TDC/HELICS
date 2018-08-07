@@ -53,6 +53,20 @@ class Filter
         helicsFilterSetString (filt, property.c_str (), val.c_str ());
     }
 
+    /** add a destination target to a cloning filter
+    @details all messages going to a destination are copied to the delivery address(es)*/
+    void addDestinationTarget(const std::string &dest) { helicsFilterAddDestinationTarget(filt, dest.c_str()); }
+
+    /** add a source target to a cloning filter
+    @details all messages coming from a source are copied to the delivery address(es)*/
+    void addSourceTarget(const std::string &source) { helicsFilterAddSourceTarget(filt, source.c_str()); }
+
+    /** remove a destination target from a cloning filter*/
+    void removeTarget(const std::string &dest)
+    {
+        helicsFilterRemoveTarget(filt, dest.c_str());
+    }
+
   protected:
     helics_filter filt;  //!< the reference to the underlying publication
 };
@@ -71,14 +85,7 @@ class CloningFilter : public Filter
         return *this;
     }
 
-    /** add a destination target to a cloning filter
-    @details all messages going to a destination are copied to the delivery address(es)*/
-    void addDestinationTarget (const std::string &dest) { helicsFilterAddDestinationTarget (filt, dest.c_str ()); }
-
-    /** add a source target to a cloning filter
-    @details all messages coming from a source are copied to the delivery address(es)*/
-    void addSourceTarget (const std::string &source) { helicsFilterAddSourceTarget (filt, source.c_str ()); }
-
+   
     /** add a delivery endpoint to a cloning filter
     @details all cloned messages are sent to the delivery address(es)
     */
@@ -86,15 +93,6 @@ class CloningFilter : public Filter
     {
         helicsFilterAddDeliveryEndpoint (filt, deliveryEndpoint.c_str ());
     }
-
-    /** remove a destination target from a cloning filter*/
-    void removeDestinationTarget (const std::string &dest)
-    {
-        helicsFilterRemoveDestinationTarget (filt, dest.c_str ());
-    }
-
-    /** remove a source target from a cloning filter*/
-    void removeSourceTarget (const std::string &source) { helicsFilterRemoveSourceTarget (filt, source.c_str ()); }
 
     /** remove a delivery destination from a cloning filter*/
     void removeDeliveryEndpoint (const std::string &deliveryEndpoint)

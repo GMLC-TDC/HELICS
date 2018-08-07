@@ -83,7 +83,7 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics_federate_info_t fi = helicsFederateInfoCreate ();
+        helics_federate_info_t fi = helicsCreateFederateInfo ();
         CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str ()));
         CE (helicsFederateInfoSetTimeProperty (fi,TIME_DELTA_PROPERTY, time_delta));
 

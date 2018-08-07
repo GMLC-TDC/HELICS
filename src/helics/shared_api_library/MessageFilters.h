@@ -26,24 +26,9 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_EXPORT helics_filter helicsFederateRegisterSourceFilter (helics_federate fed,
+HELICS_EXPORT helics_filter helicsFederateRegisterFilter (helics_federate fed,
                                                                 helics_filter_type_t type,
-                                                                const char *target,
                                                                 const char *name);
-
-/** create a destination Filter on the specified federate
-@details filters can be created through a federate or a core , linking through a federate allows
-a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-@param fed the fed to register through
-@param type the type of filter to create
-@param target the name of endpoint to target
-@param name the name of the filter (can be NULL)
-@return a helics_filter object
-*/
-HELICS_EXPORT helics_filter helicsFederateRegisterDestinationFilter (helics_federate fed,
-                                                                     helics_filter_type_t type,
-                                                                     const char *target,
-                                                                     const char *name);
 
 /** create a cloning Filter on the specified federate
 @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -63,24 +48,9 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_EXPORT helics_filter helicsCoreRegisterSourceFilter (helics_core core,
+HELICS_EXPORT helics_filter helicsCoreRegisterFilter (helics_core core,
                                                             helics_filter_type_t type,
-                                                            const char *target,
                                                             const char *name);
-
-/** create a destination Filter on the specified core
-@details filters can be created through a federate or a core , linking through a federate allows
-a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-@param core the core to register the filter through
-@param type the type of filter to create
-@param target the name of endpoint to target
-@param name the name of the filter (can be NULL)
-@return a helics_filter object
-*/
-HELICS_EXPORT helics_filter helicsCoreRegisterDestinationFilter (helics_core core,
-                                                                 helics_filter_type_t type,
-                                                                 const char *target,
-                                                                 const char *name);
 
 /** create a cloning Filter on the specified core
 @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -125,11 +95,11 @@ HELICS_EXPORT helics_status helicsFilterSetString (helics_filter filt, const cha
 * @{
 */
 
-/** add a destination target to a cloning filter
+/** add a destination target to a filter
 @details all messages going to a destination are copied to the delivery address(es)*/
 HELICS_EXPORT helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest);
 
-/** add a source target to a cloning filter
+/** add a source target to a filter
 @details all messages coming from a source are copied to the delivery address(es)*/
 HELICS_EXPORT helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *source);
 
@@ -138,11 +108,8 @@ HELICS_EXPORT helics_status helicsFilterAddSourceTarget (helics_filter filt, con
 */
 HELICS_EXPORT helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);
 
-/** remove a destination target from a cloning filter*/
-HELICS_EXPORT helics_status helicsFilterRemoveDestinationTarget (helics_filter filt, const char *dest);
-
-/** remove a source target from a cloning filter*/
-HELICS_EXPORT helics_status helicsFilterRemoveSourceTarget (helics_filter filt, const char *source);
+/** remove a destination target from a filter*/
+HELICS_EXPORT helics_status helicsFilterRemoveTarget (helics_filter filt, const char *dest);
 
 /** remove a delivery destination from a cloning filter*/
 HELICS_EXPORT helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint);

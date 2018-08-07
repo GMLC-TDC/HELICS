@@ -136,12 +136,12 @@ helics_federate helicsCreateValueFederate (const char *fedName, const helics_fed
     return (fed);
 }
 
-helics_federate helicsCreateValueFederateFromJson (const char *json)
+helics_federate helicsCreateValueFederateFromConfig (const char *configFile)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::ValueFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::ValueFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {
@@ -182,13 +182,13 @@ helics_federate helicsCreateMessageFederate (const char *fedName, const helics_f
     return (fed);
 }
 
-helics_federate helicsCreateMessageFederateFromJson (const char *json)
+helics_federate helicsCreateMessageFederateFromConfig(const char *configFile)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
 
     try
     {
-        FedI->fedptr = std::make_shared<helics::MessageFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::MessageFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {
@@ -229,12 +229,12 @@ helics_federate helicsCreateCombinationFederate (const char *fedName, const heli
     return (fed);
 }
 
-helics_federate helicsCreateCombinationFederateFromJson (const char *json)
+helics_federate helicsCreateCombinationFederateFromConfig (const char *configFile)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {
@@ -299,7 +299,7 @@ helics_status helicsFederateFinalize (helics_federate fed)
 }
 
 /* initialization, execution, and time requests */
-helics_status helicsFederateEnterInitializationMode (helics_federate fed)
+helics_status helicsFederateEnterInitializingMode (helics_federate fed)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -317,7 +317,7 @@ helics_status helicsFederateEnterInitializationMode (helics_federate fed)
     }
 }
 
-helics_status helicsFederateEnterInitializationModeAsync (helics_federate fed)
+helics_status helicsFederateEnterInitializingModeAsync (helics_federate fed)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -345,7 +345,7 @@ int helicsFederateIsAsyncOperationCompleted (helics_federate fed)
     return (fedObj->isAsyncOperationCompleted ()) ? 1 : 0;
 }
 
-helics_status helicsFederateEnterInitializationModeComplete (helics_federate fed)
+helics_status helicsFederateEnterInitializingModeComplete (helics_federate fed)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
@@ -693,7 +693,7 @@ helics_status helicsFederateSetTimeProperty (helics_federate fed, int32_t timePr
     }
 }
 
-helics_status helicsFederateSetFlagProperty (helics_federate fed, int flag, helics_bool_t flagValue)
+helics_status helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
