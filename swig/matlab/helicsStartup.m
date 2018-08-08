@@ -7,7 +7,7 @@ if nargin < 1
     helicsLibPath = fileparts(mfilename('fullpath'));
 end
 
-fprintf('Loading HELICS (from %s)...', helicsLibPath)
+fprintf('Loading HELICS (from %s)...\n', helicsLibPath)
 
 %% Extract HELICS library name in a cross-platform way
 listing = dir(fullfile(helicsLibPath, '*helicsSharedLib.*'));

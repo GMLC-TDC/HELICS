@@ -1,85 +1,137 @@
+% PISENDER script demonstrating MATLAB-HELICS interface
+%
+% Usage:
+%  1. Start two separate MATLAB terminals 
+%  2. In the first: 
+%     >> pisender
+%  3. In the second:
+%     >> pireciever
 
-%loadlibrary(GetFullPath('~/local/helics-develop/lib/libhelicsSharedLib.dylib'));
 
-initstring = '2 --name=mainbroker';
-fedinitstring = '--broker=mainbroker --federates=1';
-deltat = 0.01;
+%% Initialize HELICS library in MATLAB
+helicsStartup()
 
+%% Configuration
+deltat = 1;  %Base time interval (seconds)
+numsteps = 20;
+
+% HELICS options
+% Note: these configure this matlab process to host the main broker and 1
+% federate
+pisend_start_broker = true;
+helics_core_type = 'zmq'; 
+broker_initstring = '2 --name=mainbroker';
+fed_initstring = '--broker=mainbroker --federates=1';
+
+%% Provide summary information
 helicsversion = helics.helicsGetVersion();
 
-display(strcat('PI SENDER: Helics version = ', helicsversion));
+fprintf('PI SENDER (with main broker): Helics version = %s\n', helicsversion)
 
-% Create broker
-display('Creating Broker');
-broker = helics.helicsCreateBroker('zmq', '', initstring);
-display('Created Broker');
+%% Create broker (if desired)
+if pisend_start_broker
+    disp('Creating Broker');
+    broker = helics.helicsCreateBroker(helics_core_type, '', broker_initstring);
+    disp('Created Broker');
 
-display('Checking if Broker is connected');
-isconnected = helics.helicsBrokerIsConnected(broker);
-display('Checked if Broker is connected');
+    fprintf('Checking if Broker is connected...');
+    isconnected = helics.helicsBrokerIsConnected(broker);
 
-if isconnected == 1;
-    display('Broker created and connected');
-end;
+    if isconnected == 1
+        fprintf('SUCCESS, Broker created and connected\n');
+    else
+        fprintf('\n')
+        error('NOT CONNECTED (helicsBrokerIsConnected return = %d)', isconnected)
+    end
+end
 
-% Create Federate Info object that describes the federate properties
+%% Create Federate Info object that describes the federate properties
 fedinfo = helics.helicsFederateInfoCreate();
+assert(not(isempty(fedinfo)))
 
 % Set Federate name
-status = helics.helicsFederateInfoSetFederateName(fedinfo, 'TestA Federate');
+status = helics.helicsFederateInfoSetFederateName(fedinfo, 'MATLAB Pi SENDER Federate');
+assert(status==0)
 
 % Set core type from string
-status = helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, 'zmq');
+status = helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, helics_core_type);
+assert(status==0)
 
 % Federate init string
-status = helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
+status = helics.helicsFederateInfoSetCoreInitString(fedinfo, fed_initstring);
+assert(status==0)
 
-% Set the message interval (timedelta) for federate. Note th#
+
+% Note:
 % HELICS minimum message time interval is 1 ns and by default
 % it uses a time delta of 1 second. What is provided to the
-% setTimedelta routine is a multiplier for the default timedelta.
+% setTimedelta routine is a multiplier for the default timedelta 
+% (default unit = seconds).
 
-% Set one second message interval
+% Set one message interval
 status = helics.helicsFederateInfoSetTimeDelta(fedinfo, deltat);
+assert(status==0)
 
 status = helics.helicsFederateInfoSetLoggingLevel(fedinfo, 1);
+assert(status==0)
 
-% Create value federate
+%% Actually create value federate
 vfed = helics.helicsCreateValueFederate(fedinfo);
-display('PI SENDER: Value federate created');
+disp('PI SENDER: Value federate created');
 
-% Register the publication
+%% Register our value to publish
 pub = helics.helicsFederateRegisterGlobalPublication(vfed, 'testA', 'double', '');
-display('PI SENDER: Publication registered');
+disp('PI SENDER: Publication registered (testA)');
 
-% Enter execution mode
+%% Start execution
 status = helics.helicsFederateEnterExecutionMode(vfed);
-display('PI SENDER: Entering execution mode');
+if status == 0
+    disp('PI SENDER: Entering execution mode');
+else
+    error('PI SENDER: Failed to enter execution mode (status = %d)\n Try running pisender.m first. (or start the broker seperately)', status);
+end
 
+%% Execution Loop
 % This federate will be publishing deltat*pi for numsteps steps
 this_time = 0.0;
 value = pi;
 
-for i = 1:20
+for i = 1:numsteps
     val = value;
 
     currenttime = helics.helicsFederateRequestTime(vfed, i);
 
-    display(['PI SENDER: Sending value pi = ', '', num2str(val), ' at time ', '', num2str(this_time + (deltat * i)),' to PI RECEIVER']);
+%    fprintf('PI SENDER: Sending value pi = %f at time %f to PI RECEIVER\n', val, this_time + (deltat * i));
+    fprintf('PI SENDER: Sending value pi = %f at time %f to PI RECEIVER... ', val, currenttime);
     status = helics.helicsPublicationPublishDouble(pub, val);
+    fprintf('DONE (status=%d)\n', status);
 end
 
-status = helics.helicsFederateFinalize(vfed);
-display('PI SENDER: Federate finalized');
+%% Shutdown
 
+if pisend_start_broker
+    % If we started the broker in this thread, we have to be careful
+    % sequencing the shutdown in hopes of doing so cleanly
+    status = helics.helicsFederateFinalize(vfed);
+    disp('PI SENDER: Federate finalized');
 
-while helics.helicsBrokerIsConnected(broker)
-    pause(1);
+    %Make sure the broker is gone in case we have a lingering low-level
+    %reference (to avoid memory leaks)
+    for foo = 1:60
+        if not(helics.helicsBrokerIsConnected(broker))
+            break
+        end
+        pause(1);
+    end
+    disp('PI SENDER: Broker disconnected');
+
+    helics.helicsFederateFree(vfed);
+    helics.helicsCloseLibrary();
+else
+    %But if we just setup the federate, we can simply call endFederate
+    helicsEndFederate(vfed); %#ok<UNRCH>  
+    disp('PI SENDER: Federate finalized');
 end
 
-helics.helicsFederateFree(vfed);
-helics.helicsCloseLibrary();
-
-display('PI SENDER: Broker disconnected');
 
 

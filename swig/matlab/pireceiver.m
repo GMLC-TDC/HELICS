@@ -1,12 +1,17 @@
 % PIRECEIVER script demonstrating MATLAB-HELICS interface
 %
+% See pisender for usage information
+%
 % This example attempts to request the next time equal to its
 % sim_stop_time, but the corresponding pisender will request intermediate
 % times such that the pireceiver will be granted times earlier than
 % requested
+%
+% Note to non-programmers: if unfamiliar, the assert functions simply check
+% if the condition is true and if so continues. If false, execution stops.
 
 %% Initialize HELICS library in MATLAB
-helicsStartup
+helicsStartup()
 
 %% Configuration
 deltat = 0.01;  %Base time interval (seconds)
@@ -23,6 +28,7 @@ fprintf('PI RECEIVER: Helics version = %s\n', helicsversion)
 
 %% Create Federate Info object that describes the federate properties
 fedinfo = helics.helicsFederateInfoCreate();
+assert(not(isempty(fedinfo)))
 
 % Set Federate name
 status = helics.helicsFederateInfoSetFederateName(fedinfo, 'MATLAB Pi Receiver Federate');
@@ -36,7 +42,7 @@ assert(status==0)
 status = helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
 assert(status==0)
 
-% Set the message interval (timedelta) for federate. 
+%% Set the message interval (timedelta) for federate. 
 % Note:
 % HELICS minimum message time interval is 1 ns and by default
 % it uses a time delta of 1 second. What is provided to the
@@ -57,17 +63,17 @@ disp('PI RECEIVER: Value federate created');
 % Subscribe to PI SENDER's publication (note: published as global)
 sub = helics.helicsFederateRegisterSubscription(vfed, 'testA', 'double', '');
 
-disp('PI RECEIVER: Subscription registered');
+disp('PI RECEIVER: Subscription registered (testA)');
 
 %% Start execution
 status = helics.helicsFederateEnterExecutionMode(vfed);
-if not(status == 0)
-    fprintf('PI RECEIVER: Failed to enter execution mode (status = %d)\n', status);
-    disp('
+if status == 0
+    disp('PI RECEIVER: Entering execution mode');
+else
+    error('PI RECEIVER: Failed to enter execution mode (status = %d)\n Try running pisender.m first. (or start the broker seperately)', status);
 end
 
-disp('PI RECEIVER: Entering execution mode');
-
+%% Execution Loop
 value = 0.0;
 prevtime = 0;
 
@@ -94,10 +100,8 @@ while currenttime <= sim_stop_time
     end
 end
 
-status = helics.helicsFederateFinalize(vfed);
-assert(status==0)
-
-helics.helicsFederateFree(vfed);
-helics.helicsCloseLibrary();
+%% Shutdown
+helicsEndFederate(vfed);
 
 disp('PI RECEIVER: Federate finalized');
+
