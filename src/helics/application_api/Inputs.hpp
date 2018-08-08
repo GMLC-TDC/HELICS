@@ -150,7 +150,7 @@ class Input : public InputBase
                        "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
                        "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = callback;
-        fed->registerNotificationCallback (id, [this](input_id_t, Time time) {
+        fed->registerInputNotificationCallback (id, [this](input_id_t, Time time) {
             handleCallback (time);
         });
     }
@@ -337,7 +337,7 @@ class InputT : public InputBase
     void registerCallback (std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->registerSubscriptionNotificationCallback (id, [=](input_id_t, Time time) {
+        fed->registerInputNotificationCallback (id, [=](input_id_t, Time time) {
             handleCallback (time);
         });
     }

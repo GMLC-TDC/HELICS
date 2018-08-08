@@ -125,8 +125,8 @@ Federate::Federate (const std::string &configString) : Federate (std::string(),l
     registerFilterInterfaces (configString);
 }
 
-Federate::Federate (const std::string &name, const std::string &configString)
-    : Federate (name,loadFederateInfo (configString))
+Federate::Federate (const std::string &fedName, const std::string &configString)
+    : Federate (fedName,loadFederateInfo (configString))
 {
     registerFilterInterfaces (configString);
 }

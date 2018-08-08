@@ -14,13 +14,13 @@ namespace helics
 {
 /**constructor taking a core engine and federate info structure
  */
-ValueFederate::ValueFederate (const std::string &name, const FederateInfo &fi) : Federate (name,fi)
+ValueFederate::ValueFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName,fi)
 {
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
-ValueFederate::ValueFederate (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : Federate (name,core, fi)
+ValueFederate::ValueFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : Federate (fedName,core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
 }
@@ -30,8 +30,8 @@ ValueFederate::ValueFederate (const std::string &configString) : Federate (std::
     ValueFederate::registerInterfaces (configString);
 }
 
-ValueFederate::ValueFederate (const std::string &name, const std::string &configString)
-    : Federate (name,loadFederateInfo (configString))
+ValueFederate::ValueFederate (const std::string &fedName, const std::string &configString)
+    : Federate (fedName,loadFederateInfo (configString))
 {
     vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
     ValueFederate::registerInterfaces (configString);
