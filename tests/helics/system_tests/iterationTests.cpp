@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerSubscription<double> ("pub1");
+    auto subid = vFed1->registerSubscription ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 27.0);
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed2->registerSubscription<double> ("pub1");
+    auto subid = vFed2->registerSubscription ("pub1");
 
     vFed1->enterInitializingModeAsync ();
     vFed2->enterInitializingMode ();
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerSubscription<double> ("pub1");
+    auto subid = vFed1->registerSubscription("pub1");
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutingMode ();
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed2->registerSubscription<double> ("pub1");
+    auto subid = vFed2->registerSubscription ("pub1");
 
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);

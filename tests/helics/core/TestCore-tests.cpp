@@ -89,8 +89,9 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     core->timeRequest (id, 100.0);
     valueUpdates = core->getValueUpdates (id);
+    BOOST_REQUIRE_EQUAL(valueUpdates.size(), 1u);
     BOOST_CHECK_EQUAL (valueUpdates[0], sub1);
-    BOOST_CHECK_EQUAL (valueUpdates.size (), 1u);
+    
     data = core->getValue (sub1);
     std::string str2 (data->to_string ());
     BOOST_CHECK_EQUAL (str1, str2);

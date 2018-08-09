@@ -94,7 +94,7 @@ FedObject *getFedObject (helics_federate fed);
 class InputObject
 {
   public:
-    std::unique_ptr<Input> subptr;
+    std::unique_ptr<Input> inputPtr;
     input_id_t id;
     int valid = 0;
     bool rawOnly = false;

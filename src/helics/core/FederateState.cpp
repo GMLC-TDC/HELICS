@@ -1164,12 +1164,20 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         if (state == HELICS_CREATED)
         {
             source_only = value;
+            if (value)
+            {
+                observer = false;
+            }
         }
         break;
     case OBSERVER_FLAG:
         if (state == HELICS_CREATED)
         {
             observer = value;
+            if (value)
+            {
+                source_only = false;
+            }
         }
         break;
 
@@ -1205,6 +1213,10 @@ bool FederateState::getOptionFlag (int optionFlag) const
         return interfaceInformation.getChangeUpdateFlag ();
     case REALTIME_FLAG:
         return realtime;
+    case OBSERVER_FLAG:
+        return observer;
+    case SOURCE_ONLY_FLAG:
+        return source_only;
     default:
         return timeCoord->getOptionFlag (optionFlag);
     }

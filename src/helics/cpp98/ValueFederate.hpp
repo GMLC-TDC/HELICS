@@ -151,14 +151,6 @@ private:
     }
 
     Input
-    registerTypeSubscription (const std::string &name, const std::string &type, const std::string &units = "")
-    {
-        helics_input sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type.c_str(), units.c_str());
-        ipts.push_back(sub);
-        return Input(sub);
-    }
-
-    Input
     registerSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);

@@ -37,7 +37,7 @@ helics_input helicsFederateRegisterSubscription (helics_federate fed, const char
         try
         {
             auto sub = std::make_unique<helics::InputObject> ();
-            sub->subptr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
+            sub->inputPtr = std::make_unique<helics::Subscription> (fedObj, key, (units == nullptr) ? nullStr : std::string (units));
             sub->fedptr = std::move (fedObj);
             auto ret = reinterpret_cast<helics_input> (sub.get ());
             addInput (fed, std::move (sub));
@@ -47,57 +47,6 @@ helics_input helicsFederateRegisterSubscription (helics_federate fed, const char
         {
         }
         return nullptr;
-}
-
-helics_input helicsFederateRegisterTypeSubscription (helics_federate fed, const char *key, const char *type, const char *units)
-{
-    if ((type == nullptr) || (std::string(type).empty()))
-    {  // empty type should default to a regular subscription
-        auto fedObj = getValueFedSharedPtr(fed);
-        if (!fedObj)
-        {
-            return nullptr;
-        }
-        try
-        {
-            auto sub = std::make_unique<helics::InputObject>();
-            sub->subptr = std::make_unique<helics::Subscription>(fedObj, key, (units == nullptr) ? nullStr : std::string(units));
-            sub->fedptr = std::move(fedObj);
-            auto ret = reinterpret_cast<helics_input> (sub.get());
-            addInput(fed, std::move(sub));
-            return ret;
-        }
-        catch (const helics::InvalidFunctionCall &)
-        {
-        }
-        return nullptr;
-    }
-    auto htype = helics::getTypeFromString(type);
-    //if the type is one of the primary types just go to a regular subscription
-    if (htype != helics::helics_type_t::helicsInvalid)
-    {
-        return helicsFederateRegisterSubscription(fed, key, units);
-    }
-    // now generate a generic subscription if we have an unrecognized type
-    auto fedObj = getValueFedSharedPtr(fed);
-    if (!fedObj)
-    {
-        return nullptr;
-    }
-    try
-    {
-        auto sub = std::make_unique<helics::InputObject>();
-        sub->id = fedObj->registerSubscription(key, type, (units == nullptr) ? nullStr : std::string(units));
-        sub->rawOnly = true;
-        sub->fedptr = std::move(fedObj);
-        auto ret = reinterpret_cast<helics_input> (sub.get());
-        addInput(fed, std::move(sub));
-        return ret;
-    }
-    catch (const helics::InvalidFunctionCall &)
-    {
-    }
-    return nullptr;
 }
 
 helics_publication helicsFederateRegisterTypePublication (helics_federate fed, const char *key, const char *type, const char *units)
@@ -129,6 +78,7 @@ helics_publication helicsFederateRegisterTypePublication (helics_federate fed, c
     }
     return nullptr;
 }
+
 helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, int type, const char *units)
 {
     if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
@@ -462,7 +412,7 @@ int helicsInputGetRawValueSize (helics_input inp)
         auto dv = subObj->fedptr->getValueRaw (subObj->id);
         return static_cast<int> (dv.size ());
     }
-    return static_cast<int> (subObj->subptr->getRawSize());
+    return static_cast<int> (subObj->inputPtr->getRawSize());
 }
 
 helics_status helicsInputGetRawValue (helics_input sub, void *data, int maxDatalen, int *actualSize)
@@ -499,7 +449,7 @@ helics_status helicsInputGetRawValue (helics_input sub, void *data, int maxDatal
             return helics_warning;
         }
 
-        auto str = subObj->subptr->getValue<std::string> ();
+        auto str = subObj->inputPtr->getValue<std::string> ();
         if (maxDatalen > static_cast<int> (str.size ()))
         {
             memcpy (data, str.data (), static_cast<int> (str.size ()));
@@ -557,7 +507,7 @@ helics_status helicsInputGetString (helics_input sub, char *outputString, int ma
             }
             return res;
         }
-        length = subObj->subptr->getValue (outputString, maxlen);
+        length = subObj->inputPtr->getValue (outputString, maxlen);
         if (actualLength != nullptr)
         {
             *actualLength = length;
@@ -590,7 +540,7 @@ helics_status helicsInputGetInteger (helics_input sub, int64_t *val)
         }
         else
         {
-            subObj->subptr->getValue (*val);
+            subObj->inputPtr->getValue (*val);
         }
         return helics_ok;
     }
@@ -633,7 +583,7 @@ helics_status helicsInputGetBoolean (helics_input sub, helics_bool_t *val)
         }
         else
         {
-            boolval = subObj->subptr->getValue<bool> ();
+            boolval = subObj->inputPtr->getValue<bool> ();
         }
         *val = (boolval) ? helics_true : helics_false;
         return helics_ok;
@@ -663,7 +613,7 @@ helics_status helicsInputGetDouble (helics_input sub, double *val)
         }
         else
         {
-            *val = subObj->subptr->getValue<double> ();
+            *val = subObj->inputPtr->getValue<double> ();
         }
         return helics_ok;
     }
@@ -694,7 +644,7 @@ helics_status helicsInputGetComplex (helics_input sub, double *real, double *ima
         }
         else
         {
-            auto cval = subObj->subptr->getValue<std::complex<double>> ();
+            auto cval = subObj->inputPtr->getValue<std::complex<double>> ();
             *real = cval.real ();
             *imag = cval.imag ();
         }
@@ -719,7 +669,7 @@ int helicsInputGetVectorSize (helics_input sub)
         return static_cast<int> (V.size ());
     }
 
-    return static_cast<int> (subObj->subptr->getVectorSize());
+    return static_cast<int> (subObj->inputPtr->getVectorSize());
 }
 
 int helicsInputGetStringSize(helics_input sub)
@@ -735,7 +685,7 @@ int helicsInputGetStringSize(helics_input sub)
         return static_cast<int> (str.size())+1;
     }
 
-    return static_cast<int> (subObj->subptr->getStringSize())+1;
+    return static_cast<int> (subObj->inputPtr->getStringSize())+1;
 }
 
 
@@ -763,7 +713,7 @@ helics_status helicsInputGetVector (helics_input sub, double data[], int maxlen,
             }
             return (length <= maxlen) ? helics_ok : helics_warning;
         }
-        int length = subObj->subptr->getValue (data, maxlen);
+        int length = subObj->inputPtr->getValue (data, maxlen);
         if (actualSize != nullptr)
         {
             *actualSize = length;
@@ -797,7 +747,7 @@ helicsInputGetNamedPoint (helics_input sub, char *outputString, int maxStringlen
         }
         else
         {
-            np = subObj->subptr->getValue<helics::named_point> ();
+            np = subObj->inputPtr->getValue<helics::named_point> ();
         }
         int length = std::min (static_cast<int> (np.name.size ()), maxStringlen);
         memcpy (outputString, np.name.data (), length);
@@ -868,7 +818,7 @@ helics_status helicsInputSetDefaultString (helics_input sub, const char *str)
         }
         else
         {
-            subObj->subptr->setDefault<std::string> (str);
+            subObj->inputPtr->setDefault<std::string> (str);
         }
         return helics_ok;
     }
@@ -893,7 +843,7 @@ helics_status helicsInputSetDefaultInteger (helics_input sub, int64_t val)
         }
         else
         {
-            subObj->subptr->setDefault (val);
+            subObj->inputPtr->setDefault (val);
         }
         return helics_ok;
     }
@@ -918,7 +868,7 @@ helics_status helicsInputSetDefaultBoolean (helics_input sub, helics_bool_t val)
         }
         else
         {
-            subObj->subptr->setDefault ((val != helics_false));
+            subObj->inputPtr->setDefault ((val != helics_false));
         }
         return helics_ok;
     }
@@ -943,7 +893,7 @@ helics_status helicsInputSetDefaultDouble (helics_input sub, double val)
         }
         else
         {
-            subObj->subptr->setDefault (val);
+            subObj->inputPtr->setDefault (val);
         }
         return helics_ok;
     }
@@ -967,7 +917,7 @@ helics_status helicsInputSetDefaultComplex (helics_input sub, double real, doubl
         }
         else
         {
-            subObj->subptr->setDefault (std::complex<double> (real, imag));
+            subObj->inputPtr->setDefault (std::complex<double> (real, imag));
         }
         return helics_ok;
     }
@@ -994,7 +944,7 @@ helics_status helicsInputSetDefaultVector (helics_input sub, const double *vecto
             }
             else
             {
-                subObj->subptr->setDefault (std::vector<double>{});
+                subObj->inputPtr->setDefault (std::vector<double>{});
             }
         }
         else
@@ -1005,7 +955,7 @@ helics_status helicsInputSetDefaultVector (helics_input sub, const double *vecto
             }
             else
             {
-                subObj->subptr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorlength));
+                subObj->inputPtr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorlength));
             }
         }
 
@@ -1032,7 +982,7 @@ helics_status helicsInputSetDefaultNamedPoint (helics_input sub, const char *str
         }
         else
         {
-            subObj->subptr->setDefault (helics::named_point ((str != nullptr) ? str : "", val));
+            subObj->inputPtr->setDefault (helics::named_point ((str != nullptr) ? str : "", val));
         }
         return helics_ok;
     }
@@ -1062,7 +1012,7 @@ helics_status helicsInputGetType (helics_input sub, char *outputString, int maxl
         }
         else
         {
-            type = subObj->subptr->getType ();
+            type = subObj->inputPtr->getType ();
         }
         if (static_cast<int> (type.size ()) > maxlen)
         {
@@ -1140,7 +1090,7 @@ helics_status helicsInputGetKey (helics_input sub, char *outputString, int maxle
         }
         else
         {
-            type = subObj->subptr->getName ();
+            type = subObj->inputPtr->getName ();
         }
         if (static_cast<int> (type.size ()) > maxlen)
         {
@@ -1218,7 +1168,7 @@ helics_status helicsInputGetUnits (helics_input sub, char *outputString, int max
         }
         else
         {
-            type = subObj->subptr->getUnits ();
+            type = subObj->inputPtr->getUnits ();
         }
         if (static_cast<int> (type.size ()) > maxlen)
         {
@@ -1288,7 +1238,7 @@ helics_bool_t helicsInputIsUpdated (helics_input sub)
         auto val = subObj->fedptr->isUpdated (subObj->id);
         return (val) ? 1 : 0;
     }
-    auto val = subObj->subptr->isUpdated ();
+    auto val = subObj->inputPtr->isUpdated ();
     return (val) ? helics_true : helics_false;
 }
 
@@ -1304,7 +1254,7 @@ helics_time_t helicsInputLastUpdateTime (helics_input sub)
         auto time = subObj->fedptr->getLastUpdateTime (subObj->id);
         return time;
     }
-    auto time = subObj->subptr->getLastUpdate ();
+    auto time = subObj->inputPtr->getLastUpdate ();
     return time;
 }
 

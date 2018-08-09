@@ -4,6 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "HandleManager.hpp"
+#include "ActionMessage.hpp"
+//TODO move the flags out of actionMessage
 
 namespace helics
 {
@@ -120,6 +122,90 @@ BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
         return &handles[fnd->second];
     }
     return nullptr;
+}
+
+
+void HandleManager::setHandleOption(int32_t index, int option, bool val)
+{
+    if (isValidIndex(index, handles))
+    {
+        switch (option)
+        {
+        case ONLY_UPDATE_ON_CHANGE_FLAG:
+            if (val)
+            {
+                setActionFlag(handles[index], extra_flag1);
+            }
+            else
+            {
+                clearActionFlag(handles[index], extra_flag1);
+            }
+            break;
+        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+            if (val)
+            {
+                setActionFlag(handles[index], extra_flag2);
+            }
+            else
+            {
+                clearActionFlag(handles[index], extra_flag1);
+            }
+            break;
+        case CONNECTION_REQUIRED_OPTION:
+            if (val)
+            {
+                setActionFlag(handles[index], required_flag);
+            }
+            else
+            {
+                clearActionFlag(handles[index], required_flag);
+            }
+            break;
+        case CONNECTION_OPTIONAL_OPTION:
+            if (val)
+            {
+                clearActionFlag(handles[index], required_flag);
+            }
+            else
+            {
+                setActionFlag(handles[index], required_flag);
+            }
+            break;
+        case SINGLE_CONNECTION_ONLY_OPTION:
+            if (val)
+            {
+                setActionFlag(handles[index], extra_flag4);
+            }
+            else
+            {
+                clearActionFlag(handles[index], extra_flag4);
+            }
+            break;
+        }
+    }
+}
+
+bool HandleManager::getHandleOption(int32_t index, int option) const
+{
+    if (isValidIndex(index, handles))
+    {
+        switch (option)
+        {
+        case ONLY_UPDATE_ON_CHANGE_FLAG:
+            return checkActionFlag(handles[index], extra_flag1);
+        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+            return checkActionFlag(handles[index], extra_flag2);
+        case CONNECTION_REQUIRED_OPTION:
+           return checkActionFlag(handles[index], required_flag);
+        case CONNECTION_OPTIONAL_OPTION:
+            return  !checkActionFlag(handles[index], required_flag);
+        case SINGLE_CONNECTION_ONLY_OPTION:
+            return checkActionFlag(handles[index], extra_flag4);
+        default:
+            return false;
+        }
+    }
+    return false;
 }
 
 BasicHandleInfo *HandleManager::getEndpoint (const std::string &name)

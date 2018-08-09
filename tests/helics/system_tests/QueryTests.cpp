@@ -25,7 +25,7 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     // register the publications
     vFed1->registerGlobalPublication<double> ("pub1");
 
-    vFed2->registerSubscription<double> ("pub1");
+    vFed2->registerSubscription("pub1");
 
     vFed1->registerPublication<double> ("pub2");
 

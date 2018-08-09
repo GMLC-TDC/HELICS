@@ -81,12 +81,6 @@ enum class iteration_request : signed char
 #define FORCE_ITERATION helics::iteration_request::force_iteration
 #define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
 
-/** defining some check modes for dealing with required or optional components*/
-enum class handle_check_mode : char
-{
-    required = 0,  //!< indicator that the publication or endpoint is required to be there
-    optional = 1,  //!< indicator that the publication or endpoint is optional
-};
 
 /**generate a string based on the core type*/
 std::string to_string (core_type type);
@@ -104,6 +98,3 @@ core_type coreTypeFromString (std::string type);
 bool isCoreTypeAvailable (core_type type) noexcept;
 
 }  // namespace helics
-
-#define PUBLICATION_REQUIRED helics::handle_check_mode::required
-#define PUBLICATION_OPTIONAL helics::handle_check_mode::optional

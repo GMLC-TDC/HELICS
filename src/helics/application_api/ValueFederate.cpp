@@ -105,10 +105,9 @@ input_id_t ValueFederate::registerGlobalInput(const std::string &key, const std:
 }
 
 input_id_t ValueFederate::registerSubscription (const std::string &key,
-                                                               const std::string &type,
                                                                const std::string &units)
 {
-    auto id=vfManager->registerInput (std::string(), type, units);
+    auto id=vfManager->registerInput (std::string(), std::string(), units);
     vfManager->addTarget (id, key);
     return id;
 }
@@ -196,13 +195,12 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
                 continue;
             }
             auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
-            auto type = (sub.isMember ("type")) ? sub["type"].asString () : "";
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
                 required = sub["required"].asBool ();
             }
-            id = registerSubscription (key, type, units);
+            id = registerSubscription (key, units);
             if (required)
             {
                 //TODO add setOPTION call
@@ -290,14 +288,13 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             {
                 continue;
             }
-            auto type = tomlGetOrDefault (sub, "type", std::string ());
             auto units = tomlGetOrDefault (sub, "units", std::string ());
             bool optional = tomlGetOrDefault (sub, "optional", false);
             bool required = tomlGetOrDefault (sub, "required", !optional);
-            id = registerSubscription (key, type, units);
+            id = registerSubscription (key, units);
             if (required)
             {
-               
+               //setInterfaceOption()
             }
             
             auto shortcut = sub.find ("shortcut");

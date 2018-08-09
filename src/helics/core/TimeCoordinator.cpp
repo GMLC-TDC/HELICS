@@ -808,7 +808,7 @@ int TimeCoordinator::getIntegerProperty (int intProperty) const
     case MAX_ITERATIONS_PROPERTY:
         return info.maxIterations;
     default:
-		//TODO: max this something consistent
+		//TODO: make this something consistent
         return -972;
     }
 }
@@ -820,6 +820,8 @@ bool TimeCoordinator::getOptionFlag(int optionFlag) const
     {
     case UNINTERRUPTIBLE_FLAG:
         return info.uninterruptible;
+    case INTERRUPTIBLE_FLAG:
+        return !info.uninterruptible;
     case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
         return info.wait_for_current_time_updates;
     default:

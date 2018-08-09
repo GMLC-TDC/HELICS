@@ -123,14 +123,14 @@ class VectorSubscription
                         int count,
                         const X &defValue,
                         const std::string &units = std::string ())
-        : fed (*valueFed), m_key (key), m_units (units)
+        : fed (valueFed), m_key (key), m_units (units)
     {
         ids.reserve (count);
         vals.resize (count, defValue);
        
         for (auto ind = startIndex; ind < startIndex + count; ++ind)
         {
-                auto id = fed->registerSubscriptionIndexed<X> (m_key, ind, m_units);
+                auto id = fed->registerSubscriptionIndexed (m_key, ind, m_units);
             ids.push_back (id);
         }
        
@@ -201,11 +201,9 @@ class VectorSubscription
   private:
     void handleCallback (input_id_t id, Time time)
     {
-        X out;
         auto res = std::lower_bound (ids.begin (), ids.end (), id);
         int index = static_cast<int> (res - ids.begin ());
-        fed->getValue (ids[index], out);
-        vals[index] = out;
+		vals[index]=fed->getValue<X> (ids[index]);
         if (update_callback)
         {
             update_callback (index, time);
@@ -260,7 +258,7 @@ class VectorSubscription2d
         {
             for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
             {
-                    auto id = fed->registerSubscriptionIndexed<X> (m_key, ind_x, ind_y, m_units);
+                    auto id = fed->registerSubscriptionIndexed (m_key, ind_x, ind_y, m_units);
                     ids.push_back (id);
             }
         }

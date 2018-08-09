@@ -109,10 +109,10 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    auto subid = vFed1->registerSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerSubscription<int> ("sub2");
+    auto subid = vFed1->registerSubscription ("sub1", "V");
+    auto subid2 = vFed1->registerSubscription ("sub2");
 
-    auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
+    auto subid3 = vFed1->registerSubscription ("sub3", "V");
     vFed1->enterExecutingMode ();
 
     // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
@@ -154,10 +154,10 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
 
 	//optional
-    auto subid = vFed1->registerSubscription ("sub1", "double", "V");
-    auto subid2 = vFed1->registerSubscription<int> ("sub2");
+    auto subid = vFed1->registerSubscription ("sub1", "V");
+    auto subid2 = vFed1->registerSubscription("sub2");
 
-    auto subid3 = vFed1->registerSubscription ("sub3", "double", "V");
+    auto subid3 = vFed1->registerSubscription ("sub3", "V");
     // enter execution
     vFed1->enterExecutingMode ();
 
@@ -199,7 +199,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed1->registerSubscription<std::string> ("pub1");
+    auto subid = vFed1->registerSubscription ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -349,9 +349,9 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
 
     auto pubid3 = vFed1->registerPublicationIndexed<double> ("pub1", 2);
 
-    auto sub1 = vFed1->registerSubscriptionIndexed<double> ("pub1", 0);
-    auto sub2 = vFed1->registerSubscriptionIndexed<double> ("pub1", 1);
-    auto sub3 = vFed1->registerSubscriptionIndexed<double> ("pub1", 2);
+    auto sub1 = vFed1->registerSubscriptionIndexed ("pub1", 0);
+    auto sub2 = vFed1->registerSubscriptionIndexed ("pub1", 1);
+    auto sub3 = vFed1->registerSubscriptionIndexed ("pub1", 2);
     vFed1->enterExecutingMode ();
 
     vFed1->publish (pubid1, 10.0);
@@ -379,7 +379,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed2->registerSubscription<std::string> ("pub1");
+    auto subid = vFed2->registerSubscription ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 

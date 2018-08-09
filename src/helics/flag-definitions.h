@@ -64,6 +64,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define MAX_ITERATIONS_PROPERTY 259
 #define LOG_LEVEL_PROPERTY 271
 
-
+/** handle option flags*/
+#define CONNECTION_REQUIRED_OPTION 397
+#define CONNECTION_OPTIONAL_OPTION 402
+#define SINGLE_CONNECTION_ONLY_OPTION 407
 
 #endif

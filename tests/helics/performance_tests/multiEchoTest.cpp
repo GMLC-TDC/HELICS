@@ -61,7 +61,7 @@ public:
         for (int ii = 0; ii < cnt_; ++ii)
         {
             pubs.push_back(vFed->registerPublicationIndexed < std::string > ("leafrx", ii));
-            subs.push_back(vFed->registerSubscriptionIndexed<std::string>("leafsend", ii));
+            subs.push_back(vFed->registerSubscriptionIndexed("leafsend", ii));
         }
         initialized = true;
     }
@@ -119,7 +119,7 @@ public:
         fi.coreName = coreName;
         vFed = std::make_unique<helics::ValueFederate>(name,fi);
         pub = vFed->registerPublicationIndexed<std::string>("leafsend",index_);
-        sub = vFed->registerSubscriptionIndexed<std::string>("leafrx", index_);
+        sub = vFed->registerSubscriptionIndexed("leafrx", index_);
         initialized = true;
     }
 

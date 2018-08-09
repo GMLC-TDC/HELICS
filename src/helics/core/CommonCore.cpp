@@ -869,22 +869,13 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
 }
 
 
-void CommonCore::setHandleOption (interface_handle handle, int32_t /*option*/, bool /*option_value*/) {
-    auto handleInfo = getHandleInfo (handle);
-	if (handleInfo == nullptr)
-	{
-        throw (InvalidIdentifier ("invalid handle"));
-	}
+void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value) {
+    handles.modify([handle,option,option_value](auto &hand) { return hand.setHandleOption(handle, option,option_value); });
 
 }
 
-bool CommonCore::getHandleOption (interface_handle handle, int32_t /*option*/) const {
-    auto handleInfo = getHandleInfo (handle);
-    if (handleInfo == nullptr)
-    {
-        throw (InvalidIdentifier ("invalid handle"));
-    }
-    return false;
+bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const {
+    return handles.read([handle,option](auto &hand) { return hand.getHandleOption(handle, option); });
 }
 
 void CommonCore::removeTarget (interface_handle handle, const std::string &/*targetToRemove*/) {
@@ -893,20 +884,29 @@ void CommonCore::removeTarget (interface_handle handle, const std::string &/*tar
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
+    
 }
-void CommonCore::addDestinationTarget (interface_handle handle, const std::string & /*dest*/) {
+void CommonCore::addDestinationTarget (interface_handle handle, const std::string & dest) {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
+    ActionMessage cmd(CMD_ADD_DESTINATION_TARGET);
+    cmd.setSource(handleInfo->handle);
+    cmd.payload = dest;
+    addActionMessage(std::move(cmd));
 }
-void CommonCore::addSourceTarget (interface_handle handle, const std::string & /*name*/) {
+void CommonCore::addSourceTarget (interface_handle handle, const std::string &targetName) {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
+    ActionMessage cmd(CMD_ADD_SOURCE_TARGET);
+    cmd.setSource(handleInfo->handle);
+    cmd.payload = targetName;
+    addActionMessage(std::move(cmd));
 }
 
 const std::string &CommonCore::getTarget (interface_handle handle, int32_t /*index*/) const

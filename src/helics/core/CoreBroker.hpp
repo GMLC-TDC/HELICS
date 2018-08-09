@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Broker.hpp"
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
+#include "UnknownHandleManager.hpp"
 #include "TimeDependencies.hpp"
 #include "JsonMapBuilder.hpp"
 
@@ -74,7 +75,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::string previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
-
+    UnknownHandleManager unknownHandles; //!< structure containing unknown targeted handles
     std::vector<std::pair<std::string, int32_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
     std::map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
@@ -207,17 +208,12 @@ class CoreBroker : public Broker, public BrokerBase
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
-    /** check subscriptions for completion and mismatches*/
-    void checkSubscriptions ();
     /** find any existing publishers for a subscription*/
-    bool FindandNotifyInputPublisher (BasicHandleInfo &handleInfo);
-    void FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInfo);
-    /** check endpoints for any issues*/
-    void checkEndpoints ();
-    /** check filters for any issues*/
-    void checkFilters ();
-    bool FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo);
-    void FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo);
+    void FindandNotifyInputTargets (BasicHandleInfo &handleInfo);
+    void FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo);
+
+    void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
+    void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
     /** answer a query or route the message the appropriate location*/

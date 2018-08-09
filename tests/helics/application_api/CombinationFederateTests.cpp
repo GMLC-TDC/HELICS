@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed1->registerSubscription<std::string> ("pub1");
+    auto subid = vFed1->registerSubscription("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -198,7 +198,7 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // register the publications
     auto pubid = cFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = cFed2->registerSubscription<std::string> ("pub1");
+    auto subid = cFed2->registerSubscription("pub1");
 
     cFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     cFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);

@@ -59,11 +59,11 @@ public:
         pub = vFed->registerPublicationIndexed<std::string>("pub", index_);
         if (index_ == 0)
         {
-            sub = vFed->registerSubscriptionIndexed<std::string>("pub", maxIndex_-1);
+            sub = vFed->registerSubscriptionIndexed("pub", maxIndex_-1);
         }
         else
         {
-            sub = vFed->registerSubscriptionIndexed<std::string>("pub", index_-1);
+            sub = vFed->registerSubscriptionIndexed("pub", index_-1);
         }
         initialized = true;
     }

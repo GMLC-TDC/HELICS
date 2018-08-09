@@ -42,29 +42,12 @@ for subscriptions and publications
 @param fed the federate object in which to create a subscription must have been create with helicsCreateValueFederate or
 helicsCreateCombinationFederate
 @param key the identifier matching a publication to get a subscription for
-@param type a string describing the expected type of the publication may be NULL
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the subscription
 */
 HELICS_EXPORT helics_input helicsFederateRegisterSubscription (helics_federate fed,
                                                                       const char *key,                                                          
                                                                       const char *units);
-
-/** create a subscription of a specific known type
-@details the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
-for subscriptions and publications
-@param fed the federate object in which to create a subscription
-@param key the identifier matching a publication to get a subscription for
-@param type a known type identifier  HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE,
-HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN,
-HELICS_DATA_TYPE_RAW
-@param units a string listing the units of the subscription maybe NULL
-@return an object containing the subscription
-*/
-HELICS_EXPORT helics_input helicsFederateRegisterTypeSubscription (helics_federate fed,
-                                                                          const char *key,
-                                                                          const char *type,
-                                                                          const char *units);
 
 
 /** register a publication with a a known type

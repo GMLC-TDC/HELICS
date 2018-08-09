@@ -39,7 +39,7 @@ int main(int /*argc*/,char ** /*argv*/)
   helics98::ValueFederate* vfed = new helics98::ValueFederate ("TestB Federate", fi);
   printf(" Value federate created\n");
 
-  sub = vfed->registerTypeSubscription("testA","double");
+  sub = vfed->registerSubscription("testA");
   printf(" Subscription registered\n");
 
   /* Register the publication */

@@ -27,6 +27,7 @@ set(
 	NetworkBrokerData.cpp
 	helics-time.cpp
 	HandleManager.cpp
+	UnknownHandleManager.cpp
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
 )
@@ -107,6 +108,7 @@ set(
 	FilterFunctions.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
+	UnknownHandleManager.hpp
 	queryHelpers.hpp
 	MessageTimer.hpp
 	JsonMapBuilder.hpp

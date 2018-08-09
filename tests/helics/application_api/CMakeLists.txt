@@ -22,7 +22,8 @@ set(
   subPubObjectTests.cpp
   ValueFederateAdditionalTests.cpp
   CombinationFederateTests.cpp
-  ValueFederateExtendedTests.cpp
+  ValueFederateSingleTransfer.cpp
+  ValueFederateDualTransfer.cpp
 )
 
 add_executable(

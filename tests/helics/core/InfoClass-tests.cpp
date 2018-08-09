@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE (inputinfo_test)
     BOOST_CHECK_EQUAL(subI.key,"key");
     BOOST_CHECK_EQUAL(subI.type,"type");
     BOOST_CHECK_EQUAL(subI.units,"units");
-    BOOST_CHECK_EQUAL (subI.required, true);
+    BOOST_CHECK_EQUAL (subI.required, false);
 
 	helics::global_handle testHandle (helics::global_federate_id_t (5), helics::interface_handle (45));
     subI.addSource (testHandle);

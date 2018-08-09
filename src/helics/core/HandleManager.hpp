@@ -29,7 +29,6 @@ class HandleManager
     std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
     std::unordered_map<std::string, interface_handle> inputs;  //!< map of all local endpoints
     std::unordered_map<std::string, interface_handle> filters;  //!< map of all local endpoints
-    std::unordered_multimap<std::string, interface_handle> subscriptions;  //!< multimap of subscriptions
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
@@ -66,14 +65,19 @@ class HandleManager
     void addHandle(const BasicHandleInfo &otherHandle);
     /** add a handle at the specified index*/
     void addHandleAtIndex(const BasicHandleInfo &otherHandle,int32_t index);
-    /** get a handle by index*/
+     /** get a handle by index*/
     BasicHandleInfo *getHandleInfo (int32_t index);
     /** get a const handle by index*/
     const BasicHandleInfo *getHandleInfo(int32_t index) const;
     /** find a handle from both the federate and local id*/
     BasicHandleInfo *findHandle (global_handle id);
 
+    void setHandleOption(int32_t index, int option, bool val);
+
+    bool getHandleOption(int32_t index, int option) const;
+    /** get an endpoint from its name*/
     BasicHandleInfo *getEndpoint (const std::string &name);
+    /** get an endpoint from its name*/
     const BasicHandleInfo *getEndpoint(const std::string &name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
@@ -84,7 +88,6 @@ class HandleManager
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
     BasicHandleInfo *getFilter(int32_t index);
-    auto getSubscribers (const std::string &name) const { return subscriptions.equal_range (name); }
     BasicHandleInfo *getPublication (const std::string &name);
     const BasicHandleInfo *getPublication(const std::string &name) const;
     /** get a publication by index

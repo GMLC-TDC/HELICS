@@ -202,61 +202,47 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     }
     
     /** register a subscription
-    @details call is only valid in startup mode
     @param[in] target the name of the publication to subscribe to
     @param[in] type the type of the subscription
     @param[in] units the units associated with the desired output
     */
     input_id_t registerSubscription (const std::string &target,
-                                                    const std::string &type,
                                                     const std::string &units = std::string ());
-    /** register a subscription
-    @details call is only valid in startup mode
-    @param[in] key the name of the subscription
-    @param[in] units the optional units on the subscription
-    */
-    template <typename X>
-    input_id_t
-    registerSubscription (const std::string &target, const std::string &units = std::string ())
-    {
-        return registerSubscription (target, ValueConverter<X>::type (), units);
-    }
 
-    /** register an optional subscription
-    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
+
+    /** register a subscription
+    @details register asubscription for a 1D array of values
     @param[in] key the name of the subscription
     @param[in] index1 the index into a 1 dimensional array of values
     @param[in] units the optional units on the subscription
     */
-    template <typename X>
     input_id_t registerSubscriptionIndexed (const std::string &target,
                                                            int index1,
                                                            const std::string &units = std::string ())
     {
-        return registerSubscription<X> (target + '_' + std::to_string (index1), units);
+        return registerSubscription(target + '_' + std::to_string (index1), units);
     }
 
-    /** register an optional subscription for a 2-D array of values
+    /** register a subscription for an index of a 2-D array of values
     @details call is only valid in startup mode
     @param[in] key the name of the subscription
     @param[in] index1 the first index of a 2-D value structure
     @param[in] index2 the 2nd index of a 2-D value structure
     @param[in] units the optional units on the subscription
     */
-    template <typename X>
     input_id_t registerSubscriptionIndexed (const std::string &target,
                                                            int index1,
                                                            int index2,
                                                            const std::string &units = std::string ())
     {
-        return registerSubscription<X> (target + '_' + std::to_string (index1) + '_' +
+        return registerSubscription(target + '_' + std::to_string (index1) + '_' +
                                                   std::to_string (index2),
                                                 units);
     }
-    /** add a shortcut for locating a subscription
+    /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
+    @param[in] subid the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
     void addShortcut (input_id_t subid, const std::string &shortcutName);

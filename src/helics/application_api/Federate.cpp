@@ -143,7 +143,6 @@ Federate::Federate (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    FedInfo = std::move (fed.FedInfo);
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
 }
@@ -155,7 +154,6 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    FedInfo = std::move (fed.FedInfo);
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     return *this;
@@ -701,8 +699,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                 }
                 else if ((mode == "clone") || (mode == "cloning"))
                 {
-                    // TODO:: do something with the name
-                    auto clonefilt = std::make_shared<CloningFilter> (this);
+                    auto clonefilt = std::make_shared<CloningFilter> (this,key);
                     clonefilt->addDeliveryEndpoint (target);
                     filter = std::move (clonefilt);
                 }
@@ -977,14 +974,28 @@ filter_id_t Federate::registerFilter (const std::string &filterName,
                                             const std::string &inputType,
                                             const std::string &outputType)
 {
-    return filter_id_t(coreObject->registerFilter (filterName, inputType, outputType));
+    return filter_id_t(coreObject->registerFilter (getName() + separator_ + filterName, inputType, outputType));
 }
 
 filter_id_t Federate::registerCloningFilter (const std::string &filterName,
                                                    const std::string &inputType,
                                                    const std::string &outputType)
 {
-    return filter_id_t(coreObject->registerCloningFilter (filterName, inputType, outputType));
+    return filter_id_t(coreObject->registerCloningFilter (getName() + separator_ + filterName, inputType, outputType));
+}
+
+filter_id_t Federate::registerGlobalFilter(const std::string &filterName,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    return filter_id_t(coreObject->registerFilter(filterName, inputType, outputType));
+}
+
+filter_id_t Federate::registerGlobalCloningFilter(const std::string &filterName,
+    const std::string &inputType,
+    const std::string &outputType)
+{
+    return filter_id_t(coreObject->registerCloningFilter(filterName, inputType, outputType));
 }
 
 void Federate::addSourceTarget (filter_id_t id, const std::string &targetEndpoint)

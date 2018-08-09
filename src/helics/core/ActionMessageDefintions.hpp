@@ -130,6 +130,13 @@ enum class action_t : int32_t
     cmd_add_source_endpoint = 90,  //!< notify of a source endpoint
     cmd_add_destination_endpoint = 91,  //!< notify of a destination endpoint
 
+    cmd_add_source_target=107, //!< command to add a named source target
+    cmd_add_destination_target=108, //!< command to add a named destination target
+	cmd_remove_target=110, //!< cmd to remove a target from connection
+
+    cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
+
+
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
     cmd_protocol_big = cmd_info_basis + 60000  //!< command used in the protocol stacks with the additional info
@@ -186,6 +193,10 @@ enum class action_t : int32_t
 #define CMD_REG_INPUT action_message_def::action_t::cmd_reg_input
 #define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
 
+#define CMD_ADD_SOURCE_TARGET action_message_def::action_t::cmd_add_source_target
+#define CMD_ADD_DESTINATION_TARGET action_message_def::action_t::cmd_add_destination_target
+#define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
+
 #define CMD_REG_END action_message_def::action_t::cmd_reg_end
 #define CMD_ADD_SOURCE_ENDPOINT action_message_def::action_t::cmd_add_source_endpoint
 #define CMD_ADD_DESTINATION_ENDPOINT action_message_def::action_t::cmd_add_destination_endpoint
@@ -221,6 +232,8 @@ enum class action_t : int32_t
 #define CMD_QUERY action_message_def::action_t::cmd_query
 #define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
+
+#define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
 
 // definitions for the protocol options
 #define PROTOCOL_PING 10

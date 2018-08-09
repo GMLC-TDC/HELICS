@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
     BOOST_CHECK_EQUAL (m.source_id, fr.source_id);
     BOOST_CHECK_EQUAL (m.dest_handle, fr.dest_handle);
     BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
-    BOOST_CHECK (m.actionTime = fr.actionTime);
+    BOOST_CHECK (m.actionTime == fr.actionTime);
 }
 
 BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
@@ -89,6 +89,7 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     m.info ().orig_source = "this is a longer alternate source string to test";
     m.info ().target = "this is a target";
     m.Tdemin = 2342532.2342;
+    m.Tso = 54.7814;
     m.Te = Time::epsilon ();
 
     std::string data;
@@ -107,6 +108,7 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     BOOST_CHECK_EQUAL (m.info ().source, fr.info ().source);
     BOOST_CHECK_EQUAL (m.info ().orig_source, fr.info ().orig_source);
     BOOST_CHECK_EQUAL (m.info ().target, fr.info ().target);
+    BOOST_CHECK(m.Tso == fr.Tso);
     BOOST_CHECK (m.Te == fr.Te);
     BOOST_CHECK (m.Tdemin == fr.Tdemin);
 }

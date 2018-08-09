@@ -95,7 +95,6 @@ class Federate
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime;  //!< the current simulation time
-    FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
     std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
@@ -296,27 +295,51 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
+    
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerFilter (const std::string &filterName,
-                                      const std::string &inputType = std::string (),
-                                      const std::string &outputType = std::string ());
+    filter_id_t registerGlobalFilter(const std::string &filterName,
+        const std::string &inputType = std::string(),
+        const std::string &outputType = std::string());
 
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param filterName the name of the filter
     @param inputType the inputType which the filter can handle
-	@param outputType the outputType of the filter which the filter produces
+    @param outputType the outputType of the filter which the filter produces
     */
-    filter_id_t registerCloningFilter (const std::string &filterName,
-                                             const std::string &inputType = std::string (),
-                                             const std::string &outputType = std::string ());
+    filter_id_t registerGlobalCloningFilter(const std::string &filterName,
+        const std::string &inputType = std::string(),
+        const std::string &outputType = std::string());
     
+    /** define a filter interface
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    filter_id_t registerFilter(const std::string &filterName,
+        const std::string &inputType = std::string(),
+        const std::string &outputType = std::string());
+
+
+        /** define a cloning filter interface on a source
+        @details a source filter will be sent any packets that come from a particular source
+        if multiple filters are defined on the same source, they will be placed in some order defined by the core
+        @param filterName the name of the filter
+        @param inputType the inputType which the filter can handle
+        @param outputType the outputType of the filter which the filter produces
+        */
+        filter_id_t registerCloningFilter(const std::string &filterName,
+            const std::string &inputType = std::string(),
+            const std::string &outputType = std::string());
+
+
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -325,7 +348,7 @@ class Federate
     */
     filter_id_t registerFilter ()
     {
-        return registerFilter (std::string (), std::string (), std::string ());
+        return registerGlobalFilter (std::string (), std::string (), std::string ());
     }
     
     /** define a cloning filter interface on a source
@@ -336,7 +359,7 @@ class Federate
     */
     filter_id_t registerCloningFilter ()
     {
-        return registerCloningFilter (std::string (), std::string (), std::string ());
+        return registerGlobalCloningFilter (std::string (), std::string (), std::string ());
     }
     
     /** add a source target to a filter

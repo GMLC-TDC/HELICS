@@ -127,7 +127,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types_all)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed2->registerSubscription<std::string> ("pub1");
+    auto subid = vFed2->registerSubscription("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
@@ -175,7 +175,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerSubscription<double> ("pub1");
+    auto subid = vFed1->registerSubscription("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 1.0);

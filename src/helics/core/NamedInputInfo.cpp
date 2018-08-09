@@ -86,7 +86,13 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource) { input_sources.push_back (newSource); }
+void NamedInputInfo::addSource (global_handle newSource) 
+{ 
+    input_sources.push_back (newSource);
+    data_queues.resize(input_sources.size());
+    current_data.resize(input_sources.size());
+}
+
 bool NamedInputInfo::updateTimeUpTo (Time newTime)
 {
     int index = 0;

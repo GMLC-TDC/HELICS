@@ -165,7 +165,7 @@ class ActionMessage
         decltype (Te.getBaseTimeCode ()) Tebase;
         decltype (Tdemin.getBaseTimeCode ()) Tdeminbase;
         decltype (Tso.getBaseTimeCode()) Tsobase;
-        ar (btc, Tebase, Tdeminbase, Tsobase, payload);
+        ar (btc, Tebase, Tsobase, Tdeminbase,  payload);
 
         actionTime.setBaseTimeCode (btc);
         Te.setBaseTimeCode (Tebase);
