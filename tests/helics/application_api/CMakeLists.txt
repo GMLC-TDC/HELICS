@@ -55,7 +55,7 @@ add_test(
   COMMAND
     application-api-tests
     --run_test=@ci
-    --log_level=message
+    --log_level=test_suite
     --report_level=short
 )
 set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)

@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
  - some CMake options have been removed (BUILD_BROKER)
  - major changes to the build of the CTest testing Framework
+ - moved most examples to new [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples) Repo
 
 ### Fixed
  - potential segmentation fault in C shared library when calling free with invalid object.
@@ -29,6 +30,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
  - Environment variables are recognized in CMAKE find options
  - split API tests from system wide tests
  - added options on MSVC to build with embedded system libraries and embedded debug info.
+ 
+### Removed
+ - Most examples are now located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples)
 
 ## [1.2.1] - 2018-06-30
 ### Fixed
