@@ -74,29 +74,19 @@ else
 end
 
 %% Execution Loop
-value = 0.0;
-prevtime = 0;
-
-currenttime = helics.helicsFederateRequestTime(vfed, sim_stop_time);
-
-isupdated = helics.helicsSubscriptionIsUpdated(sub);
-
-if (isupdated == 1)
-    [result, value] = helics.helicsSubscriptionGetDouble(sub);
-    fprintf('PI RECEIVER: Received value = %s at time %s from PI SENDER\n', value, currenttime);
-end
+granted_time =- 1;  %Force at least one run
 
 %% Continue execution until end of requested simulation time
-while currenttime <= sim_stop_time
+while granted_time <= sim_stop_time
 
-    [status, currenttime] = helics.helicsFederateRequestTime(vfed, sim_stop_time);
+    [status, granted_time] = helics.helicsFederateRequestTime(vfed, sim_stop_time);
     assert(status==0)
 
     isupdated = helics.helicsSubscriptionIsUpdated(sub);
 
     if (isupdated == 1)
         [result, value] = helics.helicsSubscriptionGetDouble(sub);
-        fprintf('PI RECEIVER: Received value = %s at time %s from PI SENDER\n', value, currenttime);
+        fprintf('PI RECEIVER: Received value = %g at time %4.1f from PI SENDER\n', value, granted_time);
     end
 end
 
