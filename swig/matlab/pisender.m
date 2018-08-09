@@ -129,7 +129,7 @@ if pisend_start_broker
     helics.helicsCloseLibrary();
 else
     %But if we just setup the federate, we can simply call endFederate
-    helicsEndFederate(vfed); %#ok<UNRCH>  
+    helicsDestroyFederate(vfed); %#ok<UNRCH>  
     disp('PI SENDER: Federate finalized');
 end
 

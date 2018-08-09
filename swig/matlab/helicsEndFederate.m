@@ -1,5 +1,5 @@
-function helicsEndFederate(fed_info)
-% helicsEndFederate helper function to abstract steps to close a HELICS federate
+function helicsDestroyFederate(fed_info)
+% helicsDestroyFederate helper function to abstract steps to close a HELICS federate
 %
 % TODO: mauy eventually become part of the C library and called via mex
 if isempty(fed_info)

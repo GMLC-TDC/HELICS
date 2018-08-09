@@ -101,7 +101,7 @@ while currenttime <= sim_stop_time
 end
 
 %% Shutdown
-helicsEndFederate(vfed);
+helicsDestroyFederate(vfed);
 
 disp('PI RECEIVER: Federate finalized');
 
