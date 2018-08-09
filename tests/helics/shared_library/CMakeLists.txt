@@ -99,7 +99,7 @@ add_test(
   COMMAND
     shared-library-tests
     --run_test=@ci
-    --log_level=message
+    --log_level=test_suite
     --report_level=short
 )
 add_test(
@@ -107,7 +107,7 @@ add_test(
   COMMAND
     shared-library-tests-cpp
     --run_test=@ci
-    --log_level=message
+    --log_level=test_suite
     --report_level=short
 )
 
