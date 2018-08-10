@@ -886,27 +886,63 @@ void CommonCore::removeTarget (interface_handle handle, const std::string &/*tar
     }
     
 }
-void CommonCore::addDestinationTarget (interface_handle handle, const std::string & dest) {
+void CommonCore::addDestinationTarget (interface_handle handle, const std::string & dest) 
+{
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
-    ActionMessage cmd(CMD_ADD_DESTINATION_TARGET);
-    cmd.setSource(handleInfo->handle);
-    cmd.payload = dest;
+    ActionMessage cmd;
+	cmd.setSource(handleInfo->handle);
+	cmd.flags = handleInfo->flags;
+	setActionFlag(cmd, destination_target);
+	cmd.payload = dest;
+	switch (handleInfo->handle_type)
+	{
+	case handle_type_t::endpoint:
+		cmd.setAction(CMD_ADD_NAMED_FILTER);
+		break;
+	case handle_type_t::filter:
+		cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+		break;
+	case handle_type_t::publication:
+		cmd.setAction(CMD_ADD_NAMED_INPUT);
+		break;
+	case handle_type_t::input:
+	default:
+		throw (InvalidIdentifier("inputs cannot have destination targets"));
+	}
+    
     addActionMessage(std::move(cmd));
 }
+
 void CommonCore::addSourceTarget (interface_handle handle, const std::string &targetName) {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
-    ActionMessage cmd(CMD_ADD_SOURCE_TARGET);
-    cmd.setSource(handleInfo->handle);
-    cmd.payload = targetName;
-    addActionMessage(std::move(cmd));
+	ActionMessage cmd;
+	cmd.setSource(handleInfo->handle);
+	cmd.flags = handleInfo->flags;
+	cmd.payload = targetName;
+	switch (handleInfo->handle_type)
+	{
+	case handle_type_t::endpoint:
+		cmd.setAction(CMD_ADD_NAMED_FILTER);
+		break;
+	case handle_type_t::filter:
+		cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+		break;
+	case handle_type_t::input:
+		cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+		break;
+	case handle_type_t::publication:
+	default:
+		throw (InvalidIdentifier("publications cannot have source targets"));
+	}
+	addActionMessage(std::move(cmd));
 }
 
 const std::string &CommonCore::getTarget (interface_handle handle, int32_t /*index*/) const
@@ -1021,7 +1057,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createEndpoint (id, name, type);
     fed->hasEndpoints = true;
-    ActionMessage m (CMD_REG_END);
+    ActionMessage m (CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
     m.name = name;
@@ -2266,8 +2302,6 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_REG_INPUT:
-        // for these registration filters any processing is already done in the
-        // registration functions so this is just a router
         if (command.dest_id != 0)
         {
             auto fed = getFederateCore (global_federate_id_t (command.dest_id));
@@ -2294,15 +2328,14 @@ void CommonCore::processCommand (ActionMessage &&command)
                 loopHandles.addHandleAtIndex (*sub, command.source_handle);
             }
 
-            if (checkForLocalPublication (command))
-            {
-                setActionFlag (command, processing_complete_flag);
-            }
-            transmit (0, command);
+			if (!sub->key.empty())
+			{
+				transmit(0, command);
+			}
         }
 
         break;
-    case CMD_REG_END:
+    case CMD_REG_ENDPOINT:
         if (command.dest_id == global_broker_id_local)
         {  // in this branch the message came from somewhere else and is targeted at a filter
             auto filtI =
@@ -2321,7 +2354,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         else
         {
-            transmit (0, command);
+           
             auto ept = getHandleInfo (interface_handle (command.source_handle));
             if (ept != nullptr)
             {
@@ -2349,6 +2382,10 @@ void CommonCore::processCommand (ActionMessage &&command)
                     timeCoord->addDependent (higher_broker_id);
                 }
             }
+			if (!ept->key.empty())
+			{
+				transmit(0, command);
+			}
         }
 
         break;
@@ -2360,13 +2397,28 @@ void CommonCore::processCommand (ActionMessage &&command)
             {
                 loopHandles.addHandleAtIndex (*pub, command.source_handle);
             }
+			if (!pub->key.empty())
+			{
+				transmit(0, command);
+			}
         }
-        routeMessage (command);
+		else
+		{
+			routeMessage(command);
+		}
+        
         break;
     case CMD_REG_FILTER:
         if (command.dest_id == 0)
         {
-            localFilterCreation (command);
+			auto filt = getHandleInfo(interface_handle(command.source_handle));
+			if (filt != nullptr)
+			{
+				loopHandles.addHandleAtIndex(*filt, command.source_handle);
+			}
+
+			createFilter(global_broker_id_local, interface_handle(command.source_handle), command.name,
+					command.info().type, command.info().type_out, checkActionFlag(command, clone_flag));
             if (!hasFilters)
             {
                 hasFilters = true;
@@ -2376,12 +2428,17 @@ void CommonCore::processCommand (ActionMessage &&command)
                     transmit (higher_broker_id, add);
                 }
             }
+			if (!filt->key.empty())
+			{
+				transmit(0, command);
+			}
         }
-        routeMessage (command);
-        if (command.dest_id != 0)
-        {
-            processFilterInfo (command);
-        }
+		else
+		{
+			routeMessage(command);
+			processFilterInfo(command);
+		}
+       
         break;
 
     case CMD_ADD_SUBSCRIBER:
@@ -2399,7 +2456,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
     }
     break;
-    case CMD_ADD_SOURCE_ENDPOINT:
+    case CMD_ADD_ENDPOINT:
     {
         if (command.dest_id == global_broker_id_local)
         {
@@ -2425,7 +2482,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ADD_PUBLISHER:
         routeMessage (command);
         break;
-    case CMD_ADD_SRC_FILTER:
+    case CMD_ADD_FILTER:
     {
         auto endhandle = loopHandles.getEndpoint (command.dest_handle);
         if (endhandle != nullptr)
@@ -2444,20 +2501,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
         }
     }
-    break;
-    case CMD_ADD_DEST_FILTER:
-    {
-        processFilterInfo (command);
-        if (command.source_id != global_broker_id_local)
-        {
-            auto fed = getFederateCore (global_federate_id_t (command.dest_id));
-            if (fed != nullptr)
-            {
-                command.setAction (CMD_ADD_DEPENDENT);
-                fed->addAction (command);
-            }
-        }
-    }
+    
     break;
     case CMD_CORE_CONFIGURE:
         processCoreConfigureCommands (command);
@@ -2521,62 +2565,6 @@ void CommonCore::processCommand (ActionMessage &&command)
     }
 }
 
-void CommonCore::localFilterCreation (ActionMessage &command)
-{
-    // add the local handle from the global one
-    auto filt = getHandleInfo (interface_handle (command.source_handle));
-    if (filt != nullptr)
-    {
-        loopHandles.addHandleAtIndex (*filt, command.source_handle);
-    }
-    if (command.action () == CMD_REG_FILTER)
-    {
-        auto filtInfo =
-          createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
-                        command.info ().type, command.info ().type_out, checkActionFlag (command, clone_flag));
-        if (filtInfo->key != command.name)
-        {
-            command.name = filtInfo->key;
-        }
-        auto epthand = loopHandles.getEndpoint (command.info ().target);
-        if (epthand != nullptr)
-        {
-            setActionFlag (*epthand, has_dest_filter_flag);
-            if (!checkActionFlag (command, clone_flag))
-            {
-                setActionFlag (*epthand, has_non_cloning_dest_filter_flag);
-            }
-            setActionFlag (command, processing_complete_flag);
-            command.dest_handle = epthand->getInterfaceHandle ();
-            command.dest_id = epthand->getFederateId ();
-            routeMessage (command);
-            command.dest_id = 0;
-            command.dest_handle = 0;
-        }
-    }
-    else if (command.action () == CMD_REG_FILTER)
-    {
-        auto filtInfo =
-          createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
-                        command.info ().type, command.info ().type_out, checkActionFlag (command, clone_flag));
-        if (filtInfo->key != command.name)
-        {
-            command.name = filtInfo->key;
-        }
-        auto ept = loopHandles.getEndpoint (command.info ().target);
-        if (ept != nullptr)
-        {
-            setActionFlag (*ept, has_source_filter_flag);
-            setActionFlag (command, processing_complete_flag);
-            // now send the same command to the endpoint
-            command.dest_handle = ept->getInterfaceHandle ();
-            command.dest_id = ept->getFederateId ();
-            routeMessage (command);
-            command.dest_id = 0;
-            command.dest_handle = 0;
-        }
-    }
-}
 
 void CommonCore::processFilterInfo (ActionMessage &command)
 {
@@ -2587,8 +2575,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     }
     switch (command.action ())
     {
-    case CMD_ADD_SOURCE_ENDPOINT:
-    case CMD_ADD_DESTINATION_ENDPOINT:
+    case CMD_ADD_ENDPOINT:
     {
         bool FilterAlreadyPresent = false;
         if (filterInfo->destFilter != nullptr)

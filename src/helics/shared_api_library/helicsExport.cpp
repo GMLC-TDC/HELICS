@@ -71,7 +71,7 @@ helics_status helicsErrorHandler () noexcept
             }
             else
             {
-                return helics_error;
+                return helics_other_error;
             }
         }
         catch (const helics::InvalidIdentifier &)
@@ -88,12 +88,12 @@ helics_status helicsErrorHandler () noexcept
         }
         catch (...)
         {
-            return helics_error;
+            return helics_other_error;
         }
     }
     catch (...)
     {
-        return helics_error;
+        return helics_other_error;
     }
 }
 
@@ -594,7 +594,7 @@ helics_status helicsBrokerDisconnect (helics_broker broker)
 {
     if (broker == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     auto brk = getBroker (broker);
     if (brk == nullptr)
@@ -930,6 +930,7 @@ void MasterObjectHolder::deleteAll ()
     {
         return;
     }
+	//brackets are for the scopes on the lock handles
     {
         auto brokerHandle = brokers.lock ();
         brokerHandle->clear ();
@@ -938,9 +939,20 @@ void MasterObjectHolder::deleteAll ()
         auto coreHandle = cores.lock ();
         coreHandle->clear ();
     }
+	errorStrings.lock()->clear();
     auto fedHandle = feds.lock ();
     fedHandle->clear ();
 }
+
+
+const char *MasterObjectHolder::addErrorString(std::string newError)
+{
+	auto estring=errorStrings.lock();
+	estring->push_back(std::move(newError));
+	auto &v = estring->back();
+	return v.c_str();
+}
+
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder ()
 {

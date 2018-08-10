@@ -665,7 +665,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
         addInput (command);
         break;
-    case CMD_REG_END:
+    case CMD_REG_ENDPOINT:
         if ((!_isRoot) && (command.dest_id != 0))
         {
                 routeMessage (command);
@@ -1032,32 +1032,28 @@ void CoreBroker::executeInitializationOperations ()
 
 void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)
 {
-    if (!checkActionFlag (handleInfo, processing_complete_flag))
-    {
-        auto pubHandle = handles.getPublication (handleInfo.key);
-        if (pubHandle != nullptr)
-        {
-            if (!matchingTypes (pubHandle->type, handleInfo.type))
-            {
-                // LOG(WARN) << "sub " << hndl->key << " does not match types" << hndl->type << " " <<
-                // pubInfo->type << ENDL;
-            }
-            // notify the subscription about its publisher
-            ActionMessage m (CMD_ADD_PUBLISHER);
-            m.setSource (pubHandle->handle);
-            m.setDestination (handleInfo.handle);
-            m.payload = pubHandle->type;
-            transmit (getRoute (global_federate_id_t(m.dest_id)), m);
+	auto Handles = unknownHandles.checkForInputs(handleInfo.key);
+	for (auto target : Handles)
+	{
+		// notify the publication about its subscriber
+		ActionMessage m(CMD_ADD_PUBLISHER);
+		m.setSource(target.first);
+		m.setDestination(handleInfo.handle);
+		m.flags = target.second;
+		transmit(getRoute(global_federate_id_t(m.dest_id)), m);
 
-            // notify the publisher about its subscription
-            m.setAction (CMD_ADD_SUBSCRIBER);
-            m.setSource (handleInfo.handle);
-            m.setDestination (pubHandle->handle);
-
-            transmit (getRoute (global_federate_id_t(m.dest_id)), m);
-            setActionFlag (handleInfo, processing_complete_flag);
-        }
-    }
+		// notify the subscriber about its publisher
+		m.setAction(CMD_ADD_SUBSCRIBER);
+		m.setDestination(target.first);
+		m.setSource(handleInfo.handle);
+		m.payload = handleInfo.type;
+		m.flags = handleInfo.flags;
+		transmit(getRoute(m.dest_id), m);
+	}
+	if (!Handles.empty())
+	{
+		unknownHandles.clearPublication(handleInfo.key);
+	}
 }
 
 void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
@@ -1067,16 +1063,17 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
     {
         // notify the publication about its subscriber
         ActionMessage m (CMD_ADD_SUBSCRIBER);
-        m.setSource (sub);
+        m.setSource (sub.first);
         m.setDestination (handleInfo.handle);
-
+		m.flags = sub.second;
         transmit (getRoute (global_federate_id_t(m.dest_id)), m);
 
         // notify the subscriber about its publisher
         m.setAction (CMD_ADD_PUBLISHER);
-        m.setDestination (sub);
+        m.setDestination (sub.first);
         m.setSource (handleInfo.handle);
         m.payload = handleInfo.type;
+		m.flags = handleInfo.flags;
         transmit (getRoute (m.dest_id), m);
     }
     if (!subHandles.empty())
@@ -1087,19 +1084,19 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
 
 void CoreBroker::FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo)
 {
-    auto Handles = unknownHandles.checkForSourceEndpoints(handleInfo.key);
+    auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
     for (auto target : Handles)
     {
         // notify the filter about its endpoint
-        ActionMessage m(CMD_ADD_SOURCE_ENDPOINT);
-        m.setSource(target);
+        ActionMessage m(CMD_ADD_ENDPOINT);
+        m.setSource(target.first);
         m.setDestination(handleInfo.handle);
-
+		m.flags = target.second;
         transmit(getRoute(global_federate_id_t(m.dest_id)), m);
 
         // notify the endpoint about its filter
-        m.setAction(CMD_ADD_SRC_FILTER);
-        m.setDestination(target);
+        m.setAction(CMD_ADD_FILTER);
+        m.setDestination(target.first);
         m.setSource(handleInfo.handle);
 
         m.flags = handleInfo.flags;
@@ -1108,51 +1105,28 @@ void CoreBroker::FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo)
       
     if (!Handles.empty())
     {
-        unknownHandles.clearSourceEndpoint(handleInfo.key);
+        unknownHandles.clearEndpoint(handleInfo.key);
     }
 
-    Handles = unknownHandles.checkForDestinationEndpoints(handleInfo.key);
-    for (auto target : Handles)
-    {
-        // notify the filter about its endpoint
-        ActionMessage m(CMD_ADD_DESTINATION_ENDPOINT);
-        m.setSource(target);
-        m.setDestination(handleInfo.handle);
-
-        transmit(getRoute(global_federate_id_t(m.dest_id)), m);
-
-        // notify the endpoint about its filter
-        m.setAction(CMD_ADD_DEST_FILTER);
-        m.setDestination(target);
-        m.setSource(handleInfo.handle);
-
-        m.flags = handleInfo.flags;
-        transmit(getRoute(global_federate_id_t(m.dest_id)), m);
-    }
-
-    if (!Handles.empty())
-    {
-        unknownHandles.clearDestinationEndpoint(handleInfo.key);
-    }
    
 }
 
 void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
 {
-    auto Handles = unknownHandles.checkForSourceFilters(handleInfo.key);
+    auto Handles = unknownHandles.checkForFilters(handleInfo.key);
     for (auto target : Handles)
     {
-        // notify the filter about its endpoint
-        ActionMessage m(CMD_ADD_SRC_FILTER);
-        m.setSource(target);
-        m.flags = handleInfo.flags;
+        // notify the endpoint about a filter
+        ActionMessage m(CMD_ADD_FILTER);
+        m.setSource(target.first);
+        m.flags = target.second;
         m.setDestination(handleInfo.handle);
 
         transmit(getRoute(global_federate_id_t(m.dest_id)), m);
 
-        // notify the endpoint about its filter
-        m.setAction(CMD_ADD_SRC_FILTER);
-        m.setDestination(target);
+        // notify the filter about an endpoint
+        m.setAction(CMD_ADD_ENDPOINT);
+        m.setDestination(target.first);
         m.setSource(handleInfo.handle);
 
         m.flags = handleInfo.flags;
@@ -1161,49 +1135,10 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
 
     if (!Handles.empty())
     {
-        unknownHandles.clearSourceFilter(handleInfo.key);
+        unknownHandles.clearFilter(handleInfo.key);
     }
 
-   // auto filtHandles = handles.getFilter (handleInfo.target);
-    //for (auto filt = filtHandles.first; filt != filtHandles.second; ++filt)
-    //{
-       // auto &filtInfo = handles[filt->second];
-        auto filtInfop = handles.getFilter (handleInfo.target);
-		if (filtInfop == nullptr)
-		{
-            return;
-		}
-        auto &filtInfo = *filtInfop;
-        if (checkActionFlag (filtInfo, processing_complete_flag))
-        {
-            return;
-        }
-        if (!matchingTypes (filtInfo.type, handleInfo.type))
-        {
-            ActionMessage mismatch (CMD_WARNING);
-            mismatch.source_id = global_broker_id_local;
-			mismatch.setDestination (filtInfo.handle);
-
-            mismatch.payload = fmt::format ("filter type mismatch for {}: {} does not match {} for endpoint {}",
-                                            filtInfo.key, filtInfo.type, handleInfo.type, handleInfo.key);
-            transmit (getRoute (filtInfo.handle.fed_id), mismatch);
-        }
-        // notify the endpoint about a filter
-        ActionMessage m ((handleInfo.handle_type == handle_type_t::filter) ? CMD_ADD_SRC_FILTER :
-                                                                     CMD_ADD_DEST_FILTER);
-        m.setSource (filtInfo.handle);
-        m.setDestination (handleInfo.handle);
-        m.flags = handleInfo.flags;
-        transmit (getRoute (global_federate_id_t(m.dest_id)), m);
-
-        // notify the filter about its endpoint
-        m.setAction (CMD_ADD_SOURCE_ENDPOINT);
-        m.setSource (handleInfo.handle);
-        m.setDestination (filtInfo.handle);
-
-        transmit (getRoute (global_federate_id_t(m.dest_id)), m);
-        setActionFlag (filtInfo, processing_complete_flag);
-   // }
+   
 }
 
 // public query function

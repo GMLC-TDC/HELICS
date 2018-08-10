@@ -13,7 +13,7 @@ namespace helics
 enum action_message_flags : uint16_t
 {
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
-    processing_complete_flag = 1,  //!< indicator that processing has been completed
+    destination_target = 1,  //!< indicator that the target is a destination target
     required_flag = 2,  //!< flag indicating that an action or match is required
     core_flag = 3,  //!< flag indicating that message comes from a core vs a broker
     error_flag = 4,  //!< flag indicating an error condition associated with the command
@@ -122,17 +122,17 @@ enum class action_t : int32_t
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
     cmd_add_publisher = 50,  //!< notify of a publication
     cmd_reg_filter = cmd_info_basis + 60,  //!< register a destination filter
-    cmd_add_dst_filter = cmd_info_basis + 62,  //!< notify of a destination filter
+    cmd_add_filter = 62,  //!< notify of a destination filter
     cmd_reg_input = cmd_info_basis + 70,  //!< register an input interface
     cmd_add_subscriber = 70,  //!< notify of a subscription
-    cmd_add_src_filter = cmd_info_basis + 82,  //!< notify of a source
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
-    cmd_add_source_endpoint = 90,  //!< notify of a source endpoint
-    cmd_add_destination_endpoint = 91,  //!< notify of a destination endpoint
+    cmd_add_endpoint = 90,  //!< notify of a source endpoint
 
-    cmd_add_source_target=107, //!< command to add a named source target
-    cmd_add_destination_target=108, //!< command to add a named destination target
-	cmd_remove_target=110, //!< cmd to remove a target from connection
+    cmd_add_named_input=104, //!< command to add a named input as a target
+	cmd_add_named_filter=105, //!< command to add named filter as a target
+	cmd_add_named_publication=106, //!< command to add a named publication as a target
+	cmd_add_named_endpoint=107, //!< command to add a named endpoint as a target
+	cmd_remove_target=120, //!< cmd to remove a target from connection
 
     cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
 
@@ -193,17 +193,18 @@ enum class action_t : int32_t
 #define CMD_REG_INPUT action_message_def::action_t::cmd_reg_input
 #define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
 
-#define CMD_ADD_SOURCE_TARGET action_message_def::action_t::cmd_add_source_target
-#define CMD_ADD_DESTINATION_TARGET action_message_def::action_t::cmd_add_destination_target
+#define CMD_ADD_NAMED_ENDPOINT action_message_def::action_t::cmd_add_named_endpoint
+#define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
+#define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
+#define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
+
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
 
-#define CMD_REG_END action_message_def::action_t::cmd_reg_end
-#define CMD_ADD_SOURCE_ENDPOINT action_message_def::action_t::cmd_add_source_endpoint
-#define CMD_ADD_DESTINATION_ENDPOINT action_message_def::action_t::cmd_add_destination_endpoint
+#define CMD_REG_ENDPOINT action_message_def::action_t::cmd_reg_end
+#define CMD_ADD_ENDPOINT action_message_def::action_t::cmd_add_endpoint
 
 #define CMD_REG_FILTER action_message_def::action_t::cmd_reg_filter
-#define CMD_ADD_SRC_FILTER action_message_def::action_t::cmd_add_src_filter
-#define CMD_ADD_DEST_FILTER action_message_def::action_t::cmd_add_dst_filter
+#define CMD_ADD_FILTER action_message_def::action_t::cmd_add_filter
 
 #define CMD_SEARCH_DEPENDENCY action_message_def::action_t::cmd_search_dependency
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency

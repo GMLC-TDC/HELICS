@@ -30,7 +30,7 @@ typedef enum {
     helics_warning, /*!< the function issued a warning of some kind */
     helics_invalid_state_transition, /*!< error issued when an invalid state transition occurred */
     helics_invalid_function_call, /*!< the call made was invalid in the present state of the calling object*/
-    helics_error /*!< the function produced an error */
+    helics_other_error /*!< the function produced an error of some other type */
 } helics_status;
 
 /** opaque object representing an input*/
@@ -116,6 +116,7 @@ typedef struct data_t
     int64_t length; /*!< the size of the data */
 } data_t;
 
+
 /**
  *  Message_t mapped to a c compatible structure
  */
@@ -130,6 +131,17 @@ typedef struct message_t
     const char *original_dest; /*!< the original destination of the message */
 
 } message_t;
+
+/**
+* helics error error object
+*
+* if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string
+*/
+typedef struct helics_error
+{
+	int32_t error_code; /*!< an error code associated with the error*/
+	const char *message; /*!< a message associated with the error*/
+} helics_error;
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or UDP */
 #define HELICS_CORE_TYPE_DEFAULT 0

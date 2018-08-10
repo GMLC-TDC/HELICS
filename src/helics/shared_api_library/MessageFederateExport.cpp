@@ -203,7 +203,7 @@ helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key
 {
     if (endpoint == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {

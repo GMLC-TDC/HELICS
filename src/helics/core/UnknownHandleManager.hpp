@@ -4,11 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-#include "Core.hpp"
-#include "helics-time.hpp"
+#include "federate_id.hpp"
 #include <unordered_map>
-#include <deque>
-#include <utility>
 
 namespace helics
 {
@@ -17,57 +14,48 @@ namespace helics
 */
 class UnknownHandleManager
 {
+public:
+	using targetInfo = std::pair<global_handle, uint16_t>;
   private:
-
-    std::unordered_multimap<std::string,global_handle> unknown_publications;  //!< map of all unknown publications
-    std::unordered_multimap<std::string, global_handle> unknown_source_endpoints;  //!< map of all unknown endpoints
-    std::unordered_multimap<std::string, global_handle> unknown_dest_endpoints;  //!< map of all unknown endpoints
-    std::unordered_multimap<std::string, global_handle> unknown_inputs;  //!< map of all unknown endpoints
-    std::unordered_multimap<std::string, global_handle> unknown_source_filters;  //!< map of all unknown source filters
-    std::unordered_multimap<std::string, global_handle> unknown_dest_filters;  //!< map of all unknown dest filters
+	 
+    std::unordered_multimap<std::string, targetInfo> unknown_publications;  //!< map of all unknown publications
+    std::unordered_multimap<std::string, targetInfo> unknown_endpoints;  //!< map of all unknown endpoints
+    std::unordered_multimap<std::string, targetInfo> unknown_inputs;  //!< map of all unknown endpoints
+    std::unordered_multimap<std::string, targetInfo> unknown_filters;  //!< map of all unknown filters
   public:
     /** default constructor*/
     UnknownHandleManager () = default;
     /** add a missingPublication*/
-    void addUnknownPublication (const std::string &key, global_handle target);
+    void addUnknownPublication (const std::string &key, global_handle target,uint16_t flags);
     /** add a missingPublication*/
-    void addUnknownInput(const std::string &key, global_handle target);
+    void addUnknownInput(const std::string &key, global_handle target, uint16_t flags);
     /** add a missing source endpoint*/
-    void addUnknownSourceEndpoint(const std::string &key, global_handle target);
-    /** add a missing destination endpoint*/
-    void addUnknownDestinationEndpoint(const std::string &key, global_handle target);
+    void addUnknownEndpoint(const std::string &key, global_handle target, uint16_t flags);
+   
     /** add a missing source filter*/
-    void addUnknownSourceFilter(const std::string &key, global_handle target);
+    void addUnknownFilter(const std::string &key, global_handle target, uint16_t flags);
 
-    /** add a missing dest filter*/
-    void addUnknownDestinationFilter(const std::string &key, global_handle target);
     /** specify a found input*/
-    std::vector<global_handle> checkForInputs(const std::string &newInput);
+    std::vector<targetInfo> checkForInputs(const std::string &newInput);
     /** specify a found input*/
-    std::vector<global_handle> checkForPublications(const std::string &newPublication);
+    std::vector<targetInfo> checkForPublications(const std::string &newPublication);
     /** specify a found input*/
-    std::vector<global_handle> checkForSourceEndpoints(const std::string &newEndpoint);
-    /** specify a found input*/
-    std::vector<global_handle> checkForDestinationEndpoints(const std::string &newEndpoint);
+    std::vector<targetInfo> checkForEndpoints(const std::string &newEndpoint);
 
     /** specify a found Source Filter*/
-    std::vector<global_handle> checkForSourceFilters(const std::string &newFilter);
-    /** specify a found Destination Filter*/
-    std::vector<global_handle> checkForDestinationFilters(const std::string &newFilter);
+    std::vector<targetInfo> checkForFilters(const std::string &newFilter);
+
 
     /** specify a found input*/
     void clearInput(const std::string &newInput);
     /** specify a found input*/
     void clearPublication(const std::string &newPublication);
     /** specify a found input*/
-    void clearSourceEndpoint(const std::string &newEndpoint);
-    /** specify a found destination Endpoint*/
-    void clearDestinationEndpoint(const std::string &newEndpoint);
+    void clearEndpoint(const std::string &newEndpoint);
 
     /** specify a found source filter*/
-    void clearSourceFilter(const std::string &newFilter);
-    /** specify a found source filter*/
-    void clearDestinationFilter(const std::string &newFilter);
+    void clearFilter(const std::string &newFilter);
+
 };
 
 }  // namespace helics

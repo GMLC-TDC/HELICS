@@ -32,6 +32,12 @@ HELICS_EXPORT const char *helicsGetVersion ();
  */
 HELICS_EXPORT helics_bool_t helicsIsCoreTypeAvailable (const char *type);
 
+/** return an initialized error object*/
+HELICS_EXPORT helics_error helicsErrorInitialize();
+
+/** clear an error object*/
+HELICS_EXPORT void helicsErrorClear(helics_error *err);
+
 /** create a core object
 @param type the type of the core to create
 @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned

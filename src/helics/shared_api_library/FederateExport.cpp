@@ -545,7 +545,7 @@ helics_status helicsFederateRequestTimeIterative (helics_federate fed,
         auto val = fedObj->requestTimeIterative (requestTime, getIterationRequest (iterate));
         if (val.state == helics::iteration_result::error)
         {
-            return helics_error;
+            return helics_other_error;
         }
         *outIteration = getIterationStatus (val.state);
         *timeOut = static_cast<double> (val.grantedTime);
@@ -772,7 +772,7 @@ helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *
         auto val = fedObj->requestTimeIterativeComplete ();
         if (val.state == helics::iteration_result::error)
         {
-            return helics_error;
+            return helics_other_error;
         }
         *outIteration = getIterationStatus (val.state);
         *timeOut = static_cast<double> (val.grantedTime);

@@ -176,7 +176,7 @@ helics_status helicsPublicationPublishRaw (helics_publication pub, const void *d
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {
@@ -201,7 +201,7 @@ helics_status helicsPublicationPublishString (helics_publication pub, const char
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {
@@ -226,7 +226,7 @@ helics_status helicsPublicationPublishInteger (helics_publication pub, int64_t v
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {
@@ -251,7 +251,7 @@ helics_status helicsPublicationPublishBoolean (helics_publication pub, helics_bo
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {
@@ -276,7 +276,7 @@ helics_status helicsPublicationPublishDouble (helics_publication pub, double val
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {
@@ -301,7 +301,7 @@ helics_status helicsPublicationPublishComplex (helics_publication pub, double re
 {
     if (pub == nullptr)
     {
-        return helics_error;
+        return helics_invalid_object;
     }
     try
     {

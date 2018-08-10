@@ -50,6 +50,7 @@ class BrokerObject
     int valid;
 };
 
+
 /** get the brokerObject from a helics_broker and verify it is valid*/
 BrokerObject *getBrokerObject (helics_broker broker);
 /** object wrapping a core for the c-api*/
@@ -176,7 +177,7 @@ class MasterObjectHolder
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
     tripwire::TripWireDetector tripDetect; //!< detector for library termination
-
+	guarded<std::deque<std::string>> errorStrings; //!< container for strings generated from error conditions
   public:
     MasterObjectHolder () noexcept;
     ~MasterObjectHolder ();
@@ -191,6 +192,9 @@ class MasterObjectHolder
     void clearCore (int index);
     void clearFed (int index);
     void deleteAll ();
+	/** store an error string to a string buffer
+	@return a pointer to the memory location*/
+	const char *addErrorString(std::string newError);
 };
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder ();
