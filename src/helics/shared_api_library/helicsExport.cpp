@@ -730,6 +730,26 @@ helics_status helicsBrokerDisconnect (helics_broker broker)
     }
 }
 
+void helicsDestroyFederate (helics_federate fed)
+{
+    helicsFederateFinalize (fed);
+    helicsFederateFree (fed);
+}
+
+
+void helicsDestroyBroker(helics_broker broker)
+{
+    helicsBrokerDisconnect (broker);
+    helicsBrokerFree (broker);
+}
+
+
+void helicsDestroyCore(helics_core core)
+{
+    helicsCoreDisconnect (core);
+    helicsCoreFree (core);
+}
+
 void helicsCoreFree (helics_core core)
 {
     auto coreObj = helics::getCoreObject (core);
@@ -1004,7 +1024,7 @@ helics::FedObject *MasterObjectHolder::findFed (const std::string &fedName)
     auto handle = feds.lock ();
     for (auto &fed : (*handle))
     {
-        if ((fed)&&(fed->fedptr))
+        if ((fed) && (fed->fedptr))
         {
             if (fed->fedptr->getName () == fedName)
             {
@@ -1049,15 +1069,38 @@ void MasterObjectHolder::deleteAll ()
         return;
     }
     {
-        auto brokerHandle = brokers.lock ();
-        brokerHandle->clear ();
+        auto fedHandle = feds.lock ();
+        for (auto &fed : fedHandle)
+        {
+            if (fed->fedptr)
+            {
+                fed->fedptr->finalize ();
+            }
+        }
+        fedHandle->clear ();
     }
     {
         auto coreHandle = cores.lock ();
+        for (auto &cr : coreHandle)
+        {
+            if (cr->coreptr)
+            {
+                cr->coreptr->disconnect ();
+            }
+        }
         coreHandle->clear ();
     }
-    auto fedHandle = feds.lock ();
-    fedHandle->clear ();
+    {
+        auto brokerHandle = brokers.lock ();
+        for (auto &brk : brokerHandle)
+        {
+            if (brk->brokerptr)
+            {
+                brk->brokerptr->disconnect ();
+            }
+        }
+        brokerHandle->clear ();
+    }
 }
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder ()

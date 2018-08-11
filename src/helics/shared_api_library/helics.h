@@ -138,6 +138,15 @@ HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName);
 */
 HELICS_EXPORT helics_status helicsBrokerDisconnect (helics_broker broker);
 
+/** disconnect and free a broker*/
+HELICS_EXPORT void helicsDestroyFederate (helics_federate fed);
+
+/** disconnect and free a broker*/
+HELICS_EXPORT void helicsDestroyBroker (helics_broker broker);
+
+/** disconnect and free a core*/
+HELICS_EXPORT void helicsDestroyCore (helics_core core);
+
 /** release the memory associated with a core*/
 HELICS_EXPORT void helicsCoreFree (helics_core core);
 /** release the memory associated with a broker*/

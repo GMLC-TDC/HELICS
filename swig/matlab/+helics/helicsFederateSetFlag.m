@@ -10,5 +10,5 @@ function varargout = helicsFederateSetFlag(varargin)
     %* `flagValue` :
     %    the new value of the flag 0 for false !=0 for true
     %
-  [varargout{1:nargout}] = helicsMEX(100, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(103, varargin{:});
 end

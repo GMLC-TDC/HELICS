@@ -1,4 +1,4 @@
 function varargout = helicsFederateInfoSetTimeOffset(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(73, varargin{:});
 end

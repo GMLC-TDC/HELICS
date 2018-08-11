@@ -9,5 +9,5 @@ function varargout = helicsFederateSetInputDelay(varargin)
     %* `lookAhead` :
     %    the look ahead time
     %
-  [varargout{1:nargout}] = helicsMEX(98, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(101, varargin{:});
 end

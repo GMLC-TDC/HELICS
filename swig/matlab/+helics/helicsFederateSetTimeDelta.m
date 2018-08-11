@@ -6,5 +6,5 @@ function varargout = helicsFederateSetTimeDelta(varargin)
     %* `tdelta` :
     %    the minimum time delta to return from a time request function
     %
-  [varargout{1:nargout}] = helicsMEX(96, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(99, varargin{:});
 end
