@@ -83,7 +83,7 @@ class CommsInterface
     std::string brokerName_;  //!< the identifier for the broker
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
-    int connectionTimeout = 4000;  // timeout for the initial connection to a broker
+    int connectionTimeout = 4000;  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
     

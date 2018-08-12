@@ -84,8 +84,11 @@ static const ArgDescriptors extraArgs{
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
   {"dumplog", ArgDescriptor::arg_type_t::flag_type,
    "capture a record of all messages and dump a complete log to file or console on termination"},
+  {"networktimeout",
+   "milliseconds to wait to establish a network (can also be entered as a time like '500ms' or '2s') "},
   {"timeout",
    "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}};
+
 
 void BrokerBase::displayHelp ()
 {
@@ -148,11 +151,24 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         logFile = vm["logfile"].as<std::string> ();
     }
+    if (vm.count ("networktimeout") > 0)
+    {
+        auto network_to = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
+        networkTimeout = network_to.toCount (timeUnits::ms);
+    }
     if (vm.count ("timeout") > 0)
     {
         auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
         timeout = time_out.toCount (timeUnits::ms);
+		if (networkTimeout < 0)
+		{
+            networkTimeout = timeout;
+		}
     }
+	if (networkTimeout < 0)
+	{
+        networkTimeout = 4000;
+	}
     if (vm.count ("tick") > 0)
     {
         auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);

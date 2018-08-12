@@ -38,6 +38,7 @@ class BrokerBase
     int32_t tickTimer = 4000;  //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
+    int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
 
     std::unique_ptr<Logger>

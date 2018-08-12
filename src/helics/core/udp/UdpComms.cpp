@@ -194,29 +194,32 @@ void UdpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer ();
     udp::socket socket (ioserv->getBaseService ());
     socket.open (udp::v4 ());
-    int cntr = 0;
-    while (true)
+    int t_cnt = 0;
+    bool bindsuccess = false;
+    while (!bindsuccess)
     {
         try
         {
             socket.bind (udp::endpoint (udp::v4 (), PortNumber));
-            break;
+            bindsuccess = true;
         }
         catch (const boost::system::system_error &error)
         {
-            if (cntr == 1)
+            if (t_cnt == 0)
             {
                 std::cerr << "bind error on UDP socket " << error.what () << std::endl;
             }
-            std::this_thread::sleep_for (std::chrono::milliseconds (100));
-            if (cntr > 40)
+            std::this_thread::sleep_for (std::chrono::milliseconds (200));
+            t_cnt += 200;
+            if (t_cnt > connectionTimeout)
             {
-                std::cerr << "Unable to bind socket " << error.what () << std::endl;
+                disconnecting = true;
+                std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
+                          << error.what () << std::endl;
                 socket.close ();
                 rx_status = connection_status::error;
                 return;
             }
-            ++cntr;
         }
     }
 

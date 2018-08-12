@@ -306,8 +306,13 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), PortNumber, maxMessageSize_);
-
+    auto server =
+      helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, maxMessageSize_);
+	if (!server->isReady())
+	{
+        rx_status = connection_status::error;
+        return;
+	}
     auto serviceLoop = ioserv->runServiceLoop ();
     server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);

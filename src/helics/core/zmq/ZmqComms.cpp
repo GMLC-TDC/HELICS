@@ -20,10 +20,40 @@ static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 23600;
 static const int DEFAULT_BROKER_PULL_PORT_NUMBER = 23405;
 static const int DEFAULT_BROKER_REP_PORT_NUMBER = 23404;
 
-namespace helics
+/** bind a zmq socket, with a timeout and timeout period*/
+static bool bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, int timeout, int period=200)
 {
+    bool bindsuccess = false;
+    int tcount = 0;
+    while (!bindsuccess)
+    {
+        try
+        {
+            socket.bind (helics::makePortAddress (address, port));
+            bindsuccess = true;
+        }
+        catch (const zmq::error_t &)
+        {
+            if (tcount == 0)
+            {
+                std::cerr << "zmq binding error on socket sleeping then will try again \n";
+            }
+			if (tcount > timeout)
+			{
+                break;
+			}
+            std::this_thread::sleep_for (std::chrono::milliseconds (period));
+            tcount += period;
+        }
+    }
+    return bindsuccess;
+}
+
+    namespace helics
+    {
 namespace zeromq
 {
+
 ZmqComms::ZmqComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork)
     : CommsInterface (brokerTarget, localTarget,targetNetwork)
 {
@@ -316,49 +346,29 @@ void ZmqComms::queue_rx_function ()
             }
         }
     }
-    try
+    auto bindsuccess = bindzmqSocket (repSocket, localTarget_, repPortNumber, connectionTimeout);
+    if (!bindsuccess)
     {
-        repSocket.bind (makePortAddress (localTarget_, repPortNumber));
+        pullSocket.close ();
+        repSocket.close ();
+        disconnecting = true;
+        std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, repPortNumber)
+                  << '\n';
+        rx_status = connection_status::error;
+        return;
     }
-    catch (const zmq::error_t &)
+    bindsuccess = bindzmqSocket (pullSocket, localTarget_, pullPortNumber, connectionTimeout);
+    
+    if (!bindsuccess)
     {
-        std::cerr << "binding error on reply socket sleeping then will try again \n";
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-        try
-        {
-            repSocket.bind (makePortAddress (localTarget_, repPortNumber));
-        }
-        catch (const zmq::error_t &ze)
-        {
-            pullSocket.close ();
-            disconnecting = true;
-            std::cerr << "zmqError binding rep port " << makePortAddress (localTarget_, repPortNumber)
-                      << ze.what () << '\n';
-            rx_status = connection_status::error;
-            return;
-        }
+        pullSocket.close ();
+        repSocket.close ();
+        disconnecting = true;
+        std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, pullPortNumber) << '\n';
+        rx_status = connection_status::error;
+        return;
     }
-    try
-    {
-        pullSocket.bind (makePortAddress (localTarget_, pullPortNumber));
-    }
-    catch (const zmq::error_t &)
-    {
-        std::cerr << "binding error on pull socket sleeping then will try again \n";
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-        try
-        {
-            pullSocket.bind (makePortAddress (localTarget_, pullPortNumber));
-        }
-        catch (const zmq::error_t &ze)
-        {
-            disconnecting = true;
-            std::cerr << "zmqError binding pull port " << makePortAddress (localTarget_, pullPortNumber)
-                      << ze.what () << '\n';
-            rx_status = connection_status::error;
-            return;
-        }
-    }
+
 
     std::vector<zmq::pollitem_t> poller (3);
     poller[0].socket = static_cast<void *> (controlSocket);
