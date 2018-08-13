@@ -30,6 +30,7 @@ using boost::asio::ip::tcp;
 using helics::Core;
 
 #define TCP_BROKER_PORT 24160
+#define TCP_BROKER_PORT_STRING "24160"
 #define TCP_SECONDARY_PORT 24180
 BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 {
@@ -129,7 +130,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 
     auto srv = AsioServiceManager::getServicePointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
     auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall ([&counter](helics::tcp::TcpRxConnection::pointer, const char *, size_t data_avail) {
@@ -219,12 +220,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::atomic<int> CommCounter{0};
     std::atomic<size_t> len{0};
     helics::ActionMessage act;
-    std::string host = "localhost";
+    std::string host = "127.0.0.1";
     helics::tcp::TcpComms comm (host, host);
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (),host, TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (),host, TCP_BROKER_PORT_STRING);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall ([&data, &ServerCounter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec,

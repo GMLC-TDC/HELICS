@@ -284,7 +284,17 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
         tcp::resolver resolver (io_service);
         tcp::resolver::query query (tcp::v4 (), address, std::to_string (portNum),
                                     tcp::resolver::query::canonical_name);
-        ep = *resolver.resolve (query).begin ();
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+        tcp::resolver::iterator end;
+        if (endpoint_iterator != end)
+        {
+            ep = *endpoint_iterator;
+        }
+        else
+        {
+            halted = true;
+            return;
+        }
     }
     initialConnect ();
 }
@@ -298,8 +308,18 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
         tcp::resolver resolver (io_service);
         tcp::resolver::query query (tcp::v4 (), address, port,
                                     tcp::resolver::query::canonical_name);
-        ep = *resolver.resolve (query).begin ();
-    initialConnect ();
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+        tcp::resolver::iterator end;
+        if (endpoint_iterator != end)
+        {
+            ep = *endpoint_iterator;
+        }
+		else
+		{
+            halted = true;
+            return;
+		}
+		initialConnect ();
 }
 
 TcpServer::TcpServer (boost::asio::io_service &io_service,
@@ -362,7 +382,13 @@ bool TcpServer::reConnect (const std::string &address, const std::string &port, 
     {
         tcp::resolver resolver (acceptor_.get_io_service ());
         tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
-        ep = *resolver.resolve (query).begin ();
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+        tcp::resolver::iterator end;
+		if (endpoint_iterator != end)
+		{
+            ep = *endpoint_iterator;
+		}
+        
     }
     return reConnect (timeout);
 }
@@ -373,6 +399,21 @@ TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       int nominalBufferSize)
 {
     return pointer (new TcpServer (io_service, address, PortNum, nominalBufferSize));
+}
+
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
+                                      const std::string &address,
+                                      const std::string &port,
+                                      int nominalBufferSize)
+{
+    return pointer (new TcpServer (io_service, address, port, nominalBufferSize));
+}
+
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
+                                      int PortNum,
+                                      int nominalBufferSize)
+{
+    return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
 }
 
 void TcpServer::start ()
