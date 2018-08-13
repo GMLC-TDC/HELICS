@@ -197,9 +197,11 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     /** close the server*/
     void close ();
     /** check if the server is ready to start*/
-    bool isReady () const { return halted.load (); }
-    /** reConnect the server with the same or new address*/
+    bool isReady () const { return !(halted.load ()); }
+    /** reConnect the server with a new address*/
     bool reConnect (const std::string &address, const std::string &port, int timeout);
+    /** reConnect the server with the same address*/
+    bool reConnect (int timeout);
     /** set the data callback*/
     void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc)
     {
@@ -215,11 +217,21 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   private:
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
+               int portNum,
+               int nominalBufferSize);
+    TcpServer (boost::asio::io_service &io_service,
+               const std::string &address,
                const std::string &port,
                int nominalBufferSize);
+    TcpServer (boost::asio::io_service &io_service,
+               int portNum,
+               int nominalBufferSize);
 
+	void initialConnect ();
+
+	std::atomic<bool> accepting{false};
     boost::asio::ip::tcp::acceptor acceptor_;
-    std::atomic<bool> accepting{false};
+    boost::asio::ip::tcp::endpoint ep;
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;

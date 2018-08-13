@@ -34,10 +34,11 @@ using helics::Core;
 BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 {
     std::atomic<int> counter{0};
-    std::string host = "localhost";
+    std::string host = "127.0.0.1";
 
     auto srv = AsioServiceManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host,TCP_BROKER_PORT);
+    BOOST_REQUIRE (server->isReady ());
     auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<bool> validData{true};

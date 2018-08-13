@@ -271,37 +271,72 @@ void TcpConnection::close ()
 
 TcpServer::TcpServer (boost::asio::io_service &io_service,
                       const std::string &address,
+                      int portNum,
+                      int nominalBufferSize)
+    : acceptor_ (io_service), bufferSize (nominalBufferSize)
+{
+    if (address == "localhost")
+    {
+        ep = boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum);
+    }
+    else
+    {
+        tcp::resolver resolver (io_service);
+        tcp::resolver::query query (tcp::v4 (), address, std::to_string (portNum),
+                                    tcp::resolver::query::canonical_name);
+        ep = *resolver.resolve (query).begin ();
+    }
+    initialConnect ();
+}
+
+TcpServer::TcpServer (boost::asio::io_service &io_service,
+                      const std::string &address,
                       const std::string &port,
                       int nominalBufferSize)
     : acceptor_ (io_service), bufferSize (nominalBufferSize)
 {
-    boost::asio::ip::tcp::resolver resolver (io_service);
-    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve (address, port).begin ();
-    acceptor_.open (endpoint.protocol ());
-    acceptor_.set_option (boost::asio::ip::tcp::acceptor::reuse_address (false));
+        tcp::resolver resolver (io_service);
+        tcp::resolver::query query (tcp::v4 (), address, port,
+                                    tcp::resolver::query::canonical_name);
+        ep = *resolver.resolve (query).begin ();
+    initialConnect ();
+}
+
+TcpServer::TcpServer (boost::asio::io_service &io_service,
+                      int portNum,
+                      int nominalBufferSize)
+    : acceptor_ (io_service), bufferSize (nominalBufferSize)
+{
+    ep = boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum);
+    initialConnect ();
+}
+
+
+void TcpServer::initialConnect ()
+{
+    acceptor_.open (ep.protocol ());
+    acceptor_.set_option (tcp::acceptor::reuse_address (false));
     boost::system::error_code ec;
-    acceptor_.bind (endpoint, ec);
+    acceptor_.bind (ep, ec);
     if (ec)
     {
         halted = true;
     }
 }
 
-bool TcpServer::reConnect (const std::string &address, const std::string &port, int timeout)
+bool TcpServer::reConnect(int timeout)
 {
     if (!halted)
     {
         close ();
     }
-    boost::asio::ip::tcp::resolver resolver (acceptor_.get_io_service ());
-    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve (address, port).begin ();
-    acceptor_.open (endpoint.protocol ());
+
     boost::system::error_code ec;
     bool bindsuccess = false;
     int tcount = 0;
     while (!bindsuccess)
     {
-        acceptor_.bind (endpoint, ec);
+        acceptor_.bind (ep, ec);
         if (ec)
         {
             if (tcount > timeout)
@@ -318,6 +353,18 @@ bool TcpServer::reConnect (const std::string &address, const std::string &port, 
     }
 
     halted = !bindsuccess;
+    return bindsuccess;
+}
+
+bool TcpServer::reConnect (const std::string &address, const std::string &port, int timeout)
+{
+    if (!address.empty ())
+    {
+        tcp::resolver resolver (acceptor_.get_io_service ());
+        tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
+        ep = *resolver.resolve (query).begin ();
+    }
+    return reConnect (timeout);
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
@@ -325,7 +372,7 @@ TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       int PortNum,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, std::to_string (PortNum), nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, PortNum, nominalBufferSize));
 }
 
 void TcpServer::start ()
@@ -351,7 +398,7 @@ void TcpServer::start ()
         TcpRxConnection::pointer new_connection =
           TcpRxConnection::create (acceptor_.get_io_service (), bufferSize);
         auto &socket = new_connection->socket ();
-
+        acceptor_.listen ();
         acceptor_.async_accept (socket,
                                 [this, connection = std::move (new_connection)](
                                   const boost::system::error_code &error) { handle_accept (connection, error); });

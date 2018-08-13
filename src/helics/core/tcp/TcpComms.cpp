@@ -310,8 +310,14 @@ void TcpComms::queue_rx_function ()
       helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, maxMessageSize_);
 	if (!server->isReady())
 	{
-        rx_status = connection_status::error;
-        return;
+        auto connected=server->reConnect (connectionTimeout);
+		if (!connected)
+		{
+            std::cerr << "unable to bind to tcp connection socket\n";
+            rx_status = connection_status::error;
+            return;
+		}
+        
 	}
     auto serviceLoop = ioserv->runServiceLoop ();
     server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
