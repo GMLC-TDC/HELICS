@@ -1072,7 +1072,7 @@ void MasterObjectHolder::deleteAll ()
         auto fedHandle = feds.lock ();
         for (auto &fed : fedHandle)
         {
-            if (fed->fedptr)
+            if ((fed)&&(fed->fedptr))
             {
                 fed->fedptr->finalize ();
             }
@@ -1083,7 +1083,7 @@ void MasterObjectHolder::deleteAll ()
         auto coreHandle = cores.lock ();
         for (auto &cr : coreHandle)
         {
-            if (cr->coreptr)
+            if ((cr)&&(cr->coreptr))
             {
                 cr->coreptr->disconnect ();
             }
@@ -1094,7 +1094,7 @@ void MasterObjectHolder::deleteAll ()
         auto brokerHandle = brokers.lock ();
         for (auto &brk : brokerHandle)
         {
-            if (brk->brokerptr)
+            if ((brk)&&(brk->brokerptr))
             {
                 brk->brokerptr->disconnect ();
             }

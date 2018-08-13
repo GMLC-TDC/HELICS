@@ -182,6 +182,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
           ++counter;
           return data_Size;
       });
+    BOOST_REQUIRE (server->isReady ());
     server->start ();
 
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
@@ -235,6 +236,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
         ++ServerCounter;
         return data_Size;
     });
+    BOOST_REQUIRE (server->isReady ());
     server->start ();
 
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
