@@ -27,6 +27,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 const char *helicsGetVersion (void) { return helics::versionString; }
 
+static const char *nullstrPtr = "";
+
+helics_error helicsErrorInitialize()
+{
+	helics_error err;
+	err.error_code = 0;
+	err.message = nullstrPtr;
+	return err;
+}
+
+/** clear an error object*/
+void helicsErrorClear(helics_error *err)
+{
+	err->error_code = 0;
+	err->message = nullstrPtr;
+}
+
 helics_bool_t helicsIsCoreTypeAvailable (const char *type)
 {
     if (type == nullptr)

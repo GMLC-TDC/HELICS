@@ -26,17 +26,17 @@ Common Functions
 /** get a version string for HELICS */
 HELICS_EXPORT const char *helicsGetVersion ();
 
-/**
- * Returns true if core/broker type specified is available in current compilation.
- @details possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
- */
-HELICS_EXPORT helics_bool_t helicsIsCoreTypeAvailable (const char *type);
-
 /** return an initialized error object*/
 HELICS_EXPORT helics_error helicsErrorInitialize();
 
 /** clear an error object*/
 HELICS_EXPORT void helicsErrorClear(helics_error *err);
+
+/**
+ * Returns true if core/broker type specified is available in current compilation.
+ @details possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
+ */
+HELICS_EXPORT helics_bool_t helicsIsCoreTypeAvailable (const char *type);
 
 /** create a core object
 @param type the type of the core to create

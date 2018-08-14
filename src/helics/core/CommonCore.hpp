@@ -353,7 +353,10 @@ class CommonCore : public Core, public BrokerBase
     @param command the message to process
     */
     void processFilterInfo (ActionMessage &command);
-
+	/** function to consolidate the registration of interfaces in the core*/
+	void registerInterface(ActionMessage &command);
+	/** function to handle adding a target to an interface*/
+	void addTargetToInterface(ActionMessage &command);
     /** organize filters
     @detsils organize the filter and report and potential warnings and errors
     */

@@ -730,6 +730,61 @@ helics_status helicsFederateSetIntegerProperty (helics_federate fed, int32_t int
 }
 
 
+helics_time_t helicsFederateGetTimeProperty(helics_federate fed, int32_t timeProperty)
+{
+	auto fedObj = getFed(fed);
+	if (fedObj == nullptr)
+	{
+		return helics_time_zero;
+	}
+	try
+	{
+		//fedObj->getTime
+		return helics_time_zero;
+	}
+	catch (...)
+	{
+		return helicsErrorHandler();
+	}
+}
+
+helics_bool_t helicsFederateGetFlagOption(helics_federate fed, int flag)
+{
+	auto fedObj = getFed(fed);
+	if (fedObj == nullptr)
+	{
+		return helics_false;
+	}
+	try
+	{
+		//int res=fedObj->getIntegerProperty(intProperty);
+		return helics_false;
+	}
+	catch (...)
+	{
+		return helicsErrorHandler();
+	}
+}
+
+
+int32_t helicsFederateGetIntegerProperty(helics_federate fed, int32_t intProperty)
+{
+	auto fedObj = getFed(fed);
+	if (fedObj == nullptr)
+	{
+		return helics_invalid_object;
+	}
+	try
+	{
+		//fedObj->setIntegerProperty(intProperty);
+		return helics_ok;
+	}
+	catch (...)
+	{
+		return helicsErrorHandler();
+	}
+}
+
 helics_status helicsFederateSetSeparator (helics_federate fed, char separator)
 {
     auto fedObj = getFed (fed);
