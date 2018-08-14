@@ -236,10 +236,10 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
                int nominalBufferSize);
 
 	void initialConnect ();
-
+    boost::asio::io_service &ioserv;
 	std::atomic<bool> accepting{false};
-    boost::asio::ip::tcp::acceptor acceptor_;
-    boost::asio::ip::tcp::endpoint ep;
+    std::vector<std::unique_ptr<boost::asio::ip::tcp::acceptor>> acceptors;
+    std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
