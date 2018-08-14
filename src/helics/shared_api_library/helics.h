@@ -46,6 +46,7 @@ typical options include a broker address  --broker="XSSAF" or the number of fede
 @return a helics_core object
 */
 HELICS_EXPORT helics_core helicsCreateCore (const char *type, const char *name, const char *initString);
+
 /** create a core object by passing command line arguments
 @param type the type of the core to create
 @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned

@@ -22,15 +22,17 @@ extern "C" {
 typedef enum {
 
     helics_ok = 0, /*!< the function executed successfully */
-    helics_registration_failure,  /*!< registration has failed*/
-    helics_invalid_object, /*!< indicator that the object used was not a valid object */
-    helics_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
-    helics_discard, /*!< the input was discarded and not used for some reason */
-    helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
-    helics_warning, /*!< the function issued a warning of some kind */
-    helics_invalid_state_transition, /*!< error issued when an invalid state transition occurred */
-    helics_invalid_function_call, /*!< the call made was invalid in the present state of the calling object*/
-    helics_other_error /*!< the function produced an error of some other type */
+    helics_registration_failure=-1,  /*!< registration has failed*/
+    helics_connection_failure = -2, /*!< the operation to connect has failed*/
+    helics_invalid_object=-3, /*!< indicator that the object used was not a valid object */
+    helics_invalid_argument=-4, /*!< the parameter passed was invalid and unable to be used*/
+    helics_discard=-4, /*!< the input was discarded and not used for some reason */
+    helics_terminated=-6, /*!< the federate has terminated and the call cannot be completed*/
+    helics_warning=-8, /*!< the function issued a warning of some kind */
+    helics_invalid_state_transition=-9, /*!< error issued when an invalid state transition occurred */
+    helics_invalid_function_call=-10, /*!< the call made was invalid in the present state of the calling object*/
+    helics_execution_failure = -14, /*!< the function execution has failed*/
+    helics_other_error=-101 /*!< the function produced an error of some other type */
 } helics_status;
 
 /** opaque object representing an input*/
@@ -133,9 +135,10 @@ typedef struct message_t
 } message_t;
 
 /**
-* helics error error object
+* helics error object
 *
 * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string
+otherwise it will be an empty string
 */
 typedef struct helics_error
 {

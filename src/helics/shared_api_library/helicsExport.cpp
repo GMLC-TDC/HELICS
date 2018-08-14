@@ -114,6 +114,77 @@ helics_status helicsErrorHandler () noexcept
     }
 }
 
+const char unknown_err_string[] = "unknown error";
+
+void helicsErrorHandler (helics_error *err) noexcept
+{
+	if (err == nullptr)
+	{
+        return;
+	}
+    try
+    {
+        try
+        {
+			//this is intended to be a single '='
+            if (std::exception_ptr eptr = std::current_exception ())
+            {
+                std::rethrow_exception (eptr);
+            }
+            else
+            {
+                err->error_code=helics_other_error;
+                err->message = unknown_err_string;
+            }
+        }
+        catch (const helics::InvalidIdentifier &iid)
+        {
+            err->error_code = helics_invalid_object;
+            err->message = getMasterHolder ()->addErrorString (iid.what ());
+        }
+        catch (const helics::InvalidFunctionCall &ifc)
+        {
+            err->error_code = helics_invalid_function_call;
+            err->message = getMasterHolder ()->addErrorString (ifc.what ());
+        }
+        catch (const helics::InvalidParameter &ip)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = getMasterHolder ()->addErrorString (ip.what ());
+        }
+        catch (const helics::RegistrationFailure &rf)
+        {
+            err->error_code = helics_registration_failure;
+            err->message = getMasterHolder ()->addErrorString (rf.what ());
+        }
+        catch (const helics::ConnectionFailure &cf)
+        {
+            err->error_code = helics_connection_failure;
+            err->message = getMasterHolder ()->addErrorString (cf.what ());
+        }
+        catch (const helics::HelicsTerminated &ht)
+        {
+            err->error_code = helics_connection_failure;
+            err->message = getMasterHolder ()->addErrorString (ht.what ());
+        }
+        catch (const helics::HelicsException &he)
+        {
+            err->error_code = helics_other_error;
+            err->message = getMasterHolder ()->addErrorString (he.what ());
+        }
+        catch (...)
+        {
+            err->error_code = helics_other_error;
+            err->message = unknown_err_string;
+        }
+    }
+    catch (...)
+    {
+        err->error_code = helics_other_error;
+        err->message = unknown_err_string;
+    }
+}
+
 void helicsFederateInfoFree (helics_federate_info_t fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
 
 static const std::string nullstr;
