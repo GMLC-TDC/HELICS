@@ -269,182 +269,8 @@ void TcpConnection::close ()
     socket_.close ();
 }
 
-TcpServer::TcpServer (boost::asio::io_service &io_service,
-                      const std::string &address,
-                      int portNum,
-                      int nominalBufferSize)
-    : ioserv (io_service), bufferSize (nominalBufferSize)
-{
-    if (address == "localhost")
-    {
-        endpoints.push_back(boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
-    }
-    else
-    {
-        tcp::resolver resolver (io_service);
-        tcp::resolver::query query (tcp::v4 (), address, std::to_string (portNum),
-                                    tcp::resolver::query::canonical_name);
-        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-        tcp::resolver::iterator end;
-        if (endpoint_iterator != end)
-        {
-			while (endpoint_iterator != end)
-			{
-                endpoints.push_back (*endpoint_iterator);
-                ++endpoint_iterator;
-			}
-        }
-        else
-        {
-            halted = true;
-            return;
-        }
-    }
-    initialConnect ();
-}
-
-TcpServer::TcpServer (boost::asio::io_service &io_service,
-                      const std::string &address,
-                      const std::string &port,
-                      int nominalBufferSize)
-    : ioserv (io_service), bufferSize (nominalBufferSize)
-{
-        tcp::resolver resolver (io_service);
-        tcp::resolver::query query (tcp::v4 (), address, port,
-                                    tcp::resolver::query::canonical_name);
-        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-        tcp::resolver::iterator end;
-        if (endpoint_iterator != end)
-        {
-            while (endpoint_iterator != end)
-            {
-                endpoints.push_back (*endpoint_iterator);
-                ++endpoint_iterator;
-            }
-        }
-		else
-		{
-            halted = true;
-            return;
-		}
-		initialConnect ();
-}
-
-TcpServer::TcpServer (boost::asio::io_service &io_service,
-                      int portNum,
-                      int nominalBufferSize)
-    : ioserv (io_service), bufferSize (nominalBufferSize)
-{
-    endpoints.push_back(boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
-    initialConnect ();
-}
-
-
-void TcpServer::initialConnect ()
-{
-	if (halted == true)
-	{
-        return;
-	}
-	for (auto &ep : endpoints)
-	{
-        auto acc = std::make_unique<tcp::acceptor> (ioserv);
-        acc->open (ep.protocol ());
-        acc->set_option (tcp::acceptor::reuse_address (false));
-        boost::system::error_code ec;
-        acc->bind (ep, ec);
-        if (ec)
-        {
-            close ();
-        }
-		else
-		{
-            acceptors.push_back (std::move (acc));
-		}
-	}
-   
-}
-
-bool TcpServer::reConnect(int timeout)
-{
-    if (!halted)
-    {
-        close ();
-    }
-    halted = false;
-    boost::system::error_code ec;
-    for (auto &ep : endpoints)
-    {
-        auto acc = std::make_unique<tcp::acceptor> (ioserv);
-        acc->open (ep.protocol ());
-        acc->set_option (tcp::acceptor::reuse_address (false));
-    bool bindsuccess = false;
-    int tcount = 0;
-    while (!bindsuccess)
-    {
-        acc->bind (ep, ec);
-        if (ec)
-        {
-            if (tcount > timeout)
-            {
-                break;
-            }
-            std::this_thread::sleep_for (std::chrono::milliseconds (200));
-            tcount += 200;
-        }
-        else
-        {
-            bindsuccess = true;
-        }
-    }
-	
-    halted = !bindsuccess;
-    }
-    
-    return !halted;
-}
-
-bool TcpServer::reConnect (const std::string &address, const std::string &port, int timeout)
-{
-    if (!address.empty ())
-    {
-        tcp::resolver resolver (ioserv);
-        tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
-        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-        tcp::resolver::iterator end;
-		if (endpoint_iterator != end)
-		{
-            ep = *endpoint_iterator;
-		}
-        
-    }
-    return reConnect (timeout);
-}
-
-TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
-                                      const std::string &address,
-                                      int PortNum,
-                                      int nominalBufferSize)
-{
-    return pointer (new TcpServer (io_service, address, PortNum, nominalBufferSize));
-}
-
-TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
-                                      const std::string &address,
-                                      const std::string &port,
-                                      int nominalBufferSize)
-{
-    return pointer (new TcpServer (io_service, address, port, nominalBufferSize));
-}
-
-TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
-                                      int PortNum,
-                                      int nominalBufferSize)
-{
-    return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
-}
-
-void TcpServer::start ()
+/** start the acceptor*/
+void TcpAcceptor::start (TcpRxConnection::pointer conn)
 {
     if (halted)
     {
@@ -453,31 +279,30 @@ void TcpServer::start ()
     bool exp = false;
     if (accepting.compare_exchange_strong (exp, true))
     {
-        auto connects = connections.lock ();
-        if (!connects->empty ())
-        {
-            for (auto &conn : *connects)
-            {
-                if (!conn->isReceiving ())
-                {
-                    conn->start ();
-                }
-            }
-        }
-        TcpRxConnection::pointer new_connection =
-          TcpRxConnection::create (ioserv, bufferSize);
-        auto &socket = new_connection->socket ();
+        auto &socket = conn->socket ();
         acceptor_.listen ();
         acceptor_.async_accept (socket,
-                                [this, connection = std::move (new_connection)](
-                                  const boost::system::error_code &error) { handle_accept (connection, error); });
+                                [this, connection = std::move (conn)](const boost::system::error_code &error) {
+                                    handle_accept (connection, error);
+                                });
     }
 }
 
-void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
+/** close the socket*/
+void TcpAcceptor::close () {}
+
+/** set the callback for the data object*/
+void TcpAcceptor::setAcceptCall (std::function<size_t (TcpRxConnection::pointer)> accFunc) {}
+
+
+void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
     if (!error)
     {
+        // Set options here
+        boost::asio::socket_base::linger optionLinger (true, 0);
+        new_connection->socket ().set_option (optionLinger);
+
         new_connection->setDataCall (dataCall);
         new_connection->setErrorCall (errorCall);
         {  // scope for the connection lock
@@ -504,10 +329,241 @@ void TcpServer::handle_accept (TcpRxConnection::pointer new_connection, const bo
     }
 }
 
+TcpServer::TcpServer (boost::asio::io_service &io_service,
+                      const std::string &address,
+                      int portNum,
+                      int nominalBufferSize)
+    : ioserv (io_service), bufferSize (nominalBufferSize)
+{
+    if (address == "localhost")
+    {
+        endpoints.push_back (boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
+    }
+    else
+    {
+        tcp::resolver resolver (io_service);
+        tcp::resolver::query query (tcp::v4 (), address, std::to_string (portNum),
+                                    tcp::resolver::query::canonical_name);
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+        tcp::resolver::iterator end;
+        if (endpoint_iterator != end)
+        {
+            while (endpoint_iterator != end)
+            {
+                endpoints.push_back (*endpoint_iterator);
+                ++endpoint_iterator;
+            }
+        }
+        else
+        {
+            halted = true;
+            return;
+        }
+    }
+    initialConnect ();
+}
+
+TcpServer::TcpServer (boost::asio::io_service &io_service,
+                      const std::string &address,
+                      const std::string &port,
+                      int nominalBufferSize)
+    : ioserv (io_service), bufferSize (nominalBufferSize)
+{
+    tcp::resolver resolver (io_service);
+    tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
+    tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+    tcp::resolver::iterator end;
+    if (endpoint_iterator != end)
+    {
+        while (endpoint_iterator != end)
+        {
+            endpoints.push_back (*endpoint_iterator);
+            ++endpoint_iterator;
+        }
+    }
+    else
+    {
+        halted = true;
+        return;
+    }
+    initialConnect ();
+}
+
+TcpServer::TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize)
+    : ioserv (io_service), bufferSize (nominalBufferSize)
+{
+    endpoints.push_back (boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
+    initialConnect ();
+}
+
+void TcpServer::initialConnect ()
+{
+    if (halted == true)
+    {
+        return;
+    }
+    for (auto &ep : endpoints)
+    {
+        auto acc = std::make_unique<tcp::acceptor> (ioserv);
+        acc->open (ep.protocol ());
+        acc->set_option (tcp::acceptor::reuse_address (false));
+        boost::system::error_code ec;
+        acc->bind (ep, ec);
+        if (ec)
+        {
+            close ();
+        }
+        else
+        {
+            acceptors.push_back (std::move (acc));
+        }
+    }
+}
+
+bool TcpServer::reConnect (int timeout)
+{
+    if (!halted)
+    {
+        close ();
+    }
+    halted = false;
+    boost::system::error_code ec;
+    for (auto &ep : endpoints)
+    {
+        auto acc = std::make_shared<tcp::acceptor> (ioserv);
+        acc->open (ep.protocol ());
+        acc->set_option (tcp::acceptor::reuse_address (false));
+        bool bindsuccess = false;
+        int tcount = 0;
+        while (!bindsuccess)
+        {
+            acc->bind (ep, ec);
+            if (ec)
+            {
+                if (tcount > timeout)
+                {
+                    break;
+                }
+                std::this_thread::sleep_for (std::chrono::milliseconds (200));
+                tcount += 200;
+            }
+            else
+            {
+                bindsuccess = true;
+                acceptors.push_back (std::move (acc));
+            }
+        }
+
+        halted = !bindsuccess;
+    }
+
+    return !halted;
+}
+
+bool TcpServer::reConnect (const std::string &address, const std::string &port, int timeout)
+{
+    if (!address.empty ())
+    {
+        endpoints.clear ();
+        tcp::resolver resolver (ioserv);
+        tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
+        tcp::resolver::iterator end;
+        if (endpoint_iterator != end)
+        {
+            while (endpoint_iterator != end)
+            {
+                endpoints.push_back (*endpoint_iterator);
+                ++endpoint_iterator;
+            }
+        }
+        else
+        {
+            halted = true;
+            return;
+        }
+    }
+    return reConnect (timeout);
+}
+
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
+                                      const std::string &address,
+                                      int PortNum,
+                                      int nominalBufferSize)
+{
+    return pointer (new TcpServer (io_service, address, PortNum, nominalBufferSize));
+}
+
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
+                                      const std::string &address,
+                                      const std::string &port,
+                                      int nominalBufferSize)
+{
+    return pointer (new TcpServer (io_service, address, port, nominalBufferSize));
+}
+
+TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)
+{
+    return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
+}
+
+void TcpServer::start ()
+{
+    if (halted)
+    {
+        return;
+    }
+    bool exp = false;
+    if (accepting.compare_exchange_strong (exp, true))
+    {
+        auto connects = connections.lock ();
+        if (!connects->empty ())
+        {
+            for (auto &conn : *connects)
+            {
+                if (!conn->isReceiving ())
+                {
+                    conn->start ();
+                }
+            }
+        }
+        for (auto &acc : acceptors)
+        {
+            TcpRxConnection::pointer new_connection = TcpRxConnection::create (ioserv, bufferSize);
+            auto &socket = new_connection->socket ();
+            acc->listen ();
+            acc->async_accept (socket,
+                               [this, connection = std::move (new_connection)](
+                                 const boost::system::error_code &error) { handle_accept (connection, error); });
+        }
+    }
+}
+
+void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointer new_connection)
+{
+        // Set options here
+        boost::asio::socket_base::linger optionLinger (true, 0);
+        new_connection->socket ().set_option (optionLinger);
+
+        new_connection->setDataCall (dataCall);
+        new_connection->setErrorCall (errorCall);
+        {  // scope for the connection lock
+            auto connects = connections.lock ();
+            //  new_connection->index = static_cast<int> (connects->size());
+            // the previous 3 calls have to be made before this call since they could be used immediately
+            new_connection->start ();
+            connects->push_back (std::move (new_connection));
+        }
+}
+
 void TcpServer::close ()
 {
     halted = true;
-    acceptor_.close ();
+    for (auto &acc : acceptors)
+    {
+        acc->close ();
+    }
+    acceptors.clear ();
     auto connects = connections.lock ();
     for (auto &conn : *connects)
     {

@@ -72,6 +72,53 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     std::atomic<connection_state_t> state{connection_state_t::prestart};
 };
 
+/** tcp acceptor*/
+class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
+{
+  public:
+    enum class connection_state_t
+    {
+        prestart = -1,
+        halted = 0,
+        receiving = 1,
+        closed = 2,
+    };
+
+    typedef std::shared_ptr<TcpAcceptor> pointer;
+    /** create an RxConnection object using the specified service and bufferSize*/
+    static pointer create (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
+    {
+        return pointer (new TcpAcceptor (io_service, ep));
+    }
+
+    static pointer create (boost::asio::io_service &io_service, int port)
+    {
+        return pointer (new TcpAcceptor (io_service, port));
+    }
+    /** get the underlying socket object*/
+
+    /** start the acceptor*/
+    void start (TcpRxConnection::pointer conn);
+    /** close the socket*/
+    void close ();
+    bool isAccepting () const { return accepting.load (); }
+    /** set the callback for the data object*/
+    void setAcceptCall (std::function<size_t (TcpRxConnection::pointer)> accFunc);
+
+    // int index = 0;
+
+  private:
+    TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
+    TcpAcceptor (boost::asio::io_service &io_service, int port);
+    /** function for handling the asynchronous return from a read request*/
+    void handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
+    std::atomic<bool> accepting{false};
+    boost::asio::ip::tcp::acceptor acceptor_;
+    boost::asio::ip::tcp::endpoint endpoint_;
+    std::function<void(TcpRxConnection::pointer)> acceptCall;
+    std::atomic<bool> halted{false};
+};
+
 /** tcp socket connection for connecting to a server*/
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
@@ -186,7 +233,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   public:
     typedef std::shared_ptr<TcpServer> pointer;
 
-	static pointer create (boost::asio::io_service &io_service,
+    static pointer create (boost::asio::io_service &io_service,
                            const std::string &address,
                            const std::string &port,
                            int nominalBufferSize = 10192);
@@ -195,9 +242,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
                            const std::string &address,
                            int PortNum,
                            int nominalBufferSize = 10192);
-    static pointer create (boost::asio::io_service &io_service,
-                           int PortNum,
-                           int nominalBufferSize = 10192);
+    static pointer create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192);
 
   public:
     /** start accepting new connections*/
@@ -231,14 +276,12 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
                const std::string &address,
                const std::string &port,
                int nominalBufferSize);
-    TcpServer (boost::asio::io_service &io_service,
-               int portNum,
-               int nominalBufferSize);
+    TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize);
 
-	void initialConnect ();
+    void initialConnect ();
     boost::asio::io_service &ioserv;
-	std::atomic<bool> accepting{false};
-    std::vector<std::unique_ptr<boost::asio::ip::tcp::acceptor>> acceptors;
+    std::atomic<bool> accepting{false};
+    std::vector<std::shared_ptr<boost::asio::ip::tcp::acceptor>> acceptors;
     std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
