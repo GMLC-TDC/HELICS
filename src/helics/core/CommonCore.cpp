@@ -627,10 +627,10 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
                 cmd.messageID = DELAY_INIT_ENTRY;
-				if (flagValue)
-				{
+                if (flagValue)
+                {
                     setActionFlag (cmd, indicator_flag);
-				}
+                }
                 addActionMessage (cmd);
             }
         }
@@ -667,15 +667,15 @@ bool CommonCore::getFlagOption (federate_id_t federateID, int32_t flag) const
     {
         return false;
     }
-	else
-	{
+    else
+    {
         auto fed = getFederateAt (federateID);
         if (fed == nullptr)
         {
             throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
         }
         return fed->getOptionFlag (flag);
-	}
+    }
 }
 
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
@@ -868,25 +868,26 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
     return nullStr;
 }
 
-
-void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value) {
-    handles.modify([handle,option,option_value](auto &hand) { return hand.setHandleOption(handle, option,option_value); });
-
+void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)
+{
+    handles.modify (
+      [handle, option, option_value](auto &hand) { return hand.setHandleOption (handle, option, option_value); });
 }
 
-bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const {
-    return handles.read([handle,option](auto &hand) { return hand.getHandleOption(handle, option); });
+bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const
+{
+    return handles.read ([handle, option](auto &hand) { return hand.getHandleOption (handle, option); });
 }
 
-void CommonCore::removeTarget (interface_handle handle, const std::string &/*targetToRemove*/) {
+void CommonCore::removeTarget (interface_handle handle, const std::string & /*targetToRemove*/)
+{
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
-    
 }
-void CommonCore::addDestinationTarget (interface_handle handle, const std::string & dest) 
+void CommonCore::addDestinationTarget (interface_handle handle, const std::string &dest)
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
@@ -894,55 +895,56 @@ void CommonCore::addDestinationTarget (interface_handle handle, const std::strin
         throw (InvalidIdentifier ("invalid handle"));
     }
     ActionMessage cmd;
-	cmd.setSource(handleInfo->handle);
-	cmd.flags = handleInfo->flags;
-	setActionFlag(cmd, destination_target);
-	cmd.payload = dest;
-	switch (handleInfo->handle_type)
-	{
-	case handle_type_t::endpoint:
-		cmd.setAction(CMD_ADD_NAMED_FILTER);
-		break;
-	case handle_type_t::filter:
-		cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-		break;
-	case handle_type_t::publication:
-		cmd.setAction(CMD_ADD_NAMED_INPUT);
-		break;
-	case handle_type_t::input:
-	default:
-		throw (InvalidIdentifier("inputs cannot have destination targets"));
-	}
-    
-    addActionMessage(std::move(cmd));
+    cmd.setSource (handleInfo->handle);
+    cmd.flags = handleInfo->flags;
+    setActionFlag (cmd, destination_target);
+    cmd.payload = dest;
+    switch (handleInfo->handle_type)
+    {
+    case handle_type_t::endpoint:
+        cmd.setAction (CMD_ADD_NAMED_FILTER);
+        break;
+    case handle_type_t::filter:
+        cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
+        break;
+    case handle_type_t::publication:
+        cmd.setAction (CMD_ADD_NAMED_INPUT);
+        break;
+    case handle_type_t::input:
+    default:
+        throw (InvalidIdentifier ("inputs cannot have destination targets"));
+    }
+
+    addActionMessage (std::move (cmd));
 }
 
-void CommonCore::addSourceTarget (interface_handle handle, const std::string &targetName) {
+void CommonCore::addSourceTarget (interface_handle handle, const std::string &targetName)
+{
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
-	ActionMessage cmd;
-	cmd.setSource(handleInfo->handle);
-	cmd.flags = handleInfo->flags;
-	cmd.payload = targetName;
-	switch (handleInfo->handle_type)
-	{
-	case handle_type_t::endpoint:
-		cmd.setAction(CMD_ADD_NAMED_FILTER);
-		break;
-	case handle_type_t::filter:
-		cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-		break;
-	case handle_type_t::input:
-		cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
-		break;
-	case handle_type_t::publication:
-	default:
-		throw (InvalidIdentifier("publications cannot have source targets"));
-	}
-	addActionMessage(std::move(cmd));
+    ActionMessage cmd;
+    cmd.setSource (handleInfo->handle);
+    cmd.flags = handleInfo->flags;
+    cmd.payload = targetName;
+    switch (handleInfo->handle_type)
+    {
+    case handle_type_t::endpoint:
+        cmd.setAction (CMD_ADD_NAMED_FILTER);
+        break;
+    case handle_type_t::filter:
+        cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
+        break;
+    case handle_type_t::input:
+        cmd.setAction (CMD_ADD_NAMED_PUBLICATION);
+        break;
+    case handle_type_t::publication:
+    default:
+        throw (InvalidIdentifier ("publications cannot have source targets"));
+    }
+    addActionMessage (std::move (cmd));
 }
 
 const std::string &CommonCore::getTarget (interface_handle handle, int32_t /*index*/) const
@@ -1005,8 +1007,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
     }
 }
 
-
-std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interface_handle handle) 
+std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interface_handle handle)
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
@@ -1196,18 +1197,11 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
+void CommonCore::dataConnect (const std::string & /*source*/, const std::string & /*target*/) {}
 
-void CommonCore::dataConnect (const std::string & /*source*/, const std::string & /*target*/) {
+void CommonCore::filterAddSourceTarget (const std::string & /*filter*/, const std::string & /*target*/) {}
 
-}
-
-void CommonCore::filterAddSourceTarget (const std::string & /*filter*/, const std::string & /*target*/) {
-
-}
-
-void CommonCore::filterAddDestinationTarget (const std::string & /*filter*/, const std::string & /*target*/) {
-
-}
+void CommonCore::filterAddDestinationTarget (const std::string & /*filter*/, const std::string & /*target*/) {}
 
 void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName)
 {
@@ -2305,41 +2299,20 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REG_ENDPOINT:
     case CMD_REG_PUB:
     case CMD_REG_FILTER:
-		registerInterface(command);
+        registerInterface (command);
         break;
-	case CMD_ADD_NAMED_ENDPOINT:
-	case CMD_ADD_NAMED_PUBLICATION:
-	case CMD_ADD_NAMED_INPUT:
-	case CMD_ADD_NAMED_FILTER:
-		break;
-	case CMD_ADD_ENDPOINT:
-	case CMD_ADD_FILTER:
-	case CMD_ADD_SUBSCRIBER:
-	case CMD_ADD_PUBLISHER:
-		addTargetToInterface(command);
-		break;
-    case CMD_ADD_SUBSCRIBER:
-    {
-       
-    }
-    break;
+    case CMD_ADD_NAMED_ENDPOINT:
+    case CMD_ADD_NAMED_PUBLICATION:
+    case CMD_ADD_NAMED_INPUT:
+    case CMD_ADD_NAMED_FILTER:
+        checkForNamedInterface (command);
+        break;
     case CMD_ADD_ENDPOINT:
-    {
-        if (command.dest_id == global_broker_id_local)
-        {
-           
-        }
-    }
-    break;
-    case CMD_ADD_PUBLISHER:
-        routeMessage (command);
-        break;
     case CMD_ADD_FILTER:
-    {
-        
-    }
-    
-    break;
+    case CMD_ADD_SUBSCRIBER:
+    case CMD_ADD_PUBLISHER:
+        addTargetToInterface (command);
+        break;
     case CMD_CORE_CONFIGURE:
         processCoreConfigureCommands (command);
         break;
@@ -2402,149 +2375,231 @@ void CommonCore::processCommand (ActionMessage &&command)
     }
 }
 
-void CommonCore::registerInterface(ActionMessage &command)
+void CommonCore::registerInterface (ActionMessage &command)
 {
-	if (command.dest_id == 0)
-	{
-		auto ifc = getHandleInfo(interface_handle(command.source_handle));
-		if (ifc != nullptr)
-		{
-			loopHandles.addHandleAtIndex(*ifc, command.source_handle);
-		}
-		switch (command.action())
-		{
-		case CMD_REG_INPUT:
-		case CMD_REG_PUB:
-			break;
-		case CMD_REG_ENDPOINT:
-			bool added = timeCoord->addDependency(global_federate_id_t(command.source_id));
-			if (added)
-			{
-				auto fed = getFederateCore(global_federate_id_t(command.source_id));
-				ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, command.source_id);
+    if (command.dest_id == 0)
+    {
+        auto ifc = getHandleInfo (interface_handle (command.source_handle));
+        if (ifc != nullptr)
+        {
+            loopHandles.addHandleAtIndex (*ifc, command.source_handle);
+        }
+        switch (command.action ())
+        {
+        case CMD_REG_INPUT:
+        case CMD_REG_PUB:
+            break;
+        case CMD_REG_ENDPOINT:
+            if (timeCoord->addDependency (global_federate_id_t (command.source_id)))
+            {
+                auto fed = getFederateCore (global_federate_id_t (command.source_id));
+                ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, command.source_id);
 
-				fed->addAction(add);
-				timeCoord->addDependent(fed->global_id);
-			}
+                fed->addAction (add);
+                timeCoord->addDependent (fed->global_id);
+            }
 
-			if (!hasTimeDependency)
-			{
-				if (timeCoord->addDependency(higher_broker_id))
-				{
-					hasTimeDependency = true;
-					ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
-					transmit(higher_broker_id, add);
+            if (!hasTimeDependency)
+            {
+                if (timeCoord->addDependency (higher_broker_id))
+                {
+                    hasTimeDependency = true;
+                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
+                    transmit (higher_broker_id, add);
 
-					timeCoord->addDependent(higher_broker_id);
-				}
-			}
-			break;
-		case CMD_REG_FILTER:
-			createFilter(global_broker_id_local, interface_handle(command.source_handle), command.name,
-				command.info().type, command.info().type_out, checkActionFlag(command, clone_flag));
-			if (!hasFilters)
-			{
-				hasFilters = true;
-				if (timeCoord->addDependent(higher_broker_id))
-				{
-					ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
-					transmit(higher_broker_id, add);
-				}
-			}
-			break;
-		}
-		if (!ifc->key.empty())
-		{
-			transmit(0, command);
-		}
-	}
-	else if (command.dest_id == global_broker_id_local)
-	{
-		if (command.action() == CMD_REG_ENDPOINT)
-		{
-			auto filtI =
-				filters.find(global_handle(global_broker_id_local, interface_handle(command.dest_handle)));
-			if (filtI != nullptr)
-			{
-				filtI->sourceTargets.emplace_back(global_federate_id_t(command.source_id),
-					interface_handle(command.source_handle));
-				timeCoord->addDependency(global_federate_id_t(command.source_id));
-			}
-			auto filthandle = loopHandles.getFilter(command.dest_handle);
-			if (filthandle != nullptr)
-			{
-				filthandle->used = true;
-			}
-		}
-		else if (command.action() == CMD_REG_FILTER)
-		{
-			processFilterInfo(command);
-		}
-	}
-	else
-	{
-		routeMessage(command);
-	}
+                    timeCoord->addDependent (higher_broker_id);
+                }
+            }
+            break;
+        case CMD_REG_FILTER:
+            createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
+                          command.info ().type, command.info ().type_out, checkActionFlag (command, clone_flag));
+            if (!hasFilters)
+            {
+                hasFilters = true;
+                if (timeCoord->addDependent (higher_broker_id))
+                {
+                    ActionMessage add (CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
+                    transmit (higher_broker_id, add);
+                }
+            }
+            break;
+        }
+        if (!ifc->key.empty ())
+        {
+            transmit (0, command);
+        }
+    }
+    else if (command.dest_id == global_broker_id_local)
+    {
+        if (command.action () == CMD_REG_ENDPOINT)
+        {
+            auto filtI =
+              filters.find (global_handle (global_broker_id_local, interface_handle (command.dest_handle)));
+            if (filtI != nullptr)
+            {
+                filtI->sourceTargets.emplace_back (global_federate_id_t (command.source_id),
+                                                   interface_handle (command.source_handle));
+                timeCoord->addDependency (global_federate_id_t (command.source_id));
+            }
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
+            if (filthandle != nullptr)
+            {
+                filthandle->used = true;
+            }
+        }
+        else if (command.action () == CMD_REG_FILTER)
+        {
+            processFilterInfo (command);
+        }
+    }
+    else
+    {
+        routeMessage (command);
+    }
 }
 
-
-void CommonCore::addTargetToInterface(ActionMessage &command)
+void CommonCore::checkForNamedInterface (ActionMessage &command)
 {
-	// just forward these to the appropriate federate
-	if (command.dest_id == global_broker_id_local)
-	{
-		if (command.action() == CMD_ADD_ENDPOINT)
-		{
-				auto filtI =
-					filters.find(global_handle(global_broker_id_local, interface_handle(command.dest_handle)));
-				if (filtI != nullptr)
-				{
-					filtI->sourceTargets.emplace_back(command.getSource());
-					timeCoord->addDependency(global_federate_id_t(command.source_id));
-				}
-
-			auto filthandle = loopHandles.getFilter(command.dest_handle);
-			if (filthandle != nullptr)
-			{
-				filthandle->used = true;
-			}
-		}
-		else if (command.action() == CMD_ADD_FILTER)
-		{
-			auto endhandle = loopHandles.getEndpoint(command.dest_handle);
-			if (endhandle != nullptr)
-			{
-				setActionFlag(*endhandle, has_source_filter_flag);
-			}
-
-			processFilterInfo(command);
-			if (command.source_id != global_broker_id_local)
-			{
-				auto fed = getFederateCore(global_federate_id_t(command.dest_id));
-				if (fed != nullptr)
-				{
-					command.setAction(CMD_ADD_DEPENDENT);
-					fed->addAction(command);
-				}
-			}
-		}
-	}
-	else
-	{
-		auto fed = getFederateCore(global_federate_id_t(command.dest_id));
-		if (fed != nullptr)
-		{
-			fed->addAction(command);
-			auto handle = loopHandles.getHandleInfo(command.dest_handle);
-			if ((handle != nullptr) && (!handle->used))
-			{
-				handle->used = true;
-				
-			}
-		}
-	}
-	
+    switch (command.action ())
+    {
+    case CMD_ADD_NAMED_PUBLICATION:
+    {
+        auto pub = loopHandles.getPublication (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_SUBSCRIBER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_PUBLISHER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_INPUT:
+    {
+        auto pub = loopHandles.getInput (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_PUBLISHER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_SUBSCRIBER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_FILTER:
+    {
+        auto pub = loopHandles.getFilter (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_ENDPOINT);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_FILTER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_ENDPOINT:
+    {
+        auto pub = loopHandles.getEndpoint (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_FILTER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_ENDPOINT);
+            command.swapSourceDest ();       
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    default:
+        break;
+    }
 }
+
+void CommonCore::addTargetToInterface (ActionMessage &command)
+{
+    // just forward these to the appropriate federate
+    if (command.dest_id == global_broker_id_local)
+    {
+        if (command.action () == CMD_ADD_ENDPOINT)
+        {
+            auto filtI =
+              filters.find (global_handle (global_broker_id_local, interface_handle (command.dest_handle)));
+            if (filtI != nullptr)
+            {
+                filtI->sourceTargets.emplace_back (command.getSource ());
+                timeCoord->addDependency (global_federate_id_t (command.source_id));
+            }
+
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
+            if (filthandle != nullptr)
+            {
+                filthandle->used = true;
+            }
+        }
+        else if (command.action () == CMD_ADD_FILTER)
+        {
+            auto endhandle = loopHandles.getEndpoint (command.dest_handle);
+            if (endhandle != nullptr)
+            {
+                setActionFlag (*endhandle, has_source_filter_flag);
+            }
+
+            processFilterInfo (command);
+            if (command.source_id != global_broker_id_local)
+            {
+                auto fed = getFederateCore (global_federate_id_t (command.dest_id));
+                if (fed != nullptr)
+                {
+                    command.setAction (CMD_ADD_DEPENDENT);
+                    fed->addAction (command);
+                }
+            }
+        }
+    }
+    else
+    {
+        auto fed = getFederateCore (global_federate_id_t (command.dest_id));
+        if (fed != nullptr)
+        {
+            fed->addAction (command);
+            auto handle = loopHandles.getHandleInfo (command.dest_handle);
+            if ((handle != nullptr) && (!handle->used))
+            {
+                handle->used = true;
+            }
+        }
+    }
+}
+
 void CommonCore::processFilterInfo (ActionMessage &command)
 {
     auto filterInfo = getFilterCoordinator (interface_handle (command.dest_handle));
@@ -2661,7 +2716,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            if (fed->getOptionFlag(OBSERVER_FLAG))
+            if (fed->getOptionFlag (OBSERVER_FLAG))
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2861,26 +2916,26 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
     switch (cmd.messageID)
     {
     case ENABLE_INIT_ENTRY:
-            if (delayInitCounter <= 1)
+        if (delayInitCounter <= 1)
+        {
+            delayInitCounter = 0;
+            if (allInitReady ())
             {
-                delayInitCounter = 0;
-                if (allInitReady ())
-                {
-                    broker_state_t exp = connected;
-                    if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
-                    {  // make sure we only do this once
-                        checkDependencies ();
-                        cmd.setAction (CMD_INIT);
-                        cmd.source_id = global_broker_id_local;
-                        cmd.dest_id = 0;
-                        transmit (0, cmd);
-                    }
+                broker_state_t exp = connected;
+                if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
+                {  // make sure we only do this once
+                    checkDependencies ();
+                    cmd.setAction (CMD_INIT);
+                    cmd.source_id = global_broker_id_local;
+                    cmd.dest_id = 0;
+                    transmit (0, cmd);
                 }
             }
-            else
-            {
-                --delayInitCounter;
-            }
+        }
+        else
+        {
+            --delayInitCounter;
+        }
         break;
     case LOG_LEVEL_PROPERTY:
         setLogLevel (cmd.counter);

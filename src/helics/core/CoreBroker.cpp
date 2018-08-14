@@ -696,11 +696,104 @@ void CoreBroker::processCommand (ActionMessage &&command)
             timeCoord->processDependencyUpdateMessage (command);
         }
         break;
+    case CMD_ADD_NAMED_ENDPOINT:
+    case CMD_ADD_NAMED_PUBLICATION:
+    case CMD_ADD_NAMED_INPUT:
+    case CMD_ADD_NAMED_FILTER:
+        checkForNamedInterface (command);
+        break;
     default:
         if (command.dest_id != global_broker_id_local)
         {
             routeMessage (command);
         }
+    }
+}
+
+
+
+void CoreBroker::checkForNamedInterface (ActionMessage &command)
+{
+    switch (command.action ())
+    {
+    case CMD_ADD_NAMED_PUBLICATION:
+    {
+        auto pub = handles.getPublication (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_SUBSCRIBER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_PUBLISHER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_INPUT:
+    {
+        auto pub = handles.getInput (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_PUBLISHER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_SUBSCRIBER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_FILTER:
+    {
+        auto pub = handles.getFilter (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_ENDPOINT);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_FILTER);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    case CMD_ADD_NAMED_ENDPOINT:
+    {
+        auto pub = handles.getEndpoint (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_ADD_FILTER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_ENDPOINT);
+            command.swapSourceDest ();
+            routeMessage (command);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+    break;
+    default:
+        break;
     }
 }
 

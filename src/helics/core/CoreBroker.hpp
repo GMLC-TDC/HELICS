@@ -211,9 +211,11 @@ class CoreBroker : public Broker, public BrokerBase
     /** find any existing publishers for a subscription*/
     void FindandNotifyInputTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo);
-
+   
     void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
+
+	 void checkForNamedInterface (ActionMessage &command);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
     /** answer a query or route the message the appropriate location*/

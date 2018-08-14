@@ -54,24 +54,24 @@ class ActionMessage
   private:
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
-    int32_t messageID = 0; //!< 8 -- message ID for a variety of purposes
+    int32_t messageID = 0;  //!< 8 -- message ID for a variety of purposes
     int32_t source_id = 0;  //!< 12 -- for federate_id or route_id
     int32_t source_handle = 0;  //!< 16 -- for local handle or local code
     int32_t dest_id = 0;  //!< 20 fed_id for a targeted message
     int32_t dest_handle = 0;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
-    //4 byte gap
+    // 4 byte gap
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
     Time Te = timeZero;  //!< 48 event time
     Time Tdemin = timeZero;  //!< 56 min dependent event time
-    Time Tso = timeZero;  //!<64 the second order dependent time
+    Time Tso = timeZero;  //!< 64 the second order dependent time
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
   private:
     std::unique_ptr<AdditionalInfo>
-        extraInfo;  //!< pointer to an additional info structure with more data if required //72
+      extraInfo;  //!< pointer to an additional info structure with more data if required //72
   public:
     /** default constructor*/
     ActionMessage () noexcept : name (payload){};
@@ -116,10 +116,11 @@ class ActionMessage
     */
     void moveInfo (std::unique_ptr<Message> message);
     /** set the source from a global handle*/
-	void setSource(global_handle hand)
-	{ source_id = hand.fed_id;
+    void setSource (global_handle hand)
+    {
+        source_id = hand.fed_id;
         source_handle = hand.handle;
-	}
+    }
     /** set the destination from a global handle*/
     void setDestination (global_handle hand)
     {
@@ -130,24 +131,30 @@ class ActionMessage
     global_handle getSource () const
     {
         return global_handle (global_federate_id_t (source_id), interface_handle (source_handle));
-	}
+    }
     /** get the global destination handle*/
     global_handle getDest () const
     {
         return global_handle (global_federate_id_t (dest_id), interface_handle (dest_handle));
     }
+    /** swap the source and destination*/
+    void swapSourceDest () noexcept
+    {
+        std::swap (source_id, dest_id);
+        std::swap (source_handle, dest_handle);
+    }
     /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (messageAction,messageID, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, messageID, source_id, source_handle, dest_id, dest_handle);
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
         auto Tebase = Te.getBaseTimeCode ();
         auto Tdeminbase = Tdemin.getBaseTimeCode ();
-        auto Tsobase = Tso.getBaseTimeCode();
-        ar (btc, Tebase,Tsobase, Tdeminbase, payload);
+        auto Tsobase = Tso.getBaseTimeCode ();
+        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
         if (hasInfo (messageAction))
         {
             ar (extraInfo);
@@ -157,20 +164,20 @@ class ActionMessage
     template <class Archive>
     void load (Archive &ar)
     {
-        ar (messageAction,messageID, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, messageID, source_id, source_handle, dest_id, dest_handle);
 
         ar (counter, flags);
 
         decltype (actionTime.getBaseTimeCode ()) btc;
         decltype (Te.getBaseTimeCode ()) Tebase;
         decltype (Tdemin.getBaseTimeCode ()) Tdeminbase;
-        decltype (Tso.getBaseTimeCode()) Tsobase;
-        ar (btc, Tebase, Tsobase, Tdeminbase,  payload);
+        decltype (Tso.getBaseTimeCode ()) Tsobase;
+        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
 
         actionTime.setBaseTimeCode (btc);
         Te.setBaseTimeCode (Tebase);
         Tdemin.setBaseTimeCode (Tdeminbase);
-        Tso.setBaseTimeCode(Tsobase);
+        Tso.setBaseTimeCode (Tsobase);
         if (hasInfo (messageAction))
         {
             if (!extraInfo)
@@ -233,24 +240,18 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
-inline bool operator<(const ActionMessage &cmd, const ActionMessage &cmd2)
+inline bool operator< (const ActionMessage &cmd, const ActionMessage &cmd2)
 {
     return (cmd.actionTime < cmd2.actionTime);
 }
 
-inline constexpr uint16_t make_flags(int flag)
-{
-    return static_cast<uint16_t>(1) << (flag);
-}
+inline constexpr uint16_t make_flags (int flag) { return static_cast<uint16_t> (1) << (flag); }
 
-inline constexpr uint16_t make_flags(int flag1, int flag2)
-{
-    return make_flags(flag1) | make_flags(flag2);
-}
+inline constexpr uint16_t make_flags (int flag1, int flag2) { return make_flags (flag1) | make_flags (flag2); }
 
-inline constexpr uint16_t make_flags(int flag1, int flag2, int flag3)
+inline constexpr uint16_t make_flags (int flag1, int flag2, int flag3)
 {
-    return make_flags(flag1, flag2) | make_flags(flag3);
+    return make_flags (flag1, flag2) | make_flags (flag3);
 }
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory
@@ -330,4 +331,3 @@ std::string prettyPrintString (const ActionMessage &command);
 std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
 }  // namespace helics
-
