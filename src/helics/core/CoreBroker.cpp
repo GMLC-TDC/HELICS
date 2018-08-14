@@ -94,21 +94,31 @@ void CoreBroker::setLoggingCallback (
 }
 
 
-void CoreBroker::dataConnect(const std::string & /*source*/, const std::string & /*target*/)
+void CoreBroker::dataConnect(const std::string &source, const std::string &target)
 {
-
+    ActionMessage M (CMD_DATA_CONNECT);
+    M.name = source;
+    M.info ().target = target;
+    addActionMessage (std::move (M));
 }
 
 void
-CoreBroker::filterAddSourceTarget(const std::string & /*filter*/, const std::string & /*target*/)
+CoreBroker::filterAddSourceTarget(const std::string & filter, const std::string &target)
 {
-
+    ActionMessage M (CMD_FILTER_CONNECT);
+    M.name = filter;
+    M.info ().target = target;
+    addActionMessage (std::move (M));
 }
 
 void
-CoreBroker::filterAddDestinationTarget(const std::string & /*filter*/, const std::string & /*target*/)
+CoreBroker::filterAddDestinationTarget(const std::string &filter, const std::string &target)
 {
-
+    ActionMessage M (CMD_FILTER_CONNECT);
+    M.name = filter;
+    M.info ().target = target;
+    setActionFlag (M, destination_target);
+    addActionMessage (std::move (M));
 }
 
 int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
@@ -513,6 +523,72 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     }
+    case CMD_DATA_CONNECT:
+	{
+        auto pub = handles.getPublication (command.name);
+		if (pub != nullptr)
+		{
+            command.name = command.info ().target;
+            command.setAction (CMD_ADD_NAMED_INPUT);
+            command.setSource (pub->handle);
+            checkForNamedInterface (command);
+		}
+		else
+		{
+            auto input = handles.getInput (command.info ().target);
+			if (input == nullptr)
+			{
+				if (isRoot())
+				{
+					//TODO:: not decided what to do here yet need a buffer
+				}
+				else
+				{
+                    routeMessage (command);
+				}
+			}
+			else
+			{
+                command.setAction (CMD_ADD_NAMED_PUBLICATION);
+                command.setSource (input->handle);
+                checkForNamedInterface (command);
+			}
+		}
+	}
+    break;
+    case CMD_FILTER_CONNECT:
+	{
+        auto filt = handles.getFilter (command.name);
+        if (filt != nullptr)
+        {
+            command.name = command.info ().target;
+            command.setAction (CMD_ADD_NAMED_ENDPOINT);
+            command.setSource (filt->handle);
+            checkForNamedInterface (command);
+        }
+        else
+        {
+            auto ept = handles.getEndpoint (command.info ().target);
+            if (ept == nullptr)
+            {
+                if (isRoot ())
+                {
+                    // TODO:: not decided what to do here yet need a buffer
+                }
+                else
+                {
+                    routeMessage (command);
+                }
+            }
+            else
+            {
+                command.setAction (CMD_ADD_NAMED_FILTER);
+                command.setSource (ept->handle);
+                checkForNamedInterface (command);
+            }
+        }
+	}
+    break;
     case CMD_DISCONNECT_NAME:
         if (command.dest_id == 0)
         {

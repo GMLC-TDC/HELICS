@@ -94,9 +94,12 @@ enum class action_t : int32_t
     cmd_add_interdependency = 148,  //!< command to add a federate as both dependent and a dependency
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
+    cmd_data_connect = cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
+    cmd_filter_connect = cmd_info_basis + 709,  //!< command to add a target to a filter
+
     cmd_fed_configure_time = 202,  //!< command to update the configuration of a federate a time parameter
     cmd_fed_configure_int = 203,  //!< command to update the configuration of a federate an int parameter
-    cmd_fed_configure_flag = 204,  //!< command to update the configuration of a federate a flag parameter 
+    cmd_fed_configure_flag = 204,  //!< command to update the configuration of a federate a flag parameter
     cmd_core_configure = 207,  //!< command to update the configuration of a core
     cmd_interface_configure = 209,  //!< command to update the configuration of an interface
     cmd_broker_configure = 211,  //!< command to update the configuration of a broker
@@ -128,14 +131,13 @@ enum class action_t : int32_t
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
     cmd_add_endpoint = 90,  //!< notify of a source endpoint
 
-    cmd_add_named_input=104, //!< command to add a named input as a target
-	cmd_add_named_filter=105, //!< command to add named filter as a target
-	cmd_add_named_publication=106, //!< command to add a named publication as a target
-	cmd_add_named_endpoint=107, //!< command to add a named endpoint as a target
-	cmd_remove_target=120, //!< cmd to remove a target from connection
+    cmd_add_named_input = 104,  //!< command to add a named input as a target
+    cmd_add_named_filter = 105,  //!< command to add named filter as a target
+    cmd_add_named_publication = 106,  //!< command to add a named publication as a target
+    cmd_add_named_endpoint = 107,  //!< command to add a named endpoint as a target
+    cmd_remove_target = 120,  //!< cmd to remove a target from connection
 
     cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
-
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
@@ -197,6 +199,9 @@ enum class action_t : int32_t
 #define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
 #define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
 #define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
+
+#define CMD_DATA_CONNECT action_message_def::action_t::cmd_data_connect
+#define CMD_FILTER_CONNECT action_message_def::action_t::cmd_filter_connect
 
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
 

@@ -1197,11 +1197,30 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::dataConnect (const std::string & /*source*/, const std::string & /*target*/) {}
+void CommonCore::dataConnect (const std::string &source, const std::string &target)
+{
+    ActionMessage M (CMD_DATA_CONNECT);
+    M.name = source;
+    M.info ().target = target;
+    addActionMessage (std::move (M));
+}
 
-void CommonCore::filterAddSourceTarget (const std::string & /*filter*/, const std::string & /*target*/) {}
+void CommonCore::filterAddSourceTarget (const std::string &filter, const std::string &target)
+{
+    ActionMessage M (CMD_FILTER_CONNECT);
+    M.name = filter;
+    M.info ().target = target;
+    addActionMessage (std::move (M));
+}
 
-void CommonCore::filterAddDestinationTarget (const std::string & /*filter*/, const std::string & /*target*/) {}
+void CommonCore::filterAddDestinationTarget (const std::string &filter, const std::string &target)
+{
+    ActionMessage M (CMD_FILTER_CONNECT);
+    M.name = filter;
+    M.info ().target = target;
+    setActionFlag (M, destination_target);
+    addActionMessage (std::move (M));
+}
 
 void CommonCore::addDependency (federate_id_t federateID, const std::string &federateName)
 {
@@ -2295,6 +2314,58 @@ void CommonCore::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
+    case CMD_DATA_CONNECT:
+    {
+        auto pub = loopHandles.getPublication (command.name);
+        if (pub != nullptr)
+        {
+            command.name = command.info ().target;
+            command.setAction (CMD_ADD_NAMED_INPUT);
+            command.setSource (pub->handle);
+            checkForNamedInterface(command);
+        }
+        else
+        {
+            auto input = loopHandles.getInput (command.info ().target);
+            if (input == nullptr)
+            {
+                    routeMessage (command);
+            }
+            else
+            {
+                command.setAction (CMD_ADD_NAMED_PUBLICATION);
+                command.setSource (input->handle);
+                checkForNamedInterface (command);
+            }
+        }
+    }
+    break;
+    case CMD_FILTER_CONNECT:
+    {
+        auto filt = loopHandles.getFilter (command.name);
+        if (filt != nullptr)
+        {
+            command.name = command.info ().target;
+            command.setAction (CMD_ADD_NAMED_ENDPOINT);
+            command.setSource (filt->handle);
+            checkForNamedInterface (command);
+        }
+        else
+        {
+            auto ept = loopHandles.getEndpoint (command.info ().target);
+            if (ept == nullptr)
+            {
+                    routeMessage (command);
+            }
+            else
+            {
+                command.setAction (CMD_ADD_NAMED_FILTER);
+                command.setSource (ept->handle);
+                checkForNamedInterface (command);
+            }
+        }
+    }
+    break;
     case CMD_REG_INPUT:
     case CMD_REG_ENDPOINT:
     case CMD_REG_PUB:
