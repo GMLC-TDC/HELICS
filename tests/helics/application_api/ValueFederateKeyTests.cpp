@@ -30,6 +30,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
                       bdata::make (core_types_single),
                       core_type)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     using namespace helics;
     SetupTest<ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<ValueFederate> (0);

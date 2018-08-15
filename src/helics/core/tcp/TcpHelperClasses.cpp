@@ -585,6 +585,13 @@ void TcpServer::close ()
 {
     halted = true;
     accepting = false;
+    //cancel first to give the threads some time to process
+    for (auto &acc : acceptors)
+    {
+        acc->cancel();
+    }
+    //yeild the thread to allow some time for handles to process the cancellation
+    std::this_thread::yield();
     for (auto &acc : acceptors)
     {
         acc->close ();
