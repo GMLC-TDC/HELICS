@@ -76,14 +76,14 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
 class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
 {
   public:
-    enum class connection_state_t
+    enum class accepting_state_t
     {
-        prestart = -1,
-        halted = 0,
-        receiving = 1,
-        closed = 2,
+        opened = 0,
+        connecting = 1,
+		connected=2,
+        halted =3,
+		closed=4,
     };
-
     typedef std::shared_ptr<TcpAcceptor> pointer;
     /** create an RxConnection object using the specified service and bufferSize*/
     static pointer create (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
@@ -95,18 +95,33 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     {
         return pointer (new TcpAcceptor (io_service, port));
     }
-    /** get the underlying socket object*/
-
+    /** connect the acceptor to the socket*/
+	bool connect ();
+    /** connect the acceptor to the socket if disconnected and try up to timeout*/
+    bool connect (int timeout);
     /** start the acceptor*/
-    void start (TcpRxConnection::pointer conn);
+    bool start (TcpRxConnection::pointer conn);
     /** close the socket*/
     void close ();
     bool isAccepting () const { return accepting.load (); }
+    bool isConnected () const { return (state.load ()==accepting_state_t::connected); }
     /** set the callback for the data object*/
-    void setAcceptCall (std::function<size_t (TcpRxConnection::pointer)> accFunc);
+	void setAcceptCall(std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> accFunc)
+	{
+        acceptCall = std::move (accFunc);
+	}
 
-    // int index = 0;
+	 /** set the error path callback*/
+    void setErrorCall (std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorFunc)
+    {
+        errorCall = std::move (errorFunc);
+    }
 
+	template <class X>
+	void set_option(const X& option)
+	{
+        acceptor_.set_option (option);
+	}
   private:
     TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
     TcpAcceptor (boost::asio::io_service &io_service, int port);
@@ -115,8 +130,9 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     std::atomic<bool> accepting{false};
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::endpoint endpoint_;
-    std::function<void(TcpRxConnection::pointer)> acceptCall;
-    std::atomic<bool> halted{false};
+    std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> acceptCall;
+    std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorCall;
+    std::atomic<accepting_state_t> state{accepting_state_t::opened};
 };
 
 /** tcp socket connection for connecting to a server*/
@@ -251,8 +267,6 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     void close ();
     /** check if the server is ready to start*/
     bool isReady () const { return !(halted.load ()); }
-    /** reConnect the server with a new address*/
-    bool reConnect (const std::string &address, const std::string &port, int timeout);
     /** reConnect the server with the same address*/
     bool reConnect (int timeout);
     /** set the data callback*/
@@ -265,7 +279,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     {
         errorCall = std::move (errorFunc);
     }
-    void handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
+    void handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointer new_connection);
 
   private:
     TcpServer (boost::asio::io_service &io_service,
@@ -281,7 +295,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     void initialConnect ();
     boost::asio::io_service &ioserv;
     std::atomic<bool> accepting{false};
-    std::vector<std::shared_ptr<boost::asio::ip::tcp::acceptor>> acceptors;
+    std::vector<TcpAcceptor::pointer> acceptors;
     std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
