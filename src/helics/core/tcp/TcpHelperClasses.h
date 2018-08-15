@@ -80,9 +80,9 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     {
         opened = 0,
         connecting = 1,
-		connected=2,
-        halted =3,
-		closed=4,
+        connected = 2,
+        halted = 3,
+        closed = 4,
     };
     typedef std::shared_ptr<TcpAcceptor> pointer;
     /** create an RxConnection object using the specified service and bufferSize*/
@@ -95,33 +95,41 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     {
         return pointer (new TcpAcceptor (io_service, port));
     }
+    /** destructor to make sure everything is closed without threading issues*/
+    ~TcpAcceptor () { close (); };
+
     /** connect the acceptor to the socket*/
-	bool connect ();
+    bool connect ();
     /** connect the acceptor to the socket if disconnected and try up to timeout*/
     bool connect (int timeout);
     /** start the acceptor*/
     bool start (TcpRxConnection::pointer conn);
+    /** cancel pending operations*/
+    void cancel () { acceptor_.cancel (); }
     /** close the socket*/
     void close ();
+    /** check if the acceptor is current accepting new connections*/
     bool isAccepting () const { return accepting.load (); }
-    bool isConnected () const { return (state.load ()==accepting_state_t::connected); }
+    /** check if the acceptor is ready to begin accepting*/
+    bool isConnected () const { return (state.load () == accepting_state_t::connected); }
     /** set the callback for the data object*/
-	void setAcceptCall(std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> accFunc)
-	{
+    void setAcceptCall (std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> accFunc)
+    {
         acceptCall = std::move (accFunc);
-	}
+    }
 
-	 /** set the error path callback*/
+    /** set the error path callback*/
     void setErrorCall (std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
 
-	template <class X>
-	void set_option(const X& option)
-	{
+    template <class X>
+    void set_option (const X &option)
+    {
         acceptor_.set_option (option);
-	}
+    }
+
   private:
     TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
     TcpAcceptor (boost::asio::io_service &io_service, int port);

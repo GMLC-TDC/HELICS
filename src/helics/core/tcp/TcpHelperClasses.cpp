@@ -361,23 +361,28 @@ void TcpAcceptor::close ()
 {
     acceptor_.close ();
     state = accepting_state_t::halted;
+	while (accepting)
+	{
+        std::this_thread::yield ();
+	}
 }
 
 void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
+    auto ptr = shared_from_this ();
     accepting = false;
     if (!error)
     {
         if (acceptCall)
         {
-            acceptCall (shared_from_this (), std::move (new_connection));
+            acceptCall (std::move(ptr), std::move (new_connection));
         }
     }
     else if (error != boost::asio::error::operation_aborted)
     {
         if (errorCall)
         {
-            errorCall (shared_from_this (), error);
+            errorCall (std::move (ptr), error);
         }
         else
         {
@@ -392,7 +397,7 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
                       int nominalBufferSize)
     : ioserv (io_service), bufferSize (nominalBufferSize)
 {
-    if (address == "*")
+    if ((address == "*")||(address=="tcp://*"))
     {
         acceptors.push_back (TcpAcceptor::create (ioserv, portNum));
     }
@@ -481,7 +486,7 @@ void TcpServer::initialConnect ()
 	for (auto &acc : acceptors)
 	{
         acc->setAcceptCall (
-          [this](TcpAcceptor::pointer acc, TcpRxConnection::pointer conn) { handle_accept (acc, conn); });
+          [this](TcpAcceptor::pointer accPtr, TcpRxConnection::pointer conn) { handle_accept (accPtr, conn); });
 	}
 }
 

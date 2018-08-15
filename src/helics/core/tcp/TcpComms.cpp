@@ -27,7 +27,7 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
 {
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost") || (brokerTarget_ == "localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") || (brokerTarget_ == "localhost"))
         {
             localTarget_ = "localhost";
         }
