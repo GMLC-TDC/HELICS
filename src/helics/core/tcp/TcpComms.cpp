@@ -310,6 +310,7 @@ void TcpComms::queue_rx_function ()
       helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, maxMessageSize_);
 	if (!server->isReady())
 	{
+        std::cerr << "retrying tcp bind\n";
         auto connected=server->reConnect (connectionTimeout);
 		if (!connected)
 		{

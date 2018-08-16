@@ -473,20 +473,17 @@ void TcpServer::initialConnect ()
         auto acc = TcpAcceptor::create (ioserv, ep);
 
         acc->set_option (tcp::acceptor::reuse_address (false));
-        if (!acc->connect ())
-        {
-            halted = true;
-        }
+        acc->setAcceptCall (
+          [this](TcpAcceptor::pointer accPtr, TcpRxConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
-        if (halted)
-        {
-            break;
-        }
     }
 	for (auto &acc : acceptors)
 	{
-        acc->setAcceptCall (
-          [this](TcpAcceptor::pointer accPtr, TcpRxConnection::pointer conn) { handle_accept (accPtr, conn); });
+        if (!acc->connect ())
+        {
+            halted = true;
+            break;
+        }
 	}
 }
 
