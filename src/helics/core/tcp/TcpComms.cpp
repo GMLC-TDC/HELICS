@@ -311,6 +311,7 @@ void TcpComms::queue_rx_function ()
 	if (!server->isReady())
 	{
         std::cerr << "retrying tcp bind\n";
+        std::this_thread::sleep_for (std::chrono::milliseconds (150));
         auto connected=server->reConnect (connectionTimeout);
 		if (!connected)
 		{

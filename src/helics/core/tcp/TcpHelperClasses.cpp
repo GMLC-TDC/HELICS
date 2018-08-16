@@ -309,11 +309,12 @@ bool TcpAcceptor::connect (int timeout)
     accepting_state_t exp = accepting_state_t::opened;
     if (state.compare_exchange_strong (exp, accepting_state_t::connecting))
     {
-    boost::system::error_code ec;
+   
     bool bindsuccess = false;
     int tcount = 0;
     while (!bindsuccess)
     {
+        boost::system::error_code ec;
         acceptor_.bind (endpoint_, ec);
         if (ec)
         {
@@ -491,10 +492,10 @@ bool TcpServer::reConnect (int timeout)
 {
     if (!halted)
     {
+        std::cerr << "closing server and reopening\n";
         close ();
     }
     halted = false;
-    boost::system::error_code ec;
     for (auto &acc : acceptors)
     {
         if (!acc->isConnected ())
