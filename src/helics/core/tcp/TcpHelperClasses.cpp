@@ -368,6 +368,13 @@ void TcpAcceptor::close ()
 	}
 }
 
+std::string TcpAcceptor::to_string () const
+{
+    auto str = endpoint_.address ().to_string ();
+    str += ':';
+    str += std::to_string (endpoint_.port ());
+    return str;
+}
 void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
     auto ptr = shared_from_this ();
@@ -497,6 +504,7 @@ bool TcpServer::reConnect (int timeout)
         {
             if (!acc->connect (timeout))
             {
+                std::cerr << "unable to connect on " << acc->to_string () << '\n';
                 halted = true;
                 break;
             }

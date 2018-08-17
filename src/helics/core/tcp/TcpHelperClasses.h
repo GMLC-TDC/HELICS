@@ -123,13 +123,14 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     {
         errorCall = std::move (errorFunc);
     }
-
+    /** set an option on the underlying acceptor*/
     template <class X>
     void set_option (const X &option)
     {
         acceptor_.set_option (option);
     }
-
+    /** generate a string from the associated endpoint*/
+    std::string to_string () const;
   private:
     TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
     TcpAcceptor (boost::asio::io_service &io_service, int port);

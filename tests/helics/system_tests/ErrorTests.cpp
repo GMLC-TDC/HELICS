@@ -224,9 +224,25 @@ const std::string networkCores[] = {"zmq", "tcp", "udp"};
 BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)
 {
     auto broker = AddBroker (core_type, "1");
-    auto broker2=AddBroker (core_type, "1 --timeout=500");
+    auto broker2 = AddBroker (core_type, "1 --timeout=500");
     BOOST_CHECK (!broker2->isConnected ());
     broker->disconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
+/** test broker recovery*/
+BOOST_DATA_TEST_CASE (test_broker_recovery, bdata::make (networkCores), core_type)
+{
+    auto broker = AddBroker (core_type, "1");
+    BOOST_REQUIRE (broker->isConnected ());
+    auto res = std::async (std::launch::async, [&broker]() {
+        std::this_thread::sleep_for (std::chrono::milliseconds (1400));
+        broker->disconnect ();
+    });
+    auto broker2 = AddBroker (core_type, "1 --timeout=2500");
+    BOOST_CHECK (!broker->isConnected ());
+    BOOST_CHECK (broker2->isConnected ());
+    broker2->disconnect ();
     helics::cleanupHelicsLibrary ();
 }
 
