@@ -228,6 +228,7 @@ script:
  
   # Run CI tests
   - export CTEST_OPTIONS="--output-on-failure --timeout 220"
+  - ls -l ../scripts
   - ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
 
 
