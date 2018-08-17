@@ -46,9 +46,9 @@ do
     esac
 done
 
-if [[ "$RUN_CACHEGRIND" == "true" ]]; then
+#if [[ "$RUN_CACHEGRIND" == "true" ]]; then
     #valgrind --track-origins=yes --tool=cachegrind <cmd>
-fi
+#fi
 
 if [[ "$NO_CTEST" == "true" ]]; then
     echo "CTest disabled, full set of CI tests may not run"
