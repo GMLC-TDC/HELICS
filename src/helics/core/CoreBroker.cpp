@@ -364,6 +364,20 @@ void CoreBroker::transmitDelayedMessages ()
     }
 }
 
+void CoreBroker::sendErrorToImmediateBrokers(int error_code)
+{
+    ActionMessage errorCom (CMD_ERROR);
+    errorCom.counter = static_cast<int16_t> (error_code);
+    for (auto &brk : _brokers)
+    {
+		if (!brk._nonLocal)
+		{
+            routeMessage (errorCom, brk.global_id);
+		}
+        
+    }
+}
+
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
@@ -373,6 +387,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
     case CMD_PROTOCOL:
         break;
+        
     case CMD_TICK:
         if (!_isRoot)
         {
@@ -380,6 +395,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 // try to reset the connection to the broker
                 // brokerReconnect()
+                LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
+               sendErrorToImmediateBrokers (-5);
+                disconnect ();
+                brokerState = broker_state_t::errored;
+                addActionMessage (CMD_STOP);
             }
             else
             {

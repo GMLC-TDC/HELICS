@@ -244,6 +244,9 @@ class CoreBroker : public Broker, public BrokerBase
     void initializeFederateMap ();
     /** generate a json string containing the dependency information for all federation object*/
     void initializeDependencyGraph();
+
+	 /** send an error code to all direct cores*/
+    void sendErrorToImmediateBrokers (int error_code);
 };
 
 }  // namespace helics

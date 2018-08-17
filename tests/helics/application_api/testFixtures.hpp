@@ -64,6 +64,10 @@ struct FederateTestFixture
                     const std::string &name_prefix = defaultNamePrefix)
     {
         auto broker = AddBroker (core_type_name, count);
+		if (!broker->isConnected())
+		{
+            throw (std::exception ("Unable to connect broker"));
+		}
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
     }
 
@@ -136,6 +140,10 @@ struct FederateTestFixture
         case 3:
         {
             auto subbroker = AddBroker (core_type_name, initString + " --federates " + std::to_string (count));
+            if (!subbroker->isConnected ())
+            {
+                throw (std::exception ("Unable to connect subbroker"));
+            }
             auto newTypeString = core_type_name;
             newTypeString.push_back ('_');
             newTypeString.push_back ('2');
@@ -153,6 +161,10 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }
@@ -192,6 +204,10 @@ struct FederateTestFixture
                 int fedcnt = (ii > count - 3) ? 4 : (count - ii);
                 auto subbroker =
                   AddBroker (core_type_name, initString + " --federates " + std::to_string (fedcnt));
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, fedcnt, subbroker, time_delta, name_prefix);
             }
         }
@@ -204,6 +220,10 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }

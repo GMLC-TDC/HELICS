@@ -2466,7 +2466,15 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger (0, 0, getFederateNameNoThrow (command.source_id), command.payload);
+			if (command.source_id == higher_broker_id)
+			{
+                sendErrorToFederates (command.counter);
+			}
+			else
+			{
+                sendToLogger (0, 0, getFederateNameNoThrow (command.source_id), command.payload);
+			}
+            
         }
         else
         {
