@@ -357,7 +357,7 @@ bool TcpAcceptor::start (TcpRxConnection::pointer conn)
     return true;
 }
 
-/** close the socket*/
+/** close the acceptor*/
 void TcpAcceptor::close ()
 {
     acceptor_.close ();
@@ -490,11 +490,6 @@ void TcpServer::initialConnect ()
 
 bool TcpServer::reConnect (int timeout)
 {
-    if (!halted)
-    {
-        std::cerr << "closing server and reopening\n";
-        close ();
-    }
     halted = false;
     for (auto &acc : acceptors)
     {

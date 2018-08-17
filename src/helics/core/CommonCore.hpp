@@ -317,7 +317,7 @@ class CommonCore : public Core, public BrokerBase
                             fed_handle_pair>> filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
+    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
 
   protected:
     /** deliver a message to the appropriate location*/

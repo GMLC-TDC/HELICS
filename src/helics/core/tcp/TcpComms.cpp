@@ -316,6 +316,7 @@ void TcpComms::queue_rx_function ()
 		if (!connected)
 		{
             std::cerr << "unable to bind to tcp connection socket\n";
+            server->close ();
             rx_status = connection_status::error;
             return;
 		}

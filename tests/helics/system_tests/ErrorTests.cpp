@@ -101,6 +101,8 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names2)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
 
     fed1->registerGlobalPublication ("testkey", "");
+    fed1->enterInitializationStateAsync ();
+
     fed2->registerGlobalPublication ("testkey", "");
 
     BOOST_CHECK_THROW (fed2->enterInitializationState (), helics::RegistrationFailure);
