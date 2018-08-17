@@ -1,0 +1,6 @@
+addPath('${CMAKE_BINARY_DIR}/swig/octave');
+helicsLibPath='${CMAKE_BINARY_DIR}/src/helics/shared_api_library';
+helicsStartup
+test valueFedTests
+test messageFedTests
+test messageFilterTests
