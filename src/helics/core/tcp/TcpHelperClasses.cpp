@@ -470,6 +470,8 @@ TcpServer::TcpServer (boost::asio::io_service &io_service, int portNum, int nomi
     initialConnect ();
 }
 
+TcpServer::~TcpServer() { close (); }
+
 void TcpServer::initialConnect ()
 {
     if (halted == true)
@@ -591,7 +593,7 @@ void TcpServer::close ()
     {
         acc->cancel();
     }
-    //yeild the thread to allow some time for handles to process the cancellation
+    //yield the thread to allow some time for handles to process the cancellation
     std::this_thread::yield();
     for (auto &acc : acceptors)
     {

@@ -270,6 +270,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     static pointer create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192);
 
   public:
+    ~TcpServer ();
     /** start accepting new connections*/
     void start ();
     /** close the server*/
