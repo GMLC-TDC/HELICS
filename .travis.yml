@@ -112,19 +112,23 @@ jobs:
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
+    # Valgrind build
     - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
         - BUILD_TYPE=RelWithDebInfo
+    # Code coverage build
     - <<: *daily_linux
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true 
+        - USE_SWIG=true
+        - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
+    # GCC 5 build
     - <<: *daily_linux
       addons:
         apt:
@@ -134,6 +138,7 @@ jobs:
             - g++-5
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
+    # Clang 5 build
     - <<: *daily_linux
       compiler: clang
       addons:
@@ -149,6 +154,23 @@ jobs:
         - CCACHE_CPP2=yes
         - USE_SWIG=true
         - CXX_STANDARD=17
+    # TSAN build
+    - <<: *daily_linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - libstdc++-6-dev
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - CCACHE_CPP2=yes
+        - RUN_TSAN=true
+        - USE_MPI=mpich
+        - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
     # XCode 8gm, OS X 10.11
     - <<: *daily_osx
       env:
@@ -186,6 +208,7 @@ install:
   - if [[ "$RUN_CACHEGRIND" ]]; then TEST_FLAGS_ARR+=("--cachegrind") ; fi
   - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
   - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
+  - if [[ "$RUN_TSAN" ]]; then TEST_FLAGS_ARR+=("--tsan") ; fi
   - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
   - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
   - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
@@ -194,7 +217,7 @@ install:
 script:
   - mkdir build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
-  - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+  - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make ${MAKEFLAGS}
 
   # Setup counters for coverage
@@ -202,7 +225,11 @@ script:
 
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make ${MAKEFLAGS} install ; fi
-  - ctest --output-on-failure --timeout 220 -L Continuous
+ 
+  # Run CI tests
+  - export CTEST_OPTIONS="--output-on-failure --timeout 220"
+  - ../scripts/run-ci-tests.sh ${TEST_TYPE} ${CI_TEST_FLAGS}
+
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
