@@ -588,17 +588,25 @@ void TcpServer::close ()
 {
     halted = true;
     accepting = false;
-    //cancel first to give the threads some time to process
-    for (auto &acc : acceptors)
-    {
-        acc->cancel();
-    }
-    //yield the thread to allow some time for handles to process the cancellation
-    std::this_thread::yield();
-    for (auto &acc : acceptors)
-    {
-        acc->close ();
-    }
+	if (acceptors.size() == 1)
+	{
+        acceptors[0]->close ();
+	}
+    else if (!acceptors.empty ())
+	{
+        // cancel first to give the threads some time to process
+        for (auto &acc : acceptors)
+        {
+            acc->cancel ();
+        }
+        // yield the thread to allow some time for handles to process the cancellation
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        for (auto &acc : acceptors)
+        {
+            acc->close ();
+        }
+	}
+    
     acceptors.clear ();
     auto connects = connections.lock ();
     for (auto &conn : *connects)
