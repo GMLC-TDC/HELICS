@@ -29,5 +29,6 @@ set_property(
     LABELS
     Matlab
     Continuous
+    Coverage
     Daily
 )

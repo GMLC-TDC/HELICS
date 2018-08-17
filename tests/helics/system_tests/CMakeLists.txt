@@ -37,7 +37,7 @@ add_test(
   NAME system-tests
   COMMAND system-tests --log_level=message --report_level=short
 )
-set_property(TEST system-tests PROPERTY LABELS System Daily)
+set_property(TEST system-tests PROPERTY LABELS System Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(

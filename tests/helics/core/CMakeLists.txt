@@ -48,7 +48,7 @@ target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
-set_property(TEST core-tests PROPERTY LABELS Core Daily)
+set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(

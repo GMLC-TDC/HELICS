@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#TEST_CONFIG="Continuous"
 for i in "$@"
 do
     case $i in
@@ -62,15 +61,18 @@ else
     # Include releasetest or coveragetest in the branch name to run a longer set of tests
     export CTEST_OUTPUT_ON_FAILURE=true
 
-    TEST_CONFIG="Continuous"
     if [[ "$TEST_CONFIG_GIVEN" == "true" ]]; then
         test_label=$(tr '[:upper:]' '[:lower:]' <<< $TEST_CONFIG)
         case "${test_label}" in
+            *daily*)
+	        TEST_CONFIG="Daily"
+		;;
             *coverage*)
-                TEST_CONFIG=""
+                TEST_CONFIG="Coverage"
                 ;;
             *)
                 TEST_CONFIG="Continuous"
+		CTEST_OPTIONS+=" --timeout 220"
                 ;;
         esac
 
@@ -78,13 +80,14 @@ else
     elif [[ "$TRAVIS" == "true" ]]; then
         case "${TRAVIS_BRANCH}" in
             *coveragetest*)
-                TEST_CONFIG=""
+                TEST_CONFIG="Coverage"
                 ;;
-            *releasetest*)
-                TEST_CONFIG=""
+            *dailytest*)
+                TEST_CONFIG="Daily"
                 ;;
             *)
                 TEST_CONFIG="Continuous"
+		CTEST_OPTIONS+=" --timeout 220"
                 ;;
         esac
     fi
@@ -100,7 +103,7 @@ else
         	echo "Running ${TEST_CONFIG} tests"
         	ctest -L ${TEST_CONFIG} ${CTEST_OPTIONS}
 	else
-		echo "Running tests"
+		echo "Running all tests"
 		ctest ${CTEST_OPTIONS}
 	fi
     fi

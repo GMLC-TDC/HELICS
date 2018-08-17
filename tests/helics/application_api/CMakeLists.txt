@@ -47,7 +47,7 @@ add_test(
   NAME application-api-tests
   COMMAND application-api-tests --log_level=message --report_level=short
 )
-set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Daily)
+set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(
