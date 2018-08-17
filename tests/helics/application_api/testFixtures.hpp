@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include <stdexcept>
 #include <memory>
 
 #ifdef HELICS_HAVE_ZEROMQ
@@ -17,10 +18,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ZMQTEST3 "zmq_3",
 #define ZMQTEST4 "zmq_4",
 #else
-#define ZMQTEST 
-#define ZMQTEST2 
-#define ZMQTEST3 
-#define ZMQTEST4 
+#define ZMQTEST
+#define ZMQTEST2
+#define ZMQTEST3
+#define ZMQTEST4
 #endif
 
 #ifndef DISABLE_TCP_CORE
@@ -64,10 +65,10 @@ struct FederateTestFixture
                     const std::string &name_prefix = defaultNamePrefix)
     {
         auto broker = AddBroker (core_type_name, count);
-		if (!broker->isConnected())
-		{
-            throw (std::exception ("Unable to connect broker"));
-		}
+        if (!broker->isConnected ())
+        {
+            throw (std::runtime_error ("Unable to connect broker"));
+        }
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
     }
 
@@ -142,7 +143,7 @@ struct FederateTestFixture
             auto subbroker = AddBroker (core_type_name, initString + " --federates " + std::to_string (count));
             if (!subbroker->isConnected ())
             {
-                throw (std::exception ("Unable to connect subbroker"));
+                throw (std::runtime_error ("Unable to connect subbroker"));
             }
             auto newTypeString = core_type_name;
             newTypeString.push_back ('_');
@@ -163,7 +164,7 @@ struct FederateTestFixture
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
                 if (!subbroker->isConnected ())
                 {
-                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
                 }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
@@ -206,7 +207,7 @@ struct FederateTestFixture
                   AddBroker (core_type_name, initString + " --federates " + std::to_string (fedcnt));
                 if (!subbroker->isConnected ())
                 {
-                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
                 }
                 AddFederates<FedType> (newTypeString, fedcnt, subbroker, time_delta, name_prefix);
             }
@@ -222,7 +223,7 @@ struct FederateTestFixture
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
                 if (!subbroker->isConnected ())
                 {
-                    throw (std::exception ("Unable to connect subbroker(mode 4)"));
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
                 }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
