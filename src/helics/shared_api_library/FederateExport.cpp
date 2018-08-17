@@ -735,12 +735,12 @@ helics_time_t helicsFederateGetTimeProperty(helics_federate fed, int32_t timePro
 	auto fedObj = getFed(fed);
 	if (fedObj == nullptr)
 	{
-		return helics_time_zero;
+		return helics_time_invalid;
 	}
 	try
 	{
-		//fedObj->getTime
-		return helics_time_zero;
+        auto T = fedObj->getTimeProperty (timeProperty);
+        return static_cast<double> (T);
 	}
 	catch (...)
 	{
@@ -757,8 +757,8 @@ helics_bool_t helicsFederateGetFlagOption(helics_federate fed, int flag)
 	}
 	try
 	{
-		//int res=fedObj->getIntegerProperty(intProperty);
-		return helics_false;
+        bool res = fedObj->getFlagOption (flag);
+		return (res)?helics_true:helics_false;
 	}
 	catch (...)
 	{
@@ -776,8 +776,7 @@ int32_t helicsFederateGetIntegerProperty(helics_federate fed, int32_t intPropert
 	}
 	try
 	{
-		//fedObj->setIntegerProperty(intProperty);
-		return helics_ok;
+		return fedObj->getIntegerProperty(intProperty);
 	}
 	catch (...)
 	{

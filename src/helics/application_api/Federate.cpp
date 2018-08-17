@@ -379,6 +379,16 @@ void Federate::setTimeProperty (int32_t option, Time timeValue)
 
 void Federate::setIntegerProperty (int32_t option, int32_t optionValue) { coreObject->setIntegerProperty (fedID,option,  optionValue); }
 
+Time Federate::getTimeProperty (int32_t option)
+{
+    return coreObject->getTimeProperty (fedID, option);
+}
+
+int32_t Federate::getIntegerProperty (int32_t option)
+{
+    return coreObject->getIntegerProperty (fedID, option);
+}
+
 void Federate::setLoggingCallback (
   const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {
@@ -390,6 +400,7 @@ void Federate::setFlagOption (int flag, bool flagValue)
     coreObject->setFlagOption (fedID, flag, flagValue);
 }
 
+bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
 {
     switch (state)

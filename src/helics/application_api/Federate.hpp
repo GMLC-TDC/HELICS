@@ -229,6 +229,20 @@ class Federate
     */
     void setIntegerProperty (int32_t option, int32_t optionValue);
 
+	/** get the value of a time option for the federate
+    @param[in] option the option to get
+    */
+    Time getTimeProperty (int32_t option);
+
+    /** get the value of a flag option
+    @param[in] flag an index into the flag /ref flag-definitions.h
+    */
+    virtual bool getFlagOption (int flag);
+    /**  set an integer option for the federate
+    @param option,  the option to inquire
+    */
+    int getIntegerProperty (int32_t option);
+
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
     @param logFunction the callback function for doing something with a log message
