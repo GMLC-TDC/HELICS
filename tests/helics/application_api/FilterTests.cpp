@@ -105,6 +105,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), cor
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a filter operator
@@ -165,6 +166,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a remove dest filter operator
@@ -227,6 +229,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a remote dest filter operator
@@ -283,6 +286,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     mFed1->finalize ();
     mFed2->finalize ();
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a remove dest filter operator
@@ -343,6 +347,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a filter operator
@@ -422,6 +427,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     fFed->finalize ();
     fFed2->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 /** test a filter operator
@@ -500,6 +506,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     fFed->finalize ();
     fFed2->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
@@ -565,6 +572,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (message_clone_test)
@@ -632,6 +640,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     dFed->finalize ();
     dcFed->finalize ();
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
@@ -735,6 +744,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     dFed->finalize ();
     dcFed->finalize ();
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
+    broker->disconnect ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
