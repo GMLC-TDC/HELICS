@@ -304,14 +304,15 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
 
     void initialConnect ();
     boost::asio::io_service &ioserv;
-    std::atomic<bool> accepting{false};
+    std::mutex accepting;
     std::vector<TcpAcceptor::pointer> acceptors;
     std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
-    guarded<std::vector<std::shared_ptr<TcpRxConnection>>> connections;
+	//this data structure is protected by the accepting atomic
+    std::vector<std::shared_ptr<TcpRxConnection>> connections;
 };
 
 }  // namespace tcp
