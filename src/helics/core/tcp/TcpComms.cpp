@@ -22,16 +22,19 @@ namespace tcp
 using boost::asio::ip::tcp;
 TcpComms::TcpComms () noexcept {}
 
-TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork)
-    : CommsInterface (brokerTarget, localTarget,targetNetwork)
+TcpComms::TcpComms (const std::string &brokerTarget,
+                    const std::string &localTarget,
+                    interface_networks targetNetwork)
+    : CommsInterface (brokerTarget, localTarget, targetNetwork)
 {
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") || (brokerTarget_ == "localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
+            (brokerTarget_ == "localhost"))
         {
             localTarget_ = "localhost";
         }
-        else if (brokerTarget_.empty())
+        else if (brokerTarget_.empty ())
         {
             switch (interfaceNetwork)
             {
@@ -45,8 +48,7 @@ TcpComms::TcpComms (const std::string &brokerTarget, const std::string &localTar
         }
         else
         {
-            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
-
+            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
         }
     }
 }
@@ -56,11 +58,12 @@ TcpComms::TcpComms (const NetworkBrokerData &netInfo)
 {
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") || (brokerTarget_ == "localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
+            (brokerTarget_ == "localhost"))
         {
             localTarget_ = "localhost";
         }
-        else if (brokerTarget_.empty())
+        else if (brokerTarget_.empty ())
         {
             switch (interfaceNetwork)
             {
@@ -74,8 +77,7 @@ TcpComms::TcpComms (const NetworkBrokerData &netInfo)
         }
         else
         {
-            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
-
+            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
         }
     }
     if (netInfo.portStart > 0)
@@ -262,6 +264,8 @@ bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/
 
 void TcpComms::queue_rx_function ()
 {
+    bool autoPortNumber = (PortNumber < 0);
+
     while (PortNumber < 0)
     {
         auto message = rxMessageQueue.pop ();
@@ -308,20 +312,29 @@ void TcpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer ();
     auto server =
       helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, maxMessageSize_);
-	if (!server->isReady())
-	{
-        std::cerr << "retrying tcp bind\n";
-        std::this_thread::sleep_for (std::chrono::milliseconds (150));
-        auto connected=server->reConnect (connectionTimeout);
-		if (!connected)
-		{
-            std::cerr << "unable to bind to tcp connection socket\n";
+    while (!server->isReady ())
+    {
+        if ((autoPortNumber)&&(hasBroker))
+        { //If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
-            rx_status = connection_status::error;
-            return;
-		}
-        
-	}
+            ++PortNumber;
+            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
+                                                     maxMessageSize_);
+        }
+        else
+        {
+            std::cerr << "retrying tcp bind\n";
+            std::this_thread::sleep_for (std::chrono::milliseconds (150));
+            auto connected = server->reConnect (connectionTimeout);
+            if (!connected)
+            {
+                std::cerr << "unable to bind to tcp connection socket\n";
+                server->close ();
+                rx_status = connection_status::error;
+                return;
+            }
+        }
+    }
     auto serviceLoop = ioserv->runServiceLoop ();
     server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
