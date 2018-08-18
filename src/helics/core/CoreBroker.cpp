@@ -1826,7 +1826,7 @@ bool CoreBroker::allInitReady () const
 
 bool CoreBroker::allDisconnected () const
 {
-    return std::all_of (_brokers.begin (), _brokers.end (), [](const auto &brk) { return brk._disconnected; });
+    return std::all_of (_brokers.begin (), _brokers.end (), [](const auto &brk) {return ((brk._nonLocal) || (brk._disconnected)); });
 }
 
 }  // namespace helics
