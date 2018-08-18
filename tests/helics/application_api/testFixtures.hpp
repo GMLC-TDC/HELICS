@@ -9,8 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 #ifdef HELICS_HAVE_ZEROMQ
 #define ZMQTEST "zmq",
@@ -67,7 +67,14 @@ struct FederateTestFixture
         auto broker = AddBroker (core_type_name, count);
         if (!broker->isConnected ())
         {
-            throw (std::runtime_error ("Unable to connect broker"));
+            broker->disconnect ();
+            broker = nullptr;
+            helics::cleanupHelicsLibrary ();
+            broker = AddBroker (core_type_name, count);
+            if (!broker->isConnected ())
+            {
+                throw (std::runtime_error ("Unable to connect rootbroker"));
+            }
         }
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
     }
