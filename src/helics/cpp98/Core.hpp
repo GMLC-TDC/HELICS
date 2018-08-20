@@ -14,7 +14,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../cpp98/Filter.hpp"
 #include <exception>
 
-namespace helics98
+#define HELICS_IGNORE_ERROR nullptr
+namespace helicscpp
 {
 
 class Core
@@ -52,8 +53,7 @@ class Core
 
     helics_core baseObject() const { return core; }
     bool isConnected () const
-    {
-        return helicsCoreIsConnected (core);
+    { return helicsCoreIsConnected (core,HELICS_IGNORE_ERROR);
     }
 
     Core(const Core &cr)
@@ -90,7 +90,7 @@ class Core
     std::string getIdentifier() const
     {
         char str[255];
-        helicsCoreGetIdentifier(core, &str[0], sizeof(str));
+        helicsCoreGetIdentifier(core, &str[0], sizeof(str),nullptr);
         std::string result(str);
         return result;
     }
@@ -126,5 +126,5 @@ class Core
     helics_core core;
 };
 
-} //namespace helics
+} //namespace helicscpp
 #endif

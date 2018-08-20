@@ -8,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/ValueFederate.h"
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 class Publication
 {

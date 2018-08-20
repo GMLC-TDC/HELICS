@@ -88,9 +88,9 @@ std::string to_string (core_type type);
 /** generate a core type value from a std::string
 @param a string describing the desired core type
 @return a value of the helics_core_type enumeration
-@throws invalid_argument if the string is not recognized
+helics::core_type::unrecognized if the type is not valid
 */
-core_type coreTypeFromString (std::string type);
+core_type coreTypeFromString (std::string type) noexcept;
 
 /**
  * Returns true if core/broker type specified is available in current compilation.

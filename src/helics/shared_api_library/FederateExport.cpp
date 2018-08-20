@@ -16,12 +16,20 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int fedValidationIdentifier = 0x2352188;
+static const char *invalidFedString = "federate object is not valid";
+
 namespace helics
 {
-FedObject *getFedObject (helics_federate fed)
+FedObject *getFedObject (helics_federate fed, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     if (fed == nullptr)
     {
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_object;
+            err->message = invalidFedString;
+        }
         return nullptr;
     }
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
@@ -29,51 +37,74 @@ FedObject *getFedObject (helics_federate fed)
     {
         return fedObj;
     }
+    if (err != nullptr)
+    {
+        err->error_code = helics_invalid_object;
+        err->message = invalidFedString;
+    }
     return nullptr;
 }
 }  // namespace helics
 
-helics::Federate *getFed (helics_federate fed)
+helics::Federate *getFed (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
-    if (fedObj == nullptr)
-    {
-        return nullptr;
-    }
-    return fedObj->fedptr.get ();
+    auto fedObj = helics::getFedObject (fed, err);
+    return (fedObj == nullptr) ? nullptr : fedObj->fedptr.get ();
 }
 
-helics::ValueFederate *getValueFed (helics_federate fed)
+static const char *notValueFedString = "Federate must be a value federate";
+
+helics::ValueFederate *getValueFed (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
+    auto fedObj = helics::getFedObject (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
     }
     if ((fedObj->type == helics::vtype::value_fed) || (fedObj->type == helics::vtype::combination_fed))
     {
-        return dynamic_cast<helics::ValueFederate *> (fedObj->fedptr.get ());
+        auto rval = dynamic_cast<helics::ValueFederate *> (fedObj->fedptr.get ());
+        if (rval != nullptr)
+        {
+            return rval;
+        }
+    }
+    if (err != nullptr)
+    {
+        err->error_code = helics_invalid_object;
+        err->message = notValueFedString;
     }
     return nullptr;
 }
 
-helics::MessageFederate *getMessageFed (helics_federate fed)
+static const char *notMessageFedString = "Federate must be a message federate";
+
+helics::MessageFederate *getMessageFed (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
+    auto fedObj = helics::getFedObject (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
     }
     if ((fedObj->type == helics::vtype::message_fed) || (fedObj->type == helics::vtype::combination_fed))
     {
-        return dynamic_cast<helics::MessageFederate *> (fedObj->fedptr.get ());
+        auto rval = dynamic_cast<helics::MessageFederate *> (fedObj->fedptr.get ());
+        if (rval != nullptr)
+        {
+            return rval;
+        }
+    }
+    if (err != nullptr)
+    {
+        err->error_code = helics_invalid_object;
+        err->message = notMessageFedString;
     }
     return nullptr;
 }
 
-std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
+std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
+    auto fedObj = helics::getFedObject (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
@@ -81,43 +112,63 @@ std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed)
     return fedObj->fedptr;
 }
 
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed)
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
+    auto fedObj = helics::getFedObject (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
     }
     if ((fedObj->type == helics::vtype::value_fed) || (fedObj->type == helics::vtype::combination_fed))
     {
-        return std::dynamic_pointer_cast<helics::ValueFederate> (fedObj->fedptr);
+        auto rval = std::dynamic_pointer_cast<helics::ValueFederate> (fedObj->fedptr);
+        if (rval)
+        {
+            return rval;
+        }
+    }
+    if (err != nullptr)
+    {
+        err->error_code = helics_invalid_object;
+        err->message = notValueFedString;
     }
     return nullptr;
 }
 
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed)
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed, helics_error *err)
 {
-    auto fedObj = helics::getFedObject (fed);
+    auto fedObj = helics::getFedObject (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
     }
     if ((fedObj->type == helics::vtype::message_fed) || (fedObj->type == helics::vtype::combination_fed))
     {
-        return std::dynamic_pointer_cast<helics::MessageFederate> (fedObj->fedptr);
+        auto rval = std::dynamic_pointer_cast<helics::MessageFederate> (fedObj->fedptr);
+        if (rval)
+        {
+            return rval;
+        }
+    }
+    if (err != nullptr)
+    {
+        err->error_code = helics_invalid_object;
+        err->message = notMessageFedString;
     }
     return nullptr;
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info_t fi)
+helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info_t fi, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string(fedName):std::string(), helics::FederateInfo());
+            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+                                                                    helics::FederateInfo ());
         }
         else
         {
@@ -125,8 +176,9 @@ helics_federate helicsCreateValueFederate (const char *fedName, const helics_fed
                                                                     *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
     FedI->type = helics::vtype::value_fed;
@@ -136,15 +188,17 @@ helics_federate helicsCreateValueFederate (const char *fedName, const helics_fed
     return (fed);
 }
 
-helics_federate helicsCreateValueFederateFromConfig (const char *configFile)
+helics_federate helicsCreateValueFederateFromConfig (const char *configFile, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
         FedI->fedptr = std::make_shared<helics::ValueFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
     FedI->type = helics::vtype::value_fed;
@@ -155,15 +209,16 @@ helics_federate helicsCreateValueFederateFromConfig (const char *configFile)
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateMessageFederate (const char *fedName, const helics_federate_info_t fi)
+helics_federate helicsCreateMessageFederate (const char *fedName, const helics_federate_info_t fi, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) :
-                                                                                             std::string (), helics::FederateInfo ());
+            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+                                                                      helics::FederateInfo ());
         }
         else
         {
@@ -171,8 +226,9 @@ helics_federate helicsCreateMessageFederate (const char *fedName, const helics_f
                                                                       *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
     FedI->type = helics::vtype::message_fed;
@@ -182,16 +238,18 @@ helics_federate helicsCreateMessageFederate (const char *fedName, const helics_f
     return (fed);
 }
 
-helics_federate helicsCreateMessageFederateFromConfig(const char *configFile)
+helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
 
     try
     {
         FedI->fedptr = std::make_shared<helics::MessageFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
     FedI->type = helics::vtype::message_fed;
@@ -202,8 +260,9 @@ helics_federate helicsCreateMessageFederateFromConfig(const char *configFile)
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateCombinationFederate (const char *fedName, const helics_federate_info_t fi)
+helics_federate helicsCreateCombinationFederate (const char *fedName, const helics_federate_info_t fi, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
@@ -218,8 +277,9 @@ helics_federate helicsCreateCombinationFederate (const char *fedName, const heli
                                                                           *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
     FedI->type = helics::vtype::combination_fed;
@@ -229,15 +289,17 @@ helics_federate helicsCreateCombinationFederate (const char *fedName, const heli
     return (fed);
 }
 
-helics_federate helicsCreateCombinationFederateFromConfig (const char *configFile)
+helics_federate helicsCreateCombinationFederateFromConfig (const char *configFile, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
         FedI->fedptr = std::make_shared<helics::CombinationFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
     }
-    catch (const helics::RegistrationFailure &)
+    catch (...)
     {
+        helicsErrorHandler (err);
         return nullptr;
     }
 
@@ -248,13 +310,13 @@ helics_federate helicsCreateCombinationFederateFromConfig (const char *configFil
     return (fed);
 }
 
-helics_federate helicsFederateClone (helics_federate fed)
+helics_federate helicsFederateClone (helics_federate fed, helics_error *err)
 {
-    if (fed == nullptr)
+    auto *fedObj = helics::getFedObject (fed, err);
+    if (fedObj == nullptr)
     {
         return nullptr;
     }
-    auto *fedObj = reinterpret_cast<helics::FedObject *> (fed);
     auto fedClone = std::make_unique<helics::FedObject> ();
     fedClone->fedptr = fedObj->fedptr;
 
@@ -265,9 +327,9 @@ helics_federate helicsFederateClone (helics_federate fed)
     return (fedB);
 }
 
-helics_core helicsFederateGetCoreObject (helics_federate fed)
+helics_core helicsFederateGetCoreObject (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
         return nullptr;
@@ -280,105 +342,100 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
     return retcore;
 }
 
-helics_status helicsFederateFinalize (helics_federate fed)
+void helicsFederateFinalize (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->finalize ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
 /* initialization, execution, and time requests */
-helics_status helicsFederateEnterInitializingMode (helics_federate fed)
+void helicsFederateEnterInitializingMode (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterInitializingMode ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateEnterInitializingModeAsync (helics_federate fed)
+void helicsFederateEnterInitializingModeAsync (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterInitializingModeAsync ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-int helicsFederateIsAsyncOperationCompleted (helics_federate fed)
+helics_bool_t helicsFederateIsAsyncOperationCompleted (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return 0;
+        return helics_false;
     }
-    return (fedObj->isAsyncOperationCompleted ()) ? 1 : 0;
+    return (fedObj->isAsyncOperationCompleted ()) ? helics_true : helics_false;
 }
 
-helics_status helicsFederateEnterInitializingModeComplete (helics_federate fed)
+void helicsFederateEnterInitializingModeComplete (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterInitializingModeComplete ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateEnterExecutingMode (helics_federate fed)
+void helicsFederateEnterExecutingMode (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         // printf("current state=%d\n", static_cast<int>(fedObj->getCurrentState()));
         fedObj->enterExecutingMode ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
@@ -413,129 +470,119 @@ static helics_iteration_status getIterationStatus (helics::iteration_result iter
     }
 }
 
-helics_status
-helicsFederateEnterExecutingModeIterative (helics_federate fed, helics_iteration_request iterate, helics_iteration_status *outIterate)
+helics_iteration_status helicsFederateEnterExecutingModeIterative (helics_federate fed, helics_iteration_request iterate, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return iteration_error;
     }
     try
     {
         auto val = fedObj->enterExecutingMode (getIterationRequest (iterate));
-        if (outIterate != nullptr)
-        {
-            *outIterate = getIterationStatus (val);
-        }
-        return helics_ok;
+        return getIterationStatus (val);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return iteration_error;
     }
 }
 
-helics_status helicsFederateEnterExecutingModeAsync (helics_federate fed)
+void helicsFederateEnterExecutingModeAsync (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterExecutingModeAsync ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateEnterExecutingModeIterativeAsync (helics_federate fed, helics_iteration_request iterate)
+void helicsFederateEnterExecutingModeIterativeAsync (helics_federate fed, helics_iteration_request iterate, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterExecutingModeAsync (getIterationRequest (iterate));
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateEnterExecutingModeComplete (helics_federate fed)
+void helicsFederateEnterExecutingModeComplete (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->enterExecutingModeComplete ();
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
-helics_status helicsFederateEnterExecutingModeIterativeComplete (helics_federate fed, helics_iteration_status *outConverged)
+helics_iteration_status helicsFederateEnterExecutingModeIterativeComplete (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return iteration_error;
     }
     try
     {
         auto val = fedObj->enterExecutingModeComplete ();
-        if (outConverged != nullptr)
-        {
-            *outConverged = getIterationStatus (val);
-        }
-        return helics_ok;
+        return getIterationStatus (val);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return iteration_error;
     }
 }
 
-helics_status helicsFederateRequestTime (helics_federate fed, helics_time_t requestTime, helics_time_t *timeOut)
+helics_time_t helicsFederateRequestTime (helics_federate fed, helics_time_t requestTime, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return helics_time_invalid;
     }
     try
     {
-        *timeOut = static_cast<double> (fedObj->requestTime (requestTime));
-        return helics_ok;
+        return static_cast<double> (fedObj->requestTime (requestTime));
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return helics_time_invalid;
     }
 }
 
-helics_status helicsFederateRequestTimeIterative (helics_federate fed,
+helics_time_t helicsFederateRequestTimeIterative (helics_federate fed,
                                                   helics_time_t requestTime,
                                                   helics_iteration_request iterate,
-                                                  helics_time_t *timeOut,
-                                                  helics_iteration_status *outIteration)
+                                                  helics_iteration_status *outIteration,
+                                                  helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
         return helics_invalid_object;
@@ -543,70 +590,71 @@ helics_status helicsFederateRequestTimeIterative (helics_federate fed,
     try
     {
         auto val = fedObj->requestTimeIterative (requestTime, getIterationRequest (iterate));
-        if (val.state == helics::iteration_result::error)
+        if (outIteration != nullptr)
         {
-            return helics_other_error;
+            *outIteration = getIterationStatus (val.state);
         }
-        *outIteration = getIterationStatus (val.state);
-        *timeOut = static_cast<double> (val.grantedTime);
-        return helics_ok;
+        return static_cast<double> (val.grantedTime);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return iteration_error;
     }
 }
 
-helics_status helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime)
+void helicsFederateRequestTimeAsync (helics_federate fed, helics_time_t requestTime, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->requestTimeAsync (requestTime);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateRequestTimeIterativeAsync (helics_federate fed, helics_time_t requestTime, helics_iteration_request iterate)
+void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
+                                              helics_time_t requestTime,
+                                              helics_iteration_request iterate,
+                                              helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->requestTimeIterative (requestTime, getIterationRequest (iterate));
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
-helics_status helicsFederateRequestTimeComplete (helics_federate fed, helics_time_t *timeOut)
+
+helics_time_t helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return helics_time_invalid;
     }
     try
     {
-        *timeOut = fedObj->requestTimeComplete ();
-        return helics_ok;
+        return static_cast<double>(fedObj->requestTimeComplete ());
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return helics_time_invalid;
     }
 }
 
@@ -621,39 +669,35 @@ static const std::map<helics::Federate::op_states, federate_state> stateEnumConv
   {helics::Federate::op_states::pending_time, federate_state::helics_pending_time_state},
   {helics::Federate::op_states::initialization, federate_state::helics_initialization_state}};
 
-helics_status helicsFederateGetState (helics_federate fed, federate_state *state)
+federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
-    }
-    if (state == nullptr)
-    {
-        return helics_discard;
+        return helics_error_state;
     }
     try
     {
         auto FedState = fedObj->getCurrentState ();
-        *state = stateEnumConversions.at (FedState);
-        return helics_ok;
+        return stateEnumConversions.at (FedState);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return helics_error_state;
     }
 }
 
-helics_status helicsFederateGetName (helics_federate fed, char *outputString, int maxlen)
+void helicsFederateGetName (helics_federate fed, char *outputString, int maxlen, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
-    if (outputString == nullptr)
+    if (!checkOutArgString (outputString, maxlen, err))
     {
-        return helics_discard;
+        return;
     }
     try
     {
@@ -667,159 +711,161 @@ helics_status helicsFederateGetName (helics_federate fed, char *outputString, in
         {
             strcpy (outputString, ident.c_str ());
         }
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time)
+void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->setTimeProperty (timeProperty, time);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue)
+void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
         fedObj->setFlagOption (flag, (flagValue != helics_false));
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int loggingLevel)
+void helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int propVal, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
-        fedObj->setIntegerProperty (intProperty, loggingLevel);
-        return helics_ok;
+        fedObj->setIntegerProperty (intProperty, propVal);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        return helicsErrorHandler (err);
     }
 }
 
-
-helics_time_t helicsFederateGetTimeProperty(helics_federate fed, int32_t timeProperty)
+helics_time_t helicsFederateGetTimeProperty (helics_federate fed, int32_t timeProperty, helics_error *err)
 {
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helics_time_invalid;
-	}
-	try
-	{
+    auto fedObj = getFed (fed,err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
         auto T = fedObj->getTimeProperty (timeProperty);
         return static_cast<double> (T);
-	}
-	catch (...)
-	{
-		return helicsErrorHandler();
-	}
-}
-
-helics_bool_t helicsFederateGetFlagOption(helics_federate fed, int flag)
-{
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helics_false;
-	}
-	try
-	{
-        bool res = fedObj->getFlagOption (flag);
-		return (res)?helics_true:helics_false;
-	}
-	catch (...)
-	{
-		return helicsErrorHandler();
-	}
-}
-
-
-int32_t helicsFederateGetIntegerProperty(helics_federate fed, int32_t intProperty)
-{
-	auto fedObj = getFed(fed);
-	if (fedObj == nullptr)
-	{
-		return helics_invalid_object;
-	}
-	try
-	{
-		return fedObj->getIntegerProperty(intProperty);
-	}
-	catch (...)
-	{
-		return helicsErrorHandler();
-	}
-}
-
-helics_status helicsFederateSetSeparator (helics_federate fed, char separator)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    fedObj->setSeparator (separator);
-    return helics_ok;
-}
-
-helics_status helicsFederateGetCurrentTime (helics_federate fed, helics_time_t *time)
-{
-    auto fedObj = getFed (fed);
-    if (fedObj == nullptr)
-    {
-        return helics_invalid_object;
-    }
-    try
-    {
-        *time = static_cast<double> (fedObj->getCurrentTime ());
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return helics_time_invalid;
     }
 }
 
-helics_status
-helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *timeOut, helics_iteration_status *outIteration)
+helics_bool_t helicsFederateGetFlagOption (helics_federate fed, int flag, helics_error *err)
 {
-    auto fedObj = getFed (fed);
+    auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return helics_false;
+    }
+    try
+    {
+        bool res = fedObj->getFlagOption (flag);
+        return (res) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_false;
+    }
+}
+
+int32_t helicsFederateGetIntegerProperty (helics_federate fed, int32_t intProperty, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return -101;
+    }
+    try
+    {
+        return fedObj->getIntegerProperty (intProperty);
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return -101;
+    }
+}
+
+void helicsFederateSetSeparator (helics_federate fed, char separator, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+	try
+	{
+        fedObj->setSeparator (separator);
+	}
+	catch (...)
+	{
+        helicsErrorHandler (err);
+	}
+}
+
+helics_time_t helicsFederateGetCurrentTime (helics_federate fed, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
+        return static_cast<double> (fedObj->getCurrentTime ());
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_time_invalid;
+    }
+}
+
+helics_time_t helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_iteration_status *outIteration, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
     }
     try
     {
@@ -828,12 +874,15 @@ helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_time_t *
         {
             return helics_other_error;
         }
-        *outIteration = getIterationStatus (val.state);
-        *timeOut = static_cast<double> (val.grantedTime);
-        return helics_ok;
+		if (outIteration != nullptr)
+		{
+            *outIteration = getIterationStatus (val.state);
+		}
+        return static_cast<double> (val.grantedTime);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return helics_time_invalid;
     }
 }

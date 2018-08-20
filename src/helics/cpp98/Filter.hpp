@@ -9,8 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/MessageFilters.h"
 #include <string>
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 class Filter
 {
@@ -101,5 +102,5 @@ class CloningFilter : public Filter
     }
 };
 
-}  // namespace helics
+}  // namespace helicscpp
 #endif

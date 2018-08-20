@@ -8,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/MessageFederate.h"
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 class Endpoint
 {
@@ -107,5 +108,5 @@ public:
 private:
     helics_endpoint ep;
 };
-} //namespace helics98
+} //namespace helicscpp
 #endif

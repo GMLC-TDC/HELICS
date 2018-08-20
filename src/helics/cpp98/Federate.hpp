@@ -9,17 +9,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/MessageFilters.h"
 #include "../shared_api_library/helics.h"
+#include "helicsExceptions.hpp"
 #include "Filter.hpp"
 #include "config.hpp"
 #include <complex>
-#include <stdexcept>
+
 #include <string>
 #include <vector>
 
 // defines for setFlag values in core/flag-definitions.h
 // enum for core_type:int in core/core-types.h
 
-namespace helics98
+namespace helicscpp
 {
 class FederateInfo
 {
@@ -61,25 +62,6 @@ class FederateInfo
     helics_federate_info_t fi;
 };
 
-/** defining an exception class for state transition errors*/
-class InvalidStateTransition : public std::runtime_error
-{
-  public:
-    explicit InvalidStateTransition (const char *s) : std::runtime_error (s) {}
-};
-
-/** defining an exception class for invalid function calls*/
-class InvalidFunctionCall : public std::runtime_error
-{
-  public:
-    explicit InvalidFunctionCall (const char *s) : std::runtime_error (s) {}
-};
-/** defining an exception class for invalid parameter values*/
-class InvalidParameterValue : public std::runtime_error
-{
-  public:
-    explicit InvalidParameterValue (const char *s) : std::runtime_error (s) {}
-};
 
 typedef struct
 {
@@ -309,5 +291,5 @@ class Federate
     bool exec_async_iterate;
 };
 
-}  // namespace helics
+}  // namespace helicscpp
 #endif

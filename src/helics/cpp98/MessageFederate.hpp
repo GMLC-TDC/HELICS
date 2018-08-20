@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Endpoint.hpp"
 #include "../shared_api_library/MessageFederate.h"
 
-namespace helics98
+namespace helicscpp
 {
 class MessageFederate : public virtual Federate
 {

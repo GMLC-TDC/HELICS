@@ -50,7 +50,6 @@ class BrokerObject
     int valid;
 };
 
-
 /** get the brokerObject from a helics_broker and verify it is valid*/
 BrokerObject *getBrokerObject (helics_broker broker);
 /** object wrapping a core for the c-api*/
@@ -89,7 +88,7 @@ class FedObject
 };
 
 /** get the FedObject from a helics_broker and verify it is valid*/
-FedObject *getFedObject (helics_federate fed);
+FedObject *getFedObject (helics_federate fed, helics_error *err);
 
 /** object wrapping a subscription*/
 class InputObject
@@ -122,19 +121,13 @@ class EndpointObject
     int valid = 0;
 };
 
-/** enumeration of possible filter object types*/
-enum class ftype
-{
-    source,
-    dest,
-    clone,
-};
+
 
 /** object wrapping a source filter*/
 class FilterObject
 {
   public:
-    ftype type;
+    bool cloning=false;  //indicator that the filter is a cloning filter
     int valid = 0;
     std::unique_ptr<Filter> filtptr;
     std::shared_ptr<Federate> fedptr;
@@ -156,18 +149,30 @@ class QueryObject
 
 }  // namespace helics
 
-helics::Federate *getFed (helics_federate fed);
-helics::ValueFederate *getValueFed (helics_federate fed);
-helics::MessageFederate *getMessageFed (helics_federate fed);
-helics::Core *getCore (helics_core core);
-helics::Broker *getBroker (helics_broker broker);
+/** definitions to simplify error returns if an error already exists*/
+#define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
+    do                                                                                                                                     \
+    {                                                                                                                                      \
+        if ((err != nullptr) && (err->error_code != 0))                                                                                    \
+        {                                                                                                                                  \
+            return retval;                                                                                                                 \
+        }                                                                                                                                  \
+    } while (0)
 
-std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core);
+helics::Federate *getFed (helics_federate fed, helics_error *err);
+helics::ValueFederate *getValueFed (helics_federate fed, helics_error *err);
+helics::MessageFederate *getMessageFed (helics_federate fed, helics_error *err);
+helics::Core *getCore (helics_core core, helics_error *err);
+helics::Broker *getBroker (helics_broker broker, helics_error *err);
+
+std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core, helics_error *err);
 /**centralized error handler for the C interface*/
-helics_status helicsErrorHandler () noexcept;
+void helicsErrorHandler (helics_error *err) noexcept;
+
+bool checkOutArgString (char *outputString, int maxlen, helics_error *err);
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder
@@ -176,8 +181,8 @@ class MasterObjectHolder
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
-    tripwire::TripWireDetector tripDetect; //!< detector for library termination
-	guarded<std::deque<std::string>> errorStrings; //!< container for strings generated from error conditions
+    tripwire::TripWireDetector tripDetect;  //!< detector for library termination
+    guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
     MasterObjectHolder () noexcept;
     ~MasterObjectHolder ();
@@ -192,9 +197,9 @@ class MasterObjectHolder
     void clearCore (int index);
     void clearFed (int index);
     void deleteAll ();
-	/** store an error string to a string buffer
-	@return a pointer to the memory location*/
-	const char *addErrorString(std::string newError);
+    /** store an error string to a string buffer
+    @return a pointer to the memory location*/
+    const char *addErrorString (std::string newError);
 };
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder ();

@@ -13,18 +13,31 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const std::string nullstr;
 
+static const char *invalidFilterString = "The given filter object is not valid";
+
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
-static helics::FilterObject *getFilterObj(helics_filter filt)
+static helics::FilterObject *getFilterObj(helics_filter filt, helics_error *err)
 {
+    HELICS_ERROR_CHECK (err, nullptr);
     if (filt == nullptr)
     {
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_object;
+            err->message = invalidFilterString;
+        }
         return nullptr;
     }
     auto fObj = reinterpret_cast<helics::FilterObject *> (filt);
     if (fObj->valid != filterValidationIdentifier)
     {
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_object;
+            err->message = invalidFilterString;
+        }
         return nullptr;
     }
     return fObj;
@@ -33,19 +46,21 @@ static helics::FilterObject *getFilterObj(helics_filter filt)
 static inline void federateAddFilter (helics_federate fed, std::unique_ptr<helics::FilterObject >filt)
 {
     auto fedObj = reinterpret_cast<helics::FedObject *> (fed);
+    filt->valid = filterValidationIdentifier;
     fedObj->filters.push_back (std::move(filt));
 }
 
 static inline void coreAddFilter (helics_core core, std::unique_ptr<helics::FilterObject >filt)
 {
     auto coreObj = reinterpret_cast<helics::CoreObject *> (core);
+    filt->valid = filterValidationIdentifier;
     coreObj->filters.push_back (std::move(filt));
 }
 
-helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type_t type, const char *name)
+helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
 {
     // now generate a generic subscription
-    auto fedObj = getFedSharedPtr (fed);
+    auto fedObj = getFedSharedPtr (fed,err);
     if (!fedObj)
     {
         return nullptr;
@@ -57,21 +72,20 @@ helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_t
         filt->filtptr = helics::make_filter (static_cast<helics::defined_filter_types> (type), fedObj.get (),
                                                     (name != nullptr) ? std::string (name) : nullstr);
         filt->fedptr = std::move (fedObj);
-        filt->type = helics::ftype::source;
-        filt->valid = filterValidationIdentifier;
         auto ret = reinterpret_cast<helics_filter> (filt.get());
         federateAddFilter (fed, std::move(filt));
         return ret;
     }
-    catch (const helics::InvalidFunctionCall &)
+    catch (...)
     {
+        helicsErrorHandler (err);
     }
     return nullptr;
 }
 
-helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name)
+helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name, helics_error *err)
 {
-    auto core = getCoreSharedPtr (cr);
+    auto core = getCoreSharedPtr (cr,err);
     if (!core)
     {
         return nullptr;
@@ -82,21 +96,20 @@ helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t typ
         filt->filtptr = helics::make_filter (static_cast<helics::defined_filter_types> (type), core.get (),
                                                     (name != nullptr) ? std::string (name) : nullstr);
         filt->corePtr = std::move (core);
-        filt->type = helics::ftype::source;
-        filt->valid = filterValidationIdentifier;
         auto ret = reinterpret_cast<helics_filter> (filt.get());
         coreAddFilter (cr, std::move(filt));
         return ret;
     }
-    catch (const helics::InvalidFunctionCall &)
+    catch (...)
     {
+        helicsErrorHandler (err);
     }
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint)
+helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint, helics_error *err)
 {
-    auto fedObj = getFedSharedPtr (fed);
+    auto fedObj = getFedSharedPtr (fed,err);
     if (!fedObj)
     {
         return nullptr;
@@ -112,21 +125,21 @@ helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const ch
         }
         filt->filtptr = std::move (filtptr);
         filt->fedptr = std::move (fedObj);
-        filt->type = helics::ftype::clone;
-        filt->valid = filterValidationIdentifier;
+        filt->cloning = true;
         auto ret = reinterpret_cast<helics_filter> (filt.get());
         federateAddFilter (fed, std::move(filt));
         return ret;
     }
-    catch (const helics::InvalidFunctionCall &)
+    catch (...)
     {
+        helicsErrorHandler (err);
     }
     return nullptr;
 }
 
-helics_filter helicsCoreRegisterCloningFilter (helics_core cr, const char *deliveryEndpoint)
+helics_filter helicsCoreRegisterCloningFilter (helics_core cr, const char *deliveryEndpoint, helics_error *err)
 {
-    auto core = getCoreSharedPtr (cr);
+    auto core = getCoreSharedPtr (cr,err);
     if (!core)
     {
         return nullptr;
@@ -141,21 +154,21 @@ helics_filter helicsCoreRegisterCloningFilter (helics_core cr, const char *deliv
         }
         filt->filtptr = std::move (filtptr);
         filt->corePtr = std::move (core);
-        filt->type = helics::ftype::clone;
-        filt->valid = filterValidationIdentifier;
+        filt->cloning = true;
         auto ret = reinterpret_cast<helics_filter> (filt.get());
         coreAddFilter (cr, std::move(filt));
         return ret;
     }
-    catch (const helics::InvalidFunctionCall &)
+    catch (...)
     {
+        helicsErrorHandler (err);
     }
     return nullptr;
 }
 
-static helics::Filter *getFilter (helics_filter filt)
+static helics::Filter *getFilter (helics_filter filt, helics_error *err)
 {
-    auto fObj = getFilterObj(filt);
+    auto fObj = getFilterObj(filt,err);
     if (fObj == nullptr)
     {
         return nullptr;
@@ -163,27 +176,37 @@ static helics::Filter *getFilter (helics_filter filt)
     return fObj->filtptr.get ();
 }
 
-static helics::CloningFilter *getCloningFilter (helics_filter filt)
+static helics::CloningFilter *getCloningFilter (helics_filter filt, helics_error *err)
 {
-    auto fObj = getFilterObj(filt);
+    static const char *nonCloningFilterString = "filter must be a cloning filter";
+    auto fObj = getFilterObj(filt,err);
     if (fObj == nullptr)
     {
         return nullptr;
     }
-    if (fObj->type != helics::ftype::clone)
+    if (!fObj->cloning)
     {
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_object;
+            err->message = nonCloningFilterString;
+        }
         return nullptr;
     }
     return dynamic_cast<helics::CloningFilter *> (fObj->filtptr.get ());
 }
 
 /** get the target of the filter*/
-helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen)
+int helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen, helics_error *err)
 {
-    auto filter = getFilter (filt);
+    auto filter = getFilter (filt,err);
     if (filter == nullptr)
     {
-        return helics_invalid_object;
+        return (-1);
+    }
+    if (!checkOutArgString (outputString, maxlen, err))
+    {
+        return (-1);
     }
     try
     {
@@ -192,24 +215,29 @@ helics_status helicsFilterGetTarget (helics_filter filt, char *outputString, int
         {
             strncpy (outputString, target.c_str (), maxlen);
             outputString[maxlen - 1] = 0;
-            return helics_warning;
+            return maxlen;
         }
         strcpy (outputString, target.c_str ());
-        return helics_ok;
+        return static_cast<int>(target.size());
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
+        return (-1);
     }
 }
 
 /** get the name of the filter*/
-helics_status helicsFilterGetName (helics_filter filt, char *outputString, int maxlen)
+int helicsFilterGetName (helics_filter filt, char *outputString, int maxlen, helics_error *err)
 {
-    auto filter = getFilter (filt);
+    auto filter = getFilter (filt,err);
     if (filter == nullptr)
     {
-        return helics_invalid_object;
+        return (-1);
+    }
+    if (!checkOutArgString (outputString, maxlen, err))
+    {
+        return (-1);
     }
     try
     {
@@ -225,160 +253,196 @@ helics_status helicsFilterGetName (helics_filter filt, char *outputString, int m
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterSet (helics_filter filt, const char *property, double val)
+static const char *invalidPropertyString = "the specified property is invalid";
+
+void helicsFilterSet (helics_filter filt, const char *prop, double val, helics_error *err)
 {
-    auto filter = getFilter (filt);
+    auto filter = getFilter (filt,err);
     if (filter == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
-    if (property == nullptr)
+    if (prop == nullptr)
     {
-        return helics_invalid_argument;
+		if (err != nullptr)
+		{
+            err->error_code = helics_invalid_argument;
+            err->message = invalidPropertyString;
+		}
+        return;
     }
     try
     {
-        filter->set (property, val);
-        return helics_ok;
+        filter->set (prop, val);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterSetString (helics_filter filt, const char *property, const char *val)
+void helicsFilterSetString (helics_filter filt, const char *prop, const char *val, helics_error *err)
 {
-    auto filter = getFilter (filt);
+    auto filter = getFilter (filt,err);
     if (filter == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
-    if (property == nullptr)
+    if (prop == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidPropertyString;
+        }
+        return;
     }
     try
     {
-        filter->setString (property, val);
-        return helics_ok;
+        filter->setString (prop, val);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterAddDestinationTarget (helics_filter filt, const char *dest)
+void helicsFilterAddDestinationTarget (helics_filter filt, const char *dest, helics_error *err)
 {
-    auto cfilt = getFilter (filt);
+    static constexpr char *invalidDestinationString = "the specified destination is not valid";
+    auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     if (dest == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidDestinationString;
+        }
+        return;
     }
     try
     {
         cfilt->addDestinationTarget (dest);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterAddSourceTarget (helics_filter filt, const char *src)
+void helicsFilterAddSourceTarget (helics_filter filt, const char *src, helics_error *err)
 {
-    auto cfilt = getFilter (filt);
+    static constexpr char *invalidSourceString = "the specified Source is not valid";
+    auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     if (src == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidSourceString;
+        }
+        return;
     }
     try
     {
         cfilt->addSourceTarget (src);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery)
+static constexpr char *invalidDeliveryString = "the specified Delivery address is not valid";
+
+void helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery, helics_error *err)
 {
-    auto cfilt = getCloningFilter (filt);
+    auto cfilt = getCloningFilter (filt,err);
     if (cfilt == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     if (delivery == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidDeliveryString;
+        }
+        return;
     }
     try
     {
         cfilt->addDeliveryEndpoint (delivery);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterRemoveTarget (helics_filter filt, const char *dest)
+void helicsFilterRemoveTarget (helics_filter filt, const char *target, helics_error *err)
 {
-    auto cfilt = getFilter (filt);
+    static constexpr char *invalidTargetString = "The specified Target address is not valid";
+
+    auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
-    if (dest == nullptr)
+    if (target == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidTargetString;
+        }
+        return;
     }
     try
     {
-        cfilt->removeTarget (dest);
-        return helics_ok;
+        cfilt->removeTarget (target);
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *delivery)
+void helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *delivery, helics_error *err)
 {
-    auto cfilt = getCloningFilter (filt);
+    auto cfilt = getCloningFilter (filt,err);
     if (cfilt == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     if (delivery == nullptr)
     {
-        return helics_invalid_argument;
+        if (err != nullptr)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidDeliveryString;
+        }
+        return;
     }
     try
     {
         cfilt->removeDeliveryEndpoint (delivery);
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }

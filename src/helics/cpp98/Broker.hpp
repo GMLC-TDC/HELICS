@@ -10,9 +10,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
 #include <string>
-#include <exception>
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 
 class Broker
@@ -103,5 +103,5 @@ class Broker
     helics_broker broker;
 };
 
-} //namespace helics
+} //namespace helicscpp
 #endif

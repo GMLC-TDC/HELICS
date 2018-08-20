@@ -15,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /**
  * HELICS C++98 Interface
  */
-namespace helics98
+namespace helicscpp
 {
 
 /** get a string with the helics version info*/
@@ -24,5 +24,5 @@ std::string getHelicsVersionString()
     return std::string(helicsGetVersion());
 }
 
-} //namespace helics
+} //namespace helicscpp
 #endif

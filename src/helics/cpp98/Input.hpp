@@ -3,13 +3,14 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#ifndef HELICS_CPP98_SUBSCRIPTION_HPP_
-#define HELICS_CPP98_SUBSCRIPTION_HPP_
+#ifndef HELICS_CPP98_INPUT_HPP_
+#define HELICS_CPP98_INPUT_HPP_
 #pragma once
 
 #include "../shared_api_library/ValueFederate.h"
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 class Input
 {
@@ -207,5 +208,5 @@ private:
     helics_input inp;  //!< the reference to the underlying publication
 };
 
-}
+} // namespace helicscpp
 #endif

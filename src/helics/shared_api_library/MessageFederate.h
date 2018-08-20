@@ -45,7 +45,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_feder
 @param endpoint the endpoint to set the destination for
 @param dest a string naming the desired default endpoint
 */
-HELICS_EXPORT helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest);
+HELICS_EXPORT void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest);
 
 /** send a message to the specified destination
 @param endpoint the endpoint to send the data from
@@ -54,7 +54,7 @@ HELICS_EXPORT helics_status helicsEndpointSetDefaultDestination (helics_endpoint
 @param len the length of the data to send
 @return helics_ok if everything worked
 */
-HELICS_EXPORT helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoint,
+HELICS_EXPORT void helicsEndpointSendMessageRaw (helics_endpoint endpoint,
                                                           const char *dest,
                                                           const void *data,
                                                           int inputDataLength);
@@ -67,7 +67,7 @@ HELICS_EXPORT helics_status helicsEndpointSendMessageRaw (helics_endpoint endpoi
 @param time the time the message should be sent
 @return helics_ok if everything worked
 */
-HELICS_EXPORT helics_status
+HELICS_EXPORT void
 helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_time_t time);
 
 /** send a message object from a specific endpoint
@@ -75,13 +75,13 @@ helicsEndpointSendEventRaw (helics_endpoint endpoint, const char *dest, const vo
 @param message the actual message to send
 @return helics_ok if everything worked
 */
-HELICS_EXPORT helics_status helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message);
+HELICS_EXPORT void helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message);
 
 /** subscribe an endpoint to a publication
 @param endpoint the endpoint to use
 @param key the name of the publication
 */
-HELICS_EXPORT helics_status helicsEndpointSubscribe (helics_endpoint endpoint, const char *key);
+HELICS_EXPORT void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key);
 /** check if the federate has any outstanding messages
 @param fed the federate to check if it has
 @return helics_true if the federate has a message waiting false otherwise*/
@@ -120,7 +120,7 @@ HELICS_EXPORT message_t helicsFederateGetMessage (helics_federate fed);
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_EXPORT helics_status helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen);
+HELICS_EXPORT void helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the name of an endpoint
 @param endpoint  the endpoint object in question
@@ -128,7 +128,7 @@ HELICS_EXPORT helics_status helicsEndpointGetType (helics_endpoint endpoint, cha
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_EXPORT helics_status helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen);
+HELICS_EXPORT void helicsEndpointGetName (helics_endpoint endpoint, char *outputString, int maxlen);
 
 /** get the number of endpoints in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/

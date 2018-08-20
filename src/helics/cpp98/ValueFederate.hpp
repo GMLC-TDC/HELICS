@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <sstream>
 #include <exception>
 
-namespace helics98
+namespace helicscpp
 {
 enum PubSubTypes
 {
@@ -32,7 +32,7 @@ private:
     std::vector<helics_input> ipts;
     std::vector<helics_publication> pubs;
   public:
-    friend class helics98::FederateInfo;
+    friend class helicscpp::FederateInfo;
 
     explicit ValueFederate (const std::string &fedname,FederateInfo &fi)
     {

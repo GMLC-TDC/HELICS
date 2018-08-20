@@ -59,7 +59,7 @@ static const std::map<std::string, core_type> coreTypes{{"default", core_type::D
                                                         {"inprocess", core_type::TEST},
                                                         {"test1", core_type::TEST}};
 
-core_type coreTypeFromString (std::string type)
+core_type coreTypeFromString (std::string type) noexcept
 {
     if (type.empty ())
     {
