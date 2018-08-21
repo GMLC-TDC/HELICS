@@ -40,19 +40,19 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", "", "");
     BOOST_CHECK (pubid3 != nullptr);
     auto sub1 = helicsFederateRegisterSubscription (vFed1, "fed0/pub3", "");
-    CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
+    CE(helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0,&err));
 
-    CE (helicsFederateEnterExecutingMode (vFed1));
-    CE (helicsPublicationPublishRaw (pubid3, s.data (), len));
+    CE(helicsFederateEnterExecutingMode (vFed1,&err));
+    CE(helicsPublicationPublishRaw (pubid3, s.data (,&err), len));
 
-    CE (helicsFederateRequestTime (vFed1, 1.0, &gtime));
+    CE(helicsFederateRequestTime (vFed1, 1.0, &gtime,&err));
 
     BOOST_CHECK (helicsInputIsUpdated (sub1));
 
     int len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
-    CE (helicsInputGetRawValue (sub1, val, 600, &actualLen));
+    CE(helicsInputGetRawValue (sub1, val, 600, &actualLen,&err));
     BOOST_CHECK_EQUAL (actualLen, len);
 
     len1 = helicsInputGetRawValueSize (sub1);
@@ -61,7 +61,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 
     BOOST_CHECK (helicsInputIsUpdated (sub1) == false);
 
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsFederateFinalize (vFed1,&err));
 }
 
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
@@ -80,53 +80,53 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, nullptr);
     auto subid = helicsFederateRegisterSubscription (vFed2, "pub1", "");
-    CE (helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0));
-    CE (helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 1.0));
+    CE(helicsFederateSetTimeProperty (vFed1, TIME_DELTA_PROPERTY, 1.0,&err));
+    CE(helicsFederateSetTimeProperty (vFed2, TIME_DELTA_PROPERTY, 1.0,&err));
 
-    CE (helicsFederateEnterExecutingModeAsync (vFed1));
-    CE (helicsFederateEnterExecutingModeAsync (vFed2));
-    CE (helicsFederateEnterExecutingModeComplete (vFed1));
-    CE (helicsFederateEnterExecutingModeComplete (vFed2));
+    CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
+    CE(helicsFederateEnterExecutingModeAsync (vFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed1,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed2,&err));
 
     // publish string1 at time=0.0;
-    CE (helicsPublicationPublishString (pubid, "string1"));
+    CE(helicsPublicationPublishString (pubid, "string1",&err));
 
-    CE (helicsFederateRequestTimeAsync (vFed1, 1.0));
-    CE (helicsFederateRequestTimeComplete (vFed1, &f1time));
-    CE (helicsFederateRequestTimeAsync (vFed2, 1.0));
-    CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+    CE(helicsFederateRequestTimeAsync (vFed1, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed1, &f1time,&err));
+    CE(helicsFederateRequestTimeAsync (vFed2, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
 
     BOOST_CHECK_EQUAL (f1time, 1.0);
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
+    CE(helicsInputGetString (subid, s, STRINGLEN, &len,&err));
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
 
     // publish a second string
-    CE (helicsPublicationPublishString (pubid, "string2"));
+    CE(helicsPublicationPublishString (pubid, "string2",&err));
 
     // make sure the value is still what we expect
-    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
+    CE(helicsInputGetString (subid, s, STRINGLEN, &len,&err));
     BOOST_CHECK_EQUAL (s, "string1");
 
     // advance time
-    CE (helicsFederateRequestTimeAsync (vFed1, 2.0));
-    CE (helicsFederateRequestTimeComplete (vFed1, &f1time));
-    CE (helicsFederateRequestTimeAsync (vFed2, 2.0));
-    CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+    CE(helicsFederateRequestTimeAsync (vFed1, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed1, &f1time,&err));
+    CE(helicsFederateRequestTimeAsync (vFed2, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
 
     BOOST_CHECK_EQUAL (f1time, 2.0);
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
     // make sure the value was updated
-    CE (helicsInputGetString (subid, s, STRINGLEN, &len));
+    CE(helicsInputGetString (subid, s, STRINGLEN, &len,&err));
     BOOST_CHECK_EQUAL (s, "string2");
 
-    CE (helicsFederateFinalize (vFed1));
-    CE (helicsFederateFinalize (vFed2));
+    CE(helicsFederateFinalize (vFed1,&err));
+    CE(helicsFederateFinalize (vFed2,&err));
 }
 //
 
@@ -139,12 +139,12 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     // path of the json file is hardcoded for now
     vFed = helicsCreateValueFederateFromConfig (TEST_DIR "/test_files/example_value_fed.json");
     BOOST_REQUIRE (vFed != nullptr);
-    CE (helicsFederateGetName (vFed, s, 100));
+    CE(helicsFederateGetName (vFed, s, 100,&err));
     BOOST_CHECK_EQUAL (s, "valueFed");
     BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed), 2);
     BOOST_CHECK_EQUAL (helicsFederateGetPublicationCount (vFed), 2);
     //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
-    CE (helicsFederateFinalize (vFed));
+    CE(helicsFederateFinalize (vFed,&err));
     //
     //	 BOOST_CHECK_EQUAL(vFed.getName(), "fedName");
 

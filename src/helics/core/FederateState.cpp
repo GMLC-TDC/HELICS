@@ -419,7 +419,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
-        LOG_TRACE (timeCoord->printTimeStatus ());
+        LOG_TRACE(timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
         ActionMessage treq (CMD_TIME_REQUEST);
@@ -439,7 +439,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         }
 
         addAction (treq);
-        LOG_TRACE (timeCoord->printTimeStatus ());
+        LOG_TRACE(timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         if ((realtime) && (rt_lag < Time::maxVal ()))
         {
@@ -723,7 +723,7 @@ message_processing_result FederateState::processQueue ()
 
 message_processing_result FederateState::processActionMessage (ActionMessage &cmd)
 {
-    LOG_TRACE ("processing cmd " + prettyPrintString (cmd));
+    LOG_TRACE("processing cmd " + prettyPrintString (cmd));
     switch (cmd.action ())
     {
     case CMD_IGNORE:
@@ -964,7 +964,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                                std::make_shared<const data_block> (std::move (cmd.payload)));
                 timeCoord->updateValueTime (cmd.actionTime);
                 LOG_DEBUG ("receive publication " + prettyPrintString (cmd));
-                LOG_TRACE (timeCoord->printTimeStatus ());
+                LOG_TRACE(timeCoord->printTimeStatus ());
             }
         }
     }

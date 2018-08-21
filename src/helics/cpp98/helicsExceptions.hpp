@@ -28,7 +28,7 @@ class HelicsException : public std::runtime_error
 class hThrowOnError
 {
     hThrowOnError () : eObj (helicsErrorInitialize ()) {}
-    ~ThrowOnError () noexcept (false)
+    ~hThrowOnError () noexcept (false)
     {
         if (eObj.error_code != 0)
         {

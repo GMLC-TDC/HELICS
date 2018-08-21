@@ -24,27 +24,27 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-	CE (helicsFederateSetTimeProperty (vFed1,PERIOD_PROPERTY, 0.5));
-    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5));
+	CE(helicsFederateSetTimeProperty (vFed1,PERIOD_PROPERTY, 0.5,&err));
+    CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5,&err));
 
     auto pub=helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", "double", "");
     helicsFederateRegisterSubscription (vFed2, "pub1", "");
-    CE (helicsFederateEnterExecutingModeAsync (vFed1));
-    CE (helicsFederateEnterExecutingMode (vFed2));
-    CE (helicsFederateEnterExecutingModeComplete (vFed1));
-    CE (helicsPublicationPublishDouble (pub, 0.27));
+    CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
+    CE(helicsFederateEnterExecutingMode (vFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed1,&err));
+    CE(helicsPublicationPublishDouble (pub, 0.27,&err));
     helics_time_t gtime;
-    CE (helicsFederateRequestTime (vFed1, 2.0, &gtime));
+    CE(helicsFederateRequestTime (vFed1, 2.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-	 CE (helicsFederateRequestTime (vFed2, 2.0, &gtime));
+	 CE(helicsFederateRequestTime (vFed2, 2.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 0.5);
 
-   CE (helicsFederateRequestTime (vFed2, 2.0, &gtime));
+   CE(helicsFederateRequestTime (vFed2, 2.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsFederateFinalize (vFed1));
-    CE (helicsFederateFinalize (vFed2));
+    CE(helicsFederateFinalize (vFed1,&err));
+    CE(helicsFederateFinalize (vFed2,&err));
 }
 
 BOOST_AUTO_TEST_CASE (simple_timing_test2)
@@ -53,31 +53,31 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-   CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.5));
-    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5));
+   CE(helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.5,&err));
+    CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5,&err));
 
    auto pub = helicsFederateRegisterGlobalPublication (vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "");
     helicsFederateRegisterSubscription (vFed2, "pub1", "");
 
-    CE (helicsFederateEnterExecutingModeAsync (vFed1));
-    CE (helicsFederateEnterExecutingMode (vFed2));
-    CE (helicsFederateEnterExecutingModeComplete (vFed1));
+    CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
+    CE(helicsFederateEnterExecutingMode (vFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed1,&err));
 
 	helics_time_t gtime;
-	 CE (helicsFederateRequestTime (vFed1, 0.32, &gtime));
+	 CE(helicsFederateRequestTime (vFed1, 0.32, &gtime,&err));
 
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_EQUAL (gtime, 0.5);
-     CE (helicsPublicationPublishDouble (pub, 0.27));
-    CE (helicsFederateRequestTime (vFed1, 1.85, &gtime));
+     CE(helicsPublicationPublishDouble (pub, 0.27,&err));
+    CE(helicsFederateRequestTime (vFed1, 1.85, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    CE (helicsFederateRequestTime (vFed2, 1.79, &gtime));
+    CE(helicsFederateRequestTime (vFed2, 1.79, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 0.5);  // the result should show up at the next available time point
-    CE (helicsFederateRequestTime (vFed2, 2.0, &gtime));
+    CE(helicsFederateRequestTime (vFed2, 2.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-     CE (helicsFederateFinalize (vFed1));
-    CE (helicsFederateFinalize (vFed2));
+     CE(helicsFederateFinalize (vFed1,&err));
+    CE(helicsFederateFinalize (vFed2,&err));
 }
 
 BOOST_AUTO_TEST_CASE (simple_timing_test_message)
@@ -86,37 +86,37 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-	CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.6));
-    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.45));
+	CE(helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.6,&err));
+    CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.45,&err));
 
 	auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "");
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "");
 
-    CE (helicsFederateEnterExecutingModeAsync (vFed1));
-    CE (helicsFederateEnterExecutingMode (vFed2));
-    CE (helicsFederateEnterExecutingModeComplete (vFed1));
-    CE (helicsFederateRequestTimeAsync (vFed2, 3.5));
+    CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
+    CE(helicsFederateEnterExecutingMode (vFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed1,&err));
+    CE(helicsFederateRequestTimeAsync (vFed2, 3.5,&err));
 
     helics_time_t gtime;
-    CE (helicsFederateRequestTime (vFed1, 0.32, &gtime));
+    CE(helicsFederateRequestTime (vFed1, 0.32, &gtime,&err));
 
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_CLOSE (gtime, 0.6,0.000000001);
-    CE (helicsEndpointSendMessageRaw (ept1, "e2", "test1", 5));
+    CE(helicsEndpointSendMessageRaw (ept1, "e2", "test1", 5,&err));
 
-    CE (helicsFederateRequestTimeAsync (vFed1, 1.85));
+    CE(helicsFederateRequestTimeAsync (vFed1, 1.85,&err));
 
-	CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+	CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
 
     BOOST_CHECK_EQUAL (gtime, 0.9);  // the message should show up at the next available time point
-    CE (helicsFederateRequestTimeAsync (vFed2, 2.0));
-    CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+    CE(helicsFederateRequestTimeAsync (vFed2, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.25);  // the message should show up at the next available time point
-    CE (helicsFederateRequestTimeAsync (vFed2, 3.0));
-    CE (helicsFederateRequestTimeComplete (vFed1, &gtime));
+    CE(helicsFederateRequestTimeAsync (vFed2, 3.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed1, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.4);
-    CE (helicsFederateFinalize (vFed1));
-    CE (helicsFederateFinalize (vFed2));
+    CE(helicsFederateFinalize (vFed1,&err));
+    CE(helicsFederateFinalize (vFed2,&err));
 }
 
 BOOST_AUTO_TEST_CASE (timing_with_input_delay)
@@ -125,34 +125,34 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay)
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
-    CE (helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.1));
-    CE (helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.1));
+    CE(helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.1,&err));
+    CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.1,&err));
 
-	CE (helicsFederateSetTimeProperty (vFed2, INPUT_DELAY_PROPERTY, 0.1));
+	CE(helicsFederateSetTimeProperty (vFed2, INPUT_DELAY_PROPERTY, 0.1,&err));
 
    auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "");
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "");
 
-    CE (helicsFederateEnterExecutingModeAsync (vFed1));
-    CE (helicsFederateEnterExecutingMode (vFed2));
-    CE (helicsFederateEnterExecutingModeComplete (vFed1));
-    CE (helicsFederateRequestTimeAsync (vFed2, 2.0));
+    CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
+    CE(helicsFederateEnterExecutingMode (vFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (vFed1,&err));
+    CE(helicsFederateRequestTimeAsync (vFed2, 2.0,&err));
     helics_time_t gtime;
-    CE (helicsFederateRequestTime (vFed1, 1.0, &gtime));
+    CE(helicsFederateRequestTime (vFed1, 1.0, &gtime,&err));
     // check that the request is only granted at the appropriate period
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    CE (helicsEndpointSendMessageRaw (ept1, "e2", "test1", 5));
-    CE (helicsFederateRequestTimeAsync (vFed1, 1.9));
-    CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+    CE(helicsEndpointSendMessageRaw (ept1, "e2", "test1", 5,&err));
+    CE(helicsFederateRequestTimeAsync (vFed1, 1.9,&err));
+    CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
     BOOST_CHECK_EQUAL (
       gtime, 1.1);  // the message should show up at the next available time point after the impact window
-    CE (helicsFederateRequestTimeAsync (vFed2, 2.0));
-    CE (helicsFederateRequestTimeComplete (vFed1, &gtime));
+    CE(helicsFederateRequestTimeAsync (vFed2, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (vFed1, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 1.9);
-    CE (helicsFederateRequestTimeComplete (vFed2, &gtime));
+    CE(helicsFederateRequestTimeComplete (vFed2, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    CE (helicsFederateFinalize (vFed1));
-    CE (helicsFederateFinalize (vFed2));
+    CE(helicsFederateFinalize (vFed1,&err));
+    CE(helicsFederateFinalize (vFed2,&err));
 }
 
 BOOST_AUTO_TEST_CASE (timing_with_minDelta_change)
@@ -161,22 +161,22 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change)
 	 SetupTest (helicsCreateValueFederate, "test", 1, 1.0);
     auto vFed = GetFederateAt (0);
 
-     CE (helicsFederateEnterExecutingMode (vFed));
+     CE(helicsFederateEnterExecutingMode (vFed,&err));
 
     helics_time_t gtime;
-     CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
+     CE(helicsFederateRequestTime (vFed, 1.0, &gtime,&err));
     // check that the request is only granted at the appropriate period
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // purposely requesting 1.0 to test min delta
-    CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
+    CE(helicsFederateRequestTime (vFed, 1.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsFederateSetTimeProperty (vFed, TIME_DELTA_PROPERTY, 0.1));
-    CE (helicsFederateRequestTime (vFed, gtime, &gtime));
+    CE(helicsFederateSetTimeProperty (vFed, TIME_DELTA_PROPERTY, 0.1,&err));
+    CE(helicsFederateRequestTime (vFed, gtime, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.1);
-    CE (helicsFederateFinalize (vFed));
+    CE(helicsFederateFinalize (vFed,&err));
 }
 
 BOOST_AUTO_TEST_CASE (timing_with_period_change)
@@ -185,23 +185,23 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
 	 SetupTest (helicsCreateValueFederate, "test",1);
     auto vFed = GetFederateAt (0);
 
-    CE (helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 1.0));
-    CE (helicsFederateEnterExecutingMode (vFed));
+    CE(helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 1.0,&err));
+    CE(helicsFederateEnterExecutingMode (vFed,&err));
 
      helics_time_t gtime;
-    CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
+    CE(helicsFederateRequestTime (vFed, 1.0, &gtime,&err));
     // check that the request is only granted at the appropriate period
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // purposely requesting 1.0 to test min delta
-    CE (helicsFederateRequestTime (vFed, 1.0, &gtime));
+    CE(helicsFederateRequestTime (vFed, 1.0, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE (helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 0.1));
-    CE (helicsFederateRequestTime (vFed, gtime, &gtime));
+    CE(helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 0.1,&err));
+    CE(helicsFederateRequestTime (vFed, gtime, &gtime,&err));
     BOOST_CHECK_EQUAL (gtime, 2.1);
-    CE (helicsFederateFinalize (vFed));
+    CE(helicsFederateFinalize (vFed,&err));
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

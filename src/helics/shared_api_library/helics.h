@@ -150,7 +150,7 @@ HELICS_EXPORT void helicsBrokerDisconnect (helics_broker broker, helics_error *e
 /** release the memory associated with a core*/
 HELICS_EXPORT void helicsCoreFree (helics_core core);
 /** release the memory associated with a broker*/
-HELICS_EXPORT void helicsBrokerFree (helics_broker broker, helics_error *err);
+HELICS_EXPORT void helicsBrokerFree (helics_broker broker);
 
 /* Creation and destruction of Federates */
 /** create a value federate from a federate info object

@@ -143,7 +143,7 @@ bool CoreBroker::isOpenToNewFederates () const { return ((brokerState != created
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
-    LOG_TRACE (global_broker_id_local, getIdentifier (),
+    LOG_TRACE(global_broker_id_local, getIdentifier (),
                fmt::format ("|| priority_cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {
@@ -398,7 +398,7 @@ void CoreBroker::transmitDelayedMessages ()
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (global_broker_id.load(), getIdentifier (),
+    LOG_TRACE(global_broker_id.load(), getIdentifier (),
                fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {

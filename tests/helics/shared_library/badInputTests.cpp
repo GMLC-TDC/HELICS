@@ -24,12 +24,12 @@ BOOST_AUTO_TEST_CASE (test_bad_fed)
 	auto vFed2 = reinterpret_cast<helics_federate> (reinterpret_cast<uint64_t>(vFed1)+8); 
     // register the publications
 
-    CE(helicsFederateEnterInitializingMode(vFed1));
+    CE(helicsFederateEnterInitializingMode(vFed1,&err));
     auto status = helicsFederateEnterInitializingMode (vFed2);
     BOOST_CHECK_EQUAL (status, helics_invalid_object);
    // auto core = helicsFederateGetCoreObject(vFed1);
 
-    CE(helicsFederateFinalize(vFed1));
+    CE(helicsFederateFinalize(vFed1,&err));
     status=helicsFederateFinalize(vFed2);
     BOOST_CHECK_EQUAL (status, helics_invalid_object);
 

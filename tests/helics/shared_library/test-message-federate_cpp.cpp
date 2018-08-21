@@ -112,31 +112,31 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     auto epid = helicsFederateRegisterEndpoint (mFed1, "ep1", NULL);
     auto epid2 = helicsFederateRegisterGlobalEndpoint (mFed2, "ep2", "random");
 
-    CE(helicsFederateSetTimeDelta (mFed1, 1.0));
-     CE(helicsFederateSetTimeDelta (mFed2, 1.0));
+    CE(helicsFederateSetTimeDelta (mFed1, 1.0,&err));
+     CE(helicsFederateSetTimeDelta (mFed2, 1.0,&err));
 
-     CE(helicsFederateEnterExecutingModeAsync (mFed1));
-    CE(helicsFederateEnterExecutingMode (mFed2));
-    CE(helicsFederateEnterExecutingModeComplete (mFed1));
+     CE(helicsFederateEnterExecutingModeAsync (mFed1,&err));
+    CE(helicsFederateEnterExecutingMode (mFed2,&err));
+    CE(helicsFederateEnterExecutingModeComplete (mFed1,&err));
 
     federate_state mFed1State = helics_execution_state;
-    CE(helicsFederateGetState(mFed1, &mFed1State));
+    CE(helicsFederateGetState(mFed1, &mFed1State,&err));
     BOOST_CHECK (mFed1State == helics_execution_state);
     federate_state mFed2State = helics_execution_state;
-    CE(helicsFederateGetState(mFed2, &mFed2State));
+    CE(helicsFederateGetState(mFed2, &mFed2State,&err));
     BOOST_CHECK (mFed2State == helics_execution_state);
 
     std::string data(500, 'a');
     std::string data2(400, 'b');
 
-    CE(helicsEndpointSendEventRaw (epid, "ep2", data.c_str(), 500, 0.0));
-    CE(helicsEndpointSendEventRaw (epid2, "fed0/ep1", data2.c_str(), 400, 0.0));
+    CE(helicsEndpointSendEventRaw (epid, "ep2", data.c_str(,&err), 500, 0.0));
+    CE(helicsEndpointSendEventRaw (epid2, "fed0/ep1", data2.c_str(,&err), 400, 0.0));
     // move the time to 1.0
     helics_time_t time;
-    CE(helicsFederateRequestTimeAsync (mFed1, 1.0));
+    CE(helicsFederateRequestTimeAsync (mFed1, 1.0,&err));
     helics_time_t gtime;
-    CE(helicsFederateRequestTime (mFed2, 1.0, &gtime));
-    CE(helicsFederateRequestTimeComplete (mFed1, &time));
+    CE(helicsFederateRequestTime (mFed2, 1.0, &gtime,&err));
+    CE(helicsFederateRequestTimeComplete (mFed1, &time,&err));
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (time, 1.0);
@@ -159,14 +159,14 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     BOOST_REQUIRE_EQUAL (M2.length, 500);
 
     BOOST_CHECK_EQUAL (M2.data[245], 'a');
-    CE(helicsFederateFinalize(mFed1));
-    CE(helicsFederateFinalize(mFed2));
+    CE(helicsFederateFinalize(mFed1,&err));
+    CE(helicsFederateFinalize(mFed2,&err));
 
     mFed1State = federate_state::helics_finalize_state;
-    CE(helicsFederateGetState(mFed1, &mFed1State));
+    CE(helicsFederateGetState(mFed1, &mFed1State,&err));
     BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
     mFed2State = federate_state::helics_finalize_state;
-    CE(helicsFederateGetState(mFed2, &mFed2State));
+    CE(helicsFederateGetState(mFed2, &mFed2State,&err));
     BOOST_CHECK (mFed2State == federate_state::helics_finalize_state);
 }
 */

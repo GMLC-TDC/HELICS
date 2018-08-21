@@ -1887,7 +1887,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
 void CommonCore::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately
-    LOG_TRACE (global_broker_id_local, getIdentifier (),
+    LOG_TRACE(global_broker_id_local, getIdentifier (),
                fmt::format ("|| priority_cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {
@@ -2098,7 +2098,7 @@ void CommonCore::transmitDelayedMessages (global_federate_id_t source)
 
 void CommonCore::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (global_broker_id.load (), getIdentifier (),
+    LOG_TRACE(global_broker_id_local, getIdentifier (),
                fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {

@@ -26,9 +26,9 @@ static auto StartBrokerImp (const std::string &core_type_name, const std::string
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str ());
+        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str (),0);
     }
-    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str ());
+    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str (),0);
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -54,28 +54,28 @@ auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str ());
+        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str (),nullptr);
     }
 
-    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str ());
+    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str (),nullptr);
 }
 
+FederateTestFixture::FederateTestFixture () { helicsErrorClear (&err); }
 FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
     {
         if (fed)
         {
-            federate_state state;
-            helicsFederateGetState (fed, &state);
-            helics_core core = helicsFederateGetCoreObject (fed);
+            federate_state state = helicsFederateGetState (fed, nullptr);
+            helics_core core = helicsFederateGetCoreObject (fed,nullptr);
             if (core != nullptr)
             {
-                helicsCoreDisconnect (core);
+                helicsCoreDisconnect (core,nullptr);
             }
             if (state != helics_finalize_state)
             {
-                helicsFederateFinalize (fed);
+                helicsFederateFinalize (fed,nullptr);
             }
             helicsFederateFree (fed);
         }
@@ -83,7 +83,7 @@ FederateTestFixture::~FederateTestFixture ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        helicsBrokerDisconnect (broker);
+        helicsBrokerDisconnect (broker,nullptr);
         helicsBrokerFree (broker);
     }
     brokers.clear ();

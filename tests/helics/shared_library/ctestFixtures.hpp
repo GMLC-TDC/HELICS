@@ -11,7 +11,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/chelics.h"
 #include "helics/helics-config.h"
 
-#define CE(status) BOOST_CHECK_EQUAL (status, helics_ok)
+#define CE(command)                                                                                                \
+    helicsClearError (&err);                                                                                      \
+	command;		\
+    BOOST_CHECK_EQUAL (err.error_code,helics_ok)
 #define HELICS_SIZE_MAX 512
 
 #ifndef DISABLE_TCP_CORE
@@ -33,11 +36,11 @@ const std::string core_types_single[] = {"test", "ipc", "udp"};
 #endif
 #endif
 
-typedef helics_federate (*FedCreator) (const char *, helics_federate_info_t);
+typedef helics_federate (*FedCreator) (const char *, helics_federate_info_t, helics_error *err);
 
 struct FederateTestFixture
 {
-    FederateTestFixture () = default;
+    FederateTestFixture ();
     ~FederateTestFixture ();
 
     helics_broker AddBroker (const std::string &core_type_name, int count);
@@ -49,6 +52,7 @@ struct FederateTestFixture
                     helics_time_t time_delta = helics_time_zero,
                     const std::string &name_prefix = "fed")
     {
+
         helics_broker broker = AddBroker (core_type_name, count);
         BOOST_CHECK (nullptr != broker);
         AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
@@ -71,10 +75,10 @@ struct FederateTestFixture
         }
 
         std::string initString = std::string ("--broker=");
-        CE (helicsBrokerGetIdentifier (broker, tmp, HELICS_SIZE_MAX));
+        CE(helicsBrokerGetIdentifier (broker, tmp, HELICS_SIZE_MAX,&err));
         initString += tmp;
         initString += " --broker_address=";
-        CE (helicsBrokerGetAddress (broker, tmp, HELICS_SIZE_MAX));
+        CE(helicsBrokerGetAddress (broker, tmp, HELICS_SIZE_MAX,&err));
         initString += tmp;
 
         if (!extraCoreArgs.empty ())
@@ -84,8 +88,8 @@ struct FederateTestFixture
         }
 
         helics_federate_info_t fi = helicsCreateFederateInfo ();
-        CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str ()));
-        CE (helicsFederateInfoSetTimeProperty (fi,TIME_DELTA_PROPERTY, time_delta));
+        CE(helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str (,&err)));
+        CE(helicsFederateInfoSetTimeProperty (fi,TIME_DELTA_PROPERTY, time_delta,&err));
 
         std::vector<helics_federate> federates_added;
 
@@ -96,8 +100,8 @@ struct FederateTestFixture
         {
             auto init = initString + " --federates " + std::to_string (count);
             auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str ());
-            CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
-            CE (helicsFederateInfoSetCoreName (fi, tmp));
+            CE(helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX,&err));
+            CE(helicsFederateInfoSetCoreName (fi, tmp,&err));
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
@@ -118,8 +122,8 @@ struct FederateTestFixture
             {
                 auto init = initString + " --federates 1";
                 auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str ());
-                CE (helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX));
-                CE (helicsFederateInfoSetCoreName (fi, tmp));
+                CE(helicsCoreGetIdentifier (core, tmp, HELICS_SIZE_MAX,&err));
+                CE(helicsFederateInfoSetCoreName (fi, tmp,&err));
 
                 auto name = name_prefix + std::to_string (ii + offset);
                 auto fed = ctor (name.c_str(),fi);
@@ -171,7 +175,7 @@ struct FederateTestFixture
     std::vector<helics_federate> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
-
+    helics_error err;
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);

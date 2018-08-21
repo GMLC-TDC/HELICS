@@ -26,9 +26,9 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "double", "");
     helicsFederateRegisterTypePublication(vFed1, "pub2", "double","");
     helicsFederateRegisterTypePublication(vFed2, "pub3", "double","");
-    CE(helicsFederateEnterInitializingModeAsync(vFed1));
-    CE(helicsFederateEnterInitializingMode(vFed2));
-    CE(helicsFederateEnterInitializingModeComplete(vFed1));
+    CE(helicsFederateEnterInitializingModeAsync(vFed1,&err));
+    CE(helicsFederateEnterInitializingMode(vFed2,&err));
+    CE(helicsFederateEnterInitializingModeComplete(vFed1,&err));
 
     auto core = helicsFederateGetCoreObject(vFed1);
 
@@ -53,8 +53,8 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (res, "[fed1/pub3]");
     helicsQueryFree(q1);
     helicsCoreFree(core);
-    CE(helicsFederateFinalize(vFed1));
-    CE(helicsFederateFinalize(vFed2));
+    CE(helicsFederateFinalize(vFed1,&err));
+    CE(helicsFederateFinalize(vFed2,&err));
 }
 
 
@@ -75,10 +75,10 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     std::string str ("[");
     std::string name;
     name.resize(100);
-    CE(helicsFederateGetName(vFed1, &(name[0]), 100));
+    CE(helicsFederateGetName(vFed1, &(name[0],&err), 100));
     str.append (name.c_str());
     str.push_back (';');
-    CE(helicsFederateGetName(vFed2, &(name[0]), 100));
+    CE(helicsFederateGetName(vFed2, &(name[0],&err), 100));
     str.append (name.c_str());
     str.push_back (']');
 
@@ -86,13 +86,13 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
 
     std::string res2 = helicsQueryExecute(q1, vFed1);
     BOOST_CHECK_EQUAL(res2, str);
-    CE(helicsFederateEnterInitializingModeAsync(vFed1));
-    CE(helicsFederateEnterInitializingMode(vFed2));
-    CE(helicsFederateEnterInitializingModeComplete(vFed1));
+    CE(helicsFederateEnterInitializingModeAsync(vFed1,&err));
+    CE(helicsFederateEnterInitializingMode(vFed2,&err));
+    CE(helicsFederateEnterInitializingModeComplete(vFed1,&err));
     helicsQueryFree(q1);
     helicsCoreFree(core);
-    CE(helicsFederateFinalize(vFed1));
-    CE(helicsFederateFinalize(vFed2));
+    CE(helicsFederateFinalize(vFed1,&err));
+    CE(helicsFederateFinalize(vFed2,&err));
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

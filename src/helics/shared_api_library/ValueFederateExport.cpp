@@ -530,7 +530,7 @@ int helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, helics
     }
 }
 
-int helicsInputGetString (helics_input inp, char *outputString, int maxlen, int *actualLength, helics_error *err)
+int helicsInputGetString (helics_input inp, char *outputString, int maxlen, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -627,6 +627,7 @@ helics_bool_t helicsInputGetBoolean (helics_input inp, helics_error *err)
     catch (...)
     {
         helicsErrorHandler (err);
+        return helics_false;
     }
 }
 
@@ -750,11 +751,11 @@ int helicsInputGetVector (helics_input inp, double data[], int maxlen, int *actu
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
     {
-        return 0;
+        return (-1);
     }
     if ((data == nullptr) || (maxlen <= 0))
     {
-        return helics_invalid_argument;
+        return (-1);
     }
     try
     {
@@ -774,11 +775,12 @@ int helicsInputGetVector (helics_input inp, double data[], int maxlen, int *actu
         {
             *actualSize = length;
         }
-        return (length <= maxlen) ? helics_ok : helics_warning;
+        return length;
     }
     catch (...)
     {
         helicsErrorHandler (err);
+        return (-1);
     }
 }
 
@@ -825,6 +827,7 @@ int helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxlen, 
     catch (...)
     {
         helicsErrorHandler (err);
+        return (-1);
     }
 }
 
@@ -1100,16 +1103,18 @@ int helicsPublicationGetType (helics_publication pub, char *outputString, int ma
         {
             strncpy (outputString, type.c_str (), maxlen);
             outputString[maxlen - 1] = 0;
+            return maxlen;
         }
         else
         {
             strcpy (outputString, type.c_str ());
+            return static_cast<int> (type.size ());
         }
-        return helics_ok;
     }
     catch (...)
     {
         helicsErrorHandler (err);
+        return (-1);
     }
 }
 
