@@ -35,7 +35,7 @@ class Filter
     std::string getTarget () const
     {
         char str[255];
-        helicsFilterGetTarget (filt, &str[0], sizeof (str));
+        helicsFilterGetTarget (filt, &str[0], sizeof (str), nullptr);
         std::string result (str);
         return result;
     }
@@ -43,29 +43,38 @@ class Filter
     std::string getName () const
     {
         char str[255];
-        helicsFilterGetName (filt, &str[0], sizeof (str));
+        helicsFilterGetName (filt, &str[0], sizeof (str),nullptr);
         std::string result (str);
         return result;
     }
 
-    void set (const std::string &property, double val) { helicsFilterSet (filt, property.c_str (), val); }
+    void set (const std::string &property, double val)
+    {
+        helicsFilterSet (filt, property.c_str (), val, hThrowOnError ());
+    }
     void setString (const std::string &property, const std::string &val)
     {
-        helicsFilterSetString (filt, property.c_str (), val.c_str ());
+        helicsFilterSetString (filt, property.c_str (), val.c_str (),hThrowOnError());
     }
 
     /** add a destination target to a cloning filter
     @details all messages going to a destination are copied to the delivery address(es)*/
-    void addDestinationTarget(const std::string &dest) { helicsFilterAddDestinationTarget(filt, dest.c_str()); }
+    void addDestinationTarget (const std::string &dest)
+    {
+        helicsFilterAddDestinationTarget (filt, dest.c_str (), hThrowOnError ());
+    }
 
     /** add a source target to a cloning filter
     @details all messages coming from a source are copied to the delivery address(es)*/
-    void addSourceTarget(const std::string &source) { helicsFilterAddSourceTarget(filt, source.c_str()); }
+    void addSourceTarget (const std::string &source)
+    {
+        helicsFilterAddSourceTarget (filt, source.c_str (), hThrowOnError ());
+    }
 
     /** remove a destination target from a cloning filter*/
     void removeTarget(const std::string &dest)
     {
-        helicsFilterRemoveTarget(filt, dest.c_str());
+        helicsFilterRemoveTarget (filt, dest.c_str (), hThrowOnError ());
     }
 
   protected:
@@ -92,13 +101,13 @@ class CloningFilter : public Filter
     */
     void addDeliveryEndpoint (const std::string &deliveryEndpoint)
     {
-        helicsFilterAddDeliveryEndpoint (filt, deliveryEndpoint.c_str ());
+        helicsFilterAddDeliveryEndpoint (filt, deliveryEndpoint.c_str (), hThrowOnError ());
     }
 
     /** remove a delivery destination from a cloning filter*/
     void removeDeliveryEndpoint (const std::string &deliveryEndpoint)
     {
-        helicsFilterRemoveDeliveryEndpoint (filt, deliveryEndpoint.c_str ());
+        helicsFilterRemoveDeliveryEndpoint (filt, deliveryEndpoint.c_str (), hThrowOnError ());
     }
 };
 

@@ -30,31 +30,29 @@ class FederateInfo
     FederateInfo ( const std::string &coretype)
     {
         fi = helicsCreateFederateInfo ();
-        helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str ());
+        helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
-    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str ()); }
-
     void setCoreInitString (const std::string &coreInit)
     {
-        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str ());
+        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (),nullptr);
     }
 
     void setCoreTypeFromString (const std::string &coretype)
     {
-        helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str ());
+        helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
 
-    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype); }
+    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype,nullptr); }
 
-    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value); }
+    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value,nullptr); }
 
-    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue); }
+    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue,nullptr); }
 
     
-    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue); }
+    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue,nullptr); }
 
     helics_federate_info_t getInfo () { return fi; }
 
@@ -79,12 +77,12 @@ class Federate
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
-        fed = helicsFederateClone (fedObj.fed);
+        fed = helicsFederateClone (fedObj.fed, hThrowOnError ());
     }
     Federate &operator= (const Federate &fedObj)
     {
         exec_async_iterate = fedObj.exec_async_iterate;
-        fed = helicsFederateClone (fedObj.fed);
+        fed = helicsFederateClone (fedObj.fed, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
@@ -112,48 +110,41 @@ class Federate
 
     helics_federate baseObject () const { return fed; }
 
-    void setFlag (int flag, int value) { helicsFederateSetFlagOption (fed, flag, value); }
+    void setFlag (int flag, int value) { helicsFederateSetFlagOption (fed, flag, value, hThrowOnError ()); }
 
-    void setTimeProperty (int tProperty, helics_time_t timeDelta) { helicsFederateSetTimeProperty (fed,tProperty, timeDelta); }
+    void setTimeProperty (int tProperty, helics_time_t timeDelta)
+    {
+        helicsFederateSetTimeProperty (fed, tProperty, timeDelta, hThrowOnError ());
+    }
 
 
-    void setIntegerProperty (int intProperty, int value) { helicsFederateSetIntegerProperty(fed, intProperty, value); }
+    void setIntegerProperty (int intProperty, int value)
+    {
+        helicsFederateSetIntegerProperty (fed, intProperty, value, hThrowOnError ());
+    }
 
     federate_state getState() const
     {
-        federate_state fedState;
-        helicsFederateGetState(fed, &fedState);
-        return fedState;
+        return helicsFederateGetState(fed, nullptr);
     }
 
     void enterInitializingMode ()
-    {
-        if (helics_ok != helicsFederateEnterInitializingMode (fed))
-        {
-            throw (InvalidStateTransition ("cannot transition from current mode to initialization mode"));
-        }
+    { helicsFederateEnterInitializingMode (fed, hThrowOnError ());
     }
 
     void enterInitializingModeAsync ()
-    {
-        if (helics_ok != helicsFederateEnterInitializingModeAsync (fed))
-        {
-            throw (InvalidStateTransition ("cannot transition from current mode to initialization mode"));
-        }
+    { helicsFederateEnterInitializingModeAsync (fed, hThrowOnError ());
     }
 
     bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateIsAsyncOperationCompleted (fed) > 0;
+        return helicsFederateIsAsyncOperationCompleted (fed,nullptr) > 0;
     }
 
     void enterInitializingModeComplete ()
     {
-        if (helics_ok != helicsFederateEnterInitializingModeComplete (fed))
-        {
-            throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
-        }
+        helicsFederateEnterInitializingModeComplete (fed, hThrowOnError ());
     }
 
     helics_iteration_status enterExecutingMode (helics_iteration_request iterate = no_iteration)
@@ -161,11 +152,11 @@ class Federate
         helics_iteration_status out_iterate = next_step;
         if (iterate == no_iteration)
         {
-            helicsFederateEnterExecutingMode (fed);
+            helicsFederateEnterExecutingMode (fed, hThrowOnError ());
         }
         else
         {
-            helicsFederateEnterExecutingModeIterative (fed, iterate, &out_iterate);
+            out_iterate = helicsFederateEnterExecutingModeIterative (fed, iterate, hThrowOnError ());
         }
         return out_iterate;
     }
@@ -174,12 +165,12 @@ class Federate
     {
         if (iterate == no_iteration)
         {
-            helicsFederateEnterExecutingModeAsync (fed);
+            helicsFederateEnterExecutingModeAsync (fed, hThrowOnError ());
             exec_async_iterate = false;
         }
         else
         {
-            helicsFederateEnterExecutingModeIterativeAsync (fed, iterate);
+            helicsFederateEnterExecutingModeIterativeAsync (fed, iterate, hThrowOnError ());
             exec_async_iterate = true;
         }
     }
@@ -189,62 +180,54 @@ class Federate
         helics_iteration_status out_iterate = next_step;
         if (exec_async_iterate)
         {
-            helicsFederateEnterExecutingModeIterativeComplete (fed, &out_iterate);
+            out_iterate = helicsFederateEnterExecutingModeIterativeComplete (fed, hThrowOnError ());
         }
         else
         {
-            helicsFederateEnterExecutingModeComplete (fed);
+            helicsFederateEnterExecutingModeComplete (fed, hThrowOnError ());
         }
         return out_iterate;
     }
 
-    void finalize () { helicsFederateFinalize (fed); }
+    void finalize () { helicsFederateFinalize (fed, hThrowOnError ()); }
 
     helics_time_t requestTime (helics_time_t time)
     {
-        helics_time_t grantedTime;
-        helicsFederateRequestTime (fed, time, &grantedTime);
-        return grantedTime;
+        return helicsFederateRequestTime (fed, time, hThrowOnError ());
     }
 
     helics_iteration_time requestTimeIterative (helics_time_t time, helics_iteration_request iterate)
     {
         helics_iteration_time itTime;
-        helicsFederateRequestTimeIterative (fed, time, iterate, &(itTime.grantedTime), &(itTime.status));
+        itTime.grantedTime =
+          helicsFederateRequestTimeIterative (fed, time, iterate, &(itTime.status), hThrowOnError ());
         return itTime;
     }
 
     void requestTimeAsync (helics_time_t time)
-    {
-        if (helics_ok != helicsFederateRequestTimeAsync (fed, time))
-        {
-            throw (InvalidFunctionCall ("cannot call request time in present state"));
-        }
+    { helicsFederateRequestTimeAsync (fed, time, hThrowOnError ());
     }
 
     void requestTimeIterativeAsync (helics_time_t time, helics_iteration_request iterate)
     {
-        helicsFederateRequestTimeIterativeAsync (fed, time, iterate);
+        helicsFederateRequestTimeIterativeAsync (fed, time, iterate, hThrowOnError ());
     }
 
     helics_time_t requestTimeComplete ()
-    {
-        helics_time_t newTime;
-        helicsFederateRequestTimeComplete (fed, &newTime);
-        return newTime;
+    { return helicsFederateRequestTimeComplete (fed, hThrowOnError ());
     }
 
     helics_iteration_time requestTimeIterativeComplete ()
     {
         helics_iteration_time itTime;
-        helicsFederateRequestTimeIterativeComplete (fed, &(itTime.grantedTime), &(itTime.status));
+        itTime.grantedTime = helicsFederateRequestTimeIterativeComplete (fed, &(itTime.status), hThrowOnError ());
         return itTime;
     }
 
     std::string getName () const
     {
         char str[255];
-        helicsFederateGetName (fed, &str[0], sizeof (str));
+        helicsFederateGetName (fed, &str[0], sizeof (str),nullptr);
         std::string result (str);
         return result;
     }
@@ -262,7 +245,7 @@ class Federate
     {
         // returns helics_query
         helics_query q = helicsCreateQuery (target.c_str (), queryStr.c_str ());
-        std::string result (helicsQueryExecute (q, fed));
+        std::string result (helicsQueryExecute (q, fed, hThrowOnError ()));
         helicsQueryFree (q);
         return result;
     }
@@ -270,7 +253,7 @@ class Federate
     Filter registerFilter (helics_filter_type_t type,
                                  const std::string &name = std::string ())
     {
-        return Filter (helicsFederateRegisterFilter (fed, type, name.c_str ()));
+        return Filter (helicsFederateRegisterFilter (fed, type, name.c_str ()), hThrowOnError ());
     }
 
 
@@ -283,7 +266,8 @@ class Federate
     */
     CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
     {
-        return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str ()));
+        return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str ()),
+                              hThrowOnError ());
     }
 
   protected:

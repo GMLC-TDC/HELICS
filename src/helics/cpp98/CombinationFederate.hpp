@@ -17,12 +17,12 @@ class CombinationFederate : public ValueFederate, public MessageFederate
   public:
     explicit CombinationFederate (const std::string &name, FederateInfo &fi)
     {
-        fed = helicsCreateCombinationFederate (name.c_str(),fi.getInfo());
+        fed = helicsCreateCombinationFederate (name.c_str (), fi.getInfo (), hThrowOnError ());
     }
     
     explicit CombinationFederate (const std::string &configString)
     {
-        fed = helicsCreateCombinationFederateFromConfig (configString.c_str());
+        fed = helicsCreateCombinationFederateFromConfig (configString.c_str (), hThrowOnError ());
     }
 };
 } //namespace helicscpp
