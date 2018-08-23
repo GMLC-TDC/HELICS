@@ -227,7 +227,6 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     helics_time_t gtime;
 #define STRINGLEN 100
     char s[STRINGLEN] = "n2";
-    int len;
 
     SetupTest (helicsCreateValueFederate, core_type, 1, 1.0);
     auto vFed = GetFederateAt (0);
@@ -244,7 +243,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(len=helicsInputGetString (subid, s, STRINGLEN, &err));
+    CE(helicsInputGetString (subid, s, STRINGLEN, &err));
     
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");

@@ -85,19 +85,19 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
     CE(helicsFederateRequestTimeAsync (mFed, 1.0,&err));
-    CE(timeOut=helicsFederateRequestTime(fFed, 1.0,&err));
+    CE(helicsFederateRequestTime(fFed, 1.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
 
     auto res = helicsFederateHasMessage (mFed,nullptr);
     BOOST_CHECK (!res);
 
     CE(helicsFederateRequestTimeAsync (mFed, 2.0,&err));
-    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTime(fFed, 2.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed, &err));
     BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
 
     CE(helicsFederateRequestTimeAsync (fFed, 3.0,&err));
-    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    CE(helicsFederateRequestTime(mFed, 3.0,&err));
 
     BOOST_REQUIRE (helicsEndpointHasMessage (p2,nullptr));
 
@@ -108,7 +108,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
-    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    CE(helicsFederateRequestTime(mFed, 3.0,&err));
     CE(helicsFederateRequestTimeComplete (fFed, &err));
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     CE(helicsFederateRequestTimeAsync (mFed, .0,&err));
     CE(helicsFederateRequestTimeAsync (fFed, 1.0,&err));
-    CE(timeOut=helicsFederateRequestTime(fFed2, 1.0,&err));
+    CE(helicsFederateRequestTime(fFed2, 1.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
     CE(helicsFederateRequestTimeComplete (fFed,&err));
     auto res = helicsFederateHasMessage (mFed,nullptr);
@@ -167,14 +167,14 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     CE(helicsFederateRequestTimeAsync (mFed, .0,&err));
     CE(helicsFederateRequestTimeAsync (fFed2, 2.0,&err));
-    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTime(fFed, 2.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
     CE(helicsFederateRequestTimeComplete (fFed2,&err));
     BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
 
     CE(helicsFederateRequestTimeAsync (fFed, 3.0,&err));
     CE(helicsFederateRequestTimeAsync (fFed2, 3.0,&err));
-    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    CE(helicsFederateRequestTime(mFed, 3.0,&err));
     if (!helicsEndpointHasMessage (p2,nullptr))
     {
         printf ("missing message\n");
@@ -242,13 +242,13 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (!res);
     CE (helicsEndpointSendMessageRaw (p2, "port1", data.c_str (), static_cast<int> (data.size ()), &err));
     CE(helicsFederateRequestTimeAsync (mFed, 2.0,&err));
-    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTime(fFed, 2.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
     BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
     // there may be something wrong here yet but this test isn't the one to find it and
     // this may prevent spurious errors for now.
     std::this_thread::yield ();
-    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    CE(helicsFederateRequestTime(mFed, 3.0,&err));
 
     BOOST_REQUIRE (helicsEndpointHasMessage (p2,nullptr));
 
@@ -260,7 +260,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
     BOOST_CHECK (!helicsEndpointHasMessage (p1,nullptr));
-    CE(timeOut=helicsFederateRequestTime(mFed, 4.0,&err));
+    CE(helicsFederateRequestTime(mFed, 4.0,&err));
     BOOST_CHECK (helicsEndpointHasMessage (p1,nullptr));
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));

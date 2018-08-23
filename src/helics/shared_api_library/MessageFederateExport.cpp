@@ -363,7 +363,7 @@ message_t helicsFederateGetMessage (helics_federate fed, helics_error *err)
 
 bool checkOutArgString(char *outputString, int maxlen, helics_error *err)
 {
-    static char *invalidOutputString = "Output string location is invalid";
+    static constexpr char invalidOutputString[] = "Output string location is invalid";
     if ((outputString == nullptr) || (maxlen <= 0))
     {
 		if (err != nullptr)

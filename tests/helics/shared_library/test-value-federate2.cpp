@@ -44,7 +44,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     CE(helicsFederateEnterExecutingMode (vFed1,&err));
     CE (helicsPublicationPublishRaw (pubid3, s.data (), len, &err));
 
-    CE(gtime=helicsFederateRequestTime(vFed1, 1.0,&err));
+    CE(helicsFederateRequestTime(vFed1, 1.0,&err));
 
     BOOST_CHECK (helicsInputIsUpdated (sub1,nullptr));
 
@@ -70,7 +70,6 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // federate_state state;
 #define STRINGLEN 100
     char s[STRINGLEN] = "";
-    int len;
     FederateTestFixture fixture;
     fixture.SetupTest (helicsCreateValueFederate, core_type.c_str (), 2);
     auto vFed1 = fixture.GetFederateAt (0);
