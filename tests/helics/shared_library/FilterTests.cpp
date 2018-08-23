@@ -84,7 +84,6 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     std::string data (500, 'a');
     CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
-    helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, 1.0,&err));
     CE(timeOut=helicsFederateRequestTime(fFed, 1.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
@@ -158,7 +157,6 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
-    helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, .0,&err));
     CE(helicsFederateRequestTimeAsync (fFed, 1.0,&err));
     CE(timeOut=helicsFederateRequestTime(fFed2, 1.0,&err));
@@ -236,7 +234,6 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
-    helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, 1.0,&err));
     CE(helicsFederateRequestTime(fFed, 1.0,&err));
     CE(helicsFederateRequestTimeComplete (mFed,&err));
@@ -301,7 +298,6 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
 
-    helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (sFed, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (dcFed, 1.0,&err));
     CE(helicsFederateRequestTime (dFed, 1.0,&err));
@@ -375,15 +371,13 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE(helicsFederateEnterExecutingModeComplete (sFed2,&err));
     CE(helicsFederateEnterExecutingModeComplete (dcFed,&err));
 
-    federate_state state;
-    CE(state=helicsFederateGetState (sFed,&err));
+    CE(federate_state state=helicsFederateGetState (sFed,&err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
     std::string data2 (400, 'b');
     CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
     CE (helicsEndpointSendMessageRaw (p2, "dest", data2.c_str (), static_cast<int> (data2.size ()), &err));
 
-    helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (sFed, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (sFed2, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (dcFed, 1.0,&err));

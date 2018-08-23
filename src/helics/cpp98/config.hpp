@@ -28,6 +28,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #elif defined(_MSC_VER) && (_MSC_VER >= 1900)
 #define THROWS_EXCEPTION noexcept (false)
 #else
-#define THROWS_EXCEPTION throws (...)
+#define THROWS_EXCEPTION throw (HelicsException)
 #endif
 #endif

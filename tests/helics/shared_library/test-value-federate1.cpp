@@ -482,7 +482,6 @@ void runFederateTestString (const char *core,
     helics_time_t gtime;
 #define STRINGSIZE 100
     char str[STRINGSIZE] = "";
-    int len = STRINGSIZE;
     helics_error err= helicsErrorInitialize ();
     FederateTestFixture fixture;
     fixture.SetupTest (helicsCreateValueFederate, core, 1, 1.0);
@@ -497,7 +496,7 @@ void runFederateTestString (const char *core,
     // publish string1 at time=0.0;
     CE(helicsPublicationPublishString (pubid, testValue1,&err));
 
-    CE(len=helicsInputGetString (subid, str, STRINGSIZE, &err));
+    CE(helicsInputGetString (subid, str, STRINGSIZE, &err));
 
     BOOST_CHECK_EQUAL (str, defaultValue);
 
@@ -506,7 +505,7 @@ void runFederateTestString (const char *core,
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(len=helicsInputGetString (subid, str, STRINGSIZE,&err));
+    CE(helicsInputGetString (subid, str, STRINGSIZE,&err));
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (str, testValue1);
@@ -515,7 +514,7 @@ void runFederateTestString (const char *core,
     CE(helicsPublicationPublishString (pubid, testValue2,&err));
 
     // make sure the value is still what we expect
-    CE(len=helicsInputGetString (subid, str, STRINGSIZE, &err));
+    CE(helicsInputGetString (subid, str, STRINGSIZE, &err));
     BOOST_CHECK_EQUAL (str, testValue1);
 
     // advance time
@@ -523,7 +522,7 @@ void runFederateTestString (const char *core,
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE(len=helicsInputGetString (subid, str, STRINGSIZE, &err));
+    CE(helicsInputGetString (subid, str, STRINGSIZE, &err));
     BOOST_CHECK_EQUAL (str, testValue2);
 
     CE(helicsFederateFinalize (vFed,&err));
@@ -631,7 +630,6 @@ void runFederateTestNamedPoint (const char *core,
     helics_time_t gtime;
 #define STRINGSIZE 100
     char str[STRINGSIZE] = "";
-    int len = STRINGSIZE;
 
     FederateTestFixture fixture;
     helics_error err = helicsErrorInitialize ();
@@ -648,7 +646,7 @@ void runFederateTestNamedPoint (const char *core,
     CE(helicsPublicationPublishNamedPoint (pubid, testValue1, testVal1,&err));
 
     double val;
-    CE(len=helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
+    CE(helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
 
     BOOST_CHECK_EQUAL (std::string(str), std::string(defaultValue));
     BOOST_CHECK_EQUAL (val, defVal);
@@ -657,7 +655,7 @@ void runFederateTestNamedPoint (const char *core,
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(len=helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
+    CE(helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (std::string(str), std::string(testValue1));
@@ -667,7 +665,7 @@ void runFederateTestNamedPoint (const char *core,
     CE(helicsPublicationPublishNamedPoint (pubid, testValue2, testVal2,&err));
 
     // make sure the value is still what we expect
-    CE(len=helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
+    CE(helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
     BOOST_CHECK_EQUAL (std::string(str), std::string(testValue1));
     BOOST_CHECK_EQUAL (val, testVal1);
 
@@ -676,7 +674,7 @@ void runFederateTestNamedPoint (const char *core,
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE(len=helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
+    CE(helicsInputGetNamedPoint (subid, str, STRINGSIZE, &val,&err));
     BOOST_CHECK_EQUAL (std::string(str), std::string(testValue2));
     BOOST_CHECK_EQUAL (val, testVal2);
 

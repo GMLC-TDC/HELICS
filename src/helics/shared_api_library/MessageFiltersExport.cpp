@@ -13,7 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const std::string nullstr;
 
-static const char *invalidFilterString = "The given filter object is not valid";
+static constexpr char invalidFilterString[] = "The given filter object is not valid";
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static const int filterValidationIdentifier = 0xEC26'0127;
@@ -178,7 +178,7 @@ static helics::Filter *getFilter (helics_filter filt, helics_error *err)
 
 static helics::CloningFilter *getCloningFilter (helics_filter filt, helics_error *err)
 {
-    static const char *nonCloningFilterString = "filter must be a cloning filter";
+    static const char nonCloningFilterString[] = "filter must be a cloning filter";
     auto fObj = getFilterObj(filt,err);
     if (fObj == nullptr)
     {
@@ -258,7 +258,7 @@ int helicsFilterGetName (helics_filter filt, char *outputString, int maxlen, hel
     }
 }
 
-static const char *invalidPropertyString = "the specified property is invalid";
+static constexpr char invalidPropertyString[] = "the specified property is invalid";
 
 void helicsFilterSet (helics_filter filt, const char *prop, double val, helics_error *err)
 {
@@ -314,7 +314,7 @@ void helicsFilterSetString (helics_filter filt, const char *prop, const char *va
 
 void helicsFilterAddDestinationTarget (helics_filter filt, const char *dest, helics_error *err)
 {
-    static constexpr char *invalidDestinationString = "the specified destination is not valid";
+    static constexpr char invalidDestinationString[] = "the specified destination is not valid";
     auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)
     {
@@ -341,7 +341,7 @@ void helicsFilterAddDestinationTarget (helics_filter filt, const char *dest, hel
 
 void helicsFilterAddSourceTarget (helics_filter filt, const char *src, helics_error *err)
 {
-    static constexpr char *invalidSourceString = "the specified Source is not valid";
+    static constexpr char invalidSourceString[] = "the specified Source is not valid";
     auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)
     {
@@ -366,7 +366,7 @@ void helicsFilterAddSourceTarget (helics_filter filt, const char *src, helics_er
     }
 }
 
-static constexpr char *invalidDeliveryString = "the specified Delivery address is not valid";
+static constexpr char invalidDeliveryString[] = "the specified Delivery address is not valid";
 
 void helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery, helics_error *err)
 {
@@ -396,7 +396,7 @@ void helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery, 
 
 void helicsFilterRemoveTarget (helics_filter filt, const char *target, helics_error *err)
 {
-    static constexpr char *invalidTargetString = "The specified Target address is not valid";
+    static constexpr char invalidTargetString[] = "The specified Target address is not valid";
 
     auto cfilt = getFilter (filt,err);
     if (cfilt == nullptr)

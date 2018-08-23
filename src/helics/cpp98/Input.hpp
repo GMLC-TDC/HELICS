@@ -82,7 +82,6 @@ public:
     {
         int size = helicsInputGetRawValueSize (inp, NULL);
         data.resize(size);
-        int actualSize;
         return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), NULL);
     }
 

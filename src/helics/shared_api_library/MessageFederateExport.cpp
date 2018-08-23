@@ -25,7 +25,7 @@ static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::End
 
 static const std::string nullStr;
 
-static const char *invalidEndpoint = "The given endpoint does not point to a valid object";
+static const char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
 
 

@@ -25,7 +25,6 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests2, FederateTestFixture, *utf::labe
 
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
 {
-    helics_time_t gtime;
     std::string s (500, ';');
     int len = static_cast<int> (s.size ());
     char val[600] = "";
