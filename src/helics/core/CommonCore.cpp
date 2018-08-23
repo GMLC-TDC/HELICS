@@ -2495,6 +2495,8 @@ void CommonCore::registerInterface (ActionMessage &command)
                 }
             }
             break;
+        default:
+            return;
         }
         if (!ifc->key.empty ())
         {

@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 #include "federate_id.hpp"
 #include <unordered_map>
+#include <vector>
 
 namespace helics
 {
