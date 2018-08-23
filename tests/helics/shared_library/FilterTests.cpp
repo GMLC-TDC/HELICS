@@ -31,24 +31,23 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
-    helicsFederateRegisterGlobalEndpoint (mFed, "port1","");
-    helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL);
-
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter1");
-    helicsFilterAddSourceTarget(f1, "port1");
+    helicsFederateRegisterGlobalEndpoint (mFed, "port1","",&err);
+    helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL,&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
+    CE(auto f1 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter1",&err));
+    CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f1 != NULL);
-    auto f2 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter2");
-    helicsFilterAddDestinationTarget(f2, "port2");
+    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter2",&err));
+    CE(helicsFilterAddDestinationTarget(f2, "port2",&err));
     BOOST_CHECK (f2 != f1);
-    auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "");
+    CE(auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "",&err));
     BOOST_CHECK (ep1 != NULL);
-    auto f3 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "");
-    helicsFilterAddSourceTarget(f3, "filter0/fout");
+    CE(auto f3 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "",&err));
+    helicsFilterAddSourceTarget(f3, "filter0/fout",nullptr);
     BOOST_CHECK (f3 != f2);
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
-    federate_state state;
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE(federate_state state=helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
@@ -66,10 +65,12 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", nullptr);
-    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", nullptr,&err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 2.5,&err));
@@ -78,42 +79,41 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     CE(helicsFederateEnterExecutingMode (mFed,&err));
     CE(helicsFederateEnterExecutingModeComplete (fFed,&err));
 
-    federate_state state;
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE (federate_state state=helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (,&err), static_cast<int> (data.size ())));
+    CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
     helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, 1.0,&err));
-    CE(helicsFederateRequestTime (fFed, 1.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
+    CE(timeOut=helicsFederateRequestTime(fFed, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed,&err));
 
-    auto res = helicsFederateHasMessage (mFed);
+    auto res = helicsFederateHasMessage (mFed,nullptr);
     BOOST_CHECK (!res);
 
     CE(helicsFederateRequestTimeAsync (mFed, 2.0,&err));
-    CE(helicsFederateRequestTime (fFed, 2.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
-    BOOST_REQUIRE (!helicsEndpointHasMessage (p2));
+    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed, &err));
+    BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
 
     CE(helicsFederateRequestTimeAsync (fFed, 3.0,&err));
-    CE(helicsFederateRequestTime (mFed, 3.0, &timeOut,&err));
+    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
 
-    BOOST_REQUIRE (helicsEndpointHasMessage (p2));
+    BOOST_REQUIRE (helicsEndpointHasMessage (p2,nullptr));
 
-    auto m2 = helicsEndpointGetMessage (p2);
+    auto m2 = helicsEndpointGetMessage (p2,nullptr);
     BOOST_CHECK_EQUAL (m2.source, "port1");
     BOOST_CHECK_EQUAL (m2.original_source, "port1");
     BOOST_CHECK_EQUAL (m2.dest, "port2");
     BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
-    CE(helicsFederateRequestTime (mFed, 3.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (fFed, &timeOut,&err));
+    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    CE(helicsFederateRequestTimeComplete (fFed, &err));
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE(state=helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
@@ -131,70 +131,71 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     auto fFed2 = GetFederateAt (1);
     auto mFed = GetFederateAt (2);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
-    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "",&err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
 
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 1.25,&err));
 
-    auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter2");
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter2", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f2 != NULL);
     CE(helicsFilterSet (f2, "delay", 1.25,&err));
 
     CE(helicsFederateEnterExecutingModeAsync (fFed,&err));
-    CE(helicsFederateEnterExecutingModeAsync (fFed2,&err,&err));
-    CE(helicsFederateEnterExecutingMode (mFed,&err,&err));
+    CE(helicsFederateEnterExecutingModeAsync (fFed2,&err));
+    CE(helicsFederateEnterExecutingMode (mFed,&err));
     CE(helicsFederateEnterExecutingModeComplete (fFed,&err));
     CE(helicsFederateEnterExecutingModeComplete (fFed2,&err));
 
-    federate_state state;
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE (federate_state state=helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (,&err), static_cast<int> (data.size ())));
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
     helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, .0,&err));
     CE(helicsFederateRequestTimeAsync (fFed, 1.0,&err));
-    CE(helicsFederateRequestTime (fFed2, 1.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (fFed, &timeOut,&err));
-    auto res = helicsFederateHasMessage (mFed);
+    CE(timeOut=helicsFederateRequestTime(fFed2, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed,&err));
+    CE(helicsFederateRequestTimeComplete (fFed,&err));
+    auto res = helicsFederateHasMessage (mFed,nullptr);
     BOOST_CHECK (!res);
 
     CE(helicsFederateRequestTimeAsync (mFed, .0,&err));
     CE(helicsFederateRequestTimeAsync (fFed2, 2.0,&err));
-    CE(helicsFederateRequestTime (fFed, 2.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (fFed2, &timeOut,&err));
-    BOOST_REQUIRE (!helicsEndpointHasMessage (p2));
+    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed,&err));
+    CE(helicsFederateRequestTimeComplete (fFed2,&err));
+    BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
 
     CE(helicsFederateRequestTimeAsync (fFed, 3.0,&err));
     CE(helicsFederateRequestTimeAsync (fFed2, 3.0,&err));
-    CE(helicsFederateRequestTime (mFed, 3.0, &timeOut,&err));
-    if (!helicsEndpointHasMessage (p2))
+    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
+    if (!helicsEndpointHasMessage (p2,nullptr))
     {
         printf ("missing message\n");
     }
-    BOOST_REQUIRE (helicsEndpointHasMessage (p2));
+    BOOST_REQUIRE (helicsEndpointHasMessage (p2,nullptr));
 
-    auto m2 = helicsEndpointGetMessage (p2);
+    auto m2 = helicsEndpointGetMessage (p2,nullptr);
     BOOST_CHECK_EQUAL (m2.source, "port1");
     BOOST_CHECK_EQUAL (m2.original_source, "port1");
     BOOST_CHECK_EQUAL (m2.dest, "port2");
     BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
-    CE(helicsFederateRequestTimeComplete (fFed, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (fFed2, &timeOut,&err));
+    CE(helicsFederateRequestTimeComplete (fFed,&err));
+    CE(helicsFederateRequestTimeComplete (fFed2,&err));
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
     CE(helicsFederateFinalize (fFed2,&err));
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE(state=helicsFederateGetState (fFed,&err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
@@ -212,16 +213,17 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
-    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "",&err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1");
-    helicsFilterAddSourceTarget(f1, "port1");
+   CE( auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err));
+    helicsFilterAddSourceTarget(f1, "port1",nullptr);
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 2.5,&err));
 
-    auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter,"filter2");
-    helicsFilterAddSourceTarget(f2, "port2");
+    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter,"filter2",&err));
+    helicsFilterAddSourceTarget (f2, "port2", nullptr);
     BOOST_CHECK (f2 != NULL);
     CE(helicsFilterSet (f2, "delay", 2.5,&err));
 
@@ -229,44 +231,43 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     CE(helicsFederateEnterExecutingMode (mFed,&err));
     CE(helicsFederateEnterExecutingModeComplete (fFed,&err));
 
-    federate_state state;
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE (federate_state state=helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (,&err), static_cast<int> (data.size ())));
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
     helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (mFed, 1.0,&err));
-    CE(helicsFederateRequestTime (fFed, 1.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
+    CE(helicsFederateRequestTime(fFed, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed,&err));
 
-    auto res = helicsFederateHasMessage (mFed);
+    auto res = helicsFederateHasMessage (mFed,nullptr);
     BOOST_CHECK (!res);
-    CE(helicsEndpointSendMessageRaw (p2, "port1", data.c_str (,&err), static_cast<int> (data.size ())));
+    CE (helicsEndpointSendMessageRaw (p2, "port1", data.c_str (), static_cast<int> (data.size ()), &err));
     CE(helicsFederateRequestTimeAsync (mFed, 2.0,&err));
-    CE(helicsFederateRequestTime (fFed, 2.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (mFed, &timeOut,&err));
-    BOOST_REQUIRE (!helicsEndpointHasMessage (p2));
+    CE(timeOut=helicsFederateRequestTime(fFed, 2.0,&err));
+    CE(helicsFederateRequestTimeComplete (mFed,&err));
+    BOOST_REQUIRE (!helicsEndpointHasMessage (p2,nullptr));
     // there may be something wrong here yet but this test isn't the one to find it and
     // this may prevent spurious errors for now.
     std::this_thread::yield ();
-    CE(helicsFederateRequestTime (mFed, 3.0, &timeOut,&err));
+    CE(timeOut=helicsFederateRequestTime(mFed, 3.0,&err));
 
-    BOOST_REQUIRE (helicsEndpointHasMessage (p2));
+    BOOST_REQUIRE (helicsEndpointHasMessage (p2,nullptr));
 
-    auto m2 = helicsEndpointGetMessage (p2);
+    auto m2 = helicsEndpointGetMessage (p2,nullptr);
     BOOST_CHECK_EQUAL (m2.source, "port1");
     BOOST_CHECK_EQUAL (m2.original_source, "port1");
     BOOST_CHECK_EQUAL (m2.dest, "port2");
     BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
     BOOST_CHECK_EQUAL (m2.time, 2.5);
 
-    BOOST_CHECK (!helicsEndpointHasMessage (p1));
-    CE(helicsFederateRequestTime (mFed, 4.0, &timeOut,&err));
-    BOOST_CHECK (helicsEndpointHasMessage (p1));
+    BOOST_CHECK (!helicsEndpointHasMessage (p1,nullptr));
+    CE(timeOut=helicsFederateRequestTime(mFed, 4.0,&err));
+    BOOST_CHECK (helicsEndpointHasMessage (p1,nullptr));
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
-    CE(helicsFederateGetState (fFed, &state,&err));
+    CE(state=helicsFederateGetState (fFed,&err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
@@ -281,11 +282,12 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     auto dFed = GetFederateAt (1);
     auto dcFed = GetFederateAt (2);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (sFed, "src", "");
-    auto p2 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "");
-    auto p3 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (sFed, "src", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "", &err);
+    auto p3 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "", &err);
 
-    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm");
+    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm", &err);
+    BOOST_CHECK (err.error_code == helics_ok);
     CE(helicsFilterAddSourceTarget (f1, "src",&err));
 
     CE(helicsFederateEnterExecutingModeAsync (sFed,&err));
@@ -294,25 +296,24 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     CE(helicsFederateEnterExecutingModeComplete (sFed,&err));
     CE(helicsFederateEnterExecutingModeComplete (dcFed,&err));
 
-    federate_state state;
-    CE(helicsFederateGetState (sFed, &state,&err));
+    CE (federate_state state=helicsFederateGetState (sFed, &err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
-    CE(helicsEndpointSendMessageRaw (p1, "dest", data.c_str (,&err), static_cast<int> (data.size ())));
+    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
 
     helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (sFed, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (dcFed, 1.0,&err));
-    CE(helicsFederateRequestTime (dFed, 1.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (sFed, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (dcFed, &timeOut,&err));
+    CE(helicsFederateRequestTime (dFed, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (sFed,&err));
+    CE(helicsFederateRequestTimeComplete (dcFed,&err));
 
-    auto res = helicsFederateHasMessage (dFed);
+    auto res = helicsFederateHasMessage (dFed,nullptr);
     BOOST_CHECK (res);
 
     if (res)
     {
-        auto m2 = helicsEndpointGetMessage (p2);
+        auto m2 = helicsEndpointGetMessage (p2,nullptr);
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "dest");
@@ -320,12 +321,12 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     }
 
     // now check the message clone
-    res = helicsFederateHasMessage (dcFed);
+    CE(res = helicsFederateHasMessage (dcFed,&err));
     BOOST_CHECK (res);
 
     if (res)
     {
-        auto m2 = helicsEndpointGetMessage (p3);
+        auto m2 = helicsEndpointGetMessage (p3,nullptr);
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "cm");
@@ -336,7 +337,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     CE(helicsFederateFinalize (sFed,&err));
     CE(helicsFederateFinalize (dFed,&err));
     CE(helicsFederateFinalize (dcFed,&err));
-    CE(helicsFederateGetState (sFed, &state,&err));
+    CE(state=helicsFederateGetState (sFed,&err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
@@ -352,12 +353,17 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     auto dFed = GetFederateAt (2);
     auto dcFed = GetFederateAt (3);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint (sFed, "src", "");
-    auto p2 = helicsFederateRegisterGlobalEndpoint (sFed2, "src2", "");
-    auto p3 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "");
-    auto p4 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "");
+    auto p1 = helicsFederateRegisterGlobalEndpoint (sFed, "src", "",&err);
+    BOOST_REQUIRE_EQUAL (err.error_code, 0);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (sFed2, "src2", "",&err);
+    BOOST_REQUIRE_EQUAL (err.error_code, 0);
+    auto p3 = helicsFederateRegisterGlobalEndpoint (dFed, "dest", "",&err);
+    BOOST_REQUIRE_EQUAL (err.error_code, 0);
+    auto p4 = helicsFederateRegisterGlobalEndpoint (dcFed, "cm", "",&err);
+    BOOST_REQUIRE_EQUAL (err.error_code, 0);
 
-    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm");
+    auto f1 = helicsFederateRegisterCloningFilter (dcFed, "cm",&err);
+    BOOST_REQUIRE_EQUAL (err.error_code, 0);
     CE(helicsFilterAddSourceTarget (f1, "src",&err));
     CE(helicsFilterAddSourceTarget (f1, "src2",&err));
 
@@ -370,40 +376,40 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE(helicsFederateEnterExecutingModeComplete (dcFed,&err));
 
     federate_state state;
-    CE(helicsFederateGetState (sFed, &state,&err));
+    CE(state=helicsFederateGetState (sFed,&err));
     BOOST_CHECK (state == helics_execution_state);
     std::string data (500, 'a');
     std::string data2 (400, 'b');
-    CE(helicsEndpointSendMessageRaw (p1, "dest", data.c_str (,&err), static_cast<int> (data.size ())));
-    CE(helicsEndpointSendMessageRaw (p2, "dest", data2.c_str (,&err), static_cast<int> (data2.size ())));
+    CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
+    CE (helicsEndpointSendMessageRaw (p2, "dest", data2.c_str (), static_cast<int> (data2.size ()), &err));
 
     helics_time_t timeOut;
     CE(helicsFederateRequestTimeAsync (sFed, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (sFed2, 1.0,&err));
     CE(helicsFederateRequestTimeAsync (dcFed, 1.0,&err));
-    CE(helicsFederateRequestTime (dFed, 1.0, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (sFed, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (sFed2, &timeOut,&err));
-    CE(helicsFederateRequestTimeComplete (dcFed, &timeOut,&err));
+    CE(helicsFederateRequestTime (dFed, 1.0,&err));
+    CE(helicsFederateRequestTimeComplete (sFed,&err));
+    CE(helicsFederateRequestTimeComplete (sFed2,&err));
+    CE(helicsFederateRequestTimeComplete (dcFed,&err));
 
-    auto mcnt = helicsEndpointPendingMessages (p3);
+    auto mcnt = helicsEndpointPendingMessages (p3,nullptr);
     BOOST_CHECK_EQUAL (mcnt, 2);
-    auto res = helicsFederateHasMessage (dFed);
+    auto res = helicsFederateHasMessage (dFed,nullptr);
     BOOST_CHECK (res);
 
     if (res)
     {
-        auto m2 = helicsEndpointGetMessage (p3);
+        auto m2 = helicsEndpointGetMessage (p3,nullptr);
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "dest");
         BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
-        res = helicsFederateHasMessage (dFed);
+        res = helicsFederateHasMessage (dFed,nullptr);
         BOOST_CHECK (res);
 
         if (res)
         {
-            m2 = helicsFederateGetMessage (dFed);
+            m2 = helicsFederateGetMessage (dFed,nullptr);
             BOOST_CHECK_EQUAL (m2.source, "src2");
             BOOST_CHECK_EQUAL (m2.original_source, "src2");
             BOOST_CHECK_EQUAL (m2.dest, "dest");
@@ -412,25 +418,25 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = helicsEndpointPendingMessages (p4);
+    mcnt = helicsEndpointPendingMessages (p4,nullptr);
     BOOST_CHECK_EQUAL (mcnt, 2);
-    res = helicsFederateHasMessage (dcFed);
+    res = helicsFederateHasMessage (dcFed,nullptr);
     BOOST_CHECK (res);
 
     if (res)
     {
-        auto m2 = helicsFederateGetMessage (dcFed);
+        auto m2 = helicsFederateGetMessage (dcFed,nullptr);
         BOOST_CHECK_EQUAL (m2.source, "src");
         BOOST_CHECK_EQUAL (m2.original_source, "src");
         BOOST_CHECK_EQUAL (m2.dest, "cm");
         BOOST_CHECK_EQUAL (m2.original_dest, "dest");
         BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
-        res = helicsFederateHasMessage (dcFed);
+        res = helicsFederateHasMessage (dcFed,nullptr);
         BOOST_CHECK (res);
 
         if (res)
         {
-            m2 = helicsFederateGetMessage (dcFed);
+            m2 = helicsFederateGetMessage (dcFed,nullptr);
             BOOST_CHECK_EQUAL (m2.source, "src2");
             BOOST_CHECK_EQUAL (m2.original_source, "src2");
             BOOST_CHECK_EQUAL (m2.dest, "cm");
@@ -443,21 +449,21 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE(helicsFederateFinalize (sFed2,&err));
     CE(helicsFederateFinalize (dFed,&err));
     CE(helicsFederateFinalize (dcFed,&err));
-    CE(helicsFederateGetState (sFed, &state,&err));
+    CE(state=helicsFederateGetState (sFed,&err));
     BOOST_CHECK (state == helics_finalize_state);
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
     std::string filename = std::string (TEST_DIR) + "/test_files/example_filters.json";
-    auto mFed = helicsCreateMessageFederateFromConfig (filename.c_str ());
+    auto mFed = helicsCreateMessageFederateFromConfig (filename.c_str (),&err);
 
     char name[HELICS_SIZE_MAX];
     CE(helicsFederateGetName (mFed, name, HELICS_SIZE_MAX,&err));
     BOOST_CHECK_EQUAL (name, "filterFed");
 
-    BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (mFed), 3);
-    helicsFederateFinalize (mFed);
+    BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (mFed,nullptr), 3);
+    helicsFederateFinalize (mFed,nullptr);
     helicsFederateFree (mFed);
     // auto id = mFed.getEndpointId ("ept1");
     // BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");

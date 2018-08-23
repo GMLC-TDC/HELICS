@@ -591,30 +591,15 @@ helics_bool_t helicsCoreIsConnected (helics_core core, helics_error *err)
     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
-void helicsBrokerGetIdentifier (helics_broker broker, char *identifier, int maxlen, helics_error *err)
+const char *helicsBrokerGetIdentifier (helics_broker broker, helics_error *err)
 {
     auto brk = getBroker (broker,err);
     if (brk == nullptr)
     {
-        return;
+        return nullstr.c_str ();
     }
-    try
-    {
-        auto &ident = brk->getIdentifier ();
-        if (static_cast<int> (ident.size ()) > maxlen)
-        {
-            strncpy (identifier, ident.c_str (), maxlen);
-            identifier[maxlen - 1] = '\0';
-        }
-        else
-        {
-            strcpy (identifier, ident.c_str ());
-        }
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    auto &ident = brk->getIdentifier ();
+    return ident.c_str ();
 }
 
 const char * helicsCoreGetIdentifier (helics_core core, helics_error *err)

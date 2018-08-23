@@ -254,6 +254,7 @@ int helicsFilterGetName (helics_filter filt, char *outputString, int maxlen, hel
     catch (...)
     {
         helicsErrorHandler (err);
+        return (-1);
     }
 }
 

@@ -35,6 +35,8 @@ class FederateInfo
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
+    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (),nullptr); }
+
     void setCoreInitString (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (),nullptr);
@@ -253,7 +255,7 @@ class Federate
     Filter registerFilter (helics_filter_type_t type,
                                  const std::string &name = std::string ())
     {
-        return Filter (helicsFederateRegisterFilter (fed, type, name.c_str ()), hThrowOnError ());
+        return Filter (helicsFederateRegisterFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
 
 
@@ -266,8 +268,8 @@ class Federate
     */
     CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
     {
-        return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str ()),
-                              hThrowOnError ());
+        return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str (),
+                              hThrowOnError ()));
     }
 
   protected:

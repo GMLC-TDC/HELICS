@@ -23,12 +23,8 @@ class Broker
 
     Broker (std::string type, std::string name, std::string initString)
     {
-        broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
-        if (broker == NULL)
-        {
-            throw(std::runtime_error("broker creation failed"));
-        }
-        if (helicsBrokerIsConnected(broker) != helics_true)
+        broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str(),hThrowOnError());
+        if (helicsBrokerIsConnected(broker,nullptr) != helics_true)
         {
             throw(std::runtime_error("broker creation failed"));
         }
@@ -36,20 +32,16 @@ class Broker
 
     Broker (std::string type, std::string name, int argc, const char **argv)
     {
-        broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
-        if (broker == NULL)
-        {
-            throw(std::runtime_error("broker creation failed"));
-        }
+        broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv,hThrowOnError());
     }
 
     Broker(const Broker &brk)
     {
-        broker = helicsBrokerClone(brk.broker);
+        broker = helicsBrokerClone(brk.broker,hThrowOnError());
     }
     Broker &operator=(const Broker &brk)
     {
-        broker = helicsBrokerClone(brk.broker);
+        broker = helicsBrokerClone(brk.broker,hThrowOnError());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
@@ -79,23 +71,21 @@ class Broker
 
     bool isConnected () const
     {
-        return helicsBrokerIsConnected (broker);
+        return helicsBrokerIsConnected (broker,nullptr);
     }
     void disconnect()
     {
-        helicsBrokerDisconnect(broker);
+        helicsBrokerDisconnect(broker,hThrowOnError());
     }
-    std::string getIdentifier() const
+    const char *getIdentifier() const
     {
-        char str[255];
-        helicsBrokerGetIdentifier(broker, &str[0], sizeof(str));
-        std::string result(str);
-        return result;
+        return helicsBrokerGetIdentifier(broker,nullptr);
     }
+
     std::string getAddress() const
     {
         char str[255];
-        helicsBrokerGetAddress(broker, &str[0], sizeof(str));
+        helicsBrokerGetAddress(broker, &str[0], sizeof(str),nullptr);
         std::string result(str);
         return result;
     }

@@ -37,61 +37,60 @@ public:
 void publish( const char *data, int len)
 {
     // returns helics_status
-    helicsPublicationPublishRaw(pub, data, len);
+    helicsPublicationPublishRaw(pub, data, len, nullptr);
 }
 
 void publish(const char *str)
 {
     // returns helics_status
-    helicsPublicationPublishString(pub,str);
+    helicsPublicationPublishString (pub, str, nullptr);
 }
 
 void publish(const std::string &str)
 {
     // returns helics_status
-    helicsPublicationPublishString(pub, str.c_str());
+    helicsPublicationPublishString(pub, str.c_str(),nullptr);
 }
 
 void publish( int64_t val)
 {
     // returns helics_status
-    helicsPublicationPublishInteger(pub, val);
+    helicsPublicationPublishInteger(pub, val,nullptr);
 }
 
 void publish( double val)
 {
     // returns helics_status
-    helicsPublicationPublishDouble(pub, val);
+    helicsPublicationPublishDouble(pub, val,nullptr);
 }
 
 void publish( std::complex<double> cmplx)
 {
-    // returns helics_status
-    helicsPublicationPublishComplex(pub, cmplx.real(), cmplx.imag());
+    helicsPublicationPublishComplex(pub, cmplx.real(), cmplx.imag(),nullptr);
 }
 
 void publish(const std::vector<double> &data)
 {
     // returns helics_status
-    helicsPublicationPublishVector(pub, data.data(), static_cast<int>(data.size() * sizeof(double)));
+    helicsPublicationPublishVector(pub, data.data(), static_cast<int>(data.size() * sizeof(double)),nullptr);
 }
 
 void publish(const std::string &name, double val)
 {
     // returns helics_status
-    helicsPublicationPublishNamedPoint(pub, name.c_str(), val);
+    helicsPublicationPublishNamedPoint(pub, name.c_str(), val,nullptr);
 }
 
 void publish(bool val)
 {
     // returns helics_status
-    helicsPublicationPublishBoolean(pub, val?helics_true:helics_false);
+    helicsPublicationPublishBoolean(pub, val?helics_true:helics_false,nullptr);
 }
 
 std::string getKey() const
 {
     char str[255];
-    helicsPublicationGetKey(pub, &str[0], sizeof(str));
+    helicsPublicationGetKey(pub, &str[0], sizeof(str),nullptr);
     std::string result(str);
     return result;
 }
@@ -100,7 +99,7 @@ std::string getKey() const
 std::string getUnits() const
 {
     char str[255];
-    helicsPublicationGetUnits(pub, &str[0], sizeof(str));
+    helicsPublicationGetUnits (pub, &str[0], sizeof (str), nullptr);
     std::string result(str);
     return result;
 }
@@ -109,7 +108,7 @@ std::string getUnits() const
 std::string getType() const
 {
     char str[255];
-    helicsPublicationGetType(pub, &str[0], sizeof(str));
+    helicsPublicationGetType (pub, &str[0], sizeof (str), nullptr);
     std::string result(str);
     return result;
 }

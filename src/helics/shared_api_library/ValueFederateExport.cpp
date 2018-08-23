@@ -527,6 +527,7 @@ int helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, helics
     catch (...)
     {
         helicsErrorHandler (err);
+        return (-1);
     }
 }
 
@@ -746,7 +747,7 @@ int helicsInputGetStringSize (helics_input inp, helics_error *err)
     }
 }
 
-int helicsInputGetVector (helics_input inp, double data[], int maxlen, int *actualSize, helics_error *err)
+int helicsInputGetVector (helics_input inp, double data[], int maxlen, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -764,17 +765,9 @@ int helicsInputGetVector (helics_input inp, double data[], int maxlen, int *actu
             auto V = inpObj->fedptr->getValue<std::vector<double>> (inpObj->id);
             int length = std::min (static_cast<int> (V.size ()), maxlen);
             std::copy (V.data (), V.data () + length, data);
-            if (actualSize != nullptr)
-            {
-                *actualSize = length;
-            }
-            return (length <= maxlen) ? helics_ok : helics_warning;
+            return length;
         }
         int length = inpObj->inputPtr->getValue (data, maxlen);
-        if (actualSize != nullptr)
-        {
-            *actualSize = length;
-        }
         return length;
     }
     catch (...)

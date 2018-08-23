@@ -26,28 +26,17 @@ class Core
 
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
-        core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str());
-        if (core == NULL)
-        {
-            throw(std::runtime_error("core creation failed"));
-        }
+        core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str(),hThrowOnError());
     }
 
     Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
-        core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv);
-        if (core == NULL)
-        {
-            throw(std::runtime_error("core creation failed"));
-        }
+        core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv,hThrowOnError());
     }
 
     ~Core ()
     {
-        if (core != NULL)
-        {
-            helicsCoreFree(core);
-        }
+        helicsCoreFree(core);
     }
     operator helics_core() { return core; }
 
@@ -58,11 +47,11 @@ class Core
 
     Core(const Core &cr)
     {
-        core = helicsCoreClone(cr.core);
+        core = helicsCoreClone(cr.core,hThrowOnError());
     }
     Core &operator=(const Core &cr)
     {
-        core = helicsCoreClone(cr.core);
+        core = helicsCoreClone (cr.core, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
@@ -79,20 +68,15 @@ class Core
     }
 #endif
     void setReadyToInit()
-    {
-        helicsCoreSetReadyToInit(core);
+    { helicsCoreSetReadyToInit (core, hThrowOnError ());
     }
     void disconnect()
-    {
-        helicsCoreDisconnect(core);
+    { helicsCoreDisconnect (core, hThrowOnError ());
     }
 
-    std::string getIdentifier() const
+    const char *getIdentifier() const
     {
-        char str[255];
-        helicsCoreGetIdentifier(core, &str[0], sizeof(str),nullptr);
-        std::string result(str);
-        return result;
+        return helicsCoreGetIdentifier(core, nullptr);
     }
 
     /** create a destination Filter on the specified federate
@@ -107,7 +91,7 @@ class Core
     Filter registerFilter(helics_filter_type_t type,
         const std::string &name = std::string())
     {
-        return Filter(helicsCoreRegisterFilter(core, type, name.c_str()));
+        return Filter (helicsCoreRegisterFilter (core, type, name.c_str (), hThrowOnError ()));
     }
 
     /** create a cloning Filter on the specified federate
@@ -119,7 +103,7 @@ class Core
     */
     CloningFilter registerCloningFilter( const std::string &deliveryEndpoint)
     {
-        return CloningFilter(helicsCoreRegisterCloningFilter(core, deliveryEndpoint.c_str()));
+        return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
 
   protected:

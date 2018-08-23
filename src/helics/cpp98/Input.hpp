@@ -37,68 +37,67 @@ public:
     void setDefaultValue( const char *data, int len)
     {
         // returns helics_status
-        helicsInputSetDefaultRaw(inp, data, len);
+        helicsInputSetDefaultRaw (inp, data, len, nullptr);
     }
 
     void setDefaultValue( const std::string &str)
     {
         // returns helics_status
-        helicsInputSetDefaultString(inp, str.c_str());
+        helicsInputSetDefaultString (inp, str.c_str (), nullptr);
     }
 
     void setDefaultValue( int64_t val)
     {
         // returns helics_status
-        helicsInputSetDefaultInteger(inp, val);
+        helicsInputSetDefaultInteger (inp, val, nullptr);
     }
 
     void setDefaultValue(bool val)
     {
         // returns helics_status
-        helicsInputSetDefaultBoolean(inp, val?helics_true:helics_false);
+        helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, nullptr);
     }
 
     void setDefaultValue( double val)
     {
         // returns helics_status
-        helicsInputSetDefaultDouble(inp, val);
+        helicsInputSetDefaultDouble (inp, val, nullptr);
     }
 
     void setDefaultValue( const std::complex<double> &cmplx)
     {
         // returns helics_status
-        helicsInputSetDefaultComplex(inp, cmplx.real(), cmplx.imag());
+        helicsInputSetDefaultComplex (inp, cmplx.real (), cmplx.imag (), nullptr);
     }
 
     void setDefaultValue( const std::vector<double> &data)
     {
         // returns helics_status
-        helicsInputSetDefaultVector(inp, data.data(), static_cast<int>(data.size() * sizeof(double)));
+        helicsInputSetDefaultVector (inp, data.data (), static_cast<int> (data.size () * sizeof (double)),
+                                     nullptr);
     }
 
     /** Methods to get subscription values **/
     int getRawValue( std::vector<char> &data)
     {
-        int size = helicsInputGetRawValueSize(inp);
+        int size = helicsInputGetRawValueSize (inp, nullptr);
         data.resize(size);
         int actualSize;
-        helicsInputGetRawValue(inp, data.data(), static_cast<int>(data.size()), &actualSize);
-        return actualSize;
+        return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), nullptr);
     }
 
     int getRawValueSize()
-    {
-        return helicsInputGetRawValueSize(inp);
+    { return helicsInputGetRawValueSize (inp, nullptr);
     }
 
     std::string getString()
     {
-        int size = helicsInputGetStringSize(inp);
+        int size = helicsInputGetStringSize (inp, nullptr);
         std::string result;
 
         result.resize(size+1);
         //this function results in a null terminated string
-        helicsInputGetString(inp, &result[0], size+1, &size);
+        size = helicsInputGetString (inp, &result[0], size + 1, nullptr);
         if (!(result.empty())&&(result[size-1] == '\0'))
         {
             result.resize(size - 1);
@@ -112,69 +111,63 @@ public:
 
     void getNamedPoint(std::string &name,double *val)
     {
-        int size = helicsInputGetStringSize(inp);
+        int size = helicsInputGetStringSize (inp, nullptr);
 
         name.resize(size + 1);
         //this function results in a null terminated string
-        helicsInputGetNamedPoint(inp, &name[0], size + 1, &size,val);
+        size=helicsInputGetNamedPoint (inp, &name[0], size + 1, val, nullptr);
         name.resize(size);
     }
 
     int64_t getInteger()
     {
-        int64_t val;
-        helicsInputGetInteger(inp, &val);
-        return val;
+        return helicsInputGetInteger(inp,nullptr);
+
     }
 
 
     bool getBoolean()
     {
-        helics_bool_t val;
-        helicsInputGetBoolean(inp, &val);
+        helics_bool_t val=helicsInputGetBoolean(inp, nullptr);
         return (val==helics_true);
     }
 
     double getDouble()
     {
-        double val;
-        helicsInputGetDouble(inp, &val);
-        return val;
+        return helicsInputGetDouble(inp, nullptr);
     }
 
     std::complex<double> getComplex()
     {
         double real;
         double imag;
-        helicsInputGetComplex(inp, &real, &imag);
+        helicsInputGetComplex(inp, &real, &imag,nullptr);
         std::complex<double> result(real, imag);
         return result;
     }
 
     int getVector( double *data, int maxlen)
     {
-        int actualSize;
-        helicsInputGetVector(inp, data, maxlen, &actualSize);
-        return actualSize;
+        return helicsInputGetVector(inp, data, maxlen, hThrowOnError());
     }
 
     void getVector( std::vector<double> &data)
     {
-        int actualSize = helicsInputGetVectorSize(inp);
+        int actualSize = helicsInputGetVectorSize(inp,nullptr);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize, &actualSize);
+        helicsInputGetVector(inp, data.data(), actualSize,nullptr);
     }
 
     /** Check if a subscription is updated **/
     bool isUpdated() const
     {
-        return helicsInputIsUpdated(inp) > 0;
+        return helicsInputIsUpdated(inp,nullptr) > 0;
     }
 
     /** Get the last time a subscription was updated **/
     helics_time_t getLastUpdateTime() const
     {
-        return helicsInputLastUpdateTime(inp);
+        return helicsInputLastUpdateTime(inp,hThrowOnError());
     }
 
     // call helicsInputIsUpdated for each inp
@@ -182,7 +175,7 @@ public:
     std::string getKey() const
     {
         char str[255];
-        helicsInputGetKey(inp, &str[0], sizeof(str));
+        helicsInputGetKey(inp, &str[0], sizeof(str),nullptr);
         std::string result(str);
         return result;
     }
@@ -191,7 +184,7 @@ public:
     std::string getUnits() const
     {
         char str[255];
-        helicsInputGetUnits(inp, &str[0], sizeof(str));
+        helicsInputGetUnits(inp, &str[0], sizeof(str),nullptr);
         std::string result(str);
         return result;
     }
@@ -199,7 +192,7 @@ public:
     std::string getType() const
     {
         char str[255];
-        helicsInputGetType(inp, &str[0], sizeof(str));
+        helicsInputGetType(inp, &str[0], sizeof(str),nullptr);
         std::string result(str);
         return result;
     }

@@ -25,18 +25,19 @@ BOOST_AUTO_TEST_CASE (test_bad_fed)
     // register the publications
 
     CE(helicsFederateEnterInitializingMode(vFed1,&err));
-    auto status = helicsFederateEnterInitializingMode (vFed2);
-    BOOST_CHECK_EQUAL (status, helics_invalid_object);
+    helicsFederateEnterInitializingMode (vFed2,&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
+    helicsErrorClear (&err);
    // auto core = helicsFederateGetCoreObject(vFed1);
 
     CE(helicsFederateFinalize(vFed1,&err));
-    status=helicsFederateFinalize(vFed2);
-    BOOST_CHECK_EQUAL (status, helics_invalid_object);
+    helicsFederateFinalize(vFed2,&err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
 
 	helicsFederateFree (vFed1);
-    helics_time_t gtime;
-    status = helicsFederateGetCurrentTime (vFed1, &gtime);
-    BOOST_CHECK_EQUAL (status, helics_invalid_object);
+    helicsFederateGetCurrentTime (vFed1, &err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
+    helicsErrorClear (&err);
 	//just make sure this doesn't crash
     helicsFederateFree (vFed1);
 	//and make sure this doesn't crash

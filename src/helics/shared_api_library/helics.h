@@ -98,19 +98,15 @@ HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core, helics_erro
 
 /** get an identifier for the broker
 @param broker the broker to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
-HELICS_EXPORT void helicsBrokerGetIdentifier (helics_broker broker, char *identifier, int maxlen, helics_error *err);
+HELICS_EXPORT const char *helicsBrokerGetIdentifier (helics_broker broker, helics_error *err);
 
 /** get an identifier for the core
 @param core the core to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
-HELICS_EXPORT void helicsCoreGetIdentifier (helics_core core, char *identifier, int maxlen, helics_error *err);
+HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core, helics_error *err);
 
 /** get the network address associated with a broker
 @param broker the broker to query

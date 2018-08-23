@@ -19,12 +19,12 @@ class MessageFederate : public virtual Federate
   public:
     explicit MessageFederate (const std::string &fedName, FederateInfo &fi)
     {
-        fed = helicsCreateMessageFederate (fedName.c_str(),fi.getInfo ());
+        fed = helicsCreateMessageFederate (fedName.c_str(),fi.getInfo (),hThrowOnError());
     }
 
     explicit MessageFederate (const std::string &configString)
     {
-        fed = helicsCreateMessageFederateFromConfig (configString.c_str());
+        fed = helicsCreateMessageFederateFromConfig (configString.c_str (), hThrowOnError ());
     }
 
     // Default constructor, not meant to be used
@@ -33,14 +33,15 @@ class MessageFederate : public virtual Federate
     /** Methods for registering endpoints **/
     Endpoint registerEndpoint (const std::string &name, const std::string &type = "")
     {
-        helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str(), type.c_str());
+        helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
         local_endpoints.push_back(ep);
         return Endpoint(ep);
     }
 
     Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = "")
     {
-        helics_endpoint ep = helicsFederateRegisterGlobalEndpoint (fed, name.c_str(), type.c_str());
+        helics_endpoint ep =
+          helicsFederateRegisterGlobalEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
         local_endpoints.push_back(ep);
         return Endpoint(ep);
     }
@@ -49,19 +50,19 @@ class MessageFederate : public virtual Federate
     bool hasMessage () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateHasMessage (fed) > 0;
+        return helicsFederateHasMessage (fed,nullptr) > 0;
     }
 
     /** Returns the number of pending receives for all endpoints. **/
     uint64_t pendingMessages () const
     {
-        return helicsFederatePendingMessages(fed);
+        return helicsFederatePendingMessages(fed,nullptr);
     }
 
     /** Get a packet for any endpoints in the federate **/
     message_t getMessage ()
     {
-        return helicsFederateGetMessage (fed);
+        return helicsFederateGetMessage (fed,nullptr);
     }
 
   private:

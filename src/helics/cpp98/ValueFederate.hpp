@@ -36,7 +36,7 @@ private:
 
     explicit ValueFederate (const std::string &fedname,FederateInfo &fi)
     {
-        fed = helicsCreateValueFederate (fedname.c_str(),fi.getInfo());
+        fed = helicsCreateValueFederate (fedname.c_str(),fi.getInfo(),hThrowOnError());
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr constructor"));
@@ -45,7 +45,7 @@ private:
 
     explicit ValueFederate (const std::string &configString)
     {
-        fed = helicsCreateValueFederateFromConfig(configString.c_str());
+        fed = helicsCreateValueFederateFromConfig(configString.c_str(),hThrowOnError());
         if (fed == NULL)
         {
             throw(std::runtime_error("fed==nullptr create from configuration file"));
@@ -94,11 +94,7 @@ private:
     Publication
     registerTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        if (fed == NULL)
-        {
-            throw(std::runtime_error("fed==nullptr reg pub"));
-        }
-        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type.c_str(), units.c_str(),hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
     }
@@ -106,7 +102,7 @@ private:
     Publication
     registerPublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type, units.c_str(),hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
     }
@@ -114,7 +110,7 @@ private:
     Publication
     registerGlobalTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type.c_str(), units.c_str());
+        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type.c_str(), units.c_str(),hThrowOnError());
         pubs.push_back(pub);
         return Publication(pub);
     }
@@ -122,7 +118,8 @@ private:
     Publication
     registerGlobalPublication (const std::string &name, int type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalPublication (fed, name.c_str(), type, units.c_str());
+        helics_publication pub =
+          helicsFederateRegisterGlobalPublication (fed, name.c_str (), type, units.c_str (), hThrowOnError ());
         pubs.push_back(pub);
         return Publication(pub);
     }
@@ -145,7 +142,7 @@ private:
     Input
     registerSubscription (const std::string &name,  const std::string &units = "")
     {
-        helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), units.c_str());
+        helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), units.c_str(),hThrowOnError());
         ipts.push_back(sub);
         return Input(sub);
     }
@@ -169,12 +166,12 @@ private:
 
     int getInputCount() const
     {
-        return helicsFederateGetInputCount(fed);
+        return helicsFederateGetInputCount(fed,nullptr);
     }
 
     int getPublicationCount() const
     {
-        return helicsFederateGetPublicationCount(fed);
+        return helicsFederateGetPublicationCount(fed,nullptr);
     }
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
