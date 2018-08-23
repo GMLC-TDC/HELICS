@@ -58,6 +58,7 @@ enum class action_t : int32_t
     cmd_tick = 1,  //!< command for a timer tick
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
+	cmd_disconnect_check = 5, //!< check for a disconnect
     cmd_ping = 6,  //!< request for an Echo response
     cmd_ping_reply = 7,  //!< response to a ping request
 
@@ -143,6 +144,7 @@ enum class action_t : int32_t
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
+#define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 

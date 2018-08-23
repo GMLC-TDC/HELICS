@@ -23,8 +23,9 @@ namespace helics
 {
 void cleanupHelicsLibrary ()
 {
-    BrokerFactory::cleanUpBrokers (200);
+    BrokerFactory::cleanUpBrokers (100);
     CoreFactory::cleanUpCores (200);
+    BrokerFactory::cleanUpBrokers (100);
 }
 
 Federate::Federate (const FederateInfo &fi) : Federate (fi.name, fi) {}

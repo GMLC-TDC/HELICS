@@ -38,6 +38,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 const std::string core_types[] = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
 
+const std::string core_types_2[] = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};
+
 const std::string core_types_simple[] = {"test", "ipc", TCPTEST ZMQTEST "udp"};
 const std::string core_types_single[] = {"test", "ipc", TCPTEST ZMQTEST "udp", "test_3",
                                          ZMQTEST3 TCPTEST3 "udp_3"};

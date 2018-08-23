@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../flag-definitions.h"
 #include <algorithm>
 #include "../common/fmt_format.h"
-
+#include <set>
 namespace helics
 {
 void ForwardingTimeCoordinator::enteringExecMode ()
@@ -21,6 +21,38 @@ void ForwardingTimeCoordinator::enteringExecMode ()
     ActionMessage execreq (CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
     transmitTimingMessage (execreq);
+}
+
+void ForwardingTimeCoordinator::disconnect ()
+{
+	if (sendMessageFunction)
+	{
+        ActionMessage bye (CMD_DISCONNECT);
+        bye.source_id = source_id;
+        std::set<Core::federate_id_t> connections (dependents.begin (), dependents.end ());
+        for (auto dep : dependencies)
+        {
+			if (dep.Tnext < Time::maxVal())
+			{
+                connections.insert (dep.fedID);
+			}
+            
+        }
+		for (auto fed : connections)
+		{
+            bye.dest_id = fed;
+			if (fed == source_id)
+			{
+                processTimeMessage (bye);
+			}
+			else
+			{
+                sendMessageFunction (bye);
+			}
+           
+		}
+	}
+    
 }
 
 static inline bool isBroker (Core::federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
@@ -402,6 +434,10 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
+	if (cmd.action() == CMD_DISCONNECT)
+	{
+        removeDependent (cmd.source_id);
+	}
     return dependencies.updateTime (cmd);
 }
 

@@ -517,7 +517,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             auto brk = _brokers.find (command.payload);
             if (brk != _brokers.end ())
             {
-                brk->_disconnected = true;
+                command.source_id = brk->global_id;
             }
         }
         FALLTHROUGH
@@ -531,8 +531,29 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 brk->_disconnected = true;
             }
+			if (hasTimeDependency)
+			{
+                if (!enteredExecutionMode)
+                {
+                    timeCoord->processTimeMessage (command);
+                    auto res = timeCoord->checkExecEntry ();
+                    if (res == message_processing_result::next_step)
+                    {
+                        enteredExecutionMode = true;
+                    }
+                }
+                else
+                {
+                    if (timeCoord->processTimeMessage (command))
+                    {
+                        timeCoord->updateTimeFactors ();
+                    }
+                }
+			}
+            
             if (allDisconnected ())
             {
+                timeCoord->disconnect ();
                 if (!_isRoot)
                 {
                     ActionMessage dis (CMD_DISCONNECT);
@@ -549,11 +570,15 @@ void CoreBroker::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_STOP:
-        if ((!allDisconnected ()) && (!_isRoot))
-        {  // only send a disconnect message if we haven't done so already
-            ActionMessage m (CMD_DISCONNECT);
-            m.source_id = global_broker_id;
-            transmit (0, m);
+        if (!allDisconnected ())
+        {// only send a disconnect message if we haven't done so already
+            timeCoord->disconnect ();
+            if (!_isRoot)
+            {  
+                ActionMessage m (CMD_DISCONNECT);
+                m.source_id = global_broker_id;
+                transmit (0, m);
+            }
         }
         break;
     case CMD_EXEC_REQUEST:

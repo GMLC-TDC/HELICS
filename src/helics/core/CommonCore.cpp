@@ -110,6 +110,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         if (brokerState < broker_state_t::terminating)
         {
             brokerState = broker_state_t::terminating;
+            timeCoord->disconnect ();
             if (global_broker_id != 0)
             {
                 ActionMessage dis (CMD_DISCONNECT);
@@ -311,7 +312,8 @@ bool CommonCore::allDisconnected () const
         auto state = fed->getState ();
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
-    return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    auto afed= std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    return (afed) && (!timeCoord->hasActiveTimeDependencies ());
 }
 
 void CommonCore::setCoreReadyToInit ()
@@ -2120,14 +2122,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         addRoute (command.dest_handle, command.payload);
         break;
     case CMD_PRIORITY_DISCONNECT:
-        if (allDisconnected ())
-        {
-            brokerState = broker_state_t::terminating;
-            ActionMessage dis (CMD_DISCONNECT);
-            dis.source_id = global_broker_id;
-            transmit (0, dis);
-            addActionMessage (CMD_STOP);
-        }
+        checkDisconnect ();
         break;
     case CMD_BROKER_QUERY:
         if (command.dest_id == global_broker_id)
@@ -2304,10 +2299,13 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_STOP:
+       
         if (isConnected ())
         {
-            if (!allDisconnected ())
+            if (brokerState<broker_state_t::terminating)
             {  // only send a disconnect message if we haven't done so already
+                brokerState = broker_state_t::terminating;
+                timeCoord->disconnect ();
                 ActionMessage m (CMD_DISCONNECT);
                 m.source_id = global_broker_id;
                 transmit (0, m);
@@ -2374,20 +2372,16 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == 0)
         {
-            if (allDisconnected ())
-            {
-                brokerState = broker_state_t::terminated;
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
-                addActionMessage (CMD_STOP);
-            }
+            checkDisconnect ();
         }
         else
         {
             routeMessage (command);
         }
 
+        break;
+    case CMD_DISCONNECT_CHECK:
+        checkDisconnect ();
         break;
     case CMD_SEARCH_DEPENDENCY:
     {
@@ -3118,14 +3112,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         }
         if (cmd.action () == CMD_DISCONNECT)
         {
-            if (allDisconnected ())
-            {
-                brokerState = broker_state_t::terminated;
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
-                addActionMessage (CMD_STOP);
-            }
+            checkDisconnect ();
         }
     }
     else if (isDependencyCommand (cmd))
@@ -3137,6 +3124,20 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         LOG_WARNING (global_broker_id, "core", "dropping message:" + prettyPrintString (cmd));
     }
 }
+
+
+void CommonCore::checkDisconnect()
+{
+    if (allDisconnected ())
+    {
+        brokerState = broker_state_t::terminating;
+        timeCoord->disconnect ();
+        ActionMessage dis (CMD_DISCONNECT);
+        dis.source_id = global_broker_id;
+        transmit (0, dis);
+        addActionMessage (CMD_STOP);
+    }
+ }
 
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {

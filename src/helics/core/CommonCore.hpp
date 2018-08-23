@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -373,6 +372,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
+    /** check for a disconnect and take actions if the object can disconnect*/
+    void checkDisconnect ();
 };
 
 }  // namespace helics
