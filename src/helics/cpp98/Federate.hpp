@@ -35,11 +35,11 @@ class FederateInfo
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
-    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (),nullptr); }
+    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (),NULL); }
 
     void setCoreInitString (const std::string &coreInit)
     {
-        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (),nullptr);
+        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (),NULL);
     }
 
     void setCoreTypeFromString (const std::string &coretype)
@@ -47,14 +47,14 @@ class FederateInfo
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
 
-    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype,nullptr); }
+    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype,NULL); }
 
-    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value,nullptr); }
+    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value,NULL); }
 
-    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue,nullptr); }
+    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue,NULL); }
 
     
-    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue,nullptr); }
+    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue,NULL); }
 
     helics_federate_info_t getInfo () { return fi; }
 
@@ -127,7 +127,7 @@ class Federate
 
     federate_state getState() const
     {
-        return helicsFederateGetState(fed, nullptr);
+        return helicsFederateGetState(fed, NULL);
     }
 
     void enterInitializingMode ()
@@ -141,7 +141,7 @@ class Federate
     bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateIsAsyncOperationCompleted (fed,nullptr) > 0;
+        return helicsFederateIsAsyncOperationCompleted (fed,NULL) > 0;
     }
 
     void enterInitializingModeComplete ()
@@ -229,7 +229,7 @@ class Federate
     std::string getName () const
     {
         char str[255];
-        helicsFederateGetName (fed, &str[0], sizeof (str),nullptr);
+        helicsFederateGetName (fed, &str[0], sizeof (str),NULL);
         std::string result (str);
         return result;
     }

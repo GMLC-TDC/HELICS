@@ -35,7 +35,7 @@ class Filter
     std::string getTarget () const
     {
         char str[255];
-        helicsFilterGetTarget (filt, &str[0], sizeof (str), nullptr);
+        helicsFilterGetTarget (filt, &str[0], sizeof (str), NULL);
         std::string result (str);
         return result;
     }
@@ -43,7 +43,7 @@ class Filter
     std::string getName () const
     {
         char str[255];
-        helicsFilterGetName (filt, &str[0], sizeof (str),nullptr);
+        helicsFilterGetName (filt, &str[0], sizeof (str),NULL);
         std::string result (str);
         return result;
     }

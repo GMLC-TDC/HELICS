@@ -22,4 +22,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_HAS_RVALUE_REFS
 #endif
 
+//  Detect whether the compiler supports C++11.
+#if __cplusplus > 199711L
+#define THROWS_EXCEPTION noexcept (false)
+#elif defined(_MSC_VER) && (_MSC_VER >= 1900)
+#define THROWS_EXCEPTION noexcept (false)
+#else
+#define THROWS_EXCEPTION throws (...)
+#endif
 #endif

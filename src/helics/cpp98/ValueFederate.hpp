@@ -39,7 +39,7 @@ private:
         fed = helicsCreateValueFederate (fedname.c_str(),fi.getInfo(),hThrowOnError());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr constructor"));
+            throw(std::runtime_error("fed==NULL constructor"));
         }
     }
 
@@ -48,7 +48,7 @@ private:
         fed = helicsCreateValueFederateFromConfig(configString.c_str(),hThrowOnError());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr create from configuration file"));
+            throw(std::runtime_error("fed==NULL create from configuration file"));
         }
     }
 
@@ -62,7 +62,7 @@ private:
         pubs = fedObj.pubs;
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr assignment"));
+            throw(std::runtime_error("fed==NULL assignment"));
         }
         return *this;
     }
@@ -72,7 +72,7 @@ private:
         Federate::operator=(std::move(fedObj));
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr move constructor"));
+            throw(std::runtime_error("fed==NULL move constructor"));
         }
     }
     ValueFederate &operator=(ValueFederate &&fedObj)
@@ -82,7 +82,7 @@ private:
         Federate::operator=(std::move(fedObj));
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr move assignment"));
+            throw(std::runtime_error("fed==NULL move assignment"));
         }
         return *this;
     }
@@ -166,12 +166,12 @@ private:
 
     int getInputCount() const
     {
-        return helicsFederateGetInputCount(fed,nullptr);
+        return helicsFederateGetInputCount(fed,NULL);
     }
 
     int getPublicationCount() const
     {
-        return helicsFederateGetPublicationCount(fed,nullptr);
+        return helicsFederateGetPublicationCount(fed,NULL);
     }
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/

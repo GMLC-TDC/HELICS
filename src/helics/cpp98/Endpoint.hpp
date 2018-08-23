@@ -36,19 +36,19 @@ public:
     bool hasMessage() const
     {
         // returns int, 1 = true, 0 = false
-        return helicsEndpointHasMessage(ep,nullptr) > 0;
+        return helicsEndpointHasMessage(ep,NULL) > 0;
     }
 
     /** Returns the number of pending receives for endpoint **/
     uint64_t pendingMessages() const
     {
-        return helicsEndpointPendingMessages(ep,nullptr);
+        return helicsEndpointPendingMessages(ep,NULL);
     }
 
     /** Get a packet from an endpoint **/
     message_t getMessage()
     {
-        return helicsEndpointGetMessage(ep,nullptr);
+        return helicsEndpointGetMessage(ep,NULL);
     }
 
 
@@ -97,7 +97,7 @@ public:
     std::string getName() const
     {
         char str[255];
-        helicsEndpointGetName(ep, &str[0], sizeof(str),nullptr);
+        helicsEndpointGetName(ep, &str[0], sizeof(str),NULL);
         std::string result(str);
         return result;
     }
@@ -105,7 +105,7 @@ public:
     std::string getType()
     {
         char str[255];
-        helicsEndpointGetType(ep, &str[0], sizeof(str),nullptr);
+        helicsEndpointGetType(ep, &str[0], sizeof(str),NULL);
         std::string result(str);
         return result;
     }

@@ -29,7 +29,7 @@ class hThrowOnError
 {
   public:
     hThrowOnError () : eObj (helicsErrorInitialize ()) {}
-    ~hThrowOnError () noexcept (false)
+    ~hThrowOnError () THROWS_EXCEPTION
     {
         if (eObj.error_code != 0)
         {

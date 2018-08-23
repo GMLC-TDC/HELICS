@@ -10,6 +10,7 @@ set(
   CombinationFederate.hpp
   Federate.hpp
   MessageFederate.hpp
+  helicsExceptions.hpp
   ValueFederate.hpp
   helics.hpp
   Publication.hpp

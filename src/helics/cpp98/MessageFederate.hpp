@@ -50,19 +50,19 @@ class MessageFederate : public virtual Federate
     bool hasMessage () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateHasMessage (fed,nullptr) > 0;
+        return helicsFederateHasMessage (fed,NULL) > 0;
     }
 
     /** Returns the number of pending receives for all endpoints. **/
     uint64_t pendingMessages () const
     {
-        return helicsFederatePendingMessages(fed,nullptr);
+        return helicsFederatePendingMessages(fed,NULL);
     }
 
     /** Get a packet for any endpoints in the federate **/
     message_t getMessage ()
     {
-        return helicsFederateGetMessage (fed,nullptr);
+        return helicsFederateGetMessage (fed,NULL);
     }
 
   private:

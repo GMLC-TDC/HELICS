@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../cpp98/Filter.hpp"
 #include <exception>
 
-#define HELICS_IGNORE_ERROR nullptr
+#define HELICS_IGNORE_ERROR NULL
 namespace helicscpp
 {
 
@@ -76,7 +76,7 @@ class Core
 
     const char *getIdentifier() const
     {
-        return helicsCoreGetIdentifier(core, nullptr);
+        return helicsCoreGetIdentifier(core, NULL);
     }
 
     /** create a destination Filter on the specified federate

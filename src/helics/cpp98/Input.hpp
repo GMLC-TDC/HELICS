@@ -37,67 +37,67 @@ public:
     void setDefaultValue( const char *data, int len)
     {
         // returns helics_status
-        helicsInputSetDefaultRaw (inp, data, len, nullptr);
+        helicsInputSetDefaultRaw (inp, data, len, NULL);
     }
 
     void setDefaultValue( const std::string &str)
     {
         // returns helics_status
-        helicsInputSetDefaultString (inp, str.c_str (), nullptr);
+        helicsInputSetDefaultString (inp, str.c_str (), NULL);
     }
 
     void setDefaultValue( int64_t val)
     {
         // returns helics_status
-        helicsInputSetDefaultInteger (inp, val, nullptr);
+        helicsInputSetDefaultInteger (inp, val, NULL);
     }
 
     void setDefaultValue(bool val)
     {
         // returns helics_status
-        helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, nullptr);
+        helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, NULL);
     }
 
     void setDefaultValue( double val)
     {
         // returns helics_status
-        helicsInputSetDefaultDouble (inp, val, nullptr);
+        helicsInputSetDefaultDouble (inp, val, NULL);
     }
 
     void setDefaultValue( const std::complex<double> &cmplx)
     {
         // returns helics_status
-        helicsInputSetDefaultComplex (inp, cmplx.real (), cmplx.imag (), nullptr);
+        helicsInputSetDefaultComplex (inp, cmplx.real (), cmplx.imag (), NULL);
     }
 
     void setDefaultValue( const std::vector<double> &data)
     {
         // returns helics_status
         helicsInputSetDefaultVector (inp, data.data (), static_cast<int> (data.size () * sizeof (double)),
-                                     nullptr);
+                                     NULL);
     }
 
     /** Methods to get subscription values **/
     int getRawValue( std::vector<char> &data)
     {
-        int size = helicsInputGetRawValueSize (inp, nullptr);
+        int size = helicsInputGetRawValueSize (inp, NULL);
         data.resize(size);
         int actualSize;
-        return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), nullptr);
+        return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), NULL);
     }
 
     int getRawValueSize()
-    { return helicsInputGetRawValueSize (inp, nullptr);
+    { return helicsInputGetRawValueSize (inp, NULL);
     }
 
     std::string getString()
     {
-        int size = helicsInputGetStringSize (inp, nullptr);
+        int size = helicsInputGetStringSize (inp, NULL);
         std::string result;
 
         result.resize(size+1);
         //this function results in a null terminated string
-        size = helicsInputGetString (inp, &result[0], size + 1, nullptr);
+        size = helicsInputGetString (inp, &result[0], size + 1, NULL);
         if (!(result.empty())&&(result[size-1] == '\0'))
         {
             result.resize(size - 1);
@@ -111,37 +111,37 @@ public:
 
     void getNamedPoint(std::string &name,double *val)
     {
-        int size = helicsInputGetStringSize (inp, nullptr);
+        int size = helicsInputGetStringSize (inp, NULL);
 
         name.resize(size + 1);
         //this function results in a null terminated string
-        size=helicsInputGetNamedPoint (inp, &name[0], size + 1, val, nullptr);
+        size=helicsInputGetNamedPoint (inp, &name[0], size + 1, val, NULL);
         name.resize(size);
     }
 
     int64_t getInteger()
     {
-        return helicsInputGetInteger(inp,nullptr);
+        return helicsInputGetInteger(inp,NULL);
 
     }
 
 
     bool getBoolean()
     {
-        helics_bool_t val=helicsInputGetBoolean(inp, nullptr);
+        helics_bool_t val=helicsInputGetBoolean(inp, NULL);
         return (val==helics_true);
     }
 
     double getDouble()
     {
-        return helicsInputGetDouble(inp, nullptr);
+        return helicsInputGetDouble(inp, NULL);
     }
 
     std::complex<double> getComplex()
     {
         double real;
         double imag;
-        helicsInputGetComplex(inp, &real, &imag,nullptr);
+        helicsInputGetComplex(inp, &real, &imag,NULL);
         std::complex<double> result(real, imag);
         return result;
     }
@@ -153,15 +153,15 @@ public:
 
     void getVector( std::vector<double> &data)
     {
-        int actualSize = helicsInputGetVectorSize(inp,nullptr);
+        int actualSize = helicsInputGetVectorSize(inp,NULL);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize,nullptr);
+        helicsInputGetVector(inp, data.data(), actualSize,NULL);
     }
 
     /** Check if a subscription is updated **/
     bool isUpdated() const
     {
-        return helicsInputIsUpdated(inp,nullptr) > 0;
+        return helicsInputIsUpdated(inp,NULL) > 0;
     }
 
     /** Get the last time a subscription was updated **/
@@ -175,7 +175,7 @@ public:
     std::string getKey() const
     {
         char str[255];
-        helicsInputGetKey(inp, &str[0], sizeof(str),nullptr);
+        helicsInputGetKey(inp, &str[0], sizeof(str),NULL);
         std::string result(str);
         return result;
     }
@@ -184,7 +184,7 @@ public:
     std::string getUnits() const
     {
         char str[255];
-        helicsInputGetUnits(inp, &str[0], sizeof(str),nullptr);
+        helicsInputGetUnits(inp, &str[0], sizeof(str),NULL);
         std::string result(str);
         return result;
     }
@@ -192,7 +192,7 @@ public:
     std::string getType() const
     {
         char str[255];
-        helicsInputGetType(inp, &str[0], sizeof(str),nullptr);
+        helicsInputGetType(inp, &str[0], sizeof(str),NULL);
         std::string result(str);
         return result;
     }
