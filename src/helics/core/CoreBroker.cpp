@@ -364,6 +364,29 @@ void CoreBroker::transmitDelayedMessages ()
     }
 }
 
+void CoreBroker::sendDisconnect()
+{ 
+	ActionMessage bye (CMD_DISCONNECT);
+    bye.source_id = global_broker_id;
+    for (auto &brk : _brokers)
+    {
+        if (!brk._nonLocal)
+        {
+            routeMessage (bye, brk.global_id);
+            brk._disconnected = true;
+        }
+		if (hasTimeDependency)
+		{
+            timeCoord->removeDependency (brk.global_id);
+            timeCoord->removeDependent (brk.global_id);
+		}
+    }
+	if (hasTimeDependency)
+	{
+        timeCoord->disconnect ();
+	}
+}
+
 void CoreBroker::sendErrorToImmediateBrokers(int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
@@ -526,6 +549,16 @@ void CoreBroker::processCommand (ActionMessage &&command)
     {
         if ((command.dest_id == 0) || (command.dest_id == global_broker_id))
         {
+			if (!isRoot())
+			{
+                if (command.source_id == higher_broker_id)
+                {
+                    sendDisconnect ();
+                    addActionMessage (CMD_STOP);
+                    return;
+                }
+			}
+			
             auto brk = getBrokerById (command.source_id);
             if (brk != nullptr)
             {
@@ -569,6 +602,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
     }
     break;
+    case CMD_USER_DISCONNECT:
+        sendDisconnect ();
+        addActionMessage (CMD_STOP);
+        break;
     case CMD_STOP:
         if (!allDisconnected ())
         {// only send a disconnect message if we haven't done so already
@@ -726,6 +763,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
         else
         {
             timeCoord->processDependencyUpdateMessage (command);
+			if (!hasTimeDependency)
+			{
+                hasTimeDependency = true;
+			}
         }
         break;
     default:
@@ -989,22 +1030,51 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::waitForDisconnect () const
+void CoreBroker::waitForDisconnect (int msToWait) const
 {
-    // TODO:: this should really be a future that gets triggered when isConnected changes
-    bool sleep_toggle = false;
-    while (isConnected ())
-    {
-        if (!sleep_toggle)
+	if (msToWait <= 0)
+	{
+        // TODO:: this should really be a future that gets triggered when isConnected changes
+        bool sleep_toggle = false;
+        while (isConnected ())
         {
-            std::this_thread::yield ();
+            if (!sleep_toggle)
+            {
+                std::this_thread::yield ();
+            }
+            else
+            {
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
+            }
+            sleep_toggle = !sleep_toggle;
         }
-        else
+	}
+	else
+	{
+   
+        while (isConnected ())
         {
-            std::this_thread::sleep_for (std::chrono::milliseconds (200));
+            if (msToWait>100)
+            {
+				std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                msToWait -= 100;
+            }
+			else if (msToWait > 10)
+			{
+                std::this_thread::sleep_for (std::chrono::milliseconds (msToWait));
+                msToWait=0;
+			}
+			else if (msToWait > 0)
+			{
+                std::this_thread::yield ();
+                msToWait = 0;
+			}
+			else
+			{
+                return;
+			}
         }
-        sleep_toggle = !sleep_toggle;
-    }
+	}
 }
 
 void CoreBroker::processDisconnect (bool skipUnregister)
@@ -1044,7 +1114,11 @@ void CoreBroker::unregister ()
     }
 }
 
-void CoreBroker::disconnect () { processDisconnect (); }
+void CoreBroker::disconnect () { 
+	ActionMessage udisconnect (CMD_USER_DISCONNECT);
+    addActionMessage (udisconnect);
+    waitForDisconnect ();
+}
 
 void CoreBroker::routeMessage (ActionMessage &cmd, Core::federate_id_t dest)
 {

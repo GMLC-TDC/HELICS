@@ -1,5 +1,5 @@
 /// Json-cpp amalgamated source (http://jsoncpp.sourceforge.net/).
-/// It is intended to be used with #include "json/json.h"
+/// It is intended to be used with #include "JSON/JSON.h"
 
 // //////////////////////////////////////////////////////////////////////
 // Beginning of content of file: LICENSE
@@ -73,7 +73,7 @@ license you like.
 
 
 
-#include "json/jsoncpp.h"
+#include "JSON/jsoncpp.h"
 
 #ifndef JSON_IS_AMALGAMATION
 #error "Compile with -I PATH_TO_JSON_DIRECTORY"
@@ -233,9 +233,9 @@ static inline void fixZerosInTheEnd(char* begin, char* end) {
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 
 #if !defined(JSON_IS_AMALGAMATION)
-#include <json/assertions.h>
-#include <json/reader.h>
-#include <json/value.h>
+#include <JSON/assertions.h>
+#include <JSON/reader.h>
+#include <JSON/value.h>
 #include "json_tool.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
 #include <utility>
@@ -2490,9 +2490,9 @@ ValueIterator& ValueIterator::operator=(const SelfType& other) {
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 
 #if !defined(JSON_IS_AMALGAMATION)
-#include <json/assertions.h>
-#include <json/value.h>
-#include <json/writer.h>
+#include <JSON/assertions.h>
+#include <JSON/value.h>
+#include <JSON/writer.h>
 #endif // if !defined(JSON_IS_AMALGAMATION)
 #include <math.h>
 #include <sstream>
@@ -4188,7 +4188,7 @@ Value& Path::make(Value& root) const {
 // See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
 
 #if !defined(JSON_IS_AMALGAMATION)
-#include <json/writer.h>
+#include <JSON/writer.h>
 #include "json_tool.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
 #include <iomanip>

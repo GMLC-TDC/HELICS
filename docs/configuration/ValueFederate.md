@@ -17,8 +17,8 @@ TODO:: add links to other generated documents
 File based configuration looks primarily at an "publications" or "subscriptions" JSON array
 
 ```
-//this should be a valid json file (except comments are not recognized in standard JSON)
-{ //example json configuration file for a value federate all arguments are optional
+//this should be a valid JSON file (except comments are not recognized in standard JSON)
+{ //example JSON configuration file for a value federate all arguments are optional
     "name":"valueFed", // the name of the federate
     //possible flags
     "observer":false,  // indicator that the federate does not send anything

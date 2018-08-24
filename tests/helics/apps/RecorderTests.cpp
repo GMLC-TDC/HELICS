@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
 const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "clone_example2.txt",
                                                        "clone_example3.txt",  "clone_example4.txt",
                                                        "clone_example5.txt",  "clone_example6.txt",
-                                                       "clone_example7.json", "clone_example8.JSON"};
+                                                       "clone_example7.json", "clone_example8.json"};
 
 BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
 {

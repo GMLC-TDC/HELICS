@@ -79,7 +79,11 @@ FederateTestFixture::~FederateTestFixture ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        broker->disconnect ();
+        broker->waitForDisconnect (150);
+		if (broker->isConnected())
+		{
+            broker->disconnect ();
+		}
     }
     brokers.clear ();
     helics::cleanupHelicsLibrary ();

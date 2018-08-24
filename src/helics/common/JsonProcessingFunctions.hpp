@@ -10,11 +10,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using the jsoncpp library
 */
 
-#include "json/jsoncpp.h"
+#include "JSON/jsoncpp.h"
 
 #include "../core/helics-time.hpp"
 /** load a JSON string or filename that points to a JSON file and return a
-json::Value to the root object
+JSON::Value to the root object
 */
 Json_helics::Value loadJson (const std::string &jsonString);
 

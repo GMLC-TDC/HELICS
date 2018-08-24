@@ -56,6 +56,7 @@ enum class action_t : int32_t
 
     cmd_ignore = 0,  //!< null command
     cmd_tick = 1,  //!< command for a timer tick
+	cmd_user_disconnect = 2, //!< command specifying that a user has issued a disconnect signal
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
 	cmd_disconnect_check = 5, //!< check for a disconnect
@@ -142,6 +143,7 @@ enum class action_t : int32_t
 #define CMD_TICK action_message_def::action_t::cmd_tick
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
+#define CMD_USER_DISCONNECT action_message_def::action_t::cmd_user_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check

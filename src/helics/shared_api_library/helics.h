@@ -165,7 +165,7 @@ HELICS_EXPORT helics_federate helicsCreateValueFederate (const helics_federate_i
 @param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque value federate object
 */
-HELICS_EXPORT helics_federate helicsCreateValueFederateFromJson (const char *json);
+HELICS_EXPORT helics_federate helicsCreateValueFederateFromJson (const char *JSON);
 
 /** create a message federate from a federate info object
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
@@ -181,7 +181,7 @@ argument
 @param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque message federate object
 */
-HELICS_EXPORT helics_federate helicsCreateMessageFederateFromJson (const char *json);
+HELICS_EXPORT helics_federate helicsCreateMessageFederateFromJson (const char *JSON);
 
 /** create a combination federate from a federate info object
 @details combination federates are both value federates and message federates, objects can be used in all functions that take a
@@ -197,7 +197,7 @@ helics_federate, helics_message_federate or helics_federate object as an argumen
 @param JSON  a JSON file or a JSON string that contains setup and configuration information
 @return an opaque combination federate object
 */
-HELICS_EXPORT helics_federate helicsCreateCombinationFederateFromJson (const char *json);
+HELICS_EXPORT helics_federate helicsCreateCombinationFederateFromJson (const char *JSON);
 
 /** create a new reference to an existing federate
 @details this will create a new helics_federate object that references the existing federate it must be freed as well

@@ -36,6 +36,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define TCPTEST4
 #endif
 
+const std::string ztypes[] = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
 const std::string core_types[] = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
 
 const std::string core_types_2[] = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};

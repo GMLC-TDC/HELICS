@@ -214,10 +214,21 @@ constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
 
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
-    return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+	for (auto & dep : dependencies)
+	{
+        auto v1 = (dep.fedID >= global_federate_id_shift);
+        auto v2 = (dep.fedID < global_broker_id_shift);
+        auto v3 = (dep.Tnext < Time::maxVal ());
+		if (v1&&v2&&v3)
+		{
+            return true;
+		}
+	}
+    return false;
+   /* return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
         return (((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift)) &&
                 (dep.Tnext < Time::maxVal ()));
-    });
+    });*/
 }
 
 void TimeDependencies::resetIteratingExecRequests ()
