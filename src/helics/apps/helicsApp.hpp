@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../application_api/CombinationFederate.hpp"
-#include "JSON/JSON-forwards.h"
+#include "json/json-forwards.h"
 namespace boost
 {
 namespace program_options
