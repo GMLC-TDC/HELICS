@@ -33,6 +33,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
     mFed1->finalize ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
