@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Federate.hpp"
 #include <thread>
 
-#include "JSON/jsoncpp.h"
+#include "json/jsoncpp.h"
 
 #include <boost/algorithm/string.hpp>
 

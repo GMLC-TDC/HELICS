@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using the jsoncpp library
 */
 
-#include "JSON/jsoncpp.h"
+#include "json/jsoncpp.h"
 
 #include "../core/helics-time.hpp"
 /** load a JSON string or filename that points to a JSON file and return a
