@@ -340,6 +340,7 @@ bool TcpAcceptor::start (TcpRxConnection::pointer conn)
 {
     if (state != accepting_state_t::connected)
     {
+        conn->close();
         return false;
     }
     bool exp = false;
@@ -351,6 +352,10 @@ bool TcpAcceptor::start (TcpRxConnection::pointer conn)
                                 [this, connection = std::move (conn)](const boost::system::error_code &error) {
                                     handle_accept (connection, error);
                                 });
+    }
+    else
+    {
+        conn->close();
     }
     return true;
 }
