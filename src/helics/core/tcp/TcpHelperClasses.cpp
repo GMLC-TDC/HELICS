@@ -653,13 +653,14 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointe
         new_connection->start ();
 		{ //scope for the lock_guard
             
-			std::lock_guard<std::mutex> lock (accepting);
+			std::unique_lock<std::mutex> lock (accepting);
 			if (!halted)
 			{
                 connections.push_back (std::move (new_connection));
 			}
 			else
 			{
+                lock.unlock ();
                 new_connection->close ();
                 return;
 			}
@@ -696,10 +697,12 @@ void TcpServer::close ()
     }
 
     acceptors.clear ();
-    std::lock_guard<std::mutex> lock (accepting);
-    for (auto &conn : connections)
+    std::unique_lock<std::mutex> lock (accepting);
+    auto sz = connections.size ();
+    lock.unlock ();
+    for (decltype(sz) ii=0;ii<sz;++ii)
     {
-        conn->close ();
+        connections[ii]->close ();
     }
     connections.clear ();
 }
