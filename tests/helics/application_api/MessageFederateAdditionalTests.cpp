@@ -203,7 +203,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     auto mend = [&](const helics::Endpoint *ept, helics::Time rtime) {
         rxend = ept->getID ();
         timeRx = rtime;
-    };
+    }; 
 
     ep2.setCallback (mend);
 
@@ -218,6 +218,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     auto time = mFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (time, 1.0);
+
 
     auto res = ep2.hasMessage ();
     BOOST_CHECK (res);

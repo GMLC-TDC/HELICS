@@ -607,20 +607,24 @@ void TcpServer::start ()
     {
         return;
     }
-    std::lock_guard<std::mutex> lock (accepting);
+    
 
     if (!halted)
     {
-        if (!connections.empty ())
-        {
-            for (auto &conn : connections)
+		{ //scope for the lock_guard
+            std::lock_guard<std::mutex> lock (accepting);
+            if (!connections.empty ())
             {
-                if (!conn->isReceiving ())
+                for (auto &conn : connections)
                 {
-                    conn->start ();
+                    if (!conn->isReceiving ())
+                    {
+                        conn->start ();
+                    }
                 }
             }
-        }
+		}
+        
         for (auto &acc : acceptors)
         {
             acc->start (TcpRxConnection::create (ioserv, bufferSize));
@@ -640,14 +644,17 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointe
         return;
     }
 
-    std::lock_guard<std::mutex> lock (accepting);
+    
 
     if (!halted)
     {
         new_connection->setDataCall (dataCall);
         new_connection->setErrorCall (errorCall);
         new_connection->start ();
-        connections.push_back (std::move (new_connection));
+		{ //scope for the lock_guard
+			std::lock_guard<std::mutex> lock (accepting);
+			connections.push_back (std::move (new_connection));
+		}
         acc->start (TcpRxConnection::create (ioserv, bufferSize));
     }
     else
@@ -658,7 +665,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointe
 
 void TcpServer::close ()
 {
-    std::lock_guard<std::mutex> lock (accepting);
+    
     halted = true;
     if (acceptors.size () == 1)
     {
@@ -680,6 +687,7 @@ void TcpServer::close ()
     }
 
     acceptors.clear ();
+    std::lock_guard<std::mutex> lock (accepting);
     for (auto &conn : connections)
     {
         conn->close ();
