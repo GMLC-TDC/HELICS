@@ -384,9 +384,20 @@ void TcpAcceptor::close ()
 {
     acceptor_.close ();
     state = accepting_state_t::halted;
+    int ctr = 0;
     while (accepting)
     {
         std::this_thread::yield ();
+        ++ctr;
+		if (ctr > 100)
+		{
+            std::cerr << "acceptor is not halting"<<std::endl;
+		}
+		if (ctr > 200)
+		{
+            std::cerr << "breaking acceptor close loop" << std::endl;
+            break;
+		}
     }
 }
 
