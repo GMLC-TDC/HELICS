@@ -652,8 +652,17 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointe
         new_connection->setErrorCall (errorCall);
         new_connection->start ();
 		{ //scope for the lock_guard
+            
 			std::lock_guard<std::mutex> lock (accepting);
-			connections.push_back (std::move (new_connection));
+			if (!halted)
+			{
+                connections.push_back (std::move (new_connection));
+			}
+			else
+			{
+                new_connection->close ();
+                return;
+			}
 		}
         acc->start (TcpRxConnection::create (ioserv, bufferSize));
     }
