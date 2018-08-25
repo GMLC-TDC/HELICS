@@ -183,7 +183,14 @@ void TcpRxConnection::close ()
     }
     else
     {
-        receiving = false;
+		if (receiving)
+		{
+            socket_.close ();
+            while (receiving)
+            {
+                std::this_thread::yield ();
+            }
+		}
     }
 }
 
@@ -367,6 +374,7 @@ bool TcpAcceptor::start (TcpRxConnection::pointer conn)
     else
     {
         conn->close ();
+        return false;
     }
     return true;
 }
