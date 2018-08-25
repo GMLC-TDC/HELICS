@@ -46,19 +46,19 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 
     CE(helicsFederateRequestTime(vFed1, 1.0,&err));
 
-    BOOST_CHECK (helicsInputIsUpdated (sub1,nullptr));
+    BOOST_CHECK (helicsInputIsUpdated (sub1));
 
-    int len1 = helicsInputGetRawValueSize (sub1,nullptr);
+    int len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
     CE(actualLen=helicsInputGetRawValue (sub1, val, 600, &err));
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    len1 = helicsInputGetRawValueSize (sub1,nullptr);
+    len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
 
-    BOOST_CHECK (helicsInputIsUpdated (sub1,nullptr) == false);
+    BOOST_CHECK (helicsInputIsUpdated (sub1) == false);
 
     CE(helicsFederateFinalize (vFed1,&err));
 }
@@ -140,8 +140,8 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_REQUIRE (vFed != nullptr);
     CE(helicsFederateGetName (vFed, s, 100,&err));
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed,nullptr), 2);
-    BOOST_CHECK_EQUAL (helicsFederateGetPublicationCount (vFed,nullptr), 2);
+    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed), 2);
+    BOOST_CHECK_EQUAL (helicsFederateGetPublicationCount (vFed), 2);
     //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     CE(helicsFederateFinalize (vFed,&err));
     //

@@ -166,12 +166,12 @@ private:
 
     int getInputCount() const
     {
-        return helicsFederateGetInputCount(fed,NULL);
+        return helicsFederateGetInputCount(fed);
     }
 
     int getPublicationCount() const
     {
-        return helicsFederateGetPublicationCount(fed,NULL);
+        return helicsFederateGetPublicationCount(fed);
     }
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/

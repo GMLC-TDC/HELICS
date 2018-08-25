@@ -35,6 +35,7 @@ extern "C" {
 #define HELICS_DATA_TYPE_BOOLEAN 7
 /** raw data type*/
 #define HELICS_DATA_TYPE_RAW 25
+#define HELICS_DATA_TYPE_ANY 25262
 
 /** create a subscription
 @details the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
@@ -57,7 +58,7 @@ for subscriptions and publications
 @param key the identifier for the publication the global publication key will be prepended with the federate name
 @param type a known type identifier  HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE,
 HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN,
-HELICS_DATA_TYPE_RAW
+HELICS_DATA_TYPE_RAW, HELICS_DATA_TYPE_ANY
 @param units a string listing the units of the subscription maybe NULL
 @return an object containing the publication
 */
@@ -115,7 +116,7 @@ for subscriptions and publications
 @return an object containing the publication
 */
 HELICS_EXPORT helics_input helicsFederateRegisterInput(helics_federate fed,
-    const char *name, const char *units, helics_error *err);
+    const char *name, int type, const char *units, helics_error *err);
 
 /** register a publication with a defined type
 @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
@@ -139,7 +140,7 @@ for subscriptions and publications
 @return an object containing the publication
 */
 HELICS_EXPORT helics_publication helicsFederateRegisterGlobalInput(helics_federate fed,
-    const char *key,
+    const char *key, int type,
                                                                     const char *units,
                                                                     helics_error *err);
 
@@ -250,7 +251,7 @@ and vice versa,  not all translations make that much sense but they do work.
 /** get the size of the raw value for subscription
 @returns the size of the raw data/string in bytes
 */
-HELICS_EXPORT int helicsInputGetRawValueSize (helics_input ipt, helics_error *err);
+HELICS_EXPORT int helicsInputGetRawValueSize (helics_input ipt);
 
 /** get the raw data for the latest value of a subscription
 @param ipt the input to get the data for
@@ -264,7 +265,7 @@ HELICS_EXPORT int helicsInputGetRawValue (helics_input ipt, void *data, int maxl
 /** get the size of a value for subscription assuming return as a string
 @returns the size of the string
 */
-HELICS_EXPORT int helicsInputGetStringSize (helics_input ipt, helics_error *err);
+HELICS_EXPORT int helicsInputGetStringSize (helics_input ipt);
 
 /** get a string value from a subscription
 @param ipt the input to get the data for
@@ -302,18 +303,24 @@ HELICS_EXPORT double helicsInputGetDouble (helics_input ipt, helics_error *err);
 @param[out] imag memory location to place the imaginary part of a value
 @return a void value, helics_ok if everything went fine
 */
-HELICS_EXPORT void helicsInputGetComplex (helics_input ipt, double *real, double *imag, helics_error *err);
+HELICS_EXPORT helics_complex helicsInputGetComplex (helics_input ipt, helics_error *err);
+/** get a pair of double forming a complex number from a subscriptions
+@param ipt the input to get the data for
+@param[out] real memory location to place the real part of a value
+@param[out] imag memory location to place the imaginary part of a value
+@return a void value, helics_ok if everything went fine
+*/
+HELICS_EXPORT void helicsInputGetComplexParts (helics_input ipt, double *real, double *imag, helics_error *err);
 
 /** get the size of a value for subscription assuming return as an array of doubles
 @returns the number of double in a return vector
 */
-HELICS_EXPORT int helicsInputGetVectorSize (helics_input ipt, helics_error *err);
+HELICS_EXPORT int helicsInputGetVectorSize (helics_input ipt);
 
 /** get a vector from a subscription
 @param ipt the input to get the result for
 @param[out] data the location to store the data
 @param maxlen the maximum size of the vector
-@param[out] actualSize pointer to variable to store the actual size
 */
 HELICS_EXPORT int helicsInputGetVector (helics_input ipt, double data[], int maxlen, helics_error *err);
 
@@ -452,16 +459,16 @@ HELICS_EXPORT int helicsPublicationGetUnits (helics_publication pub, char *outpu
 
 /** check if a particular subscription was updated
 @return true if it has been updated since the last value retrieval*/
-HELICS_EXPORT helics_bool_t helicsInputIsUpdated (helics_input ipt, helics_error *err);
+HELICS_EXPORT helics_bool_t helicsInputIsUpdated (helics_input ipt);
 /** get the last time a subscription was updated */
-HELICS_EXPORT helics_time_t helicsInputLastUpdateTime (helics_input ipt, helics_error *err);
+HELICS_EXPORT helics_time_t helicsInputLastUpdateTime (helics_input ipt);
 /** get the number of publications in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of publications*/
-HELICS_EXPORT int helicsFederateGetPublicationCount (helics_federate fed, helics_error *err);
+HELICS_EXPORT int helicsFederateGetPublicationCount (helics_federate fed);
 
 /** get the number of subscriptions in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
-HELICS_EXPORT int helicsFederateGetInputCount (helics_federate fed, helics_error *err);
+HELICS_EXPORT int helicsFederateGetInputCount (helics_federate fed);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

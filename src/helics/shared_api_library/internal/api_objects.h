@@ -51,7 +51,7 @@ class BrokerObject
 };
 
 /** get the brokerObject from a helics_broker and verify it is valid*/
-BrokerObject *getBrokerObject (helics_broker broker);
+BrokerObject *getBrokerObject (helics_broker broker, helics_error *err);
 /** object wrapping a core for the c-api*/
 class CoreObject
 {
@@ -63,8 +63,9 @@ class CoreObject
     CoreObject () = default;
     ~CoreObject ();
 };
+
 /** get the CoreObject from a helics_core and verify it is valid*/
-CoreObject *getCoreObject (helics_core core);
+CoreObject *getCoreObject (helics_core core, helics_error *err);
 
 class InputObject;
 class PublicationObject;
@@ -79,7 +80,7 @@ class FedObject
     int index = -2;
     std::shared_ptr<Federate> fedptr;
     std::unique_ptr<Message> lastMessage;
-    std::vector<std::unique_ptr<InputObject>> subs;
+    std::vector<std::unique_ptr<InputObject>> inputs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;

@@ -571,9 +571,9 @@ helics_broker helicsBrokerClone (helics_broker broker, helics_error *err)
     return retbroker;
 }
 
-helics_bool_t helicsBrokerIsConnected (helics_broker broker, helics_error *err)
+helics_bool_t helicsBrokerIsConnected (helics_broker broker)
 {
-    auto brk = getBroker (broker,err);
+    auto brk = getBroker (broker,nullptr);
     if (brk == nullptr)
     {
         return helics_false;
@@ -581,9 +581,9 @@ helics_bool_t helicsBrokerIsConnected (helics_broker broker, helics_error *err)
     return (brk->isConnected ()) ? helics_true : helics_false;
 }
 
-helics_bool_t helicsCoreIsConnected (helics_core core, helics_error *err)
+helics_bool_t helicsCoreIsConnected (helics_core core)
 {
-    auto cr = getCore (core,err);
+    auto cr = getCore (core,nullptr);
     if (cr == nullptr)
     {
         return helics_false;
@@ -723,7 +723,7 @@ helics::FedObject::~FedObject ()
 {
     // we want to remove the values in the arrays before deleting the fedptr
     // and we want to do it inside this function to ensure it does so in a consistent manner
-    subs.clear ();
+    inputs.clear ();
     pubs.clear ();
     epts.clear ();
     filters.clear ();
@@ -910,9 +910,9 @@ const char *helicsQueryExecuteComplete (helics_query query, helics_error *err)
     return queryObj->response.c_str ();
 }
 
-helics_bool_t helicsQueryIsCompleted (helics_query query, helics_error *err)
+helics_bool_t helicsQueryIsCompleted (helics_query query)
 {
-    auto queryObj = getQueryObj (query, err);
+    auto queryObj = getQueryObj (query, nullptr);
     if (queryObj == nullptr)
     {
         return helics_false;

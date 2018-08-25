@@ -119,6 +119,7 @@ class ordered_guarded
         m_obj = std::forward<objType>(newObj);
     }
 
+
   private:
     T         m_obj;
     mutable M m_mutex;

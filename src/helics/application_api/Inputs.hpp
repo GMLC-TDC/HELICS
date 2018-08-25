@@ -25,14 +25,10 @@ class InputBase
   public:
     InputBase () = default;
 
-    InputBase(ValueFederate *valueFed,
-        const std::string &name,
-        const std::string &type = "def",
-        const std::string &units = std::string())
-        : fed(valueFed), name_(name), type_(type), units_(units)
-    {
-        id = fed->registerInput(name_, type_, units_);
-    }
+    InputBase (ValueFederate *valueFed,
+               const std::string &name,
+               const std::string &type = "def",
+               const std::string &units = std::string ());
 
     template <class FedPtr>
     InputBase (FedPtr & valueFed,
@@ -45,6 +41,23 @@ class InputBase
                        "first argument must be a pointer to a ValueFederate");
     }
 
+	InputBase (interface_visibility locality,
+               ValueFederate *valueFed,
+               const std::string &name,
+               const std::string &type = "def",
+               const std::string &units = std::string ());
+
+    template <class FedPtr>
+    InputBase (interface_visibility locality,
+               FedPtr &valueFed,
+               const std::string &name,
+               const std::string &type = "def",
+               const std::string &units = std::string ())
+        : InputBase (locality,std::addressof (*valueFed), name, type, units)
+    {
+        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
+                       "first argument must be a pointer to a ValueFederate");
+    }
    InputBase (ValueFederate *valueFed, int intIndex);
     virtual ~InputBase () = default;
     InputBase (InputBase &&base) = default;
@@ -74,9 +87,12 @@ class InputBase
     /** get the units associated with a subscription*/
     const std::string &getUnits () const { return units_; }
     void addTarget (const std::string &newTarget) { fed->addTarget (id,newTarget);}
+
+  private:
+    void loadFromId ();
 };
 
-/** primary subscription object class
+/** primary input object class
 @details can convert between the helics primary base class types
 */
 class Input : public InputBase
@@ -128,6 +144,41 @@ class Input : public InputBase
     {
     }
 
+	Input (interface_visibility locality,
+           ValueFederate *valueFed,
+           const std::string &name,
+           const std::string &units = std::string ())
+        : InputBase (locality, valueFed, name, "def", units)
+    {
+    }
+
+    template <class FedPtr>
+    Input (interface_visibility locality,
+           FedPtr &valueFed,
+           const std::string &key,
+           const std::string &units = std::string ())
+        : InputBase (locality, valueFed, key, "def", units)
+    {
+    }
+
+    Input (interface_visibility locality,
+           ValueFederate *valueFed,
+           const std::string &name,
+           helics_type_t defType,
+           const std::string &units = std::string ())
+        : InputBase (locality, valueFed, name, typeNameStringRef (defType), units)
+    {
+    }
+
+    template <class FedPtr>
+    Input (interface_visibility locality,
+           FedPtr &valueFed,
+           const std::string &name,
+           helics_type_t defType,
+           const std::string &units = std::string ())
+        : InputBase (locality, valueFed, name, typeNameStringRef (defType), units)
+    {
+    }
     /** generate a subscription object from a preexisting subscription
     @param valueFed a pointer to the appropriate value Federate
     @param subIndex the index of the subscription

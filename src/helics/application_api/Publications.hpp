@@ -97,7 +97,9 @@ class PublicationBase
     const std::string &getType () const { return type_; }
     /** get the units of the Publication*/
     const std::string &getUnits () const { return units_; }
-private:
+    /** add a target to the publication*/
+    void addTarget (const std::string &target) { fed->addTarget (id, target); }
+  private:
     void loadFromId();
 };
 

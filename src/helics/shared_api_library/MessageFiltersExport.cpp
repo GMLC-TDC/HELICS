@@ -228,33 +228,22 @@ int helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen, h
 }
 
 /** get the name of the filter*/
-int helicsFilterGetName (helics_filter filt, char *outputString, int maxlen, helics_error *err)
+const char *helicsFilterGetName (helics_filter filt, helics_error *err)
 {
     auto filter = getFilter (filt,err);
     if (filter == nullptr)
     {
-        return (-1);
-    }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
+        return nullstr.c_str ();
     }
     try
     {
         const auto &name = filter->getName ();
-        if (static_cast<int> (name.size ()) > maxlen)
-        {
-            strncpy (outputString, name.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return helics_warning;
-        }
-        strcpy (outputString, name.c_str ());
-        return helics_ok;
+        return name.c_str ();
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return (-1);
+        return nullstr.c_str ();
     }
 }
 

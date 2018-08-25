@@ -89,12 +89,12 @@ HELICS_EXPORT helics_broker helicsBrokerClone (helics_broker broker, helics_erro
 /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
-HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker, helics_error *err);
+HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker);
 
 /** check if a core is connected
 a connected core implies is attached to federate or federates could be attached to it
 return 0 if not connected , something else if it is connected*/
-HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core, helics_error *err);
+HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core);
 
 /** get an identifier for the broker
 @param broker the broker to query
@@ -550,7 +550,7 @@ HELICS_EXPORT const char *helicsQueryExecuteComplete (helics_query query, helics
 @return will return helics_true if an asynchronous query has complete or a regular query call was made with a result
 and false if an asynchronous query has not completed or is invalid
 */
-HELICS_EXPORT helics_bool_t helicsQueryIsCompleted (helics_query query, helics_error *err);
+HELICS_EXPORT helics_bool_t helicsQueryIsCompleted (helics_query query);
 
 /** free the memory associated with a query object*/
 HELICS_EXPORT void helicsQueryFree (helics_query);

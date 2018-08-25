@@ -248,7 +248,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     //check the time
-    auto time = helicsInputLastUpdateTime(subid,nullptr);
+    auto time = helicsInputLastUpdateTime(subid);
     BOOST_CHECK_EQUAL(time, 1.0);
     // publish a second string
     CE(helicsPublicationPublishString (pubid, "string2",&err));
@@ -347,7 +347,7 @@ void runFederateTestComplex (const char *core,
     // publish string1 at time=0.0;
     CE(helicsPublicationPublishComplex (pubid, testValue1_r, testValue1_i,&err));
 
-    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
+    CE(helicsInputGetComplexParts (subid, &val1_r, &val1_i,&err));
     BOOST_CHECK_EQUAL (val1_r, defaultValue_r);
     BOOST_CHECK_EQUAL (val1_i, defaultValue_i);
 
@@ -355,16 +355,16 @@ void runFederateTestComplex (const char *core,
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
+    CE(helics_complex hc=helicsInputGetComplex (subid,&err));
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val1_r, testValue1_r);
-    BOOST_CHECK_EQUAL (val1_i, testValue1_i);
+    BOOST_CHECK_EQUAL (hc.real, testValue1_r);
+    BOOST_CHECK_EQUAL (hc.imag, testValue1_i);
 
     // publish a second value
     CE(helicsPublicationPublishComplex (pubid, testValue2_r, testValue2_i,&err));
 
     // make sure the value is still what we expect
-    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
+    CE(helicsInputGetComplexParts (subid, &val1_r, &val1_i,&err));
     BOOST_CHECK_EQUAL (val1_r, testValue1_r);
     BOOST_CHECK_EQUAL (val1_i, testValue1_i);
     // advance time
@@ -372,9 +372,9 @@ void runFederateTestComplex (const char *core,
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
-    BOOST_CHECK_EQUAL (val1_r, testValue2_r);
-    BOOST_CHECK_EQUAL (val1_i, testValue2_i);
+    CE(hc=helicsInputGetComplex (subid, &err));
+    BOOST_CHECK_EQUAL (hc.real, testValue2_r);
+    BOOST_CHECK_EQUAL (hc.imag, testValue2_i);
 
     CE(helicsFederateFinalize (vFed,&err));
 }
@@ -552,7 +552,7 @@ void runFederateTestVectorD (const char *core,
     // publish string1 at time=0.0;
     CE(helicsPublicationPublishVector (pubid, testValue1, len1,&err));
 
-    int actualLen = helicsInputGetVectorSize (subid,nullptr);
+    int actualLen = helicsInputGetVectorSize (subid);
     BOOST_CHECK_EQUAL (actualLen, len);
 
     CE(actualLen=helicsInputGetVector (subid, val, maxlen, &err));
@@ -580,7 +580,7 @@ void runFederateTestVectorD (const char *core,
     }
 
     //test getting a vector as a string
-    actualLen = helicsInputGetStringSize(subid,nullptr);
+    actualLen = helicsInputGetStringSize(subid);
     std::string buf;
     buf.resize(actualLen + 2);
     CE (actualLen = helicsInputGetString (subid, &(buf[0]), static_cast<int> (buf.size ()), &err));

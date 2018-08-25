@@ -122,6 +122,15 @@ typedef struct data_t
 
 
 /**
+ *  structure defining a basic complex type
+ */
+typedef struct helics_complex
+{
+    double real;
+    double imag;
+} helics_complex;
+
+/**
  *  Message_t mapped to a c compatible structure
  */
 typedef struct message_t

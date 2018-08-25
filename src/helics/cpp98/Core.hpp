@@ -42,7 +42,7 @@ class Core
 
     helics_core baseObject() const { return core; }
     bool isConnected () const
-    { return helicsCoreIsConnected (core,HELICS_IGNORE_ERROR);
+    { return helicsCoreIsConnected (core);
     }
 
     Core(const Core &cr)

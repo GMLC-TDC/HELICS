@@ -80,18 +80,18 @@ public:
     /** Methods to get subscription values **/
     int getRawValue( std::vector<char> &data)
     {
-        int size = helicsInputGetRawValueSize (inp, NULL);
+        int size = helicsInputGetRawValueSize (inp);
         data.resize(size);
         return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), NULL);
     }
 
     int getRawValueSize()
-    { return helicsInputGetRawValueSize (inp, NULL);
+    { return helicsInputGetRawValueSize (inp);
     }
 
     std::string getString()
     {
-        int size = helicsInputGetStringSize (inp, NULL);
+        int size = helicsInputGetStringSize (inp);
         std::string result;
 
         result.resize(size+1);
@@ -110,7 +110,7 @@ public:
 
     void getNamedPoint(std::string &name,double *val)
     {
-        int size = helicsInputGetStringSize (inp, NULL);
+        int size = helicsInputGetStringSize (inp);
 
         name.resize(size + 1);
         //this function results in a null terminated string
@@ -138,10 +138,8 @@ public:
 
     std::complex<double> getComplex()
     {
-        double real;
-        double imag;
-        helicsInputGetComplex(inp, &real, &imag,NULL);
-        std::complex<double> result(real, imag);
+        helics_complex hc=helicsInputGetComplex(inp,NULL);
+        std::complex<double> result(hc.real, hc.imag);
         return result;
     }
 
@@ -152,7 +150,7 @@ public:
 
     void getVector( std::vector<double> &data)
     {
-        int actualSize = helicsInputGetVectorSize(inp,NULL);
+        int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
         helicsInputGetVector(inp, data.data(), actualSize,NULL);
     }
@@ -160,13 +158,13 @@ public:
     /** Check if a subscription is updated **/
     bool isUpdated() const
     {
-        return helicsInputIsUpdated(inp,NULL) > 0;
+        return helicsInputIsUpdated(inp) > 0;
     }
 
     /** Get the last time a subscription was updated **/
     helics_time_t getLastUpdateTime() const
     {
-        return helicsInputLastUpdateTime(inp,hThrowOnError());
+        return helicsInputLastUpdateTime(inp);
     }
 
     // call helicsInputIsUpdated for each inp

@@ -9,6 +9,48 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+InputBase::InputBase (ValueFederate *valueFed,
+                      const std::string &name,
+                      const std::string &type,
+                      const std::string &units)
+    : fed (valueFed), name_ (name), type_ (type), units_ (units)
+{
+    try
+    {
+        id = fed->registerInput (name_, type_, units_);
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getInputId (name_);
+        loadFromId ();
+    }
+}
+
+InputBase::InputBase (interface_visibility locality,
+                      ValueFederate *valueFed,
+                      const std::string &name,
+                      const std::string &type,
+                      const std::string &units)
+    : fed (valueFed), name_ (name), type_ (type), units_ (units)
+{
+    try
+    {
+        if (locality == GLOBAL)
+        {
+            id = fed->registerGlobalInput (name_, type_, units_);
+        }
+        else
+        {
+            id = fed->registerInput (name_, type_, units_);
+        }
+    }
+    catch (const RegistrationFailure &)
+    {
+        id = fed->getInputId (name_);
+        loadFromId ();
+    }
+}
+
 InputBase::InputBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
 {
     auto cnt = fed->getInputCount ();
@@ -17,12 +59,16 @@ InputBase::InputBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
         throw (helics::InvalidParameter ("no subscription with the specified index"));
     }
     id = static_cast<input_id_t> (subIndex);
+    loadFromId ();
+}
+
+void InputBase::loadFromId ()
+{
     name_ = fed->getInputKey (id);
 
     type_ = fed->getInputType (id);
     units_ = fed->getInputUnits (id);
 }
-
 void Input::handleCallback (Time time)
 {
     if (!isUpdated ())

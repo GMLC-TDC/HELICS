@@ -48,13 +48,14 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 
     CE (federate_state mFed1State = helicsFederateGetState (mFed1, &err));
     BOOST_CHECK (mFed1State == helics_execution_state);
-    char sv[32];
-    char sv2[32];
-    CE(helicsEndpointGetName (epid, sv, 32,&err));
-    CE(helicsEndpointGetName (epid2, sv2, 32,&err));
-    BOOST_CHECK_EQUAL (sv, "fed0/ep1");
-    BOOST_CHECK_EQUAL (sv2, "ep2");
+    
+    CE(const char *name=helicsEndpointGetName (epid,&err));
+    BOOST_CHECK_EQUAL (name, "fed0/ep1");
+    CE(name=helicsEndpointGetName (epid2, &err));
+    BOOST_CHECK_EQUAL (name, "ep2");
 
+	char sv[32];
+    char sv2[32];
     CE(helicsEndpointGetType (epid, sv, 32,&err));
     CE(helicsEndpointGetType (epid2, sv2, 32,&err));
     BOOST_CHECK_EQUAL (sv, "");
@@ -89,14 +90,14 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
     CE(time=helicsFederateRequestTime(mFed1, 1.0,&err));
     BOOST_CHECK_EQUAL (time, 1.0);
 
-    auto res = helicsFederateHasMessage (mFed1,nullptr);
+    auto res = helicsFederateHasMessage (mFed1);
     BOOST_CHECK (res);
-    res = helicsEndpointHasMessage (epid,nullptr);
+    res = helicsEndpointHasMessage (epid);
     BOOST_CHECK (res == false);
-    res = helicsEndpointHasMessage (epid2,nullptr);
+    res = helicsEndpointHasMessage (epid2);
     BOOST_CHECK (res);
 
-    auto M = helicsEndpointGetMessage (epid2,nullptr);
+    auto M = helicsEndpointGetMessage (epid2);
     // BOOST_REQUIRE (M);
     BOOST_REQUIRE_EQUAL (M.length, 500);
 
@@ -146,20 +147,20 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (time, 1.0);
 
-    auto res = helicsFederateHasMessage (mFed1,nullptr);
+    auto res = helicsFederateHasMessage (mFed1);
     BOOST_CHECK (res);
-    res = helicsEndpointHasMessage (epid,nullptr);
+    res = helicsEndpointHasMessage (epid);
     BOOST_CHECK (res);
-    res = helicsEndpointHasMessage (epid2,nullptr);
+    res = helicsEndpointHasMessage (epid2);
     BOOST_CHECK (res);
 
-    auto M1 = helicsEndpointGetMessage (epid,nullptr);
+    auto M1 = helicsEndpointGetMessage (epid);
     // BOOST_REQUIRE(M1);
     BOOST_REQUIRE_EQUAL (M1.length, 400);
 
     BOOST_CHECK_EQUAL (M1.data[245], 'b');
 
-    auto M2 = helicsEndpointGetMessage (epid2,nullptr);
+    auto M2 = helicsEndpointGetMessage (epid2);
     // BOOST_REQUIRE(M2);
     BOOST_REQUIRE_EQUAL (M2.length, 500);
 

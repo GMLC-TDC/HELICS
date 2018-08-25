@@ -24,7 +24,7 @@ class Broker
     Broker (std::string type, std::string name, std::string initString)
     {
         broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str(),hThrowOnError());
-        if (helicsBrokerIsConnected(broker,NULL) != helics_true)
+        if (helicsBrokerIsConnected(broker) != helics_true)
         {
             throw(std::runtime_error("broker creation failed"));
         }
@@ -71,7 +71,7 @@ class Broker
 
     bool isConnected () const
     {
-        return helicsBrokerIsConnected (broker,NULL);
+        return helicsBrokerIsConnected (broker);
     }
     void disconnect()
     {
