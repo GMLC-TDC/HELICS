@@ -88,11 +88,11 @@ bool CommsInterface::connect ()
     std::this_thread::sleep_for (std::chrono::milliseconds (50));
     while (rx_status == connection_status::startup)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
     }
     while (tx_status == connection_status::startup)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
     }
     if (rx_status != connection_status::connected)
     {

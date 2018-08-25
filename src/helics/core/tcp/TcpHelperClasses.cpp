@@ -338,9 +338,13 @@ bool TcpAcceptor::connect (int timeout)
 /** start the acceptor*/
 bool TcpAcceptor::start (TcpRxConnection::pointer conn)
 {
+	if (!conn)
+	{
+        return false;
+	}
     if (state != accepting_state_t::connected)
     {
-        conn->close();
+        conn->close ();
         return false;
     }
     bool exp = false;
@@ -382,6 +386,12 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
 {
     auto ptr = shared_from_this ();
     accepting = false;
+	if (state != accepting_state_t::connected)
+	{
+        boost::asio::socket_base::linger optionLinger (true, 0);
+        new_connection->socket ().set_option (optionLinger);
+        new_connection->close ();
+	}
     if (!error)
     {
         if (acceptCall)
@@ -390,6 +400,8 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
         }
         else
         {
+            boost::asio::socket_base::linger optionLinger (true, 0);
+            new_connection->socket ().set_option (optionLinger);
             new_connection->close ();
         }
     }
@@ -403,6 +415,8 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
         {
             std::cerr << " error in accept::" << error.message () << std::endl;
         }
+        boost::asio::socket_base::linger optionLinger (true, 0);
+        new_connection->socket ().set_option (optionLinger);
         new_connection->close ();
     }
 }
@@ -508,17 +522,27 @@ void TcpServer::initialConnect ()
 bool TcpServer::reConnect (int timeout)
 {
     halted = false;
+    bool partialConnect = false;
     for (auto &acc : acceptors)
     {
         if (!acc->isConnected ())
         {
             if (!acc->connect (timeout))
             {
-                std::cerr << "unable to connect on " << acc->to_string () << '\n';
+				if (partialConnect)
+				{
+                    std::cerr << "unable to connect all acceptors on " << acc->to_string () << '\n';
+				}
+				else
+				{
+                    std::cerr << "unable to connect on " << acc->to_string () << '\n';
+				}
+                
                 halted = true;
                 break;
             }
         }
+        partialConnect = true;
     }
     return !halted;
 }
@@ -573,7 +597,8 @@ void TcpServer::start ()
 
 void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointer new_connection)
 {
-    boost::asio::socket_base::linger optionLinger (true, 0);
+    /*setting linger to 1 second*/
+    boost::asio::socket_base::linger optionLinger (true, 1);
     new_connection->socket ().set_option (optionLinger);
     // Set options here
 	if (halted)

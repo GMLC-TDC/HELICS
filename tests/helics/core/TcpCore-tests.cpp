@@ -284,10 +284,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     helics::tcp::TcpComms comm (host, host);
     helics::tcp::TcpComms comm2 (host, std::string ());
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (TCP_BROKER_PORT+1);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (TCP_BROKER_PORT+1);
     comm.setPortNumber (TCP_SECONDARY_PORT);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
@@ -338,13 +338,13 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     helics::tcp::TcpComms comm2 (host, "");
     helics::tcp::TcpComms comm3 (host, host);
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (TCP_BROKER_PORT+2);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPort (TCP_BROKER_PORT);
+    comm3.setBrokerPort (TCP_BROKER_PORT+2);
 
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (TCP_BROKER_PORT+2);
     comm.setPortNumber (TCP_SECONDARY_PORT);
     comm3.setPortNumber (23920);
 
