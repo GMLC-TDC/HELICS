@@ -176,19 +176,33 @@ void TcpRxConnection::close ()
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
         }
         socket_.close ();
+        int ctr = 0;
         while (receiving)
         {
             std::this_thread::yield ();
+            ++ctr;
+            if (ctr > 100)
+            {
+                std::cerr << "unable to close receiver socket" << std::endl;
+                receiving = false;
+            }
         }
     }
     else
     {
 		if (receiving)
 		{
+            int ctr = 0;
             socket_.close ();
             while (receiving)
             {
                 std::this_thread::yield ();
+                ++ctr;
+				if (ctr > 100)
+				{
+                    std::cerr << "unable to close receiver socket B" << std::endl;
+                    receiving = false;
+				}
             }
 		}
     }
