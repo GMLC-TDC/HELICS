@@ -168,15 +168,22 @@ void TcpRxConnection::close ()
     triggerhalt = true;
     state = connection_state_t::closed;
     boost::system::error_code ec;
-    socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
-    if (ec)
+    if (socket_.is_open ())
     {
-        std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
+        if (ec)
+        {
+            std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+        }
+        socket_.close ();
+        while (receiving)
+        {
+            std::this_thread::yield ();
+        }
     }
-    socket_.close ();
-    while (receiving)
+    else
     {
-        std::this_thread::yield ();
+        receiving = false;
     }
 }
 
@@ -407,14 +414,13 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
         else
         {
             boost::asio::socket_base::linger optionLinger (true, 0);
-			try
-			{
+            try
+            {
                 new_connection->socket ().set_option (optionLinger);
-			}
+            }
             catch (...)
-			{
-
-			}
+            {
+            }
             new_connection->close ();
         }
     }
