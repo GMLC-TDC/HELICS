@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include <cctype>
+#include <iostream>
 
 bool hasIndexCode (const std::string &type_name)
 {
@@ -79,9 +80,10 @@ FederateTestFixture::~FederateTestFixture ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        broker->waitForDisconnect (150);
+        broker->waitForDisconnect (300);
 		if (broker->isConnected())
 		{
+            std::cout << "forcing disconnect\n";
             broker->disconnect ();
 		}
     }
