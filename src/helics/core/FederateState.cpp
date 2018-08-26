@@ -986,8 +986,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (interface_handle (cmd.dest_handle));
         if (subI != nullptr)
         {
-            subI->input_sources.emplace_back (global_federate_id_t (cmd.source_id),
-                                              interface_handle (cmd.source_handle));
+			subI->addSource(cmd.getSource());
             if (subI->inputType.empty ())
             {
                 subI->inputType = cmd.info ().type;

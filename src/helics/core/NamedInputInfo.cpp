@@ -36,7 +36,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData()
     Time mxTime = Time::minVal();
     for (auto &cd : current_data)
     {
-        if (cd.time < mxTime)
+        if (cd.time > mxTime)
         {
             mxTime = cd.time;
             mxind = ind;

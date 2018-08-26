@@ -2532,6 +2532,17 @@ void CommonCore::registerInterface (ActionMessage &command)
     }
 }
 
+void CommonCore::setAsUsed(BasicHandleInfo *hand)
+{
+	assert(hand != nullptr);
+	if (hand->used)
+	{
+		return;
+	}
+	hand->used = true;
+	handles.modify([&](auto &handle) { handle.getHandleInfo(hand->handle.handle)->used = true; });
+	
+}
 void CommonCore::checkForNamedInterface (ActionMessage &command)
 {
     switch (command.action ())
@@ -2544,10 +2555,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.setDestination (pub->handle);
             command.name.clear ();
-            routeMessage (command);
+            
+			addTargetToInterface(command);
             command.setAction (CMD_ADD_PUBLISHER);
             command.swapSourceDest ();
-            routeMessage (command);
+			addTargetToInterface(command);
         }
         else
         {
@@ -2557,16 +2569,16 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
     break;
     case CMD_ADD_NAMED_INPUT:
     {
-        auto pub = loopHandles.getInput (command.name);
-        if (pub != nullptr)
+        auto inp = loopHandles.getInput (command.name);
+        if (inp != nullptr)
         {
             command.setAction (CMD_ADD_PUBLISHER);
-            command.setDestination (pub->handle);
+            command.setDestination (inp->handle);
             command.name.clear ();
-            routeMessage (command);
+			addTargetToInterface(command);
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.swapSourceDest ();
-            routeMessage (command);
+			addTargetToInterface(command);
         }
         else
         {
@@ -2582,10 +2594,10 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_ENDPOINT);
             command.setDestination (pub->handle);
             command.name.clear ();
-            routeMessage (command);
+			addTargetToInterface(command);
             command.setAction (CMD_ADD_FILTER);
             command.swapSourceDest ();
-            routeMessage (command);
+			addTargetToInterface(command);
         }
         else
         {
@@ -2601,10 +2613,10 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_FILTER);
             command.setDestination (pub->handle);
             command.name.clear ();
-            routeMessage (command);
+			addTargetToInterface(command);
             command.setAction (CMD_ADD_ENDPOINT);
             command.swapSourceDest ();       
-            routeMessage (command);
+			addTargetToInterface(command);
         }
         else
         {
@@ -2665,9 +2677,9 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         {
             fed->addAction (command);
             auto handle = loopHandles.getHandleInfo (command.dest_handle);
-            if ((handle != nullptr) && (!handle->used))
+            if (handle != nullptr)
             {
-                handle->used = true;
+				setAsUsed(handle);
             }
         }
     }
@@ -3094,11 +3106,7 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
         // now send the same command to the publication
         cmd.dest_handle = pub->getInterfaceHandle ();
         cmd.dest_id = pub->getFederateId ();
-        if (!pub->used)
-        {
-            pub->used = true;
-            handles.modify ([&](auto &hand) { hand.getPublication (cmd.dest_handle)->used = true; });
-        }
+		setAsUsed(pub);
         // send to
         routeMessage (cmd);
         // now send the notification to the subscription in the federateState
