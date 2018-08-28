@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace helics98
