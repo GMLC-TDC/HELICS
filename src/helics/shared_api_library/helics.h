@@ -82,6 +82,12 @@ a connected broker implies is attached to cores or cores could reach out to comm
 return 0 if not connected , something else if it is connected*/
 HELICS_EXPORT int helicsBrokerIsConnected (helics_broker broker);
 
+/** wait for the broker to disconnect
+@param broker the broker to wait for
+@param msToWait the time out in millisecond (<0 for infinite timeout)
+*/
+HELICS_EXPORT helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait);
+
 /** check if a core is connected
 a connected core implies is attached to federate or federates could be attached to it
 return 0 if not connected , something else if it is connected*/

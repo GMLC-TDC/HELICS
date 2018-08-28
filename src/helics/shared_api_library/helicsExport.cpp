@@ -708,8 +708,27 @@ helics_status helicsCoreDisconnect (helics_core core)
     }
 }
 
-helics_status helicsBrokerDisconnect (helics_broker broker)
+helics_status helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait)
 {
+    if (broker == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    auto brk = getBroker (broker);
+    if (brk == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    brk->waitForDisconnect (msToWait);
+	if (brk->isConnected())
+	{
+        return helics_warning;
+	}
+    return helics_ok;
+}
+
+    helics_status helicsBrokerDisconnect (helics_broker broker)
+    {
     if (broker == nullptr)
     {
         return helics_error;

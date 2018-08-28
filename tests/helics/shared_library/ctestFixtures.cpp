@@ -81,9 +81,16 @@ FederateTestFixture::~FederateTestFixture ()
         }
     }
     federates.clear ();
+    
+
     for (auto &broker : brokers)
     {
-        helicsBrokerDisconnect (broker);
+        auto res = helicsBrokerWaitForDisconnect (broker,200);
+		if (res != helics_ok)
+		{
+            helicsBrokerDisconnect (broker);
+		}
+        
         helicsBrokerFree (broker);
     }
     brokers.clear ();

@@ -338,7 +338,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
 
 bool BrokerBase::tryReconnect () { return false; }
 
-#define DISABLE_TICK 
+//#define DISABLE_TICK 
 void BrokerBase::queueProcessingLoop ()
 {
     std::vector<ActionMessage> dumpMessages;
