@@ -7,8 +7,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "cpptestFixtures.hpp"
 #include "../src/helics/cpp98/Broker.hpp"
+#include "cpptestFixtures.hpp"
 #include <cctype>
 #include <boost/test/unit_test.hpp>
 
@@ -72,7 +72,11 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        broker->disconnect ();
+        broker->waitForDisconnect (200);
+		if (broker->isConnected())
+		{
+            broker->disconnect ();
+		}
     }
     brokers.clear ();
     helicsCleanupHelicsLibrary ();
@@ -97,7 +101,7 @@ FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, const std
     }
     if (broker)
     {
-        brokers.push_back(broker);
+        brokers.push_back (broker);
     }
     return broker;
 }

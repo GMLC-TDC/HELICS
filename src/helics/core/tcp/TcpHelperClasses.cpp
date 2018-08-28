@@ -230,18 +230,26 @@ void TcpConnection::connect_handler (const boost::system::error_code &error)
         std::cerr << "connection error " << error.message () << ": code =" << error.value () << '\n';
     }
 }
-void TcpConnection::send (const void *buffer, size_t dataLength)
+size_t TcpConnection::send (const void *buffer, size_t dataLength)
 {
     if (!isConnected ())
     {
-        waitUntilConnected (200);
+        if (!waitUntilConnected (300))
+        {
+            std::cerr << "connection timeout waiting again" << std::endl;
+        }
+        if (!waitUntilConnected (200))
+        {
+            std::cerr << "connection timeout twice, now returning" << std::endl;
+            return 0;
+        }
     }
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
     ((void)(sz));
 }
 
-void TcpConnection::send (const std::string &dataString)
+size_t TcpConnection::send (const std::string &dataString)
 {
     if (!isConnected ())
     {
@@ -251,13 +259,13 @@ void TcpConnection::send (const std::string &dataString)
 		}
 		if (!waitUntilConnected(200))
 		{
-			std::cerr << "connection timeout twice, now throwing error" << std::endl;
-			throw(std::runtime_error("unable to connect tcp socket"));
+            std::cerr << "connection timeout twice, now returning" << std::endl;
+            return 0;
 		}
     }
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
-    ((void)(sz));
+    return sz;
 }
 
 size_t TcpConnection::receive (void *buffer, size_t maxDataLength)

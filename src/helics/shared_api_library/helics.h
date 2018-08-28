@@ -86,7 +86,7 @@ HELICS_EXPORT int helicsBrokerIsConnected (helics_broker broker);
 @param broker the broker to wait for
 @param msToWait the time out in millisecond (<0 for infinite timeout)
 */
-HELICS_EXPORT helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait);
+HELICS_EXPORT helics_status helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait);
 
 /** check if a core is connected
 a connected core implies is attached to federate or federates could be attached to it

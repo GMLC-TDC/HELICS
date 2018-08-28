@@ -163,10 +163,10 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     void close ();
     /** send raw data
     @throws boost::system::system_error on failure*/
-    void send (const void *buffer, size_t dataLength);
+    size_t send (const void *buffer, size_t dataLength);
     /** send a string
     @throws boost::system::system_error on failure*/
-    void send (const std::string &dataString);
+    size_t send (const std::string &dataString);
     /** do a blocking receive on the socket
     @throw boost::system::system_error on failure
     @return the number of bytes received
