@@ -61,19 +61,13 @@ through other functions
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint, helics_error *err);
 
-/** get the target of the filter and store in the given string
-@param filt the given filter
-@param[out] outputString storage for the name of the target
-@param maxlen the maximum length of string that str can store
-@return a void enumeration helics_ok if everything worked*/
-HELICS_EXPORT int helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen, helics_error *err);
 
 /** get the name of the filter and store in the given string
 @param filt the given filter
 @param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a void enumeration helics_ok if everything worked*/
-HELICS_EXPORT int helicsFilterGetName (helics_filter filt, char *outputString, int maxlen, helics_error *err);
+HELICS_EXPORT const char *helicsFilterGetName (helics_filter filt, helics_error *err);
 
 /** set a property on a filter
 @param filt the filter to modify

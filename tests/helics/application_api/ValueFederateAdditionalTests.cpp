@@ -126,7 +126,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     vFed1->addShortcut (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getInputType (subid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getInputUnits (subid3), "V");
 
     BOOST_CHECK (vFed1->getSubscriptionId ("sub1") == subid);
@@ -170,7 +169,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto sub3name = vFed1->getTarget (subid3);
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getInputType (subid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getInputUnits (subid3), "V");
 
     // check publications
@@ -452,6 +450,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
     auto id = vFed.getInputId ("pubshortcut");
+
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
 

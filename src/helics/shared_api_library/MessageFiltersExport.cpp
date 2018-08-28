@@ -196,37 +196,6 @@ static helics::CloningFilter *getCloningFilter (helics_filter filt, helics_error
     return dynamic_cast<helics::CloningFilter *> (fObj->filtptr.get ());
 }
 
-/** get the target of the filter*/
-int helicsFilterGetTarget (helics_filter filt, char *outputString, int maxlen, helics_error *err)
-{
-    auto filter = getFilter (filt,err);
-    if (filter == nullptr)
-    {
-        return (-1);
-    }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
-    }
-    try
-    {
-        const auto &target = filter->getTarget ();
-        if (static_cast<int> (target.size ()) > maxlen)
-        {
-            strncpy (outputString, target.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        strcpy (outputString, target.c_str ());
-        return static_cast<int>(target.size());
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-        return (-1);
-    }
-}
-
 /** get the name of the filter*/
 const char *helicsFilterGetName (helics_filter filt, helics_error *err)
 {

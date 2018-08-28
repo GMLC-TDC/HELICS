@@ -986,7 +986,7 @@ void CoreBroker::addFilter (ActionMessage &m)
         return;
     }
 
-    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::filter, m.name, m.info ().target,
+    auto &filt = handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::filter, m.name,
                                     m.info ().type, m.info ().type_out);
     addLocalInfo (filt, m);
     

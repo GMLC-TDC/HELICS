@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "Inputs.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Inputs.hpp"
 
 namespace helics
 {
@@ -17,7 +17,15 @@ InputBase::InputBase (ValueFederate *valueFed,
 {
     try
     {
-        id = fed->registerInput (name_, type_, units_);
+		if (name.empty())
+		{
+            id = fed->registerGlobalInput (name_, type_, units_);
+		}
+		else
+		{
+            id = fed->registerInput (name_, type_, units_);
+		}
+            
     }
     catch (const RegistrationFailure &)
     {
@@ -35,7 +43,7 @@ InputBase::InputBase (interface_visibility locality,
 {
     try
     {
-        if (locality == GLOBAL)
+        if ((locality == GLOBAL)||(name_.empty()))
         {
             id = fed->registerGlobalInput (name_, type_, units_);
         }

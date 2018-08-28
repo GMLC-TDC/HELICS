@@ -211,7 +211,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
 
     /** register a subscription
-    @details register asubscription for a 1D array of values
+    @details register a subscription for a 1D array of values
     @param[in] key the name of the subscription
     @param[in] index1 the index into a 1 dimensional array of values
     @param[in] units the optional units on the subscription

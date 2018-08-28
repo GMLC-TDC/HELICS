@@ -58,9 +58,6 @@ class Filter
 
     /** get the underlying core handle for use with a core*/
     interface_handle getCoreHandle () const { return id; }
-
-    /** get the target of the filter*/
-    const std::string &getTarget () const;
     /** get the name for the filter*/
     const std::string &getName () const;
     /** get the specified input type of the filter*/

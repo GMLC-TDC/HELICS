@@ -26,7 +26,6 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK (defHnd.key.empty ());
     BOOST_CHECK (defHnd.type.empty ());
     BOOST_CHECK (defHnd.units.empty ());
-    BOOST_CHECK (defHnd.target.empty ());
 
     // Constructor with last parameter default value
     helics::BasicHandleInfo hnd1 ( helics::global_federate_id_t(15), helics::interface_handle(10), helics::handle_type_t::endpoint, "key", "type", "units");
@@ -38,7 +37,6 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL(hnd1.key,"key");
     BOOST_CHECK_EQUAL(hnd1.type,"type");
     BOOST_CHECK_EQUAL(hnd1.units,"units");
-    BOOST_CHECK (hnd1.target.empty ());
 
     // Constructor overriding last parameter default value
     helics::BasicHandleInfo hnd2 ( helics::global_federate_id_t(1500), helics::interface_handle(100), helics::handle_type_t::endpoint, "key", "type", "units");
@@ -50,13 +48,12 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL(hnd2.key,"key");
     BOOST_CHECK_EQUAL(hnd2.type,"type");
     BOOST_CHECK_EQUAL(hnd2.units,"units");
-    BOOST_CHECK(hnd2.target.empty ());
 
     // Test handles created with HANDLE_FILTER
 
     // Source filter handle
     // destFilter should be false, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo srcFiltHnd ( helics::global_federate_id_t(2), helics::interface_handle(1), helics::handle_type_t::filter, "key", "target", "type_in",
+    helics::BasicHandleInfo srcFiltHnd ( helics::global_federate_id_t(2), helics::interface_handle(1), helics::handle_type_t::filter, "key", "type_in",
                                         "type_out");
     BOOST_CHECK_EQUAL (srcFiltHnd.getInterfaceHandle (), 1);
     BOOST_CHECK_EQUAL (srcFiltHnd.getFederateId(), 2);
@@ -66,11 +63,10 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL(srcFiltHnd.key,"key");
     BOOST_CHECK_EQUAL(srcFiltHnd.type_in,"type_in");
     BOOST_CHECK_EQUAL(srcFiltHnd.type_out,"type_out");
-    BOOST_CHECK_EQUAL(srcFiltHnd.target,"target");
 
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
-    helics::BasicHandleInfo dstFiltHnd ( helics::global_federate_id_t(3), helics::interface_handle(7), helics::handle_type_t::filter, "key", "target", "type_in", "type_out");
+    helics::BasicHandleInfo dstFiltHnd ( helics::global_federate_id_t(3), helics::interface_handle(7), helics::handle_type_t::filter, "key", "type_in", "type_out");
     BOOST_CHECK_EQUAL (dstFiltHnd.getInterfaceHandle (), 7);
     BOOST_CHECK_EQUAL (dstFiltHnd.getFederateId (), 3);
     BOOST_CHECK(!dstFiltHnd.local_fed_id.isValid());
@@ -78,7 +74,6 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     BOOST_CHECK_EQUAL (dstFiltHnd.key,"key");
     BOOST_CHECK_EQUAL (dstFiltHnd.type_in,"type_in");
     BOOST_CHECK_EQUAL (dstFiltHnd.type_out,"type_out");
-    BOOST_CHECK_EQUAL (dstFiltHnd.target,"target");
 }
 
 BOOST_AUTO_TEST_CASE (endpointinfo_test)

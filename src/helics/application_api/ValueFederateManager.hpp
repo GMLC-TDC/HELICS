@@ -204,6 +204,8 @@ class ValueFederateManager
     federate_id_t fedID;  //!< the federation ID from the core API
     std::atomic<input_id_t::underlyingType> inputCount{0};  //!< the count of actual endpoints
     int allCallbackIndex = -1;  //!< index of the allCallback function
+    std::multimap<std::string, input_id_t> targetIDs; //!<container for the target identifications
+    std::multimap<input_id_t, std::string> inputTargets; //!< container for the specified input targets
   private:
     void getUpdateFromCore (interface_handle handle);
 };

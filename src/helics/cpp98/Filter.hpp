@@ -32,20 +32,9 @@ class Filter
 
     helics_filter baseObject () const { return filt; }
 
-    std::string getTarget () const
+    const char *getName () const
     {
-        char str[255];
-        helicsFilterGetTarget (filt, &str[0], sizeof (str), NULL);
-        std::string result (str);
-        return result;
-    }
-
-    std::string getName () const
-    {
-        char str[255];
-        helicsFilterGetName (filt, &str[0], sizeof (str),NULL);
-        std::string result (str);
-        return result;
+        return helicsFilterGetName (filt,NULL);
     }
 
     void set (const std::string &property, double val)

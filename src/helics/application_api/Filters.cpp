@@ -133,14 +133,6 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 
 static const std::string nullStr;
 
-const std::string &Filter::getTarget () const
-{
-    if (corePtr != nullptr)
-    {
-        return corePtr->getTarget (id,0);
-    }
-    return nullStr;
-}
 
 const std::string &Filter::getName () const
 {

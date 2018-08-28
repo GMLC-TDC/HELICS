@@ -48,19 +48,7 @@ class BasicHandleInfo
 
     {
     }
-    /** construct from the data for filters*/
-    BasicHandleInfo (global_federate_id_t federate_id_t,
-                        interface_handle handle_id,
-                     handle_type_t type_of_handle,
-                     const std::string &key_name,
-                     const std::string &target_name,
-                     const std::string &type_in_name,
-                     const std::string &type_out_name)
-        :  handle (federate_id_t,handle_id), handle_type (type_of_handle), key (key_name), type (type_in_name), units (type_out_name),
-          target (target_name), type_in (type), type_out (units)
 
-    {
-    }
     const global_handle handle;  //!< the global federate id for the creator of the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
     const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
@@ -70,7 +58,6 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    std::string target;  //!< the target of the handle 
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 

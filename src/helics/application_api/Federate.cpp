@@ -145,6 +145,8 @@ Federate::Federate (Federate &&fed) noexcept
     currentTime = fed.currentTime;
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
+    localFilters = std::move (fed.localFilters);
+    name = std::move (fed.name);
 }
 
 Federate &Federate::operator= (Federate &&fed) noexcept
@@ -156,6 +158,8 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     currentTime = fed.currentTime;
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
+    localFilters = std::move (fed.localFilters);
+    name = std::move (fed.name);
     return *this;
 }
 

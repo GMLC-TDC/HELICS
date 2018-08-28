@@ -76,6 +76,7 @@ void ValueFederateManager::addShortcut (input_id_t subid, const std::string &sho
     {
         auto inpHandle = inputs.lock();
         inpHandle->addSearchTermForIndex (shortcutName, subid.value ());
+        targetIDs.emplace (shortcutName, subid);
     }
     else
     {
@@ -102,7 +103,8 @@ void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
     {
         auto inpHandle = inputs.lock ();
         coreObject->addSourceTarget ((*inpHandle)[id.value ()].coreID, target);
-        //todo:: something with a multimap here
+        targetIDs.emplace (target, id);
+        inputTargets.emplace (id, target);
     }
     else
     {
@@ -271,7 +273,12 @@ static const std::string nullStr;
 std::string ValueFederateManager::getTarget(input_id_t id) const
 {
     auto inpHandle = inputs.lock_shared();
-    return (id.value() < inpHandle->size()) ? coreObject->getTarget(interface_handle(id.value()),0): nullStr;
+    auto fnd = inputTargets.find (id);
+    if (fnd != inputTargets.end ())
+    {
+        return fnd->second;
+	}
+    return nullStr;
 }
 
 std::string ValueFederateManager::getInputKey (input_id_t input_id) const
@@ -292,7 +299,14 @@ input_id_t ValueFederateManager::getInputId (const std::string &key) const
 }
 
 input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
-{ return invalid_id_value; }
+{
+    auto res = targetIDs.equal_range (key);
+	if (res.first != res.second)
+	{
+        return res.first->second;
+	}
+    return invalid_id_value;
+}
 
 std::string ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {

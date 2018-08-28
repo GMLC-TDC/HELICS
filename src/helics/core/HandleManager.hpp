@@ -41,26 +41,11 @@ class HandleManager
                                 const std::string &units);
     /** add a handle to manage*/
     BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                handle_type_t what,
-                                const std::string &key,
-                                const std::string &target,
-                                const std::string &type_in,
-                                const std::string &type_out);
-    /** add a handle to manage*/
-    BasicHandleInfo &addHandle (global_federate_id_t fed_id,
                                 interface_handle local_id,
                                 handle_type_t what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
-    /** add a handle to manage*/
-    BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                interface_handle local_id,
-                                handle_type_t what,
-                                const std::string &key,
-                                const std::string &target,
-                                const std::string &type_in,
-                                const std::string &type_out);
 
     void addHandle(const BasicHandleInfo &otherHandle);
     /** add a handle at the specified index*/

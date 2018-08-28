@@ -23,20 +23,6 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 }
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           handle_type_t what,
-                                           const std::string &key,
-                                           const std::string &target,
-                                           const std::string &type_in,
-                                           const std::string &type_out)
-{
-    interface_handle local_id(static_cast<interface_handle::base_type>(handles.size()));
-    std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back ( fed_id, local_id, what, actKey, target, type_in, type_out);
-    addSearchFields (handles.back (), local_id);
-    return handles.back ();
-}
-
-BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            interface_handle local_id,
                                            handle_type_t what,
                                            const std::string &key,
@@ -46,21 +32,6 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
     auto index = static_cast<int32_t> (handles.size ());
     std::string actKey = (!key.empty ()) ? key : generateName (what);
     handles.emplace_back ( fed_id, local_id, what, actKey, type, units);
-    addSearchFields (handles.back (), index);
-    return handles.back ();
-}
-
-BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           interface_handle local_id,
-                                           handle_type_t what,
-                                           const std::string &key,
-                                           const std::string &target,
-                                           const std::string &type_in,
-                                           const std::string &type_out)
-{
-    auto index = static_cast<int32_t> (handles.size ());
-    std::string actKey = (!key.empty ()) ? key : generateName (what);
-    handles.emplace_back ( fed_id, local_id, what, actKey, target, type_in, type_out);
     addSearchFields (handles.back (), index);
     return handles.back ();
 }

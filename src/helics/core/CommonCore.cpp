@@ -694,23 +694,6 @@ const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t globa
     });
 }
 
-const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
-                                                      federate_id_t local_federateId,
-                                                      handle_type_t HandleType,
-                                                      const std::string &key,
-                                                      const std::string &target,
-                                                      const std::string &type_in,
-                                                      const std::string &type_out,
-                                                      uint16_t flags)
-{
-    return handles.modify ([&](auto &hand) -> const BasicHandleInfo & {
-        auto &hndl = hand.addHandle (global_federateId, HandleType, key, target, type_in, type_out);
-        hndl.local_fed_id = local_federateId;
-        hndl.flags = flags;
-        return hndl;
-    });
-}
-
 static const std::string emptyString;
 
 interface_handle CommonCore::registerInput (federate_id_t federateID,
@@ -945,16 +928,6 @@ void CommonCore::addSourceTarget (interface_handle handle, const std::string &ta
         throw (InvalidIdentifier ("publications cannot have source targets"));
     }
     addActionMessage (std::move (cmd));
-}
-
-const std::string &CommonCore::getTarget (interface_handle handle, int32_t /*index*/) const
-{
-    auto handleInfo = getHandleInfo (handle);
-    if (handleInfo != nullptr)
-    {
-        return handleInfo->target;
-    }
-    return nullStr;
 }
 
 void CommonCore::setValue (interface_handle handle, const char *data, uint64_t len)

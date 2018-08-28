@@ -51,8 +51,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
 
     BOOST_CHECK (vFed1->getCurrentState () == Federate::op_states::execution);
     // check subscriptions
-    const auto &sv = subid1.getName ();
-    const auto &sv2 = subid2.getName ();
+    const auto &sv = subid1.getTarget ();
+    const auto &sv2 = subid2.getTarget ();
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
     const auto &sub3name = subid3.getTarget ();

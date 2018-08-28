@@ -101,7 +101,6 @@ class CommonCore : public Core, public BrokerBase
     virtual void setHandleOption (interface_handle handle, int32_t option, bool option_value) override final;
 
     virtual bool getHandleOption (interface_handle handle, int32_t option) const override final;
-    virtual const std::string &getTarget (interface_handle handle, int32_t index) const override final;
     virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) override final;
     virtual void addDestinationTarget (interface_handle handle, const std::string &dest) override final;
     virtual void addSourceTarget (interface_handle handle, const std::string &name) override final;
@@ -326,17 +325,6 @@ class CommonCore : public Core, public BrokerBase
                                         const std::string &key,
                                         const std::string &type,
                                         const std::string &units,
-                                        uint16_t flags=0);
-    /** add a new handle to the generic structure
-    and return a reference to the created BasicHandle
-    */
-   const BasicHandleInfo &createBasicHandle (global_federate_id_t global_federateId,
-                                        federate_id_t local_federateId,
-                                        handle_type_t HandleType,
-                                        const std::string &key,
-                                        const std::string &target,
-                                        const std::string &type_in,
-                                        const std::string &type_out,
                                         uint16_t flags=0);
 
     /** check if a global id represents a local federate

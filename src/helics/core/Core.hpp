@@ -375,15 +375,7 @@ class Core
 	@param handle the handle to remove the target on
 	@param targetToRemove the name of the target to remove*/
     virtual void removeTarget(interface_handle handle, const std::string &targetToRemove) = 0;
-    /**
-    * Returns the target of a specified handle
-    @details for publications and subscriptions control input and control output this is the key
-    for filters this is the target and for endpoints this will return an empty string
-    @param handle the handle to get the target for
-    @param index the index of the target to retrieve
-    @return a string with the target information if empty the index was invalid, only returns a locally named targets
-    */
-    virtual const std::string &getTarget (interface_handle handle, int32_t index) const = 0;
+
     /**
      * Returns units for specified handle.
      */

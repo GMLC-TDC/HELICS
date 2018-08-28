@@ -203,6 +203,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
             id = registerSubscription (key, units);
             if (required)
             {
+
                 //TODO add setOPTION call
             }
             if (sub.isMember ("shortcut"))
