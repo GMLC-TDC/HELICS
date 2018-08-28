@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../../common/GuardedTypes.hpp"
+#include "../../common/TriggerVariable.hpp"
 #include <functional>
 #include <memory>
 #include <string>
@@ -40,7 +41,7 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     void start ();
     /** close the socket*/
     void close ();
-    bool isReceiving () const { return receiving.load (); }
+    bool isReceiving () const { return receivingHalt.isActive(); }
     /** set the callback for the data object*/
     void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
@@ -66,7 +67,7 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
-    std::atomic<bool> receiving{false};
+	TriggerVariable receivingHalt;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
@@ -109,7 +110,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** close the socket*/
     void close ();
     /** check if the acceptor is current accepting new connections*/
-    bool isAccepting () const { return accepting.load (); }
+	bool isAccepting() const { return accepting.isActive(); }
     /** check if the acceptor is ready to begin accepting*/
     bool isConnected () const { return (state.load () == accepting_state_t::connected); }
     /** set the callback for the data object*/
@@ -135,13 +136,13 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
     TcpAcceptor (boost::asio::io_service &io_service, int port);
     /** function for handling the asynchronous return from a read request*/
-    void handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
-    std::atomic<bool> accepting{false};
+    void handle_accept (TcpAcceptor::pointer ptr,TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::endpoint endpoint_;
     std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> acceptCall;
     std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
+	TriggerVariable accepting;
 };
 
 /** tcp socket connection for connecting to a server*/
@@ -231,12 +232,12 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 
   public:
     /** check if the socket has finished the connection process*/
-    bool isConnected () const { return connected.load (); }
+    bool isConnected () const { return connected.isActive (); }
     /** wait until the socket has finished the connection process
-    @param timeOut the number of ms to wait for the connection process to finish (-1) for no limit
-    @return 0 if connected, -1 if the timeout was reached, -2 if error
+    @param timeOut the number of ms to wait for the connection process to finish (<0) for no limit
+    @return true if connected, false if the timeout was reached
     */
-    int waitUntilConnected (int timeOut);
+    bool waitUntilConnected (int timeOut);
 
   private:
     TcpConnection (boost::asio::io_service &io_service,
@@ -245,7 +246,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
                    size_t bufferSize);
 
     boost::asio::ip::tcp::socket socket_;
-    std::atomic<bool> connected{false};  //!< flag indicating connectivity
+    TriggerVariable connected;  //!< variable indicating connectivity
     std::vector<char> data;
 
     void connect_handler (const boost::system::error_code &error);

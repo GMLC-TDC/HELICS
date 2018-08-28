@@ -76,13 +76,13 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     auto conn4 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
 
     auto res = conn1->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn2->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn3->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn4->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
 
     auto transmitFunc = [](helics::tcp::TcpConnection::pointer obj) {
         std::vector<char> dataB (20);
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 
     auto txconn = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
     auto res = txconn->waitUntilConnected (1000);
-    BOOST_REQUIRE_EQUAL (res, 0);
+    BOOST_REQUIRE_EQUAL (res, true);
 
     BOOST_REQUIRE (txconn->isConnected ());
 

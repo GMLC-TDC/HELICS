@@ -23,6 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "HandleManager.hpp"
 #include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
+#include "../common/TriggerVariable.hpp"
 
 namespace helics
 {
@@ -97,7 +98,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> fedMapRequestors;  //!< list of requesters for the active federate map
     JsonMapBuilder depMap;  //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors;  //!< list of requesters for the dependency graph
-
+	TriggerVariable disconnection; //!< controller for the disconection process
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process

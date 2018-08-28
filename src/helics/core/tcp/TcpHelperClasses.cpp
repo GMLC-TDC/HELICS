@@ -18,30 +18,38 @@ void TcpRxConnection::start ()
 {
     if (triggerhalt)
     {
-        receiving = false;
+		receivingHalt.trigger();
         return;
     }
     if (state == connection_state_t::prestart)
     {
-        receiving = true;
+        receivingHalt.activate();
         state = connection_state_t::halted;
     }
     connection_state_t exp = connection_state_t::halted;
     if (state.compare_exchange_strong (exp, connection_state_t::receiving))
     {
-        if (!receiving.load ())
+        if (!receivingHalt.isActive())
         {
-            receiving.store (true);
+			receivingHalt.activate();
         }
-        socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
-                                                    data.size () - residBufferSize),
-                               [this](const boost::system::error_code &error, size_t bytes_transferred) {
-                                   handle_read (error, bytes_transferred);
-                               });
+		if (!triggerhalt)
+		{
+			socket_.async_receive(boost::asio::buffer(data.data() + residBufferSize,
+				data.size() - residBufferSize),
+				[this](const boost::system::error_code &error, size_t bytes_transferred) {
+				handle_read(error, bytes_transferred);
+			});
+		}
+		else
+		{
+			receivingHalt.trigger();
+		}
+        
     }
     else if (exp != connection_state_t::receiving)
     {
-        receiving = false;
+		receivingHalt.trigger();
     }
 }
 
@@ -74,7 +82,7 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
     if (triggerhalt)
     {
         state = connection_state_t::halted;
-        receiving = false;
+		receivingHalt.trigger();
         return;
     }
     if (!error)
@@ -99,7 +107,7 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
     else if (error == boost::asio::error::operation_aborted)
     {
         state = connection_state_t::halted;
-        receiving = false;
+		receivingHalt.trigger();
         return;
     }
     else
@@ -130,7 +138,8 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
             }
             else
             {
-                receiving = false;
+				state = connection_state_t::halted;
+				receivingHalt.trigger();
             }
         }
         else if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
@@ -140,11 +149,12 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
                 std::cerr << "receive error " << error.message () << std::endl;
             }
             state = connection_state_t::halted;
-            receiving = false;
+			receivingHalt.trigger();
         }
         else
         {
-            receiving = false;
+			state = connection_state_t::halted;
+			receivingHalt.trigger();
         }
     }
 }
@@ -176,20 +186,14 @@ void TcpRxConnection::close ()
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
         }
         socket_.close ();
-        while (receiving)
-        {
-            std::this_thread::yield ();
-        }
+		receivingHalt.wait();
     }
     else
     {
-		if (receiving)
+		if (receivingHalt.isActive())
 		{
             socket_.close ();
-            while (receiving)
-            {
-                std::this_thread::yield ();
-            }
+			receivingHalt.wait();
 		}
     }
 }
@@ -219,7 +223,7 @@ void TcpConnection::connect_handler (const boost::system::error_code &error)
 {
     if (!error)
     {
-        connected.store (true);
+		connected.activate();
     }
     else
     {
@@ -241,7 +245,15 @@ void TcpConnection::send (const std::string &dataString)
 {
     if (!isConnected ())
     {
-        waitUntilConnected (200);
+		if (!waitUntilConnected(300))
+		{
+			std::cerr << "connection timeout waiting again" << std::endl;
+		}
+		if (!waitUntilConnected(200))
+		{
+			std::cerr << "connection timeout twice, now throwing error" << std::endl;
+			throw(std::runtime_error("unable to connect tcp socket"));
+		}
     }
     auto sz = socket_.send (boost::asio::buffer (dataString));
     assert (sz == dataString.size ());
@@ -253,19 +265,21 @@ size_t TcpConnection::receive (void *buffer, size_t maxDataLength)
     return socket_.receive (boost::asio::buffer (buffer, maxDataLength));
 }
 
-int TcpConnection::waitUntilConnected (int timeOut)
+bool TcpConnection::waitUntilConnected (int timeOut)
 {
-    int cnt = 0;
-    while (!isConnected ())
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-        cnt += 50;
-        if (cnt > timeOut)
-        {
-            return (-1);
-        }
-    }
-    return 0;
+	if (isConnected())
+	{
+		return true;
+	}
+	if (timeOut < 0)
+	{
+		connected.waitActivation();
+		return true;
+	}
+	else
+	{
+		return connected.wait_forActivation(std::chrono::milliseconds(timeOut));
+	}
 }
 
 void TcpConnection::close ()
@@ -354,40 +368,46 @@ bool TcpAcceptor::start (TcpRxConnection::pointer conn)
 {
     if (!conn)
     {
+		if (accepting.isActive())
+		{
+			accepting.trigger();
+		}
         return false;
     }
     if (state != accepting_state_t::connected)
     {
         conn->close ();
+		if (accepting.isActive())
+		{
+			accepting.trigger();
+		}
         return false;
     }
-    bool exp = false;
-    if (accepting.compare_exchange_strong (exp, true))
+    if (accepting.activate())
     {
         auto &socket = conn->socket ();
         acceptor_.listen ();
+		auto ptr = shared_from_this();
         acceptor_.async_accept (socket,
-                                [this, connection = std::move (conn)](const boost::system::error_code &error) {
-                                    handle_accept (connection, error);
+                                [this,apointer=std::move(ptr), connection = std::move (conn)](const boost::system::error_code &error) {
+                                    handle_accept (apointer,connection, error);
                                 });
+		return true;
     }
     else
     {
         conn->close ();
         return false;
     }
-    return true;
+    
 }
 
 /** close the acceptor*/
 void TcpAcceptor::close ()
 {
-    acceptor_.close ();
-    state = accepting_state_t::halted;
-    while (accepting)
-    {
-        std::this_thread::yield ();
-    }
+	state = accepting_state_t::halted;
+	acceptor_.close ();
+	accepting.wait();
 }
 
 std::string TcpAcceptor::to_string () const
@@ -397,10 +417,8 @@ std::string TcpAcceptor::to_string () const
     str += std::to_string (endpoint_.port ());
     return str;
 }
-void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
+void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,TcpRxConnection::pointer new_connection, const boost::system::error_code &error)
 {
-    auto ptr = shared_from_this ();
-    accepting = false;
     if (state != accepting_state_t::connected)
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
@@ -412,12 +430,19 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
         {
         }
         new_connection->close ();
+		accepting.reset();
+		return;
     }
     if (!error)
     {
         if (acceptCall)
         {
+			accepting.reset();
             acceptCall (std::move (ptr), std::move (new_connection));
+			if (!accepting.isActive())
+			{
+				accepting.trigger();
+			}
         }
         else
         {
@@ -430,6 +455,7 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
             {
             }
             new_connection->close ();
+			accepting.reset();
         }
     }
     else if (error != boost::asio::error::operation_aborted)
@@ -451,7 +477,13 @@ void TcpAcceptor::handle_accept (TcpRxConnection::pointer new_connection, const 
         {
         }
         new_connection->close ();
+		accepting.reset();
     }
+	else
+	{
+		new_connection->close();
+		accepting.reset();
+	}
 }
 
 TcpServer::TcpServer (boost::asio::io_service &io_service,
@@ -688,8 +720,6 @@ void TcpServer::close ()
         {
             acc->cancel ();
         }
-        // yield the thread to allow some time for handles to process the cancellation
-        std::this_thread::sleep_for (std::chrono::milliseconds (200));
         for (auto &acc : acceptors)
         {
             acc->close ();

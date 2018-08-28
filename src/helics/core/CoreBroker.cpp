@@ -1009,6 +1009,7 @@ bool CoreBroker::connect ()
                 {
                     timeCoord->source_id = global_broker_id;
                 }
+				disconnection.activate();
                 brokerState = broker_state_t::connected;
             }
             else
@@ -1034,46 +1035,11 @@ void CoreBroker::waitForDisconnect (int msToWait) const
 {
 	if (msToWait <= 0)
 	{
-        // TODO:: this should really be a future that gets triggered when isConnected changes
-        bool sleep_toggle = false;
-        while (isConnected ())
-        {
-            if (!sleep_toggle)
-            {
-                std::this_thread::yield ();
-            }
-            else
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-            }
-            sleep_toggle = !sleep_toggle;
-        }
+		disconnection.wait();
 	}
 	else
 	{
-   
-        while (isConnected ())
-        {
-            if (msToWait>100)
-            {
-				std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                msToWait -= 100;
-            }
-			else if (msToWait > 10)
-			{
-                std::this_thread::sleep_for (std::chrono::milliseconds (msToWait));
-                msToWait=0;
-			}
-			else if (msToWait > 0)
-			{
-                std::this_thread::yield ();
-                msToWait = 0;
-			}
-			else
-			{
-                return;
-			}
-        }
+		disconnection.wait_for(std::chrono::milliseconds(msToWait));
 	}
 }
 
@@ -1084,6 +1050,7 @@ void CoreBroker::processDisconnect (bool skipUnregister)
     {
         brokerState = broker_state_t::terminating;
         brokerDisconnect ();
+
     }
     brokerState = broker_state_t::terminated;
 
@@ -1091,6 +1058,7 @@ void CoreBroker::processDisconnect (bool skipUnregister)
     {
         unregister ();
     }
+	disconnection.trigger();
 }
 
 void CoreBroker::unregister ()

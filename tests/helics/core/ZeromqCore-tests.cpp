@@ -448,12 +448,12 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     });
 
     // need to launch the connection commands at the same time since they depend on eachother in this case
-    // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
+     auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect ();
     BOOST_REQUIRE (connected);
-    // connected = connected_fut.get();
-    connected = comm.connect ();
+    connected = connected_fut.get();
+    //connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
 
@@ -486,14 +486,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm2.transmit (3, helics::CMD_ACK);
 
     std::this_thread::yield();
-    if (counter3 != 1)
+    while (counter3 != 1)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
     }
-    if (counter3 != 1)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    }
+    
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
@@ -502,14 +499,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     comm2.transmit (4, helics::CMD_ACK);
 
     std::this_thread::yield();
-    if (counter != 1)
+    while (counter != 1)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
-    if (counter != 1)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    }
+ 
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
