@@ -91,6 +91,10 @@ UdpComms::UdpComms (const NetworkBrokerData &netInfo)
     }
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
+    if (PortNumber > 0)
+    {
+        autoPortNumber = false;
+    }
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }
@@ -123,6 +127,10 @@ void UdpComms::setPortNumber (int localPortNumber)
     if (rx_status == connection_status::startup)
     {
         PortNumber = localPortNumber;
+        if (PortNumber > 0)
+        {
+            autoPortNumber = false;
+        }
     }
 }
 
@@ -205,6 +213,41 @@ void UdpComms::queue_rx_function ()
         }
         catch (const boost::system::system_error &error)
         {
+            if ((autoPortNumber) && (hasBroker))
+            {  // If we failed and we are on an automatically assigned port number,  just try a different port
+                int tries = 0;
+				while (!bindsuccess)
+				{
+                    ++PortNumber;
+                    try
+                    {
+                        socket.bind (udp::endpoint (udp::v4 (), PortNumber));
+                        bindsuccess = true;
+                    }
+					catch (const boost::system::system_error &)
+					{
+                        ++tries;
+						if (tries > 10)
+						{
+                            break;
+						}
+					}
+				}
+				if (bindsuccess)
+				{
+                    continue;
+				}
+				else
+				{
+                    disconnecting = true;
+                    std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
+                              << error.what () << std::endl;
+                    socket.close ();
+                    rx_status = connection_status::error;
+                    return;
+				}
+                
+            }
             if (t_cnt == 0)
             {
                 std::cerr << "bind error on UDP socket " << error.what () << std::endl;

@@ -142,6 +142,7 @@ ZmqComms::ZmqComms (const NetworkBrokerData &netInfo) : CommsInterface (netInfo)
     {
         repPortNumber = netInfo.portNumber;
         pullPortNumber = repPortNumber + 1;
+        autoPortNumber = false;
     }
     if (netInfo.portStart > 0)
     {
@@ -182,6 +183,10 @@ void ZmqComms::setPortNumber (int portNumber)
     {
         repPortNumber = portNumber;
         pullPortNumber = portNumber + 1;
+        if (portNumber > 0)
+        {
+            autoPortNumber = false;
+        }
     }
 }
 

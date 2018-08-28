@@ -74,7 +74,10 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     auto conn2 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
     auto conn3 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
     auto conn4 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
-
+    BOOST_REQUIRE (conn1);
+    BOOST_REQUIRE (conn2);
+    BOOST_REQUIRE (conn3);
+    BOOST_REQUIRE (conn4);
     auto res = conn1->waitUntilConnected (1000);
     BOOST_CHECK_EQUAL (res, true);
     res = conn2->waitUntilConnected (1000);

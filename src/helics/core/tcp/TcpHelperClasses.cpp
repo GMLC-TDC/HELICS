@@ -246,7 +246,7 @@ size_t TcpConnection::send (const void *buffer, size_t dataLength)
     }
     auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
     assert (sz == dataLength);
-    ((void)(sz));
+    return sz;
 }
 
 size_t TcpConnection::send (const std::string &dataString)

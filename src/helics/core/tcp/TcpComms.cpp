@@ -84,6 +84,10 @@ TcpComms::TcpComms (const NetworkBrokerData &netInfo)
     {
         openPortStart = netInfo.portStart;
     }
+	if (PortNumber > 0)
+	{
+        autoPortNumber = false;
+	}
 }
 
 /** destructor*/
@@ -117,6 +121,10 @@ void TcpComms::setPortNumber (int localPortNumber)
     if (rx_status == connection_status::startup)
     {
         PortNumber = localPortNumber;
+        if (PortNumber > 0)
+        {
+            autoPortNumber = false;
+        }
     }
 }
 
@@ -264,8 +272,6 @@ bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/
 
 void TcpComms::queue_rx_function ()
 {
-    bool autoPortNumber = (PortNumber < 0);
-
     while (PortNumber < 0)
     {
         auto message = rxMessageQueue.pop ();
