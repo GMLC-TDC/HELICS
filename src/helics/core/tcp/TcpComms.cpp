@@ -95,7 +95,7 @@ TcpComms::~TcpComms () { disconnect (); }
 
 void TcpComms::setBrokerPort (int brokerPortNumber)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus () == connection_status::startup)
     {
         brokerPort = brokerPortNumber;
     }
@@ -118,7 +118,7 @@ int TcpComms::findOpenPort ()
 
 void TcpComms::setPortNumber (int localPortNumber)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus () == connection_status::startup)
     {
         PortNumber = localPortNumber;
         if (PortNumber > 0)
@@ -256,7 +256,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const
 bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/,
                                  const boost::system::error_code &error)
 {
-    if (rx_status == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
         {
@@ -305,14 +305,14 @@ void TcpComms::queue_rx_function ()
             case CLOSE_RECEIVER:
             case DISCONNECT:
                 disconnecting = true;
-                rx_status = connection_status::terminated;
+                setRxStatus ( connection_status::terminated);
                 return;
             }
         }
     }
     if (PortNumber < 0)
     {
-        rx_status = connection_status::error;
+        setRxStatus ( connection_status::error);
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
@@ -336,7 +336,7 @@ void TcpComms::queue_rx_function ()
             {
                 std::cerr << "unable to bind to tcp connection socket\n";
                 server->close ();
-                rx_status = connection_status::error;
+                setRxStatus ( connection_status::error);
                 return;
             }
         }
@@ -349,7 +349,7 @@ void TcpComms::queue_rx_function ()
         return commErrorHandler (connection, error);
     });
     server->start ();
-    rx_status = connection_status::connected;
+    setRxStatus ( connection_status::connected);
     bool loopRunning = true;
     while (loopRunning)
     {
@@ -368,7 +368,7 @@ void TcpComms::queue_rx_function ()
 
     disconnecting = true;
     server->close ();
-    rx_status = connection_status::terminated;
+    setRxStatus ( connection_status::terminated);
 }
 
 void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)
@@ -420,7 +420,7 @@ void TcpComms::queue_tx_function ()
                 if (cumsleep >= connectionTimeout)
                 {
                     std::cerr << "initial connection to broker timed out\n" << std::endl;
-                    tx_status = connection_status::terminated;
+                    setTxStatus ( connection_status::terminated);
                     return;
                 }
             }
@@ -436,7 +436,7 @@ void TcpComms::queue_tx_function ()
                 catch (const boost::system::system_error &error)
                 {
                     std::cerr << "error in initial send to broker " << error.what () << '\n';
-                    tx_status = connection_status::terminated;
+                    setTxStatus ( connection_status::terminated);
                     return;
                 }
                 std::vector<char> rx (512);
@@ -472,7 +472,7 @@ void TcpComms::queue_tx_function ()
                             else if (mess->second.index == DISCONNECT)
                             {
                                 brokerConnection->cancel ();
-                                tx_status = connection_status::terminated;
+                                setTxStatus ( connection_status::terminated);
                                 return;
                             }
                         }
@@ -482,7 +482,7 @@ void TcpComms::queue_tx_function ()
                     {
                         brokerConnection->cancel ();
                         std::cerr << "port number query to broker timed out\n" << std::endl;
-                        tx_status = connection_status::terminated;
+                        setTxStatus ( connection_status::terminated);
                         return;
                     }
                 }
@@ -504,7 +504,7 @@ void TcpComms::queue_tx_function ()
             rxMessageQueue.push (m);
         }
     }
-    tx_status = connection_status::connected;
+    setTxStatus ( connection_status::connected);
 
     //  std::vector<ActionMessage> txlist;
     while (true)
@@ -661,11 +661,11 @@ CLOSE_TX_LOOP:
         rt.second->close ();
     }
     routes.clear ();
-    if (rx_status == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         closeReceiver ();
     }
-    tx_status = connection_status::terminated;
+    setTxStatus ( connection_status::terminated);
 }
 
 void TcpComms::closeReceiver ()

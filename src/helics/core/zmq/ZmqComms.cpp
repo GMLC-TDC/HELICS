@@ -154,7 +154,7 @@ ZmqComms::~ZmqComms () { disconnect (); }
 
 void ZmqComms::setBrokerPort (int brokerPort)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus () == connection_status::startup)
     {
         brokerReqPort = brokerPort;
         brokerPushPort = brokerReqPort + 1;
@@ -179,7 +179,7 @@ std::pair<int, int> ZmqComms::findOpenPorts ()
 
 void ZmqComms::setPortNumber (int portNumber)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus () == connection_status::startup)
     {
         repPortNumber = portNumber;
         pullPortNumber = portNumber + 1;
@@ -215,7 +215,7 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
         case CLOSE_RECEIVER:
             return (-1);
         case RECONNECT_RECEIVER:
-            rx_status = connection_status::connected;
+            setRxStatus ( connection_status::connected);
             break;
         default:
             break;
@@ -291,7 +291,7 @@ void ZmqComms::queue_rx_function ()
     catch (const zmq::error_t &)
     {
         std::cerr << "binding error on internal comms socket" << std::endl;
-        rx_status = connection_status::error;
+        setRxStatus ( connection_status::error);
         return;
     }
     controlSocket.setsockopt (ZMQ_LINGER, 200);
@@ -334,19 +334,19 @@ void ZmqComms::queue_rx_function ()
             {
                 std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
                 disconnecting = true;
-                rx_status = connection_status::error;
+                setRxStatus ( connection_status::error);
                 return;
             }
             else if (M.index == DISCONNECT)
             {
                 disconnecting = true;
-                rx_status = connection_status::terminated;
+                setRxStatus ( connection_status::terminated);
                 return;
             }
             else if (M.index == DISCONNECT_ERROR)
             {
                 disconnecting = true;
-                rx_status = connection_status::error;
+                setRxStatus ( connection_status::error);
                 return;
             }
         }
@@ -359,7 +359,7 @@ void ZmqComms::queue_rx_function ()
         disconnecting = true;
         std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, repPortNumber)
                   << '\n';
-        rx_status = connection_status::error;
+        setRxStatus ( connection_status::error);
         return;
     }
     bindsuccess = bindzmqSocket (pullSocket, localTarget_, pullPortNumber, connectionTimeout);
@@ -370,7 +370,7 @@ void ZmqComms::queue_rx_function ()
         repSocket.close ();
         disconnecting = true;
         std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, pullPortNumber) << '\n';
-        rx_status = connection_status::error;
+        setRxStatus ( connection_status::error);
         return;
     }
 
@@ -382,7 +382,7 @@ void ZmqComms::queue_rx_function ()
     poller[1].events = ZMQ_POLLIN;
     poller[2].socket = static_cast<void *> (repSocket);
     poller[2].events = ZMQ_POLLIN;
-    rx_status = connection_status::connected;  // this is a atomic indicator that the rx queue is ready
+    setRxStatus ( connection_status::connected);  // this is a atomic indicator that the rx queue is ready
     while (true)
     {
         auto rc = zmq::poll (poller);
@@ -421,7 +421,7 @@ void ZmqComms::queue_rx_function ()
         }
     }
     disconnecting = true;
-    rx_status = connection_status::terminated;
+    setRxStatus ( connection_status::terminated);
 }
 
 int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
@@ -444,7 +444,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         {
             std::cerr << "unable to connect with broker at " << makePortAddress (brokerTarget_, brokerReqPort)
                       << ":" << ze.what () << '\n';
-            tx_status = connection_status::error;
+            setTxStatus ( connection_status::error);
             ActionMessage M (CMD_PROTOCOL);
             M.index = DISCONNECT_ERROR;
             controlSocket.send (M.to_string ());
@@ -472,14 +472,14 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 if (rc < 0)
                 {
                     std::cerr << "unable to connect with zmq broker\n";
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                 }
                 else if (rc == 0)
                 {
                     std::cerr << "zmq broker connection timed out\n";
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                 }
-                if (tx_status == connection_status::error)
+                if (getTxStatus () == connection_status::error)
                 {
                     ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
@@ -501,13 +501,13 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                     else if (rxcmd.index == DISCONNECT)
                     {
                         controlSocket.send (msg);
-                        tx_status = connection_status::terminated;
+                        setTxStatus ( connection_status::terminated);
                         return (-3);
                     }
                     else if (rxcmd.index == DISCONNECT_ERROR)
                     {
                         controlSocket.send (msg);
-                        tx_status = connection_status::error;
+                        setTxStatus ( connection_status::error);
                         return (-4);
                     }
                 }
@@ -516,7 +516,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 if (cnt > 10)
                 {
                     // we can't get the broker to respond with port numbers
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                     ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
                     controlSocket.send (M.to_string ());
@@ -538,14 +538,14 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 if (rc < 0)
                 {
                     std::cerr << "unable to connect with zmq broker (2)\n";
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                 }
                 else if (rc == 0)
                 {
                     std::cerr << "zmq broker connection timed out (2)\n";
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                 }
-                if (tx_status == connection_status::error)
+                if (getTxStatus () == connection_status::error)
                 {
                     ActionMessage M (CMD_PROTOCOL);
                     M.index = DISCONNECT_ERROR;
@@ -569,13 +569,13 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                     else if (rxcmd.index == DISCONNECT)
                     {
                         controlSocket.send (msg);
-                        tx_status = connection_status::terminated;
+                        setTxStatus ( connection_status::terminated);
                         return (-3);
                     }
                     else if (rxcmd.index == DISCONNECT_ERROR)
                     {
                         controlSocket.send (msg);
-                        tx_status = connection_status::error;
+                        setTxStatus ( connection_status::error);
                         return (-4);
                     }
                 }
@@ -584,7 +584,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 if (cnt > 10)
                 {
                     // we can't get the broker to respond with port numbers
-                    tx_status = connection_status::error;
+                    setTxStatus ( connection_status::error);
                     return (-1);
                 }
             }
@@ -619,8 +619,6 @@ void ZmqComms::queue_tx_function ()
     std::vector<char> buffer;
 
     auto ctx = zmqContextManager::getContextPointer ();
-    conditionalChangeOnDestroy<connection_status> cchange (tx_status, connection_status::error,
-                                                           connection_status::connected);
     // Setup the control socket for comms with the receiver
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
     controlSocket.setsockopt (ZMQ_LINGER, 200);
@@ -629,6 +627,7 @@ void ZmqComms::queue_tx_function ()
     auto res = initializeBrokerConnections (controlSocket);
     if (res < 0)
     {
+        setTxStatus (connection_status::error);
         controlSocket.close ();
         return;
     }
@@ -643,7 +642,7 @@ void ZmqComms::queue_tx_function ()
         priority_routes.addRoutes (0, makePortAddress (brokerTarget_, brokerReqPort));
         brokerPushSocket.connect (makePortAddress (brokerTarget_, brokerPushPort));
     }
-    tx_status = connection_status::connected;
+    setTxStatus ( connection_status::connected);
     zmq::message_t msg;
     while (true)
     {
@@ -690,7 +689,7 @@ void ZmqComms::queue_tx_function ()
                 switch (cmd.index)
                 {
                 case RECONNECT:
-                    tx_status = connection_status::connected;
+                    setTxStatus ( connection_status::connected);
                     break;
                 case NEW_ROUTE:
                 {
@@ -780,19 +779,19 @@ CLOSE_TX_LOOP:
     brokerPushSocket.close ();
 
     routes.clear ();
-    if (rx_status == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
     }
 
     controlSocket.close ();
 
-    tx_status = connection_status::terminated;
+    setTxStatus ( connection_status::terminated);
 }
 
 void ZmqComms::closeReceiver ()
 {
-    if (tx_status == connection_status::connected)
+    if (getTxStatus () == connection_status::connected)
     {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.index = CLOSE_RECEIVER;

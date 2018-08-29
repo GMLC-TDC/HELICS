@@ -101,7 +101,7 @@ UdpComms::~UdpComms () { disconnect (); }
 
 void UdpComms::setBrokerPort (int brokerPortNumber)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus() == connection_status::startup)
     {
         brokerPort = brokerPortNumber;
     }
@@ -124,7 +124,7 @@ int UdpComms::findOpenPort ()
 
 void UdpComms::setPortNumber (int localPortNumber)
 {
-    if (rx_status == connection_status::startup)
+    if (getRxStatus() == connection_status::startup)
     {
         PortNumber = localPortNumber;
         if (PortNumber > 0)
@@ -196,7 +196,7 @@ void UdpComms::queue_rx_function ()
     }
     if (PortNumber < 0)
     {
-        rx_status = connection_status::error;
+        setRxStatus( connection_status::error);
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
@@ -243,7 +243,7 @@ void UdpComms::queue_rx_function ()
                     std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
                               << error.what () << std::endl;
                     socket.close ();
-                    rx_status = connection_status::error;
+                    setRxStatus( connection_status::error);
                     return;
 				}
                 
@@ -260,7 +260,7 @@ void UdpComms::queue_rx_function ()
                 std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
                           << error.what () << std::endl;
                 socket.close ();
-                rx_status = connection_status::error;
+                setRxStatus( connection_status::error);
                 return;
             }
         }
@@ -270,13 +270,13 @@ void UdpComms::queue_rx_function ()
     udp::endpoint remote_endp;
     boost::system::error_code error;
     boost::system::error_code ignored_error;
-    rx_status = connection_status::connected;
+    setRxStatus( connection_status::connected);
     while (true)
     {
         auto len = socket.receive_from (boost::asio::buffer (data), remote_endp, 0, error);
         if (error)
         {
-            rx_status = connection_status::error;
+            setRxStatus( connection_status::error);
             return;
         }
         if (len == 5)
@@ -323,7 +323,7 @@ void UdpComms::queue_rx_function ()
     }
 CLOSE_RX_LOOP:
     disconnecting = true;
-    rx_status = connection_status::terminated;
+    setRxStatus( connection_status::terminated);
 }
 
 void UdpComms::queue_tx_function ()
@@ -396,7 +396,7 @@ void UdpComms::queue_tx_function ()
                     {
                         PortNumber = -1;
                         promisePort.set_value (-1);
-                        tx_status = connection_status::terminated;
+                        setTxStatus( connection_status::terminated);
                         return;
                     }
                 }
@@ -418,7 +418,7 @@ void UdpComms::queue_tx_function ()
     udp::resolver::query queryLocal (udp::v4 (), localTarget_, std::to_string (PortNumber));
 
     udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
-    tx_status = connection_status::connected;
+    setTxStatus( connection_status::connected);
 
     while (true)
     {
@@ -518,12 +518,12 @@ void UdpComms::queue_tx_function ()
 CLOSE_TX_LOOP:
 
     routes.clear ();
-    if (rx_status == connection_status::connected)
+    if (getRxStatus() == connection_status::connected)
     {
         if (closingRx)
         {
             int cnt = 0;
-            while (rx_status == connection_status::connected)
+            while (getRxStatus() == connection_status::connected)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
                 ++cnt;
@@ -553,12 +553,12 @@ CLOSE_TX_LOOP:
         }
     }
 
-    tx_status = connection_status::terminated;
+    setTxStatus( connection_status::terminated);
 }
 
 void UdpComms::closeReceiver ()
 {
-    if (tx_status == connection_status::connected)
+    if (getTxStatus() == connection_status::connected)
     {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.index = CLOSE_RECEIVER;

@@ -54,6 +54,76 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     transmit (-1, rt);
 }
 
+void CommsInterface::setTxStatus(connection_status txStatus)
+{
+	if (tx_status == txStatus)
+	{
+		return;
+	}
+	switch (txStatus)
+	{
+    case connection_status::connected:
+		if (tx_status == connection_status::startup)
+		{
+            tx_status = txStatus;
+            txTrigger.activate ();
+		}
+        break;
+    case connection_status::terminated:
+    case connection_status::error:
+        if (tx_status == connection_status::startup)
+        {
+            tx_status = txStatus;
+            txTrigger.activate ();
+            txTrigger.trigger ();
+        }
+        else
+        {
+            tx_status = txStatus;
+            txTrigger.trigger ();
+        }
+        break;
+    default:
+        tx_status = txStatus;
+	}
+    
+}
+
+void CommsInterface::setRxStatus(connection_status rxStatus)
+{
+    if (rx_status == rxStatus)
+    {
+        return;
+    }
+    switch (rxStatus)
+    {
+    case connection_status::connected:
+        if (rx_status == connection_status::startup)
+        {
+            rx_status = rxStatus;
+            rxTrigger.activate ();
+        }
+        break;
+    case connection_status::terminated:
+    case connection_status::error:
+		if (rx_status == connection_status::startup)
+		{
+            rx_status = rxStatus;
+            rxTrigger.activate ();
+            rxTrigger.trigger ();
+		}
+		else
+		{
+            rx_status = rxStatus;
+            rxTrigger.trigger ();
+		}
+        
+        break;
+    default:
+        rx_status = rxStatus;
+    }
+}
+
 bool CommsInterface::connect ()
 {
     if (isConnected ())
@@ -85,15 +155,8 @@ bool CommsInterface::connect ()
     }
     queue_watcher = std::thread ([this] { queue_rx_function (); });
     queue_transmitter = std::thread ([this] { queue_tx_function (); });
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    while (rx_status == connection_status::startup)
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    }
-    while (tx_status == connection_status::startup)
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    }
+    txTrigger.waitActivation ();
+    rxTrigger.waitActivation ();
     if (rx_status != connection_status::connected)
     {
         // std::cerr << "receiver connection failure" << std::endl;
@@ -146,14 +209,17 @@ void CommsInterface::disconnect ()
     int cnt = 0;
     while (rx_status.load () <= connection_status::connected)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+		if (rxTrigger.wait_for(std::chrono::milliseconds(800)))
+		{
+            continue;
+		}
         ++cnt;
-        if ((cnt & 31) == 0)  // call this every 32*50 milliseconds
+        if ((cnt & 3) == 0)  // call this every 2400 milliseconds
         {
             // try calling closeReceiver again
             closeReceiver ();
         }
-        if (cnt == 400)  // Eventually give up
+        if (cnt == 14)  // Eventually give up
         {
             std::cerr << "unable to terminate connection\n";
             break;
@@ -169,14 +235,17 @@ void CommsInterface::disconnect ()
     cnt = 0;
     while (tx_status.load () <= connection_status::connected)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-        ++cnt;
-        if ((cnt & 31) == 0)
+        if (rxTrigger.wait_for (std::chrono::milliseconds (800)))
         {
-            // try calling closeTransmitter again
+            continue;
+        }
+        ++cnt;
+        if ((cnt & 3) == 0)  // call this every 2400 milliseconds
+        {
+            // try calling closeReceiver again
             closeTransmitter ();
         }
-        if (cnt == 400)
+        if (cnt == 14)  // Eventually give up
         {
             std::cerr << "unable to terminate connection\n";
             break;
