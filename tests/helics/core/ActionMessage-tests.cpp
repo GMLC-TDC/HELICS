@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (ActionMessage_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (ActionMessage_tests, *utf::label ("ci"))
 
 using namespace helics;
 /*
@@ -85,9 +85,9 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     m.dest_id = 22552215;
     m.dest_handle = 2322342;
 
-    m.info ().source = "this is a long source string to test";
-    m.info ().orig_source = "this is a longer alternate source string to test";
-    m.info ().target = "this is a target";
+    m.setString (sourceStringLoc, "this is a long source string to test");
+    m.setString (origSourceStringLoc, "this is a longer alternate source string to test");
+    m.setString (targetStringLoc, "this is a target");
     m.Tdemin = 2342532.2342;
     m.Tso = 54.7814;
     m.Te = Time::epsilon ();
@@ -105,10 +105,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
     BOOST_CHECK (m.actionTime == fr.actionTime);
 
-    BOOST_CHECK_EQUAL (m.info ().source, fr.info ().source);
-    BOOST_CHECK_EQUAL (m.info ().orig_source, fr.info ().orig_source);
-    BOOST_CHECK_EQUAL (m.info ().target, fr.info ().target);
-    BOOST_CHECK(m.Tso == fr.Tso);
+    BOOST_CHECK (m.getStringData () == fr.getStringData ());
+    BOOST_CHECK (m.Tso == fr.Tso);
     BOOST_CHECK (m.Te == fr.Te);
     BOOST_CHECK (m.Tdemin == fr.Tdemin);
 }
@@ -130,11 +128,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // Additional info defaults
     BOOST_CHECK_EQUAL (cmd.Te, helics::timeZero);
     BOOST_CHECK_EQUAL (cmd.Tdemin, helics::timeZero);
-    BOOST_CHECK (cmd.info ().source.empty ());
-    BOOST_CHECK (cmd.info ().target.empty ());
-    BOOST_CHECK (cmd.info ().type.empty ());
-    BOOST_CHECK (cmd.info ().units.empty ());
-    BOOST_CHECK (cmd.info ().orig_source.empty ());
+    BOOST_CHECK (cmd.getStringData ().empty ());
 
     // Action constructor
     helics::ActionMessage cmd2 (helics::CMD_INIT);
@@ -154,9 +148,7 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
 
     cmd.Te = helics::Time::maxVal ();
     cmd.Tdemin = helics::Time::minVal ();
-    cmd.info ().source = "source";  // type aliased to source
-    cmd.info ().target = "target";  // units aliased to target
-    cmd.info ().orig_source = "original_source";
+    cmd.setStringData ("target", "source", "original_source");
 
     // Check operator= override
     helics::ActionMessage cmd_copy (cmd);
@@ -172,11 +164,9 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
 
     BOOST_CHECK_EQUAL (cmd_copy.Te, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_copy.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK_EQUAL (cmd_copy.info ().source, "source");
-    BOOST_CHECK_EQUAL (cmd_copy.info ().target, "target");
-    BOOST_CHECK_EQUAL (cmd_copy.info ().type, "source");  // aliased to source
-    BOOST_CHECK_EQUAL (cmd_copy.info ().units, "target");  // aliased to target
-    BOOST_CHECK_EQUAL (cmd_copy.info ().orig_source, "original_source");
+    BOOST_CHECK_EQUAL (cmd_copy.getString (sourceStringLoc), "source");
+    BOOST_CHECK_EQUAL (cmd_copy.getString (targetStringLoc), "target");
+    BOOST_CHECK_EQUAL (cmd_copy.getString (origSourceStringLoc), "original_source");
 }
 
 BOOST_AUTO_TEST_CASE (assignment_test)
@@ -194,9 +184,7 @@ BOOST_AUTO_TEST_CASE (assignment_test)
 
     cmd.Te = helics::Time::maxVal ();
     cmd.Tdemin = helics::Time::minVal ();
-    cmd.info ().source = "source";  // type aliased to source
-    cmd.info ().target = "target";  // units aliased to target
-    cmd.info ().orig_source = "original_source";
+    cmd.setStringData ("target", "source", "original_source","original_dest");
 
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
@@ -214,11 +202,10 @@ BOOST_AUTO_TEST_CASE (assignment_test)
 
     BOOST_CHECK_EQUAL (cmd_assign.Te, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_assign.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.info ().source, "source");
-    BOOST_CHECK_EQUAL (cmd_assign.info ().target, "target");
-    BOOST_CHECK_EQUAL (cmd_assign.info ().type, "source");  // aliased to source
-    BOOST_CHECK_EQUAL (cmd_assign.info ().units, "target");  // aliased to target
-    BOOST_CHECK_EQUAL (cmd_assign.info ().orig_source, "original_source");
+    BOOST_CHECK_EQUAL (cmd_assign.getString(sourceStringLoc), "source");
+    BOOST_CHECK_EQUAL (cmd_assign.getString(targetStringLoc), "target");
+    BOOST_CHECK_EQUAL (cmd_assign.getString(origSourceStringLoc), "original_source");
+    BOOST_CHECK_EQUAL (cmd_assign.getString (origDestStringLoc), "original_dest");
 }
 
 BOOST_AUTO_TEST_CASE (comparison_test)
@@ -233,25 +220,23 @@ BOOST_AUTO_TEST_CASE (comparison_test)
     cmd3.actionTime = helics::Time::maxVal ();
 
     // Check less than comparison (not implemented yet)
-    
-    BOOST_CHECK(cmd1 < cmd2);
-    BOOST_CHECK(cmd2 < cmd3);
-    BOOST_CHECK(cmd1 < cmd3);
-    BOOST_CHECK(!(cmd1 < cmd1));
-    
+
+    BOOST_CHECK (cmd1 < cmd2);
+    BOOST_CHECK (cmd2 < cmd3);
+    BOOST_CHECK (cmd1 < cmd3);
+    BOOST_CHECK (!(cmd1 < cmd1));
 
     // Insert messages into a set, check for correct ordering when scanned
     std::set<helics::ActionMessage> q;
     q.insert (cmd2);
     q.insert (cmd3);
     q.insert (cmd1);
-    helics::Time ctime = helics::Time::minVal();
+    helics::Time ctime = helics::Time::minVal ();
     for (const auto &cmd : q)
     {
-        BOOST_CHECK(cmd.actionTime >= ctime);
+        BOOST_CHECK (cmd.actionTime >= ctime);
         ctime = cmd.actionTime;
     }
-    
 }
 
 BOOST_AUTO_TEST_CASE (conversion_test)
@@ -269,9 +254,7 @@ BOOST_AUTO_TEST_CASE (conversion_test)
 
     cmd.Te = 0.89;
     cmd.Tdemin = 5.55;
-    cmd.info ().source = "source as a very long string test .........";  // type aliased to source
-    cmd.info ().target = "target";  // units aliased to target
-    cmd.info ().orig_source = "original_source";
+    cmd.setStringData ("target", "source as a very long string test .........", "original_source");
 
     auto cmdString = cmd.to_string ();
 
@@ -286,9 +269,7 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
     BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
     BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
-    BOOST_CHECK_EQUAL (cmd.info ().source, cmd2.info ().source);
-    BOOST_CHECK_EQUAL (cmd.info ().target, cmd2.info ().target);
-    BOOST_CHECK_EQUAL (cmd.info ().orig_source, cmd2.info ().orig_source);
+    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
 }
 
 BOOST_AUTO_TEST_CASE (message_message_conversion_test)
@@ -306,25 +287,21 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 
     cmd.Te = 0.89;
     cmd.Tdemin = 5.55;
-    cmd.info ().source = "source as a very long string test .........";  // type aliased to source
-    cmd.info ().target = "target";  // units aliased to target
-    cmd.info ().orig_source = "original_source";
+    cmd.setStringData ("target", "source as a very long string test .........", "original_source");
 
     auto msg = helics::createMessageFromCommand (cmd);
 
     BOOST_CHECK_EQUAL (cmd.actionTime, msg->time);
-    BOOST_CHECK_EQUAL (cmd.info ().source, msg->source);
-    BOOST_CHECK_EQUAL (cmd.info ().orig_source, msg->original_source);
-    BOOST_CHECK_EQUAL (cmd.info ().target, msg->dest);
+    BOOST_CHECK_EQUAL (cmd.getString(sourceStringLoc), msg->source);
+    BOOST_CHECK_EQUAL (cmd.getString(origSourceStringLoc), msg->original_source);
+    BOOST_CHECK_EQUAL (cmd.getString(targetStringLoc), msg->dest);
     BOOST_CHECK_EQUAL (cmd.payload, msg->data.to_string ());
 
     ActionMessage cmd2;
     cmd2.moveInfo (std::move (msg));
     BOOST_CHECK (cmd.action () == CMD_SEND_MESSAGE);
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.info ().source, cmd2.info ().source);
-    BOOST_CHECK_EQUAL (cmd.info ().orig_source, cmd2.info ().orig_source);
-    BOOST_CHECK_EQUAL (cmd.info ().target, cmd.info ().target);
+    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
     BOOST_CHECK_EQUAL (cmd.payload, cmd.payload);
 }
 
@@ -368,9 +345,7 @@ BOOST_AUTO_TEST_CASE (check_packetization)
 
     cmd.Te = 0.89;
     cmd.Tdemin = 5.55;
-    cmd.info ().source = "source as a very long string test .........";  // type aliased to source
-    cmd.info ().target = "target";  // units aliased to target
-    cmd.info ().orig_source = "original_source";
+    cmd.setStringData ("target", "source as a very long string test .........", "original_source");
     auto cmdStringNormal = cmd.to_string ();
     auto cmdString = cmd.packetize ();
     BOOST_CHECK_GE (cmdStringNormal.size () + 6, cmdString.size ());
@@ -387,9 +362,7 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
     BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
     BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
-    BOOST_CHECK_EQUAL (cmd.info ().source, cmd2.info ().source);
-    BOOST_CHECK_EQUAL (cmd.info ().target, cmd2.info ().target);
-    BOOST_CHECK_EQUAL (cmd.info ().orig_source, cmd2.info ().orig_source);
+    BOOST_CHECK (cmd.getStringData()==cmd2.getStringData());
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

@@ -989,7 +989,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
 			subI->addSource(cmd.getSource());
             if (subI->inputType.empty ())
             {
-                subI->inputType = cmd.info ().type;
+                subI->inputType = cmd.getString(typeStringLoc);
             }
             addDependency (global_federate_id_t (cmd.source_id));
         }

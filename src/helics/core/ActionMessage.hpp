@@ -9,47 +9,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ActionMessageDefintions.hpp"
 #include "Core.hpp"
 #include "core-types.hpp"
+#include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
 #include <memory>
 #include <string>
 
 namespace helics
 {
+constexpr int targetStringLoc = 0;
+constexpr int sourceStringLoc = 1;
+constexpr int unitStringLoc = 1;
+constexpr int origSourceStringLoc = 2;
+constexpr int origDestStringLoc = 3;
+constexpr int typeStringLoc = 0;
+constexpr int typeOutStringLoc = 1;
+
 constexpr int32_t cmd_info_basis = 65536;
 /** class defining the primary message object used in Helics */
 class ActionMessage
 {
-  public:
-    /** class for containing possibly larger additional information for certain message types */
-    class AdditionalInfo
-    {
-      public:
-        std::string source;  //!< name of a registration
-        std::string &type;  //!< alias source to type for registration
-        std::string target;  //!< target or destination
-        std::string &units;  //!< alias type to target for registration
-        std::string orig_source;  //!< the original source
-        std::string &type_out;  //!< alias type_out to orig_source for filter
-        std::string original_dest;  //!< the original destination of a message
-        /** constructor*/
-        AdditionalInfo () noexcept : type (source), units (target), type_out (orig_source){};
-        /** copy constructor*/
-        AdditionalInfo (const AdditionalInfo &ai)
-            : source (ai.source), type (source), target (ai.target), units (target), orig_source (ai.orig_source),
-              type_out (orig_source), original_dest (ai.original_dest){};
-        /** move constructor*/
-        AdditionalInfo (AdditionalInfo &&ai) noexcept
-            : source (std::move (ai.source)), type (source), target (std::move (ai.target)), units (target),
-              orig_source (std::move (ai.orig_source)), type_out (orig_source),
-              original_dest (std::move (ai.original_dest)){};
-        ~AdditionalInfo () = default;
-        template <class Archive>
-        void serialize (Archive &ar)
-        {
-            ar (source, target, orig_source, original_dest);
-        }
-    };
-
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
@@ -70,8 +48,7 @@ class ActionMessage
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
   private:
-    std::unique_ptr<AdditionalInfo>
-      extraInfo;  //!< pointer to an additional info structure with more data if required //72
+    std::vector<std::string> stringData;  //!< container for extra string data
   public:
     /** default constructor*/
     ActionMessage () noexcept : name (payload){};
@@ -106,10 +83,6 @@ class ActionMessage
     action_message_def::action_t action () const noexcept { return messageAction; }
     /** set the action*/
     void setAction (action_message_def::action_t newAction);
-    /** get a reference to the additional info structure*/
-    AdditionalInfo &info ();
-    /** get a const ref to the info structure*/
-    const AdditionalInfo &info () const;
     /** move a message data into the actionMessage
     @details take ownership of the message and move the contents out then destroy the message shell
     @param message the message to move.
@@ -127,6 +100,42 @@ class ActionMessage
         dest_id = hand.fed_id;
         dest_handle = hand.handle;
     }
+	const std::vector<std::string> &getStringData() const { return stringData;
+	}
+    // most use cases for this involve short strings, or already have references that need to be copied so
+    // supporting move isn't  going to be that useful here
+    void setStringData (const std::string &string1)
+    {
+        stringData.resize (1);
+        stringData[0] = string1;
+    }
+    void setStringData (const std::string &string1, const std::string &string2)
+    {
+        stringData.resize (2);
+        stringData[0] = string1;
+        stringData[1] = string2;
+    }
+    void setStringData (const std::string &string1, const std::string &string2, const std::string &string3)
+    {
+        stringData.resize (3);
+        stringData[0] = string1;
+        stringData[1] = string2;
+        stringData[2] = string3;
+    }
+    void setStringData (const std::string &string1,
+                        const std::string &string2,
+                        const std::string &string3,
+                        const std::string &string4)
+    {
+        stringData.resize (4);
+        stringData[0] = string1;
+        stringData[1] = string2;
+        stringData[2] = string3;
+        stringData[3] = string4;
+    }
+    const std::string &getString (int index) const;
+
+    void setString (int index, const std::string &str);
     /** get the source global_handle*/
     global_handle getSource () const
     {
@@ -155,10 +164,7 @@ class ActionMessage
         auto Tdeminbase = Tdemin.getBaseTimeCode ();
         auto Tsobase = Tso.getBaseTimeCode ();
         ar (btc, Tebase, Tsobase, Tdeminbase, payload);
-        if (hasInfo (messageAction))
-        {
-            ar (extraInfo);
-        }
+        ar (stringData);
     }
     /** load the data from an archive*/
     template <class Archive>
@@ -178,14 +184,7 @@ class ActionMessage
         Te.setBaseTimeCode (Tebase);
         Tdemin.setBaseTimeCode (Tdeminbase);
         Tso.setBaseTimeCode (Tsobase);
-        if (hasInfo (messageAction))
-        {
-            if (!extraInfo)
-            {
-                extraInfo = std::make_unique<AdditionalInfo> ();
-            }
-            ar (extraInfo);
-        }
+        ar (stringData);
     }
 
     // functions that convert to and from a byte stream
@@ -217,6 +216,9 @@ class ActionMessage
     void from_string (const std::string &data);
     /** read a command from a char vector*/
     void from_vector (const std::vector<char> &data);
+
+    friend std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd);
+    friend std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd);
 };
 
 /** template function to set a flag in an object containing a flags field*/

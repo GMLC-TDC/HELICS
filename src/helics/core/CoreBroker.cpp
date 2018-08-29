@@ -98,7 +98,7 @@ void CoreBroker::dataConnect(const std::string &source, const std::string &targe
 {
     ActionMessage M (CMD_DATA_CONNECT);
     M.name = source;
-    M.info ().target = target;
+    M.setStringData (target);
     addActionMessage (std::move (M));
 }
 
@@ -107,7 +107,7 @@ CoreBroker::filterAddSourceTarget(const std::string & filter, const std::string 
 {
     ActionMessage M (CMD_FILTER_CONNECT);
     M.name = filter;
-    M.info ().target = target;
+    M.setStringData (target);
     addActionMessage (std::move (M));
 }
 
@@ -116,14 +116,14 @@ CoreBroker::filterAddDestinationTarget(const std::string &filter, const std::str
 {
     ActionMessage M (CMD_FILTER_CONNECT);
     M.name = filter;
-    M.info ().target = target;
+    M.setStringData (target);
     setActionFlag (M, destination_target);
     addActionMessage (std::move (M));
 }
 
 int32_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 {
-    auto &endpointName = mess.info ().target;
+    auto &endpointName = mess.getString(targetStringLoc);
     auto eptInfo = handles.getEndpoint (endpointName);
     if (eptInfo != nullptr)
     {
@@ -233,7 +233,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         if (command.source_id == 0)
         {
             _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
-            addRoute (_brokers.back ().route_id, command.info ().target);
+            addRoute (_brokers.back ().route_id, command.getString(targetStringLoc));
         }
         else
         {
@@ -528,14 +528,14 @@ void CoreBroker::processCommand (ActionMessage &&command)
         auto pub = handles.getPublication (command.name);
 		if (pub != nullptr)
 		{
-            command.name = command.info ().target;
+            command.name = command.getString(targetStringLoc);
             command.setAction (CMD_ADD_NAMED_INPUT);
             command.setSource (pub->handle);
             checkForNamedInterface (command);
 		}
 		else
 		{
-            auto input = handles.getInput (command.info ().target);
+            auto input = handles.getInput (command.getString(targetStringLoc));
 			if (input == nullptr)
 			{
 				if (isRoot())
@@ -561,14 +561,14 @@ void CoreBroker::processCommand (ActionMessage &&command)
         auto filt = handles.getFilter (command.name);
         if (filt != nullptr)
         {
-            command.name = command.info ().target;
+            command.name =command.getString(targetStringLoc);
             command.setAction (CMD_ADD_NAMED_ENDPOINT);
             command.setSource (filt->handle);
             checkForNamedInterface (command);
         }
         else
         {
-            auto ept = handles.getEndpoint (command.info ().target);
+            auto ept = handles.getEndpoint (command.getString(targetStringLoc));
             if (ept == nullptr)
             {
                 if (isRoot ())
@@ -897,7 +897,7 @@ void CoreBroker::addPublication (ActionMessage &m)
         return;
     }
     auto &pub =
-      handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::publication, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::publication, m.name, m.getString(0), m.getString(1));
 
     addLocalInfo (pub, m);
     if (!_isRoot)
@@ -921,8 +921,8 @@ void CoreBroker::addInput (ActionMessage &m)
         routeMessage(eret);
         return;
     }
-    auto &inp =
-        handles.addHandle(global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::input, m.name, m.info().type, m.info().units);
+    auto &inp = handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
+                                   handle_type_t::input, m.name, m.getString(0), m.getString(1));
 
     addLocalInfo(inp, m);
     if (!_isRoot)
@@ -948,7 +948,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
         return;
     }
     auto &ept =
-      handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::endpoint, m.name, m.info ().type, m.info ().units);
+      handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::endpoint, m.name, m.getString(typeStringLoc), m.getString(unitStringLoc));
 
 
     addLocalInfo (ept, m);
@@ -987,7 +987,7 @@ void CoreBroker::addFilter (ActionMessage &m)
     }
 
     auto &filt = handles.addHandle (global_federate_id_t(m.source_id), interface_handle(m.source_handle), handle_type_t::filter, m.name,
-                                    m.info ().type, m.info ().type_out);
+                                    m.getString(typeStringLoc), m.getString(typeOutStringLoc));
     addLocalInfo (filt, m);
     
     
@@ -1067,7 +1067,7 @@ bool CoreBroker::connect ()
                 {
                     ActionMessage m (CMD_REG_BROKER);
                     m.name = getIdentifier ();
-                    m.info ().target = getAddress ();
+                    m.setStringData(getAddress ());
                     transmit (0, m);
                 }
                 else
@@ -1372,7 +1372,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        querycmd.info ().target = target;
+        querycmd.setStringData(target);
         auto fut = ActiveQueries.getFuture (querycmd.messageID);
         if (!global_broker_id.load().isValid())
         {
@@ -1696,25 +1696,26 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
 
 void CoreBroker::processQuery (const ActionMessage &m)
 {
-    if ((m.info ().target == getIdentifier ()) || (m.info ().target == "broker"))
+    auto &target = m.getString (targetStringLoc);
+    if ((target == getIdentifier ()) || (target == "broker"))
     {
         processLocalQuery (m);
     }
-    else if ((isRoot ()) && ((m.info ().target == "root") || (m.info ().target == "federation")))
+    else if ((isRoot ()) && ((target == "root") || (target == "federation")))
     {
         processLocalQuery (m);
     }
     else
     {
         int32_t route = 0;
-        auto fed = _federates.find (m.info ().target);
+        auto fed = _federates.find (target);
         if (fed != _federates.end ())
         {
             route = fed->route_id;
         }
         else
         {
-            auto broker = _brokers.find (m.info ().target);
+            auto broker = _brokers.find (target);
             if (broker != _brokers.end ())
             {
                 route = broker->route_id;

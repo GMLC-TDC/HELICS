@@ -18,10 +18,7 @@ namespace helics
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     : messageAction (startingAction), name (payload)
 {
-    if (hasInfo (startingAction))
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ();
-    }
+
 }
 
 ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId)
@@ -35,31 +32,25 @@ ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
       dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
       flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
-      payload (std::move (act.payload)), name (payload), extraInfo (std::move (act.extraInfo))
+      payload (std::move (act.payload)), name (payload), stringData (std::move (act.stringData))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
       dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
-      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload),
-      name (payload)
+      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload), stringData (act.stringData)
 
 {
-    if (act.extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
-    }
+
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
     : messageAction (CMD_SEND_MESSAGE),messageID(message->messageID), actionTime (message->time),
-      payload (std::move (message->data.m_data)), name (payload), extraInfo (std::make_unique<AdditionalInfo> ())
+      payload (std::move (message->data.m_data)), name (payload),
+      stringData ({std::move (message->source), std::move (message->dest), std::move (message->original_source),
+                   std::move (message->original_dest)})
 {
-    extraInfo->source = std::move (message->source);
-    extraInfo->orig_source = std::move (message->original_source);
-    extraInfo->original_dest = std::move (message->original_dest);
-    extraInfo->target = std::move (message->dest);
 }
 
 ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { from_string (bytes); }
@@ -84,10 +75,7 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     Te = act.Te;
     Tdemin = act.Tdemin;
     payload = act.payload;
-    if (act.extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
-    }
+    stringData = act.stringData;
     return *this;
 }
 
@@ -105,7 +93,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     Te = act.Te;
     Tdemin = act.Tdemin;
     payload = std::move (act.payload);
-    extraInfo = std::move (act.extraInfo);
+    stringData = std::move (act.stringData);
     return *this;
 }
 
@@ -115,49 +103,37 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     messageID = message->messageID;
     payload = std::move (message->data.m_data);
     actionTime = message->time;
-    if (!extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ();
-    }
-    extraInfo->source = std::move (message->source);
-    extraInfo->orig_source = std::move (message->original_source);
-    extraInfo->original_dest = std::move (message->original_dest);
-    extraInfo->target = std::move (message->dest);
+    stringData = {std::move (message->dest), std::move (message->source), std::move (message->original_source),
+                  std::move (message->original_dest)};
+
 }
 
 void ActionMessage::setAction (action_message_def::action_t newAction)
 {
-    if (hasInfo (newAction))
-    {
-        if (!extraInfo)
-        {
-            extraInfo = std::make_unique<AdditionalInfo> ();
-        }
-    }
     messageAction = newAction;
 }
 
-ActionMessage::AdditionalInfo &ActionMessage::info ()
-{
-    if (!extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ();
+static const std::string nullStr;
+const std::string &ActionMessage::getString(int index) const {
+	if ((stringData.size() > index) && (index >= 0))
+	{
+        return stringData[index];
     }
-    return *extraInfo;
+    return nullStr;
 }
 
-const ActionMessage::AdditionalInfo emptyAddInfo;
-
-const ActionMessage::AdditionalInfo &ActionMessage::info () const
-{
-    if (extraInfo)
+void ActionMessage::setString(int index, const std::string &str)
+{ 
+	if (index>=0)
     {
-        return *extraInfo;
-    }
-    return emptyAddInfo;
+		if (index > stringData.size())
+		{
+            stringData.resize (index + 1);
+		}
+        stringData[index] = str;
+	}
 }
-
-using archiver = cereal::PortableBinaryOutputArchive;
+    using archiver = cereal::PortableBinaryOutputArchive;
 
 using retriever = cereal::PortableBinaryInputArchive;
 
@@ -336,31 +312,69 @@ void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray 
 std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->original_source = cmd.info ().orig_source;
-    msg->original_dest = cmd.info ().original_dest;
-    msg->dest = cmd.info ().target;
+	switch (cmd.stringData.size())
+	{
+    case 0:
+        break;
+    case 1:
+        msg->dest = cmd.stringData[0];
+        break;
+    case 2:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        break;
+    case 3:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        msg->original_source = cmd.stringData[2];
+        break;
+    default:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        msg->original_source = cmd.stringData[2];
+        msg->original_dest = cmd.stringData[3];
+        break;
+	}
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
     msg->messageID = cmd.messageID;
-    msg->source = cmd.info ().source;
-
+    
     return msg;
 }
 
 std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->original_source = std::move (cmd.info ().orig_source);
-    msg->original_dest = std::move (cmd.info ().original_dest);
-    msg->dest = std::move (cmd.info ().target);
+    switch (cmd.stringData.size ())
+    {
+    case 0:
+        break;
+    case 1:
+        msg->dest= std::move(cmd.stringData[0]);
+        break;
+    case 2:
+        msg->dest = std::move(cmd.stringData[0]);
+        msg->source = std::move(cmd.stringData[1]);
+        break;
+    case 3:
+        msg->dest = std::move(cmd.stringData[0]);
+        msg->source = std::move(cmd.stringData[1]);
+        msg->original_source = std::move(cmd.stringData[2]);
+        break;
+    default:
+        msg->dest = std::move(cmd.stringData[0]);
+        msg->source = std::move(cmd.stringData[1]);
+        msg->original_source = std::move(cmd.stringData[2]);
+        msg->original_dest = std::move(cmd.stringData[3]);
+        break;
+    }
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
-    msg->source = std::move (cmd.info ().source);
     msg->messageID = cmd.messageID;
     return msg;
 }
 
-constexpr char nullStr[] = "unknown";
+constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
 // consts can cause seg faults
@@ -458,7 +472,7 @@ const char *actionMessageType (action_message_def::action_t action)
     {
         return res->second;
     }
-    return static_cast<const char *> (nullStr);
+    return static_cast<const char *> (unknownStr);
 }
 
 constexpr std::pair<int, const char *> errorStrings[] = {
@@ -479,7 +493,7 @@ const char *commandErrorString (int errorcode)
     {
         return res->second;
     }
-    return static_cast<const char *> (nullStr);
+    return static_cast<const char *> (unknownStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
@@ -531,8 +545,9 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f",command.info ().orig_source,
-                     command.source_id, command.source_handle, command.info ().target, command.payload.size (),
+        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f",command.getString(origSourceStringLoc),
+                                 command.source_id, command.source_handle, command.getString(targetStringLoc),
+                                 command.payload.size (),
                      static_cast<double> (command.actionTime)));
         break;
     default:
