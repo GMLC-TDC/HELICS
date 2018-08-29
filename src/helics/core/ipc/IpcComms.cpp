@@ -123,7 +123,6 @@ void IpcComms::queue_tx_function ()
     std::map<int, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
-    int sleep_counter = 50;
     if (!brokerTarget_.empty ())
     {
         bool conn = brokerQueue.connect (brokerTarget_, true, 20);
@@ -137,7 +136,6 @@ void IpcComms::queue_tx_function ()
         }
         hasBroker = true;
     }
-    sleep_counter = 50;
     // wait for the receiver to startup
     if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
     {
