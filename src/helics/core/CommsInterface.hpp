@@ -11,6 +11,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ActionMessage.hpp"
 #include <functional>
 #include <thread>
+#include "../common/TriggerVariable.hpp"
+
 namespace helics
 {
 enum class interface_networks :char;
@@ -77,6 +79,7 @@ class CommsInterface
 
     };
     std::atomic<connection_status> rx_status{connection_status::startup};  //!< the status of the receiver thread
+	
     std::string name;  //!< the name of the object
     std::string localTarget_;  //!< the base for the receive address
     std::string brokerTarget_;  //!< the base for the broker address

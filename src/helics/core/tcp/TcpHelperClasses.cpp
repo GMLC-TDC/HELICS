@@ -198,6 +198,42 @@ void TcpRxConnection::close ()
     }
 }
 
+void TcpRxConnection::closeNoWait()
+{
+    triggerhalt = true;
+    state = connection_state_t::closed;
+    boost::system::error_code ec;
+    if (socket_.is_open ())
+    {
+        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
+        if (ec)
+        {
+            std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+        }
+        socket_.close ();
+    }
+    else
+    {
+        if (receivingHalt.isActive ())
+        {
+            socket_.close ();
+        }
+    }
+ }
+
+/** wait on the closing actions*/
+void TcpRxConnection::waitOnClose()
+{ 
+	if (triggerhalt)
+    {
+        receivingHalt.wait ();
+    }
+	else
+	{
+        close ();
+	}
+}
+
 TcpConnection::pointer TcpConnection::create (boost::asio::io_service &io_service,
                                               const std::string &connection,
                                               const std::string &port,
@@ -298,7 +334,7 @@ void TcpConnection::close ()
     if (ec)
     {
         // I don't know what to do with this, in practice this message is mostly spurious
-        // but is seems I should do something with it, I just don't know what
+        // but it seems I should do something with it, I just don't know what
         // std::cerr << "error occurred sending shutdown" << std::endl;
         ((void)(ec));
     }
@@ -740,7 +776,11 @@ void TcpServer::close ()
     lock.unlock ();
     for (decltype(sz) ii=0;ii<sz;++ii)
     {
-        connections[ii]->close ();
+        connections[ii]->closeNoWait ();
+    }
+    for (decltype (sz) ii = 0; ii < sz; ++ii)
+    {
+        connections[ii]->waitOnClose ();
     }
     connections.clear ();
 }

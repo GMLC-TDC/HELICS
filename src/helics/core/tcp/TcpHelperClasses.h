@@ -41,6 +41,11 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     void start ();
     /** close the socket*/
     void close ();
+    /** perform the close actions but don't wait for them to be processed*/
+    void closeNoWait ();
+    /** wait on the closing actions*/
+    void waitOnClose ();
+    /**check if the connection is receiving data*/
     bool isReceiving () const { return receivingHalt.isActive(); }
     /** set the callback for the data object*/
     void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc);
