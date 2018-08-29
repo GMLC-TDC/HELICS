@@ -338,6 +338,8 @@ void TcpConnection::close ()
         // std::cerr << "error occurred sending shutdown" << std::endl;
         ((void)(ec));
     }
+    boost::asio::socket_base::linger optionLinger (true, 2);
+    socket_.set_option (optionLinger);
     socket_.close ();
 }
 
