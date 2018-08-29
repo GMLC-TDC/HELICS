@@ -704,13 +704,16 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
+
                 if (mode == "source")
                 {
-                  //  filter = make_source_filter (type, this, target, name);
+                    filter = make_filter (type, this, name);
+                    filter->addSourceTarget (target);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                  //  filter = make_destination_filter (type, this, target, name);
+                  filter = make_filter (type, this, name);
+                    filter->addDestinationTarget (target);
                 }
                 else if ((mode == "clone") || (mode == "cloning"))
                 {
