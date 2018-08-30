@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <unordered_map>
 #include <deque>
+#include <vector>
 
 /** class combining a vector of objects with a map to search them by a separate index term
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather

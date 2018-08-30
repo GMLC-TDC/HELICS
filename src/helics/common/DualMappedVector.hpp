@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <type_traits>
 #include <unordered_map>
 #include <deque>
+#include <vector>
 
 /** class to create a searchable vector by defined unique indices.
 The result object can be indexed multiple ways both by searching using indices or by numerical index
