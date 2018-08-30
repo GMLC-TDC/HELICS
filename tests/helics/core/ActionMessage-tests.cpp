@@ -301,7 +301,9 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     cmd2.moveInfo (std::move (msg));
     BOOST_CHECK (cmd.action () == CMD_SEND_MESSAGE);
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+    BOOST_CHECK_EQUAL (cmd.getString(0),cmd2.getString(0));
+	BOOST_CHECK_EQUAL(cmd.getString(1), cmd2.getString(1));
+	BOOST_CHECK_EQUAL(cmd.getString(2), cmd2.getString(2));
     BOOST_CHECK_EQUAL (cmd.payload, cmd.payload);
 }
 

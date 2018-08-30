@@ -281,7 +281,7 @@ std::string ValueFederateManager::getTarget(input_id_t id) const
     return nullStr;
 }
 
-std::string ValueFederateManager::getInputKey (input_id_t input_id) const
+const std::string &ValueFederateManager::getInputKey (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
     return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].name : nullStr;
@@ -308,7 +308,7 @@ input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
     return invalid_id_value;
 }
 
-std::string ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
+const std::string &ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
     return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].name : nullStr;
@@ -326,19 +326,19 @@ publication_id_t ValueFederateManager::getPublicationId (const std::string &key)
     return invalid_id_value;
 }
 
-std::string ValueFederateManager::getInputUnits (input_id_t input_id) const
+const std::string &ValueFederateManager::getInputUnits (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
     return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].units : nullStr;
 }
 
-std::string ValueFederateManager::getPublicationUnits (publication_id_t pub_id) const
+const std::string &ValueFederateManager::getPublicationUnits (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
     return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].units : nullStr;
 }
 
-std::string ValueFederateManager::getInputType (input_id_t input_id) const
+const std::string &ValueFederateManager::getInputType (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
     return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].type : nullStr;
@@ -350,7 +350,7 @@ std::string ValueFederateManager::getPublicationType (input_id_t input_id) const
     return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].pubtype : nullStr;
 }
 
-std::string ValueFederateManager::getPublicationType (publication_id_t pub_id) const
+const std::string &ValueFederateManager::getPublicationType (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
     return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].type : nullStr;

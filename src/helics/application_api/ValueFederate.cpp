@@ -361,7 +361,7 @@ void ValueFederate::initializeToExecuteStateTransition () { vfManager->initializ
 
 std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
-std::string ValueFederate::getInputKey (input_id_t ipt_id) const
+const std::string &ValueFederate::getInputKey (input_id_t ipt_id) const
 {
     return vfManager->getInputKey (ipt_id);
 }
@@ -391,7 +391,7 @@ input_id_t ValueFederate::getSubscriptionId(const std::string &key) const
     return vfManager->getSubscriptionId (key);
 }
 
-std::string ValueFederate::getPublicationKey (publication_id_t pub_id) const
+const std::string &ValueFederate::getPublicationKey (publication_id_t pub_id) const
 {
     return vfManager->getPublicationKey (pub_id);
 }
@@ -416,20 +416,20 @@ publication_id_t ValueFederate::getPublicationId (const std::string &key, int in
     return vfManager->getPublicationId (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-std::string ValueFederate::getInputUnits (input_id_t id) const
+const std::string &ValueFederate::getInputUnits (input_id_t id) const
 {
     return vfManager->getInputUnits (id);
 }
-std::string ValueFederate::getPublicationUnits (publication_id_t id) const
+const std::string &ValueFederate::getPublicationUnits (publication_id_t id) const
 {
     return vfManager->getPublicationUnits (id);
 }
 
-std::string ValueFederate::getInputType (input_id_t id) const
+const std::string &ValueFederate::getInputType (input_id_t id) const
 {
     return vfManager->getInputType (id);
 }
-std::string ValueFederate::getPublicationType (publication_id_t id) const
+const std::string &ValueFederate::getPublicationType (publication_id_t id) const
 {
     return vfManager->getPublicationType (id);
 }

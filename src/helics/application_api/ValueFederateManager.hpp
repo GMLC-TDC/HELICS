@@ -123,7 +123,7 @@ class ValueFederateManager
 
     /** get the key of a subscription from its id
     @return empty string if an invalid id is passed*/
-    std::string getInputKey (input_id_t id) const;
+    const std::string &getInputKey (input_id_t id) const;
     /** get the id of an input
 	@param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
@@ -136,7 +136,7 @@ class ValueFederateManager
 
     /** get the key of a publication from its id
     @return empty string if an invalid id is passed*/
-    std::string getPublicationKey (publication_id_t id) const;
+    const std::string &getPublicationKey (publication_id_t id) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the publication id
@@ -146,22 +146,22 @@ class ValueFederateManager
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
     @return the name or empty string on unrecognized id*/
-    std::string getInputUnits (input_id_t id) const;
+    const std::string &getInputUnits (input_id_t id) const;
 
     /** get the units of a publication from its id
     @param[in] id the publication id to query
     @return the units or empty string on unrecognized id*/
-    std::string getPublicationUnits (publication_id_t id) const;
+    const std::string &getPublicationUnits (publication_id_t id) const;
 
     /** get the type of a subscription from its id
     @param[in] id the subscription id to query
     @return the type or empty string on unrecognized id*/
-    std::string getInputType (input_id_t id) const;
+    const std::string &getInputType (input_id_t id) const;
 
     /** get the type of a publication from its id
     @param[in] id the publication id to query
     @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (publication_id_t id) const;
+    const std::string &getPublicationType (publication_id_t id) const;
 
     /** get the type of a publication from its subscription
     @param[in] id the subscription id to query

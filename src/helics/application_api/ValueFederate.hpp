@@ -444,7 +444,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     input_id_t getSubscriptionId (const std::string &key) const;
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
-    std::string getPublicationKey (publication_id_t id) const;
+    const std::string &getPublicationKey (publication_id_t id) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
@@ -463,27 +463,27 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
     @return the name or empty string on unrecognized id*/
-    std::string getInputUnits (input_id_t id) const;
+    const std::string &getInputUnits (input_id_t id) const;
 
     /** get the units of a publication from its id
     @param[in] id the publication id to query
     @return the units or empty string on unrecognized id*/
-    std::string getPublicationUnits (publication_id_t id) const;
+    const std::string &getPublicationUnits (publication_id_t id) const;
 
 	/** get the key of an input from its id
     @param[in] id the input id to query
     @return the type or empty string on unrecognized id*/
-    std::string getInputKey (input_id_t id) const;
+    const std::string &getInputKey (input_id_t id) const;
 
     /** get the type of a input from its id
     @param[in] id the input id to query
     @return the type or empty string on unrecognized id*/
-    std::string getInputType (input_id_t id) const;
+    const std::string &getInputType (input_id_t id) const;
 
     /** get the type of a publication from its id
     @param[in] id the publication id to query
     @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (publication_id_t id) const;
+    const std::string &getPublicationType (publication_id_t id) const;
 
     /** get the type of the publication of a particular subscription
     @param[in] id the subscription id to query

@@ -126,7 +126,7 @@ void ActionMessage::setString(int index, const std::string &str)
 { 
 	if (index>=0)
     {
-		if (index > stringData.size())
+		if (index >= stringData.size())
 		{
             stringData.resize (index + 1);
 		}

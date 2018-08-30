@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <vector>
+#include <deque>
 
 /** class combining a vector of objects with a map to search them by a separate index term
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
@@ -169,7 +169,7 @@ class MappedVector
     }
 
   private:
-    std::vector<VType> dataStorage;
+    std::deque<VType> dataStorage;
     std::conditional_t<is_easily_hashable<searchType>::value,
                        std::unordered_map<searchType, size_t>,
                        std::map<searchType, size_t>>
