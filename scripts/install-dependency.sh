@@ -132,20 +132,13 @@ install_boost () {
 
     echo Boost link type $b2_link_type
 
-    if [[ ! -z "${cxxflags_options}" ]]; then
-        b2_extra_options="cxxflags=\"${cxxflags_options}\" ${b2_extra_options}"
-    fi
-    if [[ ! -z "${cflags_options}" ]]; then
-        b2_extra_options="cflags=\"${cflags_options}\" ${b2_extra_options}"
-    fi
-
-    echo Boost extra options ${b2_extra_options}
-
     fetch_and_untar ${boost_version_str}.tar.gz \
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
     cd ${boost_version_str}/;
     ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
     ./b2 -j2 \
+        cxxflags=${cxxflags_options} \
+        cflags=${cflags_options} \
         link=${b2_link_type} \
         threading=multi \
         variant=release \
