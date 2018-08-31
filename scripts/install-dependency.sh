@@ -139,9 +139,9 @@ install_boost () {
     cd ${boost_version_str}/;
     ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test --with-toolset=${boost_toolset};
     ./b2 -j2 \
-        cxxflags=${cxxflags_options} \
-        cflags=${cflags_options} \
-        linkflags=${linkflags_options} \
+        cxxflags=-fPIC \
+        cflags=-fPIC \
+        linkflags=-fPIC \
         link=${b2_link_type} \
         threading=multi \
         variant=release \
