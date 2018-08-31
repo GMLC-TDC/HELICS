@@ -120,16 +120,26 @@ install_boost () {
     local boost_toolset=$3
 
     local b2_extra_options=""
-    if [[ "${BOOST_CXX_FLAGS}" ]]; then
-        b2_extra_options="cxxflags=${BOOST_CXX_FLAGS} ${b2_extra_options}"
-    fi
+    local cxxflags_options="${BOOST_CXX_FLAGS}"
+    local cflags_options="${BOOST_C_FLAGS}"
 
     local b2_link_type=shared
     if [[ "${BOOST_USE_STATIC}" ]]; then
         b2_link_type=static
+        cxxflags_options="-fPIC ${cxxflags_options}"
+        cflags_options="-fPIC ${cflags_options}"
     fi
 
     echo Boost link type $b2_link_type
+
+    if [[ ! -z "${cxxflags_options}" ]]; then
+        b2_extra_options="cxxflags=\"${cxxflags_options}\" ${b2_extra_options}"
+    fi
+    if [[ ! -z "${cflags_options}" ]]; then
+        b2_extra_options="cflags=\"${cflags_options}\" ${b2_extra_options}"
+    fi
+
+    echo Boost extra options ${b2_extra_options}
 
     fetch_and_untar ${boost_version_str}.tar.gz \
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
