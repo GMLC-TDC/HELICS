@@ -140,7 +140,6 @@ set_property(
     LABELS
     Java
     Continuous
-    Coverage
     Daily
 )
 

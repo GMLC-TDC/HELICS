@@ -44,6 +44,5 @@ set_property(
     LABELS
     Python
     Continuous
-    Coverage
     Daily
 )
