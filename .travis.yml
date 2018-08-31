@@ -49,6 +49,7 @@ jobs:
   include:
     # XCode 6.4, OS X 10.10
     - <<: *osx_base
+      name: XCode 6.4 macOS 10.10
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
         - HOMEBREW_NO_AUTO_UPDATE=1
@@ -56,22 +57,20 @@ jobs:
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
+      name: XCode 7.3 macOS 10.11
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
     - <<: *osx_base
+      name: XCode (default: 9.4) macOS 10.13
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
         - HOMEBREW_NO_AUTO_UPDATE=1
-    # Built without errors on my clone from one of the changes made
-    # Possibly local dependencies, or removing Linux-only commands fixed it
-    # XCode 8.3, OS X 10.12
-    #- env: COMPILER=clang++ BUILD_TYPE=Debug
-    #  osx_image: xcode8.3
 
     - <<: *linux_base
+      name: GCC 6
       addons:
         apt:
           sources:
@@ -84,6 +83,7 @@ jobs:
         - USE_MPI=mpich
 
     - <<: *linux_base
+      name: GCC 4.9 (No SWIG)
       addons:
         apt:
           sources:
@@ -96,6 +96,7 @@ jobs:
         - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
+      name: Clang 3.6
       compiler: clang
       addons:
         apt:
@@ -114,6 +115,7 @@ jobs:
    # ------------------------------------------------
     # Valgrind build
     - <<: *daily_linux
+      name: GCC 6 Valgrind
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
@@ -121,6 +123,7 @@ jobs:
         - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
+      name: GCC 6 Code Coverage
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
@@ -130,6 +133,7 @@ jobs:
         - USE_MPI=mpich
     # GCC 5 build
     - <<: *daily_linux
+      name: GCC 5
       addons:
         apt:
           sources:
@@ -140,6 +144,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
     # Clang 5 build
     - <<: *daily_linux
+      name: Clang 5
       compiler: clang
       addons:
         apt:
@@ -156,6 +161,7 @@ jobs:
         - CXX_STANDARD=17
     # TSAN build
     - <<: *daily_linux
+      name: Clang 4 Thread Sanitizer
       compiler: clang
       addons:
         apt:
@@ -173,6 +179,7 @@ jobs:
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
     # XCode 8gm, OS X 10.11
     - <<: *daily_osx
+      name: XCode 8gm macOS 10.11
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
