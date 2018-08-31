@@ -60,11 +60,18 @@ fi
 swig_version=3.0.10
 swig_install_path=${CI_DEPENDENCY_DIR}/swig
 
+zmq_version=4.2.3
+zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
+
 # Wipe out cached dependencies if commit message has '[update_cache]'
 if [[ $commit_msg == *'[update_cache]'* ]]; then
     individual="false"
     if [[ $commit_msg == *'boost'* ]]; then
         rm -rf ${boost_install_path};
+        individual="true"
+    fi
+    if [[ $commit_msg == *'zmq'* ]]; then
+        rm -rf ${zmq_install_path};
         individual="true"
     fi
     if [[ $commit_msg == *'swig'* ]]; then
@@ -109,6 +116,13 @@ fi
 export PATH="${swig_install_path}/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 
+# Install ZeroMQ
+if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
+    echo "*** build libzmq"
+    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
+    echo "*** built zmq successfully"
+fi
+
 # Install MPI if USE_MPI is set
 if [[ "$USE_MPI" ]]; then
     if [[ ! -d "${mpi_install_path}" ]]; then
@@ -127,10 +141,13 @@ if [[ ! -d "${boost_install_path}" ]]; then
 fi
 
 # Export variables and set load library paths
+export ZMQ_INCLUDE=${zmq_install_path}/include
+export ZMQ_LIB=${zmq_install_path}/lib
+
 if [[ "$os_name" == "Linux" ]]; then
-    export LD_LIBRARY_PATH=${boost_install_path}/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
 elif [[ "$os_name" == "Darwin" ]]; then
-    export DYLD_LIBRARY_PATH=${boost_install_path}/lib:$DYLD_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_LIBRARY_PATH
 fi
 
 if [[ "$os_name" == "Linux" ]]; then
