@@ -129,6 +129,8 @@ install_boost () {
         b2_link_type=static
     fi
 
+    echo Boost link type $b2_link_type
+
     fetch_and_untar ${boost_version_str}.tar.gz \
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
     cd ${boost_version_str}/;
