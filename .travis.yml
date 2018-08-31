@@ -224,7 +224,7 @@ install:
   - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
 
 script:
-  - mkdir build && cd build
+  - mkdir -p build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
   - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make ${MAKEFLAGS}
