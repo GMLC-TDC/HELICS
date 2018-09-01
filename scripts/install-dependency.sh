@@ -138,16 +138,13 @@ install_boost () {
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
     cd ${boost_version_str}/;
     ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test --with-toolset=${boost_toolset};
-    ./b2 -j2 \
-        cxxflags=-fPIC \
-        cflags=-fPIC \
-        linkflags=-fPIC \
+    ./b2 install -j2 --prefix=${install_path} \
+        variant=release \
         link=${b2_link_type} \
         threading=multi \
-        variant=release \
         toolset=${boost_toolset} \
+        cxxflags="-fPIC" \
         ${b2_extra_options} > /dev/null;
-    ./b2 install --prefix=${install_path} > /dev/null;
 }
 
 install_cmake () {
