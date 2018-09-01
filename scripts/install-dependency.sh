@@ -174,7 +174,7 @@ else
 fi
 
 compiler_toolset=$4
-if [[ -z ${compiler_toolset+x} ]]; then
+if [[ -z ${compiler_toolset} ]]; then
     case $COMPILER in
         gcc*)
             compiler_toolset=gcc
