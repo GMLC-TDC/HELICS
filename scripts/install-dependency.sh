@@ -145,7 +145,7 @@ install_boost () {
         link=${b2_link_type} \
         threading=multi \
         toolset=${boost_toolset} \
-        ${b2_extra_options} > /dev/null;
+        ${b2_extra_options};
 }
 
 install_cmake () {
