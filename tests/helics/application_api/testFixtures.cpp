@@ -79,8 +79,16 @@ FederateTestFixture::~FederateTestFixture ()
     }
     federates.clear ();
     for (auto &broker : brokers)
-    {
-        broker->waitForDisconnect (200);
+    { 
+        if (ctype.compare(0, 3, "tcp") == 0)
+        {
+            broker->waitForDisconnect(2000);
+        }
+        else
+        {
+            broker->waitForDisconnect(200);
+        }
+        
 		if (broker->isConnected())
 		{
             std::cout << "forcing disconnect\n";

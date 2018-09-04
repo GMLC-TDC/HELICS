@@ -444,10 +444,10 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     }
     AddBroker (core_type, "3");
 
-    auto ctype = helics::coreTypeFromString (core_type);
-    PingPongFed p1 ("fedA", 0.5, ctype);
-    PingPongFed p2 ("fedB", 0.5, ctype);
-    PingPongFed p3 ("fedC", 0.5, ctype);
+    auto crtype = helics::coreTypeFromString (core_type);
+    PingPongFed p1 ("fedA", 0.5, crtype);
+    PingPongFed p2 ("fedB", 0.5, crtype);
+    PingPongFed p3 ("fedC", 0.5, crtype);
 
     p1.addTrigger (0.5, "fedB/port");
     p1.addTrigger (0.5, "fedC/port");

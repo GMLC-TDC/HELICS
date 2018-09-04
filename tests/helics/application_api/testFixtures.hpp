@@ -67,6 +67,7 @@ struct FederateTestFixture
                     helics::Time time_delta = helics::timeZero,
                     const std::string &name_prefix = defaultNamePrefix)
     {
+        ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
         if (!broker->isConnected ())
         {
@@ -254,6 +255,7 @@ struct FederateTestFixture
     std::vector<std::shared_ptr<helics::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
+    std::string ctype;
 
   private:
     bool hasIndexCode (const std::string &type_name);
