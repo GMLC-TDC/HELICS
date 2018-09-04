@@ -213,7 +213,7 @@ void MessageFederateManager::initializeToExecuteStateTransition () {}
 
 static const std::string nullStr;
 
-std::string MessageFederateManager::getEndpointName (endpoint_id_t id) const
+const std::string &MessageFederateManager::getEndpointName (endpoint_id_t id) const
 {
     return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->name : nullStr;
 }
@@ -225,7 +225,7 @@ endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) co
     return (sub != nullptr) ? sub->id : 0;
 }
 
-std::string MessageFederateManager::getEndpointType (endpoint_id_t id) const
+const std::string &MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
     return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->type : nullStr;
 }

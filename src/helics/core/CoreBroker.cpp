@@ -52,6 +52,15 @@ void CoreBroker::setIdentifier (const std::string &name)
 }
 
 
+const std::string &CoreBroker::getAddress() const
+{ 
+	if ((brokerState!=broker_state_t::connected)||(address.empty()))
+    {
+        address = generateLocalAddressString ();
+    }
+    return address;
+}
+
 int32_t CoreBroker::getRoute (global_federate_id_t fedid) const
 {
     if ((fedid == parent_broker_id) || (fedid == higher_broker_id))

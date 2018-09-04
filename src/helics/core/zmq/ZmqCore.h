@@ -23,7 +23,8 @@ public:
   virtual void initializeFromArgs (int argc, const char * const *argv) override;
 
 public:
-	virtual std::string getAddress() const override;
+  virtual std::string generateLocalAddressString () const override;
+
 private:
 
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information

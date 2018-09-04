@@ -167,7 +167,7 @@ class Endpoint
     /** get the name of the endpoint*/
     const std::string &getName () const { return actualName; }
     /** get the specified type of the endpoint*/
-    std::string getType () const { return fed->getEndpointType (id); }
+    const std::string &getType () const { return fed->getEndpointType (id); }
     /** get the actual endpoint id for the fed*/
     endpoint_id_t getID () const { return id; }
 };

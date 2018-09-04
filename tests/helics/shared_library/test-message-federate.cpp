@@ -49,17 +49,15 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     CE (federate_state mFed1State = helicsFederateGetState (mFed1, &err));
     BOOST_CHECK (mFed1State == helics_execution_state);
     
-    CE(const char *name=helicsEndpointGetName (epid,&err));
+    const char *name=helicsEndpointGetName (epid);
     BOOST_CHECK_EQUAL (name, "fed0/ep1");
-    CE(name=helicsEndpointGetName (epid2, &err));
+    name=helicsEndpointGetName (epid2);
     BOOST_CHECK_EQUAL (name, "ep2");
 
-	char sv[32];
-    char sv2[32];
-    CE(helicsEndpointGetType (epid, sv, 32,&err));
-    CE(helicsEndpointGetType (epid2, sv2, 32,&err));
-    BOOST_CHECK_EQUAL (sv, "");
-    BOOST_CHECK_EQUAL (sv2, "random");
+    const char *type=helicsEndpointGetType (epid);
+    const char *type2=helicsEndpointGetType (epid2);
+    BOOST_CHECK_EQUAL (type, "");
+    BOOST_CHECK_EQUAL (type2, "random");
 
     CE(helicsFederateFinalize (mFed1,&err));
 

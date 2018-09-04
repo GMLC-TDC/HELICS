@@ -214,7 +214,7 @@ void TestBroker::addRoute (int route_id, const std::string &routeInfo)
     // the route will default to the central route
 }
 
-std::string TestBroker::getAddress () const { return getIdentifier (); }
+std::string TestBroker::generateLocalAddressString () const { return getIdentifier (); }
 
 }  // namespace testcore
 }  // namespace helics

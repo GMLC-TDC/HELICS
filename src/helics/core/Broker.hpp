@@ -48,7 +48,7 @@ class Broker
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/
-    virtual std::string getAddress () const = 0;
+    virtual const std::string &getAddress () const = 0;
 
     /** set the logging callback function
     @param logFunction a function with a signature of void(int level,  const std::string &source,  const

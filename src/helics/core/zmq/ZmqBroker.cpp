@@ -58,7 +58,7 @@ bool ZmqBroker::brokerConnect ()
     return res;
 }
 
-std::string ZmqBroker::getAddress () const
+std::string ZmqBroker::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

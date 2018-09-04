@@ -100,13 +100,13 @@ HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core);
 @param broker the broker to query
 @return a void enumeration indicating any error condition
 */
-HELICS_EXPORT const char *helicsBrokerGetIdentifier (helics_broker broker, helics_error *err);
+HELICS_EXPORT const char *helicsBrokerGetIdentifier (helics_broker broker);
 
 /** get an identifier for the core
 @param core the core to query
 @return a void enumeration indicating any error condition
 */
-HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core, helics_error *err);
+HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core);
 
 /** get the network address associated with a broker
 @param broker the broker to query
@@ -114,7 +114,7 @@ HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core, helics_erro
 @param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
-HELICS_EXPORT void helicsBrokerGetAddress (helics_broker broker, char *address, int maxlen, helics_error *err);
+HELICS_EXPORT const char* helicsBrokerGetAddress (helics_broker broker);
 
 /** set the core to ready to init
 @details this function is used for cores that have filters but no federates so there needs to be
@@ -303,10 +303,12 @@ the execution state
 This is a blocking call and will block until the core allows it to proceed
 */
 HELICS_EXPORT void helicsFederateEnterInitializingMode (helics_federate fed, helics_error *err);
+
 /** non blocking alternative to @helicsFederateEnterInitializingMode
 the function helicsFederateEnterInitializationModeFinalize must be called to finish the operation
 */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync (helics_federate fed, helics_error *err);
+
 /** check if the current Asynchronous operation has completed
 @param fed the federate to operate on
 @return 0 if not completed, 1 if completed*/

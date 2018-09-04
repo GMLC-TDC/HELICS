@@ -34,7 +34,7 @@ class Filter
 
     const char *getName () const
     {
-        return helicsFilterGetName (filt,NULL);
+        return helicsFilterGetName (filt);
     }
 
     void set (const std::string &property, double val)

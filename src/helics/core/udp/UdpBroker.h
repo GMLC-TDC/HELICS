@@ -25,7 +25,7 @@ class UdpBroker final : public CommsBroker<UdpComms, CoreBroker>
 
     void initializeFromArgs (int argc, const char *const *argv) override;
 
-    virtual std::string getAddress () const override;
+    virtual std::string generateLocalAddressString () const override;
     static void displayHelp (bool local_only = false);
 
   private:

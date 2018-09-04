@@ -1252,249 +1252,163 @@ void helicsInputSetDefaultNamedPoint (helics_input inp, const char *str, double 
     }
 }
 
-int helicsInputGetType (helics_input inp, char *outputString, int maxlen, helics_error *err)
+const char * helicsInputGetType (helics_input inp)
 {
-    auto inpObj = verifyInput (inp, err);
+    auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
     {
-        return 0;
+        return nullStr.c_str ();
     }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return 0;
-    }
+
     try
     {
-        std::string type;
         if (inpObj->rawOnly)
         {
-            type = inpObj->fedptr->getInputType (inpObj->id);
+            const std::string &type = inpObj->fedptr->getInputType (inpObj->id);
+            return type.c_str ();
         }
         else
         {
-            type = inpObj->inputPtr->getType ();
-        }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
+            const std::string &type = inpObj->inputPtr->getType ();
+            return type.c_str ();
         }
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return 0;
+        return nullStr.c_str ();
     }
 }
 
-int helicsPublicationGetType (helics_publication pub, char *outputString, int maxlen, helics_error *err)
+const char * helicsPublicationGetType (helics_publication pub)
 {
-    auto pubObj = verifyPublication (pub, err);
+    auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
     {
-        return (-1);
+        return nullStr.c_str ();
     }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
-    }
+
     try
     {
-        std::string type;
         if (pubObj->rawOnly)
         {
-            type = pubObj->fedptr->getPublicationType (pubObj->id);
+            const std::string &type = pubObj->fedptr->getPublicationType (pubObj->id);
+            return type.c_str ();
         }
         else
         {
-            type = pubObj->pubptr->getType ();
-        }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
+            const std::string &type = pubObj->pubptr->getType ();
+            return type.c_str ();
         }
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return (-1);
+        return nullStr.c_str ();
     }
 }
 
-int helicsInputGetKey (helics_input inp, char *outputString, int maxlen, helics_error *err)
+const char * helicsInputGetKey (helics_input inp)
 {
-    auto inpObj = verifyInput (inp, err);
+    auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
     {
-        return (-1);
+        return nullStr.c_str ();
     }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
-    }
+
     try
     {
-        std::string type;
         if (inpObj->rawOnly)
         {
-            type = inpObj->fedptr->getInputKey (inpObj->id);
+            const std::string &key = inpObj->fedptr->getInputKey (inpObj->id);
+            return key.c_str ();
         }
         else
         {
-            type = inpObj->inputPtr->getName ();
+            const std::string &key = inpObj->inputPtr->getName ();
+            return key.c_str ();
         }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
-        }
+   
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return (-1);
+        return nullStr.c_str ();
     }
 }
 
-int helicsPublicationGetKey (helics_publication pub, char *outputString, int maxlen, helics_error *err)
+const char *helicsPublicationGetKey (helics_publication pub)
 {
-    auto pubObj = verifyPublication (pub, err);
+    auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
     {
-        return (-1);
-    }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
+        return nullStr.c_str();
     }
     try
     {
-        std::string type;
         if (pubObj->rawOnly)
         {
-            type = pubObj->fedptr->getPublicationKey (pubObj->id);
+            const std::string &key = pubObj->fedptr->getPublicationKey (pubObj->id);
+            return key.c_str ();
         }
         else
         {
-            type = pubObj->pubptr->getKey ();
-        }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
+            const std::string &key = pubObj->pubptr->getKey ();
+            return key.c_str ();
         }
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return (-1);
+        return nullStr.c_str ();
     }
 }
 
-int helicsInputGetUnits (helics_input inp, char *outputString, int maxlen, helics_error *err)
+const char *helicsInputGetUnits (helics_input inp)
 {
-    auto inpObj = verifyInput (inp, err);
+    auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
     {
-        return (-1);
-    }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
+        return nullStr.c_str();
     }
     try
     {
-        std::string type;
         if (inpObj->rawOnly)
         {
-            type = inpObj->fedptr->getInputUnits (inpObj->id);
+            const std::string &units = inpObj->fedptr->getInputUnits (inpObj->id);
+            return units.c_str ();
         }
         else
         {
-            type = inpObj->inputPtr->getUnits ();
-        }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
+            const std::string &units = inpObj->inputPtr->getUnits ();
+            return units.c_str ();
         }
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return (-1);
+        return nullStr.c_str ();
     }
 }
 
-int helicsPublicationGetUnits (helics_publication pub, char *outputString, int maxlen, helics_error *err)
+const char * helicsPublicationGetUnits (helics_publication pub)
 {
-    auto pubObj = verifyPublication (pub, err);
+    auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
     {
-        return (-1);
-    }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return (-1);
+        return nullStr.c_str ();
     }
     try
     {
-        std::string type;
         if (pubObj->rawOnly)
         {
-            type = pubObj->fedptr->getPublicationUnits (pubObj->id);
+            const std::string &units = pubObj->fedptr->getPublicationUnits (pubObj->id);
+            return units.c_str ();
         }
         else
         {
-            type = pubObj->pubptr->getUnits ();
-        }
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-            return maxlen;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-            return static_cast<int> (type.size ());
+            const std::string &units = pubObj->pubptr->getUnits ();
+            return units.c_str ();
         }
     }
     catch (...)
     {
-        helicsErrorHandler (err);
-        return (-1);
+        return nullStr.c_str ();
     }
 }
 

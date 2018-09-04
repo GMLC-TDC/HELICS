@@ -39,7 +39,9 @@ class BrokerBase
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
     std::string identifier;  //!< an identifier for the broker
-
+	//address is mutable since during initial phases it may not be fixed so to maintain a consistent public interface for extracting it
+	//this variable may need to be updated in a constant function
+    mutable std::string address;  //!< network location of the broker 
     std::unique_ptr<Logger>
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
@@ -144,7 +146,8 @@ class BrokerBase
 
     /** generate a new random id based on a uuid*/
     void generateNewIdentifier ();
-
+    /** generate the local address information*/
+    virtual std::string generateLocalAddressString () const=0;
   public:
     /** close all the threads*/
     void joinAllThreads ();

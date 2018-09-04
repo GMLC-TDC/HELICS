@@ -149,7 +149,8 @@ class CommonCore : public Core, public BrokerBase
     /** set the local identification for the core*/
     void setIdentifier (const std::string &name);
     /** get the local identifier for the core*/
-    const std::string &getIdentifier () const override final { return identifier; }
+    virtual const std::string &getIdentifier () const override final { return identifier; }
+    virtual const std::string &getAddress () const override final;
     const std::string &getFederateNameNoThrow (global_federate_id_t federateID) const noexcept;
     virtual void setLoggingCallback (
       federate_id_t federateID,
@@ -158,8 +159,6 @@ class CommonCore : public Core, public BrokerBase
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> queryFunction) override;
-    /** get a string representing the connection info to send data to this object*/
-    virtual std::string getAddress () const = 0;
 
     virtual bool connect () override final;
     virtual bool isConnected () const override final;

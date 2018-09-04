@@ -100,6 +100,15 @@ bool CommonCore::isConnected () const
     return ((getCurrentState == operating) || (getCurrentState == connected));
 }
 
+const std::string &CommonCore::getAddress () const
+{
+    if ((brokerState != broker_state_t::connected) || (address.empty ()))
+    {
+        address = generateLocalAddressString ();
+    }
+    return address;
+}
+
 void CommonCore::processDisconnect (bool skipUnregister)
 {
     if (brokerState > broker_state_t::initialized)

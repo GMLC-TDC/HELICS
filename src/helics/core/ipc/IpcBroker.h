@@ -24,7 +24,7 @@ public:
     static void displayHelp(bool local_only = false);
     void initializeFromArgs(int argc, const char *const *argv) override;
 
-    virtual std::string getAddress() const override;
+   virtual std::string generateLocalAddressString () const override;
 
 private:
     virtual bool brokerConnect() override;

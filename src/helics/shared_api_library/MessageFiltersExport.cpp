@@ -197,9 +197,9 @@ static helics::CloningFilter *getCloningFilter (helics_filter filt, helics_error
 }
 
 /** get the name of the filter*/
-const char *helicsFilterGetName (helics_filter filt, helics_error *err)
+const char *helicsFilterGetName (helics_filter filt)
 {
-    auto filter = getFilter (filt,err);
+    auto filter = getFilter (filt,nullptr);
     if (filter == nullptr)
     {
         return nullstr.c_str ();
@@ -211,7 +211,6 @@ const char *helicsFilterGetName (helics_filter filt, helics_error *err)
     }
     catch (...)
     {
-        helicsErrorHandler (err);
         return nullstr.c_str ();
     }
 }

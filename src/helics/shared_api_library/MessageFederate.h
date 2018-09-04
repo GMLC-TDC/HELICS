@@ -126,7 +126,7 @@ HELICS_EXPORT message_t helicsFederateGetMessage (helics_federate fed);
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_EXPORT void helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen, helics_error *err);
+HELICS_EXPORT const char *helicsEndpointGetType (helics_endpoint endpoint);
 
 /** get the name of an endpoint
 @param endpoint  the endpoint object in question
@@ -134,7 +134,7 @@ HELICS_EXPORT void helicsEndpointGetType (helics_endpoint endpoint, char *output
 @param[in] maxlen the maximum string length that can be stored in str
 @return a status variable
 */
-HELICS_EXPORT const char *helicsEndpointGetName (helics_endpoint endpoint, helics_error *err);
+HELICS_EXPORT const char *helicsEndpointGetName (helics_endpoint endpoint);
 
 /** get the number of endpoints in a federate
 @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/

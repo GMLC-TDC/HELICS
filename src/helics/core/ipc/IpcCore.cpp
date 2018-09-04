@@ -90,7 +90,7 @@ bool IpcCore::brokerConnect ()
     return comms->connect ();
 }
 
-std::string IpcCore::getAddress () const
+std::string IpcCore::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     return fileloc;

@@ -46,7 +46,7 @@ bool TcpCore::brokerConnect ()
     return res;
 }
 
-std::string TcpCore::getAddress () const
+std::string TcpCore::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

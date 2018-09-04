@@ -96,15 +96,12 @@ public:
 
     const char *getName() const
     {
-        return helicsEndpointGetName(ep,NULL);
+        return helicsEndpointGetName(ep);
     }
 
     std::string getType()
     {
-        char str[255];
-        helicsEndpointGetType(ep, &str[0], sizeof(str),NULL);
-        std::string result(str);
-        return result;
+        return helicsEndpointGetType(ep);
     }
 private:
     helics_endpoint ep;

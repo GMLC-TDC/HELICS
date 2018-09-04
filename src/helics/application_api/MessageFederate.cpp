@@ -411,9 +411,9 @@ endpoint_id_t MessageFederate::getEndpointId (const std::string &eptName) const
     return id;
 }
 
-std::string MessageFederate::getEndpointName (endpoint_id_t id) const { return mfManager->getEndpointName (id); }
+const std::string &MessageFederate::getEndpointName (endpoint_id_t id) const { return mfManager->getEndpointName (id); }
 
-std::string MessageFederate::getEndpointType (endpoint_id_t ep) { return mfManager->getEndpointType (ep); }
+const std::string &MessageFederate::getEndpointType (endpoint_id_t ep) { return mfManager->getEndpointType (ep); }
 
 void MessageFederate::registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &func)
 {

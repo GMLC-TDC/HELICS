@@ -67,7 +67,7 @@ HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, c
 @param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
 @return a void enumeration helics_ok if everything worked*/
-HELICS_EXPORT const char *helicsFilterGetName (helics_filter filt, helics_error *err);
+HELICS_EXPORT const char *helicsFilterGetName (helics_filter filt);
 
 /** set a property on a filter
 @param filt the filter to modify

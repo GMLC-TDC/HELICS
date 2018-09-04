@@ -180,7 +180,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed*/
-    std::string getEndpointName (endpoint_id_t id) const;
+    const std::string &getEndpointName (endpoint_id_t id) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the publication id
@@ -191,7 +191,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] ep the endpoint identifier
     @return a string containing the endpoint type
     */
-    std::string getEndpointType (endpoint_id_t ep);
+    const std::string &getEndpointType (endpoint_id_t ep);
 
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint

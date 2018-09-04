@@ -378,40 +378,28 @@ bool checkOutArgString(char *outputString, int maxlen, helics_error *err)
     return true;
 }
 
-void helicsEndpointGetType (helics_endpoint endpoint, char *outputString, int maxlen, helics_error *err)
+const char * helicsEndpointGetType (helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint (endpoint, err);
+    auto endObj = verifyEndpoint (endpoint, nullptr);
     if (endObj == nullptr)
     {
-        return ;
+        return nullStr.c_str();
     }
-	if (!checkOutArgString(outputString, maxlen, err))
-	{
-        return;
-	}
-    
+	
     try
     {
-        auto type = endObj->endptr->getType ();
-        if (static_cast<int> (type.size ()) > maxlen)
-        {
-            strncpy (outputString, type.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-        }
-        else
-        {
-            strcpy (outputString, type.c_str ());
-        }
+        auto &type = endObj->endptr->getType ();
+        return type.c_str ();
     }
     catch (...)
     {
-        helicsErrorHandler (err);
+        return nullStr.c_str ();
     }
 }
 
-const char *helicsEndpointGetName (helics_endpoint endpoint, helics_error *err)
+const char *helicsEndpointGetName (helics_endpoint endpoint)
 {
-    auto endObj = verifyEndpoint (endpoint, err);
+    auto endObj = verifyEndpoint (endpoint, nullptr);
     if (endObj == nullptr)
     {
         return nullStr.c_str();
@@ -424,7 +412,6 @@ const char *helicsEndpointGetName (helics_endpoint endpoint, helics_error *err)
     }
     catch (...)
     {
-        helicsErrorHandler (err);
         return nullStr.c_str ();
     }
 }

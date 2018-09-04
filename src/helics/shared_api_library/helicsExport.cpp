@@ -591,9 +591,9 @@ helics_bool_t helicsCoreIsConnected (helics_core core)
     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
-const char *helicsBrokerGetIdentifier (helics_broker broker, helics_error *err)
+const char *helicsBrokerGetIdentifier (helics_broker broker)
 {
-    auto brk = getBroker (broker,err);
+    auto brk = getBroker (broker,nullptr);
     if (brk == nullptr)
     {
         return nullstr.c_str ();
@@ -602,9 +602,9 @@ const char *helicsBrokerGetIdentifier (helics_broker broker, helics_error *err)
     return ident.c_str ();
 }
 
-const char * helicsCoreGetIdentifier (helics_core core, helics_error *err)
+const char * helicsCoreGetIdentifier (helics_core core)
 {
-    auto cr = getCore (core,err);
+    auto cr = getCore (core,nullptr);
     if (cr == nullptr)
     {
         return nullstr.c_str();
@@ -615,31 +615,17 @@ const char * helicsCoreGetIdentifier (helics_core core, helics_error *err)
     
 }
 
-void helicsBrokerGetAddress (helics_broker broker, char *address, int maxlen, helics_error *err)
+const char * helicsBrokerGetAddress (helics_broker broker)
 {
     
-    auto brk = getBroker (broker,err);
+    auto brk = getBroker (broker,nullptr);
     if (brk == nullptr)
     {
-        return;
+        return nullstr.c_str ();
     }
-    try
-    {
-        auto ident = brk->getAddress ();
-        if (static_cast<int> (ident.size ()) > maxlen)
-        {
-            strncpy (address, ident.c_str (), maxlen);
-            address[maxlen - 1] = 0;
-        }
-        else
-        {
-            strcpy (address, ident.c_str ());
-        }
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+
+    auto &add = brk->getAddress ();
+    return add.c_str ();
 }
 
 void helicsCoreSetReadyToInit (helics_core core, helics_error *err)

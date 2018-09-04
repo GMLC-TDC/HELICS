@@ -103,7 +103,7 @@ class MessageFederateManager
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed*/
-    std::string getEndpointName (endpoint_id_t id) const;
+    const std::string &getEndpointName (endpoint_id_t id) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the publication id
@@ -112,7 +112,7 @@ class MessageFederateManager
     /** get the type of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed or no type was specified*/
-    std::string getEndpointType (endpoint_id_t id) const;
+    const std::string &getEndpointType (endpoint_id_t id) const;
     /** register a callback function to call when any endpoint receives a message
     @details there can only be one generic callback
     @param[in] callback the function to call

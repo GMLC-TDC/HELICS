@@ -76,7 +76,7 @@ class Core
 
     const char *getIdentifier() const
     {
-        return helicsCoreGetIdentifier(core, NULL);
+        return helicsCoreGetIdentifier(core);
     }
 
     /** create a destination Filter on the specified federate

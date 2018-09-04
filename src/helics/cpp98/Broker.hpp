@@ -79,15 +79,12 @@ class Broker
     }
     const char *getIdentifier() const
     {
-        return helicsBrokerGetIdentifier(broker,NULL);
+        return helicsBrokerGetIdentifier(broker);
     }
 
-    std::string getAddress() const
+    const char *getAddress() const
     {
-        char str[255];
-        helicsBrokerGetAddress(broker, &str[0], sizeof(str),NULL);
-        std::string result(str);
-        return result;
+        return helicsBrokerGetAddress(broker);
     }
   protected:
     helics_broker broker;

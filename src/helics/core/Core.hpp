@@ -81,9 +81,11 @@ class Core
     /** check if the core is ready to accept new federates
      */
     virtual bool isOpenToNewFederates () const = 0;
-    /** get and identifier string for the core
+    /** get an identifier string for the core
      */
     virtual const std::string &getIdentifier () const = 0;
+    /** get the connection network or connection address for the core*/
+    virtual const std::string &getAddress () const = 0;
     /**
      * Federate has encountered an unrecoverable error.
      */

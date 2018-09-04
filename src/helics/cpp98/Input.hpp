@@ -169,29 +169,20 @@ public:
 
     // call helicsInputIsUpdated for each inp
 
-    std::string getKey() const
+    const char *getKey() const
     {
-        char str[255];
-        helicsInputGetKey(inp, &str[0], sizeof(str),NULL);
-        std::string result(str);
-        return result;
+        return helicsInputGetKey(inp);
     }
 
 
-    std::string getUnits() const
+    const char *getUnits() const
     {
-        char str[255];
-        helicsInputGetUnits(inp, &str[0], sizeof(str),NULL);
-        std::string result(str);
-        return result;
+        return helicsInputGetUnits(inp);
     }
 
-    std::string getType() const
+    const char *getType() const
     {
-        char str[255];
-        helicsInputGetType(inp, &str[0], sizeof(str),NULL);
-        std::string result(str);
-        return result;
+        return helicsInputGetType(inp);
     }
 
 private:

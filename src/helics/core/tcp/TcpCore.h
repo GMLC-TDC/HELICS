@@ -23,8 +23,8 @@ class TcpCore final : public CommsBroker<TcpComms, CommonCore>
 
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
-  public:
-    virtual std::string getAddress () const override;
+  protected:
+    virtual std::string generateLocalAddressString () const override;
 
   private:
     NetworkBrokerData netInfo{

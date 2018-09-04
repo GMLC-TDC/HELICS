@@ -75,10 +75,9 @@ struct FederateTestFixture
         }
 
         std::string initString = std::string ("--broker=");
-        initString += helicsBrokerGetIdentifier (broker, &err);
+        initString += helicsBrokerGetIdentifier (broker);
         initString += " --broker_address=";
-        CE (helicsBrokerGetAddress (broker, tmp, HELICS_SIZE_MAX, &err));
-        initString += tmp;
+        initString += helicsBrokerGetAddress (broker);
 
         if (!extraCoreArgs.empty ())
         {
@@ -100,7 +99,7 @@ struct FederateTestFixture
             auto init = initString + " --federates " + std::to_string (count);
             auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (),&err);
             BOOST_REQUIRE_EQUAL (err.error_code, 0);
-            CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier(core,&err), &err));
+            CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier(core), &err));
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
@@ -123,7 +122,7 @@ struct FederateTestFixture
                 auto init = initString + " --federates 1";
                 auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (),&err);
                 BOOST_REQUIRE_EQUAL (err.error_code, 0);
-                CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core, &err),
+                CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core),
                                                    &err));
 
                 auto name = name_prefix + std::to_string (ii + offset);

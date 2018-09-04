@@ -25,7 +25,8 @@ class TcpBroker final : public CommsBroker<TcpComms, CoreBroker>
 
     void initializeFromArgs (int argc, const char *const *argv) override;
 
-    virtual std::string getAddress () const override;
+  public:
+    virtual std::string generateLocalAddressString () const override;
     static void displayHelp (bool local_only = false);
 
   private:

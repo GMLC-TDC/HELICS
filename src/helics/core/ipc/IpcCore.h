@@ -25,7 +25,7 @@ class IpcCore final : public CommsBroker<IpcComms, CommonCore>
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   public:
-    virtual std::string getAddress () const override;
+    virtual std::string generateLocalAddressString () const override;
 
   private:
     virtual bool brokerConnect () override;

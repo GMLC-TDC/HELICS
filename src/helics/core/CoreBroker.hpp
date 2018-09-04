@@ -199,6 +199,7 @@ class CoreBroker : public Broker, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
+    virtual const std::string &getAddress () const override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
     virtual void dataConnect (const std::string &source, const std::string &target) override final;
 

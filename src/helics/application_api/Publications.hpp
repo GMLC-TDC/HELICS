@@ -89,13 +89,13 @@ class PublicationBase
      */
     publication_id_t getID () const { return id; }
 
-    /** get the key for the subscription*/
-    std::string getKey () const { return fed->getPublicationKey (id); }
-    /** get the key for the subscription*/
+    /** get the key for the publication*/
+    const std::string &getKey () const { return fed->getPublicationKey (id); }
+    /** get the key for the publication*/
     const std::string &getName () const { return key_; }
-    /** get the key for the subscription*/
+    /** get the type for the publication*/
     const std::string &getType () const { return type_; }
-    /** get the units of the Publication*/
+    /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
     /** add a target to the publication*/
     void addTarget (const std::string &target) { fed->addTarget (id, target); }

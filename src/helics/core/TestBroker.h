@@ -30,7 +30,7 @@ class TestBroker : public CoreBroker
     virtual void addRoute (int route_id, const std::string &routeInfo) override;
 
   public:
-    virtual std::string getAddress () const override;
+    virtual std::string generateLocalAddressString () const override;
     /** static method to display the help message*/
     static void displayHelp (bool localOnly = false);
 

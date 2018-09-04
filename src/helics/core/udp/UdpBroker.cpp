@@ -57,7 +57,7 @@ bool UdpBroker::brokerConnect ()
     return res;
 }
 
-std::string UdpBroker::getAddress () const
+std::string UdpBroker::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

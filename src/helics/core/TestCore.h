@@ -33,8 +33,9 @@ protected:
     virtual void transmit(int route_id, const ActionMessage &cmd) override;
     virtual void addRoute(int route_id, const std::string &routeInfo) override;
 public:
-    virtual std::string getAddress() const override;
-private:
+    virtual std::string generateLocalAddressString () const override;
+
+  private:
     //these should only be called by the CommonCore code
     virtual bool brokerConnect() override;
     virtual void brokerDisconnect() override;

@@ -87,30 +87,21 @@ void publish(bool val)
     helicsPublicationPublishBoolean(pub, val?helics_true:helics_false,NULL);
 }
 
-std::string getKey() const
+const char *getKey() const
 {
-    char str[255];
-    helicsPublicationGetKey(pub, &str[0], sizeof(str),NULL);
-    std::string result(str);
-    return result;
+    return helicsPublicationGetKey(pub);
 }
 
 
-std::string getUnits() const
+const char *getUnits() const
 {
-    char str[255];
-    helicsPublicationGetUnits (pub, &str[0], sizeof (str), NULL);
-    std::string result(str);
-    return result;
+    return helicsPublicationGetUnits (pub);
 }
 
 
-std::string getType() const
+const char *getType() const
 {
-    char str[255];
-    helicsPublicationGetType (pub, &str[0], sizeof (str), NULL);
-    std::string result(str);
-    return result;
+    return helicsPublicationGetType (pub);
 }
 
 private:
