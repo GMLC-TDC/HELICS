@@ -49,6 +49,7 @@ struct FederateTestFixture
                     helics_time_t time_delta = helics_time_zero,
                     const std::string &name_prefix = "fed")
     {
+        ctype = core_type_name;
         helics_broker broker = AddBroker (core_type_name, count);
         BOOST_CHECK (nullptr != broker);
         AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
@@ -174,7 +175,7 @@ struct FederateTestFixture
     std::vector<helics_federate> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
-
+    std::string ctype;
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);

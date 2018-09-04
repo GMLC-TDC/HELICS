@@ -85,7 +85,16 @@ FederateTestFixture::~FederateTestFixture ()
 
     for (auto &broker : brokers)
     {
-        auto res = helicsBrokerWaitForDisconnect (broker,200);
+        helics_status res;
+        if (ctype.compare(0, 3, "tcp") == 0)
+        {
+            res = helicsBrokerWaitForDisconnect(broker, 2000);
+        }
+        else
+        {
+            res = helicsBrokerWaitForDisconnect(broker, 200);
+        }
+        
 		if (res != helics_ok)
 		{
             printf ("forcing disconnect\n");
