@@ -180,7 +180,7 @@ void TcpRxConnection::close ()
     boost::system::error_code ec;
     if (socket_.is_open ())
     {
-        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
+        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
@@ -205,7 +205,7 @@ void TcpRxConnection::closeNoWait()
     boost::system::error_code ec;
     if (socket_.is_open ())
     {
-        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
+        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
@@ -330,7 +330,7 @@ void TcpConnection::close ()
 {
     cancel ();
     boost::system::error_code ec;
-    socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_send, ec);
+    socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (ec)
     {
         // I don't know what to do with this, in practice this message is mostly spurious
