@@ -136,7 +136,11 @@ fi
 # Install Boost
 if [[ ! -d "${boost_install_path}" ]]; then
     echo "*** build boost"
-    ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
+    local boost_sanitizer=""
+    if [[ "$RUN_TSAN" ]]; then
+        boost_sanitizer="BOOST_SANITIZER=thread"
+    fi
+    ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
     echo "*** built boost successfully"
 fi
 
