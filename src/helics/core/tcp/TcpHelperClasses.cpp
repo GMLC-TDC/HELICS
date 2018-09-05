@@ -184,15 +184,16 @@ void TcpRxConnection::close ()
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            ec.clear ();
         }
-        socket_.close ();
+        socket_.close (ec);
 		receivingHalt.wait();
     }
     else
     {
 		if (receivingHalt.isActive())
 		{
-            socket_.close ();
+            socket_.close (ec);
 			receivingHalt.wait();
 		}
     }
@@ -209,14 +210,15 @@ void TcpRxConnection::closeNoWait()
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            ec.clear ();
         }
-        socket_.close ();
+        socket_.close (ec);
     }
     else
     {
         if (receivingHalt.isActive ())
         {
-            socket_.close ();
+            socket_.close (ec);
         }
     }
  }
@@ -336,11 +338,15 @@ void TcpConnection::close ()
         // I don't know what to do with this, in practice this message is mostly spurious
         // but it seems I should do something with it, I just don't know what
         // std::cerr << "error occurred sending shutdown" << std::endl;
-        ((void)(ec));
+        ec.clear ();
     }
-    boost::asio::socket_base::linger optionLinger (true, 2);
-    socket_.set_option (optionLinger);
-    socket_.close ();
+	else
+	{
+        boost::asio::socket_base::linger optionLinger (true, 2);
+        socket_.set_option (optionLinger,ec);
+        
+	}
+    socket_.close (ec);
 }
 
 TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
