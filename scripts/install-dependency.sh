@@ -166,7 +166,7 @@ install_boost () {
         toolset=${boost_toolset} \
         "${cxxflags_var}" \
         "${linkflags_var}" \
-        ${b2_extra_options} ;
+        ${b2_extra_options} >/dev/null;
 }
 
 install_cmake () {
