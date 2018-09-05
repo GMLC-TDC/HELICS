@@ -120,19 +120,15 @@ install_boost () {
     local boost_toolset=$3
 
     local b2_extra_options=""
-    local cxxflags_options="${BOOST_CXX_FLAGS}"
+    local cxxflags_fpic=""
 
     local b2_link_type=shared
     if [[ "${BOOST_USE_STATIC}" ]]; then
         b2_link_type=static
-        cxxflags_options="-fPIC ${cxxflags_options}"
+        cxxflags_fpic="cxxflags=-fPIC"
     fi
 
     echo Boost link type: $b2_link_type
-
-    if [[ "${cxxflags_options}" ]]; then
-        b2_extra_options="cxxflags=\"${cxxflags_options}\" ${b2_extra_options}"
-    fi
 
     echo Boost b2 extra options ${b2_extra_options}
 
@@ -145,7 +141,8 @@ install_boost () {
         link=${b2_link_type} \
         threading=multi \
         toolset=${boost_toolset} \
-        ${b2_extra_options};
+        ${cxxflags_fpic} \
+        ${b2_extra_options} >/dev/null;
 }
 
 install_cmake () {
