@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -514,16 +514,15 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     if (HELICS_EXECUTING == fed->getState ())
     {
         auto ret = fed->requestTime (next, iteration_request::no_iterations);
-		switch (ret.state)
-		{
+        switch (ret.state)
+        {
         case iteration_result::error:
-            throw (FunctionExecutionFailure (fed->lastErrorString()));
+            throw (FunctionExecutionFailure (fed->lastErrorString ()));
         case iteration_result::halted:
             throw (HelicsTerminated ("federate has terminated"));
         default:
             return ret.grantedTime;
-		}
-        
+        }
     }
     throw (InvalidFunctionCall ("time request may only be called in execution state"));
 }
@@ -2872,7 +2871,8 @@ void CommonCore::checkDependencies ()
     {
         return;
     }
-    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then we need to be a timeCoordinator
+    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then we need to be
+    // a timeCoordinator
     if (timeCoord->getDependents ().size () > 2)
     {
         return;
@@ -2903,10 +2903,10 @@ void CommonCore::checkDependencies ()
     // check to make sure the dependencies match
     for (auto &dep : timeCoord->getDependencies ())
     {
-		if (!((dep == fedid) || (dep == brkid)))
-		{
+        if (!((dep == fedid) || (dep == brkid)))
+        {
             return;
-		}
+        }
     }
     // remove the core from the time dependency chain since it is just adding to the communication noise in this
     // case

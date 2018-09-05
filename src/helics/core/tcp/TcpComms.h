@@ -19,8 +19,8 @@ namespace asio
 {
 class io_context;
 using io_service = io_context;
-}
-}
+}  // namespace asio
+}  // namespace boost
 #else
 namespace boost
 {
@@ -28,7 +28,7 @@ namespace asio
 {
 class io_service;
 }
-}
+}  // namespace boost
 #endif
 
 namespace boost
@@ -37,15 +37,12 @@ namespace system
 {
 class error_code;
 }
-}
-
-
+}  // namespace boost
 
 namespace helics
 {
 namespace tcp
 {
-
 class TcpRxConnection;
 class TcpConnection;
 
@@ -55,7 +52,9 @@ class TcpComms final : public CommsInterface
   public:
     /** default constructor*/
     TcpComms () noexcept;
-    TcpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork = interface_networks::local);
+    TcpComms (const std::string &brokerTarget,
+              const std::string &localTarget,
+              interface_networks targetNetwork = interface_networks::local);
     TcpComms (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~TcpComms ();
@@ -110,4 +109,3 @@ class TcpComms final : public CommsInterface
 
 }  // namespace tcp
 }  // namespace helics
-

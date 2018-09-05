@@ -66,7 +66,8 @@ class FederateState
     int errorCode = 0;  //!< storage for an error code
     CommonCore *parent_ = nullptr;  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
-    decltype (std::chrono::steady_clock::now ()) start_clock_time; //!< time the initialization mode started for real time capture
+    decltype (std::chrono::steady_clock::now ())
+      start_clock_time;  //!< time the initialization mode started for real time capture
     Time rt_lag = timeZero;  //!< max lag for the rt control
     Time rt_lead = timeZero;  //!< min lag for the realtime control
     int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
@@ -85,7 +86,8 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::map<Core::federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
+    std::map<Core::federate_id_t, std::deque<ActionMessage>>
+      delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<Core::handle_id_t> events;  //!< list of value events to process
     std::vector<Core::federate_id_t> delayedFederates;  //!< list of federates to delay messages from
@@ -204,8 +206,8 @@ class FederateState
      */
     const std::vector<Core::handle_id_t> &getEvents () const;
     /** get a vector of the federates this one depends on
-    */
-    std::vector<Core::federate_id_t> getDependencies() const;
+     */
+    std::vector<Core::federate_id_t> getDependencies () const;
     /** get a vector to the global ids of dependent federates
      */
     std::vector<Core::federate_id_t> getDependents () const;

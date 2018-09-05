@@ -132,7 +132,8 @@ class Federate
     explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with extension (.TOML, .toml)
+    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with
+    extension (.TOML, .toml)
     */
     Federate (const std::string &name, const std::string &configString);
     /**default constructor*/

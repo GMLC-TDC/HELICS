@@ -46,7 +46,7 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     /** wait on the closing actions*/
     void waitOnClose ();
     /**check if the connection is receiving data*/
-    bool isReceiving () const { return receivingHalt.isActive(); }
+    bool isReceiving () const { return receivingHalt.isActive (); }
     /** set the callback for the data object*/
     void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
@@ -72,7 +72,7 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
-	TriggerVariable receivingHalt;
+    TriggerVariable receivingHalt;
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
@@ -115,7 +115,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** close the socket*/
     void close ();
     /** check if the acceptor is current accepting new connections*/
-	bool isAccepting() const { return accepting.isActive(); }
+    bool isAccepting () const { return accepting.isActive (); }
     /** check if the acceptor is ready to begin accepting*/
     bool isConnected () const { return (state.load () == accepting_state_t::connected); }
     /** set the callback for the data object*/
@@ -137,17 +137,20 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     }
     /** generate a string from the associated endpoint*/
     std::string to_string () const;
+
   private:
     TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
     TcpAcceptor (boost::asio::io_service &io_service, int port);
     /** function for handling the asynchronous return from a read request*/
-    void handle_accept (TcpAcceptor::pointer ptr,TcpRxConnection::pointer new_connection, const boost::system::error_code &error);
+    void handle_accept (TcpAcceptor::pointer ptr,
+                        TcpRxConnection::pointer new_connection,
+                        const boost::system::error_code &error);
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::endpoint endpoint_;
     std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> acceptCall;
     std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
-	TriggerVariable accepting;
+    TriggerVariable accepting;
 };
 
 /** tcp socket connection for connecting to a server*/
@@ -264,23 +267,23 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   public:
     typedef std::shared_ptr<TcpServer> pointer;
 
-    static pointer create(boost::asio::io_service &io_service,
-        const std::string &address,
-        const std::string &port,
-        bool reuse_port = false,
+    static pointer create (boost::asio::io_service &io_service,
+                           const std::string &address,
+                           const std::string &port,
+                           bool reuse_port = false,
                            int nominalBufferSize = 10192);
 
     static pointer create (boost::asio::io_service &io_service,
                            const std::string &address,
                            int PortNum,
-        bool reuse_port = false,
+                           bool reuse_port = false,
                            int nominalBufferSize = 10192);
     static pointer create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192);
 
   public:
     ~TcpServer ();
     /**set the port reuse flag */
-    void setPortReuse(bool reuse) { reuse_address = reuse; }
+    void setPortReuse (bool reuse) { reuse_address = reuse; }
     /** start accepting new connections*/
     void start ();
     /** close the server*/
@@ -305,12 +308,12 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
                int portNum,
-        bool port_reuse,
+               bool port_reuse,
                int nominalBufferSize);
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
                const std::string &port,
-        bool port_reuse,
+               bool port_reuse,
                int nominalBufferSize);
     TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize);
 
@@ -324,7 +327,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
     bool reuse_address = false;
-	//this data structure is protected by the accepting mutex
+    // this data structure is protected by the accepting mutex
     std::vector<std::shared_ptr<TcpRxConnection>> connections;
 };
 

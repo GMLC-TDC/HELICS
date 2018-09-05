@@ -84,12 +84,11 @@ TcpComms::TcpComms (const NetworkBrokerData &netInfo)
     {
         openPortStart = netInfo.portStart;
     }
-	if (PortNumber > 0)
-	{
+    if (PortNumber > 0)
+    {
         autoPortNumber = false;
-	}
+    }
     reuse_address = netInfo.reuse_address;
-
 }
 
 /** destructor*/
@@ -307,27 +306,27 @@ void TcpComms::queue_rx_function ()
             case CLOSE_RECEIVER:
             case DISCONNECT:
                 disconnecting = true;
-                setRxStatus ( connection_status::terminated);
+                setRxStatus (connection_status::terminated);
                 return;
             }
         }
     }
     if (PortNumber < 0)
     {
-        setRxStatus ( connection_status::error);
+        setRxStatus (connection_status::error);
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto server =
-      helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,reuse_address, maxMessageSize_);
+    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
+                                                  reuse_address, maxMessageSize_);
     while (!server->isReady ())
     {
-        if ((autoPortNumber)&&(hasBroker))
-        { //If we failed and we are on an automatically assigned port number,  just try a different port
+        if ((autoPortNumber) && (hasBroker))
+        {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,reuse_address,
-                                                     maxMessageSize_);
+            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
+                                                     reuse_address, maxMessageSize_);
         }
         else
         {
@@ -338,7 +337,7 @@ void TcpComms::queue_rx_function ()
             {
                 std::cerr << "unable to bind to tcp connection socket\n";
                 server->close ();
-                setRxStatus ( connection_status::error);
+                setRxStatus (connection_status::error);
                 return;
             }
         }
@@ -351,7 +350,7 @@ void TcpComms::queue_rx_function ()
         return commErrorHandler (connection, error);
     });
     server->start ();
-    setRxStatus ( connection_status::connected);
+    setRxStatus (connection_status::connected);
     bool loopRunning = true;
     while (loopRunning)
     {
@@ -370,7 +369,7 @@ void TcpComms::queue_rx_function ()
 
     disconnecting = true;
     server->close ();
-    setRxStatus ( connection_status::terminated);
+    setRxStatus (connection_status::terminated);
 }
 
 void TcpComms::txReceive (const char *data, size_t bytes_received, const std::string &errorMessage)
@@ -422,7 +421,7 @@ void TcpComms::queue_tx_function ()
                 if (cumsleep >= connectionTimeout)
                 {
                     std::cerr << "initial connection to broker timed out\n" << std::endl;
-                    setTxStatus ( connection_status::terminated);
+                    setTxStatus (connection_status::terminated);
                     return;
                 }
             }
@@ -438,7 +437,7 @@ void TcpComms::queue_tx_function ()
                 catch (const boost::system::system_error &error)
                 {
                     std::cerr << "error in initial send to broker " << error.what () << '\n';
-                    setTxStatus ( connection_status::terminated);
+                    setTxStatus (connection_status::terminated);
                     return;
                 }
                 std::vector<char> rx (512);
@@ -474,7 +473,7 @@ void TcpComms::queue_tx_function ()
                             else if (mess->second.index == DISCONNECT)
                             {
                                 brokerConnection->cancel ();
-                                setTxStatus ( connection_status::terminated);
+                                setTxStatus (connection_status::terminated);
                                 return;
                             }
                         }
@@ -484,7 +483,7 @@ void TcpComms::queue_tx_function ()
                     {
                         brokerConnection->cancel ();
                         std::cerr << "port number query to broker timed out\n" << std::endl;
-                        setTxStatus ( connection_status::terminated);
+                        setTxStatus (connection_status::terminated);
                         return;
                     }
                 }
@@ -506,7 +505,7 @@ void TcpComms::queue_tx_function ()
             rxMessageQueue.push (m);
         }
     }
-    setTxStatus ( connection_status::connected);
+    setTxStatus (connection_status::connected);
 
     //  std::vector<ActionMessage> txlist;
     while (true)
@@ -667,7 +666,7 @@ CLOSE_TX_LOOP:
     {
         closeReceiver ();
     }
-    setTxStatus ( connection_status::terminated);
+    setTxStatus (connection_status::terminated);
 }
 
 void TcpComms::closeReceiver ()
