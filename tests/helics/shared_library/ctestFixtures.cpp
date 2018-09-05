@@ -21,8 +21,12 @@ static bool hasIndexCode (const std::string &type_name)
     return false;
 }
 
-static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
+static auto StartBrokerImp (const std::string &core_type_name, std::string initialization_string)
 {
+    if (core_type_name.compare(0, 3, "tcp") == 0)
+    {
+        initialization_string += " --reuse_address";
+    }
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
@@ -49,15 +53,9 @@ int FederateTestFixture::getIndexCode (const std::string &type_name)
 }
 
 auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
-                                        const std::string &initialization_string)
+                                        std::string initialization_string)
 {
-    if (hasIndexCode (core_type_name))
-    {
-        std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str ());
-    }
-
-    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str ());
+    StartBrokerImp(core_type_name, std::move(initialization_string));
 }
 
 FederateTestFixture::~FederateTestFixture ()

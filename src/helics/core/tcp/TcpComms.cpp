@@ -88,6 +88,8 @@ TcpComms::TcpComms (const NetworkBrokerData &netInfo)
 	{
         autoPortNumber = false;
 	}
+    reuse_address = netInfo.reuse_address;
+
 }
 
 /** destructor*/
@@ -317,14 +319,14 @@ void TcpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
     auto server =
-      helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, maxMessageSize_);
+      helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,reuse_address, maxMessageSize_);
     while (!server->isReady ())
     {
         if ((autoPortNumber)&&(hasBroker))
         { //If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
+            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,reuse_address,
                                                      maxMessageSize_);
         }
         else

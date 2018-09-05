@@ -27,14 +27,25 @@ int getIndexCode (const std::string &type_name) { return static_cast<int> (type_
 
 auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
+    helics::core_type type;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        auto core_type = helics::coreTypeFromString (new_type);
-        return helics::BrokerFactory::create (core_type, initialization_string);
+        type = helics::coreTypeFromString (new_type);
     }
-    auto core_type = helics::coreTypeFromString (core_type_name);
-    return helics::BrokerFactory::create (core_type, initialization_string);
+    else
+    {
+        type = helics::coreTypeFromString(core_type_name);
+    }
+    if (type == helics::core_type::TCP)
+    {
+        return helics::BrokerFactory::create(type, initialization_string+" --reuse_address");
+    }
+    else
+    {
+        return helics::BrokerFactory::create(type, initialization_string);
+    }
+    
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -57,15 +68,24 @@ int FederateTestFixture::getIndexCode (const std::string &type_name)
 auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
                                         const std::string &initialization_string)
 {
+    helics::core_type type;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        auto core_type = helics::coreTypeFromString (new_type);
-        return helics::BrokerFactory::create (core_type, initialization_string);
+        type = helics::coreTypeFromString (new_type);
     }
-
-    auto core_type = helics::coreTypeFromString (core_type_name);
-    return helics::BrokerFactory::create (core_type, initialization_string);
+    else
+    {
+        type = helics::coreTypeFromString(core_type_name);
+    }
+    if (type == helics::core_type::TCP)
+    {
+        return helics::BrokerFactory::create(type, initialization_string + " --reuse_address");
+    }
+    else
+    {
+        return helics::BrokerFactory::create(type, initialization_string);
+    }
 }
 
 FederateTestFixture::~FederateTestFixture ()

@@ -264,19 +264,23 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   public:
     typedef std::shared_ptr<TcpServer> pointer;
 
-    static pointer create (boost::asio::io_service &io_service,
-                           const std::string &address,
-                           const std::string &port,
+    static pointer create(boost::asio::io_service &io_service,
+        const std::string &address,
+        const std::string &port,
+        bool reuse_port = false,
                            int nominalBufferSize = 10192);
 
     static pointer create (boost::asio::io_service &io_service,
                            const std::string &address,
                            int PortNum,
+        bool reuse_port = false,
                            int nominalBufferSize = 10192);
     static pointer create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192);
 
   public:
     ~TcpServer ();
+    /**set the port reuse flag */
+    void setPortReuse(bool reuse) { reuse_address = reuse; }
     /** start accepting new connections*/
     void start ();
     /** close the server*/
@@ -301,10 +305,12 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
                int portNum,
+        bool port_reuse,
                int nominalBufferSize);
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
                const std::string &port,
+        bool port_reuse,
                int nominalBufferSize);
     TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize);
 
@@ -317,7 +323,8 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
-	//this data structure is protected by the accepting atomic
+    bool reuse_address = false;
+	//this data structure is protected by the accepting mutex
     std::vector<std::shared_ptr<TcpRxConnection>> connections;
 };
 

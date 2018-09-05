@@ -67,6 +67,7 @@ class TcpComms final : public CommsInterface
   private:
     int brokerPort = -1;
     bool autoPortNumber = true;
+    bool reuse_address = false;
     std::atomic<int> PortNumber{-1};
     std::set<int> usedPortNumbers;
     int openPortStart = -1;

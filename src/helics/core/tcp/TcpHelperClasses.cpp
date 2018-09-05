@@ -541,8 +541,9 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,TcpRxConnection::point
 TcpServer::TcpServer (boost::asio::io_service &io_service,
                       const std::string &address,
                       int portNum,
+    bool port_reuse,
                       int nominalBufferSize)
-    : ioserv (io_service), bufferSize (nominalBufferSize)
+    : ioserv (io_service), bufferSize (nominalBufferSize), reuse_address(port_reuse)
 {
     if ((address == "*") || (address == "tcp://*"))
     {
@@ -579,8 +580,9 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
 TcpServer::TcpServer (boost::asio::io_service &io_service,
                       const std::string &address,
                       const std::string &port,
+    bool port_reuse,
                       int nominalBufferSize)
-    : ioserv (io_service), bufferSize (nominalBufferSize)
+    : ioserv (io_service), bufferSize (nominalBufferSize), reuse_address(port_reuse)
 {
     tcp::resolver resolver (io_service);
     tcp::resolver::query query (tcp::v4 (), address, port, tcp::resolver::query::canonical_name);
@@ -620,8 +622,14 @@ void TcpServer::initialConnect ()
     for (auto &ep : endpoints)
     {
         auto acc = TcpAcceptor::create (ioserv, ep);
-
-        acc->set_option (tcp::acceptor::reuse_address (true));
+        if (reuse_address)
+        {
+            acc->set_option(tcp::acceptor::reuse_address(true));
+        }
+        else
+        {
+            acc->set_option(tcp::acceptor::reuse_address(false));
+        }
         acc->setAcceptCall (
           [this](TcpAcceptor::pointer accPtr, TcpRxConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
@@ -667,17 +675,19 @@ bool TcpServer::reConnect (int timeout)
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       const std::string &address,
                                       int PortNum,
+    bool port_reuse,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, PortNum, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, PortNum,port_reuse, nominalBufferSize));
 }
 
-TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
-                                      const std::string &address,
-                                      const std::string &port,
+TcpServer::pointer TcpServer::create(boost::asio::io_service &io_service,
+    const std::string &address,
+    const std::string &port,
+    bool port_reuse,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, port, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, port,port_reuse, nominalBufferSize));
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)
