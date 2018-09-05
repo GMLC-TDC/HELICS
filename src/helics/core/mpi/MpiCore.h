@@ -24,8 +24,7 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   public:
-    virtual std::string getAddress () const override;
-
+    virtual std::string generateLocalAddressString () const override;
   private:
     std::string brokerAddress;  //!< the mpi rank:tag of the broker
     int brokerRank;

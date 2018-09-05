@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE (inputinfo_test)
     BOOST_CHECK_EQUAL (subI.required, false);
 
 	helics::global_handle testHandle (helics::global_federate_id_t (5), helics::interface_handle (45));
-    subI.addSource (testHandle);
+    subI.addSource (testHandle,"double",std::string());
     // No data available, shouldn't get a data_block back
     ret_data = subI.getData (0);
     BOOST_CHECK (!ret_data);

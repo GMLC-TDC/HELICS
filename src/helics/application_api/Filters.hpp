@@ -148,7 +148,7 @@ filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_cloning_filter (defined_filter_types type,
+std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
                                      Federate *fed,
                                      const std::string &delivery,
                                      const std::string &name = EMPTY_STRING);
@@ -160,6 +160,6 @@ std::unique_ptr<Filter> make_cloning_filter (defined_filter_types type,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_cloning_filter (defined_filter_types type, Core *cr, const std::string &delivery, const std::string &name = EMPTY_STRING);
+std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type, Core *cr, const std::string &delivery, const std::string &name = EMPTY_STRING);
 
 }  // namespace helics

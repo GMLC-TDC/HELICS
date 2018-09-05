@@ -26,7 +26,7 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
     /**destructor*/
     virtual ~MpiBroker ();
 
-    virtual std::string getAddress () const override;
+    virtual std::string generateLocalAddressString () const override;
     static void displayHelp (bool local_only = false);
 
   private:

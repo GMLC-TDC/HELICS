@@ -90,6 +90,9 @@ bool MpiBroker::brokerConnect ()
     return res;
 }
 
-std::string MpiBroker::getAddress () const { return comms->getAddress (); }
+std::string MpiBroker::generateLocalAddressString () const
+{
+    return (comms) ? (comms->getAddress ()) : brokerAddress;
+}
 }  // namespace mpi
 }  // namespace helics

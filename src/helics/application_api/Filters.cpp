@@ -273,7 +273,7 @@ std::unique_ptr<Filter> make_filter (defined_filter_types type,
 {
     if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<Filter> (mFed, name);
+        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter> (mFed, name);
         addOperations (dfilt.get (), type, mFed->getCorePointer ().get ());
         dfilt->setString ("delivery", name);
         return dfilt;
@@ -293,7 +293,7 @@ make_filter (defined_filter_types type, Core *cr, const std::string &name)
 {
     if (type == defined_filter_types::clone)
     {
-        auto dfilt = std::make_unique<Filter> (cr, name);
+        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter> (cr, name);
         addOperations (dfilt.get (), type, cr);
         dfilt->setString ("delivery", name);
         return dfilt;
@@ -306,5 +306,24 @@ make_filter (defined_filter_types type, Core *cr, const std::string &name)
     }
 }
 
+
+std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
+
+{
+        auto dfilt = std::make_unique<CloningFilter> (mFed, name);
+        addOperations (dfilt.get (), type, mFed->getCorePointer ().get ());
+        dfilt->addDeliveryEndpoint (delivery);
+        return dfilt;
+}
+
+std::unique_ptr<CloningFilter>
+make_cloning_filter (defined_filter_types type, Core *cr, const std::string &delivery, const std::string &name)
+
+{
+        auto dfilt = std::make_unique<CloningFilter> (cr, name);
+        addOperations (dfilt.get (), type, cr);
+        dfilt->addDeliveryEndpoint(delivery);
+        return dfilt;
+}
 
 }  // namespace helics

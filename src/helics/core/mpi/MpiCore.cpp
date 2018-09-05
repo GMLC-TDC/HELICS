@@ -70,7 +70,10 @@ bool MpiCore::brokerConnect ()
     return res;
 }
 
-std::string MpiCore::getAddress () const { return (comms)?(comms->getAddress ()): brokerAddress; }
+std::string MpiCore::generateLocalAddressString () const
+{
+    return (comms) ? (comms->getAddress ()) : brokerAddress;
+}
 
 }  // namespace mpi
 }  // namespace helics

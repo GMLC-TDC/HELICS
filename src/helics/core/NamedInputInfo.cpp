@@ -86,9 +86,10 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource) 
+void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits) 
 { 
     input_sources.push_back (newSource);
+    source_types.emplace_back (stype, sunits);
     data_queues.resize(input_sources.size());
     current_data.resize(input_sources.size());
 }
