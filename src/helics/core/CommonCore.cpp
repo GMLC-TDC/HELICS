@@ -2867,12 +2867,12 @@ void CommonCore::checkDependencies ()
         }
     }
 
-    // if we have filters we need to be a timeCoordinator
+    // if the core has filters we need to be a timeCoordinator
     if (hasFilters)
     {
         return;
     }
-    // if there is more than 2 dependents(higher broker + 2 or more federates then we need to be a timeCoordinator
+    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then we need to be a timeCoordinator
     if (timeCoord->getDependents ().size () > 2)
     {
         return;
@@ -2903,20 +2903,10 @@ void CommonCore::checkDependencies ()
     // check to make sure the dependencies match
     for (auto &dep : timeCoord->getDependencies ())
     {
-        if (isLocal (dep))
-        {
-            if (dep != fedid)
-            {
-                return;
-            }
-        }
-        else
-        {
-            if (brkid != dep)
-            {
-                return;
-            }
-        }
+		if (!((dep == fedid) || (dep == brkid)))
+		{
+            return;
+		}
     }
     // remove the core from the time dependency chain since it is just adding to the communication noise in this
     // case

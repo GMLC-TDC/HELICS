@@ -235,7 +235,7 @@ void CommsInterface::disconnect ()
     cnt = 0;
     while (tx_status.load () <= connection_status::connected)
     {
-        if (rxTrigger.wait_for (std::chrono::milliseconds (800)))
+        if (txTrigger.wait_for (std::chrono::milliseconds (800)))
         {
             continue;
         }
