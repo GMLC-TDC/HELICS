@@ -48,7 +48,7 @@ add_test(
     --log_level=message
     --report_level=short
 )
-set_property(TEST system-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
   add_custom_command(

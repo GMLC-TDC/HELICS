@@ -214,7 +214,7 @@ install:
   - export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
 
   - TEST_FLAGS_ARR=("$TEST_TYPE")
-  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind") ; fi
+  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind" "--disable-unit-tests") ; fi
   - if [[ "$RUN_CACHEGRIND" ]]; then TEST_FLAGS_ARR+=("--cachegrind") ; fi
   - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
   - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
