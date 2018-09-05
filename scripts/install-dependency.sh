@@ -120,12 +120,35 @@ install_boost () {
     local boost_toolset=$3
 
     local b2_extra_options=""
-    local cxxflags_fpic=""
+    local cxxflags_var=""
+    local cxxflags_arr=()
+    if [[ "${BOOST_CXXFLAGS}" ]]; then
+        cxxflags_arr+=("${BOOST_CXXFLAGS}")
+    fi
+
+    local linkflags_var=""
+    local linkflags_arr=()
+    if [[ "${BOOST_LINKFLAGS}" ]]; then
+        linkflags_arr+=("${BOOST_LINKFLAGS}")
+    fi
 
     local b2_link_type=shared
     if [[ "${BOOST_USE_STATIC}" ]]; then
         b2_link_type=static
-        cxxflags_fpic="cxxflags=-fPIC"
+        cxxflags_arr+=("-fPIC")
+    fi
+
+    if [[ "${BOOST_SANITIZER}" ]]; then
+        cxxflags_arr+=("-fsanitize=${BOOST_SANITIZER}")
+        linkflags_arr+=("-fsanitize=${BOOST_SANITIZER}")
+    fi
+
+    if [[ "${cxxflags_arr[@]}" ]]; then
+        cxxflags_var="cxxflags=${cxxflags_arr[@]}"
+    fi
+
+    if [[ "${linkflags_arr[@]}" ]]; then
+        linkflags_var="linkflags=${linkflags_arr[@]}"
     fi
 
     echo Boost link type: $b2_link_type
@@ -141,8 +164,9 @@ install_boost () {
         link=${b2_link_type} \
         threading=multi \
         toolset=${boost_toolset} \
-        ${cxxflags_fpic} \
-        ${b2_extra_options} >/dev/null;
+        "${cxxflags_var}" \
+        "${linkflags_var}" \
+        ${b2_extra_options} ;
 }
 
 install_cmake () {
