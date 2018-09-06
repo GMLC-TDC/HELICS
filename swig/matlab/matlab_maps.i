@@ -1,4 +1,48 @@
 
+%{
+/* throw a helics error */
+static void throwHelicsMatlabError(helics_error *err) {
+  switch (err->error_code)
+  {
+  case helics_ok:
+	return;
+  case helics_registration_failure:
+	mexErrMsgIdAndTxt( "helics:registration_failure", err->error_msg);
+	break;
+  case   helics_connection_failure:
+  mexErrMsgIdAndTxt( "helics:connection_failure", err->error_msg);
+	break;
+  case   helics_invalid_object:
+  mexErrMsgIdAndTxt( "helics:invalid_object", err->error_msg);
+	break;
+  case   helics_invalid_argument:
+  mexErrMsgIdAndTxt( "helics:invalid_argument", err->error_msg);
+	break;
+  case   helics_discard:
+  mexErrMsgIdAndTxt( "helics:discard", err->error_msg);
+	break;
+  case   helics_terminated:
+  mexErrMsgIdAndTxt( "helics:terminated", err->error_msg);
+	break;
+  case   helics_invalid_state_transition:
+  mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->error_msg);
+	break;
+  case   helics_invalid_function_call:
+  mexErrMsgIdAndTxt( "helics:invalid_function_call", err->error_msg);
+	break;
+  case   helics_execution_failure:
+  mexErrMsgIdAndTxt( "helics:execution_failure", err->error_msg);
+	break;
+  case   helics_other_error:
+  case   other_error_type:
+  default:
+  mexErrMsgIdAndTxt( "helics:error", err->error_msg);
+	break;
+  }
+}
+
+%}
+
 //typemap for short maxlen strings
 %typemap(in, numinputs=0) (char *outputString, int maxlen) {
   $2=256;
@@ -13,6 +57,18 @@
    if ($1) free($1);
 }
 
+%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+	etemp=helicsErrorInitialize();
+	$1=&etemp;
+}
+
+%typemap(argout) helics_error *
+{
+	if (etemp.error_code!=helics_ok)
+	{
+		throwHelicsMatlabError(&etemp);
+	}
+}
 
 //typemap for large string output with a length return in C
 %typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {

@@ -9,8 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ActionMessageDefintions.hpp"
 #include "Core.hpp"
 #include "core-types.hpp"
-#include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 #include <memory>
 #include <string>
 
@@ -100,8 +100,9 @@ class ActionMessage
         dest_id = hand.fed_id;
         dest_handle = hand.handle;
     }
-	const std::vector<std::string> &getStringData() const { return stringData;
-	}
+    const std::vector<std::string> &getStringData () const { return stringData; }
+
+	void clearStringData() { stringData.clear ();}
     // most use cases for this involve short strings, or already have references that need to be copied so
     // supporting move isn't  going to be that useful here
     void setStringData (const std::string &string1)
