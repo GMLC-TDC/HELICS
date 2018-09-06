@@ -68,7 +68,7 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode8
 
-    - name: "XCode 8gm, macOS 10.11
+    - name: "XCode 8gm, macOS 10.11"
       if: branch =~ /^.*HELICS_2.*$/
       os: osx
       compiler: clang
