@@ -224,14 +224,20 @@ void helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message, he
   
     try
     {
-        if (endObj->endptr->getName()!=message->original_source)
-        if (message->dest == nullptr)
+        if ((message->original_source==nullptr)||(endObj->endptr->getName() == message->original_source))
         {
-            endObj->endptr->send (message->data, message->length, message->time);
+            if (message->dest == nullptr)
+            {
+                endObj->endptr->send(message->data, message->length, message->time);
+            }
+            else
+            {
+                endObj->endptr->send(message->dest, message->data, message->length, message->time);
+            }
         }
         else
         {
-            endObj->endptr->send (message->dest, message->data, message->length, message->time);
+            //TODO:: we have a routed message we need convert to an actual helics message object
         }
     }
     catch (...)

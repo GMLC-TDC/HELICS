@@ -18,7 +18,6 @@ namespace helics
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
     : messageAction (startingAction), name (payload)
 {
-
 }
 
 ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId)
@@ -29,24 +28,24 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
-    : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
-      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
+    : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
+      source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
       payload (std::move (act.payload)), name (payload), stringData (std::move (act.stringData))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
-    : messageAction (act.messageAction),messageID(act.messageID), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), counter (act.counter),
-      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload), name (payload), stringData (act.stringData)
+    : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
+      source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
+      payload (act.payload), name (payload), stringData (act.stringData)
 
 {
-
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : messageAction (CMD_SEND_MESSAGE),messageID(message->messageID), actionTime (message->time),
+    : messageAction (CMD_SEND_MESSAGE), messageID (message->messageID), actionTime (message->time),
       payload (std::move (message->data.m_data)), name (payload),
       stringData ({std::move (message->dest), std::move (message->source), std::move (message->original_source),
                    std::move (message->original_dest)})
@@ -105,35 +104,32 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
     actionTime = message->time;
     stringData = {std::move (message->dest), std::move (message->source), std::move (message->original_source),
                   std::move (message->original_dest)};
-
 }
 
-void ActionMessage::setAction (action_message_def::action_t newAction)
-{
-    messageAction = newAction;
-}
+void ActionMessage::setAction (action_message_def::action_t newAction) { messageAction = newAction; }
 
 static const std::string nullStr;
-const std::string &ActionMessage::getString(int index) const {
-	if ((stringData.size() > index) && (index >= 0))
-	{
+const std::string &ActionMessage::getString (int index) const
+{
+    if (isValidIndex(index,stringData))
+    {
         return stringData[index];
     }
     return nullStr;
 }
 
-void ActionMessage::setString(int index, const std::string &str)
-{ 
-	if (index>=0)
+void ActionMessage::setString (int index, const std::string &str)
+{
+    if (index >= 0)
     {
-		if (index >= stringData.size())
-		{
+        if (index >= static_cast<int>(stringData.size ()))
+        {
             stringData.resize (index + 1);
-		}
+        }
         stringData[index] = str;
-	}
+    }
 }
-    using archiver = cereal::PortableBinaryOutputArchive;
+using archiver = cereal::PortableBinaryOutputArchive;
 
 using retriever = cereal::PortableBinaryInputArchive;
 
@@ -312,8 +308,8 @@ void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray 
 std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
-	switch (cmd.stringData.size())
-	{
+    switch (cmd.stringData.size ())
+    {
     case 0:
         break;
     case 1:
@@ -334,11 +330,11 @@ std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
         msg->original_source = cmd.stringData[2];
         msg->original_dest = cmd.stringData[3];
         break;
-	}
+    }
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
     msg->messageID = cmd.messageID;
-    
+
     return msg;
 }
 
@@ -350,22 +346,22 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     case 0:
         break;
     case 1:
-        msg->dest= std::move(cmd.stringData[0]);
+        msg->dest = std::move (cmd.stringData[0]);
         break;
     case 2:
-        msg->dest = std::move(cmd.stringData[0]);
-        msg->source = std::move(cmd.stringData[1]);
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
         break;
     case 3:
-        msg->dest = std::move(cmd.stringData[0]);
-        msg->source = std::move(cmd.stringData[1]);
-        msg->original_source = std::move(cmd.stringData[2]);
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
+        msg->original_source = std::move (cmd.stringData[2]);
         break;
     default:
-        msg->dest = std::move(cmd.stringData[0]);
-        msg->source = std::move(cmd.stringData[1]);
-        msg->original_source = std::move(cmd.stringData[2]);
-        msg->original_dest = std::move(cmd.stringData[3]);
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
+        msg->original_source = std::move (cmd.stringData[2]);
+        msg->original_dest = std::move (cmd.stringData[3]);
         break;
     }
     msg->data = std::move (cmd.payload);
@@ -401,7 +397,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_ping, "ping"},
   {action_message_def::action_t::cmd_ping_reply, "ping reply"},
   {action_message_def::action_t::cmd_fed_configure_time, "fed_configure_time"},
-  {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"}, 
+  {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"},
   {action_message_def::action_t::cmd_fed_configure_flag, "fed_configure_flag"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
@@ -449,12 +445,12 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
   {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
-  { action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint" },
-  { action_message_def::action_t::cmd_add_named_input, "add_named_input" },
-  { action_message_def::action_t::cmd_add_named_publication, "add_named_publication" },
-  { action_message_def::action_t::cmd_add_named_filter, "add_named_filter" },
-  { action_message_def::action_t::cmd_remove_target, "remove_target" },
-  { action_message_def::action_t::cmd_multi_message, "multi message" },
+  {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
+  {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
+  {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
+  {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
+  {action_message_def::action_t::cmd_remove_target, "remove_target"},
+  {action_message_def::action_t::cmd_multi_message, "multi message"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
   {action_message_def::action_t::cmd_protocol, "protocol"},
@@ -462,8 +458,8 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
 constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
-//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
-//be used as the program is shutting down
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
+// can (in actuality) be used as the program is shutting down
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
@@ -483,8 +479,8 @@ constexpr std::pair<int, const char *> errorStrings[] = {
 using errorPair = std::pair<int, const char *>;
 constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
-//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
-//be used as the program is shutting down
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
+// can (in actuality) be used as the program is shutting down
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
@@ -516,13 +512,12 @@ std::string prettyPrintString (const ActionMessage &command)
         else
         {
             ret.append (std::to_string (command.dest_id));
-        } 
+        }
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) handle({}) size {} at {}",command.source_id,
-                     command.dest_handle, command.payload.size (), static_cast<double> (command.actionTime))
-                      );
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {}", command.source_id, command.dest_handle,
+                                 command.payload.size (), static_cast<double> (command.actionTime)));
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -530,14 +525,14 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_TIME_GRANT:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Granted Time({})", command.source_id ,
-                     static_cast<double> (command.actionTime)));
+        ret.append (
+          fmt::format ("From ({}) Granted Time({})", command.source_id, static_cast<double> (command.actionTime)));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
         ret.append (fmt::format ("From ({}) Time({}, {}, {})", command.source_id,
-                     static_cast<double> (command.actionTime), static_cast<double> (command.Te),
-                     static_cast<double> (command.Tdemin)));
+                                 static_cast<double> (command.actionTime), static_cast<double> (command.Te),
+                                 static_cast<double> (command.Tdemin)));
         break;
     case CMD_FED_CONFIGURE_TIME:
     case CMD_FED_CONFIGURE_INT:
@@ -545,10 +540,9 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f",command.getString(origSourceStringLoc),
-                                 command.source_id, command.source_handle, command.getString(targetStringLoc),
-                                 command.payload.size (),
-                     static_cast<double> (command.actionTime)));
+        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f", command.getString (origSourceStringLoc),
+                                 command.source_id, command.source_handle, command.getString (targetStringLoc),
+                                 command.payload.size (), static_cast<double> (command.actionTime)));
         break;
     default:
         break;

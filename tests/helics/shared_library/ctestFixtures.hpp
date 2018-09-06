@@ -65,7 +65,6 @@ struct FederateTestFixture
                                                helics_time_t time_delta = helics_time_zero,
                                                const std::string &name_prefix = "fed")
     {
-        char tmp[HELICS_SIZE_MAX];
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
         if (hasIndex)

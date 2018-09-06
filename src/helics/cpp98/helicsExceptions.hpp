@@ -8,8 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define _HELICS_CPP98_EXCEPTIONS_
 #pragma once
 
-#include "config.hpp"
 #include "../shared_api_library/helics.h"
+#include "config.hpp"
 #include <stdexcept>
 
 namespace helicscpp
@@ -37,10 +37,10 @@ class hThrowOnError
         }
     }
     operator helics_error * () { return &eObj; }
+
   private:
     helics_error eObj;
 };
-} // namespace helicscpp
-
+}  // namespace helicscpp
 
 #endif /*_HELICS_CPP98_EXCEPTIONS_*/
