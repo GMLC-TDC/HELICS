@@ -7,5 +7,5 @@ function varargout = helicsFederateSetLoggingLevel(varargin)
     %* `loggingLevel` :
     %    (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     %
-  [varargout{1:nargout}] = helicsMEX(105, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(106, varargin{:});
 end

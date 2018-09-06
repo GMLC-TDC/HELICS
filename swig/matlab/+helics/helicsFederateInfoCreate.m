@@ -6,5 +6,5 @@ function varargout = helicsFederateInfoCreate(varargin)
     %-------
     %a helics_federate_info_t object which is a reference to the created object
     %
-  [varargout{1:nargout}] = helicsMEX(60, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(61, varargin{:});
 end

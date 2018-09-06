@@ -1063,6 +1063,22 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerIsConnected(J
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerWaitForDisconnect(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jint jresult = 0 ;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int arg2 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_broker *)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (helics_status)helicsBrokerWaitForDisconnect(arg1,arg2);
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsCoreIsConnected(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_core arg1 = (helics_core) 0 ;
@@ -1204,6 +1220,36 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsBrokerDisconnect(JN
   result = (helics_status)helicsBrokerDisconnect(arg1);
   jresult = (jint)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsDestroyFederate(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  helicsDestroyFederate(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsDestroyBroker(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_broker *)&jarg1; 
+  helicsDestroyBroker(arg1);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsDestroyCore(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  helics_core arg1 = (helics_core) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_core *)&jarg1; 
+  helicsDestroyCore(arg1);
 }
 
 

@@ -3,5 +3,5 @@ function varargout = helicsCoreIsConnected(varargin)
     %federates could be attached to it return 0 if not connected , something else if
     %it is connected
     %
-  [varargout{1:nargout}] = helicsMEX(40, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(41, varargin{:});
 end

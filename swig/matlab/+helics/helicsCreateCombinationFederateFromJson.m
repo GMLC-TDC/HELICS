@@ -15,5 +15,5 @@ function varargout = helicsCreateCombinationFederateFromJson(varargin)
     %-------
     %an opaque combination federate object
     %
-  [varargout{1:nargout}] = helicsMEX(58, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(59, varargin{:});
 end
