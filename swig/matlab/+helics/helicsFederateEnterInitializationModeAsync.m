@@ -3,5 +3,5 @@ function varargout = helicsFederateEnterInitializationModeAsync(varargin)
     %helicsFederateEnterInitializationModeFinalize must be called to finish the
     %operation
     %
-  [varargout{1:nargout}] = helicsMEX(81, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(82, varargin{:});
 end

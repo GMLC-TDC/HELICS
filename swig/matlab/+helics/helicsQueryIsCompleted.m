@@ -7,5 +7,5 @@ function varargout = helicsQueryIsCompleted(varargin)
     %was made with a result and false if an async query has not completed or is
     %invalid
     %
-  [varargout{1:nargout}] = helicsMEX(114, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(115, varargin{:});
 end

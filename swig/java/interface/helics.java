@@ -67,6 +67,10 @@ public class helics implements helicsConstants {
     return helicsJNI.helicsBrokerIsConnected(SWIGTYPE_p_void.getCPtr(broker));
   }
 
+  public static helics_status helicsBrokerWaitForDisconnect(SWIGTYPE_p_void broker, int msToWait) {
+    return helics_status.swigToEnum(helicsJNI.helicsBrokerWaitForDisconnect(SWIGTYPE_p_void.getCPtr(broker), msToWait));
+  }
+
   public static int helicsCoreIsConnected(SWIGTYPE_p_void core) {
     return helicsJNI.helicsCoreIsConnected(SWIGTYPE_p_void.getCPtr(core));
   }
@@ -100,6 +104,18 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsBrokerDisconnect(SWIGTYPE_p_void.getCPtr(broker)));
   }
 
+  public static void helicsDestroyFederate(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsDestroyFederate(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsDestroyBroker(SWIGTYPE_p_void broker) {
+    helicsJNI.helicsDestroyBroker(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  public static void helicsDestroyCore(SWIGTYPE_p_void core) {
+    helicsJNI.helicsDestroyCore(SWIGTYPE_p_void.getCPtr(core));
+  }
+
   public static void helicsCoreFree(SWIGTYPE_p_void core) {
     helicsJNI.helicsCoreFree(SWIGTYPE_p_void.getCPtr(core));
   }
@@ -113,8 +129,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateValueFederateFromJson(String json) {
-    long cPtr = helicsJNI.helicsCreateValueFederateFromJson(json);
+  public static SWIGTYPE_p_void helicsCreateValueFederateFromJson(String JSON) {
+    long cPtr = helicsJNI.helicsCreateValueFederateFromJson(JSON);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -123,8 +139,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateMessageFederateFromJson(String json) {
-    long cPtr = helicsJNI.helicsCreateMessageFederateFromJson(json);
+  public static SWIGTYPE_p_void helicsCreateMessageFederateFromJson(String JSON) {
+    long cPtr = helicsJNI.helicsCreateMessageFederateFromJson(JSON);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -133,8 +149,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateCombinationFederateFromJson(String json) {
-    long cPtr = helicsJNI.helicsCreateCombinationFederateFromJson(json);
+  public static SWIGTYPE_p_void helicsCreateCombinationFederateFromJson(String JSON) {
+    long cPtr = helicsJNI.helicsCreateCombinationFederateFromJson(JSON);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 

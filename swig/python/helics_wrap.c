@@ -4448,6 +4448,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsBrokerWaitForDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  helics_status result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsBrokerWaitForDisconnect",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerWaitForDisconnect" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsBrokerWaitForDisconnect" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (helics_status)helicsBrokerWaitForDisconnect(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCoreIsConnected(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
@@ -4655,6 +4684,63 @@ SWIGINTERN PyObject *_wrap_helicsBrokerDisconnect(PyObject *SWIGUNUSEDPARM(self)
   }
   result = (helics_status)helicsBrokerDisconnect(arg1);
   resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsDestroyFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsDestroyFederate",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyFederate" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsDestroyFederate(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsDestroyBroker(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsDestroyBroker",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyBroker" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  helicsDestroyBroker(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsDestroyCore(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsDestroyCore",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyCore" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  helicsDestroyCore(arg1);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -9516,6 +9602,7 @@ static PyMethodDef SwigMethods[] = {
 		"else if it is connected\n"
 		"\n"
 		""},
+	 { (char *)"helicsBrokerWaitForDisconnect", _wrap_helicsBrokerWaitForDisconnect, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreIsConnected", _wrap_helicsCoreIsConnected, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -9621,6 +9708,9 @@ static PyMethodDef SwigMethods[] = {
 		"a helics_status enumeration indicating any error condition\n"
 		"\n"
 		""},
+	 { (char *)"helicsDestroyFederate", _wrap_helicsDestroyFederate, METH_VARARGS, NULL},
+	 { (char *)"helicsDestroyBroker", _wrap_helicsDestroyBroker, METH_VARARGS, NULL},
+	 { (char *)"helicsDestroyCore", _wrap_helicsDestroyCore, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreFree", _wrap_helicsCoreFree, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
