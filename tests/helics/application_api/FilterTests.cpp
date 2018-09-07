@@ -455,7 +455,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     f1->set ("delay", 1.25);
 
     auto f2 = helics::make_filter (helics::defined_filter_types::delay, fFed.get (), "filter2");
-    f2->addSourceTarget ("port2");
+    f2->addSourceTarget ("port1");
     f2->set ("delay", 1.25);
 
     fFed->enterExecutingModeAsync ();
