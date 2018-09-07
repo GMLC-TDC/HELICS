@@ -269,7 +269,7 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 RandomDropFilterOperation::RandomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
-      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0-dropProb), 1.0) > 0.1); });
+      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1); });
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation () = default;
@@ -351,7 +351,7 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
     for (auto &sr : *cond)
     {
         std::regex reg (sr);
-        if (std::regex_search (dest, reg,std::regex_constants::match_any))
+        if (std::regex_search (dest, reg, std::regex_constants::match_any))
         {
             return newDestGeneration (src, dest, newDest.load ());
         }
@@ -378,10 +378,17 @@ void CloneFilterOperation::setString (const std::string &property, const std::st
     else if (property == "add delivery")
     {
         auto handle = deliveryAddresses.lock ();
-        auto fnd = std::find (handle->cbegin (), handle->cend (), val);
-        if (fnd == handle->cend ())
+        if (handle->empty ())
         {
             handle->push_back (val);
+        }
+        else
+        {
+            auto fnd = std::find (handle->cbegin (), handle->cend (), val);
+            if (fnd == handle->cend ())
+            {
+                handle->push_back (val);
+            }
         }
     }
     else if (property == "remove delivery")

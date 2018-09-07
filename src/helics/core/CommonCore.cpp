@@ -3337,7 +3337,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                 {
                     ActionMessage cloneMessage (m);
                     cloneMessage.setAction (CMD_SEND_FOR_FILTER);
-                    setActionFlag (m, clone_flag);
+                    setActionFlag (cloneMessage, clone_flag);
                     cloneMessage.dest_id = filt->core_id;
                     cloneMessage.dest_handle = filt->handle;
                     routeMessage (cloneMessage);

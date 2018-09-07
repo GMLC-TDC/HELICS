@@ -187,7 +187,7 @@ CloningFilter::CloningFilter (Core *cr, const std::string &name)
         fid =corePtr->registerCloningFilter (name,std::string(),std::string());
         id = interface_handle (fid.value ());
     }
-    filtOp = std::make_shared<CloneFilterOperation> (cr);
+    setFilterOperations(std::make_shared<CloneFilterOperation> (cr));
 }
 
 CloningFilter::CloningFilter (Federate *fed, const std::string &name)
@@ -195,11 +195,11 @@ CloningFilter::CloningFilter (Federate *fed, const std::string &name)
     if (fed != nullptr)
     {
         corePtr = fed->getCorePointer ().get ();
-        fid = fed->registerFilter (name);
+        fid = fed->registerCloningFilter (name);
         id = interface_handle (fid.value ());
 		if (corePtr != nullptr)
 		{
-            filtOp = std::make_shared<CloneFilterOperation> (corePtr);
+            setFilterOperations(std::make_shared<CloneFilterOperation> (corePtr));
 		}
     }
     
