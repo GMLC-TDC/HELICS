@@ -117,7 +117,7 @@ export PATH="${swig_install_path}/bin:${PATH}"
 echo "*** built swig successfully {$PATH}"
 
 # Install ZeroMQ
-if [[ ! -d "${zmq_install_path}" ]]; then
+if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
     echo "*** build libzmq"
     ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
     echo "*** built zmq successfully"
@@ -136,7 +136,11 @@ fi
 # Install Boost
 if [[ ! -d "${boost_install_path}" ]]; then
     echo "*** build boost"
-    ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
+    local boost_sanitizer=""
+    if [[ "$RUN_TSAN" ]]; then
+        boost_sanitizer="BOOST_SANITIZER=thread"
+    fi
+    ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
     echo "*** built boost successfully"
 fi
 
