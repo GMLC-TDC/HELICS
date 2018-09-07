@@ -112,7 +112,7 @@ class Federate
 
     helics_federate baseObject () const { return fed; }
 
-    void setFlag (int flag, int value) { helicsFederateSetFlagOption (fed, flag, value, hThrowOnError ()); }
+    void setFlag (int flag, bool value) { helicsFederateSetFlagOption (fed, flag, value?helics_true:helics_false, hThrowOnError ()); }
 
     void setTimeProperty (int tProperty, helics_time_t timeDelta)
     {
@@ -123,6 +123,18 @@ class Federate
     void setIntegerProperty (int intProperty, int value)
     {
         helicsFederateSetIntegerProperty (fed, intProperty, value, hThrowOnError ());
+    }
+
+	 bool getFlag (int flag) const { return (helicsFederateGetFlagOption (fed, flag,hThrowOnError())!=helics_false); }
+
+   helics_time_t getTimeProperty (int tProperty) const
+    {
+        return helicsFederateGetTimeProperty (fed, tProperty,hThrowOnError ());
+    }
+
+    int getIntegerProperty (int intProperty) const
+    {
+        return helicsFederateGetIntegerProperty (fed, intProperty, hThrowOnError ());
     }
 
     federate_state getState() const
@@ -243,7 +255,7 @@ class Federate
     @return a string with the value requested.  this is either going to be a vector of strings value or a json
     string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
-    std::string query (const std::string &target, const std::string &queryStr)
+    std::string query (const std::string &target, const std::string &queryStr) const
     {
         // returns helics_query
         helics_query q = helicsCreateQuery (target.c_str (), queryStr.c_str ());
