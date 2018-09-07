@@ -38,6 +38,7 @@ set_property(
     LABELS
     Common
     Daily
+    Coverage
     Continuous
 )
 

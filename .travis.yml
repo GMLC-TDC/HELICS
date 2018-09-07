@@ -5,6 +5,7 @@ cache:
   ccache: true
   directories:
     - dependencies
+    - build/libs
 
 before_cache:
   - ${TRAVIS_BUILD_DIR}/scripts/cleanup-cmake.sh
@@ -49,6 +50,7 @@ jobs:
   include:
     # XCode 6.4, OS X 10.10
     - <<: *osx_base
+      name: "XCode 6.4 macOS 10.10"
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
         - HOMEBREW_NO_AUTO_UPDATE=1
@@ -56,22 +58,14 @@ jobs:
       osx_image: xcode6.4
     # XCode 7.3, OS X 10.11
     - <<: *osx_base
+      name: "XCode 7.3 macOS 10.11"
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
-    - <<: *osx_base
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-    # Built without errors on my clone from one of the changes made
-    # Possibly local dependencies, or removing Linux-only commands fixed it
-    # XCode 8.3, OS X 10.12
-    #- env: COMPILER=clang++ BUILD_TYPE=Debug
-    #  osx_image: xcode8.3
-
     - <<: *linux_base
+      name: "GCC 6"
       addons:
         apt:
           sources:
@@ -84,6 +78,7 @@ jobs:
         - USE_MPI=mpich
 
     - <<: *linux_base
+      name: "GCC 4.9 (No SWIG)"
       addons:
         apt:
           sources:
@@ -96,6 +91,7 @@ jobs:
         - CI_BOOST_VERSION=1.61.0
 
     - <<: *linux_base
+      name: "Clang 3.6"
       compiler: clang
       addons:
         apt:
@@ -112,20 +108,27 @@ jobs:
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
    # ------------------------------------------------
+    # Valgrind build
     - <<: *daily_linux
+      name: "GCC 6 Valgrind"
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
         - BUILD_TYPE=RelWithDebInfo
+    # Code coverage build
     - <<: *daily_linux
+      name: "GCC 6 Code Coverage"
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true 
+        - USE_SWIG=true
+        - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
+    # GCC 5 build
     - <<: *daily_linux
+      name: "GCC 5"
       addons:
         apt:
           sources:
@@ -134,7 +137,9 @@ jobs:
             - g++-5
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
+    # Clang 5 build
     - <<: *daily_linux
+      name: "Clang 5"
       compiler: clang
       addons:
         apt:
@@ -149,8 +154,27 @@ jobs:
         - CCACHE_CPP2=yes
         - USE_SWIG=true
         - CXX_STANDARD=17
+    # TSAN build
+    - <<: *daily_linux
+      name: "Clang 4 Thread Sanitizer"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - libstdc++-6-dev
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - CCACHE_CPP2=yes
+        - RUN_TSAN=true
+        - USE_MPI=mpich
+        - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
     # XCode 8gm, OS X 10.11
     - <<: *daily_osx
+      name: "XCode 8gm macOS 10.11"
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
@@ -165,11 +189,13 @@ before_install:
   - $CXX --version
 
 install:
+  - export BOOST_USE_STATIC=true
   - source scripts/install-ci-dependencies.sh
 
   - OPTION_FLAGS_ARR=()
   - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_CXX_SHARED_LIB=ON" "-DBUILD_PYTHON_INTERFACE=ON" "-DBUILD_JAVA_INTERFACE=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
   - OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
+  - OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON -DUSE_BOOST_STATIC_LIBS=ON")
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON") ; fi
 
@@ -181,20 +207,21 @@ install:
   - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
   - export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
 
-  - TEST_FLAGS_ARR=()
-  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind") ; fi
+  - TEST_FLAGS_ARR=("$TEST_TYPE")
+  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind" "--disable-unit-tests") ; fi
   - if [[ "$RUN_CACHEGRIND" ]]; then TEST_FLAGS_ARR+=("--cachegrind") ; fi
   - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
   - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
+  - if [[ "$RUN_TSAN" ]]; then TEST_FLAGS_ARR+=("--tsan") ; fi
   - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
   - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
   - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
   - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
 
 script:
-  - mkdir build && cd build
-  - HELICS_DEPENDENCY_FLAGS+="-DZeroMQ_INSTALL_PATH=${CI_DEPENDENCY_DIR}/zmq -DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
-  - cmake .. ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+  - mkdir -p build && cd build
+  - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+  - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make ${MAKEFLAGS}
 
   # Setup counters for coverage
@@ -202,7 +229,11 @@ script:
 
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make ${MAKEFLAGS} install ; fi
-  - ctest --output-on-failure --timeout 220 -L Continuous
+ 
+  # Run CI tests
+  - export CTEST_OPTIONS="--output-on-failure"
+  - ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
