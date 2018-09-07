@@ -41,11 +41,11 @@ void IpcComms::queue_rx_function ()
         ActionMessage err (CMD_ERROR);
         err.payload = rxQueue.getError ();
         ActionCallback (std::move (err));
-        rx_status = connection_status::error;  // the connection has failed
+        setRxStatus (connection_status::error);  // the connection has failed
         rxQueue.changeState (queue_state_t::closing);
         return;
     }
-    rx_status = connection_status::connected;  // this is a atomic indicator that the rx queue is ready
+    setRxStatus (connection_status::connected);  // this is a atomic indicator that the rx queue is ready
     bool operating = false;
     while (true)
     {
@@ -64,7 +64,7 @@ void IpcComms::queue_rx_function ()
                 ActionMessage err (CMD_ERROR);
                 err.payload = rxQueue.getError ();
                 ActionCallback (std::move (err));
-                rx_status = connection_status::error;  // the connection has failed
+                setRxStatus (connection_status::error);  // the connection has failed
                 rxQueue.changeState (queue_state_t::closing);
                 ipcbackchannel = 0;
                 return;
@@ -113,7 +113,7 @@ DISCONNECT_RX_QUEUE:
     {
         std::cerr << "error changing states" << std::endl;
     }
-    rx_status = connection_status::terminated;
+    setRxStatus (connection_status::terminated);
 }
 
 void IpcComms::queue_tx_function ()
@@ -123,7 +123,6 @@ void IpcComms::queue_tx_function ()
     std::map<int, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
-    int sleep_counter = 50;
     if (!brokerTarget_.empty ())
     {
         bool conn = brokerQueue.connect (brokerTarget_, true, 20);
@@ -132,29 +131,23 @@ void IpcComms::queue_tx_function ()
             ActionMessage err (CMD_ERROR);
             err.payload = std::string ("Unable to open broker connection ->") + brokerQueue.getError ();
             ActionCallback (std::move (err));
-            tx_status = connection_status::error;
+            setTxStatus(connection_status::error);
             return;
         }
         hasBroker = true;
     }
-    sleep_counter = 50;
     // wait for the receiver to startup
-    while (rx_status == connection_status::startup)
+    if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (sleep_counter));
-        sleep_counter *= 2;
-        if (sleep_counter > 1700)
-        {
             ActionMessage err (CMD_ERROR);
             err.payload = "Unable to link with receiver";
             ActionCallback (std::move (err));
-            tx_status = connection_status::error;
+            setTxStatus (connection_status::error);
             return;
-        }
     }
-    if (rx_status == connection_status::error)
+    if (getRxStatus() == connection_status::error)
     {
-        tx_status = connection_status::error;
+        setTxStatus (connection_status::error);
         return;
     }
     bool conn = rxQueue.connect (localTarget_, false, 0);
@@ -164,13 +157,13 @@ void IpcComms::queue_tx_function ()
         ipcbackchannel = IPC_BACKCHANNEL_TRY_RESET;
         while (ipcbackchannel != 0)
         {
-            if (rx_status != connection_status::connected)
+            if (getRxStatus() != connection_status::connected)
             {
                 break;
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (100));
         }
-        if (rx_status == connection_status::connected)
+        if (getRxStatus () == connection_status::connected)
         {
             conn = rxQueue.connect (localTarget_, false, 0);
         }
@@ -179,12 +172,12 @@ void IpcComms::queue_tx_function ()
             ActionMessage err (CMD_ERROR);
             err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
             ActionCallback (std::move (err));
-            tx_status = connection_status::error;
+            setRxStatus(connection_status::error);
             return;
         }
     }
 
-    tx_status = connection_status::connected;
+    setTxStatus(connection_status::connected);
     bool operating = false;
     while (true)
     {
@@ -251,18 +244,18 @@ void IpcComms::queue_tx_function ()
         }
     }
 DISCONNECT_TX_QUEUE:
-    tx_status = connection_status::terminated;
+    setTxStatus (connection_status::terminated);
 }
 
 void IpcComms::closeReceiver ()
 {
-    if ((rx_status == connection_status::error) || (rx_status == connection_status::terminated))
+    if ((getRxStatus() == connection_status::error) || (getRxStatus() == connection_status::terminated))
     {
         return;
     }
     ActionMessage cmd (CMD_PROTOCOL);
     cmd.index = CLOSE_RECEIVER;
-    if (tx_status == connection_status::connected)
+    if (getTxStatus() == connection_status::connected)
     {
         transmit (-1, cmd);
     }

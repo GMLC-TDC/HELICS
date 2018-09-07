@@ -67,11 +67,11 @@ class FederateInfo : public CoreFederateInfo
     void loadInfoFromArgs (int argc, const char *const *argv);
 };
 
-/** generate a FederateInfo object from a config file (json, toml)
+/** generate a FederateInfo object from a config file (JSON, toml)
  */
 FederateInfo loadFederateInfo (const std::string &configString);
 
-/** generate a FederateInfo object from a config file (json, toml)
+/** generate a FederateInfo object from a config file (JSON, toml)
  */
 FederateInfo loadFederateInfo (const std::string &name, const std::string &configString);
 
@@ -132,7 +132,8 @@ class Federate
     explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with extension (.TOML, .toml)
+    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with
+    extension (.TOML, .toml)
     */
     Federate (const std::string &name, const std::string &configString);
     /**default constructor*/
@@ -283,7 +284,7 @@ class Federate
     a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate
-    @return a string with the value requested.  this is either going to be a vector of strings value or a json
+    @return a string with the value requested.  this is either going to be a vector of strings value or a JSON
     string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
     std::string query (const std::string &target, const std::string &queryStr);
@@ -293,7 +294,7 @@ class Federate
     the federation and the specific string being queried
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate if the local federate does not recognize the query it sends it on to the federation
-    @return a string with the value requested.  this is either going to be a vector of strings value or a json
+    @return a string with the value requested.  this is either going to be a vector of strings value or a JSON
     string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
     std::string query (const std::string &queryStr);
@@ -324,7 +325,7 @@ class Federate
 
     @param queryIndex the int value returned from the queryAsync call
    @return a string with the value requested.  the format of the string will be either a single string a string
-   vector like "[string1; string2]" or json The string "#invalid" is returned if the query was not valid
+   vector like "[string1; string2]" or JSON The string "#invalid" is returned if the query was not valid
     */
     std::string queryComplete (query_id_t queryIndex);
 

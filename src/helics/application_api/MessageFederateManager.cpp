@@ -298,9 +298,12 @@ void MessageFederateManager::registerCallback (endpoint_id_t id,
     if (id.value () < endpointCount)
     {
         auto eplock = local_endpoints.lock ();
-        assert (eplock);
-        (*eplock)[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
-        callbacks.push_back (callback);
+		if (eplock)
+		{
+            (*eplock)[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
+            callbacks.push_back (callback);
+		}
+       
     }
     else
     {
@@ -315,14 +318,17 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
     callbacks.push_back (callback);
     auto cnt = endpointCount.load ();
     auto eptLock = local_endpoints.lock ();
-    assert (eptLock);
-    for (auto id : ids)
-    {
-        if (id.value () < cnt)
+	if (eptLock)
+	{
+        for (auto id : ids)
         {
-            (*eptLock)[id.value ()]->callbackIndex = ind;
+            if (id.value () < cnt)
+            {
+                (*eptLock)[id.value ()]->callbackIndex = ind;
+            }
         }
-    }
+	}
+    
 }
 
 void MessageFederateManager::removeOrderedMessage (unsigned int index)

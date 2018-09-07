@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -13,19 +12,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
+#include "../common/AirLock.hpp"
+#include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedPointerVector.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
-#include "../common/AirLock.hpp"
-#include "../common/DelayedObjects.hpp"
-#include "helics_includes/any.hpp"
 #include "HandlePointerManager.hpp"
+#include "helics_includes/any.hpp"
+#include <array>
 #include <atomic>
 #include <cstdint>
 #include <thread>
 #include <utility>
-#include <array>
 
 namespace helics
 {
@@ -272,7 +271,7 @@ class CommonCore : public Core, public BrokerBase
                                   const std::string &target,
                                   const std::string &type_in,
                                   const std::string &type_out,
-                                   bool cloning);
+                                  bool cloning);
 
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -280,14 +279,15 @@ class CommonCore : public Core, public BrokerBase
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore (const ActionMessage &cmd);
     /** process configure commands for the core*/
-    void processCoreConfigureCommands(ActionMessage &cmd);
+    void processCoreConfigureCommands (ActionMessage &cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication (ActionMessage &cmd);
     /** get an index for an airlock*/
-    uint16_t getNextAirlockIndex();
+    uint16_t getNextAirlockIndex ();
     /** generate results for core queries*/
-    std::string coreQuery(const std::string &queryStr) const;
+    std::string coreQuery (const std::string &queryStr) const;
+
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -308,16 +308,18 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
-    std::atomic<int> queryCounter{1}; //counter for queries start at 1 so the default value isn't used
-    DelayedObjects<std::string> ActiveQueries; //holder for active queries
+    std::atomic<int> queryCounter{1};  // counter for queries start at 1 so the default value isn't used
+    DelayedObjects<std::string> ActiveQueries;  // holder for active queries
 
     std::map<handle_id_t, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     using fed_handle_pair = std::pair<federate_id_t, handle_id_t>;
-    shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
-                            fed_handle_pair>> filters;  //!< storage for all the filters
+    shared_guarded<DualMappedPointerVector<FilterInfo,
+                                           std::string,
+                                           fed_handle_pair>>
+      filters;  //!< storage for all the filters
 
-    std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
+    std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
+    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
 
   protected:
     /** deliver a message to the appropriate location*/
@@ -373,6 +375,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
+    /** check for a disconnect and take actions if the object can disconnect*/
+    void checkDisconnect ();
 };
 
 }  // namespace helics

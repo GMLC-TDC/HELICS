@@ -4,10 +4,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "BrokerFactory.hpp"
 #include "../common/TripWire.hpp"
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
+#include "BrokerFactory.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
@@ -136,7 +136,11 @@ std::shared_ptr<Broker> create (core_type type, const std::string &initializatio
 {
     auto broker = makeBroker (type, std::string ());
     broker->initialize (initializationString);
-    registerBroker (broker);
+    bool reg=registerBroker (broker);
+    if (!reg)
+    {
+        throw (helics::RegistrationFailure ("unable to register broker"));
+    }
     broker->connect ();
     return broker;
 }
@@ -149,7 +153,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     bool reg = registerBroker (broker);
     if (!reg)
     {
-        // TODO:: do some automatic renaming?
+        throw (helics::RegistrationFailure ("unable to register broker"));
     }
     broker->connect ();
     return broker;
@@ -159,7 +163,11 @@ std::shared_ptr<Broker> create (core_type type, int argc, const char *const *arg
 {
     auto broker = makeBroker (type, "");
     broker->initializeFromArgs (argc, argv);
-    registerBroker (broker);
+    bool reg=registerBroker (broker);
+    if (!reg)
+    {
+        throw (helics::RegistrationFailure ("unable to register broker"));
+    }
     broker->connect ();
     return broker;
 }
@@ -171,6 +179,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
     bool reg = registerBroker (broker);
     if (!reg)
     {
+        throw (helics::RegistrationFailure ("unable to register broker"));
     }
     broker->connect ();
     return broker;
@@ -204,19 +213,24 @@ std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
 {
-    bool res = false;
+    bool registered = false;
     auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     if (tbroker)
     {
-        res = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
     }
     cleanUpBrokers ();
-    if (res)
+    if (!registered)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+    }
+    if (registered)
     {
         delayedDestroyer.addObjectsToBeDestroyed (tbroker);
     }
 
-    return res;
+    return registered;
 }
 
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }

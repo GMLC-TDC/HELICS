@@ -6,5 +6,5 @@ function varargout = helicsFederateEnterExecutionModeComplete(varargin)
     %* `fed` :
     %    the federate object to complete the call
     %
-  [varargout{1:nargout}] = helicsMEX(83, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(87, varargin{:});
 end

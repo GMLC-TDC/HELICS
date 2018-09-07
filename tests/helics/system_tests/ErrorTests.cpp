@@ -8,16 +8,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/core-exceptions.hpp"
 #include <complex>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value converters
  */
+#include "../application_api/testFixtures.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include <future>
 
 namespace utf = boost::unit_test;
+namespace bdata = boost::unit_test::data;
 
 BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
@@ -98,6 +101,8 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names2)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
 
     fed1->registerGlobalPublication ("testkey", "");
+    fed1->enterInitializationStateAsync ();
+
     fed2->registerGlobalPublication ("testkey", "");
 
     BOOST_CHECK_THROW (fed2->enterInitializationState (), helics::RegistrationFailure);
@@ -201,6 +206,44 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
+}
+
+/** test simple creation and destruction*/
+BOOST_DATA_TEST_CASE (test_duplicate_broker_name, bdata::make (core_types_simple), core_type)
+{
+    auto broker = AddBroker (core_type, "1 --name=brk1");
+    BOOST_CHECK (broker->isConnected ());
+    BOOST_CHECK_THROW (AddBroker (core_type, "1 --name=brk1 --timeout=500"), helics::RegistrationFailure);
+    broker->disconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
+const std::string networkCores[] = {"zmq", "tcp", "udp"};
+
+/** test simple creation and destruction*/
+BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)
+{
+    auto broker = AddBroker (core_type, "1");
+    auto broker2 = AddBroker (core_type, "1 --timeout=500");
+    BOOST_CHECK (!broker2->isConnected ());
+    broker->disconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
+/** test broker recovery*/
+BOOST_DATA_TEST_CASE (test_broker_recovery, bdata::make (networkCores), core_type)
+{
+    auto broker = AddBroker (core_type, "1");
+    BOOST_REQUIRE (broker->isConnected ());
+    auto res = std::async (std::launch::async, [&broker]() {
+        std::this_thread::sleep_for (std::chrono::milliseconds (1400));
+        broker->disconnect ();
+    });
+    auto broker2 = AddBroker (core_type, "1 --timeout=2500");
+    BOOST_CHECK (!broker->isConnected ());
+    BOOST_CHECK (broker2->isConnected ());
+    broker2->disconnect ();
+    helics::cleanupHelicsLibrary ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

@@ -3,5 +3,5 @@ function varargout = helicsCreateQuery(varargin)
     %
     %a query object consists of a target and query string
     %
-  [varargout{1:nargout}] = helicsMEX(105, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(109, varargin{:});
 end

@@ -50,7 +50,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -90,7 +90,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), cor
 
     fFed->requestTimeAsync (3.0);
     /*auto retTime = */ mFed->requestTime (3.0);
-
+    
     BOOST_REQUIRE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
@@ -110,8 +110,6 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-
-
 BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
@@ -340,9 +338,14 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
 
     mFed->requestTime (3.0);
     fFed->requestTimeComplete ();
+    auto filterCore = fFed->getCorePointer ();
+    auto mCore = mFed->getCorePointer ();
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    helics::cleanupHelicsLibrary ();
+    BOOST_CHECK (!filterCore->isConnected ());
+    BOOST_CHECK (!mCore->isConnected ());
 }
 
 /** test a filter operator
@@ -418,10 +421,15 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     fFed->requestTimeComplete ();
     fFed2->requestTimeComplete ();
+    auto filterCore = fFed->getCorePointer ();
+    auto mCore = mFed->getCorePointer ();
     mFed->finalize ();
     fFed->finalize ();
     fFed2->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    helics::cleanupHelicsLibrary ();
+    BOOST_CHECK (!filterCore->isConnected ());
+    BOOST_CHECK (!mCore->isConnected ());
 }
 
 /** test a filter operator
@@ -496,10 +504,15 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
 
     fFed->requestTimeComplete ();
     fFed2->requestTimeComplete ();
+    auto filterCore = fFed->getCorePointer ();
+    auto mCore = mFed->getCorePointer ();
     mFed->finalize ();
     fFed->finalize ();
     fFed2->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    helics::cleanupHelicsLibrary ();
+    BOOST_CHECK (!filterCore->isConnected ());
+    BOOST_CHECK (!mCore->isConnected ());
 }
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
@@ -737,4 +750,68 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     BOOST_CHECK (sFed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
+
+/** test whether a core termination when it should
+*/
+
+BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_2), core_type)
+{
+    auto broker = AddBroker (core_type, 2);
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate> (0);
+    auto mFed = GetFederateAs<helics::MessageFederate> (1);
+
+    auto p1 = mFed->registerGlobalEndpoint ("port1");
+    auto p2 = mFed->registerGlobalEndpoint ("port2");
+
+	auto c2 = fFed->getCorePointer ();
+    auto f1 = c2->registerSourceFilter ("filter1", "port1",std::string(),std::string());
+    auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
+    c2->setFilterOperator (f1, timeOperator);
+
+    fFed->enterExecutionStateAsync ();
+    mFed->enterExecutionState ();
+    fFed->enterExecutionStateComplete ();
+
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    helics::data_block data (500, 'a');
+    mFed->sendMessage (p1, "port2", data);
+
+    mFed->requestTimeAsync (1.0);
+    fFed->requestTime (1.0);
+    mFed->requestTimeComplete ();
+    fFed->finalize ();
+    auto res = mFed->hasMessage ();
+    BOOST_CHECK (!res);
+
+    mFed->requestTime(2.0);
+    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    BOOST_CHECK (c2->isConnected ());
+    mFed->requestTime (3.0);
+    mFed->sendMessage (p1, "port2", data);
+    BOOST_REQUIRE (mFed->hasMessage (p2));
+
+    auto m2 = mFed->getMessage (p2);
+    BOOST_CHECK_EQUAL (m2->source, "port1");
+    BOOST_CHECK_EQUAL (m2->original_source, "port1");
+    BOOST_CHECK_EQUAL (m2->dest, "port2");
+    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    BOOST_CHECK_EQUAL (m2->time, 2.5);
+
+	 mFed->requestTime (4.0);
+    BOOST_CHECK (!mFed->hasMessage (p2));
+     mFed->requestTime (6.0);
+    BOOST_CHECK (mFed->hasMessage (p2));
+    mFed->finalize ();
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+	if (c2->isConnected())
+	{
+        std::this_thread::sleep_for (std::chrono::milliseconds (400));
+	}
+    BOOST_CHECK (!c2->isConnected ());
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+}
 BOOST_AUTO_TEST_SUITE_END ()

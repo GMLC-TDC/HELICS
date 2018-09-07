@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/compiler-config.h"
 #ifndef HAVE_SHARED_TIMED_MUTEX
 #ifndef HAVE_SHARED_MUTEX
-    #define LIBGUARDED_NO_DEFAULT 1
+#define LIBGUARDED_NO_DEFAULT 1
 #endif
 #endif
 #include <libguarded/atomic_guarded.hpp>
@@ -16,7 +16,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <libguarded/ordered_guarded.hpp>
 #include <libguarded/shared_guarded.hpp>
 //#include <libguarded/staged_guarded.hpp>
-
 
 template <class T>
 using guarded = libguarded::guarded<T>;

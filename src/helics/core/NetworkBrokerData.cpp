@@ -24,6 +24,7 @@ static const ArgDescriptors extraArgs{
   { "local", ArgDescriptor::arg_type_t::flag_type,"use local interface(default)" },
   {"ipv4", ArgDescriptor::arg_type_t::flag_type,"use external ipv4 addresses"},
   { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
+  {"reuse_address", ArgDescriptor::arg_type_t::flag_type, "allow the server to reuse a bound address"},
   { "external", ArgDescriptor::arg_type_t::flag_type,"use all external interfaces" },
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
   {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
@@ -81,6 +82,10 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         checkAndUpdateBrokerAddress (localAddress);
     }
 
+	if (vm.count("reuse_address") > 0)
+	{
+        reuse_address = true;
+	}
     if (vm.count ("broker") > 0)
     {
         auto addr = vm["broker"].as<std::string> ();

@@ -9,19 +9,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 Json_helics::Value loadJson (const std::string &jsonString)
 {
-    if (jsonString.size() > 128)
+    if (jsonString.size () > 128)
     {
         try
         {
-            return loadJsonStr(jsonString);
+            return loadJsonStr (jsonString);
         }
         catch (const std::invalid_argument &)
         {
-            //this was an assumption lets try a file now, the same error will be generated again later as well
+            // this was an assumption lets try a file now, the same error will be generated again later as well
         }
     }
     std::ifstream file (jsonString);
-    
 
     if (file.is_open ())
     {
@@ -35,19 +34,19 @@ Json_helics::Value loadJson (const std::string &jsonString)
         }
         return doc;
     }
-    return loadJsonStr(jsonString);
+    return loadJsonStr (jsonString);
 }
 
-Json_helics::Value loadJsonStr(const std::string &jsonString)
+Json_helics::Value loadJsonStr (const std::string &jsonString)
 {
     Json_helics::Value doc;
     Json_helics::CharReaderBuilder rbuilder;
     std::string errs;
-    std::istringstream jstring(jsonString);
-    bool ok = Json_helics::parseFromStream(rbuilder, jstring, &doc, &errs);
+    std::istringstream jstring (jsonString);
+    bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
     if (!ok)
     {
-        throw (std::invalid_argument(errs.c_str()));
+        throw (std::invalid_argument (errs.c_str ()));
     }
     return doc;
 }
@@ -92,14 +91,13 @@ std::string getKey (const Json_helics::Value &element)
              ((element.isMember ("name")) ? element["name"].asString () : std::string ());
 }
 
-
-std::string generateJsonString(const Json_helics::Value &block)
+std::string generateJsonString (const Json_helics::Value &block)
 {
     Json_helics::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
-    auto writer(builder.newStreamWriter());
+    auto writer (builder.newStreamWriter ());
     std::stringstream sstr;
-    writer->write(block, &sstr);
-    return sstr.str();
+    writer->write (block, &sstr);
+    return sstr.str ();
 }

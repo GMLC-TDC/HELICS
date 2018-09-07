@@ -48,7 +48,7 @@ private:
         fed = helicsCreateValueFederateFromJson (jsonString.c_str());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr create from json"));
+            throw(std::runtime_error("fed==nullptr create from JSON"));
         }
     }
 

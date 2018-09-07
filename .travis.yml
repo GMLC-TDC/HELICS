@@ -234,7 +234,6 @@ script:
   - export CTEST_OPTIONS="--output-on-failure"
   - ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
 
-
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
 

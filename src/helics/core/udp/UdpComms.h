@@ -51,6 +51,7 @@ class UdpComms final : public CommsInterface
     std::atomic<int> PortNumber{-1};
     std::set<int> usedPortNumbers;
     int openPortStart = -1;
+    bool autoPortNumber = true;
     std::atomic<bool> hasBroker{false};
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data

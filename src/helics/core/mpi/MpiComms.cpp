@@ -49,7 +49,7 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
 
 void MpiComms::queue_rx_function ()
 {
-    rx_status = connection_status::connected;
+   setRxStatus(connection_status::connected);
 
     while (true)
     {
@@ -86,12 +86,12 @@ void MpiComms::queue_rx_function ()
 CLOSE_RX_LOOP:
     std::cout << "Shutdown RX Loop for " << commAddress << std::endl;
     shutdown = true;
-    rx_status = connection_status::terminated;
+    setRxStatus(connection_status::terminated);
 }
 
 void MpiComms::queue_tx_function ()
 {
-    tx_status = connection_status::connected;
+    setTxStatus( connection_status::connected);
 
     auto &mpi_service = MpiService::getInstance ();
 
@@ -171,11 +171,11 @@ void MpiComms::queue_tx_function ()
 CLOSE_TX_LOOP:
     std::cout << "Shutdown TX Loop for " << commAddress << std::endl;
     routes.clear ();
-    if (rx_status == connection_status::connected)
+    if (getRxStatus() == connection_status::connected)
     {
         shutdown = true;
     }
-    tx_status = connection_status::terminated;
+    setTxStatus(connection_status::terminated);
     mpi_service.removeMpiComms (this);
 }
 

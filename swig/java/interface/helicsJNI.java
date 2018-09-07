@@ -9,7 +9,9 @@
 package com.java.helics;
 
 public class helicsJNI {
-
+  static {
+    System.loadLibrary("JNIhelicsd");
+  }
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
@@ -61,6 +63,7 @@ public class helicsJNI {
   public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, String[] jarg3);
   public final static native long helicsBrokerClone(long jarg1);
   public final static native int helicsBrokerIsConnected(long jarg1);
+  public final static native int helicsBrokerWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsCoreIsConnected(long jarg1);
   public final static native int helicsBrokerGetIdentifier(long jarg1, byte[] jarg2);
   public final static native int helicsCoreGetIdentifier(long jarg1, byte[] jarg2);
@@ -69,6 +72,9 @@ public class helicsJNI {
   public final static native int helicsCoreDisconnect(long jarg1);
   public final static native long helicsGetFederateByName(String jarg1);
   public final static native int helicsBrokerDisconnect(long jarg1);
+  public final static native void helicsDestroyFederate(long jarg1);
+  public final static native void helicsDestroyBroker(long jarg1);
+  public final static native void helicsDestroyCore(long jarg1);
   public final static native void helicsCoreFree(long jarg1);
   public final static native void helicsBrokerFree(long jarg1);
   public final static native long helicsCreateValueFederate(long jarg1);

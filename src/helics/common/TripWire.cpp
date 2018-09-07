@@ -19,4 +19,4 @@ bool TripWireDetector::isTripped () const { return lineDetector->load (); }
 TripWireTrigger::TripWireTrigger () : lineTrigger (TripWire::getline ()) {}
 
 TripWireTrigger::~TripWireTrigger () { lineTrigger->store (true); }
-}
+}  // namespace tripwire
