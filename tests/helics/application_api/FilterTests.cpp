@@ -86,12 +86,18 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_all), cor
 
     auto res = mFed->hasMessage ();
     BOOST_CHECK (!res);
-
+    if (res)
+    {
+        auto m3 = mFed->getMessage(p2);
+    }
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
-
+    BOOST_CHECK(!mFed->hasMessage (p2));
+    if (mFed->hasMessage(p2))
+    {
+        auto m3 = mFed->getMessage(p2);
+    }
     fFed->requestTimeAsync (3.0);
     /*auto retTime = */ mFed->requestTime (3.0);
 

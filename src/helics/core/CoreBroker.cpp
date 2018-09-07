@@ -226,6 +226,9 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             if (allInitReady ())
             {
                 // send an init not ready as we were ready now we are not
+                ActionMessage noInit(CMD_INIT_NOT_READY);
+                noInit.source_id = global_broker_id_local;
+                transmit(0, noInit);
             }
         }
         else  // we are initialized already
@@ -799,6 +802,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
 void CoreBroker::checkForNamedInterface (ActionMessage &command)
 {
+    bool foundInterface = false;
     switch (command.action ())
     {
     case CMD_ADD_NAMED_PUBLICATION:
@@ -814,11 +818,9 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             command.swapSourceDest ();
             command.setStringData (pub->type, pub->units);
             routeMessage (command);
+            foundInterface = true;
         }
-        else
-        {
-            routeMessage (command);
-        }
+        
     }
     break;
     case CMD_ADD_NAMED_INPUT:
@@ -839,10 +841,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             command.swapSourceDest ();
             command.clearStringData ();
             routeMessage (command);
-        }
-        else
-        {
-            routeMessage (command);
+            foundInterface = true;
         }
     }
     break;
@@ -858,10 +857,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_FILTER);
             command.swapSourceDest ();
             routeMessage (command);
-        }
-        else
-        {
-            routeMessage (command);
+            foundInterface = true;
         }
     }
     break;
@@ -877,15 +873,37 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_ENDPOINT);
             command.swapSourceDest ();
             routeMessage (command);
-        }
-        else
-        {
-            routeMessage (command);
+            foundInterface = true;
         }
     }
     break;
     default:
         break;
+    }
+    if (!foundInterface)
+    {
+        if (isRoot())
+        {
+            switch (command.action())
+            {
+            case CMD_ADD_NAMED_PUBLICATION:
+                unknownHandles.addUnknownPublication(command.name, command.getSource(), command.flags);
+                break;
+            case CMD_ADD_NAMED_INPUT:
+                unknownHandles.addUnknownInput(command.name, command.getSource(), command.flags);
+                break;
+            case CMD_ADD_NAMED_ENDPOINT:
+                unknownHandles.addUnknownEndpoint(command.name, command.getSource(), command.flags);
+                break;
+            case CMD_ADD_NAMED_FILTER:
+                unknownHandles.addUnknownFilter(command.name, command.getSource(), command.flags);
+                break;
+            }
+        }
+        else
+        {
+            routeMessage(command);
+        }
     }
 }
 
@@ -1211,6 +1229,10 @@ void CoreBroker::executeInitializationOperations ()
     if (res == message_processing_result::next_step)
     {
         enteredExecutionMode = true;
+    }
+    if (unknownHandles.hasUnknowns())
+    {
+        LOG_NORMAL(parent_broker_id, getIdentifier(), "unknown targets remaining");
     }
 }
 

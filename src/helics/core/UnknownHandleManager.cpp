@@ -92,6 +92,10 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilt
     return targets;
 }
 
+bool UnknownHandleManager::hasUnknowns() const
+{
+    return (!(unknown_publications.empty() && unknown_endpoints.empty() && unknown_inputs.empty() && unknown_filters.empty()));
+}
 
 /** specify a found input*/
 void UnknownHandleManager::clearInput(const std::string &newInput)

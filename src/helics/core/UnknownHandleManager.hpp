@@ -58,6 +58,8 @@ public:
     /** specify a found source filter*/
     void clearFilter(const std::string &newFilter);
 
+    /** check if there are any unknowns remaining*/
+    bool hasUnknowns() const;
 };
 
 }  // namespace helics
