@@ -81,14 +81,16 @@ option(
   OFF
 )
 option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-option(BUILD_OCTAVE_INTERFACE "Build Octave extension (very experimental)" OFF)
+option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
 option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
+option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
 
 if(
   BUILD_PYTHON_INTERFACE
   OR BUILD_PYTHON2_INTERFACE
   OR BUILD_MATLAB_INTERFACE
   OR BUILD_JAVA_INTERFACE
+  OR BUILD_CSHARP_INTERFACE
   OR BUILD_OCTAVE_INTERFACE
 )
 	set(INTERFACE_BUILD ON)
@@ -205,7 +207,7 @@ if(BUILD_HELICS_TESTS)
         'dependencies/*'
         'ThirdParty/*'
         'tests/*'
-        'swig/*'
+        'interfaces/*'
         'examples/*'
       )
       setup_target_for_coverage(
@@ -561,7 +563,7 @@ if(ENABLE_CLANG_TOOLS)
 endif(ENABLE_CLANG_TOOLS)
 
 if(INTERFACE_BUILD)
-	add_subdirectory(swig)
+	add_subdirectory(interfaces)
 endif()
 
 add_subdirectory(docs)
