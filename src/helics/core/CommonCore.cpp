@@ -380,7 +380,7 @@ void CommonCore::enterInitializingMode (federate_id_t federateID)
             fed->init_requested = false;
             if (check == iteration_result::halted)
             {
-                throw (HelicsTerminated ());
+                throw (HelicsSystemFailure ());
             }
             generateFederateException (fed);
         }
@@ -507,7 +507,9 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     {
         throw (InvalidIdentifier ("federateID not valid timeRequest"));
     }
-    if (HELICS_EXECUTING == fed->getState ())
+    switch (fed->getState ())
+    {
+    case HELICS_EXECUTING:
     {
         auto ret = fed->requestTime (next, iteration_request::no_iterations);
         if (ret.state != iteration_result::error)
@@ -516,7 +518,11 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
         }
         throw (FunctionExecutionFailure ("federate has an error"));
     }
-    throw (InvalidFunctionCall ("time request may only be called in execution state"));
+    case HELICS_FINISHED:
+        return Time::maxVal ();
+    default:
+        throw (InvalidFunctionCall ("time request should only be called in execution state"));
+    }
 }
 
 iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate)
@@ -527,10 +533,19 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
         throw (InvalidIdentifier ("federateID not valid timeRequestIterative"));
     }
 
-    if (HELICS_EXECUTING != fed->getState ())
-    {
-        throw (InvalidFunctionCall ("time request may only be called in execution state"));
-    }
+	switch (fed->getState())
+	{
+    case HELICS_EXECUTING:
+        break;
+    case HELICS_FINISHED:
+        return iteration_time (Time::maxVal (), iteration_result::halted);
+    case HELICS_CREATED:
+    case HELICS_INITIALIZING:
+        return iteration_time (timeZero, iteration_result::error);
+	case HELICS_NONE:
+    case HELICS_ERROR:
+        return iteration_time (Time::maxVal (), iteration_result::error);
+	}
 
     // limit the iterations
     if (iterate == iteration_request::iterate_if_needed)
@@ -1316,7 +1331,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
     case CMD_SEND_MESSAGE:
     {
         // Find the destination endpoint
-        auto localP = loopHandles.getEndpoint(message.getString (targetStringLoc));
+        auto localP = loopHandles.getEndpoint (message.getString (targetStringLoc));
         if (localP == nullptr)
         {
             auto kfnd = knownExternalEndpoints.find (message.getString (targetStringLoc));
@@ -2749,8 +2764,8 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         bool FilterAlreadyPresent = false;
         if (checkActionFlag (command, destination_target))
         {
-			if (checkActionFlag(command, clone_flag))
-			{
+            if (checkActionFlag (command, clone_flag))
+            {
                 for (auto &filt : filterInfo->cloningDestFilters)
                 {
                     if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle))
@@ -2759,9 +2774,9 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                         break;
                     }
                 }
-			}
-			else
-			{  //there can only be one non-cloning destination filter
+            }
+            else
+            {  // there can only be one non-cloning destination filter
                 if (filterInfo->destFilter != nullptr)
                 {
                     if ((filterInfo->destFilter->core_id == command.source_id) &&
@@ -2770,11 +2785,11 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                         FilterAlreadyPresent = true;
                     }
                 }
-			}
-            
+            }
+
             if (!FilterAlreadyPresent)
             {
-                auto endhandle = loopHandles.getEndpoint(command.dest_handle);
+                auto endhandle = loopHandles.getEndpoint (command.dest_handle);
                 if (endhandle != nullptr)
                 {
                     setActionFlag (*endhandle, has_dest_filter_flag);
@@ -2815,7 +2830,6 @@ void CommonCore::processFilterInfo (ActionMessage &command)
         }
         else
         {
-            
             for (auto &filt : filterInfo->allSourceFilters)
             {
                 if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle))

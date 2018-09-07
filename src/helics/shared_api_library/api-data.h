@@ -27,7 +27,7 @@ typedef enum {
     helics_invalid_object = -3, /*!< indicator that the object used was not a valid object */
     helics_invalid_argument = -4, /*!< the parameter passed was invalid and unable to be used*/
     helics_discard = -4, /*!< the input was discarded and not used for some reason */
-    helics_terminated = -6, /*!< the federate has terminated and the call cannot be completed*/
+    helics_system_failure = -6, /*!< the federate has terminated unexpectedly and the call cannot be completed*/
     helics_warning = -8, /*!< the function issued a warning of some kind */
     helics_invalid_state_transition = -9, /*!< error issued when an invalid state transition occurred */
     helics_invalid_function_call = -10, /*!< the call made was invalid in the present state of the calling object*/

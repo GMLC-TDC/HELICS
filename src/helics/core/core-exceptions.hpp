@@ -70,10 +70,11 @@ class RegistrationFailure : public HelicsException
         : HelicsException (message){};
 };
 
-/** severe exception indicating HELICS has terminated*/
-class HelicsTerminated : public HelicsException
+/** severe exception indicating HELICS has failed and terminated unexpectedly*/
+class HelicsSystemFailure : public HelicsException
 {
   public:
-    explicit HelicsTerminated (const std::string &message = "HELICS termination") : HelicsException (message){};
+    explicit HelicsSystemFailure (const std::string &message = "HELICS system failure")
+        : HelicsException (message){};
 };
 }

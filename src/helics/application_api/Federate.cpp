@@ -3,18 +3,18 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "Federate.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Federate.hpp"
 #include "Filters.hpp"
 
+#include "../common/GuardedTypes.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
-#include "../common/GuardedTypes.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -65,10 +65,10 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
             throw (RegistrationFailure ("Unable to connect to broker->unable to register federate"));
         }
     }
-	if (name.empty())
-	{
+    if (name.empty ())
+    {
         name = fi.defName;
-	}
+    }
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (name, fi);
     separator_ = fi.separator;
@@ -110,7 +110,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
         name = fi.defName;
     }
     fedID = coreObject->registerFederate (name, fi);
-    if (!fedID.isValid())
+    if (!fedID.isValid ())
     {
         state = op_states::error;
         return;
@@ -120,13 +120,13 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
 }
 
-Federate::Federate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
+Federate::Federate (const std::string &configString) : Federate (std::string (), loadFederateInfo (configString))
 {
     registerFilterInterfaces (configString);
 }
 
 Federate::Federate (const std::string &fedName, const std::string &configString)
-    : Federate (fedName,loadFederateInfo (configString))
+    : Federate (fedName, loadFederateInfo (configString))
 {
     registerFilterInterfaces (configString);
 }
@@ -173,7 +173,7 @@ Federate::~Federate ()
 
 void Federate::enterInitializingMode ()
 {
-    auto currentState = state.load();
+    auto currentState = state.load ();
     if (currentState == op_states::startup)
     {
         coreObject->enterInitializingMode (fedID);
@@ -193,7 +193,7 @@ void Federate::enterInitializingMode ()
 
 void Federate::enterInitializingModeAsync ()
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    auto asyncInfo = asyncCallInfo->lock ();
     if (state == op_states::startup)
     {
         state = op_states::pending_init;
@@ -212,7 +212,7 @@ void Federate::enterInitializingModeAsync ()
 
 bool Federate::isAsyncOperationCompleted () const
 {
-    auto asyncInfo = asyncCallInfo->lock_shared();
+    auto asyncInfo = asyncCallInfo->lock_shared ();
     switch (state)
     {
     case op_states::pending_init:
@@ -231,12 +231,11 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializingModeComplete ()
 {
-    
     switch (state)
     {
     case op_states::pending_init:
     {
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->initFuture.get ();
         state = op_states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
@@ -306,7 +305,6 @@ iteration_result Federate::enterExecutingMode (iteration_request iterate)
 
 void Federate::enterExecutingModeAsync (iteration_request iterate)
 {
-    
     switch (state)
     {
     case op_states::startup:
@@ -316,7 +314,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
             startupToInitializeStateTransition ();
             return coreObject->enterExecutingMode (fedID, iterate);
         };
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         state = op_states::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -328,7 +326,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
     case op_states::initialization:
     {
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingMode (fedID, iterate); };
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         state = op_states::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
@@ -346,12 +344,11 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutingModeComplete ()
 {
-    
     if (state != op_states::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
-    auto asyncInfo = asyncCallInfo->lock();
+    auto asyncInfo = asyncCallInfo->lock ();
     auto res = asyncInfo->execFuture.get ();
     switch (res)
     {
@@ -377,21 +374,17 @@ iteration_result Federate::enterExecutingModeComplete ()
 
 void Federate::setTimeProperty (int32_t option, Time timeValue)
 {
-    coreObject->setTimeProperty (fedID, option,timeValue);
+    coreObject->setTimeProperty (fedID, option, timeValue);
 }
 
-
-void Federate::setIntegerProperty (int32_t option, int32_t optionValue) { coreObject->setIntegerProperty (fedID,option,  optionValue); }
-
-Time Federate::getTimeProperty (int32_t option)
+void Federate::setIntegerProperty (int32_t option, int32_t optionValue)
 {
-    return coreObject->getTimeProperty (fedID, option);
+    coreObject->setIntegerProperty (fedID, option, optionValue);
 }
 
-int32_t Federate::getIntegerProperty (int32_t option)
-{
-    return coreObject->getIntegerProperty (fedID, option);
-}
+Time Federate::getTimeProperty (int32_t option) { return coreObject->getTimeProperty (fedID, option); }
+
+int32_t Federate::getIntegerProperty (int32_t option) { return coreObject->getIntegerProperty (fedID, option); }
 
 void Federate::setLoggingCallback (
   const std::function<void(int, const std::string &, const std::string &)> &logFunction)
@@ -399,10 +392,7 @@ void Federate::setLoggingCallback (
     coreObject->setLoggingCallback (fedID, logFunction);
 }
 
-void Federate::setFlagOption (int flag, bool flagValue)
-{
-    coreObject->setFlagOption (fedID, flag, flagValue);
-}
+void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOption (fedID, flag, flagValue); }
 
 bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
@@ -511,19 +501,19 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         }
         return iterativeTime;
     }
-    else
-    {
-        throw (InvalidFunctionCall ("cannot call request time in present state"));
-    }
+	else if (state == op_states::finalize)
+	{
+        return iteration_time (Time::maxVal (), iteration_result::halted);
+	}
+    else { throw (InvalidFunctionCall ("cannot call request time in present state")); }
 }
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-   
     auto exp = op_states::execution;
-    if (state.compare_exchange_strong(exp,op_states::pending_time))
+    if (state.compare_exchange_strong (exp, op_states::pending_time))
     {
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
         });
@@ -539,11 +529,10 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-   
     auto exp = op_states::execution;
-    if (state.compare_exchange_strong(exp, op_states::pending_iterative_time))
+    if (state.compare_exchange_strong (exp, op_states::pending_iterative_time))
     {
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestIterativeFuture =
           std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
               return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
@@ -560,14 +549,12 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    
     auto exp = op_states::pending_time;
-    if (state.compare_exchange_strong(exp, op_states::execution))
+    if (state.compare_exchange_strong (exp, op_states::execution))
     {
-
-        auto asyncInfo = asyncCallInfo->lock();
+        auto asyncInfo = asyncCallInfo->lock ();
         auto newTime = asyncInfo->timeRequestFuture.get ();
-        asyncInfo.unlock(); //remove the lock;
+        asyncInfo.unlock ();  // remove the lock;
         Time oldTime = currentTime;
         currentTime = newTime;
         updateTime (newTime, oldTime);
@@ -584,9 +571,9 @@ Time Federate::requestTimeComplete ()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete ()
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    auto asyncInfo = asyncCallInfo->lock ();
     auto exp = op_states::pending_iterative_time;
-    if (state.compare_exchange_strong(exp, op_states::execution))
+    if (state.compare_exchange_strong (exp, op_states::execution))
     {
         auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get ();
         Time oldTime = currentTime;
@@ -653,14 +640,12 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
     {
         for (const auto &filt : doc["filters"])
         {
-
-
-            std::string key = jsonGetOrDefault(filt, "name", std::string());
-            std::string target = jsonGetOrDefault(filt, "target", std::string());
-            std::string inputType = jsonGetOrDefault(filt, "inputType", std::string());
-            std::string outputType = jsonGetOrDefault(filt, "outputType", std::string());
-            bool useTypes = !((inputType.empty()) && (outputType.empty()));
-            std::string mode = jsonGetOrDefault(filt, "mode", "source");
+            std::string key = jsonGetOrDefault (filt, "name", std::string ());
+            std::string target = jsonGetOrDefault (filt, "target", std::string ());
+            std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
+            std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
+            bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
+            std::string mode = jsonGetOrDefault (filt, "mode", "source");
 
             std::string operation ("custom");
             if (filt.isMember ("operation"))
@@ -684,11 +669,11 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             {
                 if (mode == "source")
                 {
-                 //   registerSourceFilter (name, target, inputType, outputType);
+                    //   registerSourceFilter (name, target, inputType, outputType);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                  //  registerDestinationFilter (name, target, inputType, outputType);
+                    //  registerDestinationFilter (name, target, inputType, outputType);
                 }
                 else
                 {
@@ -712,12 +697,12 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                  filter = make_filter (type, this, name);
+                    filter = make_filter (type, this, name);
                     filter->addDestinationTarget (target);
                 }
                 else if ((mode == "clone") || (mode == "cloning"))
                 {
-                    auto clonefilt = std::make_shared<CloningFilter> (this,key);
+                    auto clonefilt = std::make_shared<CloningFilter> (this, key);
                     clonefilt->addDeliveryEndpoint (target);
                     filter = std::move (clonefilt);
                 }
@@ -789,19 +774,19 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         auto &filtArray = filts->as<toml::Array> ();
         for (const auto &filt : filtArray)
         {
-            std::string key= tomlGetOrDefault (filt, "name", std::string ());
-			std::string target = tomlGetOrDefault (filt, "target", std::string ());
+            std::string key = tomlGetOrDefault (filt, "name", std::string ());
+            std::string target = tomlGetOrDefault (filt, "target", std::string ());
             std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
-            bool useTypes = !((inputType.empty()) && (outputType.empty()));
+            bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string mode =tomlGetOrDefault (filt, "mode", std::string ("source"));
-          
+            std::string mode = tomlGetOrDefault (filt, "mode", std::string ("source"));
+
             std::string operation ("custom");
             auto op = filt.find ("operation");
-            if (op!=nullptr)
+            if (op != nullptr)
             {
-                operation = op->as<std::string>();
+                operation = op->as<std::string> ();
                 if ((mode == "clone") || (mode == "cloning"))
                 {
                     if (operation != "clone")
@@ -820,11 +805,11 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             {
                 if (mode == "source")
                 {
-                   // registerSourceFilter (name, target, inputType, outputType);
+                    // registerSourceFilter (name, target, inputType, outputType);
                 }
                 else if ((mode == "dest") || (mode == "destination"))
                 {
-                  //  registerDestinationFilter (name, target, inputType, outputType);
+                    //  registerDestinationFilter (name, target, inputType, outputType);
                 }
                 else
                 {
@@ -862,17 +847,17 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
                 }
                 auto props = filt.find ("properties");
-                if (props!=nullptr)
+                if (props != nullptr)
                 {
                     if (props->is<toml::Array> ())
                     {
-						auto &propArray = props->as<toml::Array> ();
+                        auto &propArray = props->as<toml::Array> ();
                         for (const auto &prop : propArray)
                         {
                             auto propname = prop.find ("name");
                             auto propval = prop.find ("value");
 
-                            if ((propname == nullptr) || (propval==nullptr))
+                            if ((propname == nullptr) || (propval == nullptr))
                             {
                                 std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                                 continue;
@@ -932,43 +917,42 @@ std::string Federate::query (const std::string &queryStr)
     {
         return getName ();
     }
-    return coreObject->query (getName(), queryStr);
+    return coreObject->query (getName (), queryStr);
 }
 
 std::string Federate::query (const std::string &target, const std::string &queryStr)
 {
-	if ((target.empty())||(target=="federate"))
-	{
+    if ((target.empty ()) || (target == "federate"))
+    {
         return query (queryStr);
-	}
+    }
     return coreObject->query (target, queryStr);
 }
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
     auto queryFut =
-        std::async(std::launch::async, [this, target, queryStr]() { return coreObject->query(target, queryStr); });
-    auto asyncInfo = asyncCallInfo->lock();
+      std::async (std::launch::async, [this, target, queryStr]() { return coreObject->query (target, queryStr); });
+    auto asyncInfo = asyncCallInfo->lock ();
     int cnt = asyncInfo->queryCounter++;
-   
+
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
     return cnt;
 }
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
-    auto queryFut = std::async(std::launch::async, [this, queryStr]() { return query(queryStr); });
-    auto asyncInfo = asyncCallInfo->lock();
+    auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
+    auto asyncInfo = asyncCallInfo->lock ();
     int cnt = asyncInfo->queryCounter++;
 
-    
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
     return cnt;
 }
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    auto asyncInfo = asyncCallInfo->lock ();
     auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncInfo->inFlightQueries.end ())
     {
@@ -979,7 +963,7 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    auto asyncInfo = asyncCallInfo->lock ();
     auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncInfo->inFlightQueries.end ())
     {
@@ -989,65 +973,75 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
 }
 
 filter_id_t Federate::registerFilter (const std::string &filterName,
-                                            const std::string &inputType,
-                                            const std::string &outputType)
+                                      const std::string &inputType,
+                                      const std::string &outputType)
 {
-    return filter_id_t(coreObject->registerFilter (getName() + separator_ + filterName, inputType, outputType));
+    return filter_id_t (coreObject->registerFilter (getName () + separator_ + filterName, inputType, outputType));
 }
 
 filter_id_t Federate::registerCloningFilter (const std::string &filterName,
+                                             const std::string &inputType,
+                                             const std::string &outputType)
+{
+    return filter_id_t (
+      coreObject->registerCloningFilter (getName () + separator_ + filterName, inputType, outputType));
+}
+
+filter_id_t Federate::registerGlobalFilter (const std::string &filterName,
+                                            const std::string &inputType,
+                                            const std::string &outputType)
+{
+    return filter_id_t (coreObject->registerFilter (filterName, inputType, outputType));
+}
+
+filter_id_t Federate::registerGlobalCloningFilter (const std::string &filterName,
                                                    const std::string &inputType,
                                                    const std::string &outputType)
 {
-    return filter_id_t(coreObject->registerCloningFilter (getName() + separator_ + filterName, inputType, outputType));
-}
-
-filter_id_t Federate::registerGlobalFilter(const std::string &filterName,
-    const std::string &inputType,
-    const std::string &outputType)
-{
-    return filter_id_t(coreObject->registerFilter(filterName, inputType, outputType));
-}
-
-filter_id_t Federate::registerGlobalCloningFilter(const std::string &filterName,
-    const std::string &inputType,
-    const std::string &outputType)
-{
-    return filter_id_t(coreObject->registerCloningFilter(filterName, inputType, outputType));
+    return filter_id_t (coreObject->registerCloningFilter (filterName, inputType, outputType));
 }
 
 void Federate::addSourceTarget (filter_id_t id, const std::string &targetEndpoint)
 {
-    coreObject->addSourceTarget (interface_handle(id.value()), targetEndpoint);
+    coreObject->addSourceTarget (interface_handle (id.value ()), targetEndpoint);
 }
 
 void Federate::addDestinationTarget (filter_id_t id, const std::string &targetEndpoint)
 {
-    coreObject->addDestinationTarget (interface_handle(id.value()), targetEndpoint);
+    coreObject->addDestinationTarget (interface_handle (id.value ()), targetEndpoint);
 }
 
-std::string Federate::getFilterName (filter_id_t id) const { return coreObject->getHandleName (interface_handle(id.value ())); }
+std::string Federate::getFilterName (filter_id_t id) const
+{
+    return coreObject->getHandleName (interface_handle (id.value ()));
+}
 
-std::string Federate::getFilterInputType (filter_id_t id) const { return coreObject->getType (interface_handle(id.value ())); }
+std::string Federate::getFilterInputType (filter_id_t id) const
+{
+    return coreObject->getType (interface_handle (id.value ()));
+}
 
-std::string Federate::getFilterOutputType (filter_id_t id) const { return coreObject->getType (interface_handle(id.value ())); }
+std::string Federate::getFilterOutputType (filter_id_t id) const
+{
+    return coreObject->getType (interface_handle (id.value ()));
+}
 
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getFilter (filterName);
-    return (id.isValid()) ? filter_id_t(id):invalid_id_value ;
+    return (id.isValid ()) ? filter_id_t (id) : invalid_id_value;
 }
 
 void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
 {
-    coreObject->setFilterOperator (interface_handle(id.value ()), std::move (mo));
+    coreObject->setFilterOperator (interface_handle (id.value ()), std::move (mo));
 }
 
 void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
 {
     for (auto id : filter_ids)
     {
-        coreObject->setFilterOperator (interface_handle(id.value ()), mo);
+        coreObject->setFilterOperator (interface_handle (id.value ()), mo);
     }
 }
 

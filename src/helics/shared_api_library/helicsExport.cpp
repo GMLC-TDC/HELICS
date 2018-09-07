@@ -127,9 +127,9 @@ void helicsErrorHandler (helics_error *err) noexcept
             err->error_code = helics_connection_failure;
             err->message = getMasterHolder ()->addErrorString (cf.what ());
         }
-        catch (const helics::HelicsTerminated &ht)
+        catch (const helics::HelicsSystemFailure &ht)
         {
-            err->error_code = helics_connection_failure;
+            err->error_code = helics_system_failure;
             err->message = getMasterHolder ()->addErrorString (ht.what ());
         }
         catch (const helics::HelicsException &he)
