@@ -24,7 +24,8 @@ static const std::string nullStr;
 #define LOG_WARNING(message) logMessage (1, nullStr, message)
 
 #ifndef LOGGING_DISABLED
-#define LOG_NORMAL(message)                                                                                       \
+
+#define LOG_SUMMARY(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
         if (logLevel >= 2)                                                                                        \
@@ -33,13 +34,22 @@ static const std::string nullStr;
         }                                                                                                         \
     } while (false)
 
-#ifndef DEBUG_LOGGING_DISABLED
-#define LOG_DEBUG(message)                                                                                        \
+#define LOG_NORMAL(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
         if (logLevel >= 3)                                                                                        \
         {                                                                                                         \
             logMessage (3, nullStr, message);                                                                     \
+        }                                                                                                         \
+    } while (false)
+
+#ifndef DEBUG_LOGGING_DISABLED
+#define LOG_DEBUG(message)                                                                                        \
+    do                                                                                                            \
+    {                                                                                                             \
+        if (logLevel >= 4)                                                                                        \
+        {                                                                                                         \
+            logMessage (4, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 #else
@@ -50,15 +60,16 @@ static const std::string nullStr;
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= 4)                                                                                        \
+        if (logLevel >= 5)                                                                                        \
         {                                                                                                         \
-            logMessage (4, nullStr, message);                                                                     \
+            logMessage (5, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 #else
 #define LOG_TRACE(message) ((void)0)
 #endif
 #else  // LOGGING_DISABLED
+#define LOG_SUMMARY(message) ((void)0)
 #define LOG_NORMAL(message) ((void)0)
 #define LOG_DEBUG(message) ((void)0)
 #define LOG_TRACE(message) ((void)0)
