@@ -102,7 +102,7 @@ FederateTestFixture::~FederateTestFixture ()
         helicsBrokerFree (broker);
     }
     brokers.clear ();
-    helicsCleanupHelicsLibrary ();
+    helicsCleanupLibrary ();
 }
 
 helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, int count)

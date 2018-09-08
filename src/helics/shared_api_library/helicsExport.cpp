@@ -303,8 +303,8 @@ void helicsFederateInfoSetIntegerProperty (helics_federate_info_t fi, int intege
     hfi->setIntegerProperty (integerProperty, propertyValue);
 }
 
-static const char *invalidCoreString = "core object is not valid";
-static const char *invalidBrokerString = "broker object is not valid";
+static constexpr char invalidCoreString[] = "core object is not valid";
+static constexpr char invalidBrokerString[] = "broker object is not valid";
 
 namespace helics
 {
@@ -687,21 +687,21 @@ void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
     }
 }
 
-void helicsDestroyFederate (helics_federate fed, helics_error *err)
+void helicsFederateDestroy (helics_federate fed, helics_error *err)
 {
     helicsFederateFinalize (fed,err);
     helicsFederateFree (fed);
 }
 
 
-void helicsDestroyBroker(helics_broker broker, helics_error *err)
+void helicsBrokerDestroy (helics_broker broker, helics_error *err)
 {
     helicsBrokerDisconnect (broker,err);
     helicsBrokerFree (broker);
 }
 
 
-void helicsDestroyCore(helics_core core, helics_error *err)
+void helicsCoreDestroy (helics_core core, helics_error *err)
 {
     helicsCoreDisconnect (core,err);
     helicsCoreFree (core);
@@ -946,7 +946,7 @@ helics_bool_t helicsQueryIsCompleted (helics_query query)
 
 void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::QueryObject *> (query); }
 
-void helicsCleanupHelicsLibrary ()
+void helicsCleanupLibrary ()
 {
     helics::cleanupHelicsLibrary ();
     //  helics::LoggerManager::closeLogger();

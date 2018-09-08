@@ -150,13 +150,13 @@ HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName, heli
 HELICS_EXPORT void helicsBrokerDisconnect (helics_broker broker, helics_error *err);
 
 /** disconnect and free a broker*/
-HELICS_EXPORT void helicsDestroyFederate (helics_federate fed, helics_error *err);
+HELICS_EXPORT void helicsFederateDestroy (helics_federate fed, helics_error *err);
 
 /** disconnect and free a broker*/
-HELICS_EXPORT void helicsDestroyBroker (helics_broker broker, helics_error *err);
+HELICS_EXPORT void helicsBrokerDestroy (helics_broker broker, helics_error *err);
 
 /** disconnect and free a core*/
-HELICS_EXPORT void helicsDestroyCore (helics_core core, helics_error *err);
+HELICS_EXPORT void helicsCoreDestroy (helics_core core, helics_error *err);
 
 /** release the memory associated with a core*/
 HELICS_EXPORT void helicsCoreFree (helics_core core);
@@ -460,7 +460,7 @@ HELICS_EXPORT helics_time_t helicsFederateRequestTimeIterativeComplete (helics_f
 @param maxlen the maximum size of the buffer
 @return void object indicating success or error
 */
-HELICS_EXPORT void helicsFederateGetName (helics_federate fed, char *outputString, int maxlen, helics_error *err);
+HELICS_EXPORT const char *helicsFederateGetName (helics_federate fed);
 
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
@@ -472,7 +472,7 @@ HELICS_EXPORT void helicsFederateSetTimeProperty (helics_federate fed, int32_t t
 @param flag the flag to change
 @param flagValue the new value of the flag 0 for false !=0 for true
 */
-HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue, helics_error *err);
+HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int32_t flag, helics_bool_t flagValue, helics_error *err);
 
 /** set the separator character in the info structure
 @details the separator character is the separation character for local publications/endpoints in creating their global name
@@ -575,7 +575,7 @@ HELICS_EXPORT void helicsQueryFree (helics_query);
 /** function to do some housekeeping work
 @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
 yet*/
-HELICS_EXPORT void helicsCleanupHelicsLibrary ();
+HELICS_EXPORT void helicsCleanupLibrary ();
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

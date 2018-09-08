@@ -18,6 +18,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 static const int fedValidationIdentifier = 0x2352188;
 static const char *invalidFedString = "federate object is not valid";
 
+static const std::string nullstr;
+static constexpr char nullcstr[] = "";
+
 namespace helics
 {
 FedObject *getFedObject (helics_federate fed, helics_error *err)
@@ -167,12 +170,13 @@ helics_federate helicsCreateValueFederate (const char *fedName, const helics_fed
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr =
+              std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                     helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                     *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
@@ -194,7 +198,7 @@ helics_federate helicsCreateValueFederateFromConfig (const char *configFile, hel
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::ValueFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
+        FedI->fedptr = std::make_shared<helics::ValueFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
     }
     catch (...)
     {
@@ -217,12 +221,13 @@ helics_federate helicsCreateMessageFederate (const char *fedName, const helics_f
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr =
+              std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                       helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                       *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
@@ -245,7 +250,7 @@ helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, h
 
     try
     {
-        FedI->fedptr = std::make_shared<helics::MessageFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
+        FedI->fedptr = std::make_shared<helics::MessageFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
     }
     catch (...)
     {
@@ -268,12 +273,12 @@ helics_federate helicsCreateCombinationFederate (const char *fedName, const heli
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                           helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : std::string (),
+            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
                                                                           *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
@@ -295,7 +300,7 @@ helics_federate helicsCreateCombinationFederateFromConfig (const char *configFil
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((configFile != nullptr) ? std::string (configFile) : std::string ());
+        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
     }
     catch (...)
     {
@@ -688,34 +693,15 @@ federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
     }
 }
 
-void helicsFederateGetName (helics_federate fed, char *outputString, int maxlen, helics_error *err)
+const char * helicsFederateGetName (helics_federate fed)
 {
-    auto fedObj = getFed (fed,err);
+    auto fedObj = getFed (fed,nullptr);
     if (fedObj == nullptr)
     {
-        return;
+        return nullcstr;
     }
-    if (!checkOutArgString (outputString, maxlen, err))
-    {
-        return;
-    }
-    try
-    {
-        auto &ident = fedObj->getName ();
-        if (static_cast<int> (ident.size ()) > maxlen)
-        {
-            strncpy (outputString, ident.c_str (), maxlen);
-            outputString[maxlen - 1] = 0;
-        }
-        else
-        {
-            strcpy (outputString, ident.c_str ());
-        }
-    }
-    catch (...)
-    {
-        return helicsErrorHandler (err);
-    }
+    auto &ident = fedObj->getName ();
+    return ident.c_str ();
 }
 
 void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time, helics_error *err)
@@ -735,7 +721,7 @@ void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, h
     }
 }
 
-void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue, helics_error *err)
+void helicsFederateSetFlagOption (helics_federate fed, int32_t flag, helics_bool_t flagValue, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)

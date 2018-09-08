@@ -86,7 +86,7 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp ()
     }
     }
     brokers.clear ();
-    helicsCleanupHelicsLibrary ();
+    helicsCleanupLibrary ();
 }
 
 std::shared_ptr<helicscpp::Broker> FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, int count)

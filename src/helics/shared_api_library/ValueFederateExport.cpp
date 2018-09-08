@@ -859,7 +859,7 @@ void helicsInputGetComplexParts (helics_input inp, double *real, double *imag, h
     }
     if ((real == nullptr) && (imag == nullptr))
     {
-        // no errors here the caller just didn't want any values
+        // no errors here the caller just didn't want any values for some reason
         return;
     }
     try
@@ -901,6 +901,7 @@ helics_complex helicsInputGetComplex (helics_input inp, helics_error *err)
 
     if (inpObj == nullptr)
     {
+		//time invalid is just an invalid double 
         return {helics_time_invalid, 0};
     }
 

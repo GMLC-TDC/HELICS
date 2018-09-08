@@ -27,7 +27,7 @@ a few extra features of name matching to function on the federate interface but 
 @return a helics_filter object
 */
 HELICS_EXPORT helics_filter helicsFederateRegisterFilter (helics_federate fed,
-                                                                helics_filter_type_t type,
+                                                          helics_filter_type_t type,
                                                           const char *name,
                                                           helics_error *err);
 
@@ -49,8 +49,7 @@ a few extra features of name matching to function on the federate interface but 
 @param name the name of the filter (can be NULL)
 @return a helics_filter object
 */
-HELICS_EXPORT helics_filter helicsCoreRegisterFilter (helics_core core,
-                                                            helics_filter_type_t type, const char *name, helics_error *err);
+HELICS_EXPORT helics_filter helicsCoreRegisterFilter (helics_core core, helics_filter_type_t type, const char *name, helics_error *err);
 
 /** create a cloning Filter on the specified core
 @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -60,7 +59,6 @@ through other functions
 @return a helics_filter object
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint, helics_error *err);
-
 
 /** get the name of the filter and store in the given string
 @param filt the given filter

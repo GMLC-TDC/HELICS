@@ -238,12 +238,9 @@ class Federate
         return itTime;
     }
 
-    std::string getName () const
+    const char *getName () const
     {
-        char str[255];
-        helicsFederateGetName (fed, &str[0], sizeof (str),NULL);
-        std::string result (str);
-        return result;
+        return helicsFederateGetName (fed);
     }
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of

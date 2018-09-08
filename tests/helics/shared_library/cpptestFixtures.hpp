@@ -59,7 +59,7 @@ struct FederateTestFixture_cpp
         {
             broker->disconnect();
             broker = nullptr;
-            helicsCleanupHelicsLibrary();
+            helicsCleanupLibrary();
             broker = AddBroker(core_type_name, count);
             if (!broker->isConnected())
             {

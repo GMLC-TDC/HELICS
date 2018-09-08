@@ -68,12 +68,9 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     auto q1 = helicsCreateQuery ("root", "federates");
     std::string res = helicsQueryCoreExecute (q1, core, nullptr);
     std::string str ("[");
-    std::string name;
-    name.resize (100);
-    CE (helicsFederateGetName (vFed1, &(name[0]), 100, &err));
-    str.append (name.c_str ());
+    std::string name(helicsFederateGetName (vFed1));
     str.push_back (';');
-    CE (helicsFederateGetName (vFed2, &(name[0]), 100, &err));
+    str.append(helicsFederateGetName (vFed2));
     str.append (name.c_str ());
     str.push_back (']');
 

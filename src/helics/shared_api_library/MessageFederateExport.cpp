@@ -24,8 +24,9 @@ static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::End
 }
 
 static const std::string nullStr;
+static constexpr char nullcstr[] = "";
 
-static const char invalidEndpoint[] = "The given endpoint does not point to a valid object";
+static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
 
 
@@ -237,7 +238,14 @@ void helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message, he
         }
         else
         {
-            //TODO:: we have a routed message we need convert to an actual helics message object
+            helics::Message nmessage;
+            nmessage.time = message->time;
+            nmessage.source = message->source;
+            nmessage.dest = message->dest;
+            nmessage.original_dest = message->original_dest;
+            nmessage.original_source = message->original_source;
+            nmessage.data.assign (message->data, message->length);
+            endObj->endptr->send (nmessage);
         }
     }
     catch (...)
@@ -389,7 +397,7 @@ const char * helicsEndpointGetType (helics_endpoint endpoint)
     auto endObj = verifyEndpoint (endpoint, nullptr);
     if (endObj == nullptr)
     {
-        return nullStr.c_str();
+        return nullcstr;
     }
 	
     try
@@ -399,7 +407,7 @@ const char * helicsEndpointGetType (helics_endpoint endpoint)
     }
     catch (...)
     {
-        return nullStr.c_str ();
+        return nullcstr;
     }
 }
 
@@ -408,7 +416,7 @@ const char *helicsEndpointGetName (helics_endpoint endpoint)
     auto endObj = verifyEndpoint (endpoint, nullptr);
     if (endObj == nullptr)
     {
-        return nullStr.c_str();
+        return nullcstr;
     }
   
     try
@@ -418,7 +426,7 @@ const char *helicsEndpointGetName (helics_endpoint endpoint)
     }
     catch (...)
     {
-        return nullStr.c_str ();
+        return nullcstr;
     }
 }
 

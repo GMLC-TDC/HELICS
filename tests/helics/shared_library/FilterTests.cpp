@@ -452,8 +452,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     std::string filename = std::string (TEST_DIR) + "/test_files/example_filters.json";
     auto mFed = helicsCreateMessageFederateFromConfig (filename.c_str (),&err);
 
-    char name[HELICS_SIZE_MAX];
-    CE(helicsFederateGetName (mFed, name, HELICS_SIZE_MAX,&err));
+    const char *name=helicsFederateGetName (mFed);
     BOOST_CHECK_EQUAL (name, "filterFed");
 
     BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (mFed), 3);
