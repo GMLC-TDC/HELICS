@@ -41,6 +41,7 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInpu
         while (it != rp.second)
         {
             targets.push_back(it->second);
+            ++it;
         }
     }
     return targets;
@@ -56,6 +57,7 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForPubl
             while (it != rp.second)
             {
                 targets.push_back(it->second);
+                ++it;
             }
         }
         return targets;
@@ -71,6 +73,7 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForEndp
         while (it != rp.second)
         {
             targets.push_back(it->second);
+            ++it;
         }
     }
     return targets;
@@ -87,6 +90,7 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilt
         while (it != rp.second)
         {
             targets.push_back(it->second);
+            ++it;
         }
     }
     return targets;

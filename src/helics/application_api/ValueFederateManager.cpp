@@ -249,7 +249,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
     lastData.resize (inputCount);
     // get the actual publication types
     auto inpHandle = inputs.lock();
-    inpHandle->apply ([this](auto &sub) { sub.pubtype = coreObject->getType (sub.coreID); });
+    inpHandle->apply ([this](auto &inp) { inp.pubtype = coreObject->getType (inp.coreID); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }

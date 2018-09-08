@@ -747,7 +747,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("control Inputs must be registered before calling enterInitializingMode"));
     }
-    LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering CONTROL INPUT {}", key));
+    LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering INPUT {}", key));
     auto ci = handles.read ([&key](auto &hand) { return hand.getInput (key); });
     if (ci != nullptr)  // this key is already found
     {
@@ -853,12 +853,12 @@ const std::string &CommonCore::getType (interface_handle handle) const
         if (handleInfo->handle_type == handle_type_t::input)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto subInfo = fed->interfaces ().getInput (handle);
-            if (subInfo != nullptr)
+            auto inpInfo = fed->interfaces ().getInput (handle);
+            if (inpInfo != nullptr)
             {
-                if (!subInfo->inputType.empty ())
+                if (!inpInfo->inputType.empty ())
                 {
-                    return subInfo->inputType;
+                    return inpInfo->inputType;
                 }
             }
         }
@@ -924,9 +924,20 @@ void CommonCore::addDestinationTarget (interface_handle handle, const std::strin
         break;
     case handle_type_t::filter:
         cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
+        if (handleInfo->key.empty ())
+        {
+			if ((!handleInfo->type_in.empty()) || (!handleInfo->type_out.empty()))
+			{
+                cmd.setStringData (handleInfo->type_in, handleInfo->type_out);
+			}
+        }
         break;
     case handle_type_t::publication:
         cmd.setAction (CMD_ADD_NAMED_INPUT);
+		if (handleInfo->key.empty())
+		{
+            cmd.setStringData (handleInfo->type, handleInfo->units);
+		}
         break;
     case handle_type_t::input:
     default:
@@ -954,6 +965,13 @@ void CommonCore::addSourceTarget (interface_handle handle, const std::string &ta
         break;
     case handle_type_t::filter:
         cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
+        if (handleInfo->key.empty ())
+        {
+            if ((!handleInfo->type_in.empty ()) || (!handleInfo->type_out.empty ()))
+            {
+                cmd.setStringData (handleInfo->type_in, handleInfo->type_out);
+            }
+        }
         break;
     case handle_type_t::input:
         cmd.setAction (CMD_ADD_NAMED_PUBLICATION);
@@ -2569,6 +2587,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             addTargetToInterface (command);
             command.setAction (CMD_ADD_PUBLISHER);
             command.swapSourceDest ();
+            command.setStringData (pub->type, pub->units);
             addTargetToInterface (command);
         }
         else
@@ -2585,9 +2604,18 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_PUBLISHER);
             command.setDestination (inp->handle);
             command.name.clear ();
+			if (command.getStringData().empty())
+			{
+                auto pub = loopHandles.findHandle (command.getSource ());
+				if (pub != nullptr)
+				{
+                    command.setStringData (pub->type, pub->units);
+				}
+			}
             addTargetToInterface (command);
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.swapSourceDest ();
+            command.clearStringData ();
             addTargetToInterface (command);
         }
         else

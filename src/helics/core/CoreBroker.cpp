@@ -941,6 +941,10 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             routeMessage (command);
             command.setAction (CMD_ADD_FILTER);
             command.swapSourceDest ();
+			if ((!filt->type_in.empty()) || (!filt->type_out.empty()))
+			{
+                command.setStringData (filt->type_in, filt->type_out);
+			}
             routeMessage (command);
             foundInterface = true;
         }
@@ -954,9 +958,18 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_FILTER);
             command.setDestination (ept->handle);
             command.name.clear ();
+            auto filt = handles.findHandle (command.getSource ());
+            if (filt != nullptr)
+            {
+                if ((!filt->type_in.empty ()) || (!filt->type_out.empty ()))
+                {
+                    command.setStringData (filt->type_in, filt->type_out);
+                }
+            }
             routeMessage (command);
             command.setAction (CMD_ADD_ENDPOINT);
             command.swapSourceDest ();
+            command.clearStringData ();
             routeMessage (command);
             foundInterface = true;
         }
@@ -976,9 +989,39 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 break;
             case CMD_ADD_NAMED_INPUT:
                 unknownHandles.addUnknownInput(command.name, command.getSource(), command.flags);
+				if (!command.getStringData().empty())
+				{
+                    auto pub = handles.findHandle (command.getSource ());
+                    if (pub == nullptr)
+					{
+                        // an anonymous publisher is adding an input
+                        auto &apub =
+                          handles.addHandle (global_federate_id_t (command.source_id),
+                                             interface_handle (command.source_handle), handle_type_t::publication,
+                                             std::string (), command.getString (typeStringLoc),
+                                             command.getString (unitStringLoc));
+
+                        addLocalInfo (apub, command);
+					}
+				}
                 break;
             case CMD_ADD_NAMED_ENDPOINT:
                 unknownHandles.addUnknownEndpoint(command.name, command.getSource(), command.flags);
+                if (!command.getStringData ().empty ())
+                {
+                    auto filt = handles.findHandle (command.getSource ());
+                    if (filt == nullptr)
+                    {
+                        // an anonymous filter is adding and endpoint
+                        auto &afilt =
+                          handles.addHandle (global_federate_id_t (command.source_id),
+                                             interface_handle (command.source_handle), handle_type_t::filter,
+                                             std::string (), command.getString (typeStringLoc),
+                                             command.getString (typeOutStringLoc));
+
+                        addLocalInfo (afilt, command);
+                    }
+                }
                 break;
             case CMD_ADD_NAMED_FILTER:
                 unknownHandles.addUnknownFilter(command.name, command.getSource(), command.flags);
