@@ -657,6 +657,19 @@ void helicsCoreDisconnect (helics_core core, helics_error *err)
     }
 }
 
+helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err)
+{
+    auto brk = getBroker(broker, err);
+    {
+        return helics_true;
+    }
+    brk->waitForDisconnect (msToWait);
+	if (brk->isConnected())
+	{
+        return helics_false;
+	}
+    return helics_true;
+}
 void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
 {
     auto brk = getBroker (broker,err);
@@ -672,6 +685,26 @@ void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
     {
         return helicsErrorHandler (err);
     }
+}
+
+void helicsDestroyFederate (helics_federate fed, helics_error *err)
+{
+    helicsFederateFinalize (fed,err);
+    helicsFederateFree (fed);
+}
+
+
+void helicsDestroyBroker(helics_broker broker, helics_error *err)
+{
+    helicsBrokerDisconnect (broker,err);
+    helicsBrokerFree (broker);
+}
+
+
+void helicsDestroyCore(helics_core core, helics_error *err)
+{
+    helicsCoreDisconnect (core,err);
+    helicsCoreFree (core);
 }
 
 void helicsCoreFree (helics_core core)
@@ -1013,16 +1046,39 @@ void MasterObjectHolder::deleteAll ()
     }
     // brackets are for the scopes on the lock handles
     {
-        auto brokerHandle = brokers.lock ();
-        brokerHandle->clear ();
+        auto fedHandle = feds.lock ();
+        for (auto &fed : fedHandle)
+        {
+            if ((fed)&&(fed->fedptr))
+            {
+                fed->fedptr->finalize ();
+    }
+        }
+        fedHandle->clear ();
     }
     {
         auto coreHandle = cores.lock ();
+        for (auto &cr : coreHandle)
+        {
+            if ((cr)&&(cr->coreptr))
+            {
+                cr->coreptr->disconnect ();
+            }
+        }
         coreHandle->clear ();
     }
-    errorStrings.lock ()->clear ();
-    auto fedHandle = feds.lock ();
-    fedHandle->clear ();
+    {
+        auto brokerHandle = brokers.lock ();
+        for (auto &brk : brokerHandle)
+        {
+            if ((brk)&&(brk->brokerptr))
+            {
+                brk->brokerptr->disconnect ();
+}
+        }
+        brokerHandle->clear ();
+    }
+ errorStrings.lock ()->clear ();
 }
 
 const char *MasterObjectHolder::addErrorString (std::string newError)

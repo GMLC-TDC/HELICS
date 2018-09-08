@@ -43,9 +43,9 @@ bool ZmqBroker::brokerConnect ()
     }
     zmqContextManager::startContext ();
     comms = std::make_unique<ZmqComms> (netInfo);
-    comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
+    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-
+    comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
     if (res)

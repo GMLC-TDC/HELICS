@@ -9,12 +9,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
+#include <stdexcept>
 #include <string>
 #include "helicsExceptions.hpp"
 
 namespace helicscpp
 {
-
 class Broker
 {
   public:
@@ -73,6 +73,10 @@ class Broker
     {
         return helicsBrokerIsConnected (broker);
     }
+    bool waitForDisconnect(int msToWait = -1)
+    {
+        return helicsBrokerWaitForDisconnect(broker,msToWait, hThrowOnError());
+    }
     void disconnect()
     {
         helicsBrokerDisconnect(broker,hThrowOnError());
@@ -86,6 +90,7 @@ class Broker
     {
         return helicsBrokerGetAddress(broker);
     }
+
   protected:
     helics_broker broker;
 };

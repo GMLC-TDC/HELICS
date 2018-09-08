@@ -88,11 +88,12 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     res = Fed->requestTime (3.0);
     BOOST_CHECK_EQUAL (res, 3.0);
     brk->disconnect ();
-    std::this_thread::sleep_for (std::chrono::seconds (5));
+    std::this_thread::sleep_for (std::chrono::seconds (2));
     auto cptr = Fed->getCorePointer ();
     BOOST_CHECK (!cptr->isConnected ());
-    BOOST_CHECK_THROW (res = Fed->requestTime (4.0), helics::FunctionExecutionFailure);
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::error);
+    res = Fed->requestTime(4.0);
+    BOOST_CHECK_EQUAL(res, helics::Time::maxVal());
+    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)

@@ -18,7 +18,7 @@ using the jsoncpp library
 bool hasJsonExtension (const std::string &jsonString);
 
   /** load a JSON string or filename that points to a JSON file and return a
-json::Value to the root object
+JSON::Value to the root object
 */
 Json_helics::Value loadJson (const std::string &jsonString);
 

@@ -16,7 +16,7 @@ using the toml library
 #include <functional>
 
 /** load a Toml string or filename that points to a TOML file and return a
-json::Value to the root object
+JSON::Value to the root object
 */
 toml::Value loadToml (const std::string &tomlString);
 

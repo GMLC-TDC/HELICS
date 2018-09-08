@@ -252,7 +252,7 @@ class Federate
     a federate, core, or broker
     @param queryStr a string with the query see other documentation for specific properties to query, can be
     defined by the federate
-    @return a string with the value requested.  this is either going to be a vector of strings value or a json
+    @return a string with the value requested.  this is either going to be a vector of strings value or a JSON
     string stored in the first element of the vector.  The string "#invalid" is returned if the query was not valid
     */
     std::string query (const std::string &target, const std::string &queryStr) const

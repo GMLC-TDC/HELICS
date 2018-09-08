@@ -53,6 +53,7 @@ struct FederateTestFixture
                     helics_time_t time_delta = helics_time_zero,
                     const std::string &name_prefix = "fed")
     {
+        ctype = core_type_name;
         helics_broker broker = AddBroker (core_type_name, count);
         BOOST_CHECK (nullptr != broker);
         AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
@@ -177,8 +178,9 @@ struct FederateTestFixture
     std::string extraBrokerArgs;
     helics_error err;
 
+    std::string ctype;
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);
-    auto AddBrokerImp (const std::string &core_type_name, const std::string &initialization_string);
+    auto AddBrokerImp (const std::string &core_type_name, std::string initialization_string);
 };

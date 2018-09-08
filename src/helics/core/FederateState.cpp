@@ -833,13 +833,16 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id.load ())
         {
-            setState (HELICS_FINISHED);
-            timeCoord->disconnect ();
-            cmd.dest_id = 0;
-            if (parent_ != nullptr)
-            {
-                parent_->addActionMessage (cmd);
-            }
+			if (state != HELICS_FINISHED)
+			{
+                setState (HELICS_FINISHED);
+                timeCoord->disconnect ();
+                cmd.dest_id = 0;
+                if (parent_ != nullptr)
+                {
+                    parent_->addActionMessage (cmd);
+                }
+			}
             return message_processing_result::halted;
         }
         else

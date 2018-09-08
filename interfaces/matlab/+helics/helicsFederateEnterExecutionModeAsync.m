@@ -4,5 +4,5 @@ function varargout = helicsFederateEnterExecutionModeAsync(varargin)
     %this call is non-blocking and will return immediately call /ref
     %helicsFederateEnterExecutionModeComplete to finish the call sequence /ref
     %
-  [varargout{1:nargout}] = helicsMEX(82, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(86, varargin{:});
 end

@@ -103,8 +103,9 @@ bool IpcBroker::brokerConnect ()
         brokerloc = brokername + "_queue.hqf";
     }
     comms = std::make_unique<IpcComms> (fileloc, brokerloc);
-    comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
+    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
     comms->setMessageSize (maxMessageSize, maxMessageCount);
+    comms->setTimeout (networkTimeout);
     return comms->connect ();
 }
 

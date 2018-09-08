@@ -7,8 +7,8 @@ Institute; the National Renewable Energy Laboratory, operated by the Alliance fo
 Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
 
 */
-#include "cpptestFixtures.hpp"
 #include "../src/helics/cpp98/Broker.hpp"
+#include "cpptestFixtures.hpp"
 #include <cctype>
 #include <boost/test/unit_test.hpp>
 
@@ -24,8 +24,12 @@ static bool hasIndexCode (const std::string &type_name)
     return false;
 }
 
-static auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
+static auto StartBrokerImp (const std::string &core_type_name, std::string initialization_string)
 {
+    if (core_type_name.compare(0, 3, "tcp") == 0)
+    {
+        initialization_string += " --reuse_address";
+    }
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
@@ -54,14 +58,8 @@ int FederateTestFixture_cpp::getIndexCode (const std::string &type_name)
 auto FederateTestFixture_cpp::AddBrokerImp (const std::string &core_type_name,
                                             const std::string &initialization_string)
 {
-    if (hasIndexCode (core_type_name))
-    {
-        std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return std::make_shared<helicscpp::Broker> (new_type, std::string (), initialization_string);
+    return StartBrokerImp(core_type_name, initialization_string);
     }
-
-    return std::make_shared<helicscpp::Broker> (core_type_name, std::string (), initialization_string);
-}
 
 FederateTestFixture_cpp::~FederateTestFixture_cpp ()
 {
@@ -72,7 +70,20 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp ()
     federates.clear ();
     for (auto &broker : brokers)
     {
+        if (ctype.compare(0, 3, "tcp") == 0)
+        {
+            broker->waitForDisconnect(2000);
+        }
+        else
+        {
+            broker->waitForDisconnect(200);
+        }
+
+        if (broker->isConnected())
+        {
+
         broker->disconnect ();
+    }
     }
     brokers.clear ();
     helicsCleanupHelicsLibrary ();

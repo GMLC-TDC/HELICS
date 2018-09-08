@@ -23,8 +23,9 @@ namespace helics
 {
 void cleanupHelicsLibrary ()
 {
-    BrokerFactory::cleanUpBrokers (200);
+    BrokerFactory::cleanUpBrokers (100);
     CoreFactory::cleanUpCores (200);
+    BrokerFactory::cleanUpBrokers (100);
 }
 
 Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (fedName)
@@ -463,7 +464,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             updateTime (newTime, oldTime);
             return newTime;
         }
-        catch (FunctionExecutionFailure &fee)
+        catch (const FunctionExecutionFailure &fee)
         {
             state = op_states::error;
             throw;

@@ -40,7 +40,7 @@ class Echo:public App
     */
     Echo (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] jsonString file or json string defining the federate information and other configuration
+    @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
     Echo (const std::string &name, const std::string &jsonString);
 

@@ -41,6 +41,7 @@ private:
 	std::set<int> usedPortNumbers;
 	int openPortStart = -1;
 	std::atomic<bool> hasBroker{ false };
+    bool autoPortNumber = true;
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close

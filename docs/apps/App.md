@@ -20,7 +20,7 @@ The [player](Player.md) app will generate signals through specified interfaces f
 This is used for generating test signals into a federate
 
 #### Recorder
-The [Recorder](Recorder.md) app captures signals and data on specified interfaces and can record then to various file formats including text files and json files
+The [Recorder](Recorder.md) app captures signals and data on specified interfaces and can record then to various file formats including text files and JSON files
 The files saved can then be used by the Player app at a later time
 
 #### Tracer

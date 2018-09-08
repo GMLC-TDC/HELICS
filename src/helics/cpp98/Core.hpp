@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "config.hpp"
 #include <string>
 #include "../cpp98/Filter.hpp"
-#include <exception>
+#include <stdexcept>
 
 #define HELICS_IGNORE_ERROR NULL
 namespace helicscpp

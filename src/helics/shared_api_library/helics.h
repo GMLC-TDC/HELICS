@@ -91,6 +91,12 @@ a connected broker implies is attached to cores or cores could reach out to comm
 return 0 if not connected , something else if it is connected*/
 HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker);
 
+/** wait for the broker to disconnect
+@param broker the broker to wait for
+@param msToWait the time out in millisecond (<0 for infinite timeout)
+*/
+HELICS_EXPORT helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err);
+
 /** check if a core is connected
 a connected core implies is attached to federate or federates could be attached to it
 return 0 if not connected , something else if it is connected*/
@@ -142,6 +148,15 @@ HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName, heli
 @return a void enumeration indicating any error condition
 */
 HELICS_EXPORT void helicsBrokerDisconnect (helics_broker broker, helics_error *err);
+
+/** disconnect and free a broker*/
+HELICS_EXPORT void helicsDestroyFederate (helics_federate fed, helics_error *err);
+
+/** disconnect and free a broker*/
+HELICS_EXPORT void helicsDestroyBroker (helics_broker broker, helics_error *err);
+
+/** disconnect and free a core*/
+HELICS_EXPORT void helicsDestroyCore (helics_core core, helics_error *err);
 
 /** release the memory associated with a core*/
 HELICS_EXPORT void helicsCoreFree (helics_core core);

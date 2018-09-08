@@ -30,6 +30,7 @@ set(
   DualMappedVector.hpp
   MappedPointerVector.hpp
   DualMappedPointerVector.hpp
+  TriggerVariable.hpp
   TripWire.hpp
   fmt_format.h
   fmt_ostream.h
@@ -47,6 +48,7 @@ set(
   base64.cpp
   argParser.cpp
   TripWire.cpp
+  TriggerVariable.cpp
 )
 
 set(

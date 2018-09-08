@@ -32,9 +32,9 @@ bool TcpCore::brokerConnect ()
         netInfo.brokerAddress = "localhost";
     }
     comms = std::make_unique<TcpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
+    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-
+    comms->setTimeout (networkTimeout);
     auto res = comms->connect ();
     if (res)
     {

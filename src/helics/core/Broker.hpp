@@ -60,7 +60,7 @@ class Broker
 
     /** waits in the current thread until the broker is disconnected
 */
-    virtual void waitForDisconnect () const= 0;
+    virtual void waitForDisconnect (int msToWait=-1) const= 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", or the name of a specific object

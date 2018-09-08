@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "../common/simpleQueue.hpp"
@@ -13,19 +12,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
+#include "../common/AirLock.hpp"
+#include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedPointerVector.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
-#include "../common/AirLock.hpp"
-#include "../common/DelayedObjects.hpp"
 #include "helics_includes/any.hpp"
 #include "HandleManager.hpp"
+#include <array>
 #include <atomic>
 #include <cstdint>
 #include <thread>
 #include <utility>
-#include <array>
 
 namespace helics
 {
@@ -276,6 +275,7 @@ class CommonCore : public Core, public BrokerBase
     uint16_t getNextAirlockIndex();
     /** generate results for core queries*/
     std::string coreQuery(const std::string &queryStr) const;
+
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
@@ -308,7 +308,7 @@ class CommonCore : public Core, public BrokerBase
         global_handle> filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating the filter operators
+    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
 
   protected:
     /** deliver a message to the appropriate location*/
@@ -362,6 +362,8 @@ class CommonCore : public Core, public BrokerBase
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
+    /** check for a disconnect and take actions if the object can disconnect*/
+    void checkDisconnect ();
 };
 
 }  // namespace helics

@@ -12,9 +12,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 #include <unordered_map>
 
+#include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
-#include "../common/DelayedObjects.hpp"
 
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
@@ -22,8 +22,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
 #include "UnknownHandleManager.hpp"
-#include "TimeDependencies.hpp"
 #include "JsonMapBuilder.hpp"
+#include "TimeDependencies.hpp"
+#include "../common/TriggerVariable.hpp"
 
 namespace helics
 {
@@ -93,6 +94,7 @@ class CoreBroker : public Broker, public BrokerBase
     JsonMapBuilder dataflowMap;  //!< builder for the dependency graph
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
+	TriggerVariable disconnection; //!< controller for the disconection process
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -150,7 +152,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-	virtual void waitForDisconnect () const override final;
+    virtual void waitForDisconnect (int msToWait = -1) const override final;
 
   private:
     /** implementation details of the connection process
@@ -240,12 +242,17 @@ class CoreBroker : public Broker, public BrokerBase
     void addEndpoint (ActionMessage &m);
     void addFilter (ActionMessage &m);
  //   bool updateSourceFilterOperator (ActionMessage &m);
-    /** generate a json string containing the federate/broker/Core Map*/
+    /** generate a JSON string containing the federate/broker/Core Map*/
     void initializeFederateMap ();
-    /** generate a json string containing the dependency information for all federation object*/
+    /** generate a JSON string containing the dependency information for all federation object*/
     void initializeDependencyGraph();
     /** generate a json string containing the data flow information for all federation object*/
     void initializeDataFlowGraph ();
+
+    /** send an error code to all direct cores*/
+    void sendErrorToImmediateBrokers (int error_code);
+    /** send a disconnect message to time dependencies and child brokers*/
+	void sendDisconnect ();
 };
 
 }  // namespace helics

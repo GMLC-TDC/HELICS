@@ -28,7 +28,6 @@ Json_helics::Value loadJson (const std::string &jsonString)
     }
     std::ifstream file (jsonString);
     
-
     if (file.is_open ())
     {
         Json_helics::Value doc;
@@ -97,7 +96,6 @@ std::string getKey (const Json_helics::Value &element)
              element["key"].asString () :
              ((element.isMember ("name")) ? element["name"].asString () : std::string ());
 }
-
 
 std::string generateJsonString(const Json_helics::Value &block)
 {

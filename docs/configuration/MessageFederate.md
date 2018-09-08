@@ -14,11 +14,11 @@ TODO:: add links to other generated documents
 
 ### file configuration
 
-File based configuration looks primarily at an "endpoints" json array
+File based configuration looks primarily at an "endpoints" JSON array
 
 ```
-//this should be a valid json file (except comments are not recognized in standard JSON)
-{ //example json configuration file for a message federate all arguments are optional
+//this should be a valid JSON file (except comments are not recognized in standard JSON)
+{ //example JSON configuration file for a message federate all arguments are optional
     "name":"messageFed", // the name of the federate
     //possible flags
     "observer":false,  // indicator that the federate does not send anything
@@ -51,7 +51,7 @@ File based configuration looks primarily at an "endpoints" json array
     "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths 
  //knownDestinations can be used to optimize the communication pathways inside of HELICS
     "subscriptions":"fed2/sub1"  //subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
- //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
+ //the message will be raw data so it would have to be translated to be useful. this can also be a JSON array to subscribe to multiple publications
 }
 ]
 }

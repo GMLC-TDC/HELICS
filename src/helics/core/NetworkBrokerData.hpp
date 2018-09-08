@@ -39,6 +39,7 @@ class NetworkBrokerData
     int brokerPort = -1;  //!< the port number to use for the main broker interface
     int portStart = -1;  //!< the starting port for automatic port definitions
     interface_networks interfaceNetwork = interface_networks::local;
+    bool reuse_address = false; //!< allow reuse of binding address
   public:
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/
