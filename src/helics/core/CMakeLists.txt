@@ -103,6 +103,7 @@ set(
 	PublicationInfo.hpp
 	NamedInputInfo.hpp
 	EndpointInfo.hpp
+	flagOperations.hpp
 	FilterInfo.hpp
 	BasicHandleInfo.hpp
 	FilterFunctions.hpp

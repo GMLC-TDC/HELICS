@@ -107,6 +107,25 @@ Filter::Filter (Core *cr,const std::string &name) : corePtr (cr)
     
 }
 
+Filter::Filter(Federate *fed, int filtInd)
+{
+    if (fed != nullptr)
+    {
+        corePtr = fed->getCorePointer ().get ();
+        fid = filter_id_t (filtInd);
+        id = interface_handle (fid.value ());
+    }
+}
+
+Filter::Filter(Core *cr, int filtInd)
+{ 
+	if (cr!=nullptr)
+    {
+        corePtr = cr;
+        id = interface_handle (filtInd);
+    }
+}
+
 void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
 {
     if (corePtr != nullptr)

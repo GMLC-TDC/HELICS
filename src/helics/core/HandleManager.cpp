@@ -337,13 +337,15 @@ std::string HandleManager::generateName (handle_type_t what) const
     switch (what)
     {
     case handle_type_t::endpoint:
-        return std::string ("ept_") + std::to_string (handles.size ());
+        return std::string ("_ept_") + std::to_string (handles.size ());
+    case handle_type_t::input:
+        return std::string ("_input_") + std::to_string (handles.size ());
     case handle_type_t::publication:
-        return std::string ("pub_") + std::to_string (handles.size ());
+        return std::string ("_pub_") + std::to_string (handles.size ());
     case handle_type_t::filter:
-        return std::string ("filter_") + std::to_string (handles.size ());
+        return std::string ("_filter_") + std::to_string (handles.size ());
     default:
-        return std::string ("handle_") + std::to_string (handles.size ());
+        return std::string ("_handle_") + std::to_string (handles.size ());
     }
 }
 }  // namespace helics

@@ -9,26 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 namespace helics
 {
-/** flag definitions for the action Message Flag field*/
-enum action_message_flags : uint16_t
-{
-    iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
-    destination_target = 1,  //!< indicator that the target is a destination target
-    required_flag = 2,  //!< flag indicating that an action or match is required
-    core_flag = 3,  //!< flag indicating that message comes from a core vs a broker
-    error_flag = 4,  //!< flag indicating an error condition associated with the command
-    indicator_flag = 5,  //!< flag used for setting values
-    empty_flag = 6,  //!< flag indicating that the message is empty
-    extra_flag1 = 7,  //!< extra flag
-    forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
-    clone_flag = 9,  //!< flag indicating the filter is a clone filter
-    extra_flag2 = 8,  //!< extra flag
-    destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
-    broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
-    extra_flag3 = 13,  //!< extra flag
-    extra_flag4 = 14,  //!< extra flag
-    nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
-};
+
 /** namespace for message definitions*/
 namespace action_message_def
 {
@@ -269,11 +250,12 @@ enum class action_t : int32_t
 #define UPDATE_LOGGING_CALLBACK 592
 
 /** check if the action has an info structure associated with it*/
-inline bool hasInfo (action_message_def::action_t action) noexcept
+/*inline bool hasInfo (action_message_def::action_t action) noexcept
 {
     return ((action > action_message_def::action_t::null_info_command) ||
             (action < action_message_def::action_t::priority_null_info_command));
 }
+*/
 /** return the name of the action
 @param action The action to get the name for
 @return a pointer to string with the name

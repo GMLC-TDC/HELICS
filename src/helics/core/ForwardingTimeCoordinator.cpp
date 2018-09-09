@@ -4,10 +4,11 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "ForwardingTimeCoordinator.hpp"
-#include "../flag-definitions.h"
-#include <algorithm>
 #include "../common/fmt_format.h"
+#include "../flag-definitions.h"
+#include "ForwardingTimeCoordinator.hpp"
+#include "flagOperations.hpp"
+#include <algorithm>
 #include <set>
 namespace helics
 {
@@ -25,34 +26,31 @@ void ForwardingTimeCoordinator::enteringExecMode ()
 
 void ForwardingTimeCoordinator::disconnect ()
 {
-	if (sendMessageFunction)
-	{
+    if (sendMessageFunction)
+    {
         ActionMessage bye (CMD_DISCONNECT);
         bye.source_id = source_id;
         std::set<global_federate_id_t> connections (dependents.begin (), dependents.end ());
         for (auto dep : dependencies)
         {
-			if (dep.Tnext < Time::maxVal())
-			{
+            if (dep.Tnext < Time::maxVal ())
+            {
                 connections.insert (dep.fedID);
-			}
-            
+            }
         }
-		for (auto fed : connections)
-		{
+        for (auto fed : connections)
+        {
             bye.dest_id = fed;
-			if (fed == source_id)
-			{
+            if (fed == source_id)
+            {
                 processTimeMessage (bye);
-			}
-			else
-			{
+            }
+            else
+            {
                 sendMessageFunction (bye);
-			}
-           
-		}
-	}
-    
+            }
+        }
+    }
 }
 
 static inline bool isBroker (global_federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
@@ -91,7 +89,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
             }
             else if (dep.Tdemin == minminDe)
             {
-                minFed = global_federate_id_t();
+                minFed = global_federate_id_t ();
             }
         }
         else
@@ -247,7 +245,7 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
 std::string ForwardingTimeCoordinator::printTimeStatus () const
 {
     return fmt::format (" minDe={} minminDe={}", static_cast<double> (time_minDe),
-            static_cast<double> (time_minminDe));
+                        static_cast<double> (time_minminDe));
 }
 
 bool ForwardingTimeCoordinator::isDependency (global_federate_id_t ofed) const
@@ -434,10 +432,10 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-	if (cmd.action() == CMD_DISCONNECT)
-	{
-        removeDependent (global_federate_id_t(cmd.source_id));
-	}
+    if (cmd.action () == CMD_DISCONNECT)
+    {
+        removeDependent (global_federate_id_t (cmd.source_id));
+    }
     return dependencies.updateTime (cmd);
 }
 
@@ -446,24 +444,24 @@ void ForwardingTimeCoordinator::processDependencyUpdateMessage (const ActionMess
     switch (cmd.action ())
     {
     case CMD_ADD_DEPENDENCY:
-        addDependency (global_federate_id_t(cmd.source_id));
+        addDependency (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENCY:
-        removeDependency (global_federate_id_t(cmd.source_id));
+        removeDependency (global_federate_id_t (cmd.source_id));
         break;
     case CMD_ADD_DEPENDENT:
-        addDependent (global_federate_id_t(cmd.source_id));
+        addDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENT:
-        removeDependent (global_federate_id_t(cmd.source_id));
+        removeDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_ADD_INTERDEPENDENCY:
-        addDependency (global_federate_id_t(cmd.source_id));
-        addDependent (global_federate_id_t(cmd.source_id));
+        addDependency (global_federate_id_t (cmd.source_id));
+        addDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_INTERDEPENDENCY:
-        removeDependency (global_federate_id_t(cmd.source_id));
-        removeDependent (global_federate_id_t(cmd.source_id));
+        removeDependency (global_federate_id_t (cmd.source_id));
+        removeDependent (global_federate_id_t (cmd.source_id));
         break;
     default:
         break;

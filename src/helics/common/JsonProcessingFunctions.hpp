@@ -43,6 +43,11 @@ inline double jsonGetOrDefault (const Json_helics::Value &element, const std::st
     return (element.isMember (key)) ? element[key].asDouble () : defVal;
 }
 
+inline bool jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, bool defVal)
+{
+    return (element.isMember (key)) ? element[key].asBool () : defVal;
+}
+
 inline int64_t jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, int64_t defVal)
 {
     return (element.isMember (key)) ? element[key].asInt64 () : defVal;

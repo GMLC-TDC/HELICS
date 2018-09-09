@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 
+#include "helics/core/flagOperations.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include <cstdio>
 
@@ -184,7 +185,7 @@ BOOST_AUTO_TEST_CASE (assignment_test)
 
     cmd.Te = helics::Time::maxVal ();
     cmd.Tdemin = helics::Time::minVal ();
-    cmd.setStringData ("target", "source", "original_source","original_dest");
+    cmd.setStringData ("target", "source", "original_source", "original_dest");
 
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
@@ -202,9 +203,9 @@ BOOST_AUTO_TEST_CASE (assignment_test)
 
     BOOST_CHECK_EQUAL (cmd_assign.Te, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_assign.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.getString(sourceStringLoc), "source");
-    BOOST_CHECK_EQUAL (cmd_assign.getString(targetStringLoc), "target");
-    BOOST_CHECK_EQUAL (cmd_assign.getString(origSourceStringLoc), "original_source");
+    BOOST_CHECK_EQUAL (cmd_assign.getString (sourceStringLoc), "source");
+    BOOST_CHECK_EQUAL (cmd_assign.getString (targetStringLoc), "target");
+    BOOST_CHECK_EQUAL (cmd_assign.getString (origSourceStringLoc), "original_source");
     BOOST_CHECK_EQUAL (cmd_assign.getString (origDestStringLoc), "original_dest");
 }
 
@@ -292,18 +293,18 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
     auto msg = helics::createMessageFromCommand (cmd);
 
     BOOST_CHECK_EQUAL (cmd.actionTime, msg->time);
-    BOOST_CHECK_EQUAL (cmd.getString(sourceStringLoc), msg->source);
-    BOOST_CHECK_EQUAL (cmd.getString(origSourceStringLoc), msg->original_source);
-    BOOST_CHECK_EQUAL (cmd.getString(targetStringLoc), msg->dest);
+    BOOST_CHECK_EQUAL (cmd.getString (sourceStringLoc), msg->source);
+    BOOST_CHECK_EQUAL (cmd.getString (origSourceStringLoc), msg->original_source);
+    BOOST_CHECK_EQUAL (cmd.getString (targetStringLoc), msg->dest);
     BOOST_CHECK_EQUAL (cmd.payload, msg->data.to_string ());
 
     ActionMessage cmd2;
     cmd2.moveInfo (std::move (msg));
     BOOST_CHECK (cmd.action () == CMD_SEND_MESSAGE);
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.getString(0),cmd2.getString(0));
-	BOOST_CHECK_EQUAL(cmd.getString(1), cmd2.getString(1));
-	BOOST_CHECK_EQUAL(cmd.getString(2), cmd2.getString(2));
+    BOOST_CHECK_EQUAL (cmd.getString (0), cmd2.getString (0));
+    BOOST_CHECK_EQUAL (cmd.getString (1), cmd2.getString (1));
+    BOOST_CHECK_EQUAL (cmd.getString (2), cmd2.getString (2));
     BOOST_CHECK_EQUAL (cmd.payload, cmd.payload);
 }
 
@@ -364,7 +365,7 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
     BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
     BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
-    BOOST_CHECK (cmd.getStringData()==cmd2.getStringData());
+    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

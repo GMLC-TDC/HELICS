@@ -48,6 +48,10 @@ class Filter
     /** construct through a core object*/
     explicit Filter (Core *cr, const std::string &name = EMPTY_STRING);
 
+    /** generate filter through its index*/
+    Filter (Federate *fed, int filtInd);
+    /** generate filter through its index*/
+    Filter (Core *cr, int filtInd);
     /** virtual destructor*/
     virtual ~Filter () = default;
 
@@ -89,9 +93,6 @@ class Filter
     friend void addOperations (Filter *filt, defined_filter_types type, Core *cptr);
 };
 
-
-
-
 /** class used to clone message for delivery to other endpoints*/
 class CloningFilter : public Filter
 {
@@ -104,6 +105,11 @@ class CloningFilter : public Filter
     /** construct from a Federate
      */
     explicit CloningFilter (Federate *fed, const std::string &name = EMPTY_STRING);
+
+    /** generate a cloningfilter through its index*/
+    CloningFilter (Federate *fed, int filtInd) : Filter (fed, filtInd) {}
+    /** generate cloning filter through its index*/
+    CloningFilter (Core *cr, int filtInd) : Filter (cr, filtInd) {}
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
@@ -125,10 +131,8 @@ filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_filter (defined_filter_types type,
-                                                            Federate *fed,
-                                                            const std::string &name = EMPTY_STRING);
-
+std::unique_ptr<Filter>
+make_filter (defined_filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
@@ -137,9 +141,7 @@ std::unique_ptr<Filter> make_filter (defined_filter_types type,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_filter (defined_filter_types type,
-                                                  Core *cr,
-                                                  const std::string &name = EMPTY_STRING);
+std::unique_ptr<Filter> make_filter (defined_filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -150,9 +152,9 @@ filter
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
 std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
-                                     Federate *fed,
-                                     const std::string &delivery,
-                                     const std::string &name = EMPTY_STRING);
+                                                    Federate *fed,
+                                                    const std::string &delivery,
+                                                    const std::string &name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
@@ -161,6 +163,9 @@ std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type, Core *cr, const std::string &delivery, const std::string &name = EMPTY_STRING);
+std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
+                                                    Core *cr,
+                                                    const std::string &delivery,
+                                                    const std::string &name = EMPTY_STRING);
 
 }  // namespace helics

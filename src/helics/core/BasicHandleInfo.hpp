@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "Core.hpp"
-#include "ActionMessageDefintions.hpp"
+#include "flagOperations.hpp"
 
 namespace helics
 {

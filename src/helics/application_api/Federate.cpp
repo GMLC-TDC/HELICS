@@ -462,6 +462,10 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             Time oldTime = currentTime;
             currentTime = newTime;
             updateTime (newTime, oldTime);
+            if (newTime == Time::maxVal ())
+            {
+                state = op_states::finalize;
+            }
             return newTime;
         }
         catch (const FunctionExecutionFailure &fee)
@@ -469,6 +473,10 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             state = op_states::error;
             throw;
         }
+    }
+    else if (state == op_states::finalize)
+    {
+        return Time::maxVal ();
     }
     else
     {
@@ -502,11 +510,14 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         }
         return iterativeTime;
     }
-	else if (state == op_states::finalize)
-	{
+    else if (state == op_states::finalize)
+    {
         return iteration_time (Time::maxVal (), iteration_result::halted);
-	}
-    else { throw (InvalidFunctionCall ("cannot call request time in present state")); }
+    }
+    else
+    {
+        throw (InvalidFunctionCall ("cannot call request time in present state"));
+    }
 }
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
@@ -642,75 +653,97 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
         for (const auto &filt : doc["filters"])
         {
             std::string key = jsonGetOrDefault (filt, "name", std::string ());
-            std::string target = jsonGetOrDefault (filt, "target", std::string ());
             std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
-            bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
-            std::string mode = jsonGetOrDefault (filt, "mode", "source");
+            bool cloningflag = jsonGetOrDefault (filt, "cloning", false);
+          bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation ("custom");
-            if (filt.isMember ("operation"))
-            {
-                operation = filt["operation"].asString ();
-                if ((mode == "clone") || (mode == "cloning"))
-                {
-                    if (operation != "clone")
-                    {
-                        std::cerr << "the only valid operation with cloning filter is \"clone\"\n";
-                        continue;
-                    }
-                }
-            }
+            std::string operation = jsonGetOrDefault (filt, "custom", std::string ());
+
             if ((useTypes) && (operation != "custom"))
             {
                 std::cerr << "input and output types may only be specified for custom filters\n";
                 continue;
             }
+            std::shared_ptr<Filter> filter;
             if (useTypes)
             {
-                if (mode == "source")
-                {
-                    //   registerSourceFilter (name, target, inputType, outputType);
-                }
-                else if ((mode == "dest") || (mode == "destination"))
-                {
-                    //  registerDestinationFilter (name, target, inputType, outputType);
-                }
-                else
-                {
-                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
-                }
+				if (cloningflag)
+				{
+                    auto fid = registerCloningFilter (name, inputType, outputType);
+                    filter = std::make_shared<CloningFilter> (this, fid.value());
+				}
+				else
+				{
+                    auto fid = registerFilter (name, inputType, outputType);
+                    filter = std::make_shared<Filter> (this, fid.value());
+				}
+               
             }
             else
             {
-                std::shared_ptr<Filter> filter;
                 auto type = filterTypeFromString (operation);
                 if (type == defined_filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
-
-                if (mode == "source")
+                if (cloningflag)
                 {
-                    filter = make_filter (type, this, name);
-                    filter->addSourceTarget (target);
-                }
-                else if ((mode == "dest") || (mode == "destination"))
-                {
-                    filter = make_filter (type, this, name);
-                    filter->addDestinationTarget (target);
-                }
-                else if ((mode == "clone") || (mode == "cloning"))
-                {
-                    auto clonefilt = std::make_shared<CloningFilter> (this, key);
-                    clonefilt->addDeliveryEndpoint (target);
-                    filter = std::move (clonefilt);
-                }
+                    filter = make_cloning_filter (type, this, name);
+				}
                 else
                 {
-                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+					filter = make_filter (type, this, name);
                 }
+
+				if (filt.isMember("targets"))
+				{
+                    auto targets = filt["targets"];
+					if (targets.isArray())
+					{
+                        for (const auto &target : targets)
+                        {
+                            filter->addSourceTarget (target.asString());
+						}
+					}
+					else
+					{
+                        filter->addSourceTarget (targets.asString ());
+					}
+				}
+
+				if (filt.isMember("sourcetargets"))
+				{
+                    auto targets = filt["targets"];
+                    if (targets.isArray ())
+                    {
+                        for (const auto &target : targets)
+                        {
+                            filter->addSourceTarget (target.asString ());
+                        }
+                    }
+                    else
+                    {
+                        filter->addSourceTarget (targets.asString ());
+                    }
+				}
+
+				if (filt.isMember("desttargets"))
+				{
+                    auto targets = filt["targets"];
+                    if (targets.isArray ())
+                    {
+                        for (const auto &target : targets)
+                        {
+                            filter->addDestinationTarget (target.asString ());
+                        }
+                    }
+                    else
+                    {
+                        filter->addDestinationTarget (targets.asString ());
+                    }
+				}
 
                 if (filt.isMember ("properties"))
                 {
@@ -776,76 +809,97 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         for (const auto &filt : filtArray)
         {
             std::string key = tomlGetOrDefault (filt, "name", std::string ());
-            std::string target = tomlGetOrDefault (filt, "target", std::string ());
+            bool cloningflag = tomlGetOrDefault (filt, "cloning", false);
             std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string mode = tomlGetOrDefault (filt, "mode", std::string ("source"));
+            std::string operation = tomlGetOrDefault (filt, "custom", std::string ());
 
-            std::string operation ("custom");
-            auto op = filt.find ("operation");
-            if (op != nullptr)
-            {
-                operation = op->as<std::string> ();
-                if ((mode == "clone") || (mode == "cloning"))
-                {
-                    if (operation != "clone")
-                    {
-                        std::cerr << "the only valid operation with cloning filter is \"clone\"\n";
-                        continue;
-                    }
-                }
-            }
             if ((useTypes) && (operation != "custom"))
             {
                 std::cerr << "input and output types may only be specified for custom filters\n";
                 continue;
             }
+            std::shared_ptr<Filter> filter;
             if (useTypes)
             {
-                if (mode == "source")
+                if (cloningflag)
                 {
-                    // registerSourceFilter (name, target, inputType, outputType);
-                }
-                else if ((mode == "dest") || (mode == "destination"))
-                {
-                    //  registerDestinationFilter (name, target, inputType, outputType);
+                    auto fid = registerCloningFilter (name, inputType, outputType);
+                    filter = std::make_shared<CloningFilter> (this, fid.value());
                 }
                 else
                 {
-                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                    auto fid = registerFilter (name, inputType, outputType);
+                    filter = std::make_shared<Filter> (this, fid.value());
                 }
             }
             else
             {
-                std::shared_ptr<Filter> filter;
                 auto type = filterTypeFromString (operation);
                 if (type == defined_filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
-                if (mode == "source")
+                if (cloningflag)
                 {
-                    filter = make_filter (type, this, name);
-                    filter->addSourceTarget (target);
-                }
-                else if ((mode == "dest") || (mode == "destination"))
-                {
-                    filter = make_filter (type, this, name);
-                    filter->addDestinationTarget (target);
-                }
-                else if ((mode == "clone") || (mode == "cloning"))
-                {
-                    // TODO:: do something with the name
-                    auto clonefilt = std::make_shared<CloningFilter> (this);
-                    clonefilt->addDeliveryEndpoint (target);
-                    filter = std::move (clonefilt);
+                    filter = make_cloning_filter (type, this, name);
                 }
                 else
                 {
-                    std::cerr << "filter mode " << mode << " is unrecognized no filter created\n";
+                    filter = make_filter (type, this, name);
+                }
+
+                auto targets = filt.find ("targets");
+                if (targets != nullptr)
+                {
+                    if (targets->is<toml::Array> ())
+                    {
+                        auto &targetArray = targets->as<toml::Array> ();
+                        for (const auto &target : targetArray)
+                        {
+                            filter->addSourceTarget (target.as<std::string> ());
+                        }
+                    }
+                    else
+                    {
+                        filter->addSourceTarget (targets->as<std::string> ());
+                    }
+                }
+
+                targets = filt.find ("sourcetargets");
+                if (targets != nullptr)
+                {
+                    if (targets->is<toml::Array> ())
+                    {
+                        auto &targetArray = targets->as<toml::Array> ();
+                        for (const auto &target : targetArray)
+                        {
+                            filter->addSourceTarget (target.as<std::string> ());
+                        }
+                    }
+                    else
+                    {
+                        filter->addSourceTarget (targets->as<std::string> ());
+                    }
+                }
+                targets = filt.find ("desttargets");
+                if (targets != nullptr)
+                {
+                    if (targets->is<toml::Array> ())
+                    {
+                        auto &targetArray = targets->as<toml::Array> ();
+                        for (const auto &target : targetArray)
+                        {
+                            filter->addDestinationTarget (target.as<std::string>());
+                        }
+                    }
+                    else
+                    {
+                        filter->addDestinationTarget (targets->as<std::string> ());
+                    }
                 }
                 auto props = filt.find ("properties");
                 if (props != nullptr)

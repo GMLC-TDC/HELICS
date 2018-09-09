@@ -20,6 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/fmt_format.h"
 #include <random>
 #include <boost/program_options.hpp>
+#include "flagOperations.hpp"
 
 
 

@@ -222,39 +222,9 @@ class ActionMessage
     friend std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd);
 };
 
-/** template function to set a flag in an object containing a flags field*/
-template <class FlagContainer, class FlagIndex>
-inline void setActionFlag (FlagContainer &M, FlagIndex flag)
-{
-    M.flags |= (static_cast<decltype (M.flags)> (1) << (flag));
-}
-
-/** template function to check a flag in an object containing a flags field*/
-template <class FlagContainer, class FlagIndex>
-inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
-{
-    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0);
-}
-
-/** template function to clear a flag in an object containing a flags field*/
-template <class FlagContainer, class FlagIndex>
-inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
-{
-    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
-}
-
 inline bool operator< (const ActionMessage &cmd, const ActionMessage &cmd2)
 {
     return (cmd.actionTime < cmd2.actionTime);
-}
-
-inline constexpr uint16_t make_flags (int flag) { return static_cast<uint16_t> (1) << (flag); }
-
-inline constexpr uint16_t make_flags (int flag1, int flag2) { return make_flags (flag1) | make_flags (flag2); }
-
-inline constexpr uint16_t make_flags (int flag1, int flag2, int flag3)
-{
-    return make_flags (flag1, flag2) | make_flags (flag3);
 }
 
 /** create a new message object that copies all the information from the ActionMessage into newly allocated memory

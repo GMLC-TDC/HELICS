@@ -4,10 +4,11 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "TimeCoordinator.hpp"
-#include "../flag-definitions.h"
-#include <algorithm>
 #include "../common/fmt_format.h"
+#include "../flag-definitions.h"
+#include "TimeCoordinator.hpp"
+#include "flagOperations.hpp"
+#include <algorithm>
 #include <set>
 
 namespace helics
@@ -16,7 +17,7 @@ static auto nullMessageFunction = [](const ActionMessage &) {};
 TimeCoordinator::TimeCoordinator () : sendMessageFunction (nullMessageFunction) {}
 
 TimeCoordinator::TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_)
-    :  sendMessageFunction (std::move (sendMessageFunction_))
+    : sendMessageFunction (std::move (sendMessageFunction_))
 {
     if (!sendMessageFunction)
     {
@@ -67,15 +68,14 @@ void TimeCoordinator::disconnect ()
         for (auto fed : connections)
         {
             bye.dest_id = fed;
-			if (fed == source_id)
-			{
+            if (fed == source_id)
+            {
                 processTimeMessage (bye);
-			}
-			else
-			{
+            }
+            else
+            {
                 sendMessageFunction (bye);
-			}
-           
+            }
         }
     }
 }
@@ -104,7 +104,7 @@ void TimeCoordinator::timeRequest (Time nextTime,
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
-    dependencies.resetDependentEvents(time_granted);
+    dependencies.resetDependentEvents (time_granted);
     updateTimeFactors ();
 
     if (!dependents.empty ())
@@ -351,12 +351,12 @@ bool TimeCoordinator::updateTimeFactors ()
 message_processing_result TimeCoordinator::checkTimeGrant ()
 {
     bool update = updateTimeFactors ();
-    if (time_exec == Time::maxVal())
+    if (time_exec == Time::maxVal ())
     {
-        if (time_allow == Time::maxVal())
+        if (time_allow == Time::maxVal ())
         {
-            time_granted = Time::maxVal();
-            time_grantBase = Time::maxVal();
+            time_granted = Time::maxVal ();
+            time_grantBase = Time::maxVal ();
             disconnect ();
             return message_processing_result::halted;
         }
@@ -453,18 +453,18 @@ void TimeCoordinator::updateTimeGrant ()
 std::string TimeCoordinator::printTimeStatus () const
 {
     return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={}",
-            static_cast<double> (time_exec), static_cast<double> (time_allow), static_cast<double> (time_value),
-            static_cast<double> (time_message), static_cast<double> (time_minDe),
-            static_cast<double> (time_minminDe));
+                        static_cast<double> (time_exec), static_cast<double> (time_allow),
+                        static_cast<double> (time_value), static_cast<double> (time_message),
+                        static_cast<double> (time_minDe), static_cast<double> (time_minminDe));
 }
 
 bool TimeCoordinator::isDependency (global_federate_id_t ofed) const { return dependencies.isDependency (ofed); }
 
-bool TimeCoordinator::addDependency (global_federate_id_t fedID) 
+bool TimeCoordinator::addDependency (global_federate_id_t fedID)
 {
-    if (dependencies.addDependency(fedID))
+    if (dependencies.addDependency (fedID))
     {
-        dependency_federates.lock()->push_back(fedID);
+        dependency_federates.lock ()->push_back (fedID);
         return true;
     }
     return false;
@@ -475,14 +475,14 @@ bool TimeCoordinator::addDependent (global_federate_id_t fedID)
     if (dependents.empty ())
     {
         dependents.push_back (fedID);
-        dependent_federates.lock()->push_back(fedID);
+        dependent_federates.lock ()->push_back (fedID);
         return true;
     }
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep == dependents.end ())
     {
         dependents.push_back (fedID);
-        dependent_federates.lock()->push_back(fedID);
+        dependent_federates.lock ()->push_back (fedID);
     }
     else
     {
@@ -491,20 +491,20 @@ bool TimeCoordinator::addDependent (global_federate_id_t fedID)
             return false;
         }
         dependents.insert (dep, fedID);
-        dependent_federates.lock()->push_back(fedID);
+        dependent_federates.lock ()->push_back (fedID);
     }
     return true;
 }
 
-void TimeCoordinator::removeDependency (global_federate_id_t fedID) 
-{ 
+void TimeCoordinator::removeDependency (global_federate_id_t fedID)
+{
     dependencies.removeDependency (fedID);
-    //remove the thread safe version
-    auto dlock=dependency_federates.lock();
-    auto res = std::find(dlock.begin(), dlock.end(), fedID);
-    if (res != dlock.end())
+    // remove the thread safe version
+    auto dlock = dependency_federates.lock ();
+    auto res = std::find (dlock.begin (), dlock.end (), fedID);
+    if (res != dlock.end ())
     {
-        dlock->erase(res);
+        dlock->erase (res);
     }
 }
 
@@ -516,14 +516,14 @@ void TimeCoordinator::removeDependent (global_federate_id_t fedID)
         if (*dep == fedID)
         {
             dependents.erase (dep);
-            //remove the thread safe version
-            auto dlock = dependent_federates.lock();
-            auto res = std::find(dlock.begin(), dlock.end(), fedID);
-            if (res != dlock.end())
+            // remove the thread safe version
+            auto dlock = dependent_federates.lock ();
+            auto res = std::find (dlock.begin (), dlock.end (), fedID);
+            if (res != dlock.end ())
             {
-                dlock->erase(res);
+                dlock->erase (res);
+            }
         }
-    }
     }
 }
 
@@ -534,7 +534,7 @@ DependencyInfo *TimeCoordinator::getDependencyInfo (global_federate_id_t ofed)
 
 std::vector<global_federate_id_t> TimeCoordinator::getDependencies () const
 {
-   return *dependency_federates.lock_shared();
+    return *dependency_federates.lock_shared ();
 }
 
 void TimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
@@ -613,8 +613,8 @@ static bool isDelayableMessage (const ActionMessage &cmd, global_federate_id_t l
 
 message_process_result TimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-	switch (cmd.action())
-	{
+    switch (cmd.action ())
+    {
     case CMD_TIME_BLOCK:
     case CMD_TIME_UNBLOCK:
         return processTimeBlockMessage (cmd);
@@ -624,23 +624,23 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
             time_granted = cmd.actionTime;
             time_grantBase = time_granted;
 
-            ActionMessage treq(CMD_TIME_GRANT);
+            ActionMessage treq (CMD_TIME_GRANT);
             treq.source_id = source_id;
             treq.actionTime = time_granted;
-            transmitTimingMessage(treq);
+            transmitTimingMessage (treq);
             return message_process_result::processed;
         }
         return message_process_result::no_effect;
     case CMD_DISCONNECT:
-		//this command requires removing dependents as well as dealing with dependency processing
-        removeDependent (global_federate_id_t(cmd.source_id));
+        // this command requires removing dependents as well as dealing with dependency processing
+        removeDependent (global_federate_id_t (cmd.source_id));
         break;
     default:
         break;
-	}
+    }
     if (isDelayableMessage (cmd, source_id))
     {
-        auto dep = dependencies.getDependencyInfo (global_federate_id_t(cmd.source_id));
+        auto dep = dependencies.getDependencyInfo (global_federate_id_t (cmd.source_id));
         if (dep == nullptr)
         {
             return message_process_result::no_effect;
@@ -732,24 +732,24 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
     switch (cmd.action ())
     {
     case CMD_ADD_DEPENDENCY:
-        addDependency (global_federate_id_t(cmd.source_id));
+        addDependency (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENCY:
-        removeDependency (global_federate_id_t(cmd.source_id));
+        removeDependency (global_federate_id_t (cmd.source_id));
         break;
     case CMD_ADD_DEPENDENT:
-        addDependent (global_federate_id_t(cmd.source_id));
+        addDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_DEPENDENT:
-        removeDependent (global_federate_id_t(cmd.source_id));
+        removeDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_ADD_INTERDEPENDENCY:
-        addDependency (global_federate_id_t(cmd.source_id));
-        addDependent (global_federate_id_t(cmd.source_id));
+        addDependency (global_federate_id_t (cmd.source_id));
+        addDependent (global_federate_id_t (cmd.source_id));
         break;
     case CMD_REMOVE_INTERDEPENDENCY:
-        removeDependency (global_federate_id_t(cmd.source_id));
-        removeDependent (global_federate_id_t(cmd.source_id));
+        removeDependency (global_federate_id_t (cmd.source_id));
+        removeDependent (global_federate_id_t (cmd.source_id));
         break;
     default:
         break;
@@ -757,7 +757,7 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 }
 
 /** set a timeProperty for a the coordinator*/
-void TimeCoordinator::setTimeProperty(int timeProperty, Time propertyVal)
+void TimeCoordinator::setTimeProperty (int timeProperty, Time propertyVal)
 {
     switch (timeProperty)
     {
@@ -786,14 +786,14 @@ void TimeCoordinator::setTimeProperty(int timeProperty, Time propertyVal)
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setIntegerProperty (int intProperty, int propertyVal)
 {
-	if (intProperty == MAX_ITERATIONS_PROPERTY)
-	{
+    if (intProperty == MAX_ITERATIONS_PROPERTY)
+    {
         info.maxIterations = propertyVal;
-	}
+    }
 }
 
 /** set an option Flag for a the coordinator*/
-void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
+void TimeCoordinator::setOptionFlag (int optionFlag, bool value)
 {
     switch (optionFlag)
     {
@@ -808,7 +808,7 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
     }
 }
 /** get a time Property*/
-Time TimeCoordinator::getTimeProperty(int timeProperty) const
+Time TimeCoordinator::getTimeProperty (int timeProperty) const
 {
     switch (timeProperty)
     {
@@ -835,13 +835,13 @@ int TimeCoordinator::getIntegerProperty (int intProperty) const
     case MAX_ITERATIONS_PROPERTY:
         return info.maxIterations;
     default:
-		//TODO: make this something consistent
+        // TODO: make this something consistent
         return -972;
     }
 }
 
 /** get an option flag value*/
-bool TimeCoordinator::getOptionFlag(int optionFlag) const
+bool TimeCoordinator::getOptionFlag (int optionFlag) const
 {
     switch (optionFlag)
     {
@@ -852,26 +852,26 @@ bool TimeCoordinator::getOptionFlag(int optionFlag) const
     case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
         return info.wait_for_current_time_updates;
     default:
-        throw(std::invalid_argument("flag not recognized"));
+        throw (std::invalid_argument ("flag not recognized"));
     }
 }
 
 void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
 {
-	switch (cmd.action())
-	{
+    switch (cmd.action ())
+    {
     case CMD_FED_CONFIGURE_TIME:
         setTimeProperty (cmd.messageID, cmd.actionTime);
         break;
     case CMD_FED_CONFIGURE_INT:
         setIntegerProperty (cmd.messageID, cmd.counter);
-		break;
-	case CMD_FED_CONFIGURE_FLAG:
+        break;
+    case CMD_FED_CONFIGURE_FLAG:
         setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
         break;
     default:
         break;
-	}
+    }
 }
 
 }  // namespace helics

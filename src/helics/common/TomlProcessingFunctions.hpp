@@ -16,12 +16,12 @@ using the toml library
 #include <functional>
 
 /** load a Toml string or filename that points to a TOML file and return a
-JSON::Value to the root object
+toml::Value to the root object
 */
 toml::Value loadToml (const std::string &tomlString);
 
 bool hasTomlExtension (const std::string &tomlString);
-/** load a JSON object in a string
+/** load a TOML object in a string
  */
 toml::Value loadTomlStr (const std::string &tomlString);
 

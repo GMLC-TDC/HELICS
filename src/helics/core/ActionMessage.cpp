@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ActionMessage.hpp"
+#include "flagOperations.hpp"
 #include <cereal/archives/portable_binary.hpp>
 #include <complex>
 //#include <cereal/archives/binary.hpp>
@@ -111,7 +112,7 @@ void ActionMessage::setAction (action_message_def::action_t newAction) { message
 static const std::string nullStr;
 const std::string &ActionMessage::getString (int index) const
 {
-    if (isValidIndex(index,stringData))
+    if (isValidIndex (index, stringData))
     {
         return stringData[index];
     }
@@ -122,7 +123,7 @@ void ActionMessage::setString (int index, const std::string &str)
 {
     if (index >= 0)
     {
-        if (index >= static_cast<int>(stringData.size ()))
+        if (index >= static_cast<int> (stringData.size ()))
         {
             stringData.resize (index + 1);
         }

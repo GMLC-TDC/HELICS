@@ -42,10 +42,9 @@
 "filters":[
 {
 	"name":"filtername",  //filters can have names (optional)
-	"target":"ept1",  //this is a key field specifying the target endpoint
+	"source":"ept1", // source target for the filter
 	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
@@ -55,8 +54,8 @@
 },
 {
 	"name":"filtername2",  //filters can have names (optional)
-	"target":"filterFed/ept2",  //this is a key field specifying the target endpoint
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
+	"source":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
+	//"dest":["dest targets"],  // field specifying destination targets
 	"operation":"reroute", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
@@ -75,6 +74,7 @@
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	},
 	{
+	
 		"name":"source",  //source adds a cloning filter for all messages send from a particular endpoint
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	}
