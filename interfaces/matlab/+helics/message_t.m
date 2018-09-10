@@ -11,70 +11,70 @@ classdef message_t < SwigRef
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(15, self);
+        varargout{1} = helicsMEX(16, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(16, self, varargin{1});
+        helicsMEX(17, self, varargin{1});
       end
     end
     function varargout = data(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(17, self);
+        varargout{1} = helicsMEX(18, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(18, self, varargin{1});
+        helicsMEX(19, self, varargin{1});
       end
     end
     function varargout = length(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(19, self);
+        varargout{1} = helicsMEX(20, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(20, self, varargin{1});
+        helicsMEX(21, self, varargin{1});
       end
     end
     function varargout = original_source(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(21, self);
+        varargout{1} = helicsMEX(22, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(22, self, varargin{1});
+        helicsMEX(23, self, varargin{1});
       end
     end
     function varargout = source(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(23, self);
+        varargout{1} = helicsMEX(24, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(24, self, varargin{1});
+        helicsMEX(25, self, varargin{1});
       end
     end
     function varargout = dest(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(25, self);
+        varargout{1} = helicsMEX(26, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(26, self, varargin{1});
+        helicsMEX(27, self, varargin{1});
       end
     end
     function varargout = original_dest(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(27, self);
+        varargout{1} = helicsMEX(28, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(28, self, varargin{1});
+        helicsMEX(29, self, varargin{1});
       end
     end
     function self = message_t(varargin)
@@ -83,14 +83,14 @@ classdef message_t < SwigRef
           self.swigPtr = varargin{1}.swigPtr;
         end
       else
-        tmp = helicsMEX(29, varargin{:});
+        tmp = helicsMEX(30, varargin{:});
         self.swigPtr = tmp.swigPtr;
         tmp.swigPtr = [];
       end
     end
     function delete(self)
       if self.swigPtr
-        helicsMEX(30, self);
+        helicsMEX(31, self);
         self.swigPtr=[];
       end
     end

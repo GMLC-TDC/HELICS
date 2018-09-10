@@ -36,7 +36,7 @@ else()
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/swig/helics.i ${CMAKE_SOURCE_DIR}/swig/octave/helicsOctave.i
+      ${CMAKE_SOURCE_DIR}/interfaces/helics.i ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
       ${SHARED_LIB_HEADERS}
   )
 

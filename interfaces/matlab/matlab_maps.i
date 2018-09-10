@@ -1,5 +1,6 @@
 
 %{
+#include "api-data.h"
 /* throw a helics error */
 static void throwHelicsMatlabError(helics_error *err) {
   switch (err->error_code)
@@ -7,36 +8,36 @@ static void throwHelicsMatlabError(helics_error *err) {
   case helics_ok:
 	return;
   case helics_registration_failure:
-	mexErrMsgIdAndTxt( "helics:registration_failure", err->error_msg);
+	mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
 	break;
   case   helics_connection_failure:
-  mexErrMsgIdAndTxt( "helics:connection_failure", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
 	break;
   case   helics_invalid_object:
-  mexErrMsgIdAndTxt( "helics:invalid_object", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
 	break;
   case   helics_invalid_argument:
-  mexErrMsgIdAndTxt( "helics:invalid_argument", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
 	break;
   case   helics_discard:
-  mexErrMsgIdAndTxt( "helics:discard", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:discard", err->message);
 	break;
-  case   helics_terminated:
-  mexErrMsgIdAndTxt( "helics:terminated", err->error_msg);
+  case helics_system_failure:
+	mexErrMsgIdAndTxt( "helics:system_failure", err->message);
 	break;
   case   helics_invalid_state_transition:
-  mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
 	break;
   case   helics_invalid_function_call:
-  mexErrMsgIdAndTxt( "helics:invalid_function_call", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
 	break;
   case   helics_execution_failure:
-  mexErrMsgIdAndTxt( "helics:execution_failure", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
 	break;
   case   helics_other_error:
   case   other_error_type:
   default:
-  mexErrMsgIdAndTxt( "helics:error", err->error_msg);
+  mexErrMsgIdAndTxt( "helics:error", err->message);
 	break;
   }
 }
@@ -62,11 +63,11 @@ static void throwHelicsMatlabError(helics_error *err) {
 	$1=&etemp;
 }
 
-%typemap(argout) helics_error *
+%typemap(freearg) helics_error *
 {
-	if (etemp.error_code!=helics_ok)
+	if ($1->error_code!=helics_ok)
 	{
-		throwHelicsMatlabError(&etemp);
+		throwHelicsMatlabError($1);
 	}
 }
 
@@ -85,10 +86,44 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
+	
   if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
 }
 
+%typemap(in, numinputs=0)(double *real, double *imag)(double vals[2])
+{
+	$1=&(vals[0]);
+	$2=&(vals[1]);
+}
 
+%typemap(argout)(double *real, double *imag)
+{
+	mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
+	mxSetPr(out,$1);
+	mxSetPi(out,$2);
+	if (--resc>=0) *resv++ =out;
+}
+
+
+%typemap(in) (double real, double imag)
+{
+	if(mxIsComplex($input))
+	{
+		
+		$1=mxGetPr($input)[0];
+		$2=mxGetPi($input)[0];
+	}  
+    else if (mxIsDouble($input))
+	{
+		$2=0.0;
+		$1=mxGetPr($input)[0];
+	}
+	else
+	{
+		$1=0.0;
+		$2 = 0.0;
+	}
+}
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */

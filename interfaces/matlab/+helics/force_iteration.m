@@ -1,7 +1,7 @@
 function v = force_iteration()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1818783847);
+    vInitialized = helicsMEX(0, 1936535368);
   end
   v = vInitialized;
 end

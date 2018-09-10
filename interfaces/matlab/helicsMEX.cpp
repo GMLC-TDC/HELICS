@@ -1210,17 +1210,18 @@ namespace swig {
 #define SWIGTYPE_p_data_t swig_types[1]
 #define SWIGTYPE_p_double swig_types[2]
 #define SWIGTYPE_p_federate_state swig_types[3]
-#define SWIGTYPE_p_helics_filter_type_t swig_types[4]
-#define SWIGTYPE_p_helics_iteration_request swig_types[5]
-#define SWIGTYPE_p_helics_iteration_status swig_types[6]
-#define SWIGTYPE_p_helics_status swig_types[7]
-#define SWIGTYPE_p_int swig_types[8]
-#define SWIGTYPE_p_int64_t swig_types[9]
-#define SWIGTYPE_p_message_t swig_types[10]
-#define SWIGTYPE_p_p_char swig_types[11]
-#define SWIGTYPE_p_void swig_types[12]
-static swig_type_info *swig_types[14];
-static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
+#define SWIGTYPE_p_helics_error swig_types[4]
+#define SWIGTYPE_p_helics_error_types swig_types[5]
+#define SWIGTYPE_p_helics_filter_type_t swig_types[6]
+#define SWIGTYPE_p_helics_iteration_request swig_types[7]
+#define SWIGTYPE_p_helics_iteration_status swig_types[8]
+#define SWIGTYPE_p_int swig_types[9]
+#define SWIGTYPE_p_int32_t swig_types[10]
+#define SWIGTYPE_p_message_t swig_types[11]
+#define SWIGTYPE_p_p_char swig_types[12]
+#define SWIGTYPE_p_void swig_types[13]
+static swig_type_info *swig_types[15];
+static swig_module_info swig_module = {swig_types, 14, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1236,6 +1237,50 @@ static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
 
 
 #include <stdexcept>
+
+
+#include "api-data.h"
+/* throw a helics error */
+static void throwHelicsMatlabError(helics_error *err) {
+  switch (err->error_code)
+  {
+  case helics_ok:
+	return;
+  case helics_registration_failure:
+	mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
+	break;
+  case   helics_connection_failure:
+  mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
+	break;
+  case   helics_invalid_object:
+  mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
+	break;
+  case   helics_invalid_argument:
+  mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
+	break;
+  case   helics_discard:
+  mexErrMsgIdAndTxt( "helics:discard", err->message);
+	break;
+  case helics_system_failure:
+	mexErrMsgIdAndTxt( "helics:system_failure", err->message);
+	break;
+  case   helics_invalid_state_transition:
+  mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
+	break;
+  case   helics_invalid_function_call:
+  mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
+	break;
+  case   helics_execution_failure:
+  mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
+	break;
+  case   helics_other_error:
+  case   other_error_type:
+  default:
+  mexErrMsgIdAndTxt( "helics:error", err->message);
+	break;
+  }
+}
+
 
 
 #include "api-data.h"
@@ -1481,6 +1526,12 @@ SWIGINTERN int _wrap_helics_time_zero_get(int resc, mxArray *resv[], int argc, m
 
 SWIGINTERN int _wrap_helics_time_epsilon_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   resv[0] = SWIG_From_double(static_cast< double >(helics_time_epsilon));
+  return 0;
+}
+
+
+SWIGINTERN int _wrap_helics_time_invalid_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  resv[0] = SWIG_From_double(static_cast< double >(helics_time_invalid));
   return 0;
 }
 
@@ -2177,6 +2228,7 @@ int _wrap_helicsCreateCore(int resc, mxArray *resv[], int argc, mxArray *argv[])
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -2186,9 +2238,14 @@ int _wrap_helicsCreateCore(int resc, mxArray *resv[], int argc, mxArray *argv[])
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_core result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsCreateCore",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -2207,17 +2264,29 @@ int _wrap_helicsCreateCore(int resc, mxArray *resv[], int argc, mxArray *argv[])
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateCore" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_core)helicsCreateCore((char const *)arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_core)helicsCreateCore((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -2227,15 +2296,21 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char **arg4 = (char **) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_core result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsCreateCoreFromArgs",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -2288,7 +2363,7 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
       return NULL;
     }
   }
-  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
+  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
@@ -2296,12 +2371,24 @@ int _wrap_helicsCreateCoreFromArgs(int resc, mxArray *resv[], int argc, mxArray 
   {
     free((char **) arg4);
   }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
     free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
   }
   return 1;
 }
@@ -2309,10 +2396,16 @@ fail:
 
 int _wrap_helicsCoreClone(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_core result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreClone",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2320,11 +2413,23 @@ int _wrap_helicsCoreClone(int resc, mxArray *resv[], int argc, mxArray *argv[]) 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreClone" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_core)helicsCoreClone(arg1);
+  result = (helics_core)helicsCoreClone(arg1,arg2);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -2333,6 +2438,7 @@ int _wrap_helicsCreateBroker(int resc, mxArray *resv[], int argc, mxArray *argv[
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -2342,9 +2448,14 @@ int _wrap_helicsCreateBroker(int resc, mxArray *resv[], int argc, mxArray *argv[
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_broker result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsCreateBroker",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -2363,17 +2474,29 @@ int _wrap_helicsCreateBroker(int resc, mxArray *resv[], int argc, mxArray *argv[
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateBroker" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_broker)helicsCreateBroker((char const *)arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_broker)helicsCreateBroker((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -2383,15 +2506,21 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char **arg4 = (char **) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_broker result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsCreateBrokerFromArgs",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -2444,7 +2573,7 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
       return NULL;
     }
   }
-  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
+  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
@@ -2452,12 +2581,24 @@ int _wrap_helicsCreateBrokerFromArgs(int resc, mxArray *resv[], int argc, mxArra
   {
     free((char **) arg4);
   }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
     free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
   }
   return 1;
 }
@@ -2465,10 +2606,16 @@ fail:
 
 int _wrap_helicsBrokerClone(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_broker result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsBrokerClone",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2476,11 +2623,23 @@ int _wrap_helicsBrokerClone(int resc, mxArray *resv[], int argc, mxArray *argv[]
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerClone" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_broker)helicsBrokerClone(arg1);
+  result = (helics_broker)helicsBrokerClone(arg1,arg2);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -2489,7 +2648,7 @@ int _wrap_helicsBrokerIsConnected(int resc, mxArray *resv[], int argc, mxArray *
   helics_broker arg1 = (helics_broker) 0 ;
   int res1 ;
   mxArray * _out;
-  int result;
+  helics_bool_t result;
   
   if (!SWIG_check_num_args("helicsBrokerIsConnected",argc,1,1,0)) {
     SWIG_fail;
@@ -2498,7 +2657,7 @@ int _wrap_helicsBrokerIsConnected(int resc, mxArray *resv[], int argc, mxArray *
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerIsConnected" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (int)helicsBrokerIsConnected(arg1);
+  result = (helics_bool_t)helicsBrokerIsConnected(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -2510,12 +2669,18 @@ fail:
 int _wrap_helicsBrokerWaitForDisconnect(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
   int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
+  helics_bool_t result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsBrokerWaitForDisconnect",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -2528,11 +2693,23 @@ int _wrap_helicsBrokerWaitForDisconnect(int resc, mxArray *resv[], int argc, mxA
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsBrokerWaitForDisconnect" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsBrokerWaitForDisconnect(arg1,arg2);
+  result = (helics_bool_t)helicsBrokerWaitForDisconnect(arg1,arg2,arg3);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -2541,7 +2718,7 @@ int _wrap_helicsCoreIsConnected(int resc, mxArray *resv[], int argc, mxArray *ar
   helics_core arg1 = (helics_core) 0 ;
   int res1 ;
   mxArray * _out;
-  int result;
+  helics_bool_t result;
   
   if (!SWIG_check_num_args("helicsCoreIsConnected",argc,1,1,0)) {
     SWIG_fail;
@@ -2550,7 +2727,7 @@ int _wrap_helicsCoreIsConnected(int resc, mxArray *resv[], int argc, mxArray *ar
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreIsConnected" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (int)helicsCoreIsConnected(arg1);
+  result = (helics_bool_t)helicsCoreIsConnected(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -2561,16 +2738,10 @@ fail:
 
 int _wrap_helicsBrokerGetIdentifier(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsBrokerGetIdentifier",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2578,36 +2749,21 @@ int _wrap_helicsBrokerGetIdentifier(int resc, mxArray *resv[], int argc, mxArray
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetIdentifier" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_status)helicsBrokerGetIdentifier(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsBrokerGetIdentifier(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsCoreGetIdentifier(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsCoreGetIdentifier",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2615,36 +2771,21 @@ int _wrap_helicsCoreGetIdentifier(int resc, mxArray *resv[], int argc, mxArray *
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreGetIdentifier" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_status)helicsCoreGetIdentifier(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsCoreGetIdentifier(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsBrokerGetAddress(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsBrokerGetAddress",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2652,30 +2793,26 @@ int _wrap_helicsBrokerGetAddress(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetAddress" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_status)helicsBrokerGetAddress(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsBrokerGetAddress(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsCoreSetReadyToInit(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreSetReadyToInit",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2683,21 +2820,38 @@ int _wrap_helicsCoreSetReadyToInit(int resc, mxArray *resv[], int argc, mxArray 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreSetReadyToInit" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_status)helicsCoreSetReadyToInit(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsCoreSetReadyToInit(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsCoreDisconnect(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreDisconnect",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2705,23 +2859,41 @@ int _wrap_helicsCoreDisconnect(int resc, mxArray *resv[], int argc, mxArray *arg
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDisconnect" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_status)helicsCoreDisconnect(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsCoreDisconnect(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsGetFederateByName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_federate result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsGetFederateByName",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2730,23 +2902,40 @@ int _wrap_helicsGetFederateByName(int resc, mxArray *resv[], int argc, mxArray *
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetFederateByName" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsGetFederateByName((char const *)arg1);
+  result = (helics_federate)helicsGetFederateByName((char const *)arg1,arg2);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsBrokerDisconnect(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsBrokerDisconnect",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -2754,74 +2943,140 @@ int _wrap_helicsBrokerDisconnect(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDisconnect" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_status)helicsBrokerDisconnect(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsBrokerDisconnect(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsDestroyFederate(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   
-  if (!SWIG_check_num_args("helicsDestroyFederate",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyFederate" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDestroy" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  helicsDestroyFederate(arg1);
+  helicsFederateDestroy(arg1,arg2);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsDestroyBroker(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsBrokerDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   
-  if (!SWIG_check_num_args("helicsDestroyBroker",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsBrokerDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyBroker" "', argument " "1"" of type '" "helics_broker""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDestroy" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  helicsDestroyBroker(arg1);
+  helicsBrokerDestroy(arg1,arg2);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsDestroyCore(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsCoreDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   
-  if (!SWIG_check_num_args("helicsDestroyCore",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCoreDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsDestroyCore" "', argument " "1"" of type '" "helics_core""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDestroy" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  helicsDestroyCore(arg1);
+  helicsCoreDestroy(arg1,arg2);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -2869,158 +3124,305 @@ fail:
 
 
 int _wrap_helicsCreateValueFederate(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  mxArray * _out;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateValueFederate",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateValueFederate(arg1);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsCreateValueFederateFromJson(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   char *arg1 = (char *) 0 ;
+  helics_federate_info_t arg2 = (helics_federate_info_t) (helics_federate_info_t)0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateValueFederateFromJson",argc,1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateValueFederate",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederate" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateValueFederateFromJson((char const *)arg1);
+  res2 = SWIG_ConvertPtr(argv[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateValueFederate" "', argument " "2"" of type '" "helics_federate_info_t const""'"); 
+  }
+  result = (helics_federate)helicsCreateValueFederate((char const *)arg1,arg2,arg3);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsCreateValueFederateFromConfig(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  helics_error etemp2 ;
+  mxArray * _out;
+  helics_federate result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateValueFederateFromConfig",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (helics_federate)helicsCreateValueFederateFromConfig((char const *)arg1,arg2);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 0;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsCreateMessageFederate(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  mxArray * _out;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateMessageFederate",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateMessageFederate(arg1);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsCreateMessageFederateFromJson(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   char *arg1 = (char *) 0 ;
+  helics_federate_info_t arg2 = (helics_federate_info_t) (helics_federate_info_t)0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateMessageFederateFromJson",argc,1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateMessageFederate",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederate" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateMessageFederateFromJson((char const *)arg1);
+  res2 = SWIG_ConvertPtr(argv[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateMessageFederate" "', argument " "2"" of type '" "helics_federate_info_t const""'"); 
+  }
+  result = (helics_federate)helicsCreateMessageFederate((char const *)arg1,arg2,arg3);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsCreateMessageFederateFromConfig(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  helics_error etemp2 ;
+  mxArray * _out;
+  helics_federate result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateMessageFederateFromConfig",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (helics_federate)helicsCreateMessageFederateFromConfig((char const *)arg1,arg2);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 0;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsCreateCombinationFederate(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  mxArray * _out;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateCombinationFederate",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateCombinationFederate(arg1);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsCreateCombinationFederateFromJson(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   char *arg1 = (char *) 0 ;
+  helics_federate_info_t arg2 = (helics_federate_info_t) (helics_federate_info_t)0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateCombinationFederateFromJson",argc,1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateCombinationFederate",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederate" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateCombinationFederateFromJson((char const *)arg1);
+  res2 = SWIG_ConvertPtr(argv[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCombinationFederate" "', argument " "2"" of type '" "helics_federate_info_t const""'"); 
+  }
+  result = (helics_federate)helicsCreateCombinationFederate((char const *)arg1,arg2,arg3);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsCreateCombinationFederateFromConfig(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  helics_error etemp2 ;
+  mxArray * _out;
+  helics_federate result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateCombinationFederateFromConfig",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(argv[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (helics_federate)helicsCreateCombinationFederateFromConfig((char const *)arg1,arg2);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 0;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateClone(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_federate result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateClone",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3028,24 +3430,36 @@ int _wrap_helicsFederateClone(int resc, mxArray *resv[], int argc, mxArray *argv
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateClone" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_federate)helicsFederateClone(arg1);
+  result = (helics_federate)helicsFederateClone(arg1,arg2);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateInfoCreate(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsCreateFederateInfo(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   mxArray * _out;
   helics_federate_info_t result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoCreate",argc,0,0,0)) {
+  if (!SWIG_check_num_args("helicsCreateFederateInfo",argc,0,0,0)) {
     SWIG_fail;
   }
   (void)argv;
-  result = (helics_federate_info_t)helicsFederateInfoCreate();
+  result = (helics_federate_info_t)helicsCreateFederateInfo();
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -3058,10 +3472,15 @@ int _wrap_helicsFederateInfoLoadFromArgs(int resc, mxArray *resv[], int argc, mx
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   char **arg3 = (char **) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoLoadFromArgs",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3108,16 +3527,28 @@ int _wrap_helicsFederateInfoLoadFromArgs(int resc, mxArray *resv[], int argc, mx
       return NULL;
     }
   }
-  result = (helics_status)helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
     free((char **) arg3);
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 0;
 fail:
   {
     free((char **) arg3);
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 1;
 }
@@ -3144,49 +3575,21 @@ fail:
 }
 
 
-int _wrap_helicsFederateInfoSetFederateName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  char *arg2 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetFederateName",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFederateName" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetFederateName" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetFederateName(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 1;
-}
-
-
 int _wrap_helicsFederateInfoSetCoreName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreName",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3199,13 +3602,25 @@ int _wrap_helicsFederateInfoSetCoreName(int resc, mxArray *resv[], int argc, mxA
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreName" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreName(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreName(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -3213,13 +3628,18 @@ fail:
 int _wrap_helicsFederateInfoSetCoreInitString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreInitString",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3232,13 +3652,25 @@ int _wrap_helicsFederateInfoSetCoreInitString(int resc, mxArray *resv[], int arg
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -3246,13 +3678,18 @@ fail:
 int _wrap_helicsFederateInfoSetCoreTypeFromString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreTypeFromString",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3265,13 +3702,25 @@ int _wrap_helicsFederateInfoSetCoreTypeFromString(int resc, mxArray *resv[], int
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -3279,12 +3728,17 @@ fail:
 int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreType",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3297,49 +3751,78 @@ int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxA
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetCoreType(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateInfoSetFlag(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateInfoSetFlagOption(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   helics_bool_t arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetFlag",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetFlagOption",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFlag" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetFlag" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "3"" of type '" "helics_bool_t""'");
   } 
   arg3 = static_cast< helics_bool_t >(val3);
-  result = (helics_status)helicsFederateInfoSetFlag(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetFlagOption(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -3347,12 +3830,17 @@ fail:
 int _wrap_helicsFederateInfoSetSeparator(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetSeparator",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3365,231 +3853,148 @@ int _wrap_helicsFederateInfoSetSeparator(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetSeparator" "', argument " "2"" of type '" "char""'");
   } 
   arg2 = static_cast< char >(val2);
-  result = (helics_status)helicsFederateInfoSetSeparator(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetSeparator(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateInfoSetOutputDelay(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetOutputDelay",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetOutputDelay(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateInfoSetTimeDelta(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetTimeDelta",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetTimeDelta(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateInfoSetInputDelay(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetInputDelay",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetInputDelay(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateInfoSetTimeOffset(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetTimeOffset",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetTimeOffset(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateInfoSetPeriod(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetPeriod",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetPeriod" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetPeriod(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateInfoSetMaxIterations(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateInfoSetTimeProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
+  helics_time_t arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetMaxIterations",argc,2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetTimeProperty",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetMaxIterations(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  ecode3 = SWIG_AsVal_double(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "3"" of type '" "helics_time_t""'");
+  } 
+  arg3 = static_cast< helics_time_t >(val3);
+  helicsFederateInfoSetTimeProperty(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateInfoSetLoggingLevel(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateInfoSetIntegerProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetLoggingLevel",argc,2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetIntegerProperty",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetLoggingLevel(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  helicsFederateInfoSetIntegerProperty(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateFinalize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateFinalize",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3597,11 +4002,23 @@ int _wrap_helicsFederateFinalize(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateFinalize(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateFinalize(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -3643,56 +4060,96 @@ fail:
 }
 
 
-int _wrap_helicsFederateEnterInitializationMode(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterInitializingMode(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationMode",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingMode",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationMode(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingMode(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterInitializationModeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterInitializingModeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationModeAsync",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingModeAsync",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationModeAsync(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingModeAsync(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateIsAsyncOperationCompleted(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_bool_t result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateIsAsyncOperationCompleted",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3700,215 +4157,330 @@ int _wrap_helicsFederateIsAsyncOperationCompleted(int resc, mxArray *resv[], int
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateIsAsyncOperationCompleted" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_bool_t)helicsFederateIsAsyncOperationCompleted(arg1);
+  result = (helics_bool_t)helicsFederateIsAsyncOperationCompleted(arg1,arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterInitializationModeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterInitializingModeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationModeComplete",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingModeComplete",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationModeComplete(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingModeComplete(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionMode(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingMode(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionMode",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingMode",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionMode(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingMode(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionModeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingModeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeAsync",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeAsync",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeAsync(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeAsync(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionModeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingModeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeComplete",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeComplete",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeComplete(arg1);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeComplete(arg1,arg2);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionModeIterative(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingModeIterative(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_iteration_request arg2 ;
-  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helics_iteration_status temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
+  helics_iteration_status result;
   
-  arg3 = &temp3;
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterative",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterative",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "2"" of type '" "helics_iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutingModeIterative" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
   arg2 = static_cast< helics_iteration_request >(val2);
-  result = (helics_status)helicsFederateEnterExecutionModeIterative(arg1,arg2,arg3);
+  result = (helics_iteration_status)helicsFederateEnterExecutingModeIterative(arg1,arg2,arg3);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res3)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg3));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_helics_iteration_status, new_flags);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionModeIterativeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingModeIterativeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_iteration_request arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterativeAsync",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterativeAsync",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "2"" of type '" "helics_iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutingModeIterativeAsync" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
   arg2 = static_cast< helics_iteration_request >(val2);
-  result = (helics_status)helicsFederateEnterExecutionModeIterativeAsync(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeIterativeAsync(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateEnterExecutionModeIterativeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateEnterExecutingModeIterativeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_iteration_status *arg2 = (helics_iteration_status *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_iteration_status temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  helics_iteration_status result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterativeComplete",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterativeComplete",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeIterativeComplete(arg1,arg2);
+  result = (helics_iteration_status)helicsFederateEnterExecutingModeIterativeComplete(arg1,arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_helics_iteration_status, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateGetState(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  federate_state *arg2 = (federate_state *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  federate_state temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  federate_state result;
   
-  arg2 = &temp2;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetState",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3916,27 +4488,39 @@ int _wrap_helicsFederateGetState(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetState" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateGetState(arg1,arg2);
+  result = (federate_state)helicsFederateGetState(arg1,arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_federate_state, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateGetCoreObject(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   helics_core result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetCoreObject",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3944,11 +4528,23 @@ int _wrap_helicsFederateGetCoreObject(int resc, mxArray *resv[], int argc, mxArr
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCoreObject" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_core)helicsFederateGetCoreObject(arg1);
+  result = (helics_core)helicsFederateGetCoreObject(arg1,arg2);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -3956,16 +4552,18 @@ fail:
 int _wrap_helicsFederateRequestTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
-  helics_time_t *arg3 = (helics_time_t *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helics_time_t temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
-  arg3 = &temp3;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTime",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -3978,17 +4576,23 @@ int _wrap_helicsFederateRequestTime(int resc, mxArray *resv[], int argc, mxArray
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTime" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateRequestTime(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time_t)helicsFederateRequestTime(arg1,arg2,arg3);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res3)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg3));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -3997,22 +4601,24 @@ int _wrap_helicsFederateRequestTimeIterative(int resc, mxArray *resv[], int argc
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
   helics_iteration_request arg3 ;
-  helics_time_t *arg4 = (helics_time_t *) 0 ;
-  helics_iteration_status *arg5 = (helics_iteration_status *) 0 ;
+  helics_iteration_status *arg4 = (helics_iteration_status *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helics_time_t temp4 ;
+  helics_iteration_status temp4 ;
   int res4 = SWIG_TMPOBJ ;
-  helics_iteration_status temp5 ;
-  int res5 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
   arg4 = &temp4;
-  arg5 = &temp5;
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterative",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -4030,23 +4636,29 @@ int _wrap_helicsFederateRequestTimeIterative(int resc, mxArray *resv[], int argc
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterative" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
   arg3 = static_cast< helics_iteration_request >(val3);
-  result = (helics_status)helicsFederateRequestTimeIterative(arg1,arg2,arg3,arg4,arg5);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time_t)helicsFederateRequestTimeIterative(arg1,arg2,arg3,arg4,arg5);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
   if (SWIG_IsTmpObj(res4)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg4));
+    if (--resc>=0) *resv++ = SWIG_From_int((*arg4));
   } else {
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_double, new_flags);
+    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_helics_iteration_status, new_flags);
   }
-  if (SWIG_IsTmpObj(res5)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg5));
-  } else {
-    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_helics_iteration_status, new_flags);
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -4054,12 +4666,17 @@ fail:
 int _wrap_helicsFederateRequestTimeAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeAsync",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4072,25 +4689,39 @@ int _wrap_helicsFederateRequestTimeAsync(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeAsync" "', argument " "2"" of type '" "helics_time_t""'");
   } 
   arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateRequestTimeAsync(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateRequestTimeAsync(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateRequestTimeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
-  arg2 = &temp2;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeComplete",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -4098,17 +4729,23 @@ int _wrap_helicsFederateRequestTimeComplete(int resc, mxArray *resv[], int argc,
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateRequestTimeComplete(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time_t)helicsFederateRequestTimeComplete(arg1,arg2);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -4117,14 +4754,19 @@ int _wrap_helicsFederateRequestTimeIterativeAsync(int resc, mxArray *resv[], int
   helics_federate arg1 = (helics_federate) 0 ;
   helics_time_t arg2 ;
   helics_iteration_request arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterativeAsync",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -4142,29 +4784,43 @@ int _wrap_helicsFederateRequestTimeIterativeAsync(int resc, mxArray *resv[], int
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
   arg3 = static_cast< helics_iteration_request >(val3);
-  result = (helics_status)helicsFederateRequestTimeIterativeAsync(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateRequestTimeIterativeAsync(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateRequestTimeIterativeComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
-  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
+  helics_iteration_status *arg2 = (helics_iteration_status *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
+  helics_iteration_status temp2 ;
   int res2 = SWIG_TMPOBJ ;
-  helics_iteration_status temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
   arg2 = &temp2;
-  arg3 = &temp3;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterativeComplete",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -4172,39 +4828,39 @@ int _wrap_helicsFederateRequestTimeIterativeComplete(int resc, mxArray *resv[], 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateRequestTimeIterativeComplete(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time_t)helicsFederateRequestTimeIterativeComplete(arg1,arg2,arg3);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
   if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg2));
+    if (--resc>=0) *resv++ = SWIG_From_int((*arg2));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags);
+    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_helics_iteration_status, new_flags);
   }
-  if (SWIG_IsTmpObj(res3)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg3));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_helics_iteration_status, new_flags);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateGetName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsFederateGetName",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -4212,47 +4868,8 @@ int _wrap_helicsFederateGetName(int resc, mxArray *resv[], int argc, mxArray *ar
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetName" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateGetName(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
-  return 0;
-fail:
-  {
-    if (arg2) free(arg2);
-  }
-  return 1;
-}
-
-
-int _wrap_helicsFederateSetTimeDelta(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetTimeDelta",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeDelta" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetTimeDelta(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsFederateGetName(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
   return 0;
 fail:
@@ -4260,138 +4877,124 @@ fail:
 }
 
 
-int _wrap_helicsFederateSetOutputDelay(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateSetTimeProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetOutputDelay",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetOutputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetOutputDelay(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateSetInputDelay(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetInputDelay",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetInputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetInputDelay(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_helicsFederateSetPeriod(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
+  int32_t arg2 ;
   helics_time_t arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetPeriod",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetTimeProperty",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetPeriod" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
+  {
+    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
   ecode3 = SWIG_AsVal_double(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetPeriod" "', argument " "3"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetTimeProperty" "', argument " "3"" of type '" "helics_time_t""'");
   } 
   arg3 = static_cast< helics_time_t >(val3);
-  result = (helics_status)helicsFederateSetPeriod(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateSetTimeProperty(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateSetFlag(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateSetFlagOption(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int arg2 ;
+  int32_t arg2 ;
   helics_bool_t arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetFlag",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetFlagOption",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlag" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlagOption" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_int(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetFlag" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
+  {
+    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
   ecode3 = SWIG_AsVal_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlagOption" "', argument " "3"" of type '" "helics_bool_t""'");
   } 
   arg3 = static_cast< helics_bool_t >(val3);
-  result = (helics_status)helicsFederateSetFlag(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateSetFlagOption(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -4399,12 +5002,17 @@ fail:
 int _wrap_helicsFederateSetSeparator(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateSetSeparator",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4417,85 +5025,256 @@ int _wrap_helicsFederateSetSeparator(int resc, mxArray *resv[], int argc, mxArra
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetSeparator" "', argument " "2"" of type '" "char""'");
   } 
   arg2 = static_cast< char >(val2);
-  result = (helics_status)helicsFederateSetSeparator(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFederateSetSeparator(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateSetLoggingLevel(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateSetIntegerProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int arg2 ;
+  int32_t arg2 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetLoggingLevel",argc,2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetIntegerProperty",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetLoggingLevel" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_int(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetLoggingLevel" "', argument " "2"" of type '" "int""'");
+  {
+    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetIntegerProperty" "', argument " "3"" of type '" "int""'");
   } 
-  arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateSetLoggingLevel(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< int >(val3);
+  helicsFederateSetIntegerProperty(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFederateSetMaxIterations(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateGetTimeProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int arg2 ;
+  int32_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
-  if (!SWIG_check_num_args("helicsFederateSetMaxIterations",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetTimeProperty",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetMaxIterations" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  {
+    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
+  result = (helics_time_t)helicsFederateGetTimeProperty(arg1,arg2,arg3);
+  _out = SWIG_From_double(static_cast< double >(result));
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateGetFlagOption(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  helics_bool_t result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetFlagOption",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetFlagOption" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetMaxIterations" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetFlagOption" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateSetMaxIterations(arg1,arg2);
+  result = (helics_bool_t)helicsFederateGetFlagOption(arg1,arg2,arg3);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateGetIntegerProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int32_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  int32_t result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetIntegerProperty",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  {
+    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
+  result = helicsFederateGetIntegerProperty(arg1,arg2,arg3);
+  _out = SWIG_NewPointerObj((new int32_t(static_cast< const int32_t& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsFederateGetCurrentTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  helics_time_t result;
   
-  arg2 = &temp2;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetCurrentTime",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -4503,17 +5282,23 @@ int _wrap_helicsFederateGetCurrentTime(int resc, mxArray *resv[], int argc, mxAr
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCurrentTime" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateGetCurrentTime(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time_t)helicsFederateGetCurrentTime(arg1,arg2);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -4559,11 +5344,17 @@ fail:
 int _wrap_helicsQueryExecute(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_query arg1 = (helics_query) 0 ;
   helics_federate arg2 = (helics_federate) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   char *result = 0 ;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryExecute",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4575,11 +5366,23 @@ int _wrap_helicsQueryExecute(int resc, mxArray *resv[], int argc, mxArray *argv[
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecute" "', argument " "2"" of type '" "helics_federate""'"); 
   }
-  result = (char *)helicsQueryExecute(arg1,arg2);
+  result = (char *)helicsQueryExecute(arg1,arg2,arg3);
   _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -4587,11 +5390,17 @@ fail:
 int _wrap_helicsQueryCoreExecute(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_query arg1 = (helics_query) 0 ;
   helics_core arg2 = (helics_core) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   char *result = 0 ;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryCoreExecute",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4603,11 +5412,23 @@ int _wrap_helicsQueryCoreExecute(int resc, mxArray *resv[], int argc, mxArray *a
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryCoreExecute" "', argument " "2"" of type '" "helics_core""'"); 
   }
-  result = (char *)helicsQueryCoreExecute(arg1,arg2);
+  result = (char *)helicsQueryCoreExecute(arg1,arg2,arg3);
   _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -4615,11 +5436,17 @@ fail:
 int _wrap_helicsQueryBrokerExecute(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_query arg1 = (helics_query) 0 ;
   helics_broker arg2 = (helics_broker) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
   char *result = 0 ;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryBrokerExecute",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4631,11 +5458,23 @@ int _wrap_helicsQueryBrokerExecute(int resc, mxArray *resv[], int argc, mxArray 
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryBrokerExecute" "', argument " "2"" of type '" "helics_broker""'"); 
   }
-  result = (char *)helicsQueryBrokerExecute(arg1,arg2);
+  result = (char *)helicsQueryBrokerExecute(arg1,arg2,arg3);
   _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -4643,11 +5482,16 @@ fail:
 int _wrap_helicsQueryExecuteAsync(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_query arg1 = (helics_query) 0 ;
   helics_federate arg2 = (helics_federate) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryExecuteAsync",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -4659,21 +5503,39 @@ int _wrap_helicsQueryExecuteAsync(int resc, mxArray *resv[], int argc, mxArray *
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecuteAsync" "', argument " "2"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsQueryExecuteAsync(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsQueryExecuteAsync(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
 int _wrap_helicsQueryExecuteComplete(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_query arg1 = (helics_query) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   mxArray * _out;
   char *result = 0 ;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsQueryExecuteComplete",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -4681,11 +5543,23 @@ int _wrap_helicsQueryExecuteComplete(int resc, mxArray *resv[], int argc, mxArra
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryExecuteComplete" "', argument " "1"" of type '" "helics_query""'"); 
   }
-  result = (char *)helicsQueryExecuteComplete(arg1);
+  result = (char *)helicsQueryExecuteComplete(arg1,arg2);
   _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
@@ -4733,14 +5607,14 @@ fail:
 }
 
 
-int _wrap_helicsCleanupHelicsLibrary(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsCleanupLibrary(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   mxArray * _out;
   
-  if (!SWIG_check_num_args("helicsCleanupHelicsLibrary",argc,0,0,0)) {
+  if (!SWIG_check_num_args("helicsCleanupLibrary",argc,0,0,0)) {
     SWIG_fail;
   }
   (void)argv;
-  helicsCleanupHelicsLibrary();
+  helicsCleanupLibrary();
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -4753,7 +5627,7 @@ int _wrap_helicsFederateRegisterSubscription(int resc, mxArray *resv[], int argc
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -4761,13 +5635,15 @@ int _wrap_helicsFederateRegisterSubscription(int resc, mxArray *resv[], int argc
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_subscription result;
+  helics_input result;
   
-  if (!SWIG_check_num_args("helicsFederateRegisterSubscription",argc,4,4,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterSubscription",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -4784,181 +5660,27 @@ int _wrap_helicsFederateRegisterSubscription(int resc, mxArray *resv[], int argc
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSubscription" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_input)helicsFederateRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 1;
-}
-
-
-int _wrap_helicsFederateRegisterTypeSubscription(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  mxArray * _out;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterTypeSubscription",argc,4,4,0)) {
-    SWIG_fail;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 1;
-}
-
-
-int _wrap_helicsFederateRegisterOptionalSubscription(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  mxArray * _out;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterOptionalSubscription",argc,4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterOptionalSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 1;
-}
-
-
-int _wrap_helicsFederateRegisterOptionalTypeSubscription(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  mxArray * _out;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterOptionalTypeSubscription",argc,4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterOptionalTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   return 1;
 }
 
@@ -4966,21 +5688,26 @@ fail:
 int _wrap_helicsFederateRegisterPublication(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  int arg3 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterPublication",argc,4,4,0)) {
     SWIG_fail;
   }
@@ -4993,27 +5720,37 @@ int _wrap_helicsFederateRegisterPublication(int resc, mxArray *resv[], int argc,
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterPublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterPublication" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterPublication" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterPublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterPublication(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -5021,20 +5758,27 @@ fail:
 int _wrap_helicsFederateRegisterTypePublication(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterTypePublication",argc,4,4,0)) {
     SWIG_fail;
   }
@@ -5047,25 +5791,39 @@ int _wrap_helicsFederateRegisterTypePublication(int resc, mxArray *resv[], int a
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypePublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypePublication" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterTypePublication" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
   res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypePublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterTypePublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -5073,21 +5831,26 @@ fail:
 int _wrap_helicsFederateRegisterGlobalPublication(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  int arg3 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalPublication",argc,4,4,0)) {
     SWIG_fail;
   }
@@ -5100,27 +5863,37 @@ int _wrap_helicsFederateRegisterGlobalPublication(int resc, mxArray *resv[], int
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterGlobalPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterGlobalPublication(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -5128,20 +5901,27 @@ fail:
 int _wrap_helicsFederateRegisterGlobalTypePublication(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalTypePublication",argc,4,4,0)) {
     SWIG_fail;
   }
@@ -5154,25 +5934,325 @@ int _wrap_helicsFederateRegisterGlobalTypePublication(int resc, mxArray *resv[],
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
   res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterGlobalTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterGlobalTypePublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateRegisterInput(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  mxArray * _out;
+  helics_input result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterInput",argc,4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterInput" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_input)helicsFederateRegisterInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateRegisterTypeInput(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  mxArray * _out;
+  helics_input result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterTypeInput",argc,4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypeInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypeInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterTypeInput" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypeInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_input)helicsFederateRegisterTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateRegisterGlobalInput(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  mxArray * _out;
+  helics_publication result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalInput",argc,4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateRegisterGlobalTypeInput(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  mxArray * _out;
+  helics_publication result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalTypeInput",argc,4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -5181,14 +6261,19 @@ int _wrap_helicsPublicationPublishRaw(int resc, mxArray *resv[], int argc, mxArr
   helics_publication arg1 = (helics_publication) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   size_t size2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishRaw",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5202,13 +6287,25 @@ int _wrap_helicsPublicationPublishRaw(int resc, mxArray *resv[], int argc, mxArr
   }  
   arg2 = reinterpret_cast< void * >(buf2);
   arg3 = static_cast< int >(size2 - 1);
-  result = (helics_status)helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -5216,13 +6313,18 @@ fail:
 int _wrap_helicsPublicationPublishString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishString",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5235,13 +6337,25 @@ int _wrap_helicsPublicationPublishString(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsPublicationPublishString(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishString(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -5249,12 +6363,17 @@ fail:
 int _wrap_helicsPublicationPublishInteger(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
   int64_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   long long val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishInteger",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5267,11 +6386,23 @@ int _wrap_helicsPublicationPublishInteger(int resc, mxArray *resv[], int argc, m
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishInteger" "', argument " "2"" of type '" "int64_t""'");
   } 
   arg2 = static_cast< int64_t >(val2);
-  result = (helics_status)helicsPublicationPublishInteger(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishInteger(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -5279,12 +6410,17 @@ fail:
 int _wrap_helicsPublicationPublishBoolean(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
   helics_bool_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishBoolean",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5297,11 +6433,23 @@ int _wrap_helicsPublicationPublishBoolean(int resc, mxArray *resv[], int argc, m
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishBoolean" "', argument " "2"" of type '" "helics_bool_t""'");
   } 
   arg2 = static_cast< helics_bool_t >(val2);
-  result = (helics_status)helicsPublicationPublishBoolean(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishBoolean(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -5309,12 +6457,17 @@ fail:
 int _wrap_helicsPublicationPublishDouble(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
   double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishDouble",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5327,11 +6480,23 @@ int _wrap_helicsPublicationPublishDouble(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishDouble" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = static_cast< double >(val2);
-  result = (helics_status)helicsPublicationPublishDouble(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishDouble(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -5340,36 +6505,56 @@ int _wrap_helicsPublicationPublishComplex(int resc, mxArray *resv[], int argc, m
   helics_publication arg1 = (helics_publication) 0 ;
   double arg2 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  double val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsPublicationPublishComplex",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishComplex",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishComplex" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishComplex" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = static_cast< double >(val2);
-  ecode3 = SWIG_AsVal_double(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishComplex" "', argument " "3"" of type '" "double""'");
-  } 
-  arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsPublicationPublishComplex(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  {
+    if(mxIsComplex(argv[1]))
+    {
+      arg2=mxGetPr(argv[1])[0];
+      arg3=mxGetPi(argv[1])[0];
+    }  
+    else if (mxIsDouble(argv[1]))
+    {
+      arg3=0.0;
+      arg2=mxGetPr(argv[1])[0];
+    }
+    else
+    {
+      arg2=0.0;
+      arg3 = 0.0;
+    }
+  }
+  helicsPublicationPublishComplex(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -5378,10 +6563,15 @@ int _wrap_helicsPublicationPublishVector(int resc, mxArray *resv[], int argc, mx
   helics_publication arg1 = (helics_publication) 0 ;
   double *arg2 = (double *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishVector",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -5397,14 +6587,26 @@ int _wrap_helicsPublicationPublishVector(int resc, mxArray *resv[], int argc, mx
     arg3=static_cast<int>(mxGetNumberOfElements(argv[1]));
     arg2=mxGetPr(argv[1]);
   }
-  result = (helics_status)helicsPublicationPublishVector(arg1,(double const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishVector(arg1,(double const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
     
   }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -5413,15 +6615,20 @@ int _wrap_helicsPublicationPublishNamedPoint(int resc, mxArray *resv[], int argc
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishNamedPoint",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -5439,31 +6646,143 @@ int _wrap_helicsPublicationPublishNamedPoint(int resc, mxArray *resv[], int argc
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsPublicationPublishNamedPoint(arg1,(char const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishNamedPoint(arg1,(char const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetValueSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsPublicationAddTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  int result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetValueSize",argc,1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationAddTarget",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetValueSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationAddTarget" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (int)helicsSubscriptionGetValueSize(arg1);
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationAddTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsPublicationAddTarget(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsInputAddTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputAddTarget",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputAddTarget" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputAddTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsInputAddTarget(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsInputGetRawValueSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  mxArray * _out;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsInputGetRawValueSize",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetRawValueSize" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (int)helicsInputGetRawValueSize(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -5472,66 +6791,74 @@ fail:
 }
 
 
-int _wrap_helicsSubscriptionGetRawValue(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetRawValue(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
-  int *arg4 = (int *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   int val3 ;
   int ecode3 = 0 ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
+  int result;
   
-  arg4 = &temp4;
-  if (!SWIG_check_num_args("helicsSubscriptionGetRawValue",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputGetRawValue",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetRawValue" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetRawValue" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_ConvertPtr(argv[1],SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetRawValue" "', argument " "2"" of type '" "void *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputGetRawValue" "', argument " "2"" of type '" "void *""'"); 
   }
   ecode3 = SWIG_AsVal_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetRawValue" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputGetRawValue" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetRawValue(arg1,arg2,arg3,arg4);
+  result = (int)helicsInputGetRawValue(arg1,arg2,arg3,arg4);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res4)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg4));
-  } else {
-    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetStringSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetStringSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
   int result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetStringSize",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetStringSize",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetStringSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetStringSize" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (int)helicsSubscriptionGetStringSize(arg1);
+  result = (int)helicsInputGetStringSize(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -5540,199 +6867,251 @@ fail:
 }
 
 
-int _wrap_helicsSubscriptionGetString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
-  int *arg4 = (int *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
+  int result;
   
   {
-    arg4=&(arg3);
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
   }
-  if (!SWIG_check_num_args("helicsSubscriptionGetString",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetString",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetString" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  {
-    arg3=helicsSubscriptionGetStringSize(arg1)+2;
-    arg2 = (char *) malloc(arg3);
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputGetString" "', argument " "2"" of type '" "char *""'");
   }
-  result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3,arg4);
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputGetString" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (int)helicsInputGetString(arg1,arg2,arg3,arg4);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
-  }
-  {
-    if (arg2) free(arg2);
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 0;
 fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
-    if (arg2) free(arg2);
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetInteger(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  int64_t *arg2 = (int64_t *) 0 ;
+int _wrap_helicsInputGetInteger(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  int64_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  int64_t result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionGetInteger",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetInteger",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetInteger" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetInteger(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = helicsInputGetInteger(arg1,arg2);
+  _out = SWIG_From_long_SS_long(static_cast< long long >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_long_SS_long((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int64_t, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetBoolean(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  helics_bool_t *arg2 = (helics_bool_t *) 0 ;
+int _wrap_helicsInputGetBoolean(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_bool_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  helics_bool_t result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionGetBoolean",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetBoolean",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetBoolean" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetBoolean" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetBoolean(arg1,arg2);
+  result = (helics_bool_t)helicsInputGetBoolean(arg1,arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetDouble(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  double *arg2 = (double *) 0 ;
+int _wrap_helicsInputGetDouble(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   mxArray * _out;
-  helics_status result;
+  double result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionGetDouble",argc,1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetDouble",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetDouble" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetDouble(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (double)helicsInputGetDouble(arg1,arg2);
+  _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsGetComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   double *arg2 = (double *) 0 ;
   double *arg3 = (double *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  double temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  double vals2[2] ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  arg2 = &temp2;
-  arg3 = &temp3;
-  if (!SWIG_check_num_args("helicsSubscriptionGetComplex",argc,1,1,0)) {
+  {
+    arg2=&(vals2[0]);
+    arg3=&(vals2[1]);
+  }
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsGetComplex",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetComplex" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetComplex(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputGetComplexParts(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  if (SWIG_IsTmpObj(res2)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg2));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags);
+  {
+    mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
+    mxSetPr(out,arg2);
+    mxSetPi(out,arg3);
+    if (--resc>=0) *resv++ =out;
   }
-  if (SWIG_IsTmpObj(res3)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg3));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetVectorSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetVectorSize(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
   int result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetVectorSize",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetVectorSize",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVectorSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetVectorSize" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (int)helicsSubscriptionGetVectorSize(arg1);
+  result = (int)helicsInputGetVectorSize(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -5741,314 +7120,448 @@ fail:
 }
 
 
-int _wrap_helicsSubscriptionGetVector(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetVector(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   double *arg2 ;
   int arg3 ;
-  int *arg4 = (int *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
+  int result;
   
   {
-    arg2=(double *)(NULL);
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
   }
-  {
-    arg4=&(arg3);
-  }
-  if (!SWIG_check_num_args("helicsSubscriptionGetVector",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetVector",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetVector" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  {
-    arg3=helicsSubscriptionGetVectorSize(arg1);
-    arg2 = (double *) mxCalloc(arg3,sizeof(double));
-  }
-  result = (helics_status)helicsSubscriptionGetVector(arg1,arg2,arg3,arg4);
+  res2 = SWIG_ConvertPtr(argv[1], &argp2,SWIGTYPE_p_double, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputGetVector" "', argument " "2"" of type '" "double []""'"); 
+  } 
+  arg2 = reinterpret_cast< double * >(argp2);
+  ecode3 = SWIG_AsVal_int(argv[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputGetVector" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (int)helicsInputGetVector(arg1,arg2,arg3,arg4);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   {
-    mxArray *mat=mxCreateDoubleMatrix(*arg4,1,mxREAL);
-    mxSetPr(mat,arg2);
-    if (--resc>=0) *resv++ = mat;
-  }
-  {
-    //if (arg2) free(arg2);
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 0;
 fail:
   {
-    //if (arg2) free(arg2);
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetNamedPoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputGetNamedPoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
-  int *arg4 = (int *) 0 ;
-  double *arg5 = (double *) 0 ;
+  double *arg4 = (double *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
-  double temp5 ;
-  int res5 = SWIG_TMPOBJ ;
+  double temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
   mxArray * _out;
-  helics_status result;
+  int result;
   
   {
-    arg4=&(arg3);
+    arg3=256;
+    arg2=(char *)malloc(256);
   }
-  arg5 = &temp5;
-  if (!SWIG_check_num_args("helicsSubscriptionGetNamedPoint",argc,1,1,0)) {
+  arg4 = &temp4;
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsInputGetNamedPoint",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetNamedPoint" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetNamedPoint" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  {
-    arg3=helicsSubscriptionGetStringSize(arg1)+2;
-    arg2 = (char *) malloc(arg3);
-  }
-  result = (helics_status)helicsSubscriptionGetNamedPoint(arg1,arg2,arg3,arg4,arg5);
+  result = (int)helicsInputGetNamedPoint(arg1,arg2,arg3,arg4,arg5);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
+    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
   }
-  if (SWIG_IsTmpObj(res5)) {
-    if (--resc>=0) *resv++ = SWIG_From_double((*arg5));
+  if (SWIG_IsTmpObj(res4)) {
+    if (--resc>=0) *resv++ = SWIG_From_double((*arg4));
   } else {
-    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_double, new_flags);
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_double, new_flags);
   }
   {
     if (arg2) free(arg2);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
   }
   return 0;
 fail:
   {
     if (arg2) free(arg2);
   }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultRaw(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultRaw(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   size_t size2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultRaw",argc,2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultRaw",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultRaw" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, &size2, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "2"" of type '" "void const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultRaw" "', argument " "2"" of type '" "void const *""'");
   }  
   arg2 = reinterpret_cast< void * >(buf2);
   arg3 = static_cast< int >(size2 - 1);
-  result = (helics_status)helicsSubscriptionSetDefaultRaw(arg1,(void const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultRaw(arg1,(void const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultString",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultString",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultString" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsSubscriptionSetDefaultString(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultString(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultInteger(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultInteger(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int64_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   long long val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultInteger",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultInteger",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultInteger" "', argument " "1"" of type '" "helics_input""'"); 
   }
   ecode2 = SWIG_AsVal_long_SS_long(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
   } 
   arg2 = static_cast< int64_t >(val2);
-  result = (helics_status)helicsSubscriptionSetDefaultInteger(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultInteger(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultBoolean(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultBoolean(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   helics_bool_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultBoolean",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultBoolean",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultBoolean" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultBoolean" "', argument " "1"" of type '" "helics_input""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultBoolean" "', argument " "2"" of type '" "helics_bool_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultBoolean" "', argument " "2"" of type '" "helics_bool_t""'");
   } 
   arg2 = static_cast< helics_bool_t >(val2);
-  result = (helics_status)helicsSubscriptionSetDefaultBoolean(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultBoolean(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultDouble(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultDouble(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultDouble",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultDouble",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultDouble" "', argument " "1"" of type '" "helics_input""'"); 
   }
   ecode2 = SWIG_AsVal_double(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultDouble" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = static_cast< double >(val2);
-  result = (helics_status)helicsSubscriptionSetDefaultDouble(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultDouble(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   double arg2 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  double val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultComplex",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultComplex",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultComplex" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  ecode2 = SWIG_AsVal_double(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = static_cast< double >(val2);
-  ecode3 = SWIG_AsVal_double(argv[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "3"" of type '" "double""'");
-  } 
-  arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsSubscriptionSetDefaultComplex(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  {
+    if(mxIsComplex(argv[1]))
+    {
+      arg2=mxGetPr(argv[1])[0];
+      arg3=mxGetPi(argv[1])[0];
+    }  
+    else if (mxIsDouble(argv[1]))
+    {
+      arg3=0.0;
+      arg2=mxGetPr(argv[1])[0];
+    }
+    else
+    {
+      arg2=0.0;
+      arg3 = 0.0;
+    }
+  }
+  helicsInputSetDefaultComplex(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultVector(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultVector(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   double *arg2 = (double *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultVector",argc,2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultVector",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultVector" "', argument " "1"" of type '" "helics_input""'"); 
   }
   {
     if (!mxIsDouble(argv[1])) {
@@ -6058,108 +7571,116 @@ int _wrap_helicsSubscriptionSetDefaultVector(int resc, mxArray *resv[], int argc
     arg3=static_cast<int>(mxGetNumberOfElements(argv[1]));
     arg2=mxGetPr(argv[1]);
   }
-  result = (helics_status)helicsSubscriptionSetDefaultVector(arg1,(double const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultVector(arg1,(double const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
     
   }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionSetDefaultNamedPoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputSetDefaultNamedPoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultNamedPoint",argc,3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultNamedPoint",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   ecode3 = SWIG_AsVal_double(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultNamedPoint" "', argument " "3"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsSubscriptionSetDefaultNamedPoint(arg1,(char const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultNamedPoint(arg1,(char const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+int _wrap_helicsInputGetType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
-  if (!SWIG_check_num_args("helicsSubscriptionGetType",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetType",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetType" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetType" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetType(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsInputGetType(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsPublicationGetType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsPublicationGetType",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -6167,73 +7688,43 @@ int _wrap_helicsPublicationGetType(int resc, mxArray *resv[], int argc, mxArray 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetType" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (helics_status)helicsPublicationGetType(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsPublicationGetType(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetKey(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+int _wrap_helicsInputGetKey(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
-  if (!SWIG_check_num_args("helicsSubscriptionGetKey",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetKey",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetKey" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetKey" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetKey(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsInputGetKey(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsPublicationGetKey(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsPublicationGetKey",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -6241,73 +7732,43 @@ int _wrap_helicsPublicationGetKey(int resc, mxArray *resv[], int argc, mxArray *
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetKey" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (helics_status)helicsPublicationGetKey(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsPublicationGetKey(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionGetUnits(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+int _wrap_helicsInputGetUnits(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
-  if (!SWIG_check_num_args("helicsSubscriptionGetUnits",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetUnits",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetUnits" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetUnits" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_status)helicsSubscriptionGetUnits(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsInputGetUnits(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsPublicationGetUnits(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsPublicationGetUnits",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -6315,38 +7776,29 @@ int _wrap_helicsPublicationGetUnits(int resc, mxArray *resv[], int argc, mxArray
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetUnits" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (helics_status)helicsPublicationGetUnits(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsPublicationGetUnits(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
-int _wrap_helicsSubscriptionIsUpdated(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputIsUpdated(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
   helics_bool_t result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionIsUpdated",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputIsUpdated",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionIsUpdated" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputIsUpdated" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_bool_t)helicsSubscriptionIsUpdated(arg1);
+  result = (helics_bool_t)helicsInputIsUpdated(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -6355,20 +7807,20 @@ fail:
 }
 
 
-int _wrap_helicsSubscriptionLastUpdateTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+int _wrap_helicsInputLastUpdateTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   mxArray * _out;
   helics_time_t result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionLastUpdateTime",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputLastUpdateTime",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionLastUpdateTime" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputLastUpdateTime" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (helics_time_t)helicsSubscriptionLastUpdateTime(arg1);
+  result = (helics_time_t)helicsInputLastUpdateTime(arg1);
   _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -6399,20 +7851,20 @@ fail:
 }
 
 
-int _wrap_helicsFederateGetSubscriptionCount(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateGetInputCount(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   mxArray * _out;
   int result;
   
-  if (!SWIG_check_num_args("helicsFederateGetSubscriptionCount",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsFederateGetInputCount",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetSubscriptionCount" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetInputCount" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsFederateGetSubscriptionCount(arg1);
+  result = (int)helicsFederateGetInputCount(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -6425,6 +7877,7 @@ int _wrap_helicsFederateRegisterEndpoint(int resc, mxArray *resv[], int argc, mx
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6432,9 +7885,14 @@ int _wrap_helicsFederateRegisterEndpoint(int resc, mxArray *resv[], int argc, mx
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_endpoint result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterEndpoint",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -6452,15 +7910,27 @@ int _wrap_helicsFederateRegisterEndpoint(int resc, mxArray *resv[], int argc, mx
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterEndpoint" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_endpoint)helicsFederateRegisterEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_endpoint)helicsFederateRegisterEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -6469,6 +7939,7 @@ int _wrap_helicsFederateRegisterGlobalEndpoint(int resc, mxArray *resv[], int ar
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6476,9 +7947,14 @@ int _wrap_helicsFederateRegisterGlobalEndpoint(int resc, mxArray *resv[], int ar
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_endpoint result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalEndpoint",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -6496,15 +7972,27 @@ int _wrap_helicsFederateRegisterGlobalEndpoint(int resc, mxArray *resv[], int ar
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalEndpoint" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_endpoint)helicsFederateRegisterGlobalEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_endpoint)helicsFederateRegisterGlobalEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -6512,13 +8000,18 @@ fail:
 int _wrap_helicsEndpointSetDefaultDestination(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsEndpointSetDefaultDestination",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -6531,13 +8024,25 @@ int _wrap_helicsEndpointSetDefaultDestination(int resc, mxArray *resv[], int arg
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSetDefaultDestination" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsEndpointSetDefaultDestination(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSetDefaultDestination(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -6547,6 +8052,7 @@ int _wrap_helicsEndpointSendMessageRaw(int resc, mxArray *resv[], int argc, mxAr
   char *arg2 = (char *) 0 ;
   void *arg3 = (void *) 0 ;
   int arg4 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6555,9 +8061,13 @@ int _wrap_helicsEndpointSendMessageRaw(int resc, mxArray *resv[], int argc, mxAr
   char *buf3 = 0 ;
   size_t size3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp5 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsEndpointSendMessageRaw",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -6576,15 +8086,27 @@ int _wrap_helicsEndpointSendMessageRaw(int resc, mxArray *resv[], int argc, mxAr
   }  
   arg3 = reinterpret_cast< void * >(buf3);
   arg4 = static_cast< int >(size3 - 1);
-  result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg5);
+    }
+  }
   return 1;
 }
 
@@ -6595,6 +8117,7 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
   void *arg3 = (void *) 0 ;
   int arg4 ;
   helics_time_t arg5 ;
+  helics_error *arg6 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6605,9 +8128,13 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
   int alloc3 = 0 ;
   double val5 ;
   int ecode5 = 0 ;
+  helics_error etemp6 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp6=helicsErrorInitialize();
+    arg6=&etemp6;
+  }
   if (!SWIG_check_num_args("helicsEndpointSendEventRaw",argc,4,4,0)) {
     SWIG_fail;
   }
@@ -6631,15 +8158,27 @@ int _wrap_helicsEndpointSendEventRaw(int resc, mxArray *resv[], int argc, mxArra
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time_t""'");
   } 
   arg5 = static_cast< helics_time_t >(val5);
-  result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5,arg6);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg6);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg6);
+    }
+  }
   return 1;
 }
 
@@ -6647,12 +8186,17 @@ fail:
 int _wrap_helicsEndpointSendMessage(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   message_t *arg2 = (message_t *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsEndpointSendMessage",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -6665,11 +8209,23 @@ int _wrap_helicsEndpointSendMessage(int resc, mxArray *resv[], int argc, mxArray
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessage" "', argument " "2"" of type '" "message_t *""'"); 
   }
   arg2 = reinterpret_cast< message_t * >(argp2);
-  result = (helics_status)helicsEndpointSendMessage(arg1,arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSendMessage(arg1,arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -6677,18 +8233,19 @@ fail:
 int _wrap_helicsEndpointSubscribe(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsEndpointSubscribe",argc,3,3,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSubscribe",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -6700,20 +8257,25 @@ int _wrap_helicsEndpointSubscribe(int resc, mxArray *resv[], int argc, mxArray *
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSubscribe" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSubscribe" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_status)helicsEndpointSubscribe(arg1,(char const *)arg2,(char const *)arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSubscribe(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -6762,20 +8324,20 @@ fail:
 }
 
 
-int _wrap_helicsFederateReceiveCount(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederatePendingMessages(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   mxArray * _out;
   int result;
   
-  if (!SWIG_check_num_args("helicsFederateReceiveCount",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsFederatePendingMessages",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateReceiveCount" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederatePendingMessages" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsFederateReceiveCount(arg1);
+  result = (int)helicsFederatePendingMessages(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -6784,20 +8346,20 @@ fail:
 }
 
 
-int _wrap_helicsEndpointReceiveCount(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsEndpointPendingMessages(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
   mxArray * _out;
   int result;
   
-  if (!SWIG_check_num_args("helicsEndpointReceiveCount",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsEndpointPendingMessages",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointReceiveCount" "', argument " "1"" of type '" "helics_endpoint""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointPendingMessages" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (int)helicsEndpointReceiveCount(arg1);
+  result = (int)helicsEndpointPendingMessages(arg1);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   return 0;
@@ -6852,16 +8414,10 @@ fail:
 
 int _wrap_helicsEndpointGetType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsEndpointGetType",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -6869,36 +8425,21 @@ int _wrap_helicsEndpointGetType(int resc, mxArray *resv[], int argc, mxArray *ar
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetType" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (helics_status)helicsEndpointGetType(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsEndpointGetType(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
 
 int _wrap_helicsEndpointGetName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsEndpointGetName",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -6906,20 +8447,11 @@ int _wrap_helicsEndpointGetName(int resc, mxArray *resv[], int argc, mxArray *ar
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetName" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (helics_status)helicsEndpointGetName(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsEndpointGetName(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
@@ -6946,106 +8478,61 @@ fail:
 }
 
 
-int _wrap_helicsFederateRegisterSourceFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateRegisterFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_filter_type_t arg2 ;
   char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_filter result;
   
-  if (!SWIG_check_num_args("helicsFederateRegisterSourceFilter",argc,4,4,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterFilter",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterFilter" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
   } 
   arg2 = static_cast< helics_filter_type_t >(val2);
   res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterFilter" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsFederateRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_filter)helicsFederateRegisterFilter(arg1,arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 1;
-}
-
-
-int _wrap_helicsFederateRegisterDestinationFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  mxArray * _out;
-  helics_filter result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterDestinationFilter",argc,4,4,0)) {
-    SWIG_fail;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_int(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsFederateRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 0;
-fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   return 1;
 }
 
@@ -7053,13 +8540,19 @@ fail:
 int _wrap_helicsFederateRegisterCloningFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
   helics_filter result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterCloningFilter",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7072,117 +8565,84 @@ int _wrap_helicsFederateRegisterCloningFilter(int resc, mxArray *resv[], int arg
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_filter)helicsFederateRegisterCloningFilter(arg1,(char const *)arg2);
+  result = (helics_filter)helicsFederateRegisterCloningFilter(arg1,(char const *)arg2,arg3);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsCoreRegisterSourceFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsCoreRegisterFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
   helics_filter_type_t arg2 ;
   char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
   helics_filter result;
   
-  if (!SWIG_check_num_args("helicsCoreRegisterSourceFilter",argc,4,4,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreRegisterFilter",argc,3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "1"" of type '" "helics_core""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterFilter" "', argument " "1"" of type '" "helics_core""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
   } 
   arg2 = static_cast< helics_filter_type_t >(val2);
   res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterFilter" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsCoreRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_filter)helicsCoreRegisterFilter(arg1,arg2,(char const *)arg3,arg4);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 1;
-}
-
-
-int _wrap_helicsCoreRegisterDestinationFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_core arg1 = (helics_core) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  mxArray * _out;
-  helics_filter result;
-  
-  if (!SWIG_check_num_args("helicsCoreRegisterDestinationFilter",argc,4,4,0)) {
-    SWIG_fail;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
   }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "1"" of type '" "helics_core""'"); 
-  }
-  ecode2 = SWIG_AsVal_int(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(argv[2], &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(argv[3], &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsCoreRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return 0;
-fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   return 1;
 }
 
@@ -7190,13 +8650,19 @@ fail:
 int _wrap_helicsCoreRegisterCloningFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
   helics_filter result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsCoreRegisterCloningFilter",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7209,49 +8675,24 @@ int _wrap_helicsCoreRegisterCloningFilter(int resc, mxArray *resv[], int argc, m
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2);
+  result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2,arg3);
   _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 1;
-}
-
-
-int _wrap_helicsFilterGetTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_filter arg1 = (helics_filter) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  int res1 ;
-  mxArray * _out;
-  helics_status result;
-  
   {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
-  if (!SWIG_check_num_args("helicsFilterGetTarget",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetTarget" "', argument " "1"" of type '" "helics_filter""'"); 
-  }
-  result = (helics_status)helicsFilterGetTarget(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
-  return 0;
-fail:
-  {
-    if (arg2) free(arg2);
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
   }
   return 1;
 }
@@ -7259,16 +8700,10 @@ fail:
 
 int _wrap_helicsFilterGetName(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
   mxArray * _out;
-  helics_status result;
+  char *result = 0 ;
   
-  {
-    arg3=256;
-    arg2=(char *)malloc(256);
-  }
   if (!SWIG_check_num_args("helicsFilterGetName",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -7276,20 +8711,11 @@ int _wrap_helicsFilterGetName(int resc, mxArray *resv[], int argc, mxArray *argv
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetName" "', argument " "1"" of type '" "helics_filter""'"); 
   }
-  result = (helics_status)helicsFilterGetName(arg1,arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsFilterGetName(arg1);
+  _out = SWIG_FromCharPtr((const char *)result);
   if (_out) --resc, *resv++ = _out;
-  {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  {
-    if (arg2) free(arg2);
-  }
   return 0;
 fail:
-  {
-    if (arg2) free(arg2);
-  }
   return 1;
 }
 
@@ -7298,15 +8724,20 @@ int _wrap_helicsFilterSet(int resc, mxArray *resv[], int argc, mxArray *argv[]) 
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFilterSet",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -7324,13 +8755,25 @@ int _wrap_helicsFilterSet(int resc, mxArray *resv[], int argc, mxArray *argv[]) 
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterSet" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsFilterSet(arg1,(char const *)arg2,arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterSet(arg1,(char const *)arg2,arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -7339,6 +8782,7 @@ int _wrap_helicsFilterSetString(int resc, mxArray *resv[], int argc, mxArray *ar
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -7346,9 +8790,13 @@ int _wrap_helicsFilterSetString(int resc, mxArray *resv[], int argc, mxArray *ar
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFilterSetString",argc,3,3,0)) {
     SWIG_fail;
   }
@@ -7366,15 +8814,27 @@ int _wrap_helicsFilterSetString(int resc, mxArray *resv[], int argc, mxArray *ar
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFilterSetString" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_status)helicsFilterSetString(arg1,(char const *)arg2,(char const *)arg3);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterSetString(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
   return 1;
 }
 
@@ -7382,13 +8842,18 @@ fail:
 int _wrap_helicsFilterAddDestinationTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddDestinationTarget",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7401,13 +8866,25 @@ int _wrap_helicsFilterAddDestinationTarget(int resc, mxArray *resv[], int argc, 
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDestinationTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddDestinationTarget(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddDestinationTarget(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -7415,13 +8892,18 @@ fail:
 int _wrap_helicsFilterAddSourceTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddSourceTarget",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7434,13 +8916,25 @@ int _wrap_helicsFilterAddSourceTarget(int resc, mxArray *resv[], int argc, mxArr
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddSourceTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddSourceTarget(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddSourceTarget(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -7448,13 +8942,18 @@ fail:
 int _wrap_helicsFilterAddDeliveryEndpoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddDeliveryEndpoint",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7467,79 +8966,75 @@ int _wrap_helicsFilterAddDeliveryEndpoint(int resc, mxArray *resv[], int argc, m
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddDeliveryEndpoint(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddDeliveryEndpoint(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
 
-int _wrap_helicsFilterRemoveDestinationTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFilterRemoveTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFilterRemoveDestinationTarget",argc,2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFilterRemoveTarget",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveTarget" "', argument " "1"" of type '" "helics_filter""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveDestinationTarget(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterRemoveTarget(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 1;
-}
-
-
-int _wrap_helicsFilterRemoveSourceTarget(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  helics_filter arg1 = (helics_filter) 0 ;
-  char *arg2 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  mxArray * _out;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFilterRemoveSourceTarget",argc,2,2,0)) {
-    SWIG_fail;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
   }
-  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "1"" of type '" "helics_filter""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveSourceTarget(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return 1;
 }
 
@@ -7547,13 +9042,18 @@ fail:
 int _wrap_helicsFilterRemoveDeliveryEndpoint(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   mxArray * _out;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterRemoveDeliveryEndpoint",argc,2,2,0)) {
     SWIG_fail;
   }
@@ -7566,13 +9066,25 @@ int _wrap_helicsFilterRemoveDeliveryEndpoint(int resc, mxArray *resv[], int argc
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveDeliveryEndpoint(arg1,(char const *)arg2);
-  _out = SWIG_From_int(static_cast< int >(result));
+  helicsFilterRemoveDeliveryEndpoint(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 0;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
   return 1;
 }
 
@@ -7584,27 +9096,29 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_data_t = {"_p_data_t", "data_t *", 0, 0, (void*)"helics.data_t", 0};
 static swig_type_info _swigt__p_double = {"_p_double", "helics_time_t *|double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_federate_state = {"_p_federate_state", "enum federate_state *|federate_state *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_error = {"_p_helics_error", "helics_error *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_error_types = {"_p_helics_error_types", "enum helics_error_types *|helics_error_types *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_filter_type_t = {"_p_helics_filter_type_t", "enum helics_filter_type_t *|helics_filter_type_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_iteration_request = {"_p_helics_iteration_request", "enum helics_iteration_request *|helics_iteration_request *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_iteration_status = {"_p_helics_iteration_status", "enum helics_iteration_status *|helics_iteration_status *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_status = {"_p_helics_status", "enum helics_status *|helics_status *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "helics_bool_t *|int *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_message_t = {"_p_message_t", "message_t *", 0, 0, (void*)"helics.message_t", 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_filter|helics_subscription|helics_federate|helics_federate_info_t|helics_endpoint|void *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_filter|helics_federate|helics_federate_info_t|helics_endpoint|void *|helics_input", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
   &_swigt__p_data_t,
   &_swigt__p_double,
   &_swigt__p_federate_state,
+  &_swigt__p_helics_error,
+  &_swigt__p_helics_error_types,
   &_swigt__p_helics_filter_type_t,
   &_swigt__p_helics_iteration_request,
   &_swigt__p_helics_iteration_status,
-  &_swigt__p_helics_status,
   &_swigt__p_int,
-  &_swigt__p_int64_t,
+  &_swigt__p_int32_t,
   &_swigt__p_message_t,
   &_swigt__p_p_char,
   &_swigt__p_void,
@@ -7614,12 +9128,13 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_data_t[] = {  {&_swigt__p_data_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_federate_state[] = {  {&_swigt__p_federate_state, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_error[] = {  {&_swigt__p_helics_error, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_error_types[] = {  {&_swigt__p_helics_error_types, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_filter_type_t[] = {  {&_swigt__p_helics_filter_type_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_iteration_request[] = {  {&_swigt__p_helics_iteration_request, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_iteration_status[] = {  {&_swigt__p_helics_iteration_status, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_status[] = {  {&_swigt__p_helics_status, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_message_t[] = {  {&_swigt__p_message_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
@@ -7629,12 +9144,13 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_data_t,
   _swigc__p_double,
   _swigc__p_federate_state,
+  _swigc__p_helics_error,
+  _swigc__p_helics_error_types,
   _swigc__p_helics_filter_type_t,
   _swigc__p_helics_iteration_request,
   _swigc__p_helics_iteration_status,
-  _swigc__p_helics_status,
   _swigc__p_int,
-  _swigc__p_int64_t,
+  _swigc__p_int32_t,
   _swigc__p_message_t,
   _swigc__p_p_char,
   _swigc__p_void,
@@ -7898,52 +9414,56 @@ SWIGINTERN const char* SwigConstantName(int con_id) {
   switch (con_id) {
   case 0: return "helics_ok";
   case 1: return "helics_registration_failure";
-  case 2: return "helics_invalid_object";
-  case 3: return "helics_invalid_argument";
-  case 4: return "helics_discard";
-  case 5: return "helics_terminated";
-  case 6: return "helics_warning";
-  case 7: return "helics_invalid_state_transition";
-  case 8: return "helics_invalid_function_call";
-  case 9: return "helics_error";
-  case 10: return "no_iteration";
-  case 11: return "force_iteration";
-  case 12: return "iterate_if_needed";
-  case 13: return "next_step";
-  case 14: return "iteration_error";
-  case 15: return "iteration_halted";
-  case 16: return "iterating";
-  case 17: return "helics_startup_state";
-  case 18: return "helics_initialization_state";
-  case 19: return "helics_execution_state";
-  case 20: return "helics_finalize_state";
-  case 21: return "helics_error_state";
-  case 22: return "helics_pending_init_state";
-  case 23: return "helics_pending_exec_state";
-  case 24: return "helics_pending_time_state";
-  case 25: return "helics_pending_iterative_time_state";
-  case 26: return "helics_custom_filter";
-  case 27: return "helics_delay_filter";
-  case 28: return "helics_randomDelay_filter";
-  case 29: return "helics_randomDrop_filter";
-  case 30: return "helics_reroute_filter";
-  case 31: return "helics_clone_filter";
-  case 32: return "HELICS_CORE_TYPE_DEFAULT";
-  case 33: return "HELICS_CORE_TYPE_ZMQ";
-  case 34: return "HELICS_CORE_TYPE_MPI";
-  case 35: return "HELICS_CORE_TYPE_TEST";
-  case 36: return "HELICS_CORE_TYPE_INTERPROCESS";
-  case 37: return "HELICS_CORE_TYPE_IPC";
-  case 38: return "HELICS_CORE_TYPE_TCP";
-  case 39: return "HELICS_CORE_TYPE_UDP";
-  case 40: return "HELICS_DATA_TYPE_STRING";
-  case 41: return "HELICS_DATA_TYPE_DOUBLE";
-  case 42: return "HELICS_DATA_TYPE_INT";
-  case 43: return "HELICS_DATA_TYPE_COMPLEX";
-  case 44: return "HELICS_DATA_TYPE_VECTOR";
-  case 45: return "HELICS_DATA_TYPE_NAMEDPOINT";
-  case 46: return "HELICS_DATA_TYPE_BOOLEAN";
-  case 47: return "HELICS_DATA_TYPE_RAW";
+  case 2: return "helics_connection_failure";
+  case 3: return "helics_invalid_object";
+  case 4: return "helics_invalid_argument";
+  case 5: return "helics_discard";
+  case 6: return "helics_system_failure";
+  case 7: return "helics_warning";
+  case 8: return "helics_invalid_state_transition";
+  case 9: return "helics_invalid_function_call";
+  case 10: return "helics_execution_failure";
+  case 11: return "helics_other_error";
+  case 12: return "other_error_type";
+  case 13: return "no_iteration";
+  case 14: return "force_iteration";
+  case 15: return "iterate_if_needed";
+  case 16: return "next_step";
+  case 17: return "iteration_error";
+  case 18: return "iteration_halted";
+  case 19: return "iterating";
+  case 20: return "helics_startup_state";
+  case 21: return "helics_initialization_state";
+  case 22: return "helics_execution_state";
+  case 23: return "helics_finalize_state";
+  case 24: return "helics_error_state";
+  case 25: return "helics_pending_init_state";
+  case 26: return "helics_pending_exec_state";
+  case 27: return "helics_pending_time_state";
+  case 28: return "helics_pending_iterative_time_state";
+  case 29: return "helics_custom_filter";
+  case 30: return "helics_delay_filter";
+  case 31: return "helics_randomDelay_filter";
+  case 32: return "helics_randomDrop_filter";
+  case 33: return "helics_reroute_filter";
+  case 34: return "helics_clone_filter";
+  case 35: return "HELICS_CORE_TYPE_DEFAULT";
+  case 36: return "HELICS_CORE_TYPE_ZMQ";
+  case 37: return "HELICS_CORE_TYPE_MPI";
+  case 38: return "HELICS_CORE_TYPE_TEST";
+  case 39: return "HELICS_CORE_TYPE_INTERPROCESS";
+  case 40: return "HELICS_CORE_TYPE_IPC";
+  case 41: return "HELICS_CORE_TYPE_TCP";
+  case 42: return "HELICS_CORE_TYPE_UDP";
+  case 43: return "HELICS_DATA_TYPE_STRING";
+  case 44: return "HELICS_DATA_TYPE_DOUBLE";
+  case 45: return "HELICS_DATA_TYPE_INT";
+  case 46: return "HELICS_DATA_TYPE_COMPLEX";
+  case 47: return "HELICS_DATA_TYPE_VECTOR";
+  case 48: return "HELICS_DATA_TYPE_NAMEDPOINT";
+  case 49: return "HELICS_DATA_TYPE_BOOLEAN";
+  case 50: return "HELICS_DATA_TYPE_RAW";
+  case 51: return "HELICS_DATA_TYPE_ANY";
   default: return 0;
   }
 }
@@ -7974,54 +9494,58 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   }
   int con_id = (int)mxGetScalar(*argv++);
   switch (con_id) {
-  case 1818783836: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
-  case 1818783837: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_registration_failure",SWIG_From_int(static_cast< int >(helics_registration_failure)));; break;
-  case 1818783838: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_object",SWIG_From_int(static_cast< int >(helics_invalid_object)));; break;
-  case 1818783839: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_argument",SWIG_From_int(static_cast< int >(helics_invalid_argument)));; break;
-  case 1818783840: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_discard",SWIG_From_int(static_cast< int >(helics_discard)));; break;
-  case 1818783841: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_terminated",SWIG_From_int(static_cast< int >(helics_terminated)));; break;
-  case 1818783842: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
-  case 1818783843: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_invalid_state_transition)));; break;
-  case 1818783844: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_function_call",SWIG_From_int(static_cast< int >(helics_invalid_function_call)));; break;
-  case 1818783845: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error",SWIG_From_int(static_cast< int >(helics_error)));; break;
-  case 1818783846: *resv = SWIG_Matlab_SetConstant(module_ns,"no_iteration",SWIG_From_int(static_cast< int >(no_iteration)));; break;
-  case 1818783847: *resv = SWIG_Matlab_SetConstant(module_ns,"force_iteration",SWIG_From_int(static_cast< int >(force_iteration)));; break;
-  case 1818783848: *resv = SWIG_Matlab_SetConstant(module_ns,"iterate_if_needed",SWIG_From_int(static_cast< int >(iterate_if_needed)));; break;
-  case 1818783849: *resv = SWIG_Matlab_SetConstant(module_ns,"next_step",SWIG_From_int(static_cast< int >(next_step)));; break;
-  case 1818783850: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_error",SWIG_From_int(static_cast< int >(iteration_error)));; break;
-  case 1818783851: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_halted",SWIG_From_int(static_cast< int >(iteration_halted)));; break;
-  case 1818783852: *resv = SWIG_Matlab_SetConstant(module_ns,"iterating",SWIG_From_int(static_cast< int >(iterating)));; break;
-  case 1818783853: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_startup_state",SWIG_From_int(static_cast< int >(helics_startup_state)));; break;
-  case 1818783854: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_initialization_state",SWIG_From_int(static_cast< int >(helics_initialization_state)));; break;
-  case 1818783855: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_execution_state",SWIG_From_int(static_cast< int >(helics_execution_state)));; break;
-  case 1818783856: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_finalize_state",SWIG_From_int(static_cast< int >(helics_finalize_state)));; break;
-  case 1818783857: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_state",SWIG_From_int(static_cast< int >(helics_error_state)));; break;
-  case 1818783858: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_init_state",SWIG_From_int(static_cast< int >(helics_pending_init_state)));; break;
-  case 1818783859: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_exec_state",SWIG_From_int(static_cast< int >(helics_pending_exec_state)));; break;
-  case 1818783860: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_time_state",SWIG_From_int(static_cast< int >(helics_pending_time_state)));; break;
-  case 1818783861: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_iterative_time_state",SWIG_From_int(static_cast< int >(helics_pending_iterative_time_state)));; break;
-  case 1818783862: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_custom_filter",SWIG_From_int(static_cast< int >(helics_custom_filter)));; break;
-  case 1818783863: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_delay_filter",SWIG_From_int(static_cast< int >(helics_delay_filter)));; break;
-  case 1818783864: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_randomDelay_filter",SWIG_From_int(static_cast< int >(helics_randomDelay_filter)));; break;
-  case 1818783865: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_randomDrop_filter",SWIG_From_int(static_cast< int >(helics_randomDrop_filter)));; break;
-  case 1818783866: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_reroute_filter",SWIG_From_int(static_cast< int >(helics_reroute_filter)));; break;
-  case 1818783867: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_clone_filter",SWIG_From_int(static_cast< int >(helics_clone_filter)));; break;
-  case 1818783868: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_DEFAULT",SWIG_From_int(static_cast< int >(0)));; break;
-  case 1818783869: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ",SWIG_From_int(static_cast< int >(1)));; break;
-  case 1818783870: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_MPI",SWIG_From_int(static_cast< int >(2)));; break;
-  case 1818783871: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TEST",SWIG_From_int(static_cast< int >(3)));; break;
-  case 1818783872: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_INTERPROCESS",SWIG_From_int(static_cast< int >(4)));; break;
-  case 1818783873: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_IPC",SWIG_From_int(static_cast< int >(5)));; break;
-  case 1818783874: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP",SWIG_From_int(static_cast< int >(6)));; break;
-  case 1818783875: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_UDP",SWIG_From_int(static_cast< int >(7)));; break;
-  case 1818783876: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_STRING",SWIG_From_int(static_cast< int >(0)));; break;
-  case 1818783877: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_DOUBLE",SWIG_From_int(static_cast< int >(1)));; break;
-  case 1818783878: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_INT",SWIG_From_int(static_cast< int >(2)));; break;
-  case 1818783879: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_COMPLEX",SWIG_From_int(static_cast< int >(3)));; break;
-  case 1818783880: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_VECTOR",SWIG_From_int(static_cast< int >(4)));; break;
-  case 1818783881: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_NAMEDPOINT",SWIG_From_int(static_cast< int >(6)));; break;
-  case 1818783882: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_BOOLEAN",SWIG_From_int(static_cast< int >(7)));; break;
-  case 1818783883: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_RAW",SWIG_From_int(static_cast< int >(25)));; break;
+  case 1936535354: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
+  case 1936535355: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_registration_failure",SWIG_From_int(static_cast< int >(helics_registration_failure)));; break;
+  case 1936535356: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_connection_failure",SWIG_From_int(static_cast< int >(helics_connection_failure)));; break;
+  case 1936535357: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_object",SWIG_From_int(static_cast< int >(helics_invalid_object)));; break;
+  case 1936535358: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_argument",SWIG_From_int(static_cast< int >(helics_invalid_argument)));; break;
+  case 1936535359: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_discard",SWIG_From_int(static_cast< int >(helics_discard)));; break;
+  case 1936535360: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_system_failure",SWIG_From_int(static_cast< int >(helics_system_failure)));; break;
+  case 1936535361: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
+  case 1936535362: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_invalid_state_transition)));; break;
+  case 1936535363: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_invalid_function_call",SWIG_From_int(static_cast< int >(helics_invalid_function_call)));; break;
+  case 1936535364: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_execution_failure",SWIG_From_int(static_cast< int >(helics_execution_failure)));; break;
+  case 1936535365: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_other_error",SWIG_From_int(static_cast< int >(helics_other_error)));; break;
+  case 1936535366: *resv = SWIG_Matlab_SetConstant(module_ns,"other_error_type",SWIG_From_int(static_cast< int >(other_error_type)));; break;
+  case 1936535367: *resv = SWIG_Matlab_SetConstant(module_ns,"no_iteration",SWIG_From_int(static_cast< int >(no_iteration)));; break;
+  case 1936535368: *resv = SWIG_Matlab_SetConstant(module_ns,"force_iteration",SWIG_From_int(static_cast< int >(force_iteration)));; break;
+  case 1936535369: *resv = SWIG_Matlab_SetConstant(module_ns,"iterate_if_needed",SWIG_From_int(static_cast< int >(iterate_if_needed)));; break;
+  case 1936535370: *resv = SWIG_Matlab_SetConstant(module_ns,"next_step",SWIG_From_int(static_cast< int >(next_step)));; break;
+  case 1936535371: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_error",SWIG_From_int(static_cast< int >(iteration_error)));; break;
+  case 1936535372: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_halted",SWIG_From_int(static_cast< int >(iteration_halted)));; break;
+  case 1936535373: *resv = SWIG_Matlab_SetConstant(module_ns,"iterating",SWIG_From_int(static_cast< int >(iterating)));; break;
+  case 1936535374: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_startup_state",SWIG_From_int(static_cast< int >(helics_startup_state)));; break;
+  case 1936535375: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_initialization_state",SWIG_From_int(static_cast< int >(helics_initialization_state)));; break;
+  case 1936535376: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_execution_state",SWIG_From_int(static_cast< int >(helics_execution_state)));; break;
+  case 1936535377: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_finalize_state",SWIG_From_int(static_cast< int >(helics_finalize_state)));; break;
+  case 1936535378: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_state",SWIG_From_int(static_cast< int >(helics_error_state)));; break;
+  case 1936535379: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_init_state",SWIG_From_int(static_cast< int >(helics_pending_init_state)));; break;
+  case 1936535380: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_exec_state",SWIG_From_int(static_cast< int >(helics_pending_exec_state)));; break;
+  case 1936535381: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_time_state",SWIG_From_int(static_cast< int >(helics_pending_time_state)));; break;
+  case 1936535382: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_pending_iterative_time_state",SWIG_From_int(static_cast< int >(helics_pending_iterative_time_state)));; break;
+  case 1936535383: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_custom_filter",SWIG_From_int(static_cast< int >(helics_custom_filter)));; break;
+  case 1936535384: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_delay_filter",SWIG_From_int(static_cast< int >(helics_delay_filter)));; break;
+  case 1936535385: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_randomDelay_filter",SWIG_From_int(static_cast< int >(helics_randomDelay_filter)));; break;
+  case 1936535386: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_randomDrop_filter",SWIG_From_int(static_cast< int >(helics_randomDrop_filter)));; break;
+  case 1936535387: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_reroute_filter",SWIG_From_int(static_cast< int >(helics_reroute_filter)));; break;
+  case 1936535388: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_clone_filter",SWIG_From_int(static_cast< int >(helics_clone_filter)));; break;
+  case 1936535389: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_DEFAULT",SWIG_From_int(static_cast< int >(0)));; break;
+  case 1936535390: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ",SWIG_From_int(static_cast< int >(1)));; break;
+  case 1936535391: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_MPI",SWIG_From_int(static_cast< int >(2)));; break;
+  case 1936535392: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TEST",SWIG_From_int(static_cast< int >(3)));; break;
+  case 1936535393: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_INTERPROCESS",SWIG_From_int(static_cast< int >(4)));; break;
+  case 1936535394: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_IPC",SWIG_From_int(static_cast< int >(5)));; break;
+  case 1936535395: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP",SWIG_From_int(static_cast< int >(6)));; break;
+  case 1936535396: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_UDP",SWIG_From_int(static_cast< int >(7)));; break;
+  case 1936535397: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_STRING",SWIG_From_int(static_cast< int >(0)));; break;
+  case 1936535398: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_DOUBLE",SWIG_From_int(static_cast< int >(1)));; break;
+  case 1936535399: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_INT",SWIG_From_int(static_cast< int >(2)));; break;
+  case 1936535400: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_COMPLEX",SWIG_From_int(static_cast< int >(3)));; break;
+  case 1936535401: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_VECTOR",SWIG_From_int(static_cast< int >(4)));; break;
+  case 1936535402: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_NAMEDPOINT",SWIG_From_int(static_cast< int >(6)));; break;
+  case 1936535403: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_BOOLEAN",SWIG_From_int(static_cast< int >(7)));; break;
+  case 1936535404: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_RAW",SWIG_From_int(static_cast< int >(25)));; break;
+  case 1936535405: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_ANY",SWIG_From_int(static_cast< int >(25262)));; break;
   default:
     SWIG_Error(SWIG_RuntimeError, "No such constant.");
     return 1;
@@ -8038,194 +9562,187 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 4: return "swigTouch";
   case 5: return "helics_time_zero_get";
   case 6: return "helics_time_epsilon_get";
-  case 7: return "helics_true_get";
-  case 8: return "helics_false_get";
-  case 9: return "data_t_data_get";
-  case 10: return "data_t_data_set";
-  case 11: return "data_t_length_get";
-  case 12: return "data_t_length_set";
-  case 13: return "new_data_t";
-  case 14: return "delete_data_t";
-  case 15: return "message_t_time_get";
-  case 16: return "message_t_time_set";
-  case 17: return "message_t_data_get";
-  case 18: return "message_t_data_set";
-  case 19: return "message_t_length_get";
-  case 20: return "message_t_length_set";
-  case 21: return "message_t_original_source_get";
-  case 22: return "message_t_original_source_set";
-  case 23: return "message_t_source_get";
-  case 24: return "message_t_source_set";
-  case 25: return "message_t_dest_get";
-  case 26: return "message_t_dest_set";
-  case 27: return "message_t_original_dest_get";
-  case 28: return "message_t_original_dest_set";
-  case 29: return "new_message_t";
-  case 30: return "delete_message_t";
-  case 31: return "_wrap_helicsGetVersion";
-  case 32: return "_wrap_helicsIsCoreTypeAvailable";
-  case 33: return "_wrap_helicsCreateCore";
-  case 34: return "_wrap_helicsCreateCoreFromArgs";
-  case 35: return "_wrap_helicsCoreClone";
-  case 36: return "_wrap_helicsCreateBroker";
-  case 37: return "_wrap_helicsCreateBrokerFromArgs";
-  case 38: return "_wrap_helicsBrokerClone";
-  case 39: return "_wrap_helicsBrokerIsConnected";
-  case 40: return "_wrap_helicsBrokerWaitForDisconnect";
-  case 41: return "_wrap_helicsCoreIsConnected";
-  case 42: return "_wrap_helicsBrokerGetIdentifier";
-  case 43: return "_wrap_helicsCoreGetIdentifier";
-  case 44: return "_wrap_helicsBrokerGetAddress";
-  case 45: return "_wrap_helicsCoreSetReadyToInit";
-  case 46: return "_wrap_helicsCoreDisconnect";
-  case 47: return "_wrap_helicsGetFederateByName";
-  case 48: return "_wrap_helicsBrokerDisconnect";
-  case 49: return "_wrap_helicsDestroyFederate";
-  case 50: return "_wrap_helicsDestroyBroker";
-  case 51: return "_wrap_helicsDestroyCore";
-  case 52: return "_wrap_helicsCoreFree";
-  case 53: return "_wrap_helicsBrokerFree";
-  case 54: return "_wrap_helicsCreateValueFederate";
-  case 55: return "_wrap_helicsCreateValueFederateFromJson";
-  case 56: return "_wrap_helicsCreateMessageFederate";
-  case 57: return "_wrap_helicsCreateMessageFederateFromJson";
-  case 58: return "_wrap_helicsCreateCombinationFederate";
-  case 59: return "_wrap_helicsCreateCombinationFederateFromJson";
-  case 60: return "_wrap_helicsFederateClone";
-  case 61: return "_wrap_helicsFederateInfoCreate";
-  case 62: return "_wrap_helicsFederateInfoLoadFromArgs";
-  case 63: return "_wrap_helicsFederateInfoFree";
-  case 64: return "_wrap_helicsFederateInfoSetFederateName";
+  case 7: return "helics_time_invalid_get";
+  case 8: return "helics_true_get";
+  case 9: return "helics_false_get";
+  case 10: return "data_t_data_get";
+  case 11: return "data_t_data_set";
+  case 12: return "data_t_length_get";
+  case 13: return "data_t_length_set";
+  case 14: return "new_data_t";
+  case 15: return "delete_data_t";
+  case 16: return "message_t_time_get";
+  case 17: return "message_t_time_set";
+  case 18: return "message_t_data_get";
+  case 19: return "message_t_data_set";
+  case 20: return "message_t_length_get";
+  case 21: return "message_t_length_set";
+  case 22: return "message_t_original_source_get";
+  case 23: return "message_t_original_source_set";
+  case 24: return "message_t_source_get";
+  case 25: return "message_t_source_set";
+  case 26: return "message_t_dest_get";
+  case 27: return "message_t_dest_set";
+  case 28: return "message_t_original_dest_get";
+  case 29: return "message_t_original_dest_set";
+  case 30: return "new_message_t";
+  case 31: return "delete_message_t";
+  case 32: return "_wrap_helicsGetVersion";
+  case 33: return "_wrap_helicsIsCoreTypeAvailable";
+  case 34: return "_wrap_helicsCreateCore";
+  case 35: return "_wrap_helicsCreateCoreFromArgs";
+  case 36: return "_wrap_helicsCoreClone";
+  case 37: return "_wrap_helicsCreateBroker";
+  case 38: return "_wrap_helicsCreateBrokerFromArgs";
+  case 39: return "_wrap_helicsBrokerClone";
+  case 40: return "_wrap_helicsBrokerIsConnected";
+  case 41: return "_wrap_helicsBrokerWaitForDisconnect";
+  case 42: return "_wrap_helicsCoreIsConnected";
+  case 43: return "_wrap_helicsBrokerGetIdentifier";
+  case 44: return "_wrap_helicsCoreGetIdentifier";
+  case 45: return "_wrap_helicsBrokerGetAddress";
+  case 46: return "_wrap_helicsCoreSetReadyToInit";
+  case 47: return "_wrap_helicsCoreDisconnect";
+  case 48: return "_wrap_helicsGetFederateByName";
+  case 49: return "_wrap_helicsBrokerDisconnect";
+  case 50: return "_wrap_helicsFederateDestroy";
+  case 51: return "_wrap_helicsBrokerDestroy";
+  case 52: return "_wrap_helicsCoreDestroy";
+  case 53: return "_wrap_helicsCoreFree";
+  case 54: return "_wrap_helicsBrokerFree";
+  case 55: return "_wrap_helicsCreateValueFederate";
+  case 56: return "_wrap_helicsCreateValueFederateFromConfig";
+  case 57: return "_wrap_helicsCreateMessageFederate";
+  case 58: return "_wrap_helicsCreateMessageFederateFromConfig";
+  case 59: return "_wrap_helicsCreateCombinationFederate";
+  case 60: return "_wrap_helicsCreateCombinationFederateFromConfig";
+  case 61: return "_wrap_helicsFederateClone";
+  case 62: return "_wrap_helicsCreateFederateInfo";
+  case 63: return "_wrap_helicsFederateInfoLoadFromArgs";
+  case 64: return "_wrap_helicsFederateInfoFree";
   case 65: return "_wrap_helicsFederateInfoSetCoreName";
   case 66: return "_wrap_helicsFederateInfoSetCoreInitString";
   case 67: return "_wrap_helicsFederateInfoSetCoreTypeFromString";
   case 68: return "_wrap_helicsFederateInfoSetCoreType";
-  case 69: return "_wrap_helicsFederateInfoSetFlag";
+  case 69: return "_wrap_helicsFederateInfoSetFlagOption";
   case 70: return "_wrap_helicsFederateInfoSetSeparator";
-  case 71: return "_wrap_helicsFederateInfoSetOutputDelay";
-  case 72: return "_wrap_helicsFederateInfoSetTimeDelta";
-  case 73: return "_wrap_helicsFederateInfoSetInputDelay";
-  case 74: return "_wrap_helicsFederateInfoSetTimeOffset";
-  case 75: return "_wrap_helicsFederateInfoSetPeriod";
-  case 76: return "_wrap_helicsFederateInfoSetMaxIterations";
-  case 77: return "_wrap_helicsFederateInfoSetLoggingLevel";
-  case 78: return "_wrap_helicsFederateFinalize";
-  case 79: return "_wrap_helicsFederateFree";
-  case 80: return "_wrap_helicsCloseLibrary";
-  case 81: return "_wrap_helicsFederateEnterInitializationMode";
-  case 82: return "_wrap_helicsFederateEnterInitializationModeAsync";
-  case 83: return "_wrap_helicsFederateIsAsyncOperationCompleted";
-  case 84: return "_wrap_helicsFederateEnterInitializationModeComplete";
-  case 85: return "_wrap_helicsFederateEnterExecutionMode";
-  case 86: return "_wrap_helicsFederateEnterExecutionModeAsync";
-  case 87: return "_wrap_helicsFederateEnterExecutionModeComplete";
-  case 88: return "_wrap_helicsFederateEnterExecutionModeIterative";
-  case 89: return "_wrap_helicsFederateEnterExecutionModeIterativeAsync";
-  case 90: return "_wrap_helicsFederateEnterExecutionModeIterativeComplete";
-  case 91: return "_wrap_helicsFederateGetState";
-  case 92: return "_wrap_helicsFederateGetCoreObject";
-  case 93: return "_wrap_helicsFederateRequestTime";
-  case 94: return "_wrap_helicsFederateRequestTimeIterative";
-  case 95: return "_wrap_helicsFederateRequestTimeAsync";
-  case 96: return "_wrap_helicsFederateRequestTimeComplete";
-  case 97: return "_wrap_helicsFederateRequestTimeIterativeAsync";
-  case 98: return "_wrap_helicsFederateRequestTimeIterativeComplete";
-  case 99: return "_wrap_helicsFederateGetName";
-  case 100: return "_wrap_helicsFederateSetTimeDelta";
-  case 101: return "_wrap_helicsFederateSetOutputDelay";
-  case 102: return "_wrap_helicsFederateSetInputDelay";
-  case 103: return "_wrap_helicsFederateSetPeriod";
-  case 104: return "_wrap_helicsFederateSetFlag";
-  case 105: return "_wrap_helicsFederateSetSeparator";
-  case 106: return "_wrap_helicsFederateSetLoggingLevel";
-  case 107: return "_wrap_helicsFederateSetMaxIterations";
-  case 108: return "_wrap_helicsFederateGetCurrentTime";
-  case 109: return "_wrap_helicsCreateQuery";
-  case 110: return "_wrap_helicsQueryExecute";
-  case 111: return "_wrap_helicsQueryCoreExecute";
-  case 112: return "_wrap_helicsQueryBrokerExecute";
-  case 113: return "_wrap_helicsQueryExecuteAsync";
-  case 114: return "_wrap_helicsQueryExecuteComplete";
-  case 115: return "_wrap_helicsQueryIsCompleted";
-  case 116: return "_wrap_helicsQueryFree";
-  case 117: return "_wrap_helicsCleanupHelicsLibrary";
-  case 118: return "_wrap_helicsFederateRegisterSubscription";
-  case 119: return "_wrap_helicsFederateRegisterTypeSubscription";
-  case 120: return "_wrap_helicsFederateRegisterOptionalSubscription";
-  case 121: return "_wrap_helicsFederateRegisterOptionalTypeSubscription";
-  case 122: return "_wrap_helicsFederateRegisterPublication";
-  case 123: return "_wrap_helicsFederateRegisterTypePublication";
-  case 124: return "_wrap_helicsFederateRegisterGlobalPublication";
-  case 125: return "_wrap_helicsFederateRegisterGlobalTypePublication";
-  case 126: return "_wrap_helicsPublicationPublishRaw";
-  case 127: return "_wrap_helicsPublicationPublishString";
-  case 128: return "_wrap_helicsPublicationPublishInteger";
-  case 129: return "_wrap_helicsPublicationPublishBoolean";
-  case 130: return "_wrap_helicsPublicationPublishDouble";
-  case 131: return "_wrap_helicsPublicationPublishComplex";
-  case 132: return "_wrap_helicsPublicationPublishVector";
-  case 133: return "_wrap_helicsPublicationPublishNamedPoint";
-  case 134: return "_wrap_helicsSubscriptionGetValueSize";
-  case 135: return "_wrap_helicsSubscriptionGetRawValue";
-  case 136: return "_wrap_helicsSubscriptionGetStringSize";
-  case 137: return "_wrap_helicsSubscriptionGetString";
-  case 138: return "_wrap_helicsSubscriptionGetInteger";
-  case 139: return "_wrap_helicsSubscriptionGetBoolean";
-  case 140: return "_wrap_helicsSubscriptionGetDouble";
-  case 141: return "_wrap_helicsSubscriptionGetComplex";
-  case 142: return "_wrap_helicsSubscriptionGetVectorSize";
-  case 143: return "_wrap_helicsSubscriptionGetVector";
-  case 144: return "_wrap_helicsSubscriptionGetNamedPoint";
-  case 145: return "_wrap_helicsSubscriptionSetDefaultRaw";
-  case 146: return "_wrap_helicsSubscriptionSetDefaultString";
-  case 147: return "_wrap_helicsSubscriptionSetDefaultInteger";
-  case 148: return "_wrap_helicsSubscriptionSetDefaultBoolean";
-  case 149: return "_wrap_helicsSubscriptionSetDefaultDouble";
-  case 150: return "_wrap_helicsSubscriptionSetDefaultComplex";
-  case 151: return "_wrap_helicsSubscriptionSetDefaultVector";
-  case 152: return "_wrap_helicsSubscriptionSetDefaultNamedPoint";
-  case 153: return "_wrap_helicsSubscriptionGetType";
-  case 154: return "_wrap_helicsPublicationGetType";
-  case 155: return "_wrap_helicsSubscriptionGetKey";
-  case 156: return "_wrap_helicsPublicationGetKey";
-  case 157: return "_wrap_helicsSubscriptionGetUnits";
-  case 158: return "_wrap_helicsPublicationGetUnits";
-  case 159: return "_wrap_helicsSubscriptionIsUpdated";
-  case 160: return "_wrap_helicsSubscriptionLastUpdateTime";
-  case 161: return "_wrap_helicsFederateGetPublicationCount";
-  case 162: return "_wrap_helicsFederateGetSubscriptionCount";
-  case 163: return "_wrap_helicsFederateRegisterEndpoint";
-  case 164: return "_wrap_helicsFederateRegisterGlobalEndpoint";
-  case 165: return "_wrap_helicsEndpointSetDefaultDestination";
-  case 166: return "_wrap_helicsEndpointSendMessageRaw";
-  case 167: return "_wrap_helicsEndpointSendEventRaw";
-  case 168: return "_wrap_helicsEndpointSendMessage";
-  case 169: return "_wrap_helicsEndpointSubscribe";
-  case 170: return "_wrap_helicsFederateHasMessage";
-  case 171: return "_wrap_helicsEndpointHasMessage";
-  case 172: return "_wrap_helicsFederateReceiveCount";
-  case 173: return "_wrap_helicsEndpointReceiveCount";
-  case 174: return "_wrap_helicsEndpointGetMessage";
-  case 175: return "_wrap_helicsFederateGetMessage";
-  case 176: return "_wrap_helicsEndpointGetType";
-  case 177: return "_wrap_helicsEndpointGetName";
-  case 178: return "_wrap_helicsFederateGetEndpointCount";
-  case 179: return "_wrap_helicsFederateRegisterSourceFilter";
-  case 180: return "_wrap_helicsFederateRegisterDestinationFilter";
-  case 181: return "_wrap_helicsFederateRegisterCloningFilter";
-  case 182: return "_wrap_helicsCoreRegisterSourceFilter";
-  case 183: return "_wrap_helicsCoreRegisterDestinationFilter";
-  case 184: return "_wrap_helicsCoreRegisterCloningFilter";
-  case 185: return "_wrap_helicsFilterGetTarget";
-  case 186: return "_wrap_helicsFilterGetName";
-  case 187: return "_wrap_helicsFilterSet";
-  case 188: return "_wrap_helicsFilterSetString";
-  case 189: return "_wrap_helicsFilterAddDestinationTarget";
-  case 190: return "_wrap_helicsFilterAddSourceTarget";
-  case 191: return "_wrap_helicsFilterAddDeliveryEndpoint";
-  case 192: return "_wrap_helicsFilterRemoveDestinationTarget";
-  case 193: return "_wrap_helicsFilterRemoveSourceTarget";
-  case 194: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
+  case 71: return "_wrap_helicsFederateInfoSetTimeProperty";
+  case 72: return "_wrap_helicsFederateInfoSetIntegerProperty";
+  case 73: return "_wrap_helicsFederateFinalize";
+  case 74: return "_wrap_helicsFederateFree";
+  case 75: return "_wrap_helicsCloseLibrary";
+  case 76: return "_wrap_helicsFederateEnterInitializingMode";
+  case 77: return "_wrap_helicsFederateEnterInitializingModeAsync";
+  case 78: return "_wrap_helicsFederateIsAsyncOperationCompleted";
+  case 79: return "_wrap_helicsFederateEnterInitializingModeComplete";
+  case 80: return "_wrap_helicsFederateEnterExecutingMode";
+  case 81: return "_wrap_helicsFederateEnterExecutingModeAsync";
+  case 82: return "_wrap_helicsFederateEnterExecutingModeComplete";
+  case 83: return "_wrap_helicsFederateEnterExecutingModeIterative";
+  case 84: return "_wrap_helicsFederateEnterExecutingModeIterativeAsync";
+  case 85: return "_wrap_helicsFederateEnterExecutingModeIterativeComplete";
+  case 86: return "_wrap_helicsFederateGetState";
+  case 87: return "_wrap_helicsFederateGetCoreObject";
+  case 88: return "_wrap_helicsFederateRequestTime";
+  case 89: return "_wrap_helicsFederateRequestTimeIterative";
+  case 90: return "_wrap_helicsFederateRequestTimeAsync";
+  case 91: return "_wrap_helicsFederateRequestTimeComplete";
+  case 92: return "_wrap_helicsFederateRequestTimeIterativeAsync";
+  case 93: return "_wrap_helicsFederateRequestTimeIterativeComplete";
+  case 94: return "_wrap_helicsFederateGetName";
+  case 95: return "_wrap_helicsFederateSetTimeProperty";
+  case 96: return "_wrap_helicsFederateSetFlagOption";
+  case 97: return "_wrap_helicsFederateSetSeparator";
+  case 98: return "_wrap_helicsFederateSetIntegerProperty";
+  case 99: return "_wrap_helicsFederateGetTimeProperty";
+  case 100: return "_wrap_helicsFederateGetFlagOption";
+  case 101: return "_wrap_helicsFederateGetIntegerProperty";
+  case 102: return "_wrap_helicsFederateGetCurrentTime";
+  case 103: return "_wrap_helicsCreateQuery";
+  case 104: return "_wrap_helicsQueryExecute";
+  case 105: return "_wrap_helicsQueryCoreExecute";
+  case 106: return "_wrap_helicsQueryBrokerExecute";
+  case 107: return "_wrap_helicsQueryExecuteAsync";
+  case 108: return "_wrap_helicsQueryExecuteComplete";
+  case 109: return "_wrap_helicsQueryIsCompleted";
+  case 110: return "_wrap_helicsQueryFree";
+  case 111: return "_wrap_helicsCleanupLibrary";
+  case 112: return "_wrap_helicsFederateRegisterSubscription";
+  case 113: return "_wrap_helicsFederateRegisterPublication";
+  case 114: return "_wrap_helicsFederateRegisterTypePublication";
+  case 115: return "_wrap_helicsFederateRegisterGlobalPublication";
+  case 116: return "_wrap_helicsFederateRegisterGlobalTypePublication";
+  case 117: return "_wrap_helicsFederateRegisterInput";
+  case 118: return "_wrap_helicsFederateRegisterTypeInput";
+  case 119: return "_wrap_helicsFederateRegisterGlobalInput";
+  case 120: return "_wrap_helicsFederateRegisterGlobalTypeInput";
+  case 121: return "_wrap_helicsPublicationPublishRaw";
+  case 122: return "_wrap_helicsPublicationPublishString";
+  case 123: return "_wrap_helicsPublicationPublishInteger";
+  case 124: return "_wrap_helicsPublicationPublishBoolean";
+  case 125: return "_wrap_helicsPublicationPublishDouble";
+  case 126: return "_wrap_helicsPublicationPublishComplex";
+  case 127: return "_wrap_helicsPublicationPublishVector";
+  case 128: return "_wrap_helicsPublicationPublishNamedPoint";
+  case 129: return "_wrap_helicsPublicationAddTarget";
+  case 130: return "_wrap_helicsInputAddTarget";
+  case 131: return "_wrap_helicsInputGetRawValueSize";
+  case 132: return "_wrap_helicsInputGetRawValue";
+  case 133: return "_wrap_helicsInputGetStringSize";
+  case 134: return "_wrap_helicsInputGetString";
+  case 135: return "_wrap_helicsInputGetInteger";
+  case 136: return "_wrap_helicsInputGetBoolean";
+  case 137: return "_wrap_helicsInputGetDouble";
+  case 138: return "_wrap_helicsGetComplex";
+  case 139: return "_wrap_helicsInputGetVectorSize";
+  case 140: return "_wrap_helicsInputGetVector";
+  case 141: return "_wrap_helicsInputGetNamedPoint";
+  case 142: return "_wrap_helicsInputSetDefaultRaw";
+  case 143: return "_wrap_helicsInputSetDefaultString";
+  case 144: return "_wrap_helicsInputSetDefaultInteger";
+  case 145: return "_wrap_helicsInputSetDefaultBoolean";
+  case 146: return "_wrap_helicsInputSetDefaultDouble";
+  case 147: return "_wrap_helicsInputSetDefaultComplex";
+  case 148: return "_wrap_helicsInputSetDefaultVector";
+  case 149: return "_wrap_helicsInputSetDefaultNamedPoint";
+  case 150: return "_wrap_helicsInputGetType";
+  case 151: return "_wrap_helicsPublicationGetType";
+  case 152: return "_wrap_helicsInputGetKey";
+  case 153: return "_wrap_helicsPublicationGetKey";
+  case 154: return "_wrap_helicsInputGetUnits";
+  case 155: return "_wrap_helicsPublicationGetUnits";
+  case 156: return "_wrap_helicsInputIsUpdated";
+  case 157: return "_wrap_helicsInputLastUpdateTime";
+  case 158: return "_wrap_helicsFederateGetPublicationCount";
+  case 159: return "_wrap_helicsFederateGetInputCount";
+  case 160: return "_wrap_helicsFederateRegisterEndpoint";
+  case 161: return "_wrap_helicsFederateRegisterGlobalEndpoint";
+  case 162: return "_wrap_helicsEndpointSetDefaultDestination";
+  case 163: return "_wrap_helicsEndpointSendMessageRaw";
+  case 164: return "_wrap_helicsEndpointSendEventRaw";
+  case 165: return "_wrap_helicsEndpointSendMessage";
+  case 166: return "_wrap_helicsEndpointSubscribe";
+  case 167: return "_wrap_helicsFederateHasMessage";
+  case 168: return "_wrap_helicsEndpointHasMessage";
+  case 169: return "_wrap_helicsFederatePendingMessages";
+  case 170: return "_wrap_helicsEndpointPendingMessages";
+  case 171: return "_wrap_helicsEndpointGetMessage";
+  case 172: return "_wrap_helicsFederateGetMessage";
+  case 173: return "_wrap_helicsEndpointGetType";
+  case 174: return "_wrap_helicsEndpointGetName";
+  case 175: return "_wrap_helicsFederateGetEndpointCount";
+  case 176: return "_wrap_helicsFederateRegisterFilter";
+  case 177: return "_wrap_helicsFederateRegisterCloningFilter";
+  case 178: return "_wrap_helicsCoreRegisterFilter";
+  case 179: return "_wrap_helicsCoreRegisterCloningFilter";
+  case 180: return "_wrap_helicsFilterGetName";
+  case 181: return "_wrap_helicsFilterSet";
+  case 182: return "_wrap_helicsFilterSetString";
+  case 183: return "_wrap_helicsFilterAddDestinationTarget";
+  case 184: return "_wrap_helicsFilterAddSourceTarget";
+  case 185: return "_wrap_helicsFilterAddDeliveryEndpoint";
+  case 186: return "_wrap_helicsFilterRemoveTarget";
+  case 187: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
   default: return 0;
   }
 }
@@ -8289,194 +9806,187 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 4: flag=swigTouch(resc,resv,argc,(mxArray**)(argv)); break;
   case 5: flag=_wrap_helics_time_zero_get(resc,resv,argc,(mxArray**)(argv)); break;
   case 6: flag=_wrap_helics_time_epsilon_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 7: flag=_wrap_helics_true_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 8: flag=_wrap_helics_false_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 9: flag=_wrap_data_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 10: flag=_wrap_data_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 11: flag=_wrap_data_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 12: flag=_wrap_data_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 13: flag=_wrap_new_data_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 14: flag=_wrap_delete_data_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 15: flag=_wrap_message_t_time_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 16: flag=_wrap_message_t_time_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 17: flag=_wrap_message_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 18: flag=_wrap_message_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 19: flag=_wrap_message_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 20: flag=_wrap_message_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 21: flag=_wrap_message_t_original_source_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 22: flag=_wrap_message_t_original_source_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 23: flag=_wrap_message_t_source_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 24: flag=_wrap_message_t_source_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 25: flag=_wrap_message_t_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 26: flag=_wrap_message_t_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 27: flag=_wrap_message_t_original_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 28: flag=_wrap_message_t_original_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 29: flag=_wrap_new_message_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 30: flag=_wrap_delete_message_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 31: flag=_wrap_helicsGetVersion(resc,resv,argc,(mxArray**)(argv)); break;
-  case 32: flag=_wrap_helicsIsCoreTypeAvailable(resc,resv,argc,(mxArray**)(argv)); break;
-  case 33: flag=_wrap_helicsCreateCore(resc,resv,argc,(mxArray**)(argv)); break;
-  case 34: flag=_wrap_helicsCreateCoreFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 35: flag=_wrap_helicsCoreClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 36: flag=_wrap_helicsCreateBroker(resc,resv,argc,(mxArray**)(argv)); break;
-  case 37: flag=_wrap_helicsCreateBrokerFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 38: flag=_wrap_helicsBrokerClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 39: flag=_wrap_helicsBrokerIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
-  case 40: flag=_wrap_helicsBrokerWaitForDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 41: flag=_wrap_helicsCoreIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
-  case 42: flag=_wrap_helicsBrokerGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
-  case 43: flag=_wrap_helicsCoreGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
-  case 44: flag=_wrap_helicsBrokerGetAddress(resc,resv,argc,(mxArray**)(argv)); break;
-  case 45: flag=_wrap_helicsCoreSetReadyToInit(resc,resv,argc,(mxArray**)(argv)); break;
-  case 46: flag=_wrap_helicsCoreDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 47: flag=_wrap_helicsGetFederateByName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 48: flag=_wrap_helicsBrokerDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 49: flag=_wrap_helicsDestroyFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 50: flag=_wrap_helicsDestroyBroker(resc,resv,argc,(mxArray**)(argv)); break;
-  case 51: flag=_wrap_helicsDestroyCore(resc,resv,argc,(mxArray**)(argv)); break;
-  case 52: flag=_wrap_helicsCoreFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 53: flag=_wrap_helicsBrokerFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 54: flag=_wrap_helicsCreateValueFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 55: flag=_wrap_helicsCreateValueFederateFromJson(resc,resv,argc,(mxArray**)(argv)); break;
-  case 56: flag=_wrap_helicsCreateMessageFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 57: flag=_wrap_helicsCreateMessageFederateFromJson(resc,resv,argc,(mxArray**)(argv)); break;
-  case 58: flag=_wrap_helicsCreateCombinationFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 59: flag=_wrap_helicsCreateCombinationFederateFromJson(resc,resv,argc,(mxArray**)(argv)); break;
-  case 60: flag=_wrap_helicsFederateClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 61: flag=_wrap_helicsFederateInfoCreate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 62: flag=_wrap_helicsFederateInfoLoadFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 63: flag=_wrap_helicsFederateInfoFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 64: flag=_wrap_helicsFederateInfoSetFederateName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 7: flag=_wrap_helics_time_invalid_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 8: flag=_wrap_helics_true_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 9: flag=_wrap_helics_false_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 10: flag=_wrap_data_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 11: flag=_wrap_data_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 12: flag=_wrap_data_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 13: flag=_wrap_data_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 14: flag=_wrap_new_data_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 15: flag=_wrap_delete_data_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 16: flag=_wrap_message_t_time_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 17: flag=_wrap_message_t_time_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 18: flag=_wrap_message_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 19: flag=_wrap_message_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 20: flag=_wrap_message_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 21: flag=_wrap_message_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 22: flag=_wrap_message_t_original_source_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 23: flag=_wrap_message_t_original_source_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 24: flag=_wrap_message_t_source_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 25: flag=_wrap_message_t_source_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 26: flag=_wrap_message_t_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 27: flag=_wrap_message_t_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 28: flag=_wrap_message_t_original_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 29: flag=_wrap_message_t_original_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 30: flag=_wrap_new_message_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 31: flag=_wrap_delete_message_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 32: flag=_wrap_helicsGetVersion(resc,resv,argc,(mxArray**)(argv)); break;
+  case 33: flag=_wrap_helicsIsCoreTypeAvailable(resc,resv,argc,(mxArray**)(argv)); break;
+  case 34: flag=_wrap_helicsCreateCore(resc,resv,argc,(mxArray**)(argv)); break;
+  case 35: flag=_wrap_helicsCreateCoreFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 36: flag=_wrap_helicsCoreClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 37: flag=_wrap_helicsCreateBroker(resc,resv,argc,(mxArray**)(argv)); break;
+  case 38: flag=_wrap_helicsCreateBrokerFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 39: flag=_wrap_helicsBrokerClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 40: flag=_wrap_helicsBrokerIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
+  case 41: flag=_wrap_helicsBrokerWaitForDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 42: flag=_wrap_helicsCoreIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
+  case 43: flag=_wrap_helicsBrokerGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
+  case 44: flag=_wrap_helicsCoreGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
+  case 45: flag=_wrap_helicsBrokerGetAddress(resc,resv,argc,(mxArray**)(argv)); break;
+  case 46: flag=_wrap_helicsCoreSetReadyToInit(resc,resv,argc,(mxArray**)(argv)); break;
+  case 47: flag=_wrap_helicsCoreDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 48: flag=_wrap_helicsGetFederateByName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 49: flag=_wrap_helicsBrokerDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 50: flag=_wrap_helicsFederateDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 51: flag=_wrap_helicsBrokerDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 52: flag=_wrap_helicsCoreDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 53: flag=_wrap_helicsCoreFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 54: flag=_wrap_helicsBrokerFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 55: flag=_wrap_helicsCreateValueFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 56: flag=_wrap_helicsCreateValueFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 57: flag=_wrap_helicsCreateMessageFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 58: flag=_wrap_helicsCreateMessageFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 59: flag=_wrap_helicsCreateCombinationFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 60: flag=_wrap_helicsCreateCombinationFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 61: flag=_wrap_helicsFederateClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 62: flag=_wrap_helicsCreateFederateInfo(resc,resv,argc,(mxArray**)(argv)); break;
+  case 63: flag=_wrap_helicsFederateInfoLoadFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 64: flag=_wrap_helicsFederateInfoFree(resc,resv,argc,(mxArray**)(argv)); break;
   case 65: flag=_wrap_helicsFederateInfoSetCoreName(resc,resv,argc,(mxArray**)(argv)); break;
   case 66: flag=_wrap_helicsFederateInfoSetCoreInitString(resc,resv,argc,(mxArray**)(argv)); break;
   case 67: flag=_wrap_helicsFederateInfoSetCoreTypeFromString(resc,resv,argc,(mxArray**)(argv)); break;
   case 68: flag=_wrap_helicsFederateInfoSetCoreType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 69: flag=_wrap_helicsFederateInfoSetFlag(resc,resv,argc,(mxArray**)(argv)); break;
+  case 69: flag=_wrap_helicsFederateInfoSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
   case 70: flag=_wrap_helicsFederateInfoSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
-  case 71: flag=_wrap_helicsFederateInfoSetOutputDelay(resc,resv,argc,(mxArray**)(argv)); break;
-  case 72: flag=_wrap_helicsFederateInfoSetTimeDelta(resc,resv,argc,(mxArray**)(argv)); break;
-  case 73: flag=_wrap_helicsFederateInfoSetInputDelay(resc,resv,argc,(mxArray**)(argv)); break;
-  case 74: flag=_wrap_helicsFederateInfoSetTimeOffset(resc,resv,argc,(mxArray**)(argv)); break;
-  case 75: flag=_wrap_helicsFederateInfoSetPeriod(resc,resv,argc,(mxArray**)(argv)); break;
-  case 76: flag=_wrap_helicsFederateInfoSetMaxIterations(resc,resv,argc,(mxArray**)(argv)); break;
-  case 77: flag=_wrap_helicsFederateInfoSetLoggingLevel(resc,resv,argc,(mxArray**)(argv)); break;
-  case 78: flag=_wrap_helicsFederateFinalize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 79: flag=_wrap_helicsFederateFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 80: flag=_wrap_helicsCloseLibrary(resc,resv,argc,(mxArray**)(argv)); break;
-  case 81: flag=_wrap_helicsFederateEnterInitializationMode(resc,resv,argc,(mxArray**)(argv)); break;
-  case 82: flag=_wrap_helicsFederateEnterInitializationModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 83: flag=_wrap_helicsFederateIsAsyncOperationCompleted(resc,resv,argc,(mxArray**)(argv)); break;
-  case 84: flag=_wrap_helicsFederateEnterInitializationModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 85: flag=_wrap_helicsFederateEnterExecutionMode(resc,resv,argc,(mxArray**)(argv)); break;
-  case 86: flag=_wrap_helicsFederateEnterExecutionModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 87: flag=_wrap_helicsFederateEnterExecutionModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 88: flag=_wrap_helicsFederateEnterExecutionModeIterative(resc,resv,argc,(mxArray**)(argv)); break;
-  case 89: flag=_wrap_helicsFederateEnterExecutionModeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 90: flag=_wrap_helicsFederateEnterExecutionModeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 91: flag=_wrap_helicsFederateGetState(resc,resv,argc,(mxArray**)(argv)); break;
-  case 92: flag=_wrap_helicsFederateGetCoreObject(resc,resv,argc,(mxArray**)(argv)); break;
-  case 93: flag=_wrap_helicsFederateRequestTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 94: flag=_wrap_helicsFederateRequestTimeIterative(resc,resv,argc,(mxArray**)(argv)); break;
-  case 95: flag=_wrap_helicsFederateRequestTimeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 96: flag=_wrap_helicsFederateRequestTimeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 97: flag=_wrap_helicsFederateRequestTimeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 98: flag=_wrap_helicsFederateRequestTimeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 99: flag=_wrap_helicsFederateGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 100: flag=_wrap_helicsFederateSetTimeDelta(resc,resv,argc,(mxArray**)(argv)); break;
-  case 101: flag=_wrap_helicsFederateSetOutputDelay(resc,resv,argc,(mxArray**)(argv)); break;
-  case 102: flag=_wrap_helicsFederateSetInputDelay(resc,resv,argc,(mxArray**)(argv)); break;
-  case 103: flag=_wrap_helicsFederateSetPeriod(resc,resv,argc,(mxArray**)(argv)); break;
-  case 104: flag=_wrap_helicsFederateSetFlag(resc,resv,argc,(mxArray**)(argv)); break;
-  case 105: flag=_wrap_helicsFederateSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
-  case 106: flag=_wrap_helicsFederateSetLoggingLevel(resc,resv,argc,(mxArray**)(argv)); break;
-  case 107: flag=_wrap_helicsFederateSetMaxIterations(resc,resv,argc,(mxArray**)(argv)); break;
-  case 108: flag=_wrap_helicsFederateGetCurrentTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 109: flag=_wrap_helicsCreateQuery(resc,resv,argc,(mxArray**)(argv)); break;
-  case 110: flag=_wrap_helicsQueryExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 111: flag=_wrap_helicsQueryCoreExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 112: flag=_wrap_helicsQueryBrokerExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 113: flag=_wrap_helicsQueryExecuteAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 114: flag=_wrap_helicsQueryExecuteComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 115: flag=_wrap_helicsQueryIsCompleted(resc,resv,argc,(mxArray**)(argv)); break;
-  case 116: flag=_wrap_helicsQueryFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 117: flag=_wrap_helicsCleanupHelicsLibrary(resc,resv,argc,(mxArray**)(argv)); break;
-  case 118: flag=_wrap_helicsFederateRegisterSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 119: flag=_wrap_helicsFederateRegisterTypeSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 120: flag=_wrap_helicsFederateRegisterOptionalSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 121: flag=_wrap_helicsFederateRegisterOptionalTypeSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 122: flag=_wrap_helicsFederateRegisterPublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 123: flag=_wrap_helicsFederateRegisterTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 124: flag=_wrap_helicsFederateRegisterGlobalPublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 125: flag=_wrap_helicsFederateRegisterGlobalTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 126: flag=_wrap_helicsPublicationPublishRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 127: flag=_wrap_helicsPublicationPublishString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 128: flag=_wrap_helicsPublicationPublishInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 129: flag=_wrap_helicsPublicationPublishBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 130: flag=_wrap_helicsPublicationPublishDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 131: flag=_wrap_helicsPublicationPublishComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 132: flag=_wrap_helicsPublicationPublishVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 133: flag=_wrap_helicsPublicationPublishNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 134: flag=_wrap_helicsSubscriptionGetValueSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 135: flag=_wrap_helicsSubscriptionGetRawValue(resc,resv,argc,(mxArray**)(argv)); break;
-  case 136: flag=_wrap_helicsSubscriptionGetStringSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 137: flag=_wrap_helicsSubscriptionGetString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 138: flag=_wrap_helicsSubscriptionGetInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 139: flag=_wrap_helicsSubscriptionGetBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 140: flag=_wrap_helicsSubscriptionGetDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 141: flag=_wrap_helicsSubscriptionGetComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 142: flag=_wrap_helicsSubscriptionGetVectorSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 143: flag=_wrap_helicsSubscriptionGetVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 144: flag=_wrap_helicsSubscriptionGetNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 145: flag=_wrap_helicsSubscriptionSetDefaultRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 146: flag=_wrap_helicsSubscriptionSetDefaultString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 147: flag=_wrap_helicsSubscriptionSetDefaultInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 148: flag=_wrap_helicsSubscriptionSetDefaultBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 149: flag=_wrap_helicsSubscriptionSetDefaultDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 150: flag=_wrap_helicsSubscriptionSetDefaultComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 151: flag=_wrap_helicsSubscriptionSetDefaultVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 152: flag=_wrap_helicsSubscriptionSetDefaultNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 153: flag=_wrap_helicsSubscriptionGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 154: flag=_wrap_helicsPublicationGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 155: flag=_wrap_helicsSubscriptionGetKey(resc,resv,argc,(mxArray**)(argv)); break;
-  case 156: flag=_wrap_helicsPublicationGetKey(resc,resv,argc,(mxArray**)(argv)); break;
-  case 157: flag=_wrap_helicsSubscriptionGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
-  case 158: flag=_wrap_helicsPublicationGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
-  case 159: flag=_wrap_helicsSubscriptionIsUpdated(resc,resv,argc,(mxArray**)(argv)); break;
-  case 160: flag=_wrap_helicsSubscriptionLastUpdateTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 161: flag=_wrap_helicsFederateGetPublicationCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 162: flag=_wrap_helicsFederateGetSubscriptionCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 163: flag=_wrap_helicsFederateRegisterEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 164: flag=_wrap_helicsFederateRegisterGlobalEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 165: flag=_wrap_helicsEndpointSetDefaultDestination(resc,resv,argc,(mxArray**)(argv)); break;
-  case 166: flag=_wrap_helicsEndpointSendMessageRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 167: flag=_wrap_helicsEndpointSendEventRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 168: flag=_wrap_helicsEndpointSendMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 169: flag=_wrap_helicsEndpointSubscribe(resc,resv,argc,(mxArray**)(argv)); break;
-  case 170: flag=_wrap_helicsFederateHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 171: flag=_wrap_helicsEndpointHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 172: flag=_wrap_helicsFederateReceiveCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 173: flag=_wrap_helicsEndpointReceiveCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 174: flag=_wrap_helicsEndpointGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 175: flag=_wrap_helicsFederateGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 176: flag=_wrap_helicsEndpointGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 177: flag=_wrap_helicsEndpointGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 178: flag=_wrap_helicsFederateGetEndpointCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 179: flag=_wrap_helicsFederateRegisterSourceFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 180: flag=_wrap_helicsFederateRegisterDestinationFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 181: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 182: flag=_wrap_helicsCoreRegisterSourceFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 183: flag=_wrap_helicsCoreRegisterDestinationFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 184: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 185: flag=_wrap_helicsFilterGetTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 186: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 187: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
-  case 188: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 189: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 190: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 191: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 192: flag=_wrap_helicsFilterRemoveDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 193: flag=_wrap_helicsFilterRemoveSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 194: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 71: flag=_wrap_helicsFederateInfoSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 72: flag=_wrap_helicsFederateInfoSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 73: flag=_wrap_helicsFederateFinalize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 74: flag=_wrap_helicsFederateFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 75: flag=_wrap_helicsCloseLibrary(resc,resv,argc,(mxArray**)(argv)); break;
+  case 76: flag=_wrap_helicsFederateEnterInitializingMode(resc,resv,argc,(mxArray**)(argv)); break;
+  case 77: flag=_wrap_helicsFederateEnterInitializingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 78: flag=_wrap_helicsFederateIsAsyncOperationCompleted(resc,resv,argc,(mxArray**)(argv)); break;
+  case 79: flag=_wrap_helicsFederateEnterInitializingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 80: flag=_wrap_helicsFederateEnterExecutingMode(resc,resv,argc,(mxArray**)(argv)); break;
+  case 81: flag=_wrap_helicsFederateEnterExecutingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 82: flag=_wrap_helicsFederateEnterExecutingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 83: flag=_wrap_helicsFederateEnterExecutingModeIterative(resc,resv,argc,(mxArray**)(argv)); break;
+  case 84: flag=_wrap_helicsFederateEnterExecutingModeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 85: flag=_wrap_helicsFederateEnterExecutingModeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 86: flag=_wrap_helicsFederateGetState(resc,resv,argc,(mxArray**)(argv)); break;
+  case 87: flag=_wrap_helicsFederateGetCoreObject(resc,resv,argc,(mxArray**)(argv)); break;
+  case 88: flag=_wrap_helicsFederateRequestTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 89: flag=_wrap_helicsFederateRequestTimeIterative(resc,resv,argc,(mxArray**)(argv)); break;
+  case 90: flag=_wrap_helicsFederateRequestTimeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 91: flag=_wrap_helicsFederateRequestTimeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 92: flag=_wrap_helicsFederateRequestTimeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 93: flag=_wrap_helicsFederateRequestTimeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 94: flag=_wrap_helicsFederateGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 95: flag=_wrap_helicsFederateSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 96: flag=_wrap_helicsFederateSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 97: flag=_wrap_helicsFederateSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
+  case 98: flag=_wrap_helicsFederateSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 99: flag=_wrap_helicsFederateGetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 100: flag=_wrap_helicsFederateGetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 101: flag=_wrap_helicsFederateGetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 102: flag=_wrap_helicsFederateGetCurrentTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 103: flag=_wrap_helicsCreateQuery(resc,resv,argc,(mxArray**)(argv)); break;
+  case 104: flag=_wrap_helicsQueryExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 105: flag=_wrap_helicsQueryCoreExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 106: flag=_wrap_helicsQueryBrokerExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 107: flag=_wrap_helicsQueryExecuteAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 108: flag=_wrap_helicsQueryExecuteComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 109: flag=_wrap_helicsQueryIsCompleted(resc,resv,argc,(mxArray**)(argv)); break;
+  case 110: flag=_wrap_helicsQueryFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 111: flag=_wrap_helicsCleanupLibrary(resc,resv,argc,(mxArray**)(argv)); break;
+  case 112: flag=_wrap_helicsFederateRegisterSubscription(resc,resv,argc,(mxArray**)(argv)); break;
+  case 113: flag=_wrap_helicsFederateRegisterPublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 114: flag=_wrap_helicsFederateRegisterTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 115: flag=_wrap_helicsFederateRegisterGlobalPublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 116: flag=_wrap_helicsFederateRegisterGlobalTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 117: flag=_wrap_helicsFederateRegisterInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 118: flag=_wrap_helicsFederateRegisterTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 119: flag=_wrap_helicsFederateRegisterGlobalInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 120: flag=_wrap_helicsFederateRegisterGlobalTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 121: flag=_wrap_helicsPublicationPublishRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 122: flag=_wrap_helicsPublicationPublishString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 123: flag=_wrap_helicsPublicationPublishInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 124: flag=_wrap_helicsPublicationPublishBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 125: flag=_wrap_helicsPublicationPublishDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 126: flag=_wrap_helicsPublicationPublishComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 127: flag=_wrap_helicsPublicationPublishVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 128: flag=_wrap_helicsPublicationPublishNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 129: flag=_wrap_helicsPublicationAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 130: flag=_wrap_helicsInputAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 131: flag=_wrap_helicsInputGetRawValueSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 132: flag=_wrap_helicsInputGetRawValue(resc,resv,argc,(mxArray**)(argv)); break;
+  case 133: flag=_wrap_helicsInputGetStringSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 134: flag=_wrap_helicsInputGetString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 135: flag=_wrap_helicsInputGetInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 136: flag=_wrap_helicsInputGetBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 137: flag=_wrap_helicsInputGetDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 138: flag=_wrap_helicsGetComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 139: flag=_wrap_helicsInputGetVectorSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 140: flag=_wrap_helicsInputGetVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 141: flag=_wrap_helicsInputGetNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 142: flag=_wrap_helicsInputSetDefaultRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 143: flag=_wrap_helicsInputSetDefaultString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 144: flag=_wrap_helicsInputSetDefaultInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 145: flag=_wrap_helicsInputSetDefaultBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 146: flag=_wrap_helicsInputSetDefaultDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 147: flag=_wrap_helicsInputSetDefaultComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 148: flag=_wrap_helicsInputSetDefaultVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 149: flag=_wrap_helicsInputSetDefaultNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 150: flag=_wrap_helicsInputGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 151: flag=_wrap_helicsPublicationGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 152: flag=_wrap_helicsInputGetKey(resc,resv,argc,(mxArray**)(argv)); break;
+  case 153: flag=_wrap_helicsPublicationGetKey(resc,resv,argc,(mxArray**)(argv)); break;
+  case 154: flag=_wrap_helicsInputGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
+  case 155: flag=_wrap_helicsPublicationGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
+  case 156: flag=_wrap_helicsInputIsUpdated(resc,resv,argc,(mxArray**)(argv)); break;
+  case 157: flag=_wrap_helicsInputLastUpdateTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 158: flag=_wrap_helicsFederateGetPublicationCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 159: flag=_wrap_helicsFederateGetInputCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 160: flag=_wrap_helicsFederateRegisterEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 161: flag=_wrap_helicsFederateRegisterGlobalEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 162: flag=_wrap_helicsEndpointSetDefaultDestination(resc,resv,argc,(mxArray**)(argv)); break;
+  case 163: flag=_wrap_helicsEndpointSendMessageRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 164: flag=_wrap_helicsEndpointSendEventRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 165: flag=_wrap_helicsEndpointSendMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 166: flag=_wrap_helicsEndpointSubscribe(resc,resv,argc,(mxArray**)(argv)); break;
+  case 167: flag=_wrap_helicsFederateHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 168: flag=_wrap_helicsEndpointHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 169: flag=_wrap_helicsFederatePendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
+  case 170: flag=_wrap_helicsEndpointPendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
+  case 171: flag=_wrap_helicsEndpointGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 172: flag=_wrap_helicsFederateGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 173: flag=_wrap_helicsEndpointGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 174: flag=_wrap_helicsEndpointGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 175: flag=_wrap_helicsFederateGetEndpointCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 176: flag=_wrap_helicsFederateRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 177: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 178: flag=_wrap_helicsCoreRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 179: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 180: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 181: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
+  case 182: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 183: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 184: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 185: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 186: flag=_wrap_helicsFilterRemoveTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 187: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
   default: flag=1, SWIG_Error(SWIG_RuntimeError, "No function id %d.", fcn_id);
   }
   if (flag) {

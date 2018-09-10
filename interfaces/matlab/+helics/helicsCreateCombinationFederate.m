@@ -14,5 +14,5 @@ function varargout = helicsCreateCombinationFederate(varargin)
     %-------
     %an opaque value federate object nullptr if the object creation failed
     %
-  [varargout{1:nargout}] = helicsMEX(58, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(59, varargin{:});
 end

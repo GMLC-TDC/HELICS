@@ -28,6 +28,9 @@
 %apply (char *outputString, int maxlen) { (char *identifier, int maxlen) };
 %apply (char *outputString, int maxlen) { (char *address, int maxlen) };
 
+%ignore helicsErrorInitialize;
+%ignore helicsErrorClear;
+%ignore helics_error;
 
 %include "api-data.h"
 %include "helics.h"

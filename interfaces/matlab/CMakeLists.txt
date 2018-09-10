@@ -54,7 +54,7 @@ else()
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsMatlab.i
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/swig/helics.i
+      ../helics.i
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsMatlab.i
       ${SHARED_LIB_HEADERS}
       ${CMAKE_CURRENT_SOURCE_DIR}/matlab_maps.i
@@ -136,6 +136,15 @@ if(NOT MATLAB_GENERATE_ONLY)
       ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
   )
   set_target_properties(helicsMEX PROPERTIES FOLDER interfaces)
+else(NOT MATLAB_GENERATE_ONLY)
+  if(NOT OVERWRITE_MATLAB_FILES)
+  #extra target for generation only and no overwrite
+   add_custom_target(
+      matlab_create ALL
+      COMMAND
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+    )
+  endif()
 endif(NOT MATLAB_GENERATE_ONLY)
 
 file(GLOB HSHARED_LIB_SOURCES ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)

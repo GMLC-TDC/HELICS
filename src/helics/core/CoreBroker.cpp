@@ -448,7 +448,7 @@ void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 
 void CoreBroker::processCommand (ActionMessage &&command)
 {
-    LOG_TRACE (global_broker_id.load (), getIdentifier (),
+    LOG_TRACE (global_broker_id_local, getIdentifier (),
                fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {
@@ -1025,6 +1025,10 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 break;
             case CMD_ADD_NAMED_FILTER:
                 unknownHandles.addUnknownFilter(command.name, command.getSource(), command.flags);
+                break;
+            default:
+                LOG_WARNING (global_broker_id_local,
+                             getIdentifier (), "unknown command in interface addition code section\n");
                 break;
             }
         }

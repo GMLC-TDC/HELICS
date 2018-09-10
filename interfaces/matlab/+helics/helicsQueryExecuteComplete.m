@@ -14,5 +14,5 @@ function varargout = helicsQueryExecuteComplete(varargin)
     %a pointer to a string. the string will remain valid until the query is freed or
     %executed again the return will be nullptr if query is an invalid object
     %
-  [varargout{1:nargout}] = helicsMEX(114, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(108, varargin{:});
 end

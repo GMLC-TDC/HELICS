@@ -1,3 +1,3 @@
 function v = helics_false()
-  v = helicsMEX(8);
+  v = helicsMEX(9);
 end

@@ -1,7 +1,7 @@
 function v = helics_error_state()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1818783857);
+    vInitialized = helicsMEX(0, 1936535378);
   end
   v = vInitialized;
 end
