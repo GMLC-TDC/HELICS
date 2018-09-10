@@ -1428,15 +1428,14 @@ void CoreBroker::FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo)
     {
         // notify the filter about its endpoint
         ActionMessage m (CMD_ADD_ENDPOINT);
-        m.setSource (target.first);
-        m.setDestination (handleInfo.handle);
+        m.setSource (handleInfo.handle);
+        m.setDestination (target.first);
         m.flags = target.second;
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
 
         // notify the endpoint about its filter
         m.setAction (CMD_ADD_FILTER);
-        m.setDestination (target.first);
-        m.setSource (handleInfo.handle);
+        m.swapSourceDest();
 
         m.flags = handleInfo.flags;
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
@@ -1455,16 +1454,15 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
     {
         // notify the endpoint about a filter
         ActionMessage m (CMD_ADD_FILTER);
-        m.setSource (target.first);
+        m.setSource (handleInfo.handle);
         m.flags = target.second;
-        m.setDestination (handleInfo.handle);
+        m.setDestination (target.first);
 
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
 
         // notify the filter about an endpoint
         m.setAction (CMD_ADD_ENDPOINT);
-        m.setDestination (target.first);
-        m.setSource (handleInfo.handle);
+        m.swapSourceDest();
 
         m.flags = handleInfo.flags;
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);

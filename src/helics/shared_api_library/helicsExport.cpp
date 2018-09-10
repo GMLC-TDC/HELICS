@@ -524,11 +524,19 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     }
     auto broker = std::make_unique<helics::BrokerObject> ();
     broker->valid = brokerValidationIdentifier;
-    broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr,
-                                                       (initString != nullptr) ? std::string (initString) : nullstr);
-    auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
-    getMasterHolder ()->addBroker (std::move (broker));
-    return retbroker;
+    try
+    {
+        broker->brokerptr = helics::BrokerFactory::create(ct, (name != nullptr) ? std::string(name) : nullstr,
+            (initString != nullptr) ? std::string(initString) : nullstr);
+        auto retbroker = reinterpret_cast<helics_broker> (broker.get());
+        getMasterHolder()->addBroker(std::move(broker));
+        return retbroker;
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+        return nullptr;
+   }
 }
 
 helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err)
@@ -550,10 +558,18 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     }
     auto broker = std::make_unique<helics::BrokerObject> ();
     broker->valid = brokerValidationIdentifier;
-    broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
-    auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
-    getMasterHolder ()->addBroker (std::move (broker));
-    return retbroker;
+    try
+    {
+        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+        auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
+        getMasterHolder ()->addBroker (std::move (broker));
+        return retbroker;
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+        return nullptr;
+    }
 }
 
 helics_broker helicsBrokerClone (helics_broker broker, helics_error *err)
