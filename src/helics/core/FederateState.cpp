@@ -863,6 +863,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_STOP:
         setState (HELICS_FINISHED);
         LOG_DEBUG ("Terminating");
+        timeCoord->disconnect ();
         return message_processing_result::halted;
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id)

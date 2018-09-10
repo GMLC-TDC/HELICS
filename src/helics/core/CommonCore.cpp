@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -82,6 +82,7 @@ bool CommonCore::connect ()
                 setActionFlag (m, core_flag);
                 transmit (0, m);
                 brokerState = broker_state_t::connected;
+                disconnection.activate ();
             }
             else
             {
@@ -110,7 +111,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         if (brokerState < broker_state_t::terminating)
         {
             brokerState = broker_state_t::terminating;
-            timeCoord->disconnect ();
+            sendDisconnect ();
             if (global_broker_id != 0)
             {
                 ActionMessage dis (CMD_DISCONNECT);
@@ -133,9 +134,27 @@ void CommonCore::processDisconnect (bool skipUnregister)
     {
         unregister ();
     }
+    disconnection.trigger ();
 }
 
-void CommonCore::disconnect () { processDisconnect (); }
+void CommonCore::disconnect ()
+{
+    ActionMessage udisconnect (CMD_USER_DISCONNECT);
+    addActionMessage (udisconnect);
+    waitForDisconnect ();
+}
+
+void CommonCore::waitForDisconnect (int msToWait) const
+{
+    if (msToWait <= 0)
+    {
+        disconnection.wait ();
+    }
+    else
+    {
+        disconnection.wait_for (std::chrono::milliseconds (msToWait));
+    }
+}
 
 void CommonCore::unregister ()
 {
@@ -2278,7 +2297,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // brokerReconnect()
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
             sendErrorToFederates (-5);
-            disconnect ();
+            processDisconnect ();
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
@@ -2309,14 +2328,29 @@ void CommonCore::processCommand (ActionMessage &&command)
             waitingForServerPingReply = false;
         }
         break;
-    case CMD_STOP:
-
+    case CMD_USER_DISCONNECT:
         if (isConnected ())
         {
             if (brokerState < broker_state_t::terminating)
             {  // only send a disconnect message if we haven't done so already
                 brokerState = broker_state_t::terminating;
-                timeCoord->disconnect ();
+                sendDisconnect ();
+                ActionMessage m (CMD_DISCONNECT);
+                m.source_id = global_broker_id;
+                transmit (0, m);
+            }
+        }
+        addActionMessage (CMD_STOP);
+		//we can't just fall through since this may have generated other messages that need to be forwarded or processed
+        break;
+    case CMD_STOP:
+
+          if (isConnected ())
+        {
+            if (brokerState < broker_state_t::terminating)
+            {  // only send a disconnect message if we haven't done so already
+                brokerState = broker_state_t::terminating;
+                sendDisconnect ();
                 ActionMessage m (CMD_DISCONNECT);
                 m.source_id = global_broker_id;
                 transmit (0, m);
@@ -3164,6 +3198,24 @@ void CommonCore::checkDisconnect ()
     }
 }
 
+void CommonCore::sendDisconnect ()
+{
+    ActionMessage bye (CMD_STOP);
+    bye.source_id = global_broker_id;
+    for (auto &fed : loopFederates)
+    {
+        fed->addAction (bye);
+        if (hasTimeDependency)
+        {
+            timeCoord->removeDependency (fed->global_id);
+            timeCoord->removeDependent (fed->global_id);
+        }
+    }
+    if (hasTimeDependency)
+    {
+        timeCoord->disconnect ();
+    }
+}
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {
     auto handlelock = handles.lock_shared ();

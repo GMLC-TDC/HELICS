@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/MappedPointerVector.hpp"
+#include "../common/TriggerVariable.hpp"
 #include "HandlePointerManager.hpp"
 #include "helics_includes/any.hpp"
 #include <array>
@@ -165,8 +166,11 @@ class CommonCore : public Core, public BrokerBase
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;
+    virtual void waitForDisconnect (int msToWait = -1) const override final;
     /** unregister the core from any process find functions*/
     void unregister ();
+    /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
+     * class of some sort*/
     virtual void processDisconnect (bool skipUnregister = false) override final;
 
   private:
@@ -320,7 +324,7 @@ class CommonCore : public Core, public BrokerBase
 
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
-
+    TriggerVariable disconnection;  //!< controller for the disconnection process
   protected:
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
@@ -377,6 +381,8 @@ class CommonCore : public Core, public BrokerBase
     void sendErrorToFederates (int error_code);
     /** check for a disconnect and take actions if the object can disconnect*/
     void checkDisconnect ();
+    /** send a disconnect message to time dependencies and child federates*/
+    void sendDisconnect ();
 };
 
 }  // namespace helics
