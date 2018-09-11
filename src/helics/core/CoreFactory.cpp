@@ -311,7 +311,7 @@ bool registerCore (const std::shared_ptr<Core> &core)
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
-size_t cleanUpCores (int delay) { return delayedDestroyer.destroyObjects (delay); }
+size_t cleanUpCores (std::chrono::milliseconds delay) { return delayedDestroyer.destroyObjects (delay); }
 
 void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {

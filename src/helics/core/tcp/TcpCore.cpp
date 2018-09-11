@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpCore.h"
 #include "TcpComms.h"
+#include "TcpCommsSS.h"
 
 namespace helics
 {
@@ -56,5 +57,51 @@ std::string TcpCore::generateLocalAddressString () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
+
+TcpCoreSS::TcpCoreSS () noexcept {}
+
+TcpCoreSS::TcpCoreSS (const std::string &core_name) : CommsBroker (core_name) {}
+
+void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
+{
+    if (brokerState == created)
+    {
+        netInfo.initializeFromArgs (argc, argv, "localhost");
+
+        CommonCore::initializeFromArgs (argc, argv);
+    }
+}
+
+bool TcpCoreSS::brokerConnect ()
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (netInfo.brokerAddress.empty ())  // cores require a broker
+    {
+        netInfo.brokerAddress = "localhost";
+    }
+    comms = std::make_unique<TcpCommsSS> (netInfo);
+    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->setName (getIdentifier ());
+    comms->setTimeout (networkTimeout);
+    auto res = comms->connect ();
+    if (res)
+    {
+        if (netInfo.portNumber < 0)
+        {
+            netInfo.portNumber = comms->getPort ();
+        }
+    }
+    return res;
+}
+
+std::string TcpCoreSS::generateLocalAddressString () const
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        return comms->getAddress ();
+    }
+    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+}
 }  // namespace tcp
 }  // namespace helics

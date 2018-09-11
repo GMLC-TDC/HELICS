@@ -17,6 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 
 #ifndef DISABLE_TCP_CORE
+#include "tcp/TcpCommsSS.h"
 #include "tcp/TcpComms.h"
 #endif
 
@@ -38,6 +39,8 @@ template class CommsBroker<udp::UdpComms, CommonCore>;
 #ifndef DISABLE_TCP_CORE
 template class CommsBroker<tcp::TcpComms, CommonCore>;
 template class CommsBroker<tcp::TcpComms, CoreBroker>;
+template class CommsBroker<tcp::TcpCommsSS, CommonCore>;
+template class CommsBroker<tcp::TcpCommsSS, CoreBroker>;
 #endif
 
 #if HELICS_HAVE_MPI

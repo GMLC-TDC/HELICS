@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <chrono>
 
 /** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
  * threading issues*/
@@ -89,11 +90,11 @@ class DelayedDestructor
         return ElementsToBeDestroyed.size ();
     }
 
-    size_t destroyObjects (int delay)
+    size_t destroyObjects (std::chrono::milliseconds delay)
     {
         std::unique_lock<std::mutex> lock (destructionLock);
-        auto delayTime = std::chrono::milliseconds ((delay < 100) ? delay : 50);
-        int delayCount = (delay < 100) ? 1 : (delay / 50);
+        auto delayTime = (delay < std::chrono::milliseconds(100)) ? delay : std::chrono::milliseconds(50);
+        int delayCount = (delay < std::chrono::milliseconds(100)) ? 1 : (delay / 50).count();
 
         int cnt = 0;
         while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))

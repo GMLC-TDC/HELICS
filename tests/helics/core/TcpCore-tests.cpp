@@ -23,6 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (TcpCore_tests, *utf::label("ci"))
 
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     int cnt = 0;
     while (counter < 200)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        std::this_thread::sleep_for (50ms);
         ++cnt;
         if (cnt > 20)
         {
@@ -470,7 +471,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     server->close ();
     core->disconnect ();
     core = nullptr;
-    helics::CoreFactory::cleanUpCores (100);
+    helics::CoreFactory::cleanUpCores (100ms);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -498,8 +499,8 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
     broker->disconnect ();
     core = nullptr;
     broker = nullptr;
-    helics::CoreFactory::cleanUpCores (100);
-    helics::BrokerFactory::cleanUpBrokers (100);
+    helics::CoreFactory::cleanUpCores (100ms);
+    helics::BrokerFactory::cleanUpBrokers (100ms);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

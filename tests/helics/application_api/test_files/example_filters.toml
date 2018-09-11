@@ -44,10 +44,9 @@ name="ept2" # the name of the endpoint
 
 [[filters]]
 	name="filtername"  #filters can have names (optional)
-	target="ept1"  #this is a key field specifying the target endpoint
+	targets="ept1"  #this is a key field specifying the target endpoint
 	#inputType="genmessage"  #can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	#outputType="genmessage"  #this could be useful if the filter actually translates the data and can be used to automatically order filters
-	mode="source"  #source is the default but can be "source","destination","clone","cloning"
 	operation="delay" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	#additional properties for filters are specified in a property array or object if there is just a single one
 	#A delay filter just has a single property
@@ -55,8 +54,7 @@ name="ept2" # the name of the endpoint
 
 [[filters]]
 	name="filtername2"  #filters can have names (optional)
-	target="filterFed/ept2"  #this is a key field specifying the target endpoint
-	mode="source"  #source is the default but can be "source","destination","clone","cloning"
+	targets="filterFed/ept2"  #this is a key field specifying the target endpoint, for filters targets is a synonym for sourcetargets
 	operation="reroute" #currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	#additional properties for filters are specified in a property array or object if there is just a single one
 	 #A reroute filter takes a new destination
@@ -64,15 +62,15 @@ name="ept2" # the name of the endpoint
 	properties=  {name="newdestination", value="ept1"}
 [[filters]]
 	name="filterClone"  #filters can have names (optional)
-	target="ept2"  #for cloning filters the target is the delivery address
-	mode="clone"  #specify that this is cloning filter
-	#operation="clone" #cloning filters don't really need an operation since clone is all they do if one is specified it must be "clone" or "cloning"
+	delivery="ept2"  #for cloning filters this is the delivery address
+	cloning=true  #specify that this is cloning filter
 	[[filters.properties]]  #additional properties for filters are specified in a property array or object if there is just a single one
 		name="destination"  #destination adds a cloning filter for all messages delivered to a particular
 		value="ept1"	#the value here the endpoint that will have its messages cloned
 	[[filters.properties]]
 		name="source"  #source adds a cloning filter for all messages send from a particular endpoint
 		value="ept1"	#the value here the endpoint that will have its messages cloned
+		#this could also have been done with the sourcetarget or desttargets fields
 	 #this pair of properties clone all messages to or from "ept1"  this could also be done in one property with "endpoint" but this seemed more instructive in this file
 
 

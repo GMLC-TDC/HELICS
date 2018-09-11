@@ -71,7 +71,7 @@ ValueFederate::registerPublication (const std::string &key, const std::string &t
     {
         throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
     }
-    return vfManager->registerPublication (getName () + separator_ + key, type, units);
+    return vfManager->registerPublication ((!key.empty())?(getName () + separator_ + key):key, type, units);
 }
 
 publication_id_t ValueFederate::registerGlobalPublication (const std::string &key,
@@ -92,7 +92,7 @@ ValueFederate::registerInput(const std::string &key, const std::string &type, co
     {
         throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
     }
-    return vfManager->registerInput (getName () + separator_ + key, type, units);
+    return vfManager->registerInput ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
 }
 
 input_id_t ValueFederate::registerGlobalInput(const std::string &key, const std::string &type, const std::string &units)

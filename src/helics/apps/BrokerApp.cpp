@@ -46,7 +46,7 @@ BrokerApp::~BrokerApp ()
 	//this sleeps until disconnected
     broker->waitForDisconnect ();
     broker = nullptr;
-    helics::BrokerFactory::cleanUpBrokers (500);
+    helics::BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(500));
 }
 
 void BrokerApp::loadFromArguments (int argc, char *argv[])

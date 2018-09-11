@@ -773,9 +773,10 @@ helics::CoreObject::~CoreObject ()
 
 void helicsCloseLibrary ()
 {
+    using namespace std::literals::chrono_literals;
     clearAllObjects ();
-    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000); });
-    helics::BrokerFactory::cleanUpBrokers (2000);
+    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
+    helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
 #if HELICS_HAVE_ZEROMQ > 0
     if (zmqContextManager::setContextToLeakOnDelete ())

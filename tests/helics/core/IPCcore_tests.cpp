@@ -24,6 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label("ci"))
 
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
     helics::ActionMessage rM = mq.getMessage ();
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
@@ -73,11 +74,11 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     helics::ActionMessage cmd (helics::CMD_ACK);
 
     mq.sendMessage (cmd, 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
@@ -113,13 +114,13 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
 
     comm.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
@@ -155,7 +156,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         ++counter3;
         act3 = m;
     });
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     // need to launch the connection commands at the same time since they depend on eachother in this case
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
@@ -242,7 +243,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
     core->disconnect ();
     core = nullptr;
     boost::interprocess::message_queue::remove ("testbroker");
-    helics::CoreFactory::cleanUpCores (100);
+    helics::CoreFactory::cleanUpCores (100ms);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -267,8 +268,8 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
     broker->disconnect ();
     core = nullptr;
     broker = nullptr;
-    helics::CoreFactory::cleanUpCores (100);
-    helics::BrokerFactory::cleanUpBrokers (100);
+    helics::CoreFactory::cleanUpCores (100ms);
+    helics::BrokerFactory::cleanUpBrokers (100ms);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

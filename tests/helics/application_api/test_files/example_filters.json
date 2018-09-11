@@ -42,7 +42,7 @@
 "filters":[
 {
 	"name":"filtername",  //filters can have names (optional)
-	"source":"ept1", // source target for the filter
+	"sourcetargets":"ept1", // source target for the filter
 	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
@@ -54,7 +54,7 @@
 },
 {
 	"name":"filtername2",  //filters can have names (optional)
-	"source":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
+	"sourcetargets":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
 	//"dest":["dest targets"],  // field specifying destination targets
 	"operation":"reroute", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
@@ -65,9 +65,8 @@
 },
 {
 	"name":"filterClone",  //filters can have names (optional)
-	"target":"ept2",  //for cloning filters the target is the delivery address
-	"mode":"clone",  //specify that this is cloning filter
-	//"operation":"clone", //cloning filters don't really need an operation since clone is all they do if one is specified it must be "clone" or "cloning"
+	"delivery":"ept2",  //cloning filters can have a delivery field
+	"cloning":true,  //specify that this is cloning filter
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	[{
 		"name":"destination",  //destination adds a cloning filter for all messages delivered to a particular

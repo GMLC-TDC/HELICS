@@ -35,6 +35,7 @@ enum class core_type : int
                        //!< on the same machine
     IPC = 5,  //!< same as INTERPROCESS
     TCP = 6,  //!< use a generic TCP protocol message stream to send messages
+	TCP_SS=11, //!< a single socket version of the TCP core for more easily handling firewalls
     UDP = 7,  //!< use UDP packets to send the data
     NNG = 9, //!< reserved for future Nanomsg implementation 
     ZMQ_TEST=10, //!< test code for different type of ZMQ core

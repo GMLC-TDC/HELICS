@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "Broker.hpp"
 #include "core-types.hpp"
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -58,7 +59,7 @@ registered or when the clean up function is called this prevents some odd thread
 @param delay the number of milliseconds to wait to ensure stuff is cleaned up
 @return the number of brokers still operating
 */
-size_t cleanUpBrokers (int delay);
+size_t cleanUpBrokers (std::chrono::milliseconds delay);
 
 /** make a copy of the broker pointer to allow access to the new name
  */

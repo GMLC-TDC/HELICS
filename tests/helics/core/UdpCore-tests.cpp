@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (UdpCore_tests, *utf::label("ci"))
 
@@ -313,7 +314,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     BOOST_CHECK (!error);
     core->disconnect ();
     core = nullptr;
-    helics::CoreFactory::cleanUpCores (100);
+    helics::CoreFactory::cleanUpCores (100ms);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -322,7 +323,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::UDP, initializationString);
@@ -340,8 +341,8 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
     broker->disconnect ();
     core = nullptr;
     broker = nullptr;
-    helics::CoreFactory::cleanUpCores (100);
-    helics::BrokerFactory::cleanUpBrokers (100);
+    helics::CoreFactory::cleanUpCores (100ms);
+    helics::BrokerFactory::cleanUpBrokers (100ms);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

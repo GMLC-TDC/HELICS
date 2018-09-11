@@ -77,7 +77,7 @@ endpoint_id_t MessageFederate::registerEndpoint (const std::string &eptName, con
 {
     if (state == op_states::startup)
     {
-        return mfManager->registerEndpoint (getName () + separator_ + eptName, type);
+        return mfManager->registerEndpoint ((!eptName.empty())?(getName () + separator_ + eptName):eptName, type);
     }
     throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }

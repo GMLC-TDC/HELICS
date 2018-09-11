@@ -22,6 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (ZMQCore_tests, *utf::label("ci"))
 
@@ -94,7 +95,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket1.send (msg);
     // should still be waiting
     BOOST_CHECK (reqset.waiting ());
-    auto msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
+    auto msgCnt = reqset.checkForMessages (100ms);
 
     BOOST_CHECK (!reqset.waiting ());
     BOOST_CHECK_EQUAL (msgCnt, 1);
@@ -111,13 +112,13 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    msgCnt = reqset.checkForMessages (std::chrono::milliseconds (100));
+    msgCnt = reqset.checkForMessages (100ms);
 
     BOOST_CHECK (reqset.waiting ());
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
-    reqset.checkForMessages (std::chrono::milliseconds (100));
+    reqset.checkForMessages (100ms);
     BOOST_CHECK (!reqset.waiting ());
 
     BOOST_CHECK (reqset.hasMessages ());
@@ -125,14 +126,14 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     repSocket2.close ();
     repSocket3.close ();
     reqset.close ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
 }
 
 /** test the request set class with various scenarios*/
 BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
 {
     //sleep to clear any residual from the previous test
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (500ms);
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = zmqContextManager::getContextPointer ();
@@ -568,8 +569,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     pullSocket.close ();
     core->disconnect ();
     core = nullptr;
-    helics::CoreFactory::cleanUpCores (200);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    helics::CoreFactory::cleanUpCores (200ms);
+    std::this_thread::sleep_for (200ms);
 }
 
 /** test case checks default values and makes sure they all mesh together
@@ -594,8 +595,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
     BOOST_CHECK (!core->isConnected ());
     broker->disconnect ();
     BOOST_CHECK (!broker->isConnected ());
-    helics::CoreFactory::cleanUpCores (200);
-    helics::BrokerFactory::cleanUpBrokers (200);
+    helics::CoreFactory::cleanUpCores (200ms);
+    helics::BrokerFactory::cleanUpBrokers (200ms);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

@@ -77,7 +77,7 @@ bool TestCore::brokerConnect ()
             {
                 tbroker = nullptr;
                 broker = nullptr;
-                BrokerFactory::cleanUpBrokers (200);
+                BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(200));
                 broker = BrokerFactory::findBroker (brokerName);
                 tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
                 if (!tbroker)

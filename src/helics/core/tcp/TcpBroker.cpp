@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpBroker.h"
 #include "TcpComms.h"
+#include "TcpCommsSS.h"
 
 namespace helics
 {
@@ -58,6 +59,63 @@ bool TcpBroker::brokerConnect ()
 }
 
 std::string TcpBroker::generateLocalAddressString () const
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        return comms->getAddress ();
+    }
+    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+}
+
+TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+
+TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : CommsBroker (broker_name) {}
+
+void TcpBrokerSS::displayHelp (bool local_only)
+{
+    std::cout << " Help for TCP Broker: \n";
+
+    NetworkBrokerData::displayHelp ();
+    if (!local_only)
+    {
+        CoreBroker::displayHelp ();
+    }
+}
+
+void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
+{
+    if (brokerState == broker_state_t::created)
+    {
+        netInfo.initializeFromArgs (argc, argv, "localhost");
+        CoreBroker::initializeFromArgs (argc, argv);
+    }
+}
+
+bool TcpBrokerSS::brokerConnect ()
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (netInfo.brokerAddress.empty ())
+    {
+        setAsRoot ();
+    }
+    comms = std::make_unique<TcpCommsSS> (netInfo);
+    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->setName (getIdentifier ());
+    comms->setTimeout (networkTimeout);
+    // comms->setMessageSize(maxMessageSize, maxMessageCount);
+    auto res = comms->connect ();
+    if (res)
+    {
+        if (netInfo.portNumber < 0)
+        {
+            netInfo.portNumber = comms->getPort ();
+        }
+    }
+    return res;
+}
+
+std::string TcpBrokerSS::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (comms)

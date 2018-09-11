@@ -65,6 +65,7 @@ set(
 	tcp/TcpCore.cpp
 	tcp/TcpBroker.cpp
 	tcp/TcpComms.cpp
+	tcp/TcpCommsSS.cpp
 	tcp/TcpHelperClasses.cpp
 )
 
@@ -130,6 +131,7 @@ set(
 	tcp/TcpCore.h
 	tcp/TcpBroker.h
 	tcp/TcpComms.h
+	tcp/TcpCommsSS.h
 	tcp/TcpHelperClasses.h
 )
 
