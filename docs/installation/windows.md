@@ -159,3 +159,105 @@ Out[2]: '1.0.2 (04-28-18)'
 ```
 
 ![](../img/windows-python-success.png)
+
+## Building GridLAB-D and HELICS From Source on Windows with MSYS2 ##
+### Overview ###
+The latests release of GridLAB-D which is 4.1 will automatically come with the HELICS library bundled with it. However, The 4.1 release is not stable yet. Until then GridLAB-D and HELICS can be compiled together from source. The latest Develop branch of GridLAB-D can only be built on Windows using MSYS2. So both GridLAB-D and HELICS must be compiled using MSYS2. This page will layout the setting up of MSYS2 to compile and install HELICS and GridLAB-D. This guide will describe all the packages and install instructions for a 64bit build.
+
+### Setting up MSYS2 ###
+MSYS2 provides a linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build GridLAB-D and HELICS. The following packages need to be installed:
+- base-devel
+- mingw-w64-x86_64-toolchain
+- git
+- mingw-w64-x86_64-cmake
+- mingw-w64-x86_64-boost
+- mingw-w64-x86_64-qt5 (only if you want to be able to run cmake-gui which this guide recommends.)
+- mingw-w64-x86_64-dlfcn
+- mingw-w64-x86_64-xerces-c
+- mingw-w64-x86_64-zeromq
+
+All packages can be installed by typing the following:
+```bash
+$ pacman -S --needed base-devel mingw-w64_x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-qt5 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-xerces-c
+```
+One issue that the boost package has when building with GridLAB-D with HELICS on MSYS2 is all the boost libraries have a -mt in their names. In order for GridLAB-D to find these libraries the -mt must be removed from the libboost*-mt.dll files located in /mingw64/bin. Work is in progress to remove this modification in MSYS2 builds.
+
+After all this has been done /mingw64/bin must be added to the PATH environment variable.
+```bash
+$ export PATH=$PATH:/mingw65/bin
+```
+
+### Download HELICS and GridLAB-D Source Code ###
+Now that the MSYS2 environment has been setup and all prerequisite packages have been installed the source code can be compiled and installed. The HELICS source code can be cloned from GitHub by performing the following:
+```bash
+$ git clone https://github.com/GMLC-TDC/HELICS-src.git
+```
+git will clone the source code into a folder in the current working directory called HELICS-src. This path will be refered to by this guide as HELICS_ROOT_DIR.
+
+The GridLAB-D source code can be cloned from GitHub by perfoming the following:
+```bash
+$ git clone https://github.com/gridlab-d/gridlab-d.git
+```
+git will clone the source code into a folder in the current working directory called gridlab-d. This path will be refered to by this guide as GLD_ROOT_DIR.
+
+As of the writting of this guide the only GridLAB-D branch that can be compiled with HELICS is the develop branch. So you must checkout the develop branch of the GridLAB-D repository. Change your working directory to GLD_ROOT_DIR and then checkout the develop branch:
+```bash
+$ git checkout -b develop origin/develop
+```
+
+### Compiling HELICS From Source ###
+Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
+```bash
+$ cmake-gui ../
+```
+If this failes that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makesfiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
+
+* BUILD_CXX_SHARED_LIB should be checked as GridLAB-D dynamically links with the shared c++ library of HELICS
+* Boost_CHRONO_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_chrono.dll
+* Boost_DATE_TIME_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_date_time.dll
+* Boost_FILESYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_filesystem.dll
+* Boost_INCLUDE_DIR C:/msys64/mingw64/include
+* Boost_LIBRARY_DIR_DEBUG/RELEASE C:/msys64/mingw64/bin
+* Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_program_options.dll
+* Boost_SYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_system.dll
+* Boost_TIMER_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_timer.dll
+* Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_unit_test_framework.dll
+* CMAKE_CXX_FLAGS -std=gnu++14
+* CMAKE_INSTALL_PREFIX /usr/local or location of your choice
+* ZeroMQ_INCLUDE_DIR C:/msys64/mingw64/include
+* ZeroMQ_INSTALL_PATH C:/msys64/mingw64
+* ZeroMQ_LIBRARY C:/msys64/mingw64/bin/libzmq.dll
+* ZeroMQ_ROOT_DIR C:/msys64/mingw64
+
+Once these cmake variables have been correctly varified click Configure. Once that is complete click Generate then once that is complete the CMake gui can be closed.
+
+Back in the MSYS2 command window type:
+```bash
+$ make -j x
+```
+where x is the number of threads you can give the make process to speed up the build. Then once that is complete type:
+```bash
+$ make install
+```
+unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_1_3_0. This install path will be refered to as HELICS_INSTALL for the next section.
+
+### Compiling GridLAB-D From Source ###
+Change directories to the GLD_ROOT_DIR. If this is the first time compiling GridLAB-D from source then type the following:
+```bash
+$ autoreconf -if
+```
+Once that is complete type:
+```bash
+$ ./configure --build=x86_64-w64-mingw32 --prefix=<your disired installation prefix> --with-xerces=/mingw64 --with-helics=HELICS_INSTALL --enable-silent-rules 'CFLAGS=-g -O2 -w' 'CXXFLAGS=-g -O2 -w -std=gnu++14' 'LDFLAGS=-g -O2 -w'
+```
+Once that is complete type:
+```bash
+$ make -j x
+```
+where x is the number of threads you can give the make process to speed up the build. Once that is complete type:
+```bash
+$ make install
+```
+
+### System Environment Notes ###
+When operating a GridLAB-D model as a HELICS federate it will be necessary to for the windows path variable to contain the path containing the HELICS c++ shared library otherwise GridLAB-D will fail to run.
