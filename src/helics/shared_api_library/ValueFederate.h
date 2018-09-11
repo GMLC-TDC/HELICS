@@ -258,9 +258,8 @@ HELICS_EXPORT int helicsInputGetRawValueSize (helics_input ipt);
 @param[out] data the memory location of the data
 @param maxlen the maximum size of information that data can hold
 @param[out] actualLength  the actual length of data copied to data
-@return a void value, helics_ok if everything went fine
 */
-HELICS_EXPORT int helicsInputGetRawValue (helics_input ipt, void *data, int maxlen, helics_error *err);
+HELICS_EXPORT void helicsInputGetRawValue (helics_input ipt, void *data, int maxlen, int *actualSize, helics_error *err);
 
 /** get the size of a value for subscription assuming return as a string
 @returns the size of the string
@@ -269,12 +268,12 @@ HELICS_EXPORT int helicsInputGetStringSize (helics_input ipt);
 
 /** get a string value from a subscription
 @param ipt the input to get the data for
-@param[out] str storage for copying a null terminated string
-@param maxlen the maximum size of information that str can hold
-@param[out] the actual length of the string
-@return a void value, helics_ok if everything went fine
+@param[out] outputString storage for copying a null terminated string
+@param maxStringlen the maximum size of information that str can hold
+@param[out] actualLength the actual length of the string
+@param[in,out] error term for capturing errors
 */
-HELICS_EXPORT int helicsInputGetString (helics_input ipt, char *outputString, int maxStringlen, helics_error *err);
+HELICS_EXPORT void helicsInputGetString (helics_input ipt, char *outputString, int maxStringlen, int *actualLength, helics_error *err);
 
 /** get an integer value from a subscription
 @param ipt the input to get the data for
@@ -321,8 +320,9 @@ HELICS_EXPORT int helicsInputGetVectorSize (helics_input ipt);
 @param ipt the input to get the result for
 @param[out] data the location to store the data
 @param maxlen the maximum size of the vector
+@param actualLength location to place the actual length of the resulting vector
 */
-HELICS_EXPORT int helicsInputGetVector (helics_input ipt, double data[], int maxlen, helics_error *err);
+HELICS_EXPORT void helicsInputGetVector (helics_input ipt, double data[], int maxlen, int *actualSize, helics_error *err);
 
 
 /** get a named point from a subscription
@@ -332,8 +332,8 @@ HELICS_EXPORT int helicsInputGetVector (helics_input ipt, double data[], int max
 @param[out] the actual length of the string
 @param[out] val the double value for the named point
 */
-HELICS_EXPORT int
-helicsInputGetNamedPoint (helics_input ipt, char *outputString, int maxlen, double *val, helics_error *err);
+HELICS_EXPORT void
+helicsInputGetNamedPoint (helics_input ipt, char *outputString, int maxlen, int *actualLength, double *val, helics_error *err);
 
 /**@}*/
 

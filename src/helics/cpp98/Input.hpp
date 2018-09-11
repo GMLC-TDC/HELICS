@@ -82,7 +82,8 @@ public:
     {
         int size = helicsInputGetRawValueSize (inp);
         data.resize(size);
-        return helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), NULL);
+        helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()),&size, NULL);
+        return size;
     }
 
     int getRawValueSize()
@@ -96,7 +97,7 @@ public:
 
         result.resize(size+1);
         //this function results in a null terminated string
-        size = helicsInputGetString (inp, &result[0], size + 1, NULL);
+        helicsInputGetString (inp, &result[0], size + 1,&size, NULL);
         if (!(result.empty())&&(result[size-1] == '\0'))
         {
             result.resize(size - 1);
@@ -114,7 +115,7 @@ public:
 
         name.resize(size + 1);
         //this function results in a null terminated string
-        size=helicsInputGetNamedPoint (inp, &name[0], size + 1, val, NULL);
+        helicsInputGetNamedPoint (inp, &name[0], size + 1, &size, val, NULL);
         name.resize(size);
     }
 
@@ -145,14 +146,15 @@ public:
 
     int getVector( double *data, int maxlen)
     {
-        return helicsInputGetVector(inp, data, maxlen, hThrowOnError());
+        helicsInputGetVector(inp, data, maxlen, &maxlen,hThrowOnError());
+        return maxlen;
     }
 
     void getVector( std::vector<double> &data)
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize,NULL);
+        helicsInputGetVector(inp, data.data(), actualSize,nullptr,NULL);
     }
 
     /** Check if a subscription is updated **/

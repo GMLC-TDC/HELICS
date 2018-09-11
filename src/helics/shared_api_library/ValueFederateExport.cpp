@@ -686,16 +686,20 @@ int helicsInputGetRawValueSize (helics_input inp)
     return static_cast<int> (inpObj->inputPtr->getRawSize ());
 }
 
-int helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, helics_error *err)
+void helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, int *actualSize, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
+    if (actualSize != nullptr)
+    {  // for initialization
+        *actualSize = 0;
+    }
     if (inpObj == nullptr)
     {
-        return (-1);
+        return;
     }
     if (!checkOutArgString (static_cast<char *> (data), maxDatalen, err))
     {
-        return (-1);
+        return;
     }
     try
     {
@@ -705,60 +709,96 @@ int helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, helics
             if (maxDatalen > static_cast<int> (dv.size ()))
             {
                 memcpy (data, dv.data (), dv.size ());
-                return static_cast<int> (dv.size ());
+                if (actualSize != nullptr)
+                {
+                    *actualSize = static_cast<int> (dv.size ());
+                }
+                return;
             }
             memcpy (data, dv.data (), maxDatalen);
-            return maxDatalen;
+            if (actualSize != nullptr)
+            {
+                *actualSize = maxDatalen;
+            }
+            return;
         }
 
         auto str = inpObj->inputPtr->getValue<std::string> ();
         if (maxDatalen > static_cast<int> (str.size ()))
         {
             memcpy (data, str.data (), static_cast<int> (str.size ()));
-            return static_cast<int> (str.size ());
+            if (actualSize != nullptr)
+            {
+                *actualSize = static_cast<int> (str.size ());
+            }
         }
         memcpy (data, str.data (), maxDatalen);
-        return maxDatalen;
+        if (actualSize != nullptr)
+        {
+            *actualSize = maxDatalen;
+        }
+        return;
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return (-1);
     }
 }
 
-int helicsInputGetString (helics_input inp, char *outputString, int maxlen, helics_error *err)
+void helicsInputGetString (helics_input inp, char *outputString, int maxlen, int *actualLength, helics_error *err)
 {
+    if (actualLength != nullptr)
+    {  // for initialization
+        *actualLength = 0;
+    }
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
     {
-        return (-1);
+        return;
     }
 
     if (!checkOutArgString (outputString, maxlen, err))
     {
-        return (-1);
+        return;
     }
     try
     {
         if (inpObj->rawOnly)
         {
-            int length = helicsInputGetRawValue (inp, outputString, maxlen, err);
+            int length;
+
+            helicsInputGetRawValue (inp, outputString, maxlen, &length, err);
             // make sure we have a null terminator
             if (length == maxlen)
             {
                 outputString[maxlen - 1] = '\0';
-                return maxlen;
+                if (actualLength != nullptr)
+                {  // for initialization
+                    *actualLength = maxlen;
+                }
             }
-            outputString[length] = '\0';
-            return length;
+            else
+            {
+                outputString[length] = '\0';
+                if (actualLength != nullptr)
+                { 
+                    *actualLength = length;
+                }
+            }
         }
-        return inpObj->inputPtr->getValue (outputString, maxlen);
+        else
+        {
+            int length = inpObj->inputPtr->getValue (outputString, maxlen);
+            if (actualLength != nullptr)
+            {  // for initialization
+                *actualLength = length;
+            }
+        }
+        
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return (-1);
     }
 }
 
@@ -901,7 +941,7 @@ helics_complex helicsInputGetComplex (helics_input inp, helics_error *err)
 
     if (inpObj == nullptr)
     {
-		//time invalid is just an invalid double 
+        // time invalid is just an invalid double
         return {helics_time_invalid, 0};
     }
 
@@ -971,16 +1011,20 @@ int helicsInputGetStringSize (helics_input inp)
     }
 }
 
-int helicsInputGetVector (helics_input inp, double data[], int maxlen, helics_error *err)
+void helicsInputGetVector (helics_input inp, double data[], int maxlen, int *actualSize, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
+    if (actualSize != nullptr)
+    {
+        *actualSize = 0;
+    }
     if (inpObj == nullptr)
     {
-        return (-1);
+        return;
     }
     if ((data == nullptr) || (maxlen <= 0))
     {
-        return (-1);
+        return;
     }
     try
     {
@@ -989,28 +1033,40 @@ int helicsInputGetVector (helics_input inp, double data[], int maxlen, helics_er
             auto V = inpObj->fedptr->getValue<std::vector<double>> (inpObj->id);
             int length = std::min (static_cast<int> (V.size ()), maxlen);
             std::copy (V.data (), V.data () + length, data);
-            return length;
+            if (actualSize != nullptr)
+            {
+                *actualSize = length;
+            }
         }
-        int length = inpObj->inputPtr->getValue (data, maxlen);
-        return length;
+        else
+        {
+            int length = inpObj->inputPtr->getValue (data, maxlen);
+            if (actualSize != nullptr)
+            {
+                *actualSize = length;
+            }
+        }
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return (-1);
     }
 }
 
-int helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxlen, double *val, helics_error *err)
+void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxlen, int *actualLength, double *val, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
+    if (actualLength != nullptr)
+    {
+        *actualLength = 0;
+    }
     if (inpObj == nullptr)
     {
-        return (-1);
+        return;
     }
     if (!checkOutArgString (outputString, maxlen, err))
     {
-        return (-1);
+        return;
     }
     try
     {
@@ -1039,12 +1095,15 @@ int helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxlen, 
         {
             *val = np.value;
         }
-        return length;
+        if (actualLength != nullptr)
+        {
+            *actualLength = length;
+        }
+        return;
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return (-1);
     }
 }
 
@@ -1253,7 +1312,7 @@ void helicsInputSetDefaultNamedPoint (helics_input inp, const char *str, double 
     }
 }
 
-const char * helicsInputGetType (helics_input inp)
+const char *helicsInputGetType (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1280,7 +1339,7 @@ const char * helicsInputGetType (helics_input inp)
     }
 }
 
-const char * helicsPublicationGetType (helics_publication pub)
+const char *helicsPublicationGetType (helics_publication pub)
 {
     auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
@@ -1307,7 +1366,7 @@ const char * helicsPublicationGetType (helics_publication pub)
     }
 }
 
-const char * helicsInputGetKey (helics_input inp)
+const char *helicsInputGetKey (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1327,7 +1386,6 @@ const char * helicsInputGetKey (helics_input inp)
             const std::string &key = inpObj->inputPtr->getName ();
             return key.c_str ();
         }
-   
     }
     catch (...)
     {
@@ -1340,7 +1398,7 @@ const char *helicsPublicationGetKey (helics_publication pub)
     auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
     {
-        return nullStr.c_str();
+        return nullStr.c_str ();
     }
     try
     {
@@ -1366,7 +1424,7 @@ const char *helicsInputGetUnits (helics_input inp)
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
     {
-        return nullStr.c_str();
+        return nullStr.c_str ();
     }
     try
     {
@@ -1387,7 +1445,7 @@ const char *helicsInputGetUnits (helics_input inp)
     }
 }
 
-const char * helicsPublicationGetUnits (helics_publication pub)
+const char *helicsPublicationGetUnits (helics_publication pub)
 {
     auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)

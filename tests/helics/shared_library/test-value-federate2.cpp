@@ -51,7 +51,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     int len1 = helicsInputGetRawValueSize (sub1);
 
     BOOST_CHECK_EQUAL (len1, len);
-    CE(actualLen=helicsInputGetRawValue (sub1, val, 600, &err));
+    CE(helicsInputGetRawValue (sub1, val, 600,&actualLen, &err));
     BOOST_CHECK_EQUAL (actualLen, len);
 
     len1 = helicsInputGetRawValueSize (sub1);
@@ -98,7 +98,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(helicsInputGetString (subid, s, STRINGLEN, &err));
+    CE(helicsInputGetString (subid, s, STRINGLEN,nullptr, &err));
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
@@ -107,7 +107,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     CE(helicsPublicationPublishString (pubid, "string2",&err));
 
     // make sure the value is still what we expect
-    CE(helicsInputGetString (subid, s, STRINGLEN, &err));
+    CE(helicsInputGetString (subid, s, STRINGLEN,nullptr, &err));
     BOOST_CHECK_EQUAL (s, "string1");
 
     // advance time
@@ -120,7 +120,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
     // make sure the value was updated
-    CE(helicsInputGetString (subid, s, STRINGLEN,&err));
+    CE(helicsInputGetString (subid, s, STRINGLEN,nullptr,&err));
     BOOST_CHECK_EQUAL (s, "string2");
 
     CE(helicsFederateFinalize (vFed1,&err));
