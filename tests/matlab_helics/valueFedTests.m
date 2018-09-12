@@ -23,18 +23,20 @@ if (fedStruct.broker==0)
     success=false;
     return;
 end
-fedInfo=helicsFederateInfoCreate();
+fedInfo=helicsCreateFederateInfo();
 if (fedInfo==0)
+    helicsBrokerDestroy(fedStruct.broker);
     success=false;
     return;
 end
 try
 helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeDelta(fedInfo, 0.01);
+helicsFederateInfoSetTimeProperty(fedInfo,TIME 0.01);
 helicsFederateInfoSetLoggingLevel(fedInfo,1);
 catch ec
     success=false;
+    helicsBrokerDestroy(fedStruct.broker);
     helicsFederateInfoFree(fedInfo);
     return
 end
