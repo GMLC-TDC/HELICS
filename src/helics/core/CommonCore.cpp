@@ -258,7 +258,7 @@ void CommonCore::error (federate_id_t federateID, int errorCode)
     }
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id.load ();
-    m.counter = static_cast<int16_t> (errorCode);
+    m.messageID = errorCode;
     addActionMessage (m);
     fed->addAction (m);
     iteration_result ret = iteration_result::next_step;
@@ -2074,7 +2074,7 @@ void CommonCore::transmitDelayedMessages ()
 void CommonCore::sendErrorToFederates (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
-    errorCom.counter = static_cast<int16_t> (error_code);
+    errorCom.messageID = error_code;
     for (auto &fed : loopFederates)
     {
         routeMessage (errorCom, fed->global_id);
@@ -2327,7 +2327,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             if (command.source_id == higher_broker_id)
             {
-                sendErrorToFederates (command.counter);
+                sendErrorToFederates (command.messageID);
             }
             else
             {
@@ -2770,7 +2770,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     err.dest_id = command.source_id;
                     err.source_id = command.dest_id;
                     err.source_handle = command.dest_handle;
-                    err.counter = ERROR_CODE_REGISTRATION_FAILURE;
+                    err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
                     err.payload = std::string("Endpoint ") + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
                     return;
@@ -2840,7 +2840,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                         err.dest_id = command.source_id;
                         err.source_id = command.dest_id;
                         err.source_handle = command.dest_handle;
-                        err.counter = ERROR_CODE_REGISTRATION_FAILURE;
+                        err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
                         err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                         routeMessage (std::move (err));
                         return;

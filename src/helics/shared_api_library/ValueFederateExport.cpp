@@ -732,12 +732,14 @@ void helicsInputGetRawValue (helics_input inp, void *data, int maxDatalen, int *
                 *actualSize = static_cast<int> (str.size ());
             }
         }
-        memcpy (data, str.data (), maxDatalen);
-        if (actualSize != nullptr)
+        else
         {
-            *actualSize = maxDatalen;
+            memcpy (data, str.data (), maxDatalen);
+            if (actualSize != nullptr)
+            {
+                *actualSize = maxDatalen;
+            }
         }
-        return;
     }
     catch (...)
     {
@@ -781,7 +783,7 @@ void helicsInputGetString (helics_input inp, char *outputString, int maxlen, int
             {
                 outputString[length] = '\0';
                 if (actualLength != nullptr)
-                { 
+                {
                     *actualLength = length;
                 }
             }
@@ -794,7 +796,6 @@ void helicsInputGetString (helics_input inp, char *outputString, int maxlen, int
                 *actualLength = length;
             }
         }
-        
     }
     catch (...)
     {
@@ -1385,6 +1386,37 @@ const char *helicsInputGetKey (helics_input inp)
         {
             const std::string &key = inpObj->inputPtr->getName ();
             return key.c_str ();
+        }
+    }
+    catch (...)
+    {
+        return nullStr.c_str ();
+    }
+}
+
+const char *helicsSubscriptionGetKey (helics_input sub)
+{
+    auto inpObj = verifyInput (sub, nullptr);
+    if (inpObj == nullptr)
+    {
+        return nullStr.c_str ();
+    }
+
+    try
+    {
+        if (inpObj->rawOnly)
+        {
+            return nullStr.c_str ();
+        }
+        else
+        {
+            auto subPtr = dynamic_cast<helics::Subscription *> (inpObj->inputPtr.get ());
+            if (subPtr != nullptr)
+            {
+                const std::string &key = subPtr->getTarget ();
+                return key.c_str ();
+            }
+            return nullStr.c_str ();
         }
     }
     catch (...)

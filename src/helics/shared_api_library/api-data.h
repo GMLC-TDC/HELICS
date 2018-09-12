@@ -22,16 +22,17 @@ extern "C" {
 typedef enum {
 
     helics_ok = 0, /*!< the function executed successfully */
-    helics_registration_failure = -1, /*!< registration has failed*/
-    helics_connection_failure = -2, /*!< the operation to connect has failed*/
-    helics_invalid_object = -3, /*!< indicator that the object used was not a valid object */
-    helics_invalid_argument = -4, /*!< the parameter passed was invalid and unable to be used*/
-    helics_discard = -5, /*!< the input was discarded and not used for some reason */
-    helics_system_failure = -6, /*!< the federate has terminated unexpectedly and the call cannot be completed*/
+    helics_registration_failure = ERROR_CODE_REGISTRATION_FAILURE, /*!< registration has failed*/
+    helics_connection_failure = ERROR_CODE_CONNECTION_FAILURE, /*!< the operation to connect has failed*/
+    helics_invalid_object = ERROR_CODE_INVALID_OBJECT, /*!< indicator that the object used was not a valid object */
+    helics_invalid_argument = ERROR_CODE_INVALID_ARGUMENT, /*!< the parameter passed was invalid and unable to be used*/
+    helics_discard = ERROR_CODE_DISCARD, /*!< the input was discarded and not used for some reason */
+    helics_system_failure = ERROR_CODE_SYSTEM_FAILURE, /*!< the federate has terminated unexpectedly and the call cannot be completed*/
     helics_warning = -8, /*!< the function issued a warning of some kind */
-    helics_invalid_state_transition = -9, /*!< error issued when an invalid state transition occurred */
-    helics_invalid_function_call = -10, /*!< the call made was invalid in the present state of the calling object*/
-    helics_execution_failure = -14, /*!< the function execution has failed*/
+    helics_invalid_state_transition = ERROR_CODE_INVALID_STATE_TRANSITION, /*!< error issued when an invalid state transition occurred */
+    helics_invalid_function_call =
+      ERROR_CODE_INVALID_FUNCTION_CALL, /*!< the call made was invalid in the present state of the calling object*/
+    helics_execution_failure = ERROR_CODE_EXECUTION_FAILURE, /*!< the function execution has failed*/
     helics_other_error = -101, /*!< the function produced a helics error of some other type */
     other_error_type = -203 /*!< a non helics error was produced*/
 } helics_error_types;
@@ -120,7 +121,6 @@ typedef struct data_t
     int64_t length; /*!< the size of the data */
 } data_t;
 
-
 /**
  *  structure defining a basic complex type
  */
@@ -153,8 +153,8 @@ otherwise it will be an empty string
 */
 typedef struct helics_error
 {
-	int32_t error_code; /*!< an error code associated with the error*/
-	const char *message; /*!< a message associated with the error*/
+    int32_t error_code; /*!< an error code associated with the error*/
+    const char *message; /*!< a message associated with the error*/
 } helics_error;
 
 /** pick a core type depending on compile configuration usually either ZMQ if available or UDP */

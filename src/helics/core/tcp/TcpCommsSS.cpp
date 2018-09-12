@@ -77,15 +77,7 @@ TcpCommsSS::TcpCommsSS (const NetworkBrokerData &netInfo)
             localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
         }
     }
-    if (netInfo.portStart > 0)
-    {
-        openPortStart = netInfo.portStart;
-    }
-    if (PortNumber > 0)
-    {
-        autoPortNumber = false;
-    }
-    reuse_address = netInfo.reuse_address;
+    
 }
 
 /** destructor*/
@@ -255,7 +247,7 @@ void TcpCommsSS::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
-                                                  reuse_address, maxMessageSize_);
+                                                  true, maxMessageSize_);
     while (!server->isReady ())
     {
         

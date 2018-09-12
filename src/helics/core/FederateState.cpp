@@ -982,7 +982,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         {
             errorString = cmd.payload;
         }
-        errorCode = cmd.counter;
+        errorCode = cmd.messageID;
         return message_processing_result::error;
     case CMD_ADD_PUBLISHER:
     {

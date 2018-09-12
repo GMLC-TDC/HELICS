@@ -426,12 +426,17 @@ HELICS_EXPORT const char *helicsInputGetType (helics_input ipt);
 @return a void enumeration, helics_ok if everything worked*/
 HELICS_EXPORT const char *helicsPublicationGetType (helics_publication pub);
 
-/** get the key of a subscription
+/** get the key of an input
 @param ipt the input to query
 @param[out] outputString a pointer to a memory location to store the resulting string
 @param maxlen the maximum size of string that str can store
 @return a void enumeration, helics_ok if everything worked*/
 HELICS_EXPORT const char *helicsInputGetKey (helics_input ipt);
+
+/** get the key of a subscription
+@param ipt the input/subscription to query
+@return a const char with the subscription key*/
+HELICS_EXPORT const char *helicsSubscriptionGetKey (helics_input sub);
 
 /** get the key of a publication
 @details this will be the global key used to identify the publication to the federation

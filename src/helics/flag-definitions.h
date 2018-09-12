@@ -18,11 +18,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define UNINTERRUPTIBLE_FLAG 1
 /** flag indicating that a federate can be interrupted*/
 #define INTERRUPTIBLE_FLAG 2
-/** flag indicating that a federate is a signal generator only*/
+/** flag indicating that a federate/interface is a signal generator only*/
 #define SOURCE_ONLY_FLAG 4
-/** flag indicating a federate should only transmit values if they have changed(binary equivalence)*/
+/** flag indicating a federate/interface should only transmit values if they have changed(binary equivalence)*/
 #define ONLY_TRANSMIT_ON_CHANGE_FLAG 6
-/** flag indicating a federate should only trigger an update if a value has changed (binary equivalence)*/
+/** flag indicating a federate/interface should only trigger an update if a value has changed (binary
+ * equivalence)*/
 #define ONLY_UPDATE_ON_CHANGE_FLAG 8
 /** flag indicating a federate should only grant time if all other federates have already passed the requested
  * time*/
@@ -42,13 +43,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ENABLE_INIT_ENTRY 47
 
 /* error code definitions */
-#define ERROR_CODE_REGISTRATION_FAILURE 2
-#define ERROR_CODE_INVALID_OBJECT 4
-#define ERROR_CODE_INVALID_ARGUMENT 6
-#define ERROR_CODE_DISCARD 8
-#define ERROR_CODE_CONNECTION_FAILURE 10
-#define ERROR_CODE_INVALID_STATE_TRANSITION 12
-#define ERROR_CODE_INVALID_FUNCTION_CALL 15
+
+#define ERROR_CODE_REGISTRATION_FAILURE (-1)
+#define ERROR_CODE_CONNECTION_FAILURE (-2)
+#define ERROR_CODE_INVALID_OBJECT (-3)
+#define ERROR_CODE_INVALID_ARGUMENT (-4)
+#define ERROR_CODE_DISCARD (-5)
+#define ERROR_CODE_SYSTEM_FAILURE (-6)
+#define ERROR_CODE_INVALID_STATE_TRANSITION (-9)
+#define ERROR_CODE_INVALID_FUNCTION_CALL (-10)
+#define ERROR_CODE_EXECUTION_FAILURE (-14)
 
 /** property definitions for time properties **/
 #define TIME_DELTA_PROPERTY 137

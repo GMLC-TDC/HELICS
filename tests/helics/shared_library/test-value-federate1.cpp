@@ -124,18 +124,16 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     CE(state=helicsFederateGetState (vFed1, &err));
     BOOST_CHECK (state == helics_execution_state);
 
-   auto sv=helicsInputGetKey (subid);
-    auto sv2=helicsInputGetKey (subid2);
+   auto sv=helicsSubscriptionGetKey (subid);
+    auto sv2=helicsSubscriptionGetKey (subid2);
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
 
-    auto sub3name=helicsInputGetKey (subid3);
+    auto sub3name=helicsSubscriptionGetKey (subid3);
 
     // vFed1->addSubscriptionShortcut (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    auto type=helicsInputGetType (subid3);
-    BOOST_CHECK_EQUAL (type, "double");
     auto units=helicsInputGetUnits (subid3);
     BOOST_CHECK_EQUAL (units, "V");
 
@@ -174,16 +172,14 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     CE(state=helicsFederateGetState (vFed1, &err));
     BOOST_CHECK (state == helics_execution_state);
 
-    auto sv=helicsInputGetKey (subid);
-    auto sv2=helicsInputGetKey (subid2);
+    auto sv=helicsSubscriptionGetKey (subid);
+    auto sv2=helicsSubscriptionGetKey (subid2);
 
     BOOST_CHECK_EQUAL (sv, "sub1");
     BOOST_CHECK_EQUAL (sv2, "sub2");
-    auto sub3name=helicsInputGetKey (subid3);
+    auto sub3name=helicsSubscriptionGetKey (subid3);
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    auto type=helicsInputGetType (subid3);
-    BOOST_CHECK_EQUAL (type, "double");
     auto units=helicsInputGetUnits (subid3);
     BOOST_CHECK_EQUAL (units, "V");
 
@@ -196,7 +192,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto pub3name=helicsPublicationGetKey (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
-    type=helicsPublicationGetType (pubid3);
+    const char *type=helicsPublicationGetType (pubid3);
     BOOST_CHECK_EQUAL (type, "double");
     units=helicsPublicationGetUnits (pubid3);
     BOOST_CHECK_EQUAL (units, "V");
@@ -724,16 +720,15 @@ BOOST_DATA_TEST_CASE(value_federate_single_transfer_vector2, bdata::make(core_ty
 }
 
 
-
-
 BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdata::make (core_types), core_type)
 {
     helics_publication pubid, pubid2, pubid3;
     helics_input subid, subid2, subid3;
     const char *pubname, *pubname2, *pubname3, *pubtype,
          *pubunit3;
-    const char *subname, *subname2, *subname3, *subtype,
-         *subtype2, *subtype3, *subunit3;
+    const char *subname, *subname2, *subname3;
+    const char *subtype, *subtype2, *subtype3;
+	const char *subunit3;
 
     SetupTest (helicsCreateValueFederate, core_type.c_str (), 1, 1.0);
     auto vFed = GetFederateAt (0);
@@ -752,20 +747,20 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     CE(helicsFederateEnterExecutingMode (vFed,&err));
 
     // check subscriptions
-    subname=helicsInputGetKey (subid);
-    subname2=helicsInputGetKey (subid2);
+    subname=helicsSubscriptionGetKey (subid);
+    subname2=helicsSubscriptionGetKey (subid2);
 
     BOOST_CHECK_EQUAL (subname, "sub1");
     BOOST_CHECK_EQUAL (subname2, "sub2");
-    subname3=helicsInputGetKey (subid3);
+    subname3=helicsSubscriptionGetKey (subid3);
     BOOST_CHECK_EQUAL (subname3, "sub3");
 
-    subtype=helicsInputGetType (subid);
-    BOOST_CHECK_EQUAL (subtype, "def");
-    subtype2=helicsInputGetType (subid2);
-    BOOST_CHECK_EQUAL (subtype2, "int64");
-    subtype3=helicsInputGetType (subid3);
-    BOOST_CHECK_EQUAL (subtype3, "def");
+    //subtype=helicsInputGetType (subid);
+    //BOOST_CHECK_EQUAL (subtype, "def");
+   // subtype2=helicsInputGetType (subid2);
+   // BOOST_CHECK_EQUAL (subtype2, "int64");
+    //subtype3=helicsInputGetType (subid3);
+    //BOOST_CHECK_EQUAL (subtype3, "def");
     subunit3=helicsInputGetUnits (subid3);
     BOOST_CHECK_EQUAL (subunit3, "V");
 

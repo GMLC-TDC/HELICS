@@ -436,7 +436,7 @@ void CoreBroker::sendDisconnect ()
 void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
-    errorCom.counter = static_cast<int16_t> (error_code);
+    errorCom.messageID = error_code;
     for (auto &brk : _brokers)
     {
         if (!brk._nonLocal)
@@ -1056,7 +1056,7 @@ void CoreBroker::addPublication (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
         eret.payload = "Duplicate publication names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1081,7 +1081,7 @@ void CoreBroker::addInput (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
         eret.payload = "Duplicate input names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1107,7 +1107,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
         eret.payload = "Duplicate endpoint names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1145,7 +1145,7 @@ void CoreBroker::addFilter (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.counter = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
         eret.payload = "Duplicate filter names (" + m.name + ")";
         routeMessage (eret);
         return;

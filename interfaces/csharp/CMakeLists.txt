@@ -24,78 +24,40 @@ else(DISABLE_SWIG)
 
   set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
 
-  set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
-  if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
-    swig_add_library(JNIhelics TYPE MODULE LANGUAGE java SOURCES helicsJava.i)
-  else()
-    swig_add_module(JNIhelics csharp helicsCsharp.i)
-  endif()
+  set(CMAKE_SWIG_FLAGS "-namespace gmlc.helics")
+  swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
 
-  swig_link_libraries(JNIhelics helicsSharedLib)
-  swig_link_libraries(JNIhelics ${JAVA_LIBRARIES})
+  swig_link_libraries(CShelics helicsSharedLib)
 
-  set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
+  set_target_properties(CShelics PROPERTIES FOLDER interfaces)
 
 endif() # DISABLE_SWIG
-
-configure_file(
-  MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY
-)
-
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/buildjar/)
-
-# -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:JNIhelics>
-add_custom_command(
-  TARGET "JNIhelics" POST_BUILD
-  COMMAND
-    ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_FILE:JNIhelics> -P
-    ${CMAKE_CURRENT_SOURCE_DIR}/addLoadLibraryCommand.cmake
-)
-
-add_custom_command(
-  TARGET "JNIhelics" POST_BUILD
-  COMMAND ${CMAKE_COMMAND} ARGS ..
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar"
-  VERBATIM
-)
-
-add_custom_command(
-  TARGET "JNIhelics" POST_BUILD
-  COMMAND
-    ${CMAKE_COMMAND}
-    ARGS
-    --build .
-    --target helics
-  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar/"
-  COMMENT "Building jar file"
-  VERBATIM
-)
 
 if(WIN32)
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
     add_custom_command(
       TARGET
-      JNIhelics
+      CShelics
       POST_BUILD # Adds a post-build event to api tests
       COMMAND
         ${CMAKE_COMMAND}
         -E
         copy_if_different # which executes "cmake - E copy_if_different..."
         "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:JNIhelics>/"
+        "$<TARGET_FILE_DIR:CShelics>/"
     ) # <--this is out-file path
   endforeach(keyfile)
 
   add_custom_command(
     TARGET
-    JNIhelics
+    CShelics
     POST_BUILD # Adds a post-build event to api tests
     COMMAND
       ${CMAKE_COMMAND}
       -E
       copy_if_different # which executes "cmake - E copy_if_different..."
       "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:JNIhelics>/"
+      "$<TARGET_FILE_DIR:CShelics>/"
   ) # <--this is out- file path
 
 endif(WIN32)
@@ -105,11 +67,7 @@ install(
   DESTINATION csharp
   COMPONENT csharp
 )
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics.jar
-  DESTINATION csharp
-  COMPONENT csharp OPTIONAL
-)
+
 install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION csharp COMPONENT csharp)
 install(TARGETS JNIhelics DESTINATION csharp COMPONENT csharp)
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION csharp COMPONENT csharp)

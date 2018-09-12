@@ -83,7 +83,11 @@ option(
 option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
 option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
 option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
-option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
+
+if(${CMAKE_VERSION} VERSION_GREATER 3.8)
+#cmake projects are only available for csharp from 3.8 onward
+	option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
+ENDIF()
 
 if(
   BUILD_PYTHON_INTERFACE
