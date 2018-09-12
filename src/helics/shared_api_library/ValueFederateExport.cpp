@@ -35,7 +35,7 @@ static helics::InputObject *verifyInput (helics_input inp, helics_error *err)
         return nullptr;
     }
     auto inpObj = reinterpret_cast<helics::InputObject *> (inp);
-    if (inpObj->valid == InputValidationIdentifier)
+    if (inpObj->valid != InputValidationIdentifier)
     {
         if (err != nullptr)
         {
@@ -60,7 +60,7 @@ static helics::PublicationObject *verifyPublication (helics_publication pub, hel
         return nullptr;
     }
     auto pubObj = reinterpret_cast<helics::PublicationObject *> (pub);
-    if (pubObj->valid == PublicationValidationIdentifier)
+    if (pubObj->valid != PublicationValidationIdentifier)
     {
         if (err != nullptr)
         {

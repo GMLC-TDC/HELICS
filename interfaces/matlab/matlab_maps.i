@@ -81,7 +81,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(check)(char *outputString, int maxStringlen, int *actualLength) {
-    $2=helicsSubscriptionGetStringSize(arg1)+2;
+    $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
@@ -199,7 +199,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(double data[], int maxlen, int *actualSize) {
-    $2=helicsSubscriptionGetVectorSize(arg1);
+    $2=helicsInputGetVectorSize(arg1);
     $1 = (double *) mxCalloc($2,sizeof(double));
 }
 

@@ -154,7 +154,7 @@ public:
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize,nullptr,NULL);
+        helicsInputGetVector(inp, data.data(), actualSize,NULL,NULL);
     }
 
     /** Check if a subscription is updated **/

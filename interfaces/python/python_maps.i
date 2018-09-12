@@ -112,7 +112,7 @@
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(double data[], int maxlen, int *actualSize) {
-    $2=helicsSubscriptionGetVectorSize(arg1);
+    $2=helicsInputGetVectorSize(arg1);
     $1 = (double *) malloc($2*sizeof(double));
 }
 
@@ -175,7 +175,7 @@
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDatalen, int *actualSize) {
-    $2=helicsSubscriptionGetValueSize(arg1)+2;
+    $2=helicsInputGetValueSize(arg1)+2;
     $1 =  malloc($2);
 }
 

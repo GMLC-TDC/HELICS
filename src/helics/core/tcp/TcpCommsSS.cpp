@@ -104,10 +104,6 @@ void TcpCommsSS::setPortNumber (int localPortNumber)
     if (getRxStatus () == connection_status::startup)
     {
         PortNumber = localPortNumber;
-        if (PortNumber > 0)
-        {
-            autoPortNumber = false;
-        }
     }
 }
 
@@ -262,15 +258,7 @@ void TcpCommsSS::queue_rx_function ()
                                                   reuse_address, maxMessageSize_);
     while (!server->isReady ())
     {
-        if ((autoPortNumber) && (hasBroker))
-        {  // If we failed and we are on an automatically assigned port number,  just try a different port
-            server->close ();
-            ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
-                                                     reuse_address, maxMessageSize_);
-        }
-        else
-        {
+        
             std::cerr << "retrying tcp bind\n";
             std::this_thread::sleep_for (std::chrono::milliseconds (150));
             auto connected = server->reConnect (connectionTimeout);
@@ -281,7 +269,6 @@ void TcpCommsSS::queue_rx_function ()
                 setRxStatus (connection_status::error);
                 return;
             }
-        }
     }
     auto serviceLoop = ioserv->runServiceLoop ();
     server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
