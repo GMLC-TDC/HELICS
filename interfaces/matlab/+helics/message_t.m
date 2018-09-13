@@ -37,7 +37,7 @@ classdef message_t < SwigRef
         helicsMEX(21, self, varargin{1});
       end
     end
-    function varargout = original_source(self, varargin)
+    function varargout = messageID(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
@@ -47,7 +47,7 @@ classdef message_t < SwigRef
         helicsMEX(23, self, varargin{1});
       end
     end
-    function varargout = source(self, varargin)
+    function varargout = flags(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
@@ -57,7 +57,7 @@ classdef message_t < SwigRef
         helicsMEX(25, self, varargin{1});
       end
     end
-    function varargout = dest(self, varargin)
+    function varargout = original_source(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
@@ -67,7 +67,7 @@ classdef message_t < SwigRef
         helicsMEX(27, self, varargin{1});
       end
     end
-    function varargout = original_dest(self, varargin)
+    function varargout = source(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
@@ -77,20 +77,40 @@ classdef message_t < SwigRef
         helicsMEX(29, self, varargin{1});
       end
     end
+    function varargout = dest(self, varargin)
+      narginchk(1, 2)
+      if nargin==1
+        nargoutchk(0, 1)
+        varargout{1} = helicsMEX(30, self);
+      else
+        nargoutchk(0, 0)
+        helicsMEX(31, self, varargin{1});
+      end
+    end
+    function varargout = original_dest(self, varargin)
+      narginchk(1, 2)
+      if nargin==1
+        nargoutchk(0, 1)
+        varargout{1} = helicsMEX(32, self);
+      else
+        nargoutchk(0, 0)
+        helicsMEX(33, self, varargin{1});
+      end
+    end
     function self = message_t(varargin)
       if nargin==1 && strcmp(class(varargin{1}),'SwigRef')
         if ~isnull(varargin{1})
           self.swigPtr = varargin{1}.swigPtr;
         end
       else
-        tmp = helicsMEX(30, varargin{:});
+        tmp = helicsMEX(34, varargin{:});
         self.swigPtr = tmp.swigPtr;
         tmp.swigPtr = [];
       end
     end
     function delete(self)
       if self.swigPtr
-        helicsMEX(31, self);
+        helicsMEX(35, self);
         self.swigPtr=[];
       end
     end

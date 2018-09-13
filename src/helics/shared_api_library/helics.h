@@ -63,6 +63,10 @@ helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const ch
 @return a new reference to the same broker*/
 HELICS_EXPORT helics_core helicsCoreClone (helics_core core, helics_error *err);
 
+/** check if a core object is a valid object
+@paramcore the helics_core object to test*/
+HELICS_EXPORT helics_bool_t helicsCoreIsValid (helics_core core);
+
 /** create a broker object
 @param type the type of the broker to create
 @param name the name of the broker , may be a nullptr or empty string to have a name automatically assigned
@@ -86,7 +90,12 @@ helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const 
 @param broker an existing helics_broker
 @return a new reference to the same broker*/
 HELICS_EXPORT helics_broker helicsBrokerClone (helics_broker broker, helics_error *err);
-/** check if a broker is connected
+
+/** check if a broker object is a valid object
+@param broker the helics_broker object to test*/
+HELICS_EXPORT helics_bool_t helicsBrokerIsValid (helics_broker broker);
+
+  /** check if a broker is connected
 a connected broker implies is attached to cores or cores could reach out to communicate
 return 0 if not connected , something else if it is connected*/
 HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker);
@@ -232,8 +241,10 @@ HELICS_EXPORT void helicsFederateInfoLoadFromArgs (helics_federate_info_t fi, in
 /** delete the memory associated with a federate info object*/
 HELICS_EXPORT void helicsFederateInfoFree (helics_federate_info_t fi);
 
+/** check if a federate_object is valid*/
+HELICS_EXPORT helics_bool_t helicsFederateIsValid (helics_federate fed);
 
-/** set the name of the core to link to for a federate
+  /** set the name of the core to link to for a federate
 @param fi the federate info object to alter
 @param corename the identifier for a core to link to
 @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference

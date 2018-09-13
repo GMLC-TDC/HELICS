@@ -30,12 +30,12 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
 
     federate_state state;
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
 
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1,&err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
@@ -51,7 +51,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
 
     federate_state state;
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
 
     auto sv=helicsPublicationGetKey (pubid);
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
@@ -71,7 +71,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type)
@@ -86,7 +86,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
 
     federate_state state;
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
 
     auto sv=helicsPublicationGetKey (pubid);
     auto sv2=helicsPublicationGetKey (pubid2);
@@ -106,7 +106,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type)
@@ -122,7 +122,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
     federate_state state;
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
 
    auto sv=helicsSubscriptionGetKey (subid);
     auto sv2=helicsSubscriptionGetKey (subid2);
@@ -145,7 +145,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
@@ -170,7 +170,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     federate_state state;
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
 
     auto sv=helicsSubscriptionGetKey (subid);
     auto sv2=helicsSubscriptionGetKey (subid2);
@@ -199,7 +199,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types), core_type)

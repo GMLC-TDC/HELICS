@@ -71,7 +71,7 @@ FederateTestFixture::~FederateTestFixture ()
             {
                 helicsCoreDisconnect (core,nullptr);
             }
-            if (state != helics_finalize_state)
+            if (state != helics_state_finalize)
             {
                 helicsFederateFinalize (fed,nullptr);
             }

@@ -1,3 +1,3 @@
 function varargout = helicsFederateEnterInitializingMode(varargin)
-  [varargout{1:nargout}] = helicsMEX(76, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(83, varargin{:});
 end

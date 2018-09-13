@@ -2,5 +2,5 @@ function varargout = helicsFederateFinalize(varargin)
     %finalize the federate this halts all communication in the federate and
     %disconnects it from the core
     %
-  [varargout{1:nargout}] = helicsMEX(73, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(80, varargin{:});
 end

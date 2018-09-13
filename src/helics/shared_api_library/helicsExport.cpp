@@ -476,6 +476,16 @@ helics_core helicsCoreClone (helics_core core, helics_error *err)
     return retcore;
 }
 
+helics_bool_t helicsCoreIsValid(helics_core core)
+{
+    auto *coreObj = helics::getCoreObject (core, nullptr);
+    if (coreObj == nullptr)
+    {
+        return helics_false;
+    }
+    return (coreObj->coreptr) ? helics_true : helics_false;
+}
+
 helics_federate helicsGetFederateByName (const char *fedName, helics_error *err)
 {
     if ((err != nullptr) && (err->error_code != 0))
@@ -585,6 +595,17 @@ helics_broker helicsBrokerClone (helics_broker broker, helics_error *err)
     auto retbroker = reinterpret_cast<helics_broker> (brokerClone.get ());
     getMasterHolder ()->addBroker (std::move (brokerClone));
     return retbroker;
+}
+
+
+helics_bool_t helicsBrokerIsValid (helics_broker broker)
+{
+    auto brokerObj = helics::getBrokerObject (broker, nullptr);
+    if (brokerObj == nullptr)
+    {
+        return helics_false;
+    }
+    return (brokerObj->brokerptr) ? helics_true : helics_false;
 }
 
 helics_bool_t helicsBrokerIsConnected (helics_broker broker)

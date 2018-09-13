@@ -1,4 +1,4 @@
-function v = helics_randomDrop_filter()
+function v = helics_filtertype_randomDrop()
   persistent vInitialized;
   if isempty(vInitialized)
     vInitialized = helicsMEX(0, 1946183064);

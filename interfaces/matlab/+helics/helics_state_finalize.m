@@ -1,7 +1,7 @@
-function v = helics_clone_filter()
+function v = helics_state_finalize()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183066);
+    vInitialized = helicsMEX(0, 1946183055);
   end
   v = vInitialized;
 end

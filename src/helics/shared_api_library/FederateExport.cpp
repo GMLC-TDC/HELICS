@@ -332,6 +332,13 @@ helics_federate helicsFederateClone (helics_federate fed, helics_error *err)
     return (fedB);
 }
 
+
+helics_bool_t helicsFederateIsValid (helics_federate fed)
+{
+    auto fedObj = getFed (fed, nullptr);
+    return (fedObj == nullptr) ? helics_false : helics_true;
+}
+
 helics_core helicsFederateGetCoreObject (helics_federate fed, helics_error *err)
 {
     auto fedObj = getFed (fed, err);
@@ -664,22 +671,22 @@ helics_time_t helicsFederateRequestTimeComplete (helics_federate fed, helics_err
 }
 
 static const std::map<helics::Federate::op_states, federate_state> stateEnumConversions{
-  {helics::Federate::op_states::error, federate_state::helics_error_state},
-  {helics::Federate::op_states::startup, federate_state::helics_startup_state},
-  {helics::Federate::op_states::execution, federate_state::helics_execution_state},
-  {helics::Federate::op_states::finalize, federate_state::helics_finalize_state},
-  {helics::Federate::op_states::pending_exec, federate_state::helics_pending_exec_state},
-  {helics::Federate::op_states::pending_init, federate_state::helics_pending_init_state},
-  {helics::Federate::op_states::pending_iterative_time, federate_state::helics_pending_iterative_time_state},
-  {helics::Federate::op_states::pending_time, federate_state::helics_pending_time_state},
-  {helics::Federate::op_states::initialization, federate_state::helics_initialization_state}};
+  {helics::Federate::op_states::error, federate_state::helics_state_error},
+  {helics::Federate::op_states::startup, federate_state::helics_state_startup},
+  {helics::Federate::op_states::execution, federate_state::helics_state_execution},
+  {helics::Federate::op_states::finalize, federate_state::helics_state_finalize},
+  {helics::Federate::op_states::pending_exec, federate_state::helics_state_pending_exec},
+  {helics::Federate::op_states::pending_init, federate_state::helics_state_pending_init},
+  {helics::Federate::op_states::pending_iterative_time, federate_state::helics_state_pending_iterative_time},
+  {helics::Federate::op_states::pending_time, federate_state::helics_state_pending_time},
+  {helics::Federate::op_states::initialization, federate_state::helics_state_initialization}};
 
 federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
     {
-        return helics_error_state;
+        return helics_state_error;
     }
     try
     {
@@ -689,7 +696,7 @@ federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
     catch (...)
     {
         helicsErrorHandler (err);
-        return helics_error_state;
+        return helics_state_error;
     }
 }
 

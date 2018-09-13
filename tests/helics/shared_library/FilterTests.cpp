@@ -34,21 +34,21 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     helicsFederateRegisterGlobalEndpoint (mFed, "port1","",&err);
     helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL,&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
-    CE(auto f1 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter1",&err));
+    CE(auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter1",&err));
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f1 != NULL);
-    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "filter2",&err));
+    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter2",&err));
     CE(helicsFilterAddDestinationTarget(f2, "port2",&err));
     BOOST_CHECK (f2 != f1);
     CE(auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "",&err));
     BOOST_CHECK (ep1 != NULL);
-    CE(auto f3 = helicsFederateRegisterFilter (fFed, helics_custom_filter, "",&err));
+    CE(auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "",&err));
     helicsFilterAddSourceTarget(f3, "filter0/fout",nullptr);
     BOOST_CHECK (f3 != f2);
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
     CE(federate_state state=helicsFederateGetState (fFed, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 /** test a filter operator
@@ -69,7 +69,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err);
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f1 != NULL);
@@ -80,7 +80,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     CE(helicsFederateEnterExecutingModeComplete (fFed,&err));
 
     CE (federate_state state=helicsFederateGetState (fFed, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
     std::string data (500, 'a');
     CE(helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
@@ -113,7 +113,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
     CE(state=helicsFederateGetState (fFed, &err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 /** test a filter operator
@@ -134,14 +134,14 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err);
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
 
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 1.25,&err));
 
-    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter2", &err));
     CE(helicsFilterAddSourceTarget(f1, "port1",&err));
     BOOST_CHECK (f2 != NULL);
     CE(helicsFilterSet (f2, "delay", 1.25,&err));
@@ -153,7 +153,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     CE(helicsFederateEnterExecutingModeComplete (fFed2,&err));
 
     CE (federate_state state=helicsFederateGetState (fFed, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
@@ -194,7 +194,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     CE(helicsFederateFinalize (fFed,&err));
     CE(helicsFederateFinalize (fFed2,&err));
     CE(state=helicsFederateGetState (fFed,&err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 /** test two filter operators
@@ -215,12 +215,12 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-   CE( auto f1 = helicsFederateRegisterFilter (fFed, helics_delay_filter, "filter1",&err));
+   CE( auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1",&err));
     helicsFilterAddSourceTarget(f1, "port1",nullptr);
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 2.5,&err));
 
-    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_delay_filter,"filter2",&err));
+    CE(auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay,"filter2",&err));
     helicsFilterAddSourceTarget (f2, "port2", nullptr);
     BOOST_CHECK (f2 != NULL);
     CE(helicsFilterSet (f2, "delay", 2.5,&err));
@@ -230,7 +230,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     CE(helicsFederateEnterExecutingModeComplete (fFed,&err));
 
     CE (federate_state state=helicsFederateGetState (fFed, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
 
@@ -265,7 +265,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     CE(helicsFederateFinalize (mFed,&err));
     CE(helicsFederateFinalize (fFed,&err));
     CE(state=helicsFederateGetState (fFed,&err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_AUTO_TEST_CASE (message_clone_test)
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     CE(helicsFederateEnterExecutingModeComplete (dcFed,&err));
 
     CE (federate_state state=helicsFederateGetState (sFed, &err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
     std::string data (500, 'a');
     CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
 
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     CE(helicsFederateFinalize (dFed,&err));
     CE(helicsFederateFinalize (dcFed,&err));
     CE(state=helicsFederateGetState (sFed,&err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE(helicsFederateEnterExecutingModeComplete (dcFed,&err));
 
     CE(federate_state state=helicsFederateGetState (sFed,&err));
-    BOOST_CHECK (state == helics_execution_state);
+    BOOST_CHECK (state == helics_state_execution);
     std::string data (500, 'a');
     std::string data2 (400, 'b');
     CE (helicsEndpointSendMessageRaw (p1, "dest", data.c_str (), static_cast<int> (data.size ()), &err));
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     CE(helicsFederateFinalize (dFed,&err));
     CE(helicsFederateFinalize (dcFed,&err));
     CE(state=helicsFederateGetState (sFed,&err));
-    BOOST_CHECK (state == helics_finalize_state);
+    BOOST_CHECK (state == helics_state_finalize);
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load)

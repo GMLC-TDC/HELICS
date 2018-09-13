@@ -87,35 +87,71 @@ typedef enum {
 
 /** enumeration of possible federate states*/
 typedef enum {
-    helics_startup_state = 0, /*!< when created the federate is in startup state */
-    helics_initialization_state, /*!< entered after the enterInitializingMode call has returned */
-    helics_execution_state, /*!< entered after the enterExectuationState call has returned */
-    helics_finalize_state, /*!< the federate has finished executing normally final values may be retrieved */
-    helics_error_state, /*!< error state no core communication is possible but values can be retrieved */
+    helics_state_startup = 0, /*!< when created the federate is in startup state */
+    helics_state_initialization, /*!< entered after the enterInitializingMode call has returned */
+    helics_state_execution, /*!< entered after the enterExectuationState call has returned */
+    helics_state_finalize, /*!< the federate has finished executing normally final values may be retrieved */
+    helics_state_error, /*!< error state no core communication is possible but values can be retrieved */
     /* the following states are for asynchronous operations */
-    helics_pending_init_state, /*!< indicator that the federate is pending entry to initialization state */
-    helics_pending_exec_state, /*!< state pending EnterExecution State */
-    helics_pending_time_state, /*!< state that the federate is pending a timeRequest */
-    helics_pending_iterative_time_state /*!< state that the federate is pending an iterative time request */
+    helics_state_pending_init, /*!< indicator that the federate is pending entry to initialization state */
+    helics_state_pending_exec, /*!< state pending EnterExecution State */
+    helics_state_pending_time, /*!< state that the federate is pending a timeRequest */
+    helics_state_pending_iterative_time /*!< state that the federate is pending an iterative time request */
 } federate_state;
 
 /** enumeration of the predefined filter types*/
 typedef enum {
-    helics_custom_filter = 0,
-    helics_delay_filter = 1,
-    helics_randomDelay_filter = 2,
-    helics_randomDrop_filter = 3,
-    helics_reroute_filter = 4,
-    helics_clone_filter = 5
+    helics_filtertype_custom = 0,
+    helics_filtertype_delay = 1,
+    helics_filtertype_randomDelay = 2,
+    helics_filtertype_randomDrop = 3,
+    helics_filtertype_reroute = 4,
+    helics_filtertype_clone = 5
 
 } helics_filter_type_t;
 
-/**
- * Data to be communicated.
- *
- * Core operates on opaque byte buffers.
- */
-typedef struct data_t
+typedef enum {
+    helics_flag_observer = OBSERVER_FLAG,
+    helics_flag_uninterruptible = UNINTERRUPTIBLE_FLAG,
+    helics_flag_interruptible = INTERRUPTIBLE_FLAG,
+    helics_flag_source_only = SOURCE_ONLY_FLAG,
+    helics_flag_only_transmit_on_change = ONLY_TRANSMIT_ON_CHANGE_FLAG,
+    helics_flag_only_update_on_change = ONLY_UPDATE_ON_CHANGE_FLAG,
+    helics_flag_wait_for_current_time_update = WAIT_FOR_CURRENT_TIME_UPDATE_FLAG,
+    helics_flag_rollback = ROLLBACK_FLAG,
+    helics_flag_forward_compute = FORWARD_COMPUTE_FLAG,
+    helics_flag_realtime = REALTIME_FLAG,
+} helics_federate_flags;
+
+typedef enum {
+    helics_time_property_time_delta = TIME_DELTA_PROPERTY,
+    helics_time_property_period = PERIOD_PROPERTY,
+    helics_time_property_offset = OFFSET_PROPERTY,
+    helics_time_property_rt_lag = RT_LAG_PROPERTY,
+    helics_time_property_rt_lead = RT_LEAD_PROPERTY,
+    helics_time_property_rt_tolerance = RT_TOLERANCE_PROPERTY,
+    helics_time_property_input_delay = INPUT_DELAY_PROPERTY,
+    helics_time_property_output_delay = OUTPUT_DELAY_PROPERTY,
+} helics_time_properties;
+
+typedef enum {
+    helics_int_property_max_iterations = MAX_ITERATIONS_PROPERTY,
+    helics_int_property_log_level = LOG_LEVEL_PROPERTY,
+} helics_int_properties;
+
+typedef enum {
+helics_handle_option_connection_required=CONNECTION_REQUIRED_OPTION,
+    helics_handle_option_connection_optional=CONNECTION_OPTIONAL_OPTION,
+	helics_handle_option_single_connection_only=SINGLE_CONNECTION_ONLY_OPTION,
+	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION,
+} helics_handle_options;
+
+  /**
+   * Data to be communicated.
+   *
+   * Core operates on opaque byte buffers.
+   */
+  typedef struct data_t
 {
     char *data; /*!< pointer to the data */
     int64_t length; /*!< the size of the data */
@@ -139,7 +175,7 @@ typedef struct message_t
     const char *data; /*!< message data */
     int64_t length; /*!< message length */
     int32_t messageID; /*!< message identification information*/
-    int16_t flags;  /*!< flags related to the message*/
+    int16_t flags; /*!< flags related to the message*/
     const char *original_source; /** original source */
     const char *source; /*!< the most recent source */
     const char *dest; /*!< the final destination */
@@ -177,10 +213,10 @@ on the same machine */
 /** use UDP packets to send the data */
 #define HELICS_CORE_TYPE_UDP 7
 
-/*#define HELICS_CORE_TYPE_TCP_NNG = 9, //!< reserved for future Nanomsg implementation 
-*/
-#define HELICS_CORE_TYPE_ZMQ_TEST = 10, //!< test code for different type of ZMQ core
-#define HELICS_CORE_TYPE_TCP_SS = 11, //!< a single socket version of the TCP core for more easily handling firewalls
+/*#define HELICS_CORE_TYPE_TCP_NNG = 9, //!< reserved for future Nanomsg/nmg implementation
+ */
+#define HELICS_CORE_TYPE_ZMQ_TEST 10  //!< test code for different type of ZMQ core
+#define HELICS_CORE_TYPE_TCP_SS 11  //!< a single socket version of the TCP core for more easily handling firewalls
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

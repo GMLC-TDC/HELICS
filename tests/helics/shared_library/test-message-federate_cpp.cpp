@@ -30,12 +30,12 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     mFed1->enterExecutingMode ();
 
     federate_state mFed1State = mFed1->getState ();
-    BOOST_CHECK (mFed1State == helics_execution_state);
+    BOOST_CHECK (mFed1State == helics_state_execution);
 
     mFed1->finalize ();
 
     mFed1State = mFed1->getState ();
-    BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
+    BOOST_CHECK (mFed1State == federate_state::helics_state_finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     mFed1->enterExecutingMode ();
 
     federate_state mFed1State = mFed1->getState ();
-    BOOST_CHECK (mFed1State == helics_execution_state);
+    BOOST_CHECK (mFed1State == helics_state_execution);
 
     BOOST_CHECK_EQUAL (epid.getName (), "fed0/ep1");
     BOOST_CHECK_EQUAL (epid2.getName (), "ep2");
@@ -60,7 +60,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     mFed1->finalize ();
 
     mFed1State = mFed1->getState ();
-    BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
+    BOOST_CHECK (mFed1State == federate_state::helics_state_finalize);
 }
 
 
@@ -96,7 +96,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sin
     mFed1->finalize ();
 
     auto mFed1State = mFed1->getState ();
-    BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
+    BOOST_CHECK (mFed1State == federate_state::helics_state_finalize);
 }
 
 /*
@@ -119,12 +119,12 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     CE(helicsFederateEnterExecutingMode (mFed2,&err));
     CE(helicsFederateEnterExecutingModeComplete (mFed1,&err));
 
-    federate_state mFed1State = helics_execution_state;
+    federate_state mFed1State = helics_state_execution;
     CE(helicsFederateGetState(mFed1, &mFed1State,&err));
-    BOOST_CHECK (mFed1State == helics_execution_state);
-    federate_state mFed2State = helics_execution_state;
+    BOOST_CHECK (mFed1State == helics_state_execution);
+    federate_state mFed2State = helics_state_execution;
     CE(helicsFederateGetState(mFed2, &mFed2State,&err));
-    BOOST_CHECK (mFed2State == helics_execution_state);
+    BOOST_CHECK (mFed2State == helics_state_execution);
 
     std::string data(500, 'a');
     std::string data2(400, 'b');
@@ -162,12 +162,12 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     CE(helicsFederateFinalize(mFed1,&err));
     CE(helicsFederateFinalize(mFed2,&err));
 
-    mFed1State = federate_state::helics_finalize_state;
+    mFed1State = federate_state::helics_state_finalize;
     CE(helicsFederateGetState(mFed1, &mFed1State,&err));
-    BOOST_CHECK (mFed1State == federate_state::helics_finalize_state);
-    mFed2State = federate_state::helics_finalize_state;
+    BOOST_CHECK (mFed1State == federate_state::helics_state_finalize);
+    mFed2State = federate_state::helics_state_finalize;
     CE(helicsFederateGetState(mFed2, &mFed2State,&err));
-    BOOST_CHECK (mFed2State == federate_state::helics_finalize_state);
+    BOOST_CHECK (mFed2State == federate_state::helics_state_finalize);
 }
 */
 /*

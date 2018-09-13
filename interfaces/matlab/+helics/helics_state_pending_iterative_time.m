@@ -1,4 +1,4 @@
-function v = helics_pending_iterative_time_state()
+function v = helics_state_pending_iterative_time()
   persistent vInitialized;
   if isempty(vInitialized)
     vInitialized = helicsMEX(0, 1946183060);
