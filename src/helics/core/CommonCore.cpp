@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -321,7 +321,7 @@ bool CommonCore::allDisconnected () const
     if ((hasTimeDependency) || (hasFilters))
     {
         return (afed) && (!timeCoord->hasActiveTimeDependencies ());
-}
+    }
     else
     {
         return (afed);
@@ -526,7 +526,7 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
         case iteration_result::error:
             throw (FunctionExecutionFailure (fed->lastErrorString ()));
         case iteration_result::halted:
-            return Time::maxVal();
+            return Time::maxVal ();
         default:
             return ret.grantedTime;
         }
@@ -546,8 +546,8 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
         throw (InvalidIdentifier ("federateID not valid timeRequestIterative"));
     }
 
-	switch (fed->getState())
-	{
+    switch (fed->getState ())
+    {
     case HELICS_EXECUTING:
         break;
     case HELICS_FINISHED:
@@ -555,10 +555,10 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
         return iteration_time (timeZero, iteration_result::error);
-	case HELICS_NONE:
+    case HELICS_NONE:
     case HELICS_ERROR:
         return iteration_time (Time::maxVal (), iteration_result::error);
-	}
+    }
 
     // limit the iterations
     if (iterate == iteration_request::iterate_if_needed)
@@ -926,18 +926,18 @@ void CommonCore::addDestinationTarget (interface_handle handle, const std::strin
         cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
         if (handleInfo->key.empty ())
         {
-			if ((!handleInfo->type_in.empty()) || (!handleInfo->type_out.empty()))
-			{
+            if ((!handleInfo->type_in.empty ()) || (!handleInfo->type_out.empty ()))
+            {
                 cmd.setStringData (handleInfo->type_in, handleInfo->type_out);
-			}
+            }
         }
         break;
     case handle_type_t::publication:
         cmd.setAction (CMD_ADD_NAMED_INPUT);
-		if (handleInfo->key.empty())
-		{
+        if (handleInfo->key.empty ())
+        {
             cmd.setStringData (handleInfo->type, handleInfo->units);
-		}
+        }
         break;
     case handle_type_t::input:
     default:
@@ -1362,7 +1362,8 @@ void CommonCore::deliverMessage (ActionMessage &message)
     case CMD_SEND_MESSAGE:
     {
         // Find the destination endpoint
-        auto localP = loopHandles.getEndpoint (message.getString (targetStringLoc));
+        auto localP = (message.dest_id == 0) ? loopHandles.getEndpoint (message.getString (targetStringLoc)) :
+                                               loopHandles.findHandle (message.getDest ());
         if (localP == nullptr)
         {
             auto kfnd = knownExternalEndpoints.find (message.getString (targetStringLoc));
@@ -1442,9 +1443,12 @@ void CommonCore::deliverMessage (ActionMessage &message)
                 }
             }
         }
-        message.dest_id = localP->getFederateId ();
-        message.dest_handle = localP->getInterfaceHandle ();
-
+		if (message.dest_id == 0)
+		{
+            message.dest_id = localP->getFederateId ();
+            message.dest_handle = localP->getInterfaceHandle ();
+		}
+            
         timeCoord->processTimeMessage (message);
 
         auto fed = getFederateCore (localP->getFederateId ());
@@ -2237,7 +2241,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         if (command.dest_id == 0)
         {
             checkDisconnect ();
-            }
+        }
         else
         {
             routeMessage (command);
@@ -2331,9 +2335,9 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
             else
             {
-                sendToLogger (parent_broker_id, 0, getFederateNameNoThrow (global_federate_id_t (command.source_id)),
-                          command.payload);
-        }
+                sendToLogger (parent_broker_id, 0,
+                              getFederateNameNoThrow (global_federate_id_t (command.source_id)), command.payload);
+            }
         }
         else
         {
@@ -2604,14 +2608,14 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_PUBLISHER);
             command.setDestination (inp->handle);
             command.name.clear ();
-			if (command.getStringData().empty())
-			{
+            if (command.getStringData ().empty ())
+            {
                 auto pub = loopHandles.findHandle (command.getSource ());
-				if (pub != nullptr)
-				{
+                if (pub != nullptr)
+                {
                     command.setStringData (pub->type, pub->units);
-				}
-			}
+                }
+            }
             addTargetToInterface (command);
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.swapSourceDest ();
@@ -2971,9 +2975,9 @@ void CommonCore::checkDependencies ()
     {
         if (!((dep == fedid) || (dep == brkid)))
         {
-                return;
-            }
+            return;
         }
+    }
     // remove the core from the time dependency chain since it is just adding to the communication noise in this
     // case
     timeCoord->removeDependency (brkid);
@@ -3192,7 +3196,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
                     {
                         continue;
                     }
-                    bye.source_id = fed->global_id.load();
+                    bye.source_id = fed->global_id.load ();
                     bye.dest_id = bye.source_id;
                     fed->addAction (bye);
                 }
@@ -3202,8 +3206,8 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
             else
             {
                 checkDisconnect ();
+            }
         }
-    }
     }
     else if (isDependencyCommand (cmd))
     {

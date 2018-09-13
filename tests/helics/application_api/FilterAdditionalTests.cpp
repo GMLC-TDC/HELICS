@@ -181,13 +181,19 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
+	if (mFed->hasMessage(p3) == false)
+	{
+        BOOST_CHECK(mFed->hasMessage (p3));
+	}
+	else
+	{
+        auto m2 = mFed->getMessage (p3);
+        BOOST_CHECK_EQUAL (m2->source, "port1");
+        BOOST_CHECK_EQUAL (m2->dest, "port3");
+        BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+	}
 
-    BOOST_REQUIRE (mFed->hasMessage (p3));
-
-    auto m2 = mFed->getMessage (p3);
-    BOOST_CHECK_EQUAL (m2->source, "port1");
-    BOOST_CHECK_EQUAL (m2->dest, "port3");
-    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+   
 
     mFed->finalize ();
     fFed->finalize ();

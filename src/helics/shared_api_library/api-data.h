@@ -120,7 +120,7 @@ typedef enum {
     helics_flag_wait_for_current_time_update = WAIT_FOR_CURRENT_TIME_UPDATE_FLAG,
     helics_flag_rollback = ROLLBACK_FLAG,
     helics_flag_forward_compute = FORWARD_COMPUTE_FLAG,
-    helics_flag_realtime = REALTIME_FLAG,
+    helics_flag_realtime = REALTIME_FLAG
 } helics_federate_flags;
 
 typedef enum {
@@ -131,19 +131,19 @@ typedef enum {
     helics_time_property_rt_lead = RT_LEAD_PROPERTY,
     helics_time_property_rt_tolerance = RT_TOLERANCE_PROPERTY,
     helics_time_property_input_delay = INPUT_DELAY_PROPERTY,
-    helics_time_property_output_delay = OUTPUT_DELAY_PROPERTY,
+    helics_time_property_output_delay = OUTPUT_DELAY_PROPERTY
 } helics_time_properties;
 
 typedef enum {
     helics_int_property_max_iterations = MAX_ITERATIONS_PROPERTY,
-    helics_int_property_log_level = LOG_LEVEL_PROPERTY,
+    helics_int_property_log_level = LOG_LEVEL_PROPERTY
 } helics_int_properties;
 
 typedef enum {
 helics_handle_option_connection_required=CONNECTION_REQUIRED_OPTION,
     helics_handle_option_connection_optional=CONNECTION_OPTIONAL_OPTION,
 	helics_handle_option_single_connection_only=SINGLE_CONNECTION_ONLY_OPTION,
-	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION,
+	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION
 } helics_handle_options;
 
   /**
