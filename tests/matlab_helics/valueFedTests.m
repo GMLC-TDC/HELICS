@@ -19,21 +19,20 @@ success=true;
 initstring = '1';
 fedinitstring = '--broker=mainbroker --federates=1';
 fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
-if (fedStruct.broker==0)
+if (~helicsBrokerIsValid(fedStruct.broker))
     success=false;
     return;
 end
 fedInfo=helicsCreateFederateInfo();
 if (fedInfo==0)
-    helicsBrokerDestroy(fedStruct.broker);
     success=false;
     return;
 end
 try
 helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeProperty(fedInfo,TIME 0.01);
-helicsFederateInfoSetLoggingLevel(fedInfo,1);
+helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
 catch ec
     success=false;
     helicsBrokerDestroy(fedStruct.broker);
@@ -42,7 +41,7 @@ catch ec
 end
 try
 fedStruct.vFed=helicsCreateValueFederate('fed1',fedInfo);
-if (fedStruct.vFed==0)
+if (~helicsFederateIsValid(fedStruct.vFed))
     success=false;
 end
 catch ec
@@ -55,7 +54,7 @@ function success=closeStruct(fedStruct)
 import helics.*
 success=true;
 helicsFederateFinalize(fedStruct.vFed);
-helicsBrokerWaitForDisconnect(fedStruct.broker);
+helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
 
 helicsFederateFree(fedStruct.vFed);
 helicsBrokerFree(fedStruct.broker);
@@ -96,7 +95,7 @@ try
 testCase.verifyThat(success,IsTrue);
 helics.helicsFederateEnterExecutingMode(feds.vFed);
 state=helics.helicsFederateGetState(feds.vFed);
-testCase.verifyEqual(state,helics.helics_execution_state);
+testCase.verifyEqual(state,helics.helics_state_execution);
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
 catch e
@@ -113,9 +112,9 @@ import helics.*
 [feds,success]=generateFed();
 testCase.verifyThat(success,IsTrue);
 try
-pubid1 = helicsFederateRegisterPublication(feds.vFed, 'pub1', 'string', '');
-pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', 'int', '');
-pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', 'double', 'V');
+pubid1 = helicsFederateRegisterTypePublication(feds.vFed, 'pub1', 'string', '');
+pubid2 = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub2', 'int', '');
+pubid3 = helicsFederateRegisterTypePublication(feds.vFed, 'pub3', 'double', 'V');
 helicsFederateEnterExecutingMode(feds.vFed);
 
 publication_key = helicsPublicationGetKey(pubid1);
@@ -151,10 +150,10 @@ defaultValue = 'start';
     testValue2 = 'I am a string';
     testVal2 = 0.0;
 try
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_NAMEDPOINT, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'named_point', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_NAMEDPOINT, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal);
+    helicsInputSetDefaultNamedPoint(subid, defaultValue, defVal);
 
     helicsFederateEnterExecutingMode(feds.vFed);
 
@@ -162,7 +161,7 @@ try
     helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1);
 
     % double val;
-    [value, val] = helicsSubscriptionGetNamedPoint(subid);
+    [value, ~,val] = helicsInputGetNamedPoint(subid);
     testCase.verifyEqual(value,defaultValue);
     testCase.verifyEqual(val,defVal);
 
@@ -170,7 +169,7 @@ try
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    [value, val] = helicsSubscriptionGetNamedPoint(subid);
+    [value, ~,val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
     testCase.verifyEqual(val,testVal1);
@@ -179,7 +178,7 @@ try
     helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2);
 
     % make sure the value is still what we expect
-    [value, val] = helicsSubscriptionGetNamedPoint(subid);
+    [value,~, val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
     testCase.verifyEqual(val,testVal1);
@@ -189,7 +188,7 @@ try
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    [value, val] = helicsSubscriptionGetNamedPoint(subid);
+    [value,~, val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue2);
     testCase.verifyEqual(val,testVal2);
@@ -214,20 +213,20 @@ defaultValue = helics_true;
     testValue1 = helics_true;
     testValue2 = helics_false;
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_BOOLEAN, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'bool', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_BOOLEAN, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultBoolean(subid, defaultValue);
+    helicsInputSetDefaultBoolean(subid, defaultValue);
     
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
 
     % publish string1 at time=0.0;
      helicsPublicationPublishBoolean(pubid, testValue1);
     
 
     % double val;
-    value = helicsSubscriptionGetBoolean(subid);
+    value = helicsInputGetBoolean(subid);
     
     testCase.verifyEqual(value,defaultValue);
 
@@ -236,7 +235,7 @@ defaultValue = helics_true;
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    value = helicsSubscriptionGetBoolean(subid);
+    value = helicsInputGetBoolean(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -246,7 +245,7 @@ defaultValue = helics_true;
     
 
     % make sure the value is still what we expect
-    value = helicsSubscriptionGetBoolean(subid);
+    value = helicsInputGetBoolean(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -257,7 +256,7 @@ defaultValue = helics_true;
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    value = helicsSubscriptionGetBoolean(subid);
+    value = helicsInputGetBoolean(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue2);
@@ -278,9 +277,9 @@ import helics.*
 testCase.verifyThat(success,IsTrue);
 
 try
-    pubid1 = helicsFederateRegisterTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
-    pubid2 = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub2', HELICS_DATA_TYPE_INT, '');
-    pubid3 = helicsFederateRegisterTypePublication(feds.vFed, 'pub3', HELICS_DATA_TYPE_DOUBLE, 'V');
+    pubid1 = helicsFederateRegisterPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
+    pubid2 = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub2', HELICS_DATA_TYPE_INT, '');
+    pubid3 = helicsFederateRegisterPublication(feds.vFed, 'pub3', HELICS_DATA_TYPE_DOUBLE, 'V');
 
     publication_key = helicsPublicationGetKey(pubid1);
 
@@ -304,7 +303,7 @@ publication_units = helicsPublicationGetUnits(pubid3);
 
 testCase.verifyEqual(publication_units,'V');
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
 
    %% add state and some type checks
@@ -329,13 +328,13 @@ defaultValue = 1.0;
     testValue1 = 2.7586;
     testValue2 = 1e27;
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_DOUBLE, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'double', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_DOUBLE, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultDouble(subid, defaultValue);
+    helicsInputSetDefaultDouble(subid, defaultValue);
     
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
 
     % publish string1 at time=0.0;
@@ -343,7 +342,7 @@ defaultValue = 1.0;
     
 
     % double val;
-    value = helicsSubscriptionGetDouble(subid);
+    value = helicsInputGetDouble(subid);
     
     testCase.verifyEqual(value,defaultValue);
 
@@ -352,7 +351,7 @@ defaultValue = 1.0;
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    value = helicsSubscriptionGetDouble(subid);
+    value = helicsInputGetDouble(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -362,7 +361,7 @@ defaultValue = 1.0;
     
 
     % make sure the value is still what we expect
-    value = helicsSubscriptionGetDouble(subid);
+    value = helicsInputGetDouble(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -373,7 +372,7 @@ defaultValue = 1.0;
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    value = helicsSubscriptionGetDouble(subid);
+    value = helicsInputGetDouble(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue2);
@@ -402,13 +401,13 @@ defaultValue_j = -1.0;
     testValue2_r = 1e27;
     testValue2_j = -0.3e-2;
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_COMPLEX, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'double', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_COMPLEX, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultComplex(subid, defaultValue_r, defaultValue_j);
+    helicsInputSetDefaultComplex(subid, defaultValue_r, defaultValue_j);
     
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
 
     % publish string1 at time=0.0;
@@ -416,7 +415,7 @@ defaultValue_j = -1.0;
     
 
     % double val;
-    value = helicsSubscriptionGetComplex(subid);
+    value = helicsInputGetComplex(subid);
     
     testCase.verifyEqual(value.real,defaultValue_r);
     testCase.verifyEqual(value.imag,defaultValue_j);
@@ -426,7 +425,7 @@ defaultValue_j = -1.0;
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    [value_r, value_j] = helicsSubscriptionGetComplex(subid);
+    [value_r, value_j] = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value_r,testValue1_r);
@@ -436,7 +435,7 @@ defaultValue_j = -1.0;
     
 
     % make sure the value is still what we expect
-    [value_r,value_j] = helicsSubscriptionGetComplex(subid);
+    [value_r,value_j] = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value_r,testValue1_r);
@@ -447,7 +446,7 @@ defaultValue_j = -1.0;
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    [value_r,value_j] = helicsSubscriptionGetComplex(subid);
+    [value_r,value_j] = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value_r,testValue2_r);
@@ -474,13 +473,13 @@ defaultValue = int64(45626678);
     testValue1 = int64(-27);
     testValue2 = int64(0);
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_INT, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'int', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_INT, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultInteger(subid, defaultValue);
+    helicsInputSetDefaultInteger(subid, defaultValue);
     
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
 
     % publish string1 at time=0.0;
@@ -488,7 +487,7 @@ defaultValue = int64(45626678);
     
 
     % double val;
-    value = helicsSubscriptionGetInteger(subid);
+    value = helicsInputGetInteger(subid);
     
     testCase.verifyEqual(value,defaultValue);
 
@@ -497,7 +496,7 @@ defaultValue = int64(45626678);
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    value = helicsSubscriptionGetInteger(subid);
+    value = helicsInputGetInteger(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -506,7 +505,7 @@ defaultValue = int64(45626678);
     helicsPublicationPublishInteger(pubid, testValue2);
     
     % make sure the value is still what we expect
-    value = helicsSubscriptionGetInteger(subid);
+    value = helicsInputGetInteger(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -517,7 +516,7 @@ defaultValue = int64(45626678);
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    value = helicsSubscriptionGetInteger(subid);
+    value = helicsInputGetInteger(subid);
     
     % make sure the value is what we expect
     testCase.verifyEqual(value,testValue2);
@@ -543,19 +542,19 @@ defaultValue = 'string1';
     testValue1 = 'this is a longer test string to bypass sso';
     testValue2 = '';
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'string', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultString(subid, defaultValue);
+    helicsInputSetDefaultString(subid, defaultValue);
     
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
     % publish string1 at time=0.0;
     helicsPublicationPublishString(pubid, testValue1);
     
 
     % double val;
-    value = helicsSubscriptionGetString(subid);
+    value = helicsInputGetString(subid);
     
     testCase.verifyEqual(value,defaultValue);
 
@@ -564,7 +563,7 @@ defaultValue = 'string1';
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    value = helicsSubscriptionGetString(subid);
+    value = helicsInputGetString(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -574,7 +573,7 @@ defaultValue = 'string1';
     
 
     % make sure the value is still what we expect
-    value = helicsSubscriptionGetString(subid);
+    value = helicsInputGetString(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -585,7 +584,7 @@ defaultValue = 'string1';
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    value = helicsSubscriptionGetString(subid);
+    value = helicsInputGetString(subid);
     
     % make sure the value is what we expect
     testCase.verifyEqual(isempty(value),isempty(testValue2));
@@ -611,13 +610,13 @@ defaultValue = [34.5;22.1;-10.4];
     testValue1 = ones(22,1);
     testValue2 = [99.1;-99;2;0.0;-1e35;4.56e-7];
 
-    pubid = helicsFederateRegisterGlobalTypePublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
-    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', 'vector', '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
+    subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsSubscriptionSetDefaultVector(subid, defaultValue);
+    helicsInputSetDefaultVector(subid, defaultValue);
     
 
-    helicsFederateEnterExecutionMode(feds.vFed);
+    helicsFederateEnterExecutingMode(feds.vFed);
     
 
     % publish string1 at time=0.0;
@@ -625,7 +624,7 @@ defaultValue = [34.5;22.1;-10.4];
     
 
     % double val;
-    value = helicsSubscriptionGetVector(subid);
+    value = helicsInputGetVector(subid);
     
     testCase.verifyEqual(value,defaultValue);
 
@@ -634,7 +633,7 @@ defaultValue = [34.5;22.1;-10.4];
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    value = helicsSubscriptionGetVector(subid);
+    value = helicsInputGetVector(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -644,7 +643,7 @@ defaultValue = [34.5;22.1;-10.4];
     
 
     % make sure the value is still what we expect
-    value = helicsSubscriptionGetVector(subid);
+    value = helicsInputGetVector(subid);
     
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
@@ -655,7 +654,7 @@ defaultValue = [34.5;22.1;-10.4];
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    value = helicsSubscriptionGetVector(subid);
+    value = helicsInputGetVector(subid);
     
     % make sure the value is what we expect
     testCase.verifyEqual(isempty(value),isempty(testValue2));
