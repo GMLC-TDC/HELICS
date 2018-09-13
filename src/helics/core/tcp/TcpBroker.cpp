@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TcpBroker.h"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
+#include "../../common/argParser.h"
 
 namespace helics
 {
@@ -68,6 +69,12 @@ std::string TcpBroker::generateLocalAddressString () const
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
+
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{ { "server"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Broker should be a server"s },
+{ "connector"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Broker should be a connector"s },
+{ "connections", ArgDescriptor::arg_type_t::vector_string,"target link connections" }};
+
 TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
 TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : CommsBroker (broker_name) {}
@@ -75,7 +82,9 @@ TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : CommsBroker (broker_
 void TcpBrokerSS::displayHelp (bool local_only)
 {
     std::cout << " Help for TCP Broker: \n";
-
+    variable_map vm;
+    const char *const argV[] = { "", "--help" };
+    argumentParser(2, argV, vm, extraArgs);
     NetworkBrokerData::displayHelp ();
     if (!local_only)
     {
@@ -87,6 +96,9 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == broker_state_t::created)
     {
+        variable_map vm;
+        argumentParser(argc, argv, vm, extraArgs);
+
         netInfo.initializeFromArgs (argc, argv, "localhost");
         CoreBroker::initializeFromArgs (argc, argv);
     }
@@ -102,6 +114,7 @@ bool TcpBrokerSS::brokerConnect ()
     comms = std::make_unique<TcpCommsSS> (netInfo);
     comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
+    comms->setServerMode(true);
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();

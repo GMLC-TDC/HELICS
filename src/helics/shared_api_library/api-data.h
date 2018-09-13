@@ -138,6 +138,8 @@ typedef struct message_t
     helics_time_t time; /*!< message time */
     const char *data; /*!< message data */
     int64_t length; /*!< message length */
+    int32_t messageID; /*!< message identification information*/
+    int16_t flags;  /*!< flags related to the message*/
     const char *original_source; /** original source */
     const char *source; /*!< the most recent source */
     const char *dest; /*!< the final destination */
@@ -175,7 +177,8 @@ on the same machine */
 /** use UDP packets to send the data */
 #define HELICS_CORE_TYPE_UDP 7
 
-//#define HELICS_CORE_TYPE_TCP_NNG = 9, //!< reserved for future Nanomsg implementation 
+/*#define HELICS_CORE_TYPE_TCP_NNG = 9, //!< reserved for future Nanomsg implementation 
+*/
 #define HELICS_CORE_TYPE_ZMQ_TEST = 10, //!< test code for different type of ZMQ core
 #define HELICS_CORE_TYPE_TCP_SS = 11, //!< a single socket version of the TCP core for more easily handling firewalls
 

@@ -5,7 +5,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../CommsInterface.hpp"
 #include <atomic>
 #include <set>
@@ -57,13 +56,16 @@ class TcpCommsSS final : public CommsInterface
     TcpCommsSS (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~TcpCommsSS ();
-    /** set the port numbers for the local ports*/
+    /** set the port numbers for the broker port*/
     void setBrokerPort (int brokerPortNumber);
+    /** set the port numbers for the local port*/
     void setPortNumber (int localPortNumber);
-
+    /** set the controls to be running a server, or running connections*/
+    void setServerMode(bool mode = true);
   private:
     int brokerPort = -1;
-    std::atomic<int> PortNumber{-1};
+    int localPort = -1;
+    bool serverMode = true;
     std::atomic<bool> hasBroker{false};
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
@@ -74,7 +76,6 @@ class TcpCommsSS final : public CommsInterface
     int processIncomingMessage (ActionMessage &cmd);
     ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
-    BlockingQueue<ActionMessage> rxMessageQueue;
 
     void txReceive (const char *data, size_t bytes_received, const std::string &errorMessage);
 
@@ -94,7 +95,7 @@ class TcpCommsSS final : public CommsInterface
     //  bool errorHandle()
   public:
     /** get the port number of the comms object to push message to*/
-    int getPort () const { return PortNumber; };
+    int getPort () const { return localPort; };
 
     std::string getAddress () const;
 };

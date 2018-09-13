@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TcpCore.h"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
+#include "../../common/argParser.h"
 
 namespace helics
 {
@@ -62,6 +63,7 @@ TcpCoreSS::TcpCoreSS () noexcept {}
 
 TcpCoreSS::TcpCoreSS (const std::string &core_name) : CommsBroker (core_name) {}
 
+
 void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
@@ -81,6 +83,7 @@ bool TcpCoreSS::brokerConnect ()
     }
     comms = std::make_unique<TcpCommsSS> (netInfo);
     comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->setServerMode(false);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     auto res = comms->connect ();
