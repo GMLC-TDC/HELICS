@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
+#include <helics/core/Broker.hpp>
 
 #include <future>
 /** these test cases test out the message federates
@@ -141,7 +142,8 @@ sent to this endpoint will be rerouted to a new destination endpoint.
 
 BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), core_type)
 {
-    auto broker = AddBroker (core_type, 2);
+    auto broker = AddBroker (core_type, "2 --log_level=5");
+
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
 

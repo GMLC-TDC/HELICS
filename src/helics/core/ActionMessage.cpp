@@ -517,8 +517,8 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) handle({}) size {} at {}", command.source_id, command.dest_handle,
-                                 command.payload.size (), static_cast<double> (command.actionTime)));
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id, command.dest_handle,
+                                 command.payload.size (), static_cast<double> (command.actionTime),command.dest_id));
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -527,13 +527,13 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_TIME_GRANT:
         ret.push_back (':');
         ret.append (
-          fmt::format ("From ({}) Granted Time({})", command.source_id, static_cast<double> (command.actionTime)));
+          fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id, static_cast<double> (command.actionTime),command.dest_id));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Time({}, {}, {})", command.source_id,
+        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id,
                                  static_cast<double> (command.actionTime), static_cast<double> (command.Te),
-                                 static_cast<double> (command.Tdemin)));
+                                 static_cast<double> (command.Tdemin),command.dest_id));
         break;
     case CMD_FED_CONFIGURE_TIME:
     case CMD_FED_CONFIGURE_INT:
@@ -541,7 +541,7 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f", command.getString (origSourceStringLoc),
+        ret.append (fmt::format ("From ({})({}:{}) To {} size {} at {}", command.getString (origSourceStringLoc),
                                  command.source_id, command.source_handle, command.getString (targetStringLoc),
                                  command.payload.size (), static_cast<double> (command.actionTime)));
         break;
