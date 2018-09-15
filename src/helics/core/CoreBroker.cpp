@@ -449,7 +449,7 @@ void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id_local, getIdentifier (),
-               fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
+               fmt::format ("|| cmd:{}", prettyPrintString (command), command.source_id));
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -759,7 +759,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
-        if (command.source_id == global_broker_id.load ())
+        if ((command.source_id == global_broker_id_local)&&(command.dest_id==0))
         {
             LOG_DEBUG (global_broker_id.load (), getIdentifier (),
                        fmt::format ("time request update {}", prettyPrintString (command)));
@@ -768,7 +768,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 routeMessage (command, dep);
             }
         }
-        else if (command.dest_id == global_broker_id.load ())
+        else if (command.dest_id == global_broker_id_local)
         {
             if (timeCoord->processTimeMessage (command))
             {

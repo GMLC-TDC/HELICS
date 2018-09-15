@@ -546,6 +546,7 @@ std::string prettyPrintString (const ActionMessage &command)
                                  command.payload.size (), static_cast<double> (command.actionTime)));
         break;
     default:
+        ret.append (fmt::format ( ":From {}",command.source_id));
         break;
     }
     return ret;

@@ -380,6 +380,7 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     };
+   
     while (true)
     {
         auto command = actionQueue.pop ();

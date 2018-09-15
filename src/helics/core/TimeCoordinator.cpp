@@ -95,15 +95,16 @@ void TimeCoordinator::timeRequest (Time nextTime,
     }
     else
     {
-        if (nextTime < getNextPossibleTime ())
+        time_next = getNextPossibleTime ();
+        if (nextTime < time_next)
         {
-            nextTime = getNextPossibleTime ();
+            nextTime = time_next;
         }
     }
-
     time_requested = nextTime;
     time_value = newValueTime;
     time_message = newMessageTime;
+    time_exec = std::min(std::min (time_value, time_message),time_requested);
     dependencies.resetDependentEvents (time_granted);
     updateTimeFactors ();
 

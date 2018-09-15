@@ -40,6 +40,7 @@ class ForwardingTimeCoordinator
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
     bool iterating = false;  //!< flag indicating that the min dependency is iterating
+    bool ignoreMinFed = false;  //!< flag indicating that minFed Controls should not be used
   public:
     ForwardingTimeCoordinator () = default;
 
