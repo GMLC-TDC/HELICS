@@ -207,16 +207,16 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
-    mFed->requestTimeAsync (1.0);
-    fFed->requestTime (1.0);
-    mFed->requestTimeComplete ();
+    mFed->requestTime (1.0);
 
     auto res = mFed->hasMessage ();
-    BOOST_CHECK (!res);
+	if (res)
+	{
+        auto m = mFed->getMessage ();
+        BOOST_CHECK (!res);
+	}
 
-    mFed->requestTimeAsync (2.0);
-    fFed->requestTime (2.0);
-    mFed->requestTimeComplete ();
+    mFed->requestTime (2.0);
     BOOST_REQUIRE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);

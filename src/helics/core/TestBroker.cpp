@@ -186,6 +186,43 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     }
 }
 
+void TestBroker::transmit (int32_t route_id, ActionMessage &&cmd)
+{
+    if (brokerState >= broker_state_t::terminating)
+    {
+        return;  // no message sent in terminating or higher state
+    }
+    std::unique_lock<std::mutex> lock (routeMutex);
+
+    if ((tbroker) && (route_id == 0))
+    {
+        tbroker->addActionMessage (std::move(cmd));
+        return;
+    }
+
+    auto brkfnd = brokerRoutes.find (route_id);
+    if (brkfnd != brokerRoutes.end ())
+    {
+        auto tmp = brkfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (std::move(cmd));
+        return;
+    }
+    auto crfnd = coreRoutes.find (route_id);
+    if (crfnd != coreRoutes.end ())
+    {
+        auto tmp = crfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (std::move(cmd));
+        return;
+    }
+
+    if ((!isRoot ()) && (tbroker))
+    {
+        tbroker->addActionMessage (std::move(cmd));
+    }
+}
+
 void TestBroker::addRoute (int route_id, const std::string &routeInfo)
 {
     auto brk = BrokerFactory::findBroker (routeInfo);

@@ -1384,11 +1384,11 @@ void CommonCore::deliverMessage (ActionMessage &message)
             auto ffunc = getFilterCoordinator (localP->getInterfaceHandle ());
             if (ffunc->destFilter != nullptr)
             {
-                if (ffunc->destFilter->core_id != global_broker_id.load ())
+                if (ffunc->destFilter->core_id != global_broker_id_local)
                 {  // now we have deal with non-local processing destination filter
                     // first block the federate time advancement until the return is received
                     auto fed_id = localP->getFederateId ();
-                    ActionMessage tblock (CMD_TIME_BLOCK, global_broker_id.load (), fed_id);
+                    ActionMessage tblock (CMD_TIME_BLOCK, global_broker_id_local, fed_id);
                     auto mid = ++messageCounter;
                     tblock.messageID = mid;
                     auto fed = getFederateCore (fed_id);
@@ -1443,12 +1443,12 @@ void CommonCore::deliverMessage (ActionMessage &message)
                 }
             }
         }
-		if (message.dest_id == 0)
-		{
+        if (message.dest_id == 0)
+        {
             message.dest_id = localP->getFederateId ();
             message.dest_handle = localP->getInterfaceHandle ();
-		}
-            
+        }
+
         timeCoord->processTimeMessage (message);
 
         auto fed = getFederateCore (localP->getFederateId ());
@@ -2675,14 +2675,9 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
 {
     if (command.action () == CMD_ADD_FILTER)
     {
-        auto endhandle = loopHandles.getEndpoint (command.dest_handle);
-        if (endhandle != nullptr)
-        {
-            setActionFlag (*endhandle, has_source_filter_flag);
-        }
-
+        
         processFilterInfo (command);
-        if (command.source_id != global_broker_id_local)
+        if ((command.source_id != global_broker_id_local) && (!checkActionFlag (command, destination_target)))
         {
             auto fed = getFederateCore (global_federate_id_t (command.dest_id));
             if (fed != nullptr)
@@ -2701,8 +2696,15 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
               filters.find (global_handle (global_broker_id_local, interface_handle (command.dest_handle)));
             if (filtI != nullptr)
             {
-                filtI->sourceTargets.emplace_back (command.getSource ());
-                timeCoord->addDependency (global_federate_id_t (command.source_id));
+                if (checkActionFlag (command, destination_target))
+                {
+                    filtI->destTargets.emplace_back (command.getSource ());
+                }
+                else
+                {
+                    filtI->sourceTargets.emplace_back (command.getSource ());
+                    timeCoord->addDependency (global_federate_id_t (command.source_id));
+                }
             }
 
             auto filthandle = loopHandles.getFilter (command.dest_handle);
@@ -2734,21 +2736,10 @@ void CommonCore::processFilterInfo (ActionMessage &command)
     {
         return;
     }
-    switch (command.action ())
+    bool FilterAlreadyPresent = false;
+    if (checkActionFlag (command, destination_target))
     {
-    case CMD_ADD_ENDPOINT:
-    {
-        bool FilterAlreadyPresent = false;
-        if (filterInfo->destFilter != nullptr)
-        {
-            if ((filterInfo->destFilter->core_id == command.source_id) &&
-                (filterInfo->destFilter->handle == command.source_handle))
-            {
-                FilterAlreadyPresent = true;
-                break;
-            }
-        }
-        if (!FilterAlreadyPresent)
+        if (checkActionFlag (command, clone_flag))
         {
             for (auto &filt : filterInfo->cloningDestFilters)
             {
@@ -2759,11 +2750,21 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                 }
             }
         }
+        else
+        {  // there can only be one non-cloning destination filter
+            if (filterInfo->destFilter != nullptr)
+            {
+                if ((filterInfo->destFilter->core_id == command.source_id) &&
+                    (filterInfo->destFilter->handle == command.source_handle))
+                {
+                    FilterAlreadyPresent = true;
+                }
+            }
+        }
 
         if (!FilterAlreadyPresent)
         {
-            /*
-            auto endhandle = getHandleInfo (interface_handle (command.dest_handle));
+            auto endhandle = loopHandles.getEndpoint (command.dest_handle);
             if (endhandle != nullptr)
             {
                 setActionFlag (*endhandle, has_dest_filter_flag);
@@ -2775,133 +2776,60 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     err.source_id = command.dest_id;
                     err.source_handle = command.dest_handle;
                     err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
-                    err.payload = std::string("Endpoint ") + endhandle->key + " already has a destination filter";
+                    err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
                     return;
                 }
             }
-            */
-            auto filter = filters.find (command.getSource ());
-            if (filter == nullptr)
+            auto newFilter = filters.find (command.getSource ());
+            if (newFilter == nullptr)
             {
-                filter =
+                newFilter =
                   createFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
-                                command.payload, command.getString (typeStringLoc),
+                                command.name, command.getString (typeStringLoc),
                                 command.getString (typeOutStringLoc), checkActionFlag (command, clone_flag));
             }
 
             filterInfo->hasDestFilters = true;
             if (checkActionFlag (command, clone_flag))
             {
-                filterInfo->cloningDestFilters.push_back (filter);
+                filterInfo->cloningDestFilters.push_back (newFilter);
             }
             else
             {
-                filterInfo->destFilter = filter;
+                setActionFlag (*endhandle, has_non_cloning_dest_filter_flag);
+                filterInfo->destFilter = newFilter;
             }
         }
-
-        break;
     }
-    case CMD_ADD_FILTER:
+    else
     {
-        bool FilterAlreadyPresent = false;
-        if (checkActionFlag (command, destination_target))
+        for (auto &filt : filterInfo->allSourceFilters)
         {
-            if (checkActionFlag (command, clone_flag))
+            if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle))
             {
-                for (auto &filt : filterInfo->cloningDestFilters)
-                {
-                    if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle))
-                    {
-                        FilterAlreadyPresent = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {  // there can only be one non-cloning destination filter
-                if (filterInfo->destFilter != nullptr)
-                {
-                    if ((filterInfo->destFilter->core_id == command.source_id) &&
-                        (filterInfo->destFilter->handle == command.source_handle))
-                    {
-                        FilterAlreadyPresent = true;
-                    }
-                }
-            }
-
-            if (!FilterAlreadyPresent)
-            {
-                auto endhandle = loopHandles.getEndpoint (command.dest_handle);
-                if (endhandle != nullptr)
-                {
-                    setActionFlag (*endhandle, has_dest_filter_flag);
-                    if ((!checkActionFlag (command, clone_flag)) && (filterInfo->hasDestFilters))
-                    {
-                        // duplicate non cloning destination filters are not allowed
-                        ActionMessage err (CMD_ERROR);
-                        err.dest_id = command.source_id;
-                        err.source_id = command.dest_id;
-                        err.source_handle = command.dest_handle;
-                        err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
-                        err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
-                        routeMessage (std::move (err));
-                        return;
-                    }
-                }
-                auto newFilter = filters.find (command.getSource ());
-                if (newFilter == nullptr)
-                {
-                    newFilter =
-                      createFilter (global_broker_id_t (command.source_id),
-                                    interface_handle (command.source_handle), command.name,
-                                    command.getString (typeStringLoc), command.getString (typeOutStringLoc),
-                                    checkActionFlag (command, clone_flag));
-                }
-
-                filterInfo->hasDestFilters = true;
-                if (checkActionFlag (command, clone_flag))
-                {
-                    filterInfo->cloningDestFilters.push_back (newFilter);
-                }
-                else
-                {
-                    setActionFlag (*endhandle, has_non_cloning_dest_filter_flag);
-                    filterInfo->destFilter = newFilter;
-                }
+                FilterAlreadyPresent = true;
+                break;
             }
         }
-        else
+        if (!FilterAlreadyPresent)
         {
-            for (auto &filt : filterInfo->allSourceFilters)
+            auto newFilter = filters.find (command.getSource ());
+            if (newFilter == nullptr)
             {
-                if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle))
-                {
-                    FilterAlreadyPresent = true;
-                    break;
-                }
+                newFilter =
+                  createFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
+                                command.name, command.getString (typeStringLoc),
+                                command.getString (typeOutStringLoc), checkActionFlag (command, clone_flag));
             }
-            if (!FilterAlreadyPresent)
+            filterInfo->allSourceFilters.push_back (newFilter);
+            filterInfo->hasSourceFilters = true;
+            auto endhandle = loopHandles.getEndpoint (command.dest_handle);
+            if (endhandle != nullptr)
             {
-                auto newFilter = filters.find (command.getSource ());
-                if (newFilter == nullptr)
-                {
-                    newFilter =
-                      createFilter (global_broker_id_t (command.source_id),
-                                    interface_handle (command.source_handle), command.name,
-                                    command.getString (typeStringLoc), command.getString (typeOutStringLoc),
-                                    checkActionFlag (command, clone_flag));
-                }
-                filterInfo->allSourceFilters.push_back (newFilter);
-                filterInfo->hasSourceFilters = true;
+                setActionFlag (*endhandle, has_source_filter_flag);
             }
         }
-    }
-    break;
-    default:
-        // all other commands do not impact filters
-        break;
     }
 }
 

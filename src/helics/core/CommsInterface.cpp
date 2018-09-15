@@ -47,6 +47,18 @@ void CommsInterface::transmit (int route_id, const ActionMessage &cmd)
     }
 }
 
+void CommsInterface::transmit (int route_id, ActionMessage &&cmd)
+{
+    if (isPriorityCommand (cmd))
+    {
+        txQueue.emplacePriority (route_id, std::move(cmd));
+    }
+    else
+    {
+        txQueue.emplace (route_id, std::move(cmd));
+    }
+}
+
 void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
 {
     ActionMessage rt (CMD_PROTOCOL_PRIORITY);

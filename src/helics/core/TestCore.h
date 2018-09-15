@@ -31,6 +31,7 @@ public:
 
 protected:
     virtual void transmit(int route_id, const ActionMessage &cmd) override;
+  virtual void transmit (int route_id, ActionMessage &&cmd) override;
     virtual void addRoute(int route_id, const std::string &routeInfo) override;
 public:
     virtual std::string generateLocalAddressString () const override;

@@ -386,7 +386,7 @@ helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char 
         inp->inputPtr = std::make_unique<helics::Input> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helics_type_t> (type),
                                                          (units == nullptr) ? nullStr : std::string (units));
         inp->fedptr = std::move (fedObj);
-        auto ret = reinterpret_cast<helics_publication> (inp.get ());
+        auto ret = reinterpret_cast<helics_input> (inp.get ());
         addInput (fed, std::move (inp));
         return ret;
     }
@@ -395,6 +395,103 @@ helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char 
         helicsErrorHandler (err);
     }
     return nullptr;
+}
+
+static constexpr char invalidPubName[] = "the specified publication name is a not a valid publication name";
+
+helics_publication helicsFederateGetPublication (helics_federate fed, const char *key, helics_error *err)
+{
+	
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getPublicationId (key);
+		if (id == helics::invalid_id_value)
+		{
+            err->error_code = helics_invalid_argument;
+            err->message = invalidPubName;
+            return nullptr;
+		}
+        auto pub = std::make_unique<helics::PublicationObject> ();
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get(),id.value());
+        pub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
+    }
+	catch (...)
+	{
+        helicsErrorHandler (err);
+        return nullptr;
+	}
+}
+
+static constexpr char invalidInputName[] = "the specified input name is a not a recognized input";
+
+helics_input helicsFederateGetInput (helics_federate fed, const char *key, helics_error *err)
+{
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getInputId (key);
+        if (id == helics::invalid_id_value)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidInputName;
+            return nullptr;
+        }
+        auto inp = std::make_unique<helics::InputObject> ();
+        inp->inputPtr = std::make_unique<helics::Input> (fedObj.get (), id.value ());
+        inp->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_input> (inp.get ());
+        addInput (fed, std::move (inp));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
+static constexpr char invalidSubKey[] = "the specified subscription key is a not a recognized key";
+
+helics_input helicsFederateGetSubscription (helics_federate fed, const char *key, helics_error *err)
+{
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getSubscriptionId (key);
+        if (id == helics::invalid_id_value)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidInputName;
+            return nullptr;
+        }
+        auto inp = std::make_unique<helics::InputObject> ();
+        inp->inputPtr = std::make_unique<helics::Input> (fedObj.get (), id.value ());
+        inp->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_input> (inp.get ());
+        addInput (fed, std::move (inp));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
 }
 
 /* getting and publishing values */

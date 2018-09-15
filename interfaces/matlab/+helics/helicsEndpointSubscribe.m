@@ -11,5 +11,5 @@ function varargout = helicsEndpointSubscribe(varargin)
     %    the type of the publication that is expected (nullptr or "" for DON'T
     %    CARE)
     %
-  [varargout{1:nargout}] = helicsMEX(174, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(178, varargin{:});
 end

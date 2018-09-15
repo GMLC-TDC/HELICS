@@ -36,6 +36,9 @@ class CommsInterface
     /** transmit a message along a particular route
      */
     void transmit (int route_id, const ActionMessage &cmd);
+    /** transmit a message along a particular route
+     */
+    void transmit (int route_id, ActionMessage &&cmd);
     /** add a new route assigned to the appropriate id
      */
     void addRoute (int route_id, const std::string &routeInfo);

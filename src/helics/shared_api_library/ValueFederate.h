@@ -158,7 +158,33 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypeInput(helics_fe
     const char *key,
     const char *type, const char *units, helics_error *err);
 
-/**
+/** get a publication object from a key
+@param fed the value federate object to use to get the publication
+@param key the name of the publication
+@param err the error object to complete if there is an error 
+@return a helics_publication object, the object will not be valid and err will contain an error code if no publication with the specified key exists
+*/
+HELICS_EXPORT helics_publication helicsFederateGetPublication (helics_federate fed, const char *key, helics_error *err);
+
+/** get an input object from a key
+@param fed the value federate object to use to get the publication
+@param key the name of the input
+@param err the error object to complete if there is an error
+@return a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+key exists
+*/
+HELICS_EXPORT helics_input helicsFederateGetInput (helics_federate fed, const char *key, helics_error *err);
+
+/** get an input object from a subscription target
+@param fed the value federate object to use to get the publication
+@param key the name of the publication that a subscription is targeting
+@param err the error object to complete if there is an error
+@return a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+key exists
+*/
+HELICS_EXPORT helics_input helicsFederateGetSubscription (helics_federate fed, const char *key, helics_error *err);
+
+  /**
 * \defgroup publications Publication functions
 @details functions for publishing data of various kinds
 The data will get translated to the type specified when the publication was constructed automatically

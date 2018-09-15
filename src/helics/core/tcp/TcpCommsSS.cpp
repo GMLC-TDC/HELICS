@@ -284,7 +284,6 @@ void TcpCommsSS::queue_tx_function ()
         });
         server->start();
         setRxStatus(connection_status::connected);
-        bool loopRunning = true;
         disconnecting = true;
         server->close();
         setRxStatus(connection_status::terminated);

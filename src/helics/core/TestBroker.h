@@ -26,6 +26,7 @@ class TestBroker : public CoreBroker
 
   protected:
     virtual void transmit (int32_t route, const ActionMessage &command) override;
+    virtual void transmit (int32_t route, ActionMessage &&command) override;
 
     virtual void addRoute (int route_id, const std::string &routeInfo) override;
 

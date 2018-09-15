@@ -44,7 +44,16 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_feder
                                                                     const char *type,
                                                                     helics_error *err);
 
-/** set the default destination for an endpoint if no other endpoint is given
+/** get an endpoint object from a name
+@param fed the message federate object to use to get the endpoint
+@param name the name of the endpoint
+@param err the error object to complete if there is an error
+@return a helics_endpoint object, the object will not be valid and err will contain an error code if no endpoint with the specified
+name exists
+*/
+HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name, helics_error *err);
+
+  /** set the default destination for an endpoint if no other endpoint is given
 @param endpoint the endpoint to set the destination for
 @param dest a string naming the desired default endpoint
 */

@@ -1437,7 +1437,7 @@ void CoreBroker::FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo)
         m.setAction (CMD_ADD_FILTER);
         m.swapSourceDest();
 
-        m.flags = handleInfo.flags;
+        m.flags = target.second;
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
     }
 
@@ -1464,7 +1464,6 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
         m.setAction (CMD_ADD_ENDPOINT);
         m.swapSourceDest();
 
-        m.flags = handleInfo.flags;
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
     }
 

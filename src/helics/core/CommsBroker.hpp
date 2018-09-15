@@ -42,6 +42,7 @@ class CommsBroker : public BrokerT
     void commDisconnect();
   public:
     virtual void transmit (int route_id, const ActionMessage &cmd) override;
+    virtual void transmit (int route_id, ActionMessage &&cmd) override;
 
     virtual void addRoute (int route_id, const std::string &routeInfo) override;
 };

@@ -166,6 +166,39 @@ helics_filter helicsCoreRegisterCloningFilter (helics_core cr, const char *deliv
     return nullptr;
 }
 
+
+static constexpr char invalidFiltName[] = "the specified Filter name is not recognized";
+
+helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, helics_error *err)
+{
+    auto fedObj = getFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getFilterId (name);
+        if (id == helics::invalid_id_value)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidFiltName;
+            return nullptr;
+        }
+        auto filt = std::make_unique<helics::FilterObject> ();
+        filt->filtptr = std::make_unique<helics::Filter> (fedObj.get (), id.value ());
+        filt->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_input> (filt.get ());
+        federateAddFilter (fed, std::move (filt));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
 static helics::Filter *getFilter (helics_filter filt, helics_error *err)
 {
     auto fObj = getFilterObj(filt,err);

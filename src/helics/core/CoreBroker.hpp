@@ -170,6 +170,13 @@ class CoreBroker : public Broker, public BrokerBase
     @param[in] command the actionMessage to transmit
     */
     virtual void transmit (int32_t route, const ActionMessage &command) = 0;
+    /** this function is the one that will change for various flavors of broker communication
+    @details it takes a route info- a code of where to send the data and an action message
+    and proceeds to transmit it to the appropriate location, this variant does a move operation instead of copy
+    @param[in] route -the identifier for the routing information
+    @param[in] command the actionMessage to transmit
+    */
+    virtual void transmit (int32_t route, ActionMessage &&command) = 0;
     /** add a route to the type specific routing information and establish the connection
     @details add a route to a table, the connection information is contained in the string with the described
     identifier

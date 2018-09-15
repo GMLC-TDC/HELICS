@@ -183,6 +183,10 @@ class CommonCore : public Core, public BrokerBase
     @param route_id the identifier for the route information to send the message to
     @param[in] cmd the actionMessage to send*/
     virtual void transmit (int route_id, const ActionMessage &cmd) = 0;
+    /** transit an ActionMessage to another core or broker
+    @param route_id the identifier for the route information to send the message to
+    @param[in] cmd the actionMessage to send*/
+    virtual void transmit (int route_id, ActionMessage &&cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param route_id the identification of the route
     @param routeInfo a string containing the information necessary to connect*/

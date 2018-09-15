@@ -109,6 +109,16 @@ void CommsBroker<COMMS, BrokerT>::transmit (int route_id, const ActionMessage &c
 }
 
 template <class COMMS, class BrokerT>
+void CommsBroker<COMMS, BrokerT>::transmit (int route_id, ActionMessage &&cmd)
+{
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (comms)
+    {
+        comms->transmit (route_id, std::move(cmd));
+    }
+}
+
+template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::addRoute (int route_id, const std::string &routeInfo)
 {
     std::lock_guard<std::mutex> lock (dataMutex);

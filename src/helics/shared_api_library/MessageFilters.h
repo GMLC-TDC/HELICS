@@ -60,6 +60,15 @@ through other functions
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint, helics_error *err);
 
+/** get a filter object from a name
+@param fed the federate object to use to get the filter
+@param name the name of the filter
+@param err the error object to complete if there is an error
+@return a helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified
+name exists
+*/
+HELICS_EXPORT helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, helics_error *err);
+
 /** get the name of the filter and store in the given string
 @param filt the given filter
 @param[out] outputString storage for the name of the target

@@ -106,6 +106,40 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const
     return nullptr;
 }
 
+
+
+static constexpr char invalidEndName[] = "the specified Endpoint name is not recognized";
+
+helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name, helics_error *err)
+{
+    auto fedObj = getMessageFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getEndpointId (name);
+        if (id == helics::invalid_id_value)
+        {
+            err->error_code = helics_invalid_argument;
+            err->message = invalidEndName;
+            return nullptr;
+        }
+        auto end = std::make_unique<helics::EndpointObject> ();
+        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), id.value ());
+        end->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_input> (end.get ());
+        addEndpoint (fed, std::move (end));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
 void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest, helics_error *err)
 {
     auto endObj = verifyEndpoint (endpoint, err);
