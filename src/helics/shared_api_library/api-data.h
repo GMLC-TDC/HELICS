@@ -215,8 +215,8 @@ on the same machine */
 
 /*#define HELICS_CORE_TYPE_TCP_NNG = 9, //!< reserved for future Nanomsg/nmg implementation
  */
-#define HELICS_CORE_TYPE_ZMQ_TEST 10  //!< test code for different type of ZMQ core
-#define HELICS_CORE_TYPE_TCP_SS 11  //!< a single socket version of the TCP core for more easily handling firewalls
+#define HELICS_CORE_TYPE_ZMQ_TEST 10  /*!< test code for different type of ZMQ core*/
+#define HELICS_CORE_TYPE_TCP_SS 11  /*!< a single socket version of the TCP core for more easily handling firewalls*/
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

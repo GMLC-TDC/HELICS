@@ -727,7 +727,6 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     const char *pubname, *pubname2, *pubname3, *pubtype,
          *pubunit3;
     const char *subname, *subname2, *subname3;
-    const char *subtype, *subtype2, *subtype3;
 	const char *subunit3;
 
     SetupTest (helicsCreateValueFederate, core_type.c_str (), 1, 1.0);

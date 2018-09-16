@@ -141,8 +141,8 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     BOOST_CHECK (f1 != NULL);
     CE(helicsFilterSet (f1, "delay", 1.25,&err));
 
-    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter2", &err));
-    CE(helicsFilterAddSourceTarget(f1, "port1",&err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed2, helics_filtertype_delay, "filter2", &err));
+    CE(helicsFilterAddSourceTarget(f2, "port1",&err));
     BOOST_CHECK (f2 != NULL);
     CE(helicsFilterSet (f2, "delay", 1.25,&err));
 

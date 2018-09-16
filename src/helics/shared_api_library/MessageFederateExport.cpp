@@ -455,7 +455,7 @@ const char *helicsEndpointGetName (helics_endpoint endpoint)
   
     try
     {
-        auto type = endObj->endptr->getName ();
+        auto &type = endObj->endptr->getName ();
         return type.c_str ();
     }
     catch (...)

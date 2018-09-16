@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define CE(command)                                                                                               \
     helicsErrorClear (&err);                                                                                      \
     command;                                                                                                      \
-    BOOST_CHECK_EQUAL (err.error_code, helics_ok)
+	BOOST_CHECK_MESSAGE (err.error_code == helics_ok, err.message)
 
 #define HELICS_SIZE_MAX 512
 
@@ -97,15 +97,15 @@ struct FederateTestFixture
         default:
         {
             auto init = initString + " --federates " + std::to_string (count);
-            auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (),&err);
+            auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (), &err);
             BOOST_REQUIRE_EQUAL (err.error_code, 0);
-            CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier(core), &err));
+            CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err));
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 auto name = name_prefix + std::to_string (ii + offset);
-                auto fed = ctor (name.c_str (), fi,&err);
+                auto fed = ctor (name.c_str (), fi, &err);
                 BOOST_CHECK_EQUAL (err.error_code, 0);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
@@ -120,13 +120,12 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto init = initString + " --federates 1";
-                auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (),&err);
+                auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (), &err);
                 BOOST_REQUIRE_EQUAL (err.error_code, 0);
-                CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core),
-                                                   &err));
+                CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err));
 
                 auto name = name_prefix + std::to_string (ii + offset);
-                auto fed = ctor (name.c_str (), fi,&err);
+                auto fed = ctor (name.c_str (), fi, &err);
                 BOOST_CHECK_EQUAL (err.error_code, 0);
                 federates[ii + offset] = fed;
                 federates_added.push_back (fed);
@@ -179,6 +178,7 @@ struct FederateTestFixture
     helics_error err;
 
     std::string ctype;
+
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);
