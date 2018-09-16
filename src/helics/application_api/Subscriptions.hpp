@@ -55,7 +55,9 @@ class Subscription : public Input
     @param valueFed a pointer to the appropriate value Federate
     @param subIndex the index of the subscription
     */
-    Subscription (ValueFederate *valueFed, int subIndex) : Input (valueFed, subIndex) {}
+    Subscription (ValueFederate *valueFed, int subIndex) : Input (valueFed, subIndex), target_ (fed->getTarget (id))
+	{
+	}
     /** get the target of a subscription*/
     const std::string &getTarget () const { return target_; }
 };

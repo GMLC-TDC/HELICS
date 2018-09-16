@@ -101,7 +101,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     {
         subscriptions.emplace_back (fed.get (), ii);
         subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
-        subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
+        subkeys.emplace (subscriptions.back ().getTarget (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
@@ -382,11 +382,10 @@ void Recorder::initialize ()
 {
     generateInterfaces ();
 
-    vStat.reserve (subkeys.size ());
+    vStat.resize (subids.size ());
     for (auto &val : subkeys)
     {
-        vStat.emplace_back (ValueStats ());
-        vStat.back ().key = val.first;
+        vStat[val.second].key = val.first;
     }
 
     fed->enterInitializingMode ();

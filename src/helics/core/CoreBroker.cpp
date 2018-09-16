@@ -1398,7 +1398,7 @@ void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)
 
         
     }
-    if (!Handles.empty ())
+    if (!Handles.empty ()) 
     {
         unknownHandles.clearPublication (handleInfo.key);
     }
