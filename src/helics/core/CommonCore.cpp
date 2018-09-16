@@ -2531,9 +2531,9 @@ void CommonCore::registerInterface (ActionMessage &command)
         default:
             return;
         }
-        if (!ifc->key.empty ())
+        if (!command.name.empty ())
         {
-            transmit (0, command);
+            transmit (0, std::move(command));
         }
     }
     else if (command.dest_id == global_broker_id_local)
@@ -2561,7 +2561,7 @@ void CommonCore::registerInterface (ActionMessage &command)
     }
     else
     {
-        routeMessage (command);
+        routeMessage (std::move(command));
     }
 }
 
@@ -2596,7 +2596,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (command);
+            routeMessage (std::move(command));
         }
     }
     break;
@@ -2624,7 +2624,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (command);
+            routeMessage (std::move(command));
         }
     }
     break;
@@ -2643,7 +2643,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (command);
+            routeMessage (std::move(command));
         }
     }
     break;
@@ -2662,7 +2662,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (command);
+            routeMessage (std::move(command));
         }
     }
     break;

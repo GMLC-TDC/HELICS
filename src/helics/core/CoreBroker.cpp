@@ -1375,19 +1375,28 @@ void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)
     for (auto target : Handles)
     {
         // notify the publication about its subscriber
-        ActionMessage m (CMD_ADD_PUBLISHER);
-        m.setSource (target.first);
-        m.setDestination (handleInfo.handle);
-        m.flags = target.second;
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        ActionMessage m (CMD_ADD_SUBSCRIBER);
 
-        // notify the subscriber about its publisher
-        m.setAction (CMD_ADD_SUBSCRIBER);
         m.setDestination (target.first);
         m.setSource (handleInfo.handle);
         m.payload = handleInfo.type;
         m.flags = handleInfo.flags;
         transmit (getRoute (m.dest_id), m);
+
+        // notify the subscriber about its publisher
+        m.setAction (CMD_ADD_PUBLISHER);
+        m.setSource (target.first);
+        m.setDestination (handleInfo.handle);
+        m.flags = target.second;
+        auto pub = handles.findHandle (target.first);
+		if (pub != nullptr)
+        {
+            m.setStringData (pub->type, pub->units);
+		}
+        
+        transmit (getRoute (m.dest_id), std::move(m));
+
+        
     }
     if (!Handles.empty ())
     {
@@ -1405,6 +1414,7 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
         m.setSource (sub.first);
         m.setDestination (handleInfo.handle);
         m.flags = sub.second;
+        
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
 
         // notify the subscriber about its publisher
@@ -1413,7 +1423,8 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
         m.setSource (handleInfo.handle);
         m.payload = handleInfo.type;
         m.flags = handleInfo.flags;
-        transmit (getRoute (m.dest_id), m);
+        m.setStringData (handleInfo.type, handleInfo.units);
+        transmit (getRoute (m.dest_id), std::move(m));
     }
     if (!subHandles.empty ())
     {
@@ -1457,13 +1468,16 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
         m.setSource (handleInfo.handle);
         m.flags = target.second;
         m.setDestination (target.first);
-
+		if ((!handleInfo.type_in.empty()) || (!handleInfo.type_out.empty()))
+		{
+            m.setStringData (handleInfo.type_in, handleInfo.type_out);
+		}
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
 
         // notify the filter about an endpoint
         m.setAction (CMD_ADD_ENDPOINT);
         m.swapSourceDest();
-
+        m.clearStringData ();
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
     }
 

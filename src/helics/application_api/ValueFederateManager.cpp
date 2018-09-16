@@ -347,7 +347,18 @@ const std::string &ValueFederateManager::getInputType (input_id_t input_id) cons
 std::string ValueFederateManager::getPublicationType (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
-    return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].pubtype : nullStr;
+    if (input_id.value () < inpHandle->size ())
+    {
+        if ((*inpHandle)[input_id.value ()].pubtype=="def")
+		{
+            return coreObject->getType ((*inpHandle)[input_id.value ()].coreID);
+		}
+		else
+		{
+            return (*inpHandle)[input_id.value ()].pubtype;
+		}
+    }
+    return nullStr;
 }
 
 const std::string &ValueFederateManager::getPublicationType (publication_id_t pub_id) const
