@@ -43,6 +43,7 @@ class FederateState
   public:
     /** constructor from name and information structure*/
     FederateState (const std::string &name_, const CoreFederateInfo &info_);
+	//the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
     /** destructor*/
     ~FederateState ();
 
@@ -54,7 +55,7 @@ class FederateState
     std::atomic<global_federate_id_t> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
+    std::atomic<federate_state_t> state{HELICS_CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time

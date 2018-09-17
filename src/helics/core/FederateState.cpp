@@ -66,9 +66,9 @@ static const std::string nullStr;
 
 namespace helics
 {
-FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_) : name (name_)
+FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
+    : name (name_), global_id{global_federate_id_t ()}
 {
-    state = HELICS_CREATED;
     timeCoord = std::make_unique<TimeCoordinator> ([this](const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
