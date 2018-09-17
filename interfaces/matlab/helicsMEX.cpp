@@ -7400,7 +7400,7 @@ fail:
 }
 
 
-int _wrap_helicsGetComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsInputGetComplexParts(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_input arg1 = (helics_input) 0 ;
   double *arg2 = (double *) 0 ;
   double *arg3 = (double *) 0 ;
@@ -7418,12 +7418,12 @@ int _wrap_helicsGetComplex(int resc, mxArray *resv[], int argc, mxArray *argv[])
     etemp4=helicsErrorInitialize();
     arg4=&etemp4;
   }
-  if (!SWIG_check_num_args("helicsGetComplex",argc,1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetComplexParts",argc,1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetComplex" "', argument " "1"" of type '" "helics_input""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetComplexParts" "', argument " "1"" of type '" "helics_input""'"); 
   }
   helicsInputGetComplexParts(arg1,arg2,arg3,arg4);
   _out = (mxArray*)0;
@@ -10269,7 +10269,7 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 145: return "_wrap_helicsInputGetInteger";
   case 146: return "_wrap_helicsInputGetBoolean";
   case 147: return "_wrap_helicsInputGetDouble";
-  case 148: return "_wrap_helicsGetComplex";
+  case 148: return "_wrap_helicsInputGetComplexParts";
   case 149: return "_wrap_helicsInputGetVectorSize";
   case 150: return "_wrap_helicsInputGetVector";
   case 151: return "_wrap_helicsInputGetNamedPoint";
@@ -10526,7 +10526,7 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 145: flag=_wrap_helicsInputGetInteger(resc,resv,argc,(mxArray**)(argv)); break;
   case 146: flag=_wrap_helicsInputGetBoolean(resc,resv,argc,(mxArray**)(argv)); break;
   case 147: flag=_wrap_helicsInputGetDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 148: flag=_wrap_helicsGetComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 148: flag=_wrap_helicsInputGetComplexParts(resc,resv,argc,(mxArray**)(argv)); break;
   case 149: flag=_wrap_helicsInputGetVectorSize(resc,resv,argc,(mxArray**)(argv)); break;
   case 150: flag=_wrap_helicsInputGetVector(resc,resv,argc,(mxArray**)(argv)); break;
   case 151: flag=_wrap_helicsInputGetNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;

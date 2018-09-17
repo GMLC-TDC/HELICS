@@ -124,6 +124,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 		$2 = 0.0;
 	}
 }
+
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */

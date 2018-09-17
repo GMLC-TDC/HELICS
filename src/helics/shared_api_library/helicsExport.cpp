@@ -697,6 +697,7 @@ void helicsCoreDisconnect (helics_core core, helics_error *err)
 helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err)
 {
     auto brk = getBroker(broker, err);
+    if (brk==nullptr)
     {
         return helics_true;
     }

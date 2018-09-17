@@ -477,7 +477,7 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
         if (id == helics::invalid_id_value)
         {
             err->error_code = helics_invalid_argument;
-            err->message = invalidInputName;
+            err->message = invalidSubKey;
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject> ();
