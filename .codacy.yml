@@ -14,7 +14,7 @@ exclude_paths:
   - ThirdParty/**/*
   - ThirdParty/*
   - config/cmake/test_compiler_cxx/**
-  - swig/**/*
+  - interfaces/**/*
   - scripts/**/*
   - src/helics/common/cppzmq/*
 
