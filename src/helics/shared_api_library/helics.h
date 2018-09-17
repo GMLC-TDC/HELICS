@@ -476,14 +476,14 @@ HELICS_EXPORT const char *helicsFederateGetName (helics_federate fed);
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
 */
-HELICS_EXPORT void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time, helics_error *err);
+HELICS_EXPORT void helicsFederateSetTimeProperty (helics_federate fed, int timeProperty, helics_time_t time, helics_error *err);
 
 /** set a flag for the federate
 @param fed the federate to alter a flag for
 @param flag the flag to change
 @param flagValue the new value of the flag 0 for false !=0 for true
 */
-HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int32_t flag, helics_bool_t flagValue, helics_error *err);
+HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue, helics_error *err);
 
 /** set the separator character in the info structure
 @details the separator character is the separation character for local publications/endpoints in creating their global name
@@ -499,12 +499,12 @@ HELICS_EXPORT void helicsFederateSetSeparator (helics_federate fed, char separat
 @ details debug and trace only do anything if they were enabled in the compilation
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
 */
-HELICS_EXPORT void helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int propertyVal, helics_error *err);
+HELICS_EXPORT void helicsFederateSetIntegerProperty (helics_federate fed, int intProperty, int propertyVal, helics_error *err);
 
 /** set the minimum time delta for the federate
 @param[in] tdelta the minimum time delta to return from a time request function
 */
-HELICS_EXPORT helics_time_t helicsFederateGetTimeProperty (helics_federate fed, int32_t timeProperty, helics_error *err);
+HELICS_EXPORT helics_time_t helicsFederateGetTimeProperty (helics_federate fed, int timeProperty, helics_error *err);
 
 /** set a flag for the federate
 @param fed the federate to alter a flag for
@@ -518,7 +518,7 @@ HELICS_EXPORT helics_bool_t helicsFederateGetFlagOption (helics_federate fed, in
 @ details debug and trace only do anything if they were enabled in the compilation
 @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
 */
-HELICS_EXPORT int32_t helicsFederateGetIntegerProperty (helics_federate fed, int32_t intProperty, helics_error *err);
+HELICS_EXPORT int helicsFederateGetIntegerProperty (helics_federate fed, int intProperty, helics_error *err);
 
 
 /** get the current time of the federate

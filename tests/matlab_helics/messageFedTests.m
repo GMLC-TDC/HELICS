@@ -13,43 +13,39 @@ function teardown(testCase)  % do not change function name
 end
 
 
+
 function [fedStruct,success]=generateFed()
 import helics.*
 success=true;
-initstring = '1 --name=mainbroker';
+initstring = '1';
 fedinitstring = '--broker=mainbroker --federates=1';
-fedStruct.broker=helicsCreateBroker('zmq','',initstring);
-if (fedStruct.broker==0)
+fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
+if (~helicsBrokerIsValid(fedStruct.broker))
     success=false;
     return;
 end
-fedInfo=helicsFederateInfoCreate();
+fedInfo=helicsCreateFederateInfo();
 if (fedInfo==0)
     success=false;
     return;
 end
-status=helicsFederateInfoSetFederateName(fedInfo,'fed1');
-if (status~=0)
+try
+helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
+helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
+helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
+catch ec
+    success=false;
+    helicsBrokerDestroy(fedStruct.broker);
+    helicsFederateInfoFree(fedInfo);
+    return
+end
+try
+fedStruct.mFed=helicsCreateMessageFederate('fed1',fedInfo);
+if (~helicsFederateIsValid(fedStruct.mFed))
     success=false;
 end
-status=helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetTimeDelta(fedInfo, 0.01);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetLoggingLevel(fedInfo,1);
-if (status~=0)
-    success=false;
-end
-fedStruct.mFed=helicsCreateMessageFederate(fedInfo);
-if (fedStruct.mFed==0)
+catch ec
     success=false;
 end
 helicsFederateInfoFree(fedInfo);
@@ -58,13 +54,9 @@ end
 function success=closeStruct(fedStruct)
 import helics.*
 success=true;
-status=helicsFederateFinalize(fedStruct.mFed);
-if (status~=0)
-    success=false;
-end
-while (helicsBrokerIsConnected(fedStruct.broker))
-    pause(1);
-end
+helicsFederateFinalize(fedStruct.mFed);
+helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
+
 helicsFederateFree(fedStruct.mFed);
 helicsBrokerFree(fedStruct.broker);
 helicsCloseLibrary();
@@ -98,11 +90,9 @@ testCase.verifyThat(success,IsTrue);
 try
 epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
 testCase.verifyNotEqual(epid1,0);
-status=helicsFederateEnterExecutionMode(feds.mFed);
-testCase.verifyEqual(status,helics.helics_ok);
-[status,state]=helicsFederateGetState(feds.mFed);
-testCase.verifyEqual(status,helics.helics_ok);
-testCase.verifyEqual(state,helics.helics_execution_state);
+helicsFederateEnterExecutingMode(feds.mFed);
+state=helicsFederateGetState(feds.mFed);
+testCase.verifyEqual(state,helics.helics_state_execution);
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
 catch e
@@ -124,23 +114,18 @@ epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
 epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
 
 
-status=helicsFederateEnterExecutionMode(feds.mFed);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFederateEnterExecutingMode(feds.mFed);
 
-[status, ept_key] = helicsEndpointGetName(epid1);
-testCase.verifyEqual(status,helics.helics_ok);
+ept_key = helicsEndpointGetName(epid1);
 testCase.verifyEqual(ept_key,'fed1/ep1');
 
-[status, ept_key] = helicsEndpointGetName(epid2);
-testCase.verifyEqual(status,helics.helics_ok);
+ept_key = helicsEndpointGetName(epid2);
 testCase.verifyEqual(ept_key,'ep2');
 
-[status, ept_type] = helicsEndpointGetType(epid1);
-testCase.verifyEqual(status,helics.helics_ok);
+ept_type = helicsEndpointGetType(epid1);
 testCase.verifyThat(isempty(ept_type),IsTrue);
 
-[status, ept_type] = helicsEndpointGetType(epid2);
-testCase.verifyEqual(status,helics.helics_ok);
+ept_type = helicsEndpointGetType(epid2);
 testCase.verifyEqual(ept_type,'random');
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
@@ -162,18 +147,13 @@ epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
 
 epid2 = helicsFederateRegisterGlobalEndpoint(feds.mFed, 'ep2', 'random');
 
-helicsFederateSetTimeDelta(feds.mFed,1.0);
-status=helicsFederateEnterExecutionMode(feds.mFed);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFederateSetTimeProperty(feds.mFed,int32(137),1.0);
+helicsFederateEnterExecutingMode(feds.mFed);
 data = 'this is a random string message';
 
-status=helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
 
-
-
-[status,granted_time]=helicsFederateRequestTime(feds.mFed,2.0);
-testCase.verifyEqual(status,helics.helics_ok);
+granted_time=helicsFederateRequestTime(feds.mFed,2.0);
 testCase.verifyEqual(granted_time,1.0);
 
 res=helicsFederateHasMessage(feds.mFed);

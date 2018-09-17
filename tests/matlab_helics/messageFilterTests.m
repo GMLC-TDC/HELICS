@@ -16,41 +16,31 @@ end
 function [fedStruct,success]=generateFeds(count)
 import helics.*
 success=true;
-initstring = '1 --name=mainbroker';
+initstring = '1';
 fedinitstring = '--broker=mainbroker --federates=1';
-fedStruct.broker=helicsCreateBroker('zmq','',initstring);
-if (fedStruct.broker==0)
+fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
+if (~helicsBrokerIsValid(fedStruct.broker))
     success=false;
     return;
 end
-fedInfo=helicsFederateInfoCreate();
+fedInfo=helicsCreateFederateInfo();
 if (fedInfo==0)
     success=false;
     return;
 end
-status=helicsFederateInfoSetFederateName(fedInfo,'fed1');
-if (status~=0)
+try
+helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
+helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
+helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
+catch ec
     success=false;
-end
-status=helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetTimeDelta(fedInfo, 0.01);
-if (status~=0)
-    success=false;
-end
-status=helicsFederateInfoSetLoggingLevel(fedInfo,1);
-if (status~=0)
-    success=false;
+    helicsBrokerDestroy(fedStruct.broker);
+    helicsFederateInfoFree(fedInfo);
+    return
 end
 for ii=1:count
-    helicsFederateInfoSetFederateName(fedInfo,['fed',num2str(ii)]);
-fedStruct.mFed{ii}=helicsCreateMessageFederate(fedInfo);
+fedStruct.mFed{ii}=helicsCreateMessageFederate(['fed',num2str(ii)],fedInfo);
 if (fedStruct.mFed{ii}==0)
     success=false;
 end
@@ -61,21 +51,20 @@ end
 function success=closeStruct(fedStruct)
 import helics.*
 success=true;
+try
 for ii=1:numel(fedStruct.mFed)
-status=helicsFederateFinalize(fedStruct.mFed{ii});
-if (status~=0)
-    success=false;
+helicsFederateFinalize(fedStruct.mFed{ii});
 end
-end
-while (helicsBrokerIsConnected(fedStruct.broker))
-    pause(1);
-end
+helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
+
 for ii=1:numel(fedStruct.mFed)
 helicsFederateFree(fedStruct.mFed{ii});
 end
 helicsBrokerFree(fedStruct.broker);
 helicsCloseLibrary();
-
+catch
+    success=false;
+end
 end
 
 function forceCloseStruct(fedStruct)
@@ -106,14 +95,11 @@ import matlab.unittest.constraints.IsTrue;
 import helics.*
 initstring = '1 --name=mainbroker';
 broker=helicsCreateBroker('zmq','',initstring);
-[status, ident]=helicsBrokerGetIdentifier(broker);
-testCase.verifyEqual(status,helics.helics_ok);
+ident=helicsBrokerGetIdentifier(broker);
 testCase.verifyEqual(ident,'mainbroker');
-[status, add]=helicsBrokerGetAddress(broker);
-testCase.verifyEqual(status,helics.helics_ok);
+add=helicsBrokerGetAddress(broker);
 testCase.verifyEqual(add,'tcp://127.0.0.1:23404');
 status=helicsBrokerDisconnect(broker);
-testCase.verifyEqual(status,helics.helics_ok);
 helicsBrokerFree(broker);
 helicsCloseLibrary();
 end
@@ -136,23 +122,18 @@ f2=helicsFederateRegisterDestinationFilter(fFed,helics.helics_delay_filter,'port
 helicsFederateRegisterEndpoint(fFed,'fout','');
 helicsFederateRegisterSourceFilter(fFed,helics.helics_randomDelay_filter,'fed2/fout','filter3');
 
-status=helicsFederateEnterExecutionModeAsync(mFed);
-testCase.verifyEqual(status,helics.helics_ok);
-status=helicsFederateEnterExecutionMode(fFed);
-testCase.verifyEqual(status,helics.helics_ok);
-status=helicsFederateEnterExecutionModeComplete(mFed);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFederateEnterExecutingModeAsync(mFed);
+helicsFederateEnterExecutingMode(fFed);
 
-[status, filt_key] = helicsFilterGetName(f1);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFederateEnterExecutingModeComplete(mFed);
+
+filt_key = helicsFilterGetName(f1);
 testCase.verifyEqual(filt_key,'filter1');
 
-[status, filt_key] = helicsFilterGetName(f2);
-testCase.verifyEqual(status,helics.helics_ok);
+filt_key = helicsFilterGetName(f2);
 testCase.verifyEqual(filt_key,'filter2');
 
-[status, filt_key] = helicsFilterGetTarget(f2);
-testCase.verifyEqual(status,helics.helics_ok);
+filt_key = helicsFilterGetTarget(f2);
 testCase.verifyEqual(filt_key,'port2');
 
 success=closeStruct(feds);
@@ -179,28 +160,22 @@ p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 
 f1=helicsFederateRegisterSourceFilter(fFed,helics.helics_delay_filter,'port1','filter1');
-status=helicsFilterSet(f1,'delay',2.5);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFilterSet(f1,'delay',2.5);
 
-status=helicsFederateEnterExecutionModeAsync(mFed);
-testCase.verifyEqual(status,helics.helics_ok);
-status=helicsFederateEnterExecutionMode(fFed);
-testCase.verifyEqual(status,helics.helics_ok);
-status=helicsFederateEnterExecutionModeComplete(mFed);
-testCase.verifyEqual(status,helics.helics_ok);
+helicsFederateEnterExecutingModeAsync(mFed);
+helicsFederateEnterExecutingMode(fFed);
+helicsFederateEnterExecutingModeComplete(mFed);
 
 data='hello world';
 helicsEndpointSendMessageRaw(p1,'port2',data);
 
-[status,granted_time]=helicsFederateRequestTime(mFed,1.0);
-testCase.verifyEqual(status,helics.helics_ok);
+granted_time=helicsFederateRequestTime(mFed,1.0);
 testCase.verifyEqual(granted_time,1.0);
 
 res=helicsFederateHasMessage(mFed);
 testCase.verifyEqual(res,helics_false);
 
-[status,granted_time]=helicsFederateRequestTime(mFed,3.0);
-testCase.verifyEqual(status,helics.helics_ok);
+granted_time=helicsFederateRequestTime(mFed,3.0);
 testCase.verifyEqual(granted_time,2.5);
 
 

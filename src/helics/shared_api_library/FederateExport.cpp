@@ -711,7 +711,7 @@ const char * helicsFederateGetName (helics_federate fed)
     return ident.c_str ();
 }
 
-void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, helics_time_t time, helics_error *err)
+void helicsFederateSetTimeProperty (helics_federate fed, int timeProperty, helics_time_t time, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
@@ -728,7 +728,7 @@ void helicsFederateSetTimeProperty (helics_federate fed, int32_t timeProperty, h
     }
 }
 
-void helicsFederateSetFlagOption (helics_federate fed, int32_t flag, helics_bool_t flagValue, helics_error *err)
+void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool_t flagValue, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
@@ -745,7 +745,7 @@ void helicsFederateSetFlagOption (helics_federate fed, int32_t flag, helics_bool
     }
 }
 
-void helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty, int propVal, helics_error *err)
+void helicsFederateSetIntegerProperty (helics_federate fed, int intProperty, int propVal, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
@@ -762,7 +762,7 @@ void helicsFederateSetIntegerProperty (helics_federate fed, int32_t intProperty,
     }
 }
 
-helics_time_t helicsFederateGetTimeProperty (helics_federate fed, int32_t timeProperty, helics_error *err)
+helics_time_t helicsFederateGetTimeProperty (helics_federate fed, int timeProperty, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)
@@ -800,7 +800,7 @@ helics_bool_t helicsFederateGetFlagOption (helics_federate fed, int flag, helics
     }
 }
 
-int32_t helicsFederateGetIntegerProperty (helics_federate fed, int32_t intProperty, helics_error *err)
+int helicsFederateGetIntegerProperty (helics_federate fed, int intProperty, helics_error *err)
 {
     auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
@@ -863,10 +863,6 @@ helics_time_t helicsFederateRequestTimeIterativeComplete (helics_federate fed, h
     try
     {
         auto val = fedObj->requestTimeIterativeComplete ();
-        if (val.state == helics::iteration_result::error)
-        {
-            return helics_other_error;
-        }
 		if (outIteration != nullptr)
 		{
             *outIteration = getIterationStatus (val.state);
