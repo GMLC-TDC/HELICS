@@ -20,49 +20,59 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/foreach.hpp>
 
 static const std::string nullStr;
-#define LOG_ERROR(message) logMessage (0, nullStr, message)
-#define LOG_WARNING(message) logMessage (1, nullStr, message)
+#define LOG_ERROR(message) logMessage (LOG_LEVEL_ERROR, nullStr, message)
+#define LOG_WARNING(message) logMessage (LOG_LEVEL_WARNING, nullStr, message)
 
 #ifndef LOGGING_DISABLED
 
 #define LOG_SUMMARY(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= 2)                                                                                        \
+        if (logLevel >= LOG_LEVEL_SUMMARY)                                                                                        \
         {                                                                                                         \
-            logMessage (2, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_SUMMARY, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 
-#define LOG_NORMAL(message)                                                                                       \
+#define LOG_INTERFACES(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= 3)                                                                                        \
+        if (logLevel >= LOG_LEVEL_INTERFACES)                                                                                        \
         {                                                                                                         \
-            logMessage (3, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_INTERFACES, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 
 #ifndef DEBUG_LOGGING_DISABLED
-#define LOG_DEBUG(message)                                                                                        \
+#define LOG_TIMING(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= 4)                                                                                        \
+        if (logLevel >= LOG_LEVEL_TIMING)                                                                                        \
         {                                                                                                         \
-            logMessage (4, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_TIMING, nullStr, message);                                                                     \
+        }                                                                                                         \
+    } while (false)
+
+#define LOG_DATA(message)                                                                                       \
+    do                                                                                                            \
+    {                                                                                                             \
+        if (logLevel >= LOG_LEVEL_DATA)                                                                         \
+        {                                                                                                         \
+            logMessage (LOG_LEVEL_DATA, nullStr, message);                                                      \
         }                                                                                                         \
     } while (false)
 #else
-#define LOG_DEBUG(message)
+#define LOG_TIMING(message)
+#define LOG_DATA(message)
 #endif
 
 #ifndef TRACE_LOGGING_DISABLED
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= 5)                                                                                        \
+        if (logLevel >= LOG_LEVEL_TRACE)                                                                                        \
         {                                                                                                         \
-            logMessage (5, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_TRACE, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 #else
@@ -70,8 +80,9 @@ static const std::string nullStr;
 #endif
 #else  // LOGGING_DISABLED
 #define LOG_SUMMARY(message) ((void)0)
-#define LOG_NORMAL(message) ((void)0)
-#define LOG_DEBUG(message) ((void)0)
+#define LOG_INTERFACES(message) ((void)0)
+#define LOG_TIMING(message) ((void)0)
+#define LOG_DATA(message) ((void)0)
 #define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
 
@@ -789,7 +800,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (state == HELICS_CREATED)
         {
             setState (HELICS_INITIALIZING);
-            LOG_DEBUG ("Granting Initialization");
+            LOG_TIMING ("Granting Initialization");
             timeGranted_mode = true;
             return message_processing_result::next_step;
         }
@@ -844,7 +855,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 return grant;
             case message_processing_result::next_step:
                 setState (HELICS_EXECUTING);
-                LOG_DEBUG ("Granting Execution");
+                LOG_TIMING ("Granting Execution");
                 timeGranted_mode = true;
                 return grant;
             case message_processing_result::continue_processing:
@@ -858,11 +869,11 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     break;
     case CMD_TERMINATE_IMMEDIATELY:
         setState (HELICS_FINISHED);
-        LOG_DEBUG ("Terminating");
+        LOG_TIMING ("Terminating");
         return message_processing_result::halted;
     case CMD_STOP:
         setState (HELICS_FINISHED);
-        LOG_DEBUG ("Terminating");
+        LOG_TIMING ("Terminating");
         timeCoord->disconnect ();
         return message_processing_result::halted;
     case CMD_DISCONNECT:
@@ -956,7 +967,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 time_granted = timeCoord->getGrantedTime ();
                 allowed_send_time = timeCoord->allowedSendTime ();
-                LOG_DEBUG (std::string ("Granted Time=") + std::to_string (time_granted));
+                LOG_TIMING (std::string ("Granted Time=") + std::to_string (time_granted));
                 timeGranted_mode = true;
                 return ret;
             }
@@ -982,7 +993,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            LOG_DEBUG ("receive_message " + prettyPrintString (cmd));
+            LOG_DATA ("receive_message " + prettyPrintString (cmd));
             epi->addMessage (createMessageFromCommand (std::move (cmd)));
         }
     }
@@ -999,7 +1010,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             subI->addData (cmd.actionTime, cmd.counter,
                            std::make_shared<const data_block> (std::move (cmd.payload)));
             timeCoord->updateValueTime (cmd.actionTime);
-            LOG_DEBUG ("receive publication " + prettyPrintString (cmd));
+            LOG_DATA ("receive publication " + prettyPrintString (cmd));
             LOG_TRACE (timeCoord->printTimeStatus ());
         }
     }

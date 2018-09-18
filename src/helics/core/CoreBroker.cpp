@@ -628,8 +628,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 if (res == message_processing_result::next_step)
                 {
                     enteredExecutionMode = true;
-                    LOG_DEBUG (global_broker_id, getIdentifier (), "entering Exec Mode");
-                    LOG_DEBUG (global_broker_id, getIdentifier (), "entering Exec Mode");
+                    LOG_TIMING (global_broker_id, getIdentifier (), "entering Exec Mode");
                 }
             }
         }
@@ -650,7 +649,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_TIME_GRANT:
         if (command.source_id == global_broker_id)
         {
-            LOG_DEBUG (global_broker_id, getIdentifier (),
+            LOG_TIMING(global_broker_id, getIdentifier (),
                        fmt::format ("time request update {}", prettyPrintString (command)));
             for (auto dep : timeCoord->getDependents ())
             {
@@ -992,11 +991,11 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
-            LOG_NORMAL (0, getIdentifier (), "connecting");
+            LOG_CONNECTIONS (0, getIdentifier (), "connecting");
             auto res = brokerConnect ();
             if (res)
             {
-                LOG_NORMAL (0, getIdentifier (), fmt::format ("||connected on {}", getAddress ()));
+                LOG_CONNECTIONS (0, getIdentifier (), fmt::format ("||connected on {}", getAddress ()));
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);
@@ -1044,7 +1043,7 @@ void CoreBroker::waitForDisconnect (int msToWait) const
 
 void CoreBroker::processDisconnect (bool skipUnregister)
 {
-    LOG_NORMAL (0, getIdentifier (), "||disconnecting");
+    LOG_CONNECTIONS (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
         brokerState = broker_state_t::terminating;
