@@ -34,7 +34,7 @@ if(HELICS_HAVE_ZEROMQ)
 endif(HELICS_HAVE_ZEROMQ)
 
 if(NOT DISABLE_TCP_CORE)
-  list(APPEND core_test_sources TcpCore-tests.cpp)
+  list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
 endif()
 
 if(MPI_ENABLE)

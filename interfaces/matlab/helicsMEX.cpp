@@ -5072,12 +5072,12 @@ fail:
 
 int _wrap_helicsFederateSetTimeProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int32_t arg2 ;
+  int arg2 ;
   helics_time_t arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
   helics_error etemp4 ;
@@ -5094,17 +5094,11 @@ int _wrap_helicsFederateSetTimeProperty(int resc, mxArray *resv[], int argc, mxA
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  {
-    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int32_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int32_t""'");
-    } else {
-      arg2 = *(reinterpret_cast< int32_t * >(argp2));
-    }
-  }
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_double(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetTimeProperty" "', argument " "3"" of type '" "helics_time_t""'");
@@ -5133,12 +5127,12 @@ fail:
 
 int _wrap_helicsFederateSetFlagOption(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int32_t arg2 ;
+  int arg2 ;
   helics_bool_t arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
   helics_error etemp4 ;
@@ -5155,17 +5149,11 @@ int _wrap_helicsFederateSetFlagOption(int resc, mxArray *resv[], int argc, mxArr
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlagOption" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  {
-    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int32_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int32_t""'");
-    } else {
-      arg2 = *(reinterpret_cast< int32_t * >(argp2));
-    }
-  }
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlagOption" "', argument " "3"" of type '" "helics_bool_t""'");
@@ -5241,12 +5229,12 @@ fail:
 
 int _wrap_helicsFederateSetIntegerProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int32_t arg2 ;
+  int arg2 ;
   int arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
   helics_error etemp4 ;
@@ -5263,17 +5251,11 @@ int _wrap_helicsFederateSetIntegerProperty(int resc, mxArray *resv[], int argc, 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  {
-    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int32_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int32_t""'");
-    } else {
-      arg2 = *(reinterpret_cast< int32_t * >(argp2));
-    }
-  }
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetIntegerProperty" "', argument " "3"" of type '" "int""'");
@@ -5302,11 +5284,11 @@ fail:
 
 int _wrap_helicsFederateGetTimeProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int32_t arg2 ;
+  int arg2 ;
   helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   helics_error etemp3 ;
   mxArray * _out;
   helics_time_t result;
@@ -5322,17 +5304,11 @@ int _wrap_helicsFederateGetTimeProperty(int resc, mxArray *resv[], int argc, mxA
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  {
-    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int32_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int32_t""'");
-    } else {
-      arg2 = *(reinterpret_cast< int32_t * >(argp2));
-    }
-  }
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   result = (helics_time_t)helicsFederateGetTimeProperty(arg1,arg2,arg3);
   _out = SWIG_From_double(static_cast< double >(result));
   if (_out) --resc, *resv++ = _out;
@@ -5404,14 +5380,14 @@ fail:
 
 int _wrap_helicsFederateGetIntegerProperty(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int32_t arg2 ;
+  int arg2 ;
   helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   helics_error etemp3 ;
   mxArray * _out;
-  int32_t result;
+  int result;
   
   {
     etemp3=helicsErrorInitialize();
@@ -5424,19 +5400,13 @@ int _wrap_helicsFederateGetIntegerProperty(int resc, mxArray *resv[], int argc, 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  {
-    res2 = SWIG_ConvertPtr(argv[1], &argp2, SWIGTYPE_p_int32_t,  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int32_t""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int32_t""'");
-    } else {
-      arg2 = *(reinterpret_cast< int32_t * >(argp2));
-    }
-  }
-  result = helicsFederateGetIntegerProperty(arg1,arg2,arg3);
-  _out = SWIG_NewPointerObj((new int32_t(static_cast< const int32_t& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (int)helicsFederateGetIntegerProperty(arg1,arg2,arg3);
+  _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   {
     if (arg3->error_code!=helics_ok)
