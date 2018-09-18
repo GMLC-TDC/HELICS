@@ -14,7 +14,7 @@ namespace tcp
 {
 using boost::asio::ip::tcp;
 
-void TcpRxConnection::start ()
+void TcpConnection::start ()
 {
     if (triggerhalt)
     {
@@ -24,10 +24,11 @@ void TcpRxConnection::start ()
     if (state == connection_state_t::prestart)
     {
         receivingHalt.activate ();
+        connected.activate();
         state = connection_state_t::halted;
     }
     connection_state_t exp = connection_state_t::halted;
-    if (state.compare_exchange_strong (exp, connection_state_t::receiving))
+    if (state.compare_exchange_strong (exp, connection_state_t::operating))
     {
         if (!receivingHalt.isActive ())
         {
@@ -46,13 +47,13 @@ void TcpRxConnection::start ()
             receivingHalt.trigger ();
         }
     }
-    else if (exp != connection_state_t::receiving)
+    else if (exp != connection_state_t::operating)
     {
         receivingHalt.trigger ();
     }
 }
 
-void TcpRxConnection::setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc)
+void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc)
 {
     if (state == connection_state_t::prestart)
     {
@@ -63,8 +64,8 @@ void TcpRxConnection::setDataCall (std::function<size_t (TcpRxConnection::pointe
         throw (std::runtime_error ("cannot set data callback after socket is started"));
     }
 }
-void TcpRxConnection::setErrorCall (
-  std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorFunc)
+void TcpConnection::setErrorCall (
+  std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc)
 {
     if (state == connection_state_t::prestart)
     {
@@ -76,7 +77,7 @@ void TcpRxConnection::setErrorCall (
     }
 }
 
-void TcpRxConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
+void TcpConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
     if (triggerhalt)
     {
@@ -158,21 +159,9 @@ void TcpRxConnection::handle_read (const boost::system::error_code &error, size_
     }
 }
 
-void TcpRxConnection::send (const void *buffer, size_t dataLength)
-{
-    auto sz = socket_.send (boost::asio::buffer (buffer, dataLength));
-    assert (sz == dataLength);
-    (void)(sz);
-}
-
-void TcpRxConnection::send (const std::string &dataString)
-{
-    auto sz = socket_.send (boost::asio::buffer (dataString));
-    assert (sz == dataString.size ());
-    (void)(sz);
-}
-
-void TcpRxConnection::close ()
+//boost::asio::socket_base::linger optionLinger(true, 2);
+//socket_.set_option(optionLinger, ec);
+void TcpConnection::close ()
 {
     triggerhalt = true;
     state = connection_state_t::closed;
@@ -198,7 +187,7 @@ void TcpRxConnection::close ()
     }
 }
 
-void TcpRxConnection::closeNoWait ()
+void TcpConnection::closeNoWait ()
 {
     triggerhalt = true;
     state = connection_state_t::closed;
@@ -223,7 +212,7 @@ void TcpRxConnection::closeNoWait ()
 }
 
 /** wait on the closing actions*/
-void TcpRxConnection::waitOnClose ()
+void TcpConnection::waitOnClose ()
 {
     if (triggerhalt)
     {
@@ -327,26 +316,6 @@ bool TcpConnection::waitUntilConnected (int timeOut)
     }
 }
 
-void TcpConnection::close ()
-{
-    cancel ();
-    boost::system::error_code ec;
-    socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
-    if (ec)
-    {
-        // I don't know what to do with this, in practice this message is mostly spurious
-        // but it seems I should do something with it, I just don't know what
-        // std::cerr << "error occurred sending shutdown" << std::endl;
-        ec.clear ();
-    }
-    else
-    {
-        boost::asio::socket_base::linger optionLinger (true, 2);
-        socket_.set_option (optionLinger, ec);
-    }
-    socket_.close (ec);
-}
-
 TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
     : acceptor_ (io_service), endpoint_ (ep)
 {
@@ -414,7 +383,7 @@ bool TcpAcceptor::connect (int timeout)
 }
 
 /** start the acceptor*/
-bool TcpAcceptor::start (TcpRxConnection::pointer conn)
+bool TcpAcceptor::start (TcpConnection::pointer conn)
 {
     if (!conn)
     {
@@ -467,7 +436,7 @@ std::string TcpAcceptor::to_string () const
     return str;
 }
 void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
-                                 TcpRxConnection::pointer new_connection,
+                                 TcpConnection::pointer new_connection,
                                  const boost::system::error_code &error)
 {
     if (state != accepting_state_t::connected)
@@ -630,7 +599,7 @@ void TcpServer::initialConnect ()
             acc->set_option (tcp::acceptor::reuse_address (false));
         }
         acc->setAcceptCall (
-          [this](TcpAcceptor::pointer accPtr, TcpRxConnection::pointer conn) { handle_accept (accPtr, conn); });
+          [this](TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
     }
     for (auto &acc : acceptors)
@@ -719,12 +688,12 @@ void TcpServer::start ()
 
         for (auto &acc : acceptors)
         {
-            acc->start (TcpRxConnection::create (ioserv, bufferSize));
+            acc->start (TcpConnection::create (ioserv, bufferSize));
         }
     }
 }
 
-void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointer new_connection)
+void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer new_connection)
 {
     /*setting linger to 1 second*/
     boost::asio::socket_base::linger optionLinger (true, 0);
@@ -755,7 +724,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointe
                 return;
             }
         }
-        acc->start (TcpRxConnection::create (ioserv, bufferSize));
+        acc->start (TcpConnection::create (ioserv, bufferSize));
     }
     else
     {

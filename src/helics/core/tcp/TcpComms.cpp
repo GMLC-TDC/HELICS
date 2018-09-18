@@ -215,7 +215,7 @@ void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
     }
 }
 
-size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received)
 {
     size_t used_total = 0;
     while (used_total < bytes_received)
@@ -254,7 +254,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/,
+bool TcpComms::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/,
                                  const boost::system::error_code &error)
 {
     if (getRxStatus () == connection_status::connected)
@@ -343,10 +343,10 @@ void TcpComms::queue_rx_function ()
         }
     }
     auto serviceLoop = ioserv->runServiceLoop ();
-    server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
+    server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server->setErrorCall ([this](TcpRxConnection::pointer connection, const boost::system::error_code &error) {
+    server->setErrorCall ([this](TcpConnection::pointer connection, const boost::system::error_code &error) {
         return commErrorHandler (connection, error);
     });
     server->start ();

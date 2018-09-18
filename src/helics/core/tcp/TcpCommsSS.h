@@ -41,7 +41,6 @@ namespace helics
 {
 namespace tcp
 {
-class TcpRxConnection;
 class TcpConnection;
 
 /** implementation for the communication interface that uses TCP messages to communicate*/
@@ -89,9 +88,9 @@ class TcpCommsSS final : public CommsInterface
     @param bytes_received the length of the received data
     @return a the number of bytes used by the function
     */
-    size_t dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received);
+    size_t dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received);
 
-    bool commErrorHandler (std::shared_ptr<TcpRxConnection> connection, const boost::system::error_code &error);
+    bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const boost::system::error_code &error);
     //  bool errorHandle()
   public:
     /** get the port number of the comms object to push message to*/

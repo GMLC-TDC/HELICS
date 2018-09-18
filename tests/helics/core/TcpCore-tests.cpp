@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     std::vector<char> data (1024);
     std::atomic<bool> validData{true};
 
-    auto dataCheck = [&counter, &validData](helics::tcp::TcpRxConnection::pointer, const char *datablock,
+    auto dataCheck = [&counter, &validData](helics::tcp::TcpConnection::pointer, const char *datablock,
                                             size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20)
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
     auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server->setDataCall ([&counter](helics::tcp::TcpRxConnection::pointer, const char *, size_t data_avail) {
+    server->setDataCall ([&counter](helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
         ++counter;
         return data_avail;
     });
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall (
-      [&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++counter;
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (),host, TCP_BROKER_PORT_STRING);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
-    server->setDataCall ([&data, &ServerCounter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec,
+    server->setDataCall ([&data, &ServerCounter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec,
                                                        size_t data_Size) {
         std::copy (data_rec, data_rec + data_Size, data.begin ());
         len = data_Size;
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (
-      [&data, &counter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++counter;

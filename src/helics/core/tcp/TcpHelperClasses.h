@@ -18,27 +18,33 @@ namespace helics
 namespace tcp
 {
 /** tcp socket generation for a receiving server*/
-class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
+class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
   public:
     enum class connection_state_t
     {
         prestart = -1,
         halted = 0,
-        receiving = 1,
+        operating = 1,
         closed = 2,
     };
 
-    typedef std::shared_ptr<TcpRxConnection> pointer;
+    typedef std::shared_ptr<TcpConnection> pointer;
+    static pointer create(boost::asio::io_service &io_service,
+        const std::string &connection,
+        const std::string &port,
+        size_t bufferSize = 10192);
     /** create an RxConnection object using the specified service and bufferSize*/
     static pointer create (boost::asio::io_service &io_service, size_t bufferSize)
     {
-        return pointer (new TcpRxConnection (io_service, bufferSize));
+        return pointer (new TcpConnection (io_service, bufferSize));
     }
     /** get the underlying socket object*/
     boost::asio::ip::tcp::socket &socket () { return socket_; }
     /** start the receiving loop*/
     void start ();
+    /** cancel ongoing socket operations*/
+    void cancel() { socket_.cancel(); }
     /** close the socket*/
     void close ();
     /** perform the close actions but don't wait for them to be processed*/
@@ -48,34 +54,104 @@ class TcpRxConnection : public std::enable_shared_from_this<TcpRxConnection>
     /**check if the connection is receiving data*/
     bool isReceiving () const { return receivingHalt.isActive (); }
     /** set the callback for the data object*/
-    void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc);
+    void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
-    void setErrorCall (std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorFunc);
+    void setErrorCall (std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc);
 
     /** send raw data
     @throws boost::system::system_error on failure*/
-    void send (const void *buffer, size_t dataLength);
+    size_t send (const void *buffer, size_t dataLength);
     /** send a string
     @throws boost::system::system_error on failure*/
-    void send (const std::string &dataString);
+    size_t send (const std::string &dataString);
 
-    // int index = 0;
+    /** do a blocking receive on the socket
+    @throw boost::system::system_error on failure
+    @return the number of bytes received
+    */
+    size_t receive(void *buffer, size_t maxDataSize);
+    /**perform an asynchronous send operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+    const boost::system::error_code& error, // Result of operation.
+    std::size_t bytes_transferred           // Number of bytes received.
+    );
+    */
+    template <typename Process>
+    void send_async(const void *buffer, size_t dataLength, Process callback)
+    {
+        socket_.async_send(boost::asio::buffer(buffer, dataLength), callback);
+    }
+    /**perform an asynchronous receive operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+    const boost::system::error_code& error, // Result of operation.
+    std::size_t bytes_transferred           // Number of bytes received.
+    );
+    */
+    template <typename Process>
+    void async_receive(void *buffer, size_t dataLength, Process callback)
+    {
+        socket_.async_receive(boost::asio::buffer(buffer, dataLength), callback);
+    }
 
+    /**perform an asynchronous receive operation
+    @param buffer the data to send
+    @param dataLength the length of the data
+    @param callback a callback function of the form void handler(
+    const boost::system::error_code& error, // Result of operation.
+    std::size_t bytes_transferred           // Number of bytes received.
+    );
+    */
+    void async_receive(
+        std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
+        callback)
+    {
+        socket_.async_receive(boost::asio::buffer(data, data.size()),
+            [connection = shared_from_this(), callback](const boost::system::error_code &error,
+                size_t bytes_transferred) {
+            connection->handle_read(bytes_transferred, error, callback);
+        });
+    }
+    /** check if the socket has finished the connection process*/
+    bool isConnected() const { return connected.isActive(); }
+    /** wait until the socket has finished the connection process
+    @param timeOut the number of ms to wait for the connection process to finish (<0) for no limit
+    @return true if connected, false if the timeout was reached
+    */
+    bool waitUntilConnected(int timeOut);
   private:
-    TcpRxConnection (boost::asio::io_service &io_service, size_t bufferSize)
+    TcpConnection (boost::asio::io_service &io_service, size_t bufferSize)
         : socket_ (io_service), data (bufferSize)
     {
     }
+    TcpConnection(boost::asio::io_service &io_service,
+        const std::string &connection,
+        const std::string &port,
+        size_t bufferSize);
     /** function for handling the asynchronous return from a read request*/
     void handle_read (const boost::system::error_code &error, size_t bytes_transferred);
+    void handle_read(
+        size_t message_size,
+        const boost::system::error_code &error,
+        std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
+        callback)
+    {
+        callback(shared_from_this(), data.data(), message_size, error);
+    }
     std::atomic<size_t> residBufferSize{0};
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
     TriggerVariable receivingHalt;
-    std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorCall;
+    TriggerVariable connected;  //!< variable indicating connectivity
+    std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
+    std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
+
+    void connect_handler(const boost::system::error_code &error);
 };
 
 /** tcp acceptor*/
@@ -109,7 +185,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** connect the acceptor to the socket if disconnected and try up to timeout*/
     bool connect (int timeout);
     /** start the acceptor*/
-    bool start (TcpRxConnection::pointer conn);
+    bool start (TcpConnection::pointer conn);
     /** cancel pending operations*/
     void cancel () { acceptor_.cancel (); }
     /** close the socket*/
@@ -119,7 +195,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** check if the acceptor is ready to begin accepting*/
     bool isConnected () const { return (state.load () == accepting_state_t::connected); }
     /** set the callback for the data object*/
-    void setAcceptCall (std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> accFunc)
+    void setAcceptCall (std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> accFunc)
     {
         acceptCall = std::move (accFunc);
     }
@@ -143,121 +219,14 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     TcpAcceptor (boost::asio::io_service &io_service, int port);
     /** function for handling the asynchronous return from a read request*/
     void handle_accept (TcpAcceptor::pointer ptr,
-                        TcpRxConnection::pointer new_connection,
+                        TcpConnection::pointer new_connection,
                         const boost::system::error_code &error);
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::endpoint endpoint_;
-    std::function<void(TcpAcceptor::pointer, TcpRxConnection::pointer)> acceptCall;
+    std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
     std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
     TriggerVariable accepting;
-};
-
-/** tcp socket connection for connecting to a server*/
-class TcpConnection : public std::enable_shared_from_this<TcpConnection>
-{
-  public:
-    typedef std::shared_ptr<TcpConnection> pointer;
-
-    static pointer create (boost::asio::io_service &io_service,
-                           const std::string &connection,
-                           const std::string &port,
-                           size_t bufferSize = 10192);
-
-    boost::asio::ip::tcp::socket &socket () { return socket_; }
-    void cancel () { socket_.cancel (); }
-    /** close the socket connection
-    @param*/
-    void close ();
-    /** send raw data
-    @throws boost::system::system_error on failure*/
-    size_t send (const void *buffer, size_t dataLength);
-    /** send a string
-    @throws boost::system::system_error on failure*/
-    size_t send (const std::string &dataString);
-    /** do a blocking receive on the socket
-    @throw boost::system::system_error on failure
-    @return the number of bytes received
-    */
-    size_t receive (void *buffer, size_t maxDataSize);
-
-    /**perform an asynchronous send operation
-    @param buffer the data to send
-    @param dataLength the length of the data
-    @param callback a callback function of the form void handler(
-  const boost::system::error_code& error, // Result of operation.
-  std::size_t bytes_transferred           // Number of bytes received.
-);
-*/
-    template <typename Process>
-    void send_async (const void *buffer, size_t dataLength, Process callback)
-    {
-        socket_.async_send (boost::asio::buffer (buffer, dataLength), callback);
-    }
-
-    /**perform an asynchronous receive operation
-    @param buffer the data to send
-    @param dataLength the length of the data
-    @param callback a callback function of the form void handler(
-    const boost::system::error_code& error, // Result of operation.
-    std::size_t bytes_transferred           // Number of bytes received.
-    );
-    */
-    template <typename Process>
-    void async_receive (void *buffer, size_t dataLength, Process callback)
-    {
-        socket_.async_receive (boost::asio::buffer (buffer, dataLength), callback);
-    }
-
-    /**perform an asynchronous receive operation
-    @param buffer the data to send
-    @param dataLength the length of the data
-    @param callback a callback function of the form void handler(
-    const boost::system::error_code& error, // Result of operation.
-    std::size_t bytes_transferred           // Number of bytes received.
-    );
-    */
-    void async_receive (
-      std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
-        callback)
-    {
-        socket_.async_receive (boost::asio::buffer (data, data.size ()),
-                               [connection = shared_from_this (), callback](const boost::system::error_code &error,
-                                                                            size_t bytes_transferred) {
-                                   connection->handle_read (bytes_transferred, error, callback);
-                               });
-    }
-
-  private:
-    void handle_read (
-      size_t message_size,
-      const boost::system::error_code &error,
-      std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
-        callback)
-    {
-        callback (shared_from_this (), data.data (), message_size, error);
-    }
-
-  public:
-    /** check if the socket has finished the connection process*/
-    bool isConnected () const { return connected.isActive (); }
-    /** wait until the socket has finished the connection process
-    @param timeOut the number of ms to wait for the connection process to finish (<0) for no limit
-    @return true if connected, false if the timeout was reached
-    */
-    bool waitUntilConnected (int timeOut);
-
-  private:
-    TcpConnection (boost::asio::io_service &io_service,
-                   const std::string &connection,
-                   const std::string &port,
-                   size_t bufferSize);
-
-    boost::asio::ip::tcp::socket socket_;
-    TriggerVariable connected;  //!< variable indicating connectivity
-    std::vector<char> data;
-
-    void connect_handler (const boost::system::error_code &error);
 };
 
 /** helper class for a server*/
@@ -293,16 +262,16 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     /** reConnect the server with the same address*/
     bool reConnect (int timeout);
     /** set the data callback*/
-    void setDataCall (std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataFunc)
+    void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc)
     {
         dataCall = std::move (dataFunc);
     }
     /** set the error path callback*/
-    void setErrorCall (std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &)> errorFunc)
+    void setErrorCall (std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
-    void handle_accept (TcpAcceptor::pointer acc, TcpRxConnection::pointer new_connection);
+    void handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer new_connection);
 
   private:
     TcpServer (boost::asio::io_service &io_service,
@@ -323,12 +292,12 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     std::vector<TcpAcceptor::pointer> acceptors;
     std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
-    std::function<size_t (TcpRxConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpRxConnection::pointer, const boost::system::error_code &error)> errorCall;
+    std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
+    std::function<bool(TcpConnection::pointer, const boost::system::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
     bool reuse_address = false;
     // this data structure is protected by the accepting mutex
-    std::vector<std::shared_ptr<TcpRxConnection>> connections;
+    std::vector<std::shared_ptr<TcpConnection>> connections;
 };
 
 }  // namespace tcp
