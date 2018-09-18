@@ -251,6 +251,8 @@ class CoreBroker : public Broker, public BrokerBase
     void sendErrorToImmediateBrokers (int error_code);
     /** send a disconnect message to time dependencies and child brokers*/
 	void sendDisconnect ();
+    /** generate a string about the federation summarizing connections*/
+    std::string generateFederationSummary () const;
 };
 
 }  // namespace helics

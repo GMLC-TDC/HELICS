@@ -75,6 +75,8 @@ static const ArgDescriptors extraArgs{
   {"logfile", "the file to log message to"},
   {"loglevel", ArgDescriptor::arg_type_t::int_type,
    "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
+  {"log_level", ArgDescriptor::arg_type_t::int_type,
+   "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
   {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
   {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
   {"minbrokers", ArgDescriptor::arg_type_t::int_type,
@@ -146,6 +148,10 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     if (vm.count ("loglevel") > 0)
     {
         maxLogLevel = vm["loglevel"].as<int> ();
+    }
+    if (vm.count ("log_level") > 0)
+    {
+        maxLogLevel = vm["log_level"].as<int> ();
     }
     if (vm.count ("logfile") > 0)
     {

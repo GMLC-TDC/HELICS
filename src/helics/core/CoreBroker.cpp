@@ -120,6 +120,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {
     case CMD_REG_FED:
     {
+        
         if (brokerState != operating)
         {
             if (allInitReady ())
@@ -178,6 +179,8 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             fedReply.dest_id = global_id;
             fedReply.name = command.name;
             transmit (route_id, fedReply);
+            LOG_CONNECTIONS (global_broker_id, getIdentifier (),
+                             fmt::format ("registering federate {}({}) on route {}", command.name,global_id,route_id));
         }
     }
     break;
@@ -239,6 +242,9 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             brokerReply.dest_id = global_id;  // the new id
             brokerReply.name = command.name;  // the identifier of the broker
             transmit (route_id, brokerReply);
+            LOG_CONNECTIONS (global_broker_id, getIdentifier (),
+                             fmt::format ("registering broker {}({}) on route {}", command.name, global_id,
+                                          route_id));
         }
     }
     break;
@@ -353,6 +359,36 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     }
 }
 
+std::string CoreBroker::generateFederationSummary () const 
+{
+    int pubs = 0;
+    int epts = 0;
+    int subs = 0;
+    int filt = 0;
+	for (auto &hand : handles)
+	{
+		switch (hand.handle_type)
+		{
+        case handle_type_t::publication:
+            ++pubs;
+            break;
+        case handle_type_t::subscription:
+            ++subs;
+            break;
+        case handle_type_t::endpoint:
+            ++epts;
+            break;
+        default:
+            ++filt;
+            break;
+		}
+	}
+    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t {}brokers/cores\n\t{} "
+                                      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+                                      _federates.size (), _brokers.size (), pubs, subs, epts, filt);
+    return output;
+	}
+
 void CoreBroker::transmitDelayedMessages ()
 {
     auto msg = delayTransmitQueue.pop ();
@@ -403,7 +439,8 @@ void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
-               fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
+               fmt::format ("|| cmd:{} from {} to ", prettyPrintString (command), command.source_id,
+                            command.dest_id));
     switch (command.action ())
     {
     case CMD_IGNORE:
@@ -470,10 +507,13 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             if (_isRoot)
             {
+                LOG_TIMING (global_broker_id, "root", "entering initialization mode");
+                LOG_SUMMARY (global_broker_id, "root", generateFederationSummary ());
                 executeInitializationOperations ();
             }
             else
             {
+                LOG_TIMING (global_broker_id, getIdentifier(), "entering initialization mode");
                 checkDependencies ();
                 command.source_id = global_broker_id;
                 transmit (0, command);
@@ -1419,6 +1459,10 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         cnts += '}';
         return cnts;
     }
+	if (request == "summary")
+	{
+        return generateFederationSummary ();
+	}
     if (request == "federates")
     {
         return generateStringVector (_federates, [](auto &fed) { return fed.name; });

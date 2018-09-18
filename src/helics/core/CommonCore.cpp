@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -855,7 +855,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
-    LOG_INTERFACES(0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
+    LOG_INTERFACES (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
@@ -992,7 +992,8 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     auto fed = getFederateAt (handleInfo->local_fed_id);
     if (fed->checkAndSetValue (handle, data, len))
     {
-        LOG_DATA_MESSAGES(0, fed->getIdentifier (), fmt::format ("setting Value for {} size {}", handleInfo->key, len));
+        LOG_DATA_MESSAGES (0, fed->getIdentifier (),
+                           fmt::format ("setting Value for {} size {}", handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
@@ -2341,11 +2342,12 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
         }
         addActionMessage (CMD_STOP);
-		//we can't just fall through since this may have generated other messages that need to be forwarded or processed
+        // we can't just fall through since this may have generated other messages that need to be forwarded or
+        // processed
         break;
     case CMD_STOP:
 
-          if (isConnected ())
+        if (isConnected ())
         {
             if (brokerState < broker_state_t::terminating)
             {  // only send a disconnect message if we haven't done so already
@@ -3200,6 +3202,7 @@ void CommonCore::checkDisconnect ()
 
 void CommonCore::sendDisconnect ()
 {
+    LOG_CONNECTIONS (global_broker_id, "core", "sending disconnect");
     ActionMessage bye (CMD_STOP);
     bye.source_id = global_broker_id;
     for (auto &fed : loopFederates)
