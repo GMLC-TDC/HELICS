@@ -30,6 +30,19 @@ HELICS_EXPORT helics_filter helicsFederateRegisterFilter (helics_federate fed,
                                                           helics_filter_type_t type,
                                                           const char *name,
                                                           helics_error *err);
+/** create a globl source filter through a federate
+@details filters can be created through a federate or a core , linking through a federate allows
+a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+@param fed the fed to register through
+@param type the type of filter to create
+@param target the name of endpoint to target
+@param name the name of the filter (can be NULL)
+@return a helics_filter object
+*/
+HELICS_EXPORT helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed,
+    helics_filter_type_t type,
+    const char *name,
+    helics_error *err);
 
 /** create a cloning Filter on the specified federate
 @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -38,7 +51,16 @@ through other functions
 @param deliveryEndpoint the specified endpoint to deliver the message
 @return a helics_filter object
 */
-HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const char *deliveryEndpoint, helics_error *err);
+HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char *deliveryEndpoint, helics_error *err);
+
+/** create a global cloning Filter on the specified federate
+@details cloning filters copy a message and send it to multiple locations source and destination can be added
+through other functions
+@param fed the fed to register through
+@param deliveryEndpoint the specified endpoint to deliver the message
+@return a helics_filter object
+*/
+HELICS_EXPORT helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char *deliveryEndpoint, helics_error *err);
 
 /** create a source Filter on the specified core
 @details filters can be created through a federate or a core , linking through a federate allows

@@ -281,6 +281,26 @@ class Federate
                               hThrowOnError ()));
     }
 
+    Filter registerGlobalFilter(helics_filter_type_t type,
+        const std::string &name = std::string())
+    {
+        return Filter(helicsFederateRegisterGlobalFilter(fed, type, name.c_str(), hThrowOnError()));
+    }
+
+
+    /** create a cloning Filter on the specified federate
+    @details cloning filters copy a message and send it to multiple locations source and destination can be added
+    through other functions
+    @param fed the fed to register through
+    @param deliveryEndpoint the specified endpoint to deliver the message
+    @return a helics_filter object
+    */
+    CloningFilter registerGlobalCloningFilter(const std::string &deliveryEndpoint)
+    {
+        return CloningFilter(helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint.c_str(),
+            hThrowOnError()));
+    }
+
   protected:
     helics_federate fed;
     bool exec_async_iterate;

@@ -8,9 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_MESSAGE_FEDERATE_HPP_
 #pragma once
 
-#include "Federate.hpp"
-#include "Endpoint.hpp"
 #include "../shared_api_library/MessageFederate.h"
+#include "Endpoint.hpp"
+#include "Federate.hpp"
 
 namespace helicscpp
 {
@@ -19,7 +19,7 @@ class MessageFederate : public virtual Federate
   public:
     explicit MessageFederate (const std::string &fedName, FederateInfo &fi)
     {
-        fed = helicsCreateMessageFederate (fedName.c_str(),fi.getInfo (),hThrowOnError());
+        fed = helicsCreateMessageFederate (fedName.c_str (), fi.getInfo (), hThrowOnError ());
     }
 
     explicit MessageFederate (const std::string &configString)
@@ -31,43 +31,36 @@ class MessageFederate : public virtual Federate
     MessageFederate () {}
 
     /** Methods for registering endpoints **/
-    Endpoint registerEndpoint (const std::string &name, const std::string &type = "")
+    Endpoint registerEndpoint(const std::string &name, const std::string &type = std::string())
     {
         helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
-        local_endpoints.push_back(ep);
-        return Endpoint(ep);
+        local_endpoints.push_back (ep);
+        return Endpoint (ep);
     }
 
-    Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = "")
+    Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = std::string())
     {
         helics_endpoint ep =
           helicsFederateRegisterGlobalEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
-        local_endpoints.push_back(ep);
-        return Endpoint(ep);
+        local_endpoints.push_back (ep);
+        return Endpoint (ep);
     }
 
     /** Checks if federate has any messages **/
     bool hasMessage () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateHasMessage (fed) > 0;
+        return (helicsFederateHasMessage (fed) > 0);
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    uint64_t pendingMessages () const
-    {
-        return helicsFederatePendingMessages(fed);
-    }
+    int pendingMessages () const { return helicsFederatePendingMessages (fed); }
 
     /** Get a packet for any endpoints in the federate **/
-    message_t getMessage ()
-    {
-        return helicsFederateGetMessage (fed);
-    }
+    message_t getMessage () { return helicsFederateGetMessage (fed); }
 
   private:
     std::vector<helics_endpoint> local_endpoints;
-
 };
-} //namespace helics
+}  // namespace helicscpp
 #endif

@@ -394,63 +394,57 @@ import helics.*
 testCase.verifyThat(success,IsTrue);
 
 try
-defaultValue_r = 1.0;
-defaultValue_j = -1.0;
-    testValue1_r = 2.7586;
-    testValue1_j = 342.25626;
-    testValue2_r = 1e27;
-    testValue2_j = -0.3e-2;
+defaultValue = 1.0-1.0j;
+    testValue1 = 2.7586+ 342.25626j;
+    testValue2 = 1e27-0.3e-2j;
 
     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_COMPLEX, '');
     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
-    helicsInputSetDefaultComplex(subid, defaultValue_r, defaultValue_j);
+    helicsInputSetDefaultComplex(subid, defaultValue);
     
 
     helicsFederateEnterExecutingMode(feds.vFed);
     
 
     % publish string1 at time=0.0;
-    helicsPublicationPublishComplex(pubid, testValue1_r,testValue1_j);
+    helicsPublicationPublishComplex(pubid, testValue1);
     
 
     % double val;
     value = helicsInputGetComplex(subid);
     
-    testCase.verifyEqual(value.real,defaultValue_r);
-    testCase.verifyEqual(value.imag,defaultValue_j);
+    testCase.verifyEqual(value,defaultValue);
 
     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
     
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    [value_r, value_j] = helicsInputGetComplex(subid);
+    value = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
-    testCase.verifyEqual(value_r,testValue1_r);
-    testCase.verifyEqual(value_j,testValue1_j);
+    testCase.verifyEqual(value,testValue1);
+    
     % publish a second string
-    helicsPublicationPublishComplex(pubid, testValue2_r,testValue2_j);
+    helicsPublicationPublishComplex(pubid, testValue2);
     
 
     % make sure the value is still what we expect
-    [value_r,value_j] = helicsInputGetComplex(subid);
+    value = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
-    testCase.verifyEqual(value_r,testValue1_r);
-    testCase.verifyEqual(value_j,testValue1_j);
+    testCase.verifyEqual(value,testValue1);
     % advance time
     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
     
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    [value_r,value_j] = helicsInputGetComplex(subid);
+    value = helicsInputGetComplex(subid);
     
     % make sure the string is what we expect
-    testCase.verifyEqual(value_r,testValue2_r);
-    testCase.verifyEqual(value_j,testValue2_j);
+    testCase.verifyEqual(value,testValue2);
     success=closeStruct(feds);
     testCase.verifyThat(success,IsTrue);
 catch e

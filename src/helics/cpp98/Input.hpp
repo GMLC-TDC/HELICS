@@ -154,13 +154,13 @@ public:
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
-        helicsInputGetVector(inp, data.data(), actualSize,NULL,NULL);
+        helicsInputGetVector(inp, data.data(), actualSize,NULL, hThrowOnError());
     }
 
     /** Check if a subscription is updated **/
     bool isUpdated() const
     {
-        return helicsInputIsUpdated(inp) > 0;
+        return (helicsInputIsUpdated(inp) > 0);
     }
 
     /** Get the last time a subscription was updated **/
@@ -185,6 +185,11 @@ public:
     const char *getType() const
     {
         return helicsInputGetType(inp);
+    }
+
+    const char *getTarget() const
+    {
+        return helicsSubscriptionGetKey(inp);
     }
 
 private:

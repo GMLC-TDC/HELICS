@@ -49,6 +49,8 @@ class TcpCoreSS final : public CommsBroker<TcpCommsSS, CommonCore>
   private:
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+    bool serverMode = false;
+    std::vector<std::string> connections;  //!< defined connections 
     virtual bool brokerConnect () override;
 };
 

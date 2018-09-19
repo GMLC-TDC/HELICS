@@ -35,6 +35,7 @@ class TcpBroker final : public CommsBroker<TcpComms, CoreBroker>
 
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+
 };
 
 class TcpBrokerSS final : public CommsBroker<TcpCommsSS, CoreBroker>
@@ -55,6 +56,8 @@ class TcpBrokerSS final : public CommsBroker<TcpCommsSS, CoreBroker>
 
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+    bool serverMode = true;
+    std::vector<std::string> connections;  //!< defined connections 
 };
 
 }  // namespace tcp

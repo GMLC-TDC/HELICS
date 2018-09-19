@@ -31,8 +31,12 @@ std::string to_string (core_type type)
         return "tcp_";
     case core_type::TCP_SS:
         return "tcpss_";
+    case core_type::HTTP:
+        return "http_";
     case core_type::UDP:
         return "udp_";
+    case core_type::NNG:
+        return "nng_";
     default:
         return std::string ();
     }
@@ -74,6 +78,9 @@ static const std::map<std::string, core_type> coreTypes{{"default", core_type::D
                                                         {"UDP", core_type::UDP},
                                                         {"local", core_type::TEST},
                                                         {"inprocess", core_type::TEST},
+{ "http", core_type::HTTP },
+{ "HTTP", core_type::HTTP },
+{ "web", core_type::HTTP },
                                                         {"test1", core_type::TEST}};
 
 core_type coreTypeFromString (std::string type) noexcept
@@ -120,6 +127,10 @@ core_type coreTypeFromString (std::string type) noexcept
     if (type.compare (0, 3, "udp") == 0)
     {
         return core_type::UDP;
+    }
+    if (type.compare(0, 4, "http") == 0)
+    {
+        return core_type::HTTP;
     }
     if (type.compare (0, 3, "mpi") == 0)
     {
@@ -171,6 +182,9 @@ bool isCoreTypeAvailable (core_type type) noexcept
         break;
     case core_type::DEFAULT:  // default should always be available
         available = true;
+        break;
+    case core_type::HTTP:
+        available = false;
         break;
     default:
         break;

@@ -39,6 +39,7 @@ enum class core_type : int
     UDP = 7,  //!< use UDP packets to send the data
     NNG = 9, //!< reserved for future Nanomsg implementation 
     ZMQ_TEST=10, //!< test code for different type of ZMQ core
+    HTTP = 14,   //!< core/broker using web traffic
     UNRECOGNIZED = 22,  //!< unknown
 
 };

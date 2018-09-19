@@ -99,7 +99,7 @@ ident=helicsBrokerGetIdentifier(broker);
 testCase.verifyEqual(ident,'mainbroker');
 add=helicsBrokerGetAddress(broker);
 testCase.verifyEqual(add,'tcp://127.0.0.1:23404');
-status=helicsBrokerDisconnect(broker);
+helicsBrokerDisconnect(broker);
 helicsBrokerFree(broker);
 helicsCloseLibrary();
 end
@@ -117,10 +117,13 @@ helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 helicsFederateRegisterGlobalEndpoint(mFed, 'port2', 'random');
 
-f1=helicsFederateRegisterSourceFilter(fFed,helics.helics_custom_filter,'port1','filter1');
-f2=helicsFederateRegisterDestinationFilter(fFed,helics.helics_delay_filter,'port2','filter2');
+f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_custom,'filter1');
+helicsFilterAddSourceTarget(f1,'port1');
+f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_delay,'filter2');
+helicsFilterAddDestinationTarget(f2,'port2');
 helicsFederateRegisterEndpoint(fFed,'fout','');
-helicsFederateRegisterSourceFilter(fFed,helics.helics_randomDelay_filter,'fed2/fout','filter3');
+f3=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_randomDelay,'filter3');
+helicsFilterAddSourceTarget(f3,'fed2/fout');
 
 helicsFederateEnterExecutingModeAsync(mFed);
 helicsFederateEnterExecutingMode(fFed);
@@ -132,9 +135,6 @@ testCase.verifyEqual(filt_key,'filter1');
 
 filt_key = helicsFilterGetName(f2);
 testCase.verifyEqual(filt_key,'filter2');
-
-filt_key = helicsFilterGetTarget(f2);
-testCase.verifyEqual(filt_key,'port2');
 
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
@@ -159,7 +159,8 @@ p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 
-f1=helicsFederateRegisterSourceFilter(fFed,helics.helics_delay_filter,'port1','filter1');
+f1=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_delay,'filter1');
+helicsFilterAddSourceTarget(f1,'port1');
 helicsFilterSet(f1,'delay',2.5);
 
 helicsFederateEnterExecutingModeAsync(mFed);

@@ -64,10 +64,25 @@ TcpCoreSS::TcpCoreSS () noexcept {}
 TcpCoreSS::TcpCoreSS (const std::string &core_name) : CommsBroker (core_name) {}
 
 
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{ { "server"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Core should be a server"s },
+{ "connector"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Core should be a connector"s },
+{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s } };
+
 void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
+        variable_map vm;
+        argumentParser(argc, argv, vm, extraArgs);
+        if (vm.count("connections") > 0)
+        {
+            connections = vm["connections"].as<std::vector<std::string>>();
+        }
+        if (vm.count("server") > 0)
+        {
+            serverMode = true;
+        }
         netInfo.initializeFromArgs (argc, argv, "localhost");
 
         CommonCore::initializeFromArgs (argc, argv);
@@ -83,7 +98,7 @@ bool TcpCoreSS::brokerConnect ()
     }
     comms = std::make_unique<TcpCommsSS> (netInfo);
     comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
-    comms->setServerMode(false);
+    comms->setServerMode(serverMode);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     auto res = comms->connect ();

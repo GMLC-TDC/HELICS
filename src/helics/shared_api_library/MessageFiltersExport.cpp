@@ -83,6 +83,33 @@ helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_t
     return nullptr;
 }
 
+
+helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
+{
+    // now generate a generic subscription
+    auto fedObj = getFedSharedPtr(fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        auto filt = std::make_unique<helics::FilterObject>();
+        filt->filtptr = helics::make_filter(helics::interface_visibility::global,static_cast<helics::defined_filter_types> (type), fedObj.get(),
+            (name != nullptr) ? std::string(name) : nullstr);
+        filt->fedptr = std::move(fedObj);
+        auto ret = reinterpret_cast<helics_filter> (filt.get());
+        federateAddFilter(fed, std::move(filt));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+    }
+    return nullptr;
+}
+
 helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name, helics_error *err)
 {
     auto core = getCoreSharedPtr (cr,err);
@@ -133,6 +160,37 @@ helics_filter helicsFederateRegisterCloningFilter (helics_federate fed, const ch
     catch (...)
     {
         helicsErrorHandler (err);
+    }
+    return nullptr;
+}
+
+
+helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char *deliveryEndpoint, helics_error *err)
+{
+    auto fedObj = getFedSharedPtr(fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        auto filt = std::make_unique<helics::FilterObject>();
+        auto filtptr = std::make_unique<helics::CloningFilter>(helics::interface_visibility::global,fedObj.get());
+        if (deliveryEndpoint != nullptr)
+        {
+            filtptr->addDeliveryEndpoint(deliveryEndpoint);
+        }
+        filt->filtptr = std::move(filtptr);
+        filt->fedptr = std::move(fedObj);
+        filt->cloning = true;
+        auto ret = reinterpret_cast<helics_filter> (filt.get());
+        federateAddFilter(fed, std::move(filt));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
     }
     return nullptr;
 }

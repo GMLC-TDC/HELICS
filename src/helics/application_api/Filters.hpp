@@ -45,6 +45,8 @@ class Filter
     Filter () = default;
     /** construct through a federate*/
     explicit Filter (Federate *fed, const std::string &name = EMPTY_STRING);
+    /** construct through a federate*/
+    Filter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
     /** construct through a core object*/
     explicit Filter (Core *cr, const std::string &name = EMPTY_STRING);
 
@@ -105,7 +107,10 @@ class CloningFilter : public Filter
     /** construct from a Federate
      */
     explicit CloningFilter (Federate *fed, const std::string &name = EMPTY_STRING);
-
+    /** construct from a Federate
+    */
+    explicit CloningFilter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
+    
     /** generate a cloningfilter through its index*/
     CloningFilter (Federate *fed, int filtInd) : Filter (fed, filtInd) {}
     /** generate cloning filter through its index*/
@@ -134,6 +139,17 @@ filter
 std::unique_ptr<Filter>
 make_filter (defined_filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
+/** create a  filter
+@param type the type of filter to create
+@param fed the federate to create the filter through
+@param target the target endpoint all message with the specified target as a destination will route through the
+filter
+@param name the name of the filter (optional)
+@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+*/
+std::unique_ptr<Filter>
+make_filter(interface_visibility locality, defined_filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
+
 /** create a filter
 @param type the type of filter to create
 @param cr the core to create the filter through
@@ -155,6 +171,19 @@ std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
                                                     Federate *fed,
                                                     const std::string &delivery,
                                                     const std::string &name = EMPTY_STRING);
+
+/** create a  filter
+@param type the type of filter to create
+@param fed the federate to create the filter through
+@param target the target endpoint all message with the specified target as a destination will route through the
+filter
+@param name the name of the filter (optional)
+@return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
+*/
+std::unique_ptr<CloningFilter> make_cloning_filter(interface_visibility locality, defined_filter_types type,
+    Federate *fed,
+    const std::string &delivery,
+    const std::string &name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create

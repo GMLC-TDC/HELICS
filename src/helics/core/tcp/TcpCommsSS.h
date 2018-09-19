@@ -66,6 +66,7 @@ class TcpCommsSS final : public CommsInterface
     int localPort = -1;
     bool serverMode = true;
     std::atomic<bool> hasBroker{false};
+    std::vector<std::string> connections;  //!< list of connections to make 
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 

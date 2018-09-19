@@ -72,8 +72,7 @@ std::string TcpBroker::generateLocalAddressString () const
 
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{ { "server"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Broker should be a server"s },
-{ "connector"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Broker should be a connector"s },
-{ "connections", ArgDescriptor::arg_type_t::vector_string,"target link connections" }};
+{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s }};
 
 TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
@@ -99,6 +98,14 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
         variable_map vm;
         argumentParser(argc, argv, vm, extraArgs);
 
+        if (vm.count("connections") > 0)
+        {
+            connections = vm["connections"].as<std::vector<std::string>>();
+        }
+        if (vm.count("server") > 0)
+        {
+            serverMode = true;
+        }
         netInfo.initializeFromArgs (argc, argv, "localhost");
         CoreBroker::initializeFromArgs (argc, argv);
     }
@@ -114,7 +121,7 @@ bool TcpBrokerSS::brokerConnect ()
     comms = std::make_unique<TcpCommsSS> (netInfo);
     comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
     comms->setName (getIdentifier ());
-    comms->setServerMode(true);
+    comms->setServerMode(serverMode);
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
