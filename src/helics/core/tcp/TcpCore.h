@@ -6,8 +6,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../CommonCore.hpp"
-#include "../CommsBroker.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../NetworkCore.hpp"
 namespace helics
 {
 namespace tcp
@@ -15,27 +15,28 @@ namespace tcp
 class TcpComms;
 class TcpCommsSS;
 /** implementation for the core that uses tcp messages to communicate*/
-class TcpCore final : public CommsBroker<TcpComms, CommonCore>
-{
-  public:
+using TcpCore = NetworkCore<TcpComms, NetworkBrokerData::interface_type::tcp>;
+//class TcpCore final : public CommsBroker<TcpComms, CommonCore>
+//{
+//  public:
     /** default constructor*/
-    TcpCore () noexcept;
-    TcpCore (const std::string &core_name);
+//    TcpCore () noexcept;
+//    TcpCore (const std::string &core_name);
 
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
+//    virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
-  protected:
-    virtual std::string generateLocalAddressString () const override;
+ // protected:
+  //  virtual std::string generateLocalAddressString () const override;
 
-  private:
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{
-      NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
-    virtual bool brokerConnect () override;
-};
+ // private:
+ //   mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+ //   NetworkBrokerData netInfo{
+  //    NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+ //   virtual bool brokerConnect () override;
+//};
 
 /** implementation for the core that uses tcp messages to communicate*/
-class TcpCoreSS final : public CommsBroker<TcpCommsSS, CommonCore>
+class TcpCoreSS final : public NetworkCore<TcpCommsSS, NetworkBrokerData::interface_type::tcp>
 {
   public:
     /** default constructor*/
@@ -44,13 +45,7 @@ class TcpCoreSS final : public CommsBroker<TcpCommsSS, CommonCore>
 
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
-  protected:
-    virtual std::string generateLocalAddressString () const override;
-
   private:
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{
-      NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
     bool serverMode = false;
     std::vector<std::string> connections;  //!< defined connections 
     virtual bool brokerConnect () override;

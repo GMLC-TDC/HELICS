@@ -114,6 +114,10 @@ set(
 	queryHelpers.hpp
 	MessageTimer.hpp
 	JsonMapBuilder.hpp
+	NetworkBroker.hpp
+	NetworkCore.hpp
+	NetworkBroker_impl.hpp
+	NetworkCore_impl.hpp
 )
 
 set(TESTCORE_HEADER_FILES TestCore.h TestBroker.h)
