@@ -188,6 +188,24 @@ jobs:
         - RUN_TSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
+    # UBSAN build
+    - <<: *daily_linux
+      name: "Clang 4 Undefined Behavior Sanitizer"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - libstdc++-6-dev
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - CCACHE_CPP2=yes
+        - RUN_UBSAN=true
+        - USE_MPI=mpich
+        - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
     # XCode 8gm, OS X 10.11
     - <<: *daily_osx
       name: "XCode 8gm macOS 10.11"
