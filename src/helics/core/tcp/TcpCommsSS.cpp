@@ -19,40 +19,13 @@ namespace tcp
 using boost::asio::ip::tcp;
 TcpCommsSS::TcpCommsSS () noexcept {}
 
-TcpCommsSS::TcpCommsSS (const std::string &brokerTarget,
-                    const std::string &localTarget,
-                    interface_networks targetNetwork)
-    : CommsInterface (brokerTarget, localTarget, targetNetwork)
+void TcpCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    if (localTarget_.empty ())
+    CommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
-            (brokerTarget_ == "localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
-        }
+        return;
     }
-}
-
-TcpCommsSS::TcpCommsSS (const NetworkBrokerData &netInfo)
-    : CommsInterface (netInfo), brokerPort (netInfo.brokerPort), localPort (netInfo.portNumber)
-{
     if (localTarget_.empty ())
     {
         if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||

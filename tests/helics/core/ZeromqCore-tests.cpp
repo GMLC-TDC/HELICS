@@ -38,7 +38,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 {
     std::atomic<int> counter{0};
 
-    helics::zeromq::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm;
+	comm.loadTargetInfo(host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -242,7 +243,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     //sleep to clear any residual from the previous test
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
-    helics::zeromq::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm;
+    comm.loadTargetInfo (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -297,7 +299,8 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
-    helics::zeromq::ZmqComms comm (host, host);
+    helics::zeromq::ZmqComms comm;
+    comm.loadTargetInfo (host, host);
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
@@ -369,8 +372,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
 
-    helics::zeromq::ZmqComms comm (host, host);
-    helics::zeromq::ZmqComms comm2 (host, "");
+     helics::zeromq::ZmqComms comm,comm2;
+    comm.loadTargetInfo (host, host);
+     comm2.loadTargetInfo (host, "");
 
     comm.setBrokerPort (23405);
     comm.setName ("tests");
@@ -417,9 +421,11 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
-    helics::zeromq::ZmqComms comm (host, host);
-    helics::zeromq::ZmqComms comm2 (host, std::string());
-    helics::zeromq::ZmqComms comm3 (host, host);
+    helics::zeromq::ZmqComms comm, comm2, comm3;
+
+    comm.loadTargetInfo (host, host);
+    comm2.loadTargetInfo (host, std::string());
+    comm3.loadTargetInfo (host, host);
 
     comm.setBrokerPort (23405);
     comm.setName ("tests");

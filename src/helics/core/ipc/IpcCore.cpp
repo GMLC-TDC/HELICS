@@ -46,6 +46,9 @@ void IpcCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
         variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
 
@@ -65,12 +68,13 @@ void IpcCore::initializeFromArgs (int argc, const char *const *argv)
         }
 
         CommonCore::initializeFromArgs (argc, argv);
+		}
     }
 }
 
 bool IpcCore::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
+   std::lock_guard<std::mutex> lock (dataMutex);
     if (fileloc.empty ())
     {
         fileloc = getIdentifier () + "_queue.hqf";
@@ -84,9 +88,7 @@ bool IpcCore::brokerConnect ()
         }
         brokerloc = brokername + "_queue.hqf";
     }
-
-    comms = std::make_unique<IpcComms> (fileloc, brokerloc);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadTargetInfo (fileloc, brokerloc);
     comms->setTimeout (networkTimeout);
     return comms->connect ();
 }

@@ -4,9 +4,9 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpBroker.h"
+#include "../../common/argParser.h"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
-#include "../../common/argParser.h"
 
 namespace helics
 {
@@ -29,10 +29,14 @@ void TcpBroker::displayHelp (bool local_only)
 
 void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        netInfo.initializeFromArgs (argc, argv, "localhost");
-        CoreBroker::initializeFromArgs (argc, argv);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+            netInfo.initializeFromArgs (argc, argv, "localhost");
+            CoreBroker::initializeFromArgs (argc, argv);
+        }
     }
 }
 
@@ -43,8 +47,7 @@ bool TcpBroker::brokerConnect ()
     {
         setAsRoot ();
     }
-    comms = std::make_unique<TcpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
@@ -62,17 +65,18 @@ bool TcpBroker::brokerConnect ()
 std::string TcpBroker::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    if (comms->isConnected())
     {
         return comms->getAddress ();
     }
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
-
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{ { "server"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Broker should be a server"s },
-{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s }};
+static const ArgDescriptors extraArgs{{"server"s, ArgDescriptor::arg_type_t::flag_type,
+                                       "specify that the Broker should be a server"s},
+                                      {"connections"s, ArgDescriptor::arg_type_t::vector_string,
+                                       "target link connections"s}};
 
 TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
 
@@ -82,8 +86,8 @@ void TcpBrokerSS::displayHelp (bool local_only)
 {
     std::cout << " Help for TCP Broker: \n";
     variable_map vm;
-    const char *const argV[] = { "", "--help" };
-    argumentParser(2, argV, vm, extraArgs);
+    const char *const argV[] = {"", "--help"};
+    argumentParser (2, argV, vm, extraArgs);
     NetworkBrokerData::displayHelp ();
     if (!local_only)
     {
@@ -93,21 +97,25 @@ void TcpBrokerSS::displayHelp (bool local_only)
 
 void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        variable_map vm;
-        argumentParser(argc, argv, vm, extraArgs);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+            variable_map vm;
+            argumentParser (argc, argv, vm, extraArgs);
 
-        if (vm.count("connections") > 0)
-        {
-            connections = vm["connections"].as<std::vector<std::string>>();
+            if (vm.count ("connections") > 0)
+            {
+                connections = vm["connections"].as<std::vector<std::string>> ();
+            }
+            if (vm.count ("server") > 0)
+            {
+                serverMode = true;
+            }
+            netInfo.initializeFromArgs (argc, argv, "localhost");
+            CoreBroker::initializeFromArgs (argc, argv);
         }
-        if (vm.count("server") > 0)
-        {
-            serverMode = true;
-        }
-        netInfo.initializeFromArgs (argc, argv, "localhost");
-        CoreBroker::initializeFromArgs (argc, argv);
     }
 }
 
@@ -118,10 +126,9 @@ bool TcpBrokerSS::brokerConnect ()
     {
         setAsRoot ();
     }
-    comms = std::make_unique<TcpCommsSS> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
-    comms->setServerMode(serverMode);
+    comms->setServerMode (serverMode);
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = comms->connect ();
@@ -137,11 +144,11 @@ bool TcpBrokerSS::brokerConnect ()
 
 std::string TcpBrokerSS::generateLocalAddressString () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    if (comms->isConnected ())
     {
         return comms->getAddress ();
     }
+    std::lock_guard<std::mutex> lock (dataMutex);
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 

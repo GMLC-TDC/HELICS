@@ -18,10 +18,8 @@ class IpcComms final : public CommsInterface
   public:
     /** default constructor*/
     IpcComms () = default;
-    IpcComms (const std::string &brokerTarget, const std::string &localTarget);
     /** destructor*/
     ~IpcComms ();
-
   private:
     std::atomic<int> ipcbackchannel{0};  //!< a back channel message system if the primary is not working
 

@@ -27,10 +27,14 @@ void ZmqBroker::displayHelp (bool local_only)
 
 void ZmqBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
-        CoreBroker::initializeFromArgs (argc, argv);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+            netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
+            CoreBroker::initializeFromArgs (argc, argv);
+        }
     }
 }
 
@@ -42,8 +46,7 @@ bool ZmqBroker::brokerConnect ()
         setAsRoot ();
     }
     zmqContextManager::startContext ();
-    comms = std::make_unique<ZmqComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
@@ -61,7 +64,7 @@ bool ZmqBroker::brokerConnect ()
 std::string ZmqBroker::generateLocalAddressString () const
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    if (comms->isConnected ())
     {
         return comms->getAddress ();
     }

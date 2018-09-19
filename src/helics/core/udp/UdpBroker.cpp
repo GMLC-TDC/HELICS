@@ -27,10 +27,14 @@ void UdpBroker::displayHelp (bool local_only)
 
 void UdpBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        netInfo.initializeFromArgs (argc, argv, "localhost");
-        CoreBroker::initializeFromArgs (argc, argv);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+			netInfo.initializeFromArgs (argc, argv, "localhost");
+			CoreBroker::initializeFromArgs (argc, argv);
+		}
     }
 }
 
@@ -41,8 +45,7 @@ bool UdpBroker::brokerConnect ()
     {
         setAsRoot ();
     }
-    comms = std::make_unique<UdpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
@@ -59,11 +62,12 @@ bool UdpBroker::brokerConnect ()
 
 std::string UdpBroker::generateLocalAddressString () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    
+    if (comms->isConnected())
     {
         return comms->getAddress ();
     }
+    std::lock_guard<std::mutex> lock (dataMutex);
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 }  // namespace udp

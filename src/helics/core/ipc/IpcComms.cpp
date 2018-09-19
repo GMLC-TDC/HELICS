@@ -34,10 +34,7 @@ namespace helics
 {
 namespace ipc
 {
-IpcComms::IpcComms (const std::string &brokerTarget, const std::string &localTarget)
-    : CommsInterface (brokerTarget, localTarget)
-{
-}
+
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
 

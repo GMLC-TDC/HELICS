@@ -38,7 +38,8 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     std::this_thread::sleep_for(500ms);
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::tcp::TcpCommsSS comm (host, host);
+    helics::tcp::TcpCommsSS comm;
+    comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -81,7 +82,8 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     std::atomic<int> counter{0};
     std::atomic<size_t> len{0};
     std::string host = "localhost";
-    helics::tcp::TcpCommsSS comm (host, host);
+    helics::tcp::TcpCommsSS comm;
+    comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host,TCP_BROKER_PORT);
@@ -133,7 +135,8 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::atomic<size_t> len{0};
     helics::ActionMessage act;
     std::string host = "127.0.0.1";
-    helics::tcp::TcpCommsSS comm (host, host);
+    helics::tcp::TcpCommsSS comm;
+    comm.loadTargetInfo (host, host);
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -191,8 +194,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     guarded<helics::ActionMessage> act2;
 
     std::string host = "localhost";
-    helics::tcp::TcpCommsSS comm (host, host);
-    helics::tcp::TcpCommsSS comm2 (host, std::string ());
+    helics::tcp::TcpCommsSS comm;
+    helics::tcp::TcpCommsSS comm2;
+    comm.loadTargetInfo (host, host);
+    comm2.loadTargetInfo (host, std::string ());
 
     comm.setBrokerPort (TCP_BROKER_PORT+1);
     comm.setName ("tests");
@@ -243,9 +248,11 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::tcp::TcpCommsSS comm (host, host);
-    helics::tcp::TcpCommsSS comm2 (host, "");
-    helics::tcp::TcpCommsSS comm3 (host, host);
+    helics::tcp::TcpCommsSS comm,comm2,comm3;
+
+	comm.loadTargetInfo (host, host);
+    comm2.loadTargetInfo (host, std::string ());
+    comm3.loadTargetInfo (host, host);
 
     comm.setBrokerPort (TCP_BROKER_PORT+2);
     comm.setName ("tests");

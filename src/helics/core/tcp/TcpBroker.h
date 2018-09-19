@@ -32,7 +32,7 @@ class TcpBroker final : public CommsBroker<TcpComms, CoreBroker>
 
   private:
     virtual bool brokerConnect () override;
-
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
 
@@ -53,7 +53,7 @@ class TcpBrokerSS final : public CommsBroker<TcpCommsSS, CoreBroker>
 
   private:
     virtual bool brokerConnect () override;
-
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
     bool serverMode = true;

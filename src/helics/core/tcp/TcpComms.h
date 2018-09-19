@@ -50,12 +50,10 @@ class TcpComms final : public CommsInterface
   public:
     /** default constructor*/
     TcpComms () noexcept;
-    TcpComms (const std::string &brokerTarget,
-              const std::string &localTarget,
-              interface_networks targetNetwork = interface_networks::local);
-    TcpComms (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~TcpComms ();
+    /** load network information into the comms object*/
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
     void setBrokerPort (int brokerPortNumber);
     void setPortNumber (int localPortNumber);

@@ -33,8 +33,7 @@ bool TcpCore::brokerConnect ()
     {
         netInfo.brokerAddress = "localhost";
     }
-    comms = std::make_unique<TcpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     auto res = comms->connect ();
@@ -50,11 +49,12 @@ bool TcpCore::brokerConnect ()
 
 std::string TcpCore::generateLocalAddressString () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    
+    if (comms->isConnected())
     {
         return comms->getAddress ();
     }
+    std::lock_guard<std::mutex> lock (dataMutex);
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 
@@ -96,8 +96,7 @@ bool TcpCoreSS::brokerConnect ()
     {
         netInfo.brokerAddress = "localhost";
     }
-    comms = std::make_unique<TcpCommsSS> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setServerMode(serverMode);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
@@ -114,11 +113,12 @@ bool TcpCoreSS::brokerConnect ()
 
 std::string TcpCoreSS::generateLocalAddressString () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    
+    if (comms->isConnected())
     {
         return comms->getAddress ();
     }
+    std::lock_guard<std::mutex> lock (dataMutex);
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 }  // namespace tcp

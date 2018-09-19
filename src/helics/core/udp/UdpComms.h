@@ -37,10 +37,10 @@ class UdpComms final : public CommsInterface
   public:
     /** default constructor*/
     UdpComms ();
-    UdpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork = interface_networks::local);
-    UdpComms (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~UdpComms ();
+    /** load network information into the comms object*/
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
     void setBrokerPort (int brokerPortNumber);
     void setPortNumber (int localPortNumber);

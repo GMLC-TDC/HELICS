@@ -49,12 +49,10 @@ class TcpCommsSS final : public CommsInterface
   public:
     /** default constructor*/
     TcpCommsSS () noexcept;
-    TcpCommsSS (const std::string &brokerTarget,
-              const std::string &localTarget,
-              interface_networks targetNetwork = interface_networks::local);
-    TcpCommsSS (const NetworkBrokerData &netInfo);
     /** destructor*/
     ~TcpCommsSS ();
+    /** load network information into the comms object*/
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the broker port*/
     void setBrokerPort (int brokerPortNumber);
     /** set the port numbers for the local port*/

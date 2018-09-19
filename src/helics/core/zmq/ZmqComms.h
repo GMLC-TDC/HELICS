@@ -24,10 +24,10 @@ class ZmqComms final:public CommsInterface {
 public:
 	/** default constructor*/
 	ZmqComms() = default;
-	ZmqComms(const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork = interface_networks::local);
-    ZmqComms(const NetworkBrokerData &netInfo);
 	/** destructor*/
 	~ZmqComms();
+    /** load network information into the comms object*/
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
 	/** set the port numbers for the local ports*/
 	void setBrokerPort(int brokerPort);
 	void setPortNumber(int portNumber);

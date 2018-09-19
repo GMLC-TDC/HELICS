@@ -58,30 +58,34 @@ void IpcBroker::displayHelp (bool local_only)
 
 void IpcBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        variable_map vm;
-        argumentParser (argc, argv, vm, extraArgs);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+            variable_map vm;
+            argumentParser (argc, argv, vm, extraArgs);
 
-        if (vm.count ("broker") > 0)
-        {
-            brokername = vm["broker"].as<std::string> ();
-        }
+            if (vm.count ("broker") > 0)
+            {
+                brokername = vm["broker"].as<std::string> ();
+            }
 
-        if (vm.count ("broker_address") > 0)
-        {
-            brokerloc = vm["broker_address"].as<std::string> ();
-        }
+            if (vm.count ("broker_address") > 0)
+            {
+                brokerloc = vm["broker_address"].as<std::string> ();
+            }
 
-        if (vm.count ("fileloc") > 0)
-        {
-            fileloc = vm["fileloc"].as<std::string> ();
-        }
-        noAutomaticID = true;
-        CoreBroker::initializeFromArgs (argc, argv);
-        if (getIdentifier ().empty ())
-        {
-            setIdentifier ("_ipc_broker");
+            if (vm.count ("fileloc") > 0)
+            {
+                fileloc = vm["fileloc"].as<std::string> ();
+            }
+            noAutomaticID = true;
+            CoreBroker::initializeFromArgs (argc, argv);
+            if (getIdentifier ().empty ())
+            {
+                setIdentifier ("_ipc_broker");
+            }
         }
     }
 }
@@ -102,8 +106,7 @@ bool IpcBroker::brokerConnect ()
     {
         brokerloc = brokername + "_queue.hqf";
     }
-    comms = std::make_unique<IpcComms> (fileloc, brokerloc);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+
     comms->setMessageSize (maxMessageSize, maxMessageCount);
     comms->setTimeout (networkTimeout);
     return comms->connect ();

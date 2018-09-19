@@ -28,6 +28,7 @@ class TcpCore final : public CommsBroker<TcpComms, CommonCore>
     virtual std::string generateLocalAddressString () const override;
 
   private:
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
     virtual bool brokerConnect () override;
@@ -47,6 +48,7 @@ class TcpCoreSS final : public CommsBroker<TcpCommsSS, CommonCore>
     virtual std::string generateLocalAddressString () const override;
 
   private:
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
     bool serverMode = false;

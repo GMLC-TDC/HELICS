@@ -30,6 +30,7 @@ class UdpBroker final : public CommsBroker<UdpComms, CoreBroker>
 
   private:
     virtual bool brokerConnect () override;
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::udp};  //!< structure containing the networking information
 };

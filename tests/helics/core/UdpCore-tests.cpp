@@ -34,7 +34,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::udp::UdpComms comm (host, host);
+    helics::udp::UdpComms comm;
+	comm.loadTargetInfo(host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -71,8 +72,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
     std::string host = "localhost";
-    helics::udp::UdpComms comm (host, host);
-
+    helics::udp::UdpComms comm;
+    comm.loadTargetInfo (host, host);
     auto srv = AsioServiceManager::getServicePointer ();
 
     udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
@@ -106,7 +107,8 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
     std::string host = "localhost";
-    helics::udp::UdpComms comm (host, host);
+    helics::udp::UdpComms comm;
+    comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -152,8 +154,10 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
     guarded<helics::ActionMessage> act2;
 
     std::string host = "localhost";
-    helics::udp::UdpComms comm (host, host);
-    helics::udp::UdpComms comm2 (host, "");
+    helics::udp::UdpComms comm;
+    comm.loadTargetInfo (host, host);
+    helics::udp::UdpComms comm2;
+    comm2.loadTargetInfo (host, "");
 
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
@@ -201,9 +205,10 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
-    helics::udp::UdpComms comm (host, host);
-    helics::udp::UdpComms comm2 (host, "");
-    helics::udp::UdpComms comm3 (host, host);
+    helics::udp::UdpComms comm, comm2, comm3;
+	comm.loadTargetInfo(host, host);
+    comm2.loadTargetInfo (host, "");
+    comm3.loadTargetInfo (host, host);
 
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");

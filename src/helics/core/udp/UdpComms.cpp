@@ -27,40 +27,14 @@ UdpComms::UdpComms ()
     futurePort = promisePort.get_future ();
 }
 
-UdpComms::UdpComms (const std::string &brokerTarget, const std::string &localTarget, interface_networks targetNetwork)
-    : CommsInterface (brokerTarget, localTarget,targetNetwork)
+   /** load network information into the comms object*/
+void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    if (localTarget_.empty ())
+    CommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
     {
-        if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost")||(brokerTarget_=="localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
-
-        }
+        return;
     }
-    promisePort = std::promise<int> ();
-    futurePort = promisePort.get_future ();
-}
-
-UdpComms::UdpComms (const NetworkBrokerData &netInfo)
-    : CommsInterface (netInfo), brokerPort (netInfo.brokerPort), PortNumber (netInfo.portNumber)
-{
     if (localTarget_.empty ())
     {
         if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost") || (brokerTarget_ == "localhost"))
@@ -101,9 +75,10 @@ UdpComms::~UdpComms () { disconnect (); }
 
 void UdpComms::setBrokerPort (int brokerPortNumber)
 {
-    if (getRxStatus() == connection_status::startup)
+    if (propertyLock())
     {
         brokerPort = brokerPortNumber;
+        propertyUnLock ();
     }
 }
 
@@ -124,17 +99,26 @@ int UdpComms::findOpenPort ()
 
 void UdpComms::setPortNumber (int localPortNumber)
 {
-    if (getRxStatus() == connection_status::startup)
+    if (propertyLock())
     {
         PortNumber = localPortNumber;
         if (PortNumber > 0)
         {
             autoPortNumber = false;
         }
+        propertyUnLock ();
     }
 }
 
-void UdpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
+void UdpComms::setAutomaticPortStartPort (int startingPort) 
+{ 
+	if (propertyLock ())
+    {
+        openPortStart = startingPort;
+        propertyUnLock ();
+    }
+   
+}
 
 int UdpComms::processIncomingMessage (ActionMessage &M)
 {

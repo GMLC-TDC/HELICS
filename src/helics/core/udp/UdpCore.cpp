@@ -19,8 +19,12 @@ void UdpCore::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs (argc, argv, "localhost");
-        CommonCore::initializeFromArgs (argc, argv);
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
+        {
+			netInfo.initializeFromArgs (argc, argv, "localhost");
+			CommonCore::initializeFromArgs (argc, argv);
+		}
     }
 }
 
@@ -31,8 +35,7 @@ bool UdpCore::brokerConnect ()
     {
         netInfo.brokerAddress = "localhost";
     }
-    comms = std::make_unique<UdpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->loadNetworkInfo (netInfo);
     comms->setName (getIdentifier ());
     comms->setTimeout (networkTimeout);
     auto res = comms->connect ();
@@ -48,11 +51,12 @@ bool UdpCore::brokerConnect ()
 
 std::string UdpCore::generateLocalAddressString () const
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    
+    if (comms->isConnected())
     {
         return comms->getAddress ();
     }
+    std::lock_guard<std::mutex> lock (dataMutex);
     return makePortAddress (netInfo.localInterface, netInfo.portNumber);
 }
 

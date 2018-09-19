@@ -35,7 +35,8 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
     std::string localLoc = "localIPC";
-    helics::ipc::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm;
+	comm.loadTargetInfo(localLoc, brokerLoc);
 
     helics::ipc::ownedQueue mq;
     bool mqConn = mq.connect (brokerLoc, 1024, 1024);
@@ -59,7 +60,8 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     guarded<helics::ActionMessage> act;
     std::string brokerLoc = "";
     std::string localLoc = "localIPC";
-    helics::ipc::IpcComms comm (localLoc, brokerLoc);
+    helics::ipc::IpcComms comm;
+    comm.loadTargetInfo (localLoc, brokerLoc);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -91,8 +93,10 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
 
-    helics::ipc::IpcComms comm (localLoc, brokerLoc);
-    helics::ipc::IpcComms comm2 (brokerLoc, "");
+     helics::ipc::IpcComms comm;
+    comm.loadTargetInfo (localLoc, brokerLoc);
+     helics::ipc::IpcComms comm2;
+     comm.loadTargetInfo (brokerLoc, std::string());
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -140,9 +144,11 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    helics::ipc::IpcComms comm (localLoc, brokerLoc);
-    helics::ipc::IpcComms comm2 (brokerLoc, "");
-    helics::ipc::IpcComms comm3 (localLocB, brokerLoc);
+     helics::ipc::IpcComms comm,comm2,comm3;
+    comm.loadTargetInfo (localLoc, brokerLoc);
+
+    comm2.loadTargetInfo (brokerLoc, std::string());
+    comm3.loadTargetInfo (localLocB, brokerLoc);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;

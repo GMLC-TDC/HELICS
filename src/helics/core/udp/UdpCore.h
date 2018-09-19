@@ -25,6 +25,7 @@ public:
     virtual std::string generateLocalAddressString () const override;
 
 private:
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{
       NetworkBrokerData::interface_type::udp };  //!< structure containing the networking information
     virtual bool brokerConnect() override;

@@ -27,7 +27,7 @@ public:
 	static void displayHelp(bool local_only = false);
 private:
 	virtual bool brokerConnect() override;
-
+  mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
 
 };

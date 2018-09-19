@@ -29,7 +29,7 @@ class IpcCore final : public CommsBroker<IpcComms, CommonCore>
 
   private:
     virtual bool brokerConnect () override;
-
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string fileloc;  //!< the location of the file queue
     std::string brokerloc;  //!< the location of the broker	queue
     std::string brokername;  //!< the name of the broker

@@ -8,18 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-CommsInterface::CommsInterface (const std::string &localTarget,
-                                const std::string &brokerTarget,
-                                interface_networks targetNetwork)
-    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork (targetNetwork)
-{
-}
-
-CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
-    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
-      brokerName_ (netInfo.brokerName), interfaceNetwork (netInfo.interfaceNetwork)
-{
-}
 
 /** destructor*/
 CommsInterface::~CommsInterface ()
@@ -33,6 +21,51 @@ CommsInterface::~CommsInterface ()
     {
         queue_transmitter.join ();
     }
+}
+
+void CommsInterface::loadNetworkInfo(const NetworkBrokerData &netInfo)
+{
+    if (propertyLock ())
+    {
+        localTarget_ = netInfo.localInterface;
+        brokerTarget_ = netInfo.brokerAddress;
+        brokerName_ = netInfo.brokerName;
+        interfaceNetwork = netInfo.interfaceNetwork;
+        propertyUnLock ();
+    }
+}
+
+void CommsInterface::loadTargetInfo(const std::string &localTarget,
+	const std::string &brokerTarget,
+	interface_networks targetNetwork)
+{
+	if (propertyLock())
+	{
+        localTarget_ = localTarget;
+        brokerTarget_ = brokerTarget;
+        interfaceNetwork = targetNetwork;
+        propertyUnLock ();
+	}
+    
+}
+
+bool CommsInterface::propertyLock()
+{ 
+	bool exp = false;
+	while (!operating.compare_exchange_weak(exp, true))
+	{
+		if (tx_status != connection_status::startup)
+		{
+            return false;
+		}
+	}
+    return true;
+}
+
+void CommsInterface::propertyUnLock()
+{ 
+	bool exp = true;
+    operating.compare_exchange_strong (exp, false);
 }
 
 void CommsInterface::transmit (int route_id, const ActionMessage &cmd)

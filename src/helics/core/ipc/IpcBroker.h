@@ -30,6 +30,7 @@ private:
     virtual bool brokerConnect() override;
 
 private:
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string fileloc;  //!< the name of the file that the shared memory queue is located
     std::string brokerloc;  //!< the name of the shared queue of the broker
     std::string brokername;  //!< the name of the broker
