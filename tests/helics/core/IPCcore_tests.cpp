@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
      helics::ipc::IpcComms comm;
     comm.loadTargetInfo (localLoc, brokerLoc);
      helics::ipc::IpcComms comm2;
-     comm.loadTargetInfo (brokerLoc, std::string());
+     comm2.loadTargetInfo (brokerLoc, std::string());
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
@@ -267,9 +267,6 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    // auto ccore = static_cast<helics::IpcCore *>(core.get());
-    // this will test the automatic port allocation
-    // BOOST_CHECK_EQUAL(ccore->getAddress(), "tcp://127.0.0.1:23500;tcp://127.0.0.1:23501");
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;

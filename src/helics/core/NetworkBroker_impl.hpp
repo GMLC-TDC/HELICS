@@ -36,10 +36,10 @@ void NetworkBroker<COMMS, baseline,tcode>::displayHelp(bool local_only)
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
 void NetworkBroker<COMMS, baseline,tcode>::initializeFromArgs(int argc, const char *const *argv)
 {
-    if (brokerState == created)
+    if (BrokerBase::brokerState == BrokerBase::created)
     {
         std::lock_guard<std::mutex> lock(dataMutex);
-        if (brokerState == created)
+        if (BrokerBase::brokerState == BrokerBase::created)
         {
             netInfo.initializeFromArgs(argc, argv, "tcp://127.0.0.1");
             CoreBroker::initializeFromArgs(argc, argv);
@@ -53,19 +53,19 @@ bool NetworkBroker<COMMS, baseline,tcode>::brokerConnect()
     std::lock_guard<std::mutex> lock(dataMutex);
     if (netInfo.brokerAddress.empty())
     {
-        setAsRoot();
+        CoreBroker::setAsRoot();
     }
     // zmqContextManager::startContext();
-    comms->loadNetworkInfo(netInfo);
-    comms->setName(getIdentifier());
-    comms->setTimeout(networkTimeout);
+    CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
+    CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
+    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (BrokerBase::networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect();
+    auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)
     {
         if (netInfo.portNumber < 0)
         {
-            netInfo.portNumber = comms->getPort();
+            netInfo.portNumber = CommsBroker<COMMS, CoreBroker>::comms->getPort ();
         }
     }
     return res;
@@ -75,9 +75,9 @@ template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
 std::string NetworkBroker<COMMS, baseline,tcode>::generateLocalAddressString() const
 {
     std::string add;
-    if (comms->isConnected())
+    if (CommsBroker<COMMS, CoreBroker>::comms->isConnected ())
     {
-        add=comms->getAddress();
+        add = CommsBroker<COMMS, CoreBroker>::comms->getAddress ();
     }
     else
     {

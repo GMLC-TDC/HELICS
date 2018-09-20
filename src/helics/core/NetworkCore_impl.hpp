@@ -23,10 +23,10 @@ NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
 template <class COMMS, NetworkBrokerData::interface_type baseline>
 void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == created)
+    if (BrokerBase::brokerState == BrokerBase::created)
     {
         std::lock_guard<std::mutex> lock (dataMutex);
-        if (brokerState == created)
+        if (BrokerBase::brokerState == BrokerBase::created)
         {
             netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
             CommonCore::initializeFromArgs (argc, argv);
@@ -42,16 +42,16 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     {
         netInfo.brokerAddress = "localhost";
     }
-    comms->loadNetworkInfo (netInfo);
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
+    CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
+    CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
+    CommsBroker<COMMS, CommonCore>::comms->setTimeout (BrokerBase::networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
+    auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();
     if (res)
     {
         if (netInfo.portNumber < 0)
         {
-            netInfo.portNumber = comms->getPort ();
+            netInfo.portNumber = CommsBroker<COMMS, CommonCore>::comms->getPort ();
         }
     }
     return res;
@@ -61,9 +61,9 @@ template <class COMMS, NetworkBrokerData::interface_type baseline>
 std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
 {
     std::string add;
-    if (comms->isConnected ())
+    if (CommsBroker<COMMS, CommonCore>::comms->isConnected ())
     {
-        add=comms->getAddress ();
+        add = CommsBroker<COMMS, CommonCore>::comms->getAddress ();
     }
     else
     {

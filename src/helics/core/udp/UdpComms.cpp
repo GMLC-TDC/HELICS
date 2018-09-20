@@ -35,6 +35,8 @@ void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         return;
     }
+    brokerPort = netInfo.brokerPort;
+    PortNumber = netInfo.portNumber;
     if (localTarget_.empty ())
     {
         if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost") || (brokerTarget_ == "localhost"))
@@ -69,6 +71,7 @@ void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         autoPortNumber = false;
     }
+    propertyUnLock ();
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }

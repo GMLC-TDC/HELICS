@@ -8,7 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-
 /** destructor*/
 CommsInterface::~CommsInterface ()
 {
@@ -23,7 +22,7 @@ CommsInterface::~CommsInterface ()
     }
 }
 
-void CommsInterface::loadNetworkInfo(const NetworkBrokerData &netInfo)
+void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
     if (propertyLock ())
     {
@@ -35,36 +34,35 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData &netInfo)
     }
 }
 
-void CommsInterface::loadTargetInfo(const std::string &localTarget,
-	const std::string &brokerTarget,
-	interface_networks targetNetwork)
+void CommsInterface::loadTargetInfo (const std::string &localTarget,
+                                     const std::string &brokerTarget,
+                                     interface_networks targetNetwork)
 {
-	if (propertyLock())
-	{
+    if (propertyLock ())
+    {
         localTarget_ = localTarget;
         brokerTarget_ = brokerTarget;
         interfaceNetwork = targetNetwork;
         propertyUnLock ();
-	}
-    
+    }
 }
 
-bool CommsInterface::propertyLock()
-{ 
-	bool exp = false;
-	while (!operating.compare_exchange_weak(exp, true))
-	{
-		if (tx_status != connection_status::startup)
-		{
+bool CommsInterface::propertyLock ()
+{
+    bool exp = false;
+    while (!operating.compare_exchange_weak (exp, true))
+    {
+        if (tx_status != connection_status::startup)
+        {
             return false;
-		}
-	}
+        }
+    }
     return true;
 }
 
-void CommsInterface::propertyUnLock()
-{ 
-	bool exp = true;
+void CommsInterface::propertyUnLock ()
+{
+    bool exp = true;
     operating.compare_exchange_strong (exp, false);
 }
 
@@ -84,11 +82,11 @@ void CommsInterface::transmit (int route_id, ActionMessage &&cmd)
 {
     if (isPriorityCommand (cmd))
     {
-        txQueue.emplacePriority (route_id, std::move(cmd));
+        txQueue.emplacePriority (route_id, std::move (cmd));
     }
     else
     {
-        txQueue.emplace (route_id, std::move(cmd));
+        txQueue.emplace (route_id, std::move (cmd));
     }
 }
 
@@ -101,20 +99,20 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     transmit (-1, rt);
 }
 
-void CommsInterface::setTxStatus(connection_status txStatus)
+void CommsInterface::setTxStatus (connection_status txStatus)
 {
-	if (tx_status == txStatus)
-	{
-		return;
-	}
-	switch (txStatus)
-	{
+    if (tx_status == txStatus)
+    {
+        return;
+    }
+    switch (txStatus)
+    {
     case connection_status::connected:
-		if (tx_status == connection_status::startup)
-		{
+        if (tx_status == connection_status::startup)
+        {
             tx_status = txStatus;
             txTrigger.activate ();
-		}
+        }
         break;
     case connection_status::terminated:
     case connection_status::error:
@@ -132,11 +130,10 @@ void CommsInterface::setTxStatus(connection_status txStatus)
         break;
     default:
         tx_status = txStatus;
-	}
-    
+    }
 }
 
-void CommsInterface::setRxStatus(connection_status rxStatus)
+void CommsInterface::setRxStatus (connection_status rxStatus)
 {
     if (rx_status == rxStatus)
     {
@@ -153,18 +150,18 @@ void CommsInterface::setRxStatus(connection_status rxStatus)
         break;
     case connection_status::terminated:
     case connection_status::error:
-		if (rx_status == connection_status::startup)
-		{
+        if (rx_status == connection_status::startup)
+        {
             rx_status = rxStatus;
             rxTrigger.activate ();
             rxTrigger.trigger ();
-		}
-		else
-		{
+        }
+        else
+        {
             rx_status = rxStatus;
             rxTrigger.trigger ();
-		}
-        
+        }
+
         break;
     default:
         rx_status = rxStatus;
@@ -256,9 +253,25 @@ bool CommsInterface::connect ()
     return true;
 }
 
-void CommsInterface::setName (const std::string &name_) { name = name_; }
+void CommsInterface::setName (const std::string &name_)
+{
+    if (propertyLock ())
+    {
+        name = name_;
+        propertyUnLock ();
+    }
+}
+
 void CommsInterface::disconnect ()
 {
+	if (rx_status.load() == connection_status::startup)
+	{
+        rx_status = connection_status::terminated;
+	}
+    if (tx_status.load() == connection_status::startup)
+    {
+        tx_status = connection_status::terminated;
+    }
     if (tripDetector.isTripped ())
     {
         rx_status = connection_status::terminated;
@@ -276,10 +289,10 @@ void CommsInterface::disconnect ()
     int cnt = 0;
     while (rx_status.load () <= connection_status::connected)
     {
-		if (rxTrigger.wait_for(std::chrono::milliseconds(800)))
-		{
+        if (rxTrigger.wait_for (std::chrono::milliseconds (800)))
+        {
             continue;
-		}
+        }
         ++cnt;
         if ((cnt & 3) == 0)  // call this every 2400 milliseconds
         {
@@ -362,18 +375,26 @@ bool CommsInterface::reconnect ()
 
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
-    ActionCallback = std::move (callback);
+    if (propertyLock ())
+    {
+        ActionCallback = std::move (callback);
+        propertyUnLock ();
+    }
 }
 
 void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
 {
-    if (maxMessageSize > 0)
+    if (propertyLock ())
     {
-        maxMessageSize_ = maxMessageSize;
-    }
-    if (maxMessageCount > 0)
-    {
-        maxMessageCount_ = maxMessageCount;
+        if (maxMessageSize > 0)
+        {
+            maxMessageSize_ = maxMessageSize;
+        }
+        if (maxMessageCount > 0)
+        {
+            maxMessageCount_ = maxMessageCount;
+        }
+        propertyUnLock ();
     }
 }
 

@@ -50,6 +50,7 @@ void TcpCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
             localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
         }
     }
+    propertyUnLock ();
     
 }
 
@@ -58,26 +59,29 @@ TcpCommsSS::~TcpCommsSS () { disconnect (); }
 
 void TcpCommsSS::setBrokerPort (int brokerPortNumber)
 {
-    if (getRxStatus () == connection_status::startup)
+    if (propertyLock())
     {
         brokerPort = brokerPortNumber;
+        propertyUnLock ();
     }
 }
 
 void TcpCommsSS::setPortNumber (int localPortNumber)
 {
-    if (getRxStatus () == connection_status::startup)
+    if (propertyLock())
     {
         localPort = localPortNumber;
+        propertyUnLock ();
     }
 }
 
 
 void TcpCommsSS::setServerMode(bool mode) 
 { 
-    if (getRxStatus() == connection_status::startup)
+    if (propertyLock())
     {
         serverMode = mode;
+        propertyUnLock ();
     }
 }
 

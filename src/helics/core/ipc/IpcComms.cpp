@@ -54,7 +54,7 @@ void IpcComms::queue_rx_function ()
         return;
     }
     setRxStatus (connection_status::connected);  // this is a atomic indicator that the rx queue is ready
-    bool operating = false;
+    bool IPCoperating = false;
     while (true)
     {
         auto bc = ipcbackchannel.load ();
@@ -95,20 +95,20 @@ void IpcComms::queue_rx_function ()
             }
             if (cmdopt->messageID == SET_TO_OPERATING)
             {
-                if (!operating)
+                if (!IPCoperating)
                 {
                     rxQueue.changeState (queue_state_t::operating);
-                    operating = true;
+                    IPCoperating = true;
                 }
             }
             continue;
         }
         if (cmdopt->action () == CMD_INIT_GRANT)
         {
-            if (!operating)
+            if (!IPCoperating)
             {
                 rxQueue.changeState (queue_state_t::operating);
-                operating = true;
+                IPCoperating = true;
             }
         }
         ActionCallback (std::move (*cmdopt));
@@ -191,7 +191,7 @@ void IpcComms::queue_tx_function ()
     }
 
     setTxStatus (connection_status::connected);
-    bool operating = false;
+    bool IPCoperating = false;
     while (true)
     {
         int route_id;
@@ -220,7 +220,7 @@ void IpcComms::queue_tx_function ()
         }
         if (cmd.action () == CMD_INIT_GRANT)
         {
-            if (!operating)
+            if (!IPCoperating)
             {
                 ActionMessage op (CMD_PROTOCOL);
                 op.messageID = SET_TO_OPERATING;

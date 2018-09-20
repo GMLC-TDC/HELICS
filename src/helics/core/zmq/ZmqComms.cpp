@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ZmqComms.h"
 #include "../../common/zmqContextManager.h"
 #include "../../common/zmqHelper.h"
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
-#include "ZmqComms.h"
 #include "ZmqRequestSets.h"
 //#include <boost/asio.hpp>
 //#include <csignal>
@@ -111,16 +111,18 @@ void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         openPortStart = netInfo.portStart;
     }
+    propertyUnLock ();
 }
 /** destructor*/
 ZmqComms::~ZmqComms () { disconnect (); }
 
 void ZmqComms::setBrokerPort (int brokerPort)
 {
-    if (getRxStatus () == connection_status::startup)
+    if (propertyLock ())
     {
         brokerReqPort = brokerPort;
         brokerPushPort = brokerReqPort + 1;
+        propertyUnLock ();
     }
 }
 
@@ -142,7 +144,7 @@ std::pair<int, int> ZmqComms::findOpenPorts ()
 
 void ZmqComms::setPortNumber (int portNumber)
 {
-    if (getRxStatus () == connection_status::startup)
+    if (propertyLock ())
     {
         repPortNumber = portNumber;
         pullPortNumber = portNumber + 1;
@@ -150,10 +152,18 @@ void ZmqComms::setPortNumber (int portNumber)
         {
             autoPortNumber = false;
         }
+        propertyUnLock ();
     }
 }
 
-void ZmqComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
+void ZmqComms::setAutomaticPortStartPort (int startingPort)
+{
+    if (propertyLock ())
+    {
+        openPortStart = startingPort;
+        propertyUnLock ();
+    }
+}
 
 int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 {
@@ -770,13 +780,13 @@ void ZmqComms::closeReceiver ()
     case connection_status::terminated:
         break;
     case connection_status::connected:
-	{
+    {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
         transmit (-1, cmd);
-	}
-       
-        break;
+    }
+
+    break;
     default:
         if (!disconnecting)
         {
@@ -798,7 +808,7 @@ void ZmqComms::closeReceiver ()
             pushSocket.send (cmd.to_string ());
         }
         break;
-	}
+    }
 }
 
 std::string ZmqComms::getAddress () const

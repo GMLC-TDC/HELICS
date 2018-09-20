@@ -11,9 +11,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+template class NetworkBroker<tcp::TcpComms, NetworkBrokerData::interface_type::tcp, 6>;
 namespace tcp
 {
-template class NetworkBroker<TcpComms, NetworkBrokerData::interface_type::tcp,6>;
 
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{{"server"s, ArgDescriptor::arg_type_t::flag_type,
@@ -21,21 +21,17 @@ static const ArgDescriptors extraArgs{{"server"s, ArgDescriptor::arg_type_t::fla
                                       {"connections"s, ArgDescriptor::arg_type_t::vector_string,
                                        "target link connections"s}};
 
-TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : NetworkBroker (rootBroker) {}
 
-TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : CommsBroker (broker_name) {}
+TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : NetworkBroker (broker_name) {}
 
 void TcpBrokerSS::displayHelp (bool local_only)
 {
-    std::cout << " Help for TCP Broker: \n";
+    std::cout << " Help for TCP SS Broker only arguments: \n";
     variable_map vm;
     const char *const argV[] = {"", "--help"};
     argumentParser (2, argV, vm, extraArgs);
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
+    NetworkBroker::displayHelp (local_only);
 }
 
 void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
@@ -47,7 +43,6 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
         {
             variable_map vm;
             argumentParser (argc, argv, vm, extraArgs);
-
             if (vm.count ("connections") > 0)
             {
                 connections = vm["connections"].as<std::vector<std::string>> ();
@@ -56,43 +51,18 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
             {
                 serverMode = true;
             }
-            netInfo.initializeFromArgs (argc, argv, "localhost");
-            CoreBroker::initializeFromArgs (argc, argv);
         }
+        lock.unlock ();
+        NetworkBroker::initializeFromArgs (argc, argv);
     }
 }
 
 bool TcpBrokerSS::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())
-    {
-        setAsRoot ();
-    }
-    comms->loadNetworkInfo (netInfo);
-    comms->setName (getIdentifier ());
+    std::unique_lock<std::mutex> lock (dataMutex);
     comms->setServerMode (serverMode);
-    comms->setTimeout (networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
-        {
-            netInfo.portNumber = comms->getPort ();
-        }
-    }
-    return res;
-}
-
-std::string TcpBrokerSS::generateLocalAddressString () const
-{
-    if (comms->isConnected ())
-    {
-        return comms->getAddress ();
-    }
-    std::lock_guard<std::mutex> lock (dataMutex);
-    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+    lock.unlock ();
+    return NetworkBroker::brokerConnect ();
 }
 
 }  // namespace tcp

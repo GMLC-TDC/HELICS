@@ -106,7 +106,7 @@ bool IpcBroker::brokerConnect ()
     {
         brokerloc = brokername + "_queue.hqf";
     }
-
+    comms->loadTargetInfo (fileloc, brokerloc);
     comms->setMessageSize (maxMessageSize, maxMessageCount);
     comms->setTimeout (networkTimeout);
     return comms->connect ();

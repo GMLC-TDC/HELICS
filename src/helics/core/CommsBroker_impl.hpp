@@ -40,29 +40,29 @@ CommsBroker<COMMS, BrokerT>::CommsBroker (const std::string &obj_name) : BrokerT
     loadComms ();
 }
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::loadComms()
+void CommsBroker<COMMS, BrokerT>::loadComms ()
 {
     comms = std::make_unique<COMMS> ();
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
+    comms->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
-  template <class COMMS, class BrokerT>
-  CommsBroker<COMMS, BrokerT>::~CommsBroker ()
+template <class COMMS, class BrokerT>
+CommsBroker<COMMS, BrokerT>::~CommsBroker ()
 {
     BrokerBase::haltOperations = true;
-        int exp = 2;
-        while (!disconnectionStage.compare_exchange_weak (exp, 3))
+    int exp = 2;
+    while (!disconnectionStage.compare_exchange_weak (exp, 3))
+    {
+        if (exp == 0)
         {
-            if (exp == 0)
-            {
-                commDisconnect ();
-                exp = 1;
-            }
-            else
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (50));
-            }
+            commDisconnect ();
+            exp = 1;
         }
+        else
+        {
+            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        }
+    }
     comms = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
     BrokerBase::joinAllThreads ();
 }
@@ -76,17 +76,18 @@ void CommsBroker<COMMS, BrokerT>::brokerDisconnect ()
 template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::commDisconnect ()
 {
-        int exp = 0;
-        if (disconnectionStage.compare_exchange_strong (exp, 1))
-        {
-            comms->disconnect ();
-        }
+    int exp = 0;
+    if (disconnectionStage.compare_exchange_strong (exp, 1))
+    {
+        comms->disconnect ();
+        disconnectionStage = 2;
+    }
 }
 
 template <class COMMS, class BrokerT>
 bool CommsBroker<COMMS, BrokerT>::tryReconnect ()
 {
-     return comms->reconnect ();
+    return comms->reconnect ();
 }
 
 template <class COMMS, class BrokerT>
@@ -104,7 +105,7 @@ void CommsBroker<COMMS, BrokerT>::transmit (int route_id, ActionMessage &&cmd)
 template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::addRoute (int route_id, const std::string &routeInfo)
 {
-     comms->addRoute (route_id, routeInfo);
+    comms->addRoute (route_id, routeInfo);
 }
 
 }  // namespace helics
