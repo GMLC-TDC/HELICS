@@ -988,7 +988,7 @@ double helicsInputGetDouble (helics_input inp, helics_error *err)
     }
 }
 
-void helicsInputGetComplexParts (helics_input inp, double *real, double *imag, helics_error *err)
+void helicsInputGetComplex(helics_input inp, double *real, double *imag, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1033,14 +1033,14 @@ void helicsInputGetComplexParts (helics_input inp, double *real, double *imag, h
     }
 }
 
-helics_complex helicsInputGetComplex (helics_input inp, helics_error *err)
+helics_complex helicsInputGetComplexObject (helics_input inp, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
 
     if (inpObj == nullptr)
     {
         // time invalid is just an invalid double
-        return {helics_time_invalid, 0};
+        return {helics_time_invalid, 0.0};
     }
 
     try
@@ -1059,7 +1059,7 @@ helics_complex helicsInputGetComplex (helics_input inp, helics_error *err)
     catch (...)
     {
         helicsErrorHandler (err);
-        return {helics_time_invalid, 0};
+        return {helics_time_invalid, 0.0};
     }
 }
 

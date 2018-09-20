@@ -99,8 +99,10 @@ static void throwHelicsMatlabError(helics_error *err) {
 %typemap(argout)(double *real, double *imag)
 {
 	mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
-	mxSetPr(out,$1);
-	mxSetPi(out,$2);
+	double *r=mxGetPr(out);
+	double *i=mxGetPi(out);
+	*r=*$1;
+	*i=*$2;
 	if (--resc>=0) *resv++ =out;
 }
 

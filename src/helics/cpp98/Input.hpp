@@ -139,7 +139,7 @@ public:
 
     std::complex<double> getComplex()
     {
-        helics_complex hc=helicsInputGetComplex(inp,NULL);
+        helics_complex hc=helicsInputGetComplexObject(inp,NULL);
         std::complex<double> result(hc.real, hc.imag);
         return result;
     }

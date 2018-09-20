@@ -412,7 +412,7 @@ defaultValue = 1.0-1.0j;
     
 
     % double val;
-    value = helicsInputGetComplex(subid);
+    value = helicsInputGetComplexParts(subid);
     
     testCase.verifyEqual(value,defaultValue);
 

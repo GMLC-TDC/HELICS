@@ -322,20 +322,19 @@ HELICS_EXPORT helics_bool_t helicsInputGetBoolean (helics_input ipt, helics_erro
 */
 HELICS_EXPORT double helicsInputGetDouble (helics_input ipt, helics_error *err);
 
+/** get a complex object from an input object
+@param ipt the input to get the data for
+@param[in,out] err a helic error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an error
+@return a void value, helics_ok if everything went fine
+*/
+HELICS_EXPORT helics_complex helicsInputGetComplexObject (helics_input ipt, helics_error *err);
 /** get a pair of double forming a complex number from a subscriptions
 @param ipt the input to get the data for
 @param[out] real memory location to place the real part of a value
 @param[out] imag memory location to place the imaginary part of a value
 @return a void value, helics_ok if everything went fine
 */
-HELICS_EXPORT helics_complex helicsInputGetComplex (helics_input ipt, helics_error *err);
-/** get a pair of double forming a complex number from a subscriptions
-@param ipt the input to get the data for
-@param[out] real memory location to place the real part of a value
-@param[out] imag memory location to place the imaginary part of a value
-@return a void value, helics_ok if everything went fine
-*/
-HELICS_EXPORT void helicsInputGetComplexParts (helics_input ipt, double *real, double *imag, helics_error *err);
+HELICS_EXPORT void helicsInputGetComplex (helics_input ipt, double *real, double *imag, helics_error *err);
 
 /** get the size of a value for subscription assuming return as an array of doubles
 @returns the number of double in a return vector

@@ -10,9 +10,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 
+constexpr const char* tstr[] = { "default","ZeroMQ","MPI","TEST","Interprocess","interprocess","TCP", "UDP","undef","nng","ZMQ_test","TCPSS","undef","undef","http","unknown" };
+
 constexpr const char * tcodeStr(int tcode)
 {
-    constexpr const char* tstr[] = { "default","ZeroMQ","MPI","TEST","Interprocess","interprocess","TCP", "UDP","undef","nng","ZMQ_test","TCPSS","undef","undef","http","unknown" };
     return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15];
 }
 

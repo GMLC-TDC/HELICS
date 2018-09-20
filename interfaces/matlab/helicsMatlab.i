@@ -1,6 +1,6 @@
 %include "matlab_maps.i"
 
-%ignore helicsInputGetComplex;
+%ignore helicsInputGetComplexObject;
 %ignore helics_complex;
 
 %include "../helics.i"

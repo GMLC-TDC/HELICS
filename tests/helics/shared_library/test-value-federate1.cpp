@@ -328,7 +328,7 @@ void runFederateTestComplex (const char *core,
     // publish string1 at time=0.0;
     CE(helicsPublicationPublishComplex (pubid, testValue1_r, testValue1_i,&err));
 
-    CE(helicsInputGetComplexParts (subid, &val1_r, &val1_i,&err));
+    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
     BOOST_CHECK_EQUAL (val1_r, defaultValue_r);
     BOOST_CHECK_EQUAL (val1_i, defaultValue_i);
 
@@ -336,7 +336,7 @@ void runFederateTestComplex (const char *core,
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    CE(helics_complex hc=helicsInputGetComplex (subid,&err));
+    CE(helics_complex hc=helicsInputGetComplexObject (subid,&err));
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (hc.real, testValue1_r);
     BOOST_CHECK_EQUAL (hc.imag, testValue1_i);
@@ -345,7 +345,7 @@ void runFederateTestComplex (const char *core,
     CE(helicsPublicationPublishComplex (pubid, testValue2_r, testValue2_i,&err));
 
     // make sure the value is still what we expect
-    CE(helicsInputGetComplexParts (subid, &val1_r, &val1_i,&err));
+    CE(helicsInputGetComplex (subid, &val1_r, &val1_i,&err));
     BOOST_CHECK_EQUAL (val1_r, testValue1_r);
     BOOST_CHECK_EQUAL (val1_i, testValue1_i);
     // advance time
@@ -353,7 +353,7 @@ void runFederateTestComplex (const char *core,
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
 
-    CE(hc=helicsInputGetComplex (subid, &err));
+    CE(hc=helicsInputGetComplexObject (subid, &err));
     BOOST_CHECK_EQUAL (hc.real, testValue2_r);
     BOOST_CHECK_EQUAL (hc.imag, testValue2_i);
 

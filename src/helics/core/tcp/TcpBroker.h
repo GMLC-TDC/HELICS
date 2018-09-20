@@ -30,8 +30,8 @@ class TcpBrokerSS final : public NetworkBroker<TcpCommsSS, NetworkBrokerData::in
 
   private:
     virtual bool brokerConnect () override;
-    bool serverMode = true;
-    std::vector<std::string> connections;  //!< defined connections 
+    bool serverMode = true;  //!< flag determining if the comms should be placed in server mode
+    std::vector<std::string> connections;  //!< defined connections These are connections that the comm section reaches out to regardless of whether it is a broker/core/ or server
 };
 
 }  // namespace tcp
