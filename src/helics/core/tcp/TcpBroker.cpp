@@ -4,73 +4,16 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpBroker.h"
-#include "../../common/argParser.h"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
+#include "../../common/argParser.h"
+#include "../NetworkBroker_impl.hpp"
 
 namespace helics
 {
 namespace tcp
 {
-TcpBroker::TcpBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
-
-TcpBroker::TcpBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
-
-void TcpBroker::displayHelp (bool local_only)
-{
-    std::cout << " Help for TCP Broker: \n";
-
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-void TcpBroker::initializeFromArgs (int argc, const char *const *argv)
-{
-    if (brokerState == created)
-    {
-        std::unique_lock<std::mutex> lock (dataMutex);
-        if (brokerState == created)
-        {
-            netInfo.initializeFromArgs (argc, argv, "localhost");
-            CoreBroker::initializeFromArgs (argc, argv);
-        }
-    }
-}
-
-bool TcpBroker::brokerConnect ()
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())
-    {
-        setAsRoot ();
-    }
-    comms->loadNetworkInfo (netInfo);
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
-        {
-            netInfo.portNumber = comms->getPort ();
-        }
-    }
-    return res;
-}
-
-std::string TcpBroker::generateLocalAddressString () const
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms->isConnected())
-    {
-        return comms->getAddress ();
-    }
-    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
-}
+template class NetworkBroker<TcpComms, NetworkBrokerData::interface_type::tcp,6>;
 
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{{"server"s, ArgDescriptor::arg_type_t::flag_type,

@@ -76,16 +76,21 @@ void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        variable_map vm;
-        argumentParser(argc, argv, vm, extraArgs);
-        if (vm.count("connections") > 0)
+        std::unique_lock<std::mutex> lock(dataMutex);
+        if (brokerState == created)
         {
-            connections = vm["connections"].as<std::vector<std::string>>();
+            variable_map vm;
+            argumentParser(argc, argv, vm, extraArgs);
+            if (vm.count("connections") > 0)
+            {
+                connections = vm["connections"].as<std::vector<std::string>>();
+            }
+            if (vm.count("server") > 0)
+            {
+                serverMode = true;
+            }
         }
-        if (vm.count("server") > 0)
-        {
-            serverMode = true;
-        }
+        lock.unlock();
         NetworkCore::initializeFromArgs(argc, argv);
     }
 }

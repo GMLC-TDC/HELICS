@@ -4,34 +4,24 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-
-#include "../CoreBroker.hpp"
-#include "../CommsBroker.hpp"
-#include "../NetworkBrokerData.hpp"
-
-namespace helics
-{
+#include "../NetworkBroker.hpp"
+namespace helics {
 namespace zeromq {
 class ZmqComms;
+/** implementation for the core that uses zmq messages to communicate*/
+class ZmqBroker final : public NetworkBroker<ZmqComms, NetworkBrokerData::interface_type::tcp,1> {
 
-class ZmqBroker final:public CommsBroker<ZmqComms,CoreBroker>
-{
 public:
-	/** default constructor*/
-	ZmqBroker(bool rootBroker = false) noexcept;
-	ZmqBroker(const std::string &broker_name);
+    /** default constructor*/
+    explicit ZmqBroker(bool rootbroker=false) noexcept;
+    /** construct from with a core name*/
+    explicit ZmqBroker(const std::string &broker_name);
+    static void displayHelp(bool localOnly);
 
-	void initializeFromArgs(int argc, const char * const *argv) override;
-
-	virtual std::string generateLocalAddressString () const override;
-	static void displayHelp(bool local_only = false);
 private:
-	virtual bool brokerConnect() override;
-  mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{ NetworkBrokerData::interface_type::tcp }; //!< container for the network connection information
+    virtual bool brokerConnect() override;
 
 };
-
 } // namespace zeromq
 } // namespace helics
 

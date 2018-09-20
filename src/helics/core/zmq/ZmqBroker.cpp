@@ -7,75 +7,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ZmqBroker.h"
 #include "../../common/zmqContextManager.h"
 #include "ZmqComms.h"
+#include "../NetworkBroker_impl.hpp"
+
 namespace helics
 {
 namespace zeromq
 {
-ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+ZmqBroker::ZmqBroker (bool rootBroker) noexcept : NetworkBroker (rootBroker) {}
 
-ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
-
-void ZmqBroker::displayHelp (bool local_only)
-{
-    std::cout << " Help for Zero MQ Broker: \n";
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-void ZmqBroker::initializeFromArgs (int argc, const char *const *argv)
-{
-    if (brokerState == created)
-    {
-        std::unique_lock<std::mutex> lock (dataMutex);
-        if (brokerState == created)
-        {
-            netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
-            CoreBroker::initializeFromArgs (argc, argv);
-        }
-    }
-}
+ZmqBroker::ZmqBroker (const std::string &broker_name) : NetworkBroker (broker_name) {}
 
 bool ZmqBroker::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())
-    {
-        setAsRoot ();
-    }
     zmqContextManager::startContext ();
-    comms->loadNetworkInfo (netInfo);
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
-        {
-            netInfo.portNumber = comms->getPort ();
-        }
-    }
-    return res;
+    return NetworkBroker::brokerConnect();
 }
 
-std::string ZmqBroker::generateLocalAddressString () const
+void ZmqBroker::displayHelp(bool localOnly)
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms->isConnected ())
-    {
-        return comms->getAddress ();
-    }
-    if (netInfo.localInterface == "tcp://*")
-    {
-        return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
-    }
-    else
-    {
-        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
-    }
+    NetworkBroker::displayHelp(localOnly);
 }
 
 }  // namespace zeromq

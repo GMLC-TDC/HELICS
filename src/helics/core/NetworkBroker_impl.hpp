@@ -6,19 +6,26 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "NetworkBroker.hpp"
-
+#include "../core/core-types.hpp"
 namespace helics
 {
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-NetworkBroker<COMMS, baseline>::NetworkBroker(bool rootBroker) noexcept : CommsBroker<COMMS, CoreBroker>(rootBroker) {}
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-NetworkBroker<COMMS, baseline>::NetworkBroker(const std::string &broker_name) : CommsBroker<COMMS, CoreBroker>(broker_name) {}
-
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-void NetworkBroker<COMMS, baseline>::displayHelp(bool local_only)
+constexpr const char * tcodeStr(int tcode)
 {
-    std::cout << " Help for Zero MQ Broker: \n";
+    constexpr const char* tstr[] = { "default","ZeroMQ","MPI","TEST","Interprocess","interprocess","TCP", "UDP","undef","nng","ZMQ_test","TCPSS","undef","undef","http","unknown" };
+    return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15];
+}
+
+template <class COMMS, NetworkBrokerData::interface_type baseline,int tcode>
+NetworkBroker<COMMS, baseline,tcode>::NetworkBroker(bool rootBroker) noexcept : CommsBroker<COMMS, CoreBroker>(rootBroker) {}
+
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+NetworkBroker<COMMS, baseline,tcode>::NetworkBroker(const std::string &broker_name) : CommsBroker<COMMS, CoreBroker>(broker_name) {}
+
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+void NetworkBroker<COMMS, baseline,tcode>::displayHelp(bool local_only)
+{
+    std::cout << " Help for "<<tcodeStr(tcode)<<" Broker: \n";
     NetworkBrokerData::displayHelp();
     if (!local_only)
     {
@@ -26,12 +33,12 @@ void NetworkBroker<COMMS, baseline>::displayHelp(bool local_only)
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-void NetworkBroker<COMMS, baseline>::initializeFromArgs(int argc, const char *const *argv)
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+void NetworkBroker<COMMS, baseline,tcode>::initializeFromArgs(int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        std::unique_lock<std::mutex> lock(dataMutex);
+        std::lock_guard<std::mutex> lock(dataMutex);
         if (brokerState == created)
         {
             netInfo.initializeFromArgs(argc, argv, "tcp://127.0.0.1");
@@ -40,8 +47,8 @@ void NetworkBroker<COMMS, baseline>::initializeFromArgs(int argc, const char *co
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-bool NetworkBroker<COMMS, baseline>::brokerConnect()
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+bool NetworkBroker<COMMS, baseline,tcode>::brokerConnect()
 {
     std::lock_guard<std::mutex> lock(dataMutex);
     if (netInfo.brokerAddress.empty())
@@ -64,23 +71,28 @@ bool NetworkBroker<COMMS, baseline>::brokerConnect()
     return res;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
-std::string NetworkBroker<COMMS, baseline>::generateLocalAddressString() const
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+std::string NetworkBroker<COMMS, baseline,tcode>::generateLocalAddressString() const
 {
-
+    std::string add;
     if (comms->isConnected())
     {
-        return comms->getAddress();
-    }
-    std::lock_guard<std::mutex> lock(dataMutex);
-    if (!netInfo.localInterface.empty() && (netInfo.localInterface.back == '*'))
-    {
-        return makePortAddress(netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1), netInfo.portNumber);
+        add=comms->getAddress();
     }
     else
     {
-        return makePortAddress(netInfo.localInterface, netInfo.portNumber);
+
+        std::lock_guard<std::mutex> lock(dataMutex);
+        if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*'))
+        {
+            add=makePortAddress(netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1), netInfo.portNumber);
+        }
+        else
+        {
+            add=makePortAddress(netInfo.localInterface, netInfo.portNumber);
+        }
     }
+    return add;
 }
 
 } //namespace helics

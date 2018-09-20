@@ -5,9 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../CommonCore.hpp"
-#include "../NetworkBrokerData.hpp"
 #include "../NetworkCore.hpp"
+
 namespace helics
 {
 namespace tcp

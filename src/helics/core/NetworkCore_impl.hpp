@@ -25,7 +25,7 @@ void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *con
 {
     if (brokerState == created)
     {
-        std::unique_lock<std::mutex> lock (dataMutex);
+        std::lock_guard<std::mutex> lock (dataMutex);
         if (brokerState == created)
         {
             netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
@@ -60,20 +60,26 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
 template <class COMMS, NetworkBrokerData::interface_type baseline>
 std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
 {
+    std::string add;
     if (comms->isConnected ())
     {
-        return comms->getAddress ();
-    }
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
-    {
-        return makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
-                                netInfo.portNumber);
+        add=comms->getAddress ();
     }
     else
     {
-        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+        std::lock_guard<std::mutex> lock(dataMutex);
+        if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*'))
+        {
+            add=makePortAddress(netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
+                netInfo.portNumber);
+        }
+        else
+        {
+            add=makePortAddress(netInfo.localInterface, netInfo.portNumber);
+        }
     }
+    return add;
+    
 }
 
 }  // namespace helics
