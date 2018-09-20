@@ -188,6 +188,11 @@ bool CommsInterface::connect ()
         std::cerr << "no callback specified, the receiver cannot start\n";
         return false;
     }
+    if (!propertyLock())
+    {
+        //this will lock all the properties and should not be unlocked;
+        return isConnected();
+    }
     std::lock_guard<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
@@ -264,18 +269,20 @@ void CommsInterface::setName (const std::string &name_)
 
 void CommsInterface::disconnect ()
 {
-	if (rx_status.load() == connection_status::startup)
-	{
-        rx_status = connection_status::terminated;
-	}
-    if (tx_status.load() == connection_status::startup)
+    if (!operating)
     {
-        tx_status = connection_status::terminated;
+        if (propertyLock())
+        {
+            setRxStatus(connection_status::terminated);
+            setTxStatus(connection_status::terminated);
+            return;
+        }
     }
+	
     if (tripDetector.isTripped ())
     {
-        rx_status = connection_status::terminated;
-        tx_status = connection_status::terminated;
+        setRxStatus(connection_status::terminated);
+        setTxStatus(connection_status::terminated);
         return;
     }
     if (rx_status.load () <= connection_status::connected)

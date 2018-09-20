@@ -402,6 +402,10 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (!brokerTarget_.empty ())
     {
+        if (brokerTarget_ == "localhost")
+        {
+            brokerTarget_ = "tcp://localhost";
+        }
         auto ctx = zmqContextManager::getContextPointer ();
         if (brokerReqPort < 0)
         {
@@ -417,7 +421,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         catch (zmq::error_t &ze)
         {
             std::cerr << "unable to connect with broker at " << makePortAddress (brokerTarget_, brokerReqPort)
-                      << ":" << ze.what () << '\n';
+                      << ":("<<name<<")" << ze.what () << '\n';
             setTxStatus (connection_status::error);
             ActionMessage M (CMD_PROTOCOL);
             M.messageID = DISCONNECT_ERROR;

@@ -18,6 +18,7 @@ namespace helics
 {
 static const ArgDescriptors extraArgs{
   {"interface"s, "the local interface to use for the receive ports"s},
+{ "local_interface"s, "the local interface to use for the receive ports"s },
   {"broker,b"s, "identifier for the broker"s},
   {"broker_address", "location of the broker i.e network address"},
   { "brokername", "the name of the broker" },
@@ -130,6 +131,14 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     {
         auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
         localInterface = localprt.first;
+        //this may get overridden later
+        portNumber = localprt.second;
+    }
+    if (vm.count("local_interface") > 0)
+    {
+        auto localprt = extractInterfaceandPort(vm["local_interface"].as<std::string>());
+        localInterface = localprt.first;
+        //this may get overridden later
         portNumber = localprt.second;
     }
     if (vm.count ("port") > 0)

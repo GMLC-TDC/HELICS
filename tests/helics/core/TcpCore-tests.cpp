@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     std::atomic<int> counter{0};
     std::atomic<size_t> len{0};
     std::string host = "localhost";
