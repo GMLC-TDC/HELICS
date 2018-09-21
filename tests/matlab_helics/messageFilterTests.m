@@ -122,7 +122,7 @@ helicsFilterAddSourceTarget(f1,'port1');
 f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_delay,'filter2');
 helicsFilterAddDestinationTarget(f2,'port2');
 helicsFederateRegisterEndpoint(fFed,'fout','');
-f3=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_randomDelay,'filter3');
+f3=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_random_delay,'filter3');
 helicsFilterAddSourceTarget(f3,'fed2/fout');
 
 helicsFederateEnterExecutingModeAsync(mFed);

@@ -114,9 +114,9 @@ class Federate
 
     void setFlag (int flag, bool value) { helicsFederateSetFlagOption (fed, flag, value?helics_true:helics_false, hThrowOnError ()); }
 
-    void setTimeProperty (int tProperty, helics_time_t timeDelta)
+    void setTimeProperty (int tProperty, helics_time_t timeValue)
     {
-        helicsFederateSetTimeProperty (fed, tProperty, timeDelta, hThrowOnError ());
+        helicsFederateSetTimeProperty (fed, tProperty, timeValue, hThrowOnError ());
     }
 
 

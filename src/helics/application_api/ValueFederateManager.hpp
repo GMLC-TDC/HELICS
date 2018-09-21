@@ -168,6 +168,16 @@ class ValueFederateManager
     @return the type or empty string on unrecognized id*/
     std::string getPublicationType (input_id_t id) const;
 
+    /** set a publication option */
+    void setPublicationOption(publication_id_t id, int32_t option, bool option_value);
+
+    /** get a handle option*/
+    void setInputOption(input_id_t id, int32_t option, bool option_value);
+    /** get an option values for an input*/
+    bool getInputOption(input_id_t id, int32_t option) const;
+    /** get an option values for a publication*/
+    bool getPublicationOption(publication_id_t id, int32_t option) const;
+
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call

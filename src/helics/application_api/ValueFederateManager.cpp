@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ValueFederateManager.hpp"
+#include "helics/core/core-exceptions.hpp"
 
 namespace helics
 {
@@ -80,7 +81,7 @@ void ValueFederateManager::addShortcut (input_id_t subid, const std::string &sho
     }
     else
     {
-        throw (std::invalid_argument ("subscription id is invalid"));
+        throw (InvalidIdentifier("input id is invalid"));
     }
 }
 
@@ -93,7 +94,7 @@ void ValueFederateManager::addTarget(publication_id_t id, const std::string &tar
     }
     else
     {
-        throw (std::invalid_argument ("publication id is invalid"));
+        throw (InvalidIdentifier("publication id is invalid"));
     }
  }
 
@@ -108,7 +109,7 @@ void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
     }
     else
     {
-        throw (std::invalid_argument ("subscription id is invalid"));
+        throw (InvalidIdentifier("Input id is invalid"));
     }
  }
 
@@ -123,7 +124,7 @@ void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
     }
     else
     {
-        throw (std::invalid_argument ("subscription id is invalid"));
+        throw (InvalidIdentifier("Input id is invalid"));
     }
 }
 
@@ -153,7 +154,7 @@ data_view ValueFederateManager::getValue (input_id_t id)
     }
     else
     {
-        throw (std::invalid_argument ("subscription id is invalid"));
+        throw (InvalidIdentifier("Input id is invalid"));
     }
 }
 
@@ -284,7 +285,7 @@ std::string ValueFederateManager::getTarget(input_id_t id) const
 const std::string &ValueFederateManager::getInputKey (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
-    return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].name : nullStr;
+    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].name : nullStr;
 }
 
 input_id_t ValueFederateManager::getInputId (const std::string &key) const
@@ -311,7 +312,7 @@ input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
 const std::string &ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
-    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].name : nullStr;
+    return (isValidIndex(pub_id.value(),*pubHandle)) ? (*pubHandle)[pub_id.value()].name : nullStr;
 }
 
 publication_id_t ValueFederateManager::getPublicationId (const std::string &key) const
@@ -329,25 +330,25 @@ publication_id_t ValueFederateManager::getPublicationId (const std::string &key)
 const std::string &ValueFederateManager::getInputUnits (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
-    return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].units : nullStr;
+    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].units : nullStr;
 }
 
 const std::string &ValueFederateManager::getPublicationUnits (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
-    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].units : nullStr;
+    return (isValidIndex(pub_id.value(), *pubHandle)) ? (*pubHandle)[pub_id.value ()].units : nullStr;
 }
 
 const std::string &ValueFederateManager::getInputType (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
-    return (input_id.value () < inpHandle->size ()) ? (*inpHandle)[input_id.value ()].type : nullStr;
+    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].type : nullStr;
 }
 
 std::string ValueFederateManager::getPublicationType (input_id_t input_id) const
 {
     auto inpHandle = inputs.lock_shared();
-    if (input_id.value () < inpHandle->size ())
+    if (isValidIndex(input_id.value(),*inpHandle))
     {
         if ((*inpHandle)[input_id.value ()].pubtype=="def")
 		{
@@ -364,7 +365,55 @@ std::string ValueFederateManager::getPublicationType (input_id_t input_id) const
 const std::string &ValueFederateManager::getPublicationType (publication_id_t pub_id) const
 {
     auto pubHandle = publications.lock_shared();
-    return (pub_id.value () < pubHandle->size ()) ? (*pubHandle)[pub_id.value ()].type : nullStr;
+    return (isValidIndex(pub_id.value(), *pubHandle)) ? (*pubHandle)[pub_id.value ()].type : nullStr;
+}
+
+
+
+void ValueFederateManager::setPublicationOption(publication_id_t pub_id, int32_t option, bool option_value)
+{
+    auto pubHandle = publications.lock_shared();
+    if (isValidIndex(pub_id.value(), *pubHandle))
+    {
+        coreObject->setHandleOption((*pubHandle)[pub_id.value()].coreID, option, option_value);
+    }
+    else
+    {
+        throw(InvalidIdentifier("Publication Id is invalid"));
+    }
+}
+
+void ValueFederateManager::setInputOption(input_id_t input_id, int32_t option, bool option_value)
+{
+    auto inpHandle = inputs.lock_shared();
+    if (isValidIndex(input_id.value(), *inpHandle))
+    {
+        coreObject->setHandleOption((*inpHandle)[input_id.value()].coreID, option, option_value);
+    }
+    else
+    {
+        throw(InvalidIdentifier("Input Id is invalid"));
+    }
+}
+
+bool ValueFederateManager::getInputOption(input_id_t input_id, int32_t option) const
+{
+    auto inpHandle = inputs.lock_shared();
+    if (isValidIndex(input_id.value(), *inpHandle))
+    {
+        return coreObject->getHandleOption((*inpHandle)[input_id.value()].coreID, option);
+    }
+    throw(InvalidIdentifier("Input Id is invalid"));
+}
+
+bool ValueFederateManager::getPublicationOption(publication_id_t pub_id, int32_t option) const
+{
+    auto pubHandle = publications.lock_shared();
+    if (isValidIndex(pub_id.value(), *pubHandle))
+    {
+        return coreObject->getHandleOption((*pubHandle)[pub_id.value()].coreID, option);
+    }
+    throw(InvalidIdentifier("Publication Id is invalid"));
 }
 
 /** get a count of the number publications registered*/
@@ -389,7 +438,7 @@ void ValueFederateManager::registerCallback (std::function<void(input_id_t, Time
 void ValueFederateManager::registerCallback (input_id_t id,
                                              std::function<void(input_id_t, Time)> callback)
 {
-    if (id.value () < inputCount)
+    if ((id.value () < inputCount)&&(id.value()>=0))
     {
         auto inpHandle = inputs.lock();
         (*inpHandle)[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
@@ -397,7 +446,7 @@ void ValueFederateManager::registerCallback (input_id_t id,
     }
     else
     {
-        throw (std::invalid_argument ("subscription id is invalid"));
+        throw(InvalidIdentifier("Input Id is invalid"));
     }
 }
 

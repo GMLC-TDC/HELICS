@@ -439,6 +439,28 @@ std::string ValueFederate::getPublicationType (input_id_t id) const
     return vfManager->getPublicationType (id);
 }
 
+
+void ValueFederate::setPublicationOption(publication_id_t id, int32_t option, bool option_value)
+{
+    vfManager->setPublicationOption(id, option, option_value);
+}
+
+void ValueFederate::setInputOption(input_id_t id, int32_t option, bool option_value)
+{
+    vfManager->setInputOption(id, option, option_value);
+}
+
+bool ValueFederate::getInputOption(input_id_t id, int32_t option) const
+{
+    return vfManager->getInputOption(id, option);
+}
+
+bool ValueFederate::getPublicationOption(publication_id_t id, int32_t option) const
+{
+    return vfManager->getPublicationOption(id, option);
+}
+
+
 void ValueFederate::registerInputNotificationCallback (
   std::function<void(input_id_t, Time)> callback)
 {
