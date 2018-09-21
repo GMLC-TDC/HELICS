@@ -1,11 +1,11 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "IpcComms.h"
+#include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
+#include "IpcComms.h"
 #include "IpcQueueHelper.h"
 #include <algorithm>
 #include <cctype>
@@ -111,7 +111,8 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        std::cerr << "error changing states" << std::endl;
+        logError("error changing states");
+		
     }
     setRxStatus (connection_status::terminated);
 }
@@ -129,9 +130,9 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
-            err.payload = std::string ("Unable to open broker connection ->") + brokerQueue.getError ();
+            err.payload = fmt::format("Unable to open broker connection -> {}",brokerQueue.getError ());
             ActionCallback (std::move (err));
-            setTxStatus(connection_status::error);
+            setTxStatus (connection_status::error);
             return;
         }
         hasBroker = true;
@@ -139,13 +140,13 @@ void IpcComms::queue_tx_function ()
     // wait for the receiver to startup
     if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
     {
-            ActionMessage err (CMD_ERROR);
-            err.payload = "Unable to link with receiver";
-            ActionCallback (std::move (err));
-            setTxStatus (connection_status::error);
-            return;
+        ActionMessage err (CMD_ERROR);
+        err.payload = "Unable to link with receiver";
+        ActionCallback (std::move (err));
+        setTxStatus (connection_status::error);
+        return;
     }
-    if (getRxStatus() == connection_status::error)
+    if (getRxStatus () == connection_status::error)
     {
         setTxStatus (connection_status::error);
         return;
@@ -157,7 +158,7 @@ void IpcComms::queue_tx_function ()
         ipcbackchannel = IPC_BACKCHANNEL_TRY_RESET;
         while (ipcbackchannel != 0)
         {
-            if (getRxStatus() != connection_status::connected)
+            if (getRxStatus () != connection_status::connected)
             {
                 break;
             }
@@ -170,14 +171,14 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
-            err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
+            err.payload = fmt::format ("Unable to open receiver connection -> {}", rxQueue.getError ());
             ActionCallback (std::move (err));
-            setRxStatus(connection_status::error);
+            setRxStatus (connection_status::error);
             return;
         }
     }
 
-    setTxStatus(connection_status::connected);
+    setTxStatus (connection_status::connected);
     bool operating = false;
     while (true)
     {
@@ -249,13 +250,13 @@ DISCONNECT_TX_QUEUE:
 
 void IpcComms::closeReceiver ()
 {
-    if ((getRxStatus() == connection_status::error) || (getRxStatus() == connection_status::terminated))
+    if ((getRxStatus () == connection_status::error) || (getRxStatus () == connection_status::terminated))
     {
         return;
     }
     ActionMessage cmd (CMD_PROTOCOL);
     cmd.index = CLOSE_RECEIVER;
-    if (getTxStatus() == connection_status::connected)
+    if (getTxStatus () == connection_status::connected)
     {
         transmit (-1, cmd);
     }

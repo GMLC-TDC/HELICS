@@ -22,7 +22,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ONLY_TRANSMIT_ON_CHANGE_FLAG 3
 /** flag indicating a federate should only trigger an update if a value has changed (binary equivalence)*/
 #define ONLY_UPDATE_ON_CHANGE_FLAG 4
-/** flag indicating a federate should only grant time if all other federates have already passed the requested time*/
+/** flag indicating a federate should only grant time if all other federates have already passed the requested
+ * time*/
 #define WAIT_FOR_CURRENT_TIME_UPDATE_FLAG 5
 
 /** flag indicating that a federate has rollback capability*/
@@ -47,5 +48,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ERROR_CODE_INVALID_STATE_TRANSITION 12
 #define ERROR_CODE_INVALID_FUNCTION_CALL 15
 
+#define LOG_LEVEL_NO_PRINT (-1)
+#define LOG_LEVEL_ERROR 0
+#define LOG_LEVEL_WARNING 1
+#define LOG_LEVEL_SUMMARY 2
+#define LOG_LEVEL_CONNECTIONS 3
+#define LOG_LEVEL_INTERFACES 4
+#define LOG_LEVEL_TIMING 5
+#define LOG_LEVEL_DATA 6
+#define LOG_LEVEL_TRACE 7
 #endif
-
