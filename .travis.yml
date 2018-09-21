@@ -105,6 +105,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
+        - UPLOAD_BINTRAY_ARTIFACT=true
 
     - <<: *linux_base
       name: "Clang 3.6"
@@ -271,6 +272,8 @@ script:
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
 
+  # Upload artifact to Bintray
+  - if [[ "$UPLOAD_BINTRAY_ARTIFACT" ]]; then cpack -G STGZ -B cpack-output && curl -T $(ls cpack-output/Helics*.sh) -u${BT_USER}:${BT_APIKEY} "https://api.bintray.com/content/helics/develop/snapshot/${TRAVIS_BRANCH}/${TRAVIS_BRANCH}/helics-install-$(uname -s).sh?publish=1&override=1" ; fi 
 notifications:
     email: false
 
