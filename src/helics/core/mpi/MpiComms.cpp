@@ -13,23 +13,27 @@ namespace helics
 {
 namespace mpi
 {
-MpiComms::MpiComms () : shutdown (false)
+MpiComms::MpiComms ()
 {
     auto &mpi_service = MpiService::getInstance ();
-    commAddress = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms() - commAddress = " << commAddress << std::endl;
+    localTarget_ = mpi_service.addMpiComms (this);
+    std::cout << "MpiComms() - commAddress = " << localTarget_ << std::endl;
 }
 
-MpiComms::MpiComms (const std::string &broker) : brokerAddress (broker), shutdown (false)
-{
-    auto &mpi_service = MpiService::getInstance ();
-    commAddress = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms(" << brokerAddress << ")"
-              << " - commAddress " << commAddress << std::endl;
-}
 
 /** destructor*/
 MpiComms::~MpiComms () { disconnect (); }
+
+
+void MpiComms::setBrokerAddress (const std::string &address)
+{ 
+	if (propertyLock())
+	{
+        brokerTarget_ = address;
+        propertyUnLock ();
+	}
+	
+}
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
 {
@@ -84,7 +88,7 @@ void MpiComms::queue_rx_function ()
         }
     }
 CLOSE_RX_LOOP:
-    std::cout << "Shutdown RX Loop for " << commAddress << std::endl;
+    std::cout << "Shutdown RX Loop for " << localTarget_ << std::endl;
     shutdown = true;
     setRxStatus(connection_status::terminated);
 }
@@ -97,7 +101,7 @@ void MpiComms::queue_tx_function ()
 
     std::map<int, std::string> routes;  // for all the other possible routes
 
-    if (!brokerAddress.empty())
+    if (!brokerTarget_.empty())
     {
         hasBroker = true;
     }
@@ -139,7 +143,7 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 // std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
-                mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
+                mpi_service.sendMessage (brokerTarget_, cmd.to_vector ());
             }
         }
         else if (route_id == -1)
@@ -163,13 +167,13 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     // std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
-                    mpi_service.sendMessage (brokerAddress, cmd.to_vector ());
+                    mpi_service.sendMessage (brokerTarget_, cmd.to_vector ());
                 }
             }
         }
     }
 CLOSE_TX_LOOP:
-    std::cout << "Shutdown TX Loop for " << commAddress << std::endl;
+    std::cout << "Shutdown TX Loop for " << localTarget_ << std::endl;
     routes.clear ();
     if (getRxStatus() == connection_status::connected)
     {

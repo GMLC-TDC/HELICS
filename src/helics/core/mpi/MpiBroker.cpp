@@ -41,58 +41,65 @@ void MpiBroker::displayHelp (bool local_only)
 
 void MpiBroker::initializeFromArgs (int argc, const char *const *argv)
 {
-    if (brokerState == broker_state_t::created)
+    if (brokerState == created)
     {
-        variable_map vm;
-        argumentParser (argc, argv, vm, extraArgs);
-
-        if (vm.count ("broker_address") > 0)
+        std::unique_lock<std::mutex> lock (dataMutex);
+        if (brokerState == created)
         {
-            auto addr = vm["broker_address"].as<std::string> ();
-            auto delim_pos = addr.find_first_of (":", 1);
+            variable_map vm;
+            argumentParser (argc, argv, vm, extraArgs);
 
-            brokerRank = std::stoi (addr.substr (0, delim_pos));
-            brokerTag = std::stoi (addr.substr (delim_pos + 1, addr.length ()));
-            brokerAddress = addr;
-        }
-        else if ((vm.count ("broker_rank") > 0) || (vm.count ("broker_tag") > 0))
-        {
-            brokerRank = 0;
-            brokerTag = 0;
-
-            if (vm.count ("broker_rank") > 0)
+            if (vm.count ("broker_address") > 0)
             {
-                brokerRank = vm["broker_rank"].as<int> ();
+                auto addr = vm["broker_address"].as<std::string> ();
+                auto delim_pos = addr.find_first_of (":", 1);
+
+                brokerRank = std::stoi (addr.substr (0, delim_pos));
+                brokerTag = std::stoi (addr.substr (delim_pos + 1, addr.length ()));
+                brokerAddress = addr;
+            }
+            else if ((vm.count ("broker_rank") > 0) || (vm.count ("broker_tag") > 0))
+            {
+                brokerRank = 0;
+                brokerTag = 0;
+
+                if (vm.count ("broker_rank") > 0)
+                {
+                    brokerRank = vm["broker_rank"].as<int> ();
+                }
+
+                if (vm.count ("broker_tag") > 0)
+                {
+                    brokerTag = vm["broker_tag"].as<int> ();
+                }
             }
 
-            if (vm.count ("broker_tag") > 0)
-            {
-                brokerTag = vm["broker_tag"].as<int> ();
-            }
+            CoreBroker::initializeFromArgs (argc, argv);
         }
-
-        CoreBroker::initializeFromArgs (argc, argv);
     }
 }
 
 bool MpiBroker::brokerConnect ()
 {
-    comms = std::make_unique<MpiComms> (brokerAddress);
-    comms->setCallback ([this](ActionMessage M) { addActionMessage (std::move (M)); });
-    comms->setName (getIdentifier ());
+    std::lock_guard<std::mutex> lock (dataMutex);  // mutex protecting the other information in the ipcBroker
 
-    if (brokerAddress == "")
+    if (brokerAddress.empty ())
     {
         setAsRoot ();
     }
+	else
+	{
+        comms->setBrokerAddress (brokerAddress);
+	}
+    
+    comms->setName (getIdentifier ());
 
-    auto res = comms->connect ();
-    return res;
+   return comms->connect ();
 }
 
 std::string MpiBroker::generateLocalAddressString () const
 {
-    return (comms) ? (comms->getAddress ()) : brokerAddress;
+    return comms->getAddress ();
 }
 }  // namespace mpi
 }  // namespace helics

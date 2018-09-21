@@ -1,7 +1,7 @@
 function v = HELICS_CORE_TYPE_ZMQ()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183092);
+    vInitialized = helicsMEX(0, 1398230912);
   end
   v = vInitialized;
 end
