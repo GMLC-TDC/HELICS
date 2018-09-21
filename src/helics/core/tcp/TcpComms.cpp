@@ -263,8 +263,8 @@ bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/
         {
             if (error != boost::asio::error::connection_reset)
             {
-                std::cerr << "error message while connected " << error.message () << "code " << error.value ()
-                          << std::endl;
+                logError (std::string ("error message while connected ") + error.message () + " code " +
+                          std::to_string (error.value ()));
             }
         }
     }
@@ -330,12 +330,12 @@ void TcpComms::queue_rx_function ()
         }
         else
         {
-            std::cerr << "retrying tcp bind\n";
+            logWarning("retrying tcp bind");
             std::this_thread::sleep_for (std::chrono::milliseconds (150));
             auto connected = server->reConnect (connectionTimeout);
             if (!connected)
             {
-                std::cerr << "unable to bind to tcp connection socket\n";
+                logError("unable to bind to tcp connection socket");
                 server->close ();
                 setRxStatus (connection_status::error);
                 return;
@@ -420,7 +420,7 @@ void TcpComms::queue_tx_function ()
                 cumsleep += 100;
                 if (cumsleep >= connectionTimeout)
                 {
-                    std::cerr << "initial connection to broker timed out\n" << std::endl;
+                    logError("initial connection to broker timed out");
                     setTxStatus (connection_status::terminated);
                     return;
                 }
@@ -436,7 +436,7 @@ void TcpComms::queue_tx_function ()
                 }
                 catch (const boost::system::system_error &error)
                 {
-                    std::cerr << "error in initial send to broker " << error.what () << '\n';
+                    logError(std::string("error in initial send to broker ")+ error.what ());
                     setTxStatus (connection_status::terminated);
                     return;
                 }
@@ -482,7 +482,7 @@ void TcpComms::queue_tx_function ()
                     if (cumsleep >= connectionTimeout)
                     {
                         brokerConnection->cancel ();
-                        std::cerr << "port number query to broker timed out\n" << std::endl;
+                        logError("port number query to broker timed out");
                         setTxStatus (connection_status::terminated);
                         return;
                     }
@@ -491,7 +491,7 @@ void TcpComms::queue_tx_function ()
         }
         catch (std::exception &e)
         {
-            std::cerr << e.what () << std::endl;
+           logError(e.what ());
         }
     }
     else
@@ -577,8 +577,8 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "broker send 0 " << actionMessageType (cmd.action ()) << ':' << se.what ()
-                                      << '\n';
+                            logError (std::string ("broker send 0 ") + actionMessageType (cmd.action ()) + ':' +
+                                      se.what ());
                         }
                     }
                 }
@@ -617,7 +617,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            std::cerr << "rt send " << route_id << "::" << se.what () << '\n';
+                            logError(std::string("rt send ")+std::to_string(route_id)+"::"+se.what ());
                         }
                     }
                 }
@@ -644,7 +644,7 @@ void TcpComms::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                std::cerr << "broker send" << route_id << " ::" << se.what () << '\n';
+                                logError(std::string("broker send")+std::to_string(route_id)+ " ::" + se.what ());
                             }
                         }
                     }

@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../NetworkBrokerData.hpp"
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
+#include "../../common/fmt_format.h"
 
 static const int BEGIN_OPEN_PORT_RANGE = 23964;
 static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24053;
@@ -240,8 +241,8 @@ void UdpComms::queue_rx_function ()
 				else
 				{
                     disconnecting = true;
-                    std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
-                              << error.what () << std::endl;
+                    logError (fmt::format ("unable to bind socket {} :{}",
+                                           makePortAddress (localTarget_, PortNumber), error.what ()));
                     socket.close ();
                     setRxStatus( connection_status::error);
                     return;
@@ -250,15 +251,16 @@ void UdpComms::queue_rx_function ()
             }
             if (t_cnt == 0)
             {
-                std::cerr << "bind error on UDP socket " << error.what () << std::endl;
+                logWarning (fmt::format ("bind error on UDP socket {} :{}", makePortAddress (localTarget_, PortNumber),
+                                       error.what ()));
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (200));
             t_cnt += 200;
             if (t_cnt > connectionTimeout)
             {
                 disconnecting = true;
-                std::cerr << "Unable to bind socket " << makePortAddress (localTarget_, PortNumber) << " "
-                          << error.what () << std::endl;
+                logError (fmt::format ("unable to bind socket {} :{}", makePortAddress (localTarget_, PortNumber),
+                                       error.what ()));
                 socket.close ();
                 setRxStatus( connection_status::error);
                 return;
@@ -290,7 +292,7 @@ void UdpComms::queue_rx_function ()
         ActionMessage M (data.data (), len);
         if (!isValidCommand (M))
         {
-            std::cerr << "invalid command received udp" << std::endl;
+            logWarning ("invalid command received udp");
             continue;
         }
         if (isProtocolCommand (M))
@@ -366,7 +368,8 @@ void UdpComms::queue_tx_function ()
                 transmitSocket.send_to (boost::asio::buffer (m.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {
-                    std::cerr << "error in initial send to broker " << error.message () << '\n';
+                    logError (fmt::format ("error in initial send to broker {}",
+                                            error.message ()));
                 }
                 std::vector<char> rx (128);
                 udp::endpoint brk;
@@ -457,7 +460,7 @@ void UdpComms::queue_tx_function ()
                     transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
                     if (error)
                     {
-                        std::cerr << "transmit failure to receiver " << error.message () << '\n';
+                        logError (fmt::format ("transmit failure on sending 'close' to receiver  {}", error.message ()));
                     }
                     closingRx = true;
                     processed = true;
@@ -479,7 +482,8 @@ void UdpComms::queue_tx_function ()
                 transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {
-                    std::cerr << "transmit failure to broker " << error.message () << '\n';
+                    logWarning (
+                      fmt::format ("transmit failure sending to broker  {}", error.message ()));
                 }
             }
         }
@@ -488,7 +492,7 @@ void UdpComms::queue_tx_function ()
             transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
             if (error)
             {
-                std::cerr << "transmit failure to receiver " << error.message () << '\n';
+                logWarning (fmt::format ("transmit failure sending control message to receiver  {}", error.message ()));
             }
         }
         else
@@ -499,7 +503,7 @@ void UdpComms::queue_tx_function ()
                 transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
                 if (error)
                 {
-                    std::cerr << "transmit failure to route to " << route_id << " " << error.message () << '\n';
+                    logWarning (fmt::format ("transmit failure sending to route {}:{}", route_id,error.message ()));
                 }
             }
             else
@@ -509,7 +513,7 @@ void UdpComms::queue_tx_function ()
                     transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
                     if (error)
                     {
-                        std::cerr << "transmit failure to broker " << error.message () << '\n';
+                        logWarning (fmt::format ("transmit failure sending to broker  {}", error.message ()));
                     }
                 }
             }
@@ -533,7 +537,7 @@ CLOSE_TX_LOOP:
                     transmitSocket.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
                     if (error)
                     {
-                        std::cerr << "transmit failure II to receiver" << error.message () << '\n';
+                        logWarning (fmt::format ("transmit failure sending close to receiver III:{}", error.message ()));
                     }
                 }
                 if (cnt > 60)
@@ -548,7 +552,7 @@ CLOSE_TX_LOOP:
             transmitSocket.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
             if (error)
             {
-                std::cerr << "transmit failure to receiver" << error.message () << '\n';
+                logWarning (fmt::format ("transmit failure sending close to receiver II:{}", error.message ()));
             }
         }
     }
@@ -583,13 +587,14 @@ void UdpComms::closeReceiver ()
                 transmitter.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
                 if (error)
                 {
-                    std::cerr << "transmit failure on disconnect " << error.message () << '\n';
+                    logWarning (
+                      fmt::format ("transmit failure on disconnect:{}", error.message ()));
                 }
             }
         }
         catch (...)
         {
-            // ignore error here
+            // ignore error here since we are already disconnecting
         }
     }
 }

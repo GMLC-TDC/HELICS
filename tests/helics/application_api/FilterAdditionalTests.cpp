@@ -24,7 +24,7 @@ namespace utf = boost::unit_test;
 
 /**
 Test rerouter filter
-This test case sets reroute filter on a source endpoint. Ths means message
+This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
@@ -32,6 +32,7 @@ BOOST_TEST_DECORATOR(*utf::label("ci"))
 BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
+	
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
 
@@ -79,7 +80,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make (core_types), c
 /**
 Test rerouter filter under condition
 This test case sets reroute filter on a source endpoint with a condition parameter.
-Ths means message sent from this endpoint will be rerouted to a new destination
+This means message sent from this endpoint will be rerouted to a new destination
 endpoint only if condition matches.
 */
 BOOST_TEST_DECORATOR(*utf::label("ci"))
@@ -133,7 +134,7 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make (core_types),
 
 /**
 Test rerouter filter
-This test case sets reroute filter on a destination endpoint. Ths means message
+This test case sets reroute filter on a destination endpoint. This means message
 sent to this endpoint will be rerouted to a new destination endpoint.
 */
 
