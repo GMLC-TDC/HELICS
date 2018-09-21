@@ -9,9 +9,9 @@ switch (err->error_code)
 	return "helics:registration_failure";
   case   helics_connection_failure:
     return "helics:connection_failure";
-  case   helics_invalid_object:
+  case   helics_error_invalid_object:
     return "helics:invalid_object";
-  case   helics_invalid_argument:
+  case   helics_error_invalid_argument:
     return "helics:invalid_argument";
   case   helics_discard:
     return "helics:discard";

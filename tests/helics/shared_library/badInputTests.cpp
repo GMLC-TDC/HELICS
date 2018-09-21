@@ -26,17 +26,17 @@ BOOST_AUTO_TEST_CASE (test_bad_fed)
 
     CE(helicsFederateEnterInitializingMode(vFed1,&err));
     helicsFederateEnterInitializingMode (vFed2,&err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
+    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
     helicsErrorClear (&err);
    // auto core = helicsFederateGetCoreObject(vFed1);
 
     CE(helicsFederateFinalize(vFed1,&err));
     helicsFederateFinalize(vFed2,&err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
+    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
 
 	helicsFederateFree (vFed1);
     helicsFederateGetCurrentTime (vFed1, &err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_invalid_object);
+    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
     helicsErrorClear (&err);
 	//just make sure this doesn't crash
     helicsFederateFree (vFed1);

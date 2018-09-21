@@ -30,7 +30,7 @@ FedObject *getFedObject (helics_federate fed, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidFedString;
         }
         return nullptr;
@@ -42,7 +42,7 @@ FedObject *getFedObject (helics_federate fed, helics_error *err)
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = invalidFedString;
     }
     return nullptr;
@@ -74,7 +74,7 @@ helics::ValueFederate *getValueFed (helics_federate fed, helics_error *err)
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = notValueFedString;
     }
     return nullptr;
@@ -99,7 +99,7 @@ helics::MessageFederate *getMessageFed (helics_federate fed, helics_error *err)
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = notMessageFedString;
     }
     return nullptr;
@@ -132,7 +132,7 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = notValueFedString;
     }
     return nullptr;
@@ -155,7 +155,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = notMessageFedString;
     }
     return nullptr;
@@ -597,7 +597,7 @@ helics_time_t helicsFederateRequestTimeIterative (helics_federate fed,
     auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_invalid_object;
+        return helics_error_invalid_object;
     }
     try
     {

@@ -66,8 +66,8 @@ helics_federate_info_t helicsCreateFederateInfo ()
 // typedef enum {
 
 //    helics_ok = 0, /*!< the function executed successfully */
-//    helics_invalid_object, /*!< indicator that the object used was not a valid object */
-//    helics_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
+//    helics_error_invalid_object, /*!< indicator that the object used was not a valid object */
+//    helics_error_invalid_argument, /*!< the parameter passed was invalid and unable to be used*/
 //    helics_discard, /*!< the input was discarded and not used for some reason */
 //    helics_terminated, /*!< the federate has terminated and the call cannot be completed*/
 //    helics_warning, /*!< the function issued a warning of some kind */
@@ -98,43 +98,43 @@ void helicsErrorHandler (helics_error *err) noexcept
             }
             else
             {
-                err->error_code = helics_other_error;
+                err->error_code = other_error_type;
                 err->message = unknown_err_string;
             }
         }
         catch (const helics::InvalidIdentifier &iid)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = getMasterHolder ()->addErrorString (iid.what ());
         }
         catch (const helics::InvalidFunctionCall &ifc)
         {
-            err->error_code = helics_invalid_function_call;
+            err->error_code = helics_error_invalid_function_call;
             err->message = getMasterHolder ()->addErrorString (ifc.what ());
         }
         catch (const helics::InvalidParameter &ip)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (ip.what ());
         }
         catch (const helics::RegistrationFailure &rf)
         {
-            err->error_code = helics_registration_failure;
+            err->error_code = helics_error_registration_failure;
             err->message = getMasterHolder ()->addErrorString (rf.what ());
         }
         catch (const helics::ConnectionFailure &cf)
         {
-            err->error_code = helics_connection_failure;
+            err->error_code = helics_error_connection_failure;
             err->message = getMasterHolder ()->addErrorString (cf.what ());
         }
         catch (const helics::HelicsSystemFailure &ht)
         {
-            err->error_code = helics_system_failure;
+            err->error_code = helics_error_system_failure;
             err->message = getMasterHolder ()->addErrorString (ht.what ());
         }
         catch (const helics::HelicsException &he)
         {
-            err->error_code = helics_other_error;
+            err->error_code = helics_error_other;
             err->message = getMasterHolder ()->addErrorString (he.what ());
         }
         catch (const std::exception &exc)
@@ -150,7 +150,7 @@ void helicsErrorHandler (helics_error *err) noexcept
     }
     catch (...)
     {
-        err->error_code = helics_other_error;
+        err->error_code = other_error_type;
         err->message = unknown_err_string;
     }
 }
@@ -171,7 +171,7 @@ static helics::FederateInfo *getFedInfo (helics_federate_info_t fi, helics_error
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidFedInfoString;
         }
         return nullptr;
@@ -318,7 +318,7 @@ CoreObject *getCoreObject (helics_core core, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidCoreString;
         }
         return nullptr;
@@ -330,7 +330,7 @@ CoreObject *getCoreObject (helics_core core, helics_error *err)
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = invalidCoreString;
     }
     return nullptr;
@@ -346,7 +346,7 @@ BrokerObject *getBrokerObject (helics_broker broker, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidBrokerString;
         }
         return nullptr;
@@ -358,7 +358,7 @@ BrokerObject *getBrokerObject (helics_broker broker, helics_error *err)
     }
     if (err != nullptr)
     {
-        err->error_code = helics_invalid_object;
+        err->error_code = helics_error_invalid_object;
         err->message = invalidBrokerString;
     }
     return nullptr;
@@ -418,7 +418,7 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (std::string ("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -445,7 +445,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (std::string ("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -496,7 +496,7 @@ helics_federate helicsGetFederateByName (const char *fedName, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString ("fedName is empty");
         }
         return nullptr;
@@ -507,7 +507,7 @@ helics_federate helicsGetFederateByName (const char *fedName, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (std::string(fedName)+" is not an active federate identifier");
         }
         return nullptr;
@@ -527,7 +527,7 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (std::string ("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -561,7 +561,7 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString (std::string ("core type ") + type + " is not recognized");
         }
         return nullptr;
@@ -822,7 +822,7 @@ static helics::QueryObject *getQueryObj (helics_query query, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidQueryString;
         }
         return nullptr;

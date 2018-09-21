@@ -29,7 +29,7 @@ static helics::InputObject *verifyInput (helics_input inp, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidInputString;
         }
         return nullptr;
@@ -39,7 +39,7 @@ static helics::InputObject *verifyInput (helics_input inp, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidInputString;
         }
         return nullptr;
@@ -54,7 +54,7 @@ static helics::PublicationObject *verifyPublication (helics_publication pub, hel
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidPublicationString;
         }
         return nullptr;
@@ -64,7 +64,7 @@ static helics::PublicationObject *verifyPublication (helics_publication pub, hel
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidInputString;
         }
         return nullptr;
@@ -159,7 +159,7 @@ helics_publication helicsFederateRegisterPublication (helics_federate fed, const
         }
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString ("unrecognized type code");
         }
         return nullptr;
@@ -231,7 +231,7 @@ helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, i
         }
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString ("unrecognized type code");
         }
         return nullptr;
@@ -302,7 +302,7 @@ helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, 
         {
             if (err != nullptr)
             {
-                err->error_code = helics_invalid_argument;
+                err->error_code = helics_error_invalid_argument;
                 err->message = getMasterHolder ()->addErrorString ("unrecognized type code");
             }
             return nullptr;
@@ -374,7 +374,7 @@ helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char 
         }
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = getMasterHolder ()->addErrorString ("unrecognized type code");
         }
         return nullptr;
@@ -412,7 +412,7 @@ helics_publication helicsFederateGetPublication (helics_federate fed, const char
         auto id = fedObj->getPublicationId (key);
 		if (id == helics::invalid_id_value)
 		{
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidPubName;
             return nullptr;
 		}
@@ -444,7 +444,7 @@ helics_input helicsFederateGetInput (helics_federate fed, const char *key, helic
         auto id = fedObj->getInputId (key);
         if (id == helics::invalid_id_value)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidInputName;
             return nullptr;
         }
@@ -476,7 +476,7 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
         auto id = fedObj->getSubscriptionId (key);
         if (id == helics::invalid_id_value)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidSubKey;
             return nullptr;
         }
@@ -727,7 +727,7 @@ void helicsPublicationAddTarget (helics_publication pub, const char *target, hel
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidTargetString;
         }
         return;
@@ -753,7 +753,7 @@ void helicsInputAddTarget (helics_input ipt, const char *target, helics_error *e
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidTargetString;
         }
         return;

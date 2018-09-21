@@ -25,7 +25,7 @@ static helics::FilterObject *getFilterObj(helics_filter filt, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidFilterString;
         }
         return nullptr;
@@ -35,7 +35,7 @@ static helics::FilterObject *getFilterObj(helics_filter filt, helics_error *err)
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidFilterString;
         }
         return nullptr;
@@ -239,7 +239,7 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, he
         auto id = fedObj->getFilterId (name);
         if (id == helics::invalid_id_value)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidFiltName;
             return nullptr;
         }
@@ -279,7 +279,7 @@ static helics::CloningFilter *getCloningFilter (helics_filter filt, helics_error
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = nonCloningFilterString;
         }
         return nullptr;
@@ -319,7 +319,7 @@ void helicsFilterSet (helics_filter filt, const char *prop, double val, helics_e
     {
 		if (err != nullptr)
 		{
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidPropertyString;
 		}
         return;
@@ -345,7 +345,7 @@ void helicsFilterSetString (helics_filter filt, const char *prop, const char *va
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidPropertyString;
         }
         return;
@@ -372,7 +372,7 @@ void helicsFilterAddDestinationTarget (helics_filter filt, const char *dest, hel
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidDestinationString;
         }
         return;
@@ -399,7 +399,7 @@ void helicsFilterAddSourceTarget (helics_filter filt, const char *src, helics_er
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidSourceString;
         }
         return;
@@ -427,7 +427,7 @@ void helicsFilterAddDeliveryEndpoint (helics_filter filt, const char *delivery, 
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidDeliveryString;
         }
         return;
@@ -455,7 +455,7 @@ void helicsFilterRemoveTarget (helics_filter filt, const char *target, helics_er
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidTargetString;
         }
         return;
@@ -481,7 +481,7 @@ void helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliver
     {
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidDeliveryString;
         }
         return;

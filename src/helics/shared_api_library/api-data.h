@@ -22,18 +22,20 @@ extern "C" {
 typedef enum {
 
     helics_ok = 0, /*!< the function executed successfully */
-    helics_registration_failure = ERROR_CODE_REGISTRATION_FAILURE, /*!< registration has failed*/
-    helics_connection_failure = ERROR_CODE_CONNECTION_FAILURE, /*!< the operation to connect has failed*/
-    helics_invalid_object = ERROR_CODE_INVALID_OBJECT, /*!< indicator that the object used was not a valid object */
-    helics_invalid_argument = ERROR_CODE_INVALID_ARGUMENT, /*!< the parameter passed was invalid and unable to be used*/
-    helics_discard = ERROR_CODE_DISCARD, /*!< the input was discarded and not used for some reason */
-    helics_system_failure = ERROR_CODE_SYSTEM_FAILURE, /*!< the federate has terminated unexpectedly and the call cannot be completed*/
+    helics_error_registration_failure = ERROR_CODE_REGISTRATION_FAILURE, /*!< registration has failed*/
+    helics_error_connection_failure = ERROR_CODE_CONNECTION_FAILURE, /*!< the operation to connect has failed*/
+    helics_error_invalid_object = ERROR_CODE_INVALID_OBJECT, /*!< indicator that the object used was not a valid object */
+    helics_error_invalid_argument = ERROR_CODE_INVALID_ARGUMENT, /*!< the parameter passed was invalid and unable to be used*/
+    helics_error_discard = ERROR_CODE_DISCARD, /*!< the input was discarded and not used for some reason */
+    helics_error_system_failure =
+      ERROR_CODE_SYSTEM_FAILURE, /*!< the federate has terminated unexpectedly and the call cannot be completed*/
     helics_warning = -8, /*!< the function issued a warning of some kind */
-    helics_invalid_state_transition = ERROR_CODE_INVALID_STATE_TRANSITION, /*!< error issued when an invalid state transition occurred */
-    helics_invalid_function_call =
+    helics_error_invalid_state_transition =
+      ERROR_CODE_INVALID_STATE_TRANSITION, /*!< error issued when an invalid state transition occurred */
+    helics_error_invalid_function_call =
       ERROR_CODE_INVALID_FUNCTION_CALL, /*!< the call made was invalid in the present state of the calling object*/
-    helics_execution_failure = ERROR_CODE_EXECUTION_FAILURE, /*!< the function execution has failed*/
-    helics_other_error = -101, /*!< the function produced a helics error of some other type */
+    helics_error_execution_failure = ERROR_CODE_EXECUTION_FAILURE, /*!< the function execution has failed*/
+    helics_error_other = -101, /*!< the function produced a helics error of some other type */
     other_error_type = -203 /*!< a non helics error was produced*/
 } helics_error_types;
 
@@ -103,8 +105,8 @@ typedef enum {
 typedef enum {
     helics_filtertype_custom = 0,
     helics_filtertype_delay = 1,
-    helics_filtertype_randomDelay = 2,
-    helics_filtertype_randomDrop = 3,
+    helics_filtertype_random_delay = 2,
+    helics_filtertype_random_drop = 3,
     helics_filtertype_reroute = 4,
     helics_filtertype_clone = 5
 
@@ -143,7 +145,10 @@ typedef enum {
 helics_handle_option_connection_required=CONNECTION_REQUIRED_OPTION,
     helics_handle_option_connection_optional=CONNECTION_OPTIONAL_OPTION,
 	helics_handle_option_single_connection_only=SINGLE_CONNECTION_ONLY_OPTION,
-	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION
+	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION,
+	helics_handle_option_only_transmit_on_change =
+      ONLY_TRANSMIT_ON_CHANGE_FLAG,
+    helics_handle_option_only_update_on_change = ONLY_UPDATE_ON_CHANGE_FLAG
 } helics_handle_options;
 
   /**

@@ -37,7 +37,7 @@ static helics::EndpointObject *verifyEndpoint (helics_endpoint ept, helics_error
     {
 		if (err != nullptr)
 		{
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidEndpoint;
 		}
         return nullptr;
@@ -47,7 +47,7 @@ static helics::EndpointObject *verifyEndpoint (helics_endpoint ept, helics_error
 	{
         if (err != nullptr)
         {
-            err->error_code = helics_invalid_object;
+            err->error_code = helics_error_invalid_object;
             err->message = invalidEndpoint;
         }
         return nullptr;
@@ -122,7 +122,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
         auto id = fedObj->getEndpointId (name);
         if (id == helics::invalid_id_value)
         {
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidEndName;
             return nullptr;
         }
@@ -252,7 +252,7 @@ void helicsEndpointSendMessage (helics_endpoint endpoint, message_t *message, he
     {
 		if (err != nullptr)
 		{
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = emptyMessageErrorString;
 		}
     }
@@ -418,7 +418,7 @@ bool checkOutArgString(char *outputString, int maxlen, helics_error *err)
     {
 		if (err != nullptr)
 		{
-            err->error_code = helics_invalid_argument;
+            err->error_code = helics_error_invalid_argument;
             err->message = invalidOutputString;
 		}
         return false;

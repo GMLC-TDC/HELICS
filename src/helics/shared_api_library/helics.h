@@ -278,7 +278,7 @@ HELICS_EXPORT void helicsFederateInfoSetCoreType (helics_federate_info_t fi, int
 @param fi the federate info object to alter
 @param flag a numerical index for a flag
 @param value the desired value of the flag helics_true or helics_false
-@return a void enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+@return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the coretype
 is not recognized
 */
 HELICS_EXPORT void helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int flag, helics_bool_t value, helics_error *err);
@@ -288,7 +288,7 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption (helics_federate_info_t fi, i
 for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
 @param fi the federate info object to alter
 @param separator the character to use as a separator
-@return a void enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+@return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the coretype
 is not recognized
 */
 HELICS_EXPORT void helicsFederateInfoSetSeparator (helics_federate_info_t fi, char separator, helics_error *err);
@@ -296,7 +296,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator (helics_federate_info_t fi, ch
 /** set the output delay for a federate
 @param fi the federate info object to alter
 @param outputDelay the desired output delay of the federate
-@return a void enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the
+@return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the
 specified outputdelay is invalid
 */
 
@@ -308,7 +308,7 @@ helicsFederateInfoSetTimeProperty (helics_federate_info_t fi, int timeProperty, 
 @param fi the federateInfo object to alter
 @param intProperty an int identifying the property
 @param propertyValue the value to set the property to
-@return a void enumeration helics_ok on success helics_invalid_object if fi is not a valid reference
+@return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference
 */
 HELICS_EXPORT void helicsFederateInfoSetIntegerProperty (helics_federate_info_t fi, int intProperty, int propertyValue, helics_error *err);
 
@@ -490,7 +490,7 @@ HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int flag, h
 for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
 @param fi the federate info object to alter
 @param separator the character to use as a separator
-@return a void enumeration helics_ok on success helics_invalid_object if fi is not a valid reference helics_discard if the coretype
+@return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the coretype
 is not recognized
 */
 HELICS_EXPORT void helicsFederateSetSeparator (helics_federate fed, char separator, helics_error *err);
