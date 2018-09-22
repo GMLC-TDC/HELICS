@@ -18,11 +18,13 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
  - Himanshu Jain*
  - Dheepak Krishnamurthy*
  - Bryan Palmintier*
+ - Bryan Richardson**
 
 ### Argonne National Lab
  - Shrirang Abhyankar*
 
  `*` currently active
+ `**` subcontractor
 
 ## Used Libraries or Code
 
@@ -33,7 +35,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
   ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No zmq library code is included in the HELICS source.  Helics installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  
 
 ### [cppzmq](https://github.com/zeromq/cppzmq)
-  The header only bindings for the zmq library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source.  Cppzmp is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
+  The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source.  Cppzmp is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
 
 ### [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
   JsonCPP is used for parsing json files, it was chosen for easy inclusion the project and its support for comments. Jsoncpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE)

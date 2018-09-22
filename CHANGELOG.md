@@ -3,6 +3,22 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.3.1] - 2018-09-22
+### Changed
+ - wait for Broker now uses a condition variable instead of sleep and checking repeatedly
+
+### Fixed
+ - some race conditions in a few test cases and in user disconnection calls for brokers
+ - certain types of federates would occasionally hang during off nominal shutdown call sequences.  Fixing this led to a substantial rewrite of the tcp comms
+
+### Added
+ - federate, broker, and core destroy functions to the C api
+ - tcp cores have a --reuse-address flag to allow multiple brokers on the same port,  mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.  
+
+### Changed
+ - changed the logging levels to be error, warning, summary, connections, interfaces, timing, data, and trace to better match debugging levels used in development and make the purpose of each level clearer
+ - comm objects now can use the same logging system as the rest of HELICS
+
 
 ## [1.3.0] - 2018-07-31
 ### Changed
@@ -30,7 +46,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
  - Environment variables are recognized in CMAKE find options
  - split API tests from system wide tests
  - added options on MSVC to build with embedded system libraries and embedded debug info.
- 
+
 ### Removed
  - Most examples are now located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples)
 
