@@ -7224,7 +7224,7 @@ int _wrap_helicsInputGetString(int resc, mxArray *resv[], int argc, mxArray *arg
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
+    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4-1);
   }
   {
     if (arg2) free(arg2);

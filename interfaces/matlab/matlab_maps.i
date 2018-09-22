@@ -87,7 +87,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 %typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
 	
-  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
+  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3-1);
 }
 
 %typemap(in, numinputs=0)(double *real, double *imag)(double vals[2])
