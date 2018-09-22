@@ -13,7 +13,7 @@ project (HELICS VERSION 1.3.1)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set (HELICS_DATE "09-13-18")
+set (HELICS_DATE "09-23-18")
 
 set(
   HELICS_VERSION_UNDERSCORE
@@ -64,7 +64,7 @@ mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
-option(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
+option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 # enable testing
 if(BUILD_HELICS_TESTS)
   include(CTest)
@@ -72,7 +72,7 @@ endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
+option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 option(

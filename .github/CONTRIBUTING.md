@@ -31,7 +31,7 @@ This section guides you through submitting a feature request, or enhancement for
 #### Before Submitting An Enhancement Suggestion
 
 * check the issue list for any similar issues
-* take a look at the [RoadMap](ROADMAP.md) or projects to see if the feature is already planned
+* take a look at the [RoadMap](../ROADMAP.md) or projects to see if the feature is already planned
 
 
 ### Your First Code Contribution
