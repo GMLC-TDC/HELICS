@@ -23,8 +23,9 @@ else(DISABLE_SWIG)
   # Enable generation using swig
 
   set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
+  #set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
+  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc.helics")
 
-  set(CMAKE_SWIG_FLAGS "-namespace gmlc.helics")
   swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
 
   swig_link_libraries(CShelics helicsSharedLib)
@@ -62,12 +63,6 @@ if(WIN32)
 
 endif(WIN32)
 
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar
-  DESTINATION csharp
-  COMPONENT csharp
-)
-
 install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION csharp COMPONENT csharp)
-install(TARGETS JNIhelics DESTINATION csharp COMPONENT csharp)
+install(TARGETS CShelics DESTINATION csharp COMPONENT csharp)
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION csharp COMPONENT csharp)

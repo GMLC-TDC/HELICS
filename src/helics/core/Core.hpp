@@ -77,6 +77,9 @@ class Core
      * disconnect the core from its broker
      */
     virtual void disconnect () = 0;
+    /** waits in the current thread until the core is disconnected
+     */
+    virtual void waitForDisconnect (int msToWait = -1) const = 0;
 
     /** check if the core is ready to accept new federates
      */

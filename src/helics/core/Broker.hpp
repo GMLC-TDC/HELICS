@@ -49,7 +49,8 @@ class Broker
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/
     virtual const std::string &getAddress () const = 0;
-
+    /** set the broker logging level*/
+    virtual void setLoggingLevel (int logLevel) =0;
     /** set the logging callback function
     @param logFunction a function with a signature of void(int level,  const std::string &source,  const
     std::string &message) the function takes a level indicating the logging level string with the source name and a
@@ -59,8 +60,8 @@ class Broker
     setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 
     /** waits in the current thread until the broker is disconnected
-*/
-    virtual void waitForDisconnect (int msToWait=-1) const= 0;
+     */
+    virtual void waitForDisconnect (int msToWait = -1) const = 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", or the name of a specific object
@@ -70,20 +71,19 @@ class Broker
       @return a string containing the response to the query.  Query is a blocking call and will not return until
       the query is answered so use with caution
     */
-      virtual std::string
-      query (const std::string &target, const std::string &queryStr) = 0;
+    virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
 
     /** create a data connection between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/
-    virtual void dataConnect(const std::string &source, const std::string &target) = 0;
+    virtual void dataConnect (const std::string &source, const std::string &target) = 0;
     /** create a source filter connection between a named filter and a named endpoint
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddSourceTarget(const std::string &filter, const std::string &target) = 0;
+    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) = 0;
     /** create a destination filter connection between a named filter and an endpoint
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddDestinationTarget(const std::string &filter, const std::string &target) = 0;
+    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) = 0;
 };
 }  // namespace helics

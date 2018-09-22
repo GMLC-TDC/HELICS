@@ -94,7 +94,7 @@ class CoreBroker : public Broker, public BrokerBase
     JsonMapBuilder dataflowMap;  //!< builder for the dependency graph
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
-	TriggerVariable disconnection; //!< controller for the disconection process
+	TriggerVariable disconnection; //!< controller for the disconnection process
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -209,6 +209,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
     virtual const std::string &getAddress () const override final;
+    virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
     virtual void dataConnect (const std::string &source, const std::string &target) override final;
 
@@ -260,6 +261,8 @@ class CoreBroker : public Broker, public BrokerBase
     void sendErrorToImmediateBrokers (int error_code);
     /** send a disconnect message to time dependencies and child brokers*/
 	void sendDisconnect ();
+    /** generate a string about the federation summarizing connections*/
+    std::string generateFederationSummary () const;
 };
 
 }  // namespace helics

@@ -55,5 +55,5 @@ if(BUILD_OCTAVE_INTERFACE)
 endif()
 
 if(BUILD_CSHARP_INTERFACE)
-  # add_subdirectory(csharp)
+   add_subdirectory(csharp)
 endif()

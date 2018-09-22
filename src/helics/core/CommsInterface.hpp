@@ -56,6 +56,10 @@ class CommsInterface
     /** set the callback for processing the messages
      */
     void setCallback (std::function<void(ActionMessage &&)> callback);
+    /** set the callback for processing the messages
+     */
+    void setLoggingCallback (
+      std::function<void(int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize (int maxMessageSize, int maxMessageCount);
@@ -68,6 +72,9 @@ class CommsInterface
     */
     void setTimeout (int timeout) { connectionTimeout = timeout; }
 
+  protected:
+    void logWarning (const std::string &message) const;
+    void logError (const std::string &message) const;
   protected:
     // enumeration of the connection status flags for more immediate feedback from the processing threads
     enum class connection_status : int
@@ -102,6 +109,8 @@ class CommsInterface
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
 
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
+    std::function<void(int level, const std::string &name, const std::string &message)>
+      loggingCallback;  //!< callback for logging
     BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting

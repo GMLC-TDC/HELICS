@@ -3,17 +3,8 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "../../common/fmt_format.h"
 #include "../../flag-definitions.h"
-#include "../ActionMessage.hpp"
-#include "IpcComms.h"
-#include "IpcQueueHelper.h"
-#include <algorithm>
-#include <cctype>
-#include <memory>
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include <boost/interprocess/ipc/message_queue.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include "../ActionMessage.hpp"
 #include "IpcComms.h"
 #include "IpcQueueHelper.h"
@@ -120,7 +111,8 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        std::cerr << "error changing states" << std::endl;
+        logError("error changing states");
+		
     }
     setRxStatus (connection_status::terminated);
 }
@@ -138,9 +130,8 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
+            err.payload = fmt::format("Unable to open broker connection -> {}",brokerQueue.getError ());
             err.messageID = ERROR_CODE_CONNECTION_FAILURE;
-            err.payload =
-              std::string ("Unable to open broker connection ->") + brokerQueue.getError ();
             ActionCallback (std::move (err));
             setTxStatus (connection_status::error);
             return;
@@ -183,7 +174,7 @@ void IpcComms::queue_tx_function ()
         {
             ActionMessage err (CMD_ERROR);
             err.messageID = ERROR_CODE_CONNECTION_FAILURE;
-            err.payload = std::string ("Unable to open receiver connection ->") + brokerQueue.getError ();
+            err.payload = fmt::format ("Unable to open receiver connection -> {}", rxQueue.getError ());
             ActionCallback (std::move (err));
             setRxStatus (connection_status::error);
             return;

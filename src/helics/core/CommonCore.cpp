@@ -79,6 +79,7 @@ bool CommonCore::connect ()
                 setActionFlag (m, core_flag);
                 transmit (0, m);
                 brokerState = broker_state_t::connected;
+                disconnection.activate ();
             }
             else
             {
@@ -116,7 +117,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         if (brokerState < broker_state_t::terminating)
         {
             brokerState = broker_state_t::terminating;
-            timeCoord->disconnect ();
+            sendDisconnect ();
             if (global_broker_id.load () != parent_broker_id)
             {
                 ActionMessage dis (CMD_DISCONNECT);
@@ -139,9 +140,27 @@ void CommonCore::processDisconnect (bool skipUnregister)
     {
         unregister ();
     }
+    disconnection.trigger ();
 }
 
-void CommonCore::disconnect () { processDisconnect (); }
+void CommonCore::disconnect ()
+{
+    ActionMessage udisconnect (CMD_USER_DISCONNECT);
+    addActionMessage (udisconnect);
+    waitForDisconnect ();
+}
+
+void CommonCore::waitForDisconnect (int msToWait) const
+{
+    if (msToWait <= 0)
+    {
+        disconnection.wait ();
+    }
+    else
+    {
+        disconnection.wait_for (std::chrono::milliseconds (msToWait));
+    }
+}
 
 void CommonCore::unregister ()
 {
@@ -747,7 +766,6 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("control Inputs must be registered before calling enterInitializingMode"));
     }
-    LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering INPUT {}", key));
     auto ci = handles.read ([&key](auto &hand) { return hand.getInput (key); });
     if (ci != nullptr)  // this key is already found
     {
@@ -758,6 +776,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createInput (id, key, type, units);
 
+    LOG_INTERFACES (parent_broker_id, fed->getIdentifier (), fmt::format ("registering Input {}", key));
     ActionMessage m (CMD_REG_INPUT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
@@ -792,7 +811,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializingMode"));
     }
-    LOG_DEBUG (parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
+    LOG_INTERFACES(parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
@@ -1002,8 +1021,8 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
     auto fed = getFederateAt (handleInfo->local_fed_id);
     if (fed->checkAndSetValue (handle, data, len))
     {
-        LOG_DEBUG (parent_broker_id, fed->getIdentifier (),
-                   fmt::format ("setting Value for {} size {}", handleInfo->key, len));
+        LOG_DATA_MESSAGES (parent_broker_id, fed->getIdentifier (),
+                           fmt::format ("setting Value for {} size {}", handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->getFederateId ();
         mv.source_handle = handle;
@@ -2135,7 +2154,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // brokerReconnect()
             LOG_ERROR (global_broker_id.load (), getIdentifier (), "lost connection with server");
             sendErrorToFederates (-5);
-            disconnect ();
+            processDisconnect ();
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
@@ -2166,6 +2185,22 @@ void CommonCore::processCommand (ActionMessage &&command)
             waitingForServerPingReply = false;
         }
         break;
+    case CMD_USER_DISCONNECT:
+        if (isConnected ())
+        {
+            if (brokerState < broker_state_t::terminating)
+            {  // only send a disconnect message if we haven't done so already
+                brokerState = broker_state_t::terminating;
+                sendDisconnect ();
+                ActionMessage m (CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit (0, m);
+            }
+        }
+        addActionMessage (CMD_STOP);
+        // we can't just fall through since this may have generated other messages that need to be forwarded or
+        // processed
+        break;
     case CMD_STOP:
 
         if (isConnected ())
@@ -2173,7 +2208,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             if (brokerState < broker_state_t::terminating)
             {  // only send a disconnect message if we haven't done so already
                 brokerState = broker_state_t::terminating;
-                timeCoord->disconnect ();
+                sendDisconnect ();
                 ActionMessage m (CMD_DISCONNECT);
                 m.source_id = global_broker_id.load ();
                 transmit (0, m);
@@ -3160,6 +3195,25 @@ void CommonCore::checkDisconnect ()
     }
 }
 
+void CommonCore::sendDisconnect ()
+{
+    LOG_CONNECTIONS (global_broker_id_local, "core", "sending disconnect");
+    ActionMessage bye (CMD_STOP);
+    bye.source_id = global_broker_id_local;
+    for (auto &fed : loopFederates)
+    {
+        fed->addAction (bye);
+        if (hasTimeDependency)
+        {
+            timeCoord->removeDependency (fed->global_id);
+            timeCoord->removeDependent (fed->global_id);
+        }
+    }
+    if (hasTimeDependency)
+    {
+        timeCoord->disconnect ();
+    }
+}
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {
     auto pub = loopHandles.getPublication (cmd.payload);

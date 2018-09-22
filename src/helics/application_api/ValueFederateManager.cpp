@@ -438,7 +438,7 @@ void ValueFederateManager::registerCallback (std::function<void(input_id_t, Time
 void ValueFederateManager::registerCallback (input_id_t id,
                                              std::function<void(input_id_t, Time)> callback)
 {
-    if ((id.value () < inputCount)&&(id.value()>=0))
+    if (id.value () < inputCount)
     {
         auto inpHandle = inputs.lock();
         (*inpHandle)[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
@@ -458,7 +458,7 @@ void ValueFederateManager::registerCallback (const std::vector<input_id_t> &ids,
     callbacks.emplace_back (std::move (callback));
     for (auto id : ids)
     {
-        if (id.value () < inpHandle->size ())
+        if (isValidIndex(id.value (),*inpHandle))
         {
             (*inpHandle)[id.value ()].callbackIndex = ind;
         }

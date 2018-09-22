@@ -42,8 +42,19 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** used to clear the DELAY_INIT_ENTRY flag in cores*/
 #define ENABLE_INIT_ENTRY 47
 
-/* error code definitions */
 
+/* log level definitions*/
+#define LOG_LEVEL_NO_PRINT (-1)
+#define LOG_LEVEL_ERROR 0
+#define LOG_LEVEL_WARNING 1
+#define LOG_LEVEL_SUMMARY 2
+#define LOG_LEVEL_CONNECTIONS 3
+#define LOG_LEVEL_INTERFACES 4
+#define LOG_LEVEL_TIMING 5
+#define LOG_LEVEL_DATA 6
+#define LOG_LEVEL_TRACE 7
+
+/* error code definitions */
 #define ERROR_CODE_REGISTRATION_FAILURE (-1)
 #define ERROR_CODE_CONNECTION_FAILURE (-2)
 #define ERROR_CODE_INVALID_OBJECT (-3)

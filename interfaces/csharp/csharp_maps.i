@@ -1,20 +1,20 @@
 
 //typemap for short maxlen strings
-%typemap(in) (char *outputString, int maxlen) {
-  $1 = (char*)JCALL2(GetByteArrayElements, jenv, $input, 0);
-  $2 = (int)JCALL1(GetArrayLength, jenv, $input);
-}
+//%typemap(in) (char *outputString, int maxlen) {
+ // $1 = (char*)JCALL2(GetByteArrayElements, jenv, $input, 0);
+//  $2 = (int)JCALL1(GetArrayLength, jenv, $input);
+//}
 
-%typemap(argout) (char *outputString, int maxlen) {
-  JCALL3(ReleaseByteArrayElements, jenv, $input, (jbyte*)$1, 0);
-}
+//%typemap(argout) (char *outputString, int maxlen) {
+//  JCALL3(ReleaseByteArrayElements, jenv, $input, (jbyte*)$1, 0);
+//}
 
-%typemap(jni) (char *outputString, int maxlen) "jbyteArray"
-%typemap(jtype) (char *outputString, int maxlen) "byte[]"
-%typemap(jstype) (char *outputString, int maxlen) "byte[]"
-%typemap(javain) (char *outputString, int maxlen) "$javainput"
+//%typemap(jni) (char *outputString, int maxlen) "jbyteArray"
+//%typemap(jtype) (char *outputString, int maxlen) "byte[]"
+//%typemap(jstype) (char *outputString, int maxlen) "byte[]"
+//%typemap(javain) (char *outputString, int maxlen) "$javainput"
 
-%apply (char *outputString, int maxlen) { (char *outputString, int maxStringlen) };
+//%apply (char *outputString, int maxlen) { (char *outputString, int maxStringlen) };
 
 ////typemap for large string output with a length return in C
 //%typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {
@@ -36,34 +36,34 @@
 //}
 //
 //
-%typemap(in) (int argc, char **argv) {
-  int i = 0;
-  $1=JCALL1(GetArrayLength,jenv,$input);
-  $2 = (char **) malloc(($1+1)*sizeof(char *));
-  /* make a copy of each string */
-  for (i = 0; i<$1; i++) {
-    jstring j_string = (jstring)JCALL2(GetObjectArrayElement,jenv,$input,i);
-    const char * c_string = JCALL2(GetStringUTFChars,jenv,j_string,0);
-    $2[i] = malloc((strlen(c_string)+1)*sizeof(char));
-    strcpy($2[i], c_string);
-    JCALL2(ReleaseStringUTFChars,jenv, j_string, c_string);
-    JCALL1(DeleteLocalRef,jenv, j_string);
-  }
-  $2[i] = 0;
-}
+//%typemap(in) (int argc, char **argv) {
+ // int i = 0;
+//  $1=JCALL1(GetArrayLength,jenv,$input);
+//  $2 = (char **) malloc(($1+1)*sizeof(char *));
+//  /* make a copy of each string */
+//  for (i = 0; i<$1; i++) {
+//    jstring j_string = (jstring)JCALL2(GetObjectArrayElement,jenv,$input,i);
+//    const char * c_string = JCALL2(GetStringUTFChars,jenv,j_string,0);
+//    $2[i] = malloc((strlen(c_string)+1)*sizeof(char));
+//    strcpy($2[i], c_string);
+ //   JCALL2(ReleaseStringUTFChars,jenv, j_string, c_string);
+//    JCALL1(DeleteLocalRef,jenv, j_string);
+//  }
+ // $2[i] = 0;
+//}
 
-%typemap(freearg) (int argc, char **argv) {
-  int i;
-  for (i=0; i<$1-1; i++)
-    free($2[i]);
-  free($2);
-}
+//%typemap(freearg) (int argc, char **argv) {
+//  int i;
+//  for (i=0; i<$1-1; i++)
+ //   free($2[i]);
+//  free($2);
+//}
 
-%typemap(jni) (int argc, char **argv) "jobjectArray"
-%typemap(jtype) (int argc, char **argv) "String[]"
-%typemap(jstype) (int argc, char **argv) "String[]"
+//%typemap(jni) (int argc, char **argv) "jobjectArray"
+//%typemap(jtype) (int argc, char **argv) "String[]"
+//%typemap(jstype) (int argc, char **argv) "String[]"
 
-%typemap(javain) (int argc, char **argv) "$javainput"
+//%typemap(javain) (int argc, char **argv) "$javainput"
 
 //
 //// typemap for vector input functions

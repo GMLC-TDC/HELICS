@@ -136,6 +136,7 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     {
         broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
+    broker->setLoggingLevel (0);
     brokers.push_back (broker);
     return broker;
 }

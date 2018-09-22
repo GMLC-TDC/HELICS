@@ -185,7 +185,7 @@ bool CommsInterface::connect ()
     // bool exp = false;
     if (!ActionCallback)
     {
-        std::cerr << "no callback specified, the receiver cannot start\n";
+        logError ("no callback specified, the receiver cannot start");
         return false;
     }
     if (!propertyLock())
@@ -228,7 +228,7 @@ bool CommsInterface::connect ()
     rxTrigger.waitActivation ();
     if (rx_status != connection_status::connected)
     {
-        // std::cerr << "receiver connection failure" << std::endl;
+        logError ("receiver connection failure");
         if (tx_status == connection_status::connected)
         {
             if (queue_transmitter.joinable ())
@@ -243,7 +243,7 @@ bool CommsInterface::connect ()
 
     if (tx_status != connection_status::connected)
     {
-        std::cerr << "transmitter connection failure" << std::endl;
+        logError ("transmitter connection failure");
         if (rx_status == connection_status::connected)
         {
             if (queue_watcher.joinable ())
@@ -308,7 +308,7 @@ void CommsInterface::disconnect ()
         }
         if (cnt == 14)  // Eventually give up
         {
-            std::cerr << "unable to terminate connection\n";
+            logError ("unable to terminate receiver connection");
             break;
         }
         // check the trip detector
@@ -334,7 +334,7 @@ void CommsInterface::disconnect ()
         }
         if (cnt == 14)  // Eventually give up
         {
-            std::cerr << "unable to terminate connection\n";
+            logError ("unable to terminate transmit connection");
             break;
         }
         // check the trip detector
@@ -360,7 +360,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)  // Eventually give up
         {
-            std::cerr << "unable to reconnect\n";
+            logError ("unable to reconnect");
             break;
         }
     }
@@ -371,7 +371,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)
         {
-            std::cerr << "unable to reconnect\n";
+            logError ("unable to reconnect");
             break;
         }
     }
@@ -387,6 +387,12 @@ void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback
         ActionCallback = std::move (callback);
         propertyUnLock ();
     }
+}
+
+void CommsInterface::setLoggingCallback (
+  std::function<void(int level, const std::string &name, const std::string &message)> callback)
+{
+    loggingCallback = std::move (callback);
 }
 
 void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
@@ -408,6 +414,31 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
 bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
+}
+
+
+void CommsInterface::logWarning(const std::string &message) const
+{ 
+	if (loggingCallback)
+    {
+        loggingCallback (1, name, message);
+    }
+	else
+	{
+        std::cerr << "commWarning||" << name << ":" << message << std::endl;
+	}
+}
+
+void CommsInterface::logError(const std::string &message) const
+{
+    if (loggingCallback)
+    {
+        loggingCallback (0, name, message);
+    }
+    else
+    {
+        std::cerr <<"commERROR||"<<name<<":"<< message << std::endl;
+    }
 }
 
 void CommsInterface::closeTransmitter ()
