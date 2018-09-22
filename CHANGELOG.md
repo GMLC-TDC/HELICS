@@ -3,7 +3,7 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.3.1] - 2018-09-22
+## [1.3.1] - 2018-09-23
 ### Changed
  - wait for Broker now uses a condition variable instead of sleep and checking repeatedly
 
