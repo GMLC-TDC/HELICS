@@ -152,6 +152,9 @@ class CommonCore : public Core, public BrokerBase
     virtual const std::string &getIdentifier () const override final { return identifier; }
     virtual const std::string &getAddress () const override final;
     const std::string &getFederateNameNoThrow (global_federate_id_t federateID) const noexcept;
+
+	/** set the core logging level*/
+    virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       federate_id_t federateID,
       std::function<void(int, const std::string &, const std::string &)> logFunction) override final;

@@ -106,7 +106,7 @@ class named_point
 {
   public:
     std::string name;  //!< the text value for the named point
-    double value;   //!< the data value for the named point
+    double value;  //!< the data value for the named point
     named_point () = default;
     named_point (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
     bool operator== (const named_point &opt) const
@@ -117,113 +117,139 @@ class named_point
     bool operator!= (const named_point &opt) const { return !operator== (opt); }
     bool operator< (const named_point &opt) const
     {
-        return (name == opt.name) ? (name < opt.name) :(value < opt.value);
+        return (name == opt.name) ? (name < opt.name) : (value < opt.value);
     }
 };
 
 /** template class for generating a known name of a type*/
 template <class X>
-inline std::string typeNameString ()
+inline const char *typeNameString ()
 {
     // this will probably not be the same on all platforms
-    return std::string (typeid (X).name ());
+    return typeid (X).name ();
+}
+namespace typestrings
+{
+constexpr auto svecstr = "string_vector";
+constexpr auto dvecstr = "double_vector";
+constexpr auto cvecstr = "complex_vector";
+
+constexpr auto doublestr = "double";
+constexpr auto floatstr = "float";
+constexpr auto boolstr = "bool";
+
+constexpr auto charstr = "char";
+constexpr auto ucharstr = "uchar";
+constexpr auto i32str = "int32";
+constexpr auto ui32str = "uint32";
+constexpr auto i64str = "int64";
+constexpr auto ui64str = "uint64";
+
+constexpr auto cfloatstr = "complex_f";
+constexpr auto cdoublestr = "complex";
+constexpr auto npstr = "named_point";
+constexpr auto strstr = "string";
+
+}
+
+
+template <>
+inline const char *typeNameString<std::vector<std::string>> ()
+{
+    return typestrings::svecstr;
 }
 template <>
-inline std::string typeNameString<std::vector<std::string>> ()
+inline const char *typeNameString<std::vector<double>> ()
 {
-    return "string_vector";
-}
-template <>
-inline std::string typeNameString<std::vector<double>> ()
-{
-    return "double_vector";
+    return typestrings::dvecstr;
 }
 
 template <>
-inline std::string typeNameString<std::vector<std::complex<double>>> ()
+inline const char *typeNameString<std::vector<std::complex<double>>> ()
 {
-    return "complex_vector";
+    return typestrings::cvecstr;
 }
 
 /** for float*/
 template <>
-inline std::string typeNameString<double> ()
+inline const char *typeNameString<double> ()
 {
-    return "double";
+    return typestrings::doublestr;
 }
 
 /** for float*/
 template <>
-inline std::string typeNameString<float> ()
+inline const char *typeNameString<float> ()
 {
-    return "float";
+    return typestrings::floatstr;
 }
 
 /** for boolean*/
 template <>
-inline std::string typeNameString<bool> ()
+inline const char *typeNameString<bool> ()
 {
-    return "bool";
+    return typestrings::boolstr;
 }
 
 /** for character*/
 template <>
-inline std::string typeNameString<char> ()
+inline const char *typeNameString<char> ()
 {
-    return "char";
+    return typestrings::charstr;
 }
 /** for unsigned character*/
 template <>
-inline std::string typeNameString<unsigned char> ()
+inline const char *typeNameString<unsigned char> ()
 {
-    return "uchar";
+    return typestrings::ucharstr;
 }
 /** for integer*/
 template <>
-inline std::string typeNameString<std::int32_t> ()
+inline const char *typeNameString<std::int32_t> ()
 {
-    return "int32";
+    return typestrings::i32str;
 }
 /** for unsigned integer*/
 template <>
-inline std::string typeNameString<std::uint32_t> ()
+inline const char *typeNameString<std::uint32_t> ()
 {
-    return "uint32";
+    return typestrings::ui32str;
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline std::string typeNameString<int64_t> ()
+inline const char *typeNameString<int64_t> ()
 {
-    return "int64";
+    return typestrings::i64str;
+    ;
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline std::string typeNameString<std::uint64_t> ()
+inline const char *typeNameString<std::uint64_t> ()
 {
-    return "uint64";
+    return typestrings::ui64str;
 }
 /** for complex double*/
 template <>
-inline std::string typeNameString<std::complex<float>> ()
+inline const char *typeNameString<std::complex<float>> ()
 {
-    return "complex_f";
+    return typestrings::cfloatstr;
 }
 /** for complex double*/
 template <>
-inline std::string typeNameString<std::complex<double>> ()
+inline const char *typeNameString<std::complex<double>> ()
 {
-    return "complex";
+    return typestrings::cdoublestr;
 }
 template <>
-inline std::string typeNameString<std::string> ()
+inline const char *typeNameString<std::string> ()
 {
-    return "string";
+    return typestrings::strstr;
 }
 
 template <>
-inline std::string typeNameString<named_point> ()
+inline const char *typeNameString<named_point> ()
 {
-    return "named_point";
+    return typestrings::npstr;
 }
 /** the base types for  helics*/
 enum class helics_type_t : int
@@ -251,7 +277,7 @@ helics_type_t getTypeFromString (const std::string &typeName);
 std::string helicsComplexString (double real, double imag);
 /** generate a string representation of a complex number */
 std::string helicsComplexString (std::complex<double> val);
-/** generate a string representation of a vector 
+/** generate a string representation of a vector
 @details string will look like v[1.02,45]*/
 std::string helicsVectorString (const std::vector<double> &val);
 /** generate a string representation of a vector from pointer and size
@@ -260,7 +286,7 @@ std::string helicsVectorString (const double *vals, size_t size);
 /** generate a string representation of a complex vector
 @details string will look like cv[1.02+2j,45]*/
 std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
-/** generate a named point string 
+/** generate a named point string
 @details string will look like {"<name>":val}
 */
 std::string helicsNamedPointString (const named_point &point);
@@ -431,9 +457,9 @@ constexpr int64_t invalidValue<int64_t> ()
 }
 
 template <>
-constexpr uint64_t invalidValue<uint64_t>()
+constexpr uint64_t invalidValue<uint64_t> ()
 {
-    return std::numeric_limits<uint64_t>::max();
+    return std::numeric_limits<uint64_t>::max ();
 }
 
 template <>
@@ -445,7 +471,7 @@ inline named_point invalidValue<named_point> ()
 template <>
 constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
-    return {invalidValue<double>(), 0.0};
+    return {invalidValue<double> (), 0.0};
 }
 
 }  // namespace helics

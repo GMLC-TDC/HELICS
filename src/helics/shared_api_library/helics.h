@@ -180,7 +180,7 @@ HELICS_EXPORT void helicsBrokerFree (helics_broker broker);
 */
 HELICS_EXPORT helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info_t fi, helics_error *err);
 
-/** create a value federate from a JSON file,JSON string, or TOML file
+/** create a value federate from a JSON file, JSON string, or TOML file
 @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
 @param configFile  a JSON file or a JSON string or TOML file that contains setup and configuration information
 @return an opaque value federate object

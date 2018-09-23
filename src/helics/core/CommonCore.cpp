@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -199,6 +199,30 @@ CommonCore::~CommonCore ()
 
 FederateState *CommonCore::getFederateAt (federate_id_t federateID) const
 {
+/*
+#ifndef __apple_build_version__
+    static thread_local FederateState *lastV = nullptr;
+    if ((lastV == nullptr) || (lastV->local_id != federateID))
+    {
+        auto feds = federates.lock ();
+        lastV = (*feds)[federateID];
+    }
+    return lastV;
+#else
+#if __clang_major__ >= 8
+    static thread_local FederateState *lastV = nullptr;
+    if ((lastV == nullptr) || (lastV->local_id != federateID))
+    {
+        auto feds = federates.lock ();
+        lastV = (*feds)[federateID];
+    }
+    return lastV;
+#else
+    auto feds = federates.lock ();
+    return (*feds)[federateID];
+#endif
+#endif
+*/
     auto feds = federates.lock ();
     return (*feds)[federateID];
 }
@@ -611,17 +635,29 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t iterations)
+void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t intValue)
 {
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
+    if (federateID == local_core_id)
     {
-        throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
+        ActionMessage cmd (CMD_CORE_CONFIGURE);
+        cmd.dest_id = global_broker_id.load ();
+        cmd.messageID = property;
+        cmd.counter = intValue;
+        addActionMessage (cmd);
+        return;
     }
-    ActionMessage cmd (CMD_FED_CONFIGURE_INT);
-    cmd.messageID = property;
-    cmd.counter = iterations;
-    fed->setProperties (cmd);
+    else
+    {
+        auto fed = getFederateAt (federateID);
+        if (fed == nullptr)
+        {
+            throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
+        }
+        ActionMessage cmd (CMD_FED_CONFIGURE_INT);
+        cmd.messageID = property;
+        cmd.counter = intValue;
+        fed->setProperties (cmd);
+    }
 }
 
 void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Time time)
@@ -811,7 +847,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializingMode"));
     }
-    LOG_INTERFACES(parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
+    LOG_INTERFACES (parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
@@ -1582,6 +1618,16 @@ bool CommonCore::sendToLogger (global_federate_id_t federateID,
         fed->logMessage (logLevel, name, message);
     }
     return true;
+}
+
+void CommonCore::setLoggingLevel (int logLevel) 
+{
+    ActionMessage cmd (CMD_CORE_CONFIGURE);
+    cmd.dest_id = global_broker_id.load ();
+    cmd.messageID = LOG_LEVEL_PROPERTY;
+    cmd.counter = logLevel;
+    addActionMessage (cmd);
+    return;
 }
 
 void CommonCore::setLoggingCallback (
@@ -2568,7 +2614,7 @@ void CommonCore::registerInterface (ActionMessage &command)
         }
         if (!command.name.empty ())
         {
-            transmit (0, std::move(command));
+            transmit (0, std::move (command));
         }
     }
     else if (command.dest_id == global_broker_id_local)
@@ -2596,7 +2642,7 @@ void CommonCore::registerInterface (ActionMessage &command)
     }
     else
     {
-        routeMessage (std::move(command));
+        routeMessage (std::move (command));
     }
 }
 
@@ -2631,7 +2677,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (std::move(command));
+            routeMessage (std::move (command));
         }
     }
     break;
@@ -2659,7 +2705,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (std::move(command));
+            routeMessage (std::move (command));
         }
     }
     break;
@@ -2678,7 +2724,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (std::move(command));
+            routeMessage (std::move (command));
         }
     }
     break;
@@ -2697,7 +2743,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         }
         else
         {
-            routeMessage (std::move(command));
+            routeMessage (std::move (command));
         }
     }
     break;
@@ -2710,7 +2756,6 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
 {
     if (command.action () == CMD_ADD_FILTER)
     {
-        
         processFilterInfo (command);
         if ((command.source_id != global_broker_id_local) && (!checkActionFlag (command, destination_target)))
         {

@@ -25,7 +25,7 @@ constexpr int typeStringLoc = 0;
 constexpr int typeOutStringLoc = 1;
 
 constexpr int32_t cmd_info_basis = 65536;
-/** class defining the primary message object used in Helics */
+/** class defining the primary message object used in HELICS */
 class ActionMessage
 {
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
@@ -56,7 +56,6 @@ class ActionMessage
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
     */
-    // cppcheck-suppress noExplicitConstructor
     /* implicit */ ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
      */
@@ -104,7 +103,7 @@ class ActionMessage
 
 	void clearStringData() { stringData.clear ();}
     // most use cases for this involve short strings, or already have references that need to be copied so
-    // supporting move isn't  going to be that useful here
+    // supporting move isn't  going to be that useful here, the long strings are going in the payload
     void setStringData (const std::string &string1)
     {
         stringData.resize (1);

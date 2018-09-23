@@ -119,10 +119,12 @@ class data_view
     auto cend () const { return dblock.cend (); }
 };
 
+constexpr auto bvecstr = "block_vector";
+
 template <>
-inline std::string typeNameString<std::vector<data_block>> ()
+inline const char *typeNameString<std::vector<data_block>> ()
 {
-    return "block_vector";
+    return bvecstr;
 }
 
 }  // namespace helics

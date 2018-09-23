@@ -639,6 +639,9 @@ class Core
     setLoggingCallback (federate_id_t federateID,
                         std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 
+	/** set the core logging level*/
+    virtual void setLoggingLevel (int logLevel) = 0;
+
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", "core", or the name of a specific object
