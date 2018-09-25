@@ -16,6 +16,7 @@ Lines that don’t start with `$` are typically showing the output of the previo
     windows
     mac
     linux
+    docker
     language
 ```
 
