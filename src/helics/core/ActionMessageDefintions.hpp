@@ -34,7 +34,7 @@ enum class action_t : int32_t
     cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
-
+	cmd_broker_setup = -1,  //!< command to load the setup information for a broker
     cmd_ignore = 0,  //!< null command
     cmd_tick = 1,  //!< command for a timer tick
 	cmd_user_disconnect = 2, //!< command specifying that a user has issued a disconnect signal
@@ -141,6 +141,7 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
+#define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup
 
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready

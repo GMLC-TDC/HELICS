@@ -69,7 +69,8 @@ class CoreBroker : public Broker, public BrokerBase
   protected:
     bool _gateway = false;  //!< set to true if this broker should act as a gateway.
   private:
-    bool _isRoot = false;  //!< set to true if this object is a root broker
+	  std::atomic<bool> _isRoot{ false };  //!< set to true if this object is a root broker
+	  bool isRootc=false;
     DualMappedVector<BasicFedInfo, std::string, global_federate_id_t> _federates;  //!< container for all federates
     DualMappedVector<BasicBrokerInfo, std::string, global_broker_id_t>
       _brokers;  //!< container for all the broker information
