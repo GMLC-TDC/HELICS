@@ -52,6 +52,10 @@ bool TcpCoreSS::brokerConnect ()
 {
     std::unique_lock<std::mutex> lock (dataMutex);
     comms->setServerMode(serverMode);
+	if (!connections.empty())
+	{
+		comms->addConnections(connections);
+	}
     lock.unlock();
     return NetworkCore::brokerConnect();
 }

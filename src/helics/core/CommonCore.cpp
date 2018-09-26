@@ -118,10 +118,10 @@ void CommonCore::processDisconnect (bool skipUnregister)
         {
             brokerState = broker_state_t::terminating;
             sendDisconnect ();
-            if (global_broker_id.load () != parent_broker_id)
+            if (global_broker_id_local != parent_broker_id)
             {
                 ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id.load ();
+                dis.source_id = global_broker_id_local;
                 transmit (0, dis);
             }
             else
@@ -1474,7 +1474,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
             // now go to the cloning filters
             for (auto &clFilter : ffunc->cloningDestFilters)
             {
-                if (clFilter->core_id == global_broker_id.load ())
+                if (clFilter->core_id == global_broker_id_local)
                 {
                     auto FiltI = filters.find (global_handle (global_broker_id_local, clFilter->handle));
                     if (FiltI != nullptr)
@@ -1627,7 +1627,6 @@ void CommonCore::setLoggingLevel (int logLevel)
     cmd.messageID = LOG_LEVEL_PROPERTY;
     cmd.counter = logLevel;
     addActionMessage (cmd);
-    return;
 }
 
 void CommonCore::setLoggingCallback (
@@ -1667,9 +1666,9 @@ uint16_t CommonCore::getNextAirlockIndex ()
 {
     uint16_t index = nextAirLock++;
     if (index > 3)
-    {  // this is an atomic operation if the nextAirLock was not adjusted this could result in an out of bounds
+    {  // the increment is an atomic operation if the nextAirLock was not adjusted this could result in an out of bounds
        // exception if this check were not done
-        index %= 3;
+        index %= 4;
     }
     if (index == 3)
     {
@@ -1912,9 +1911,9 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (index);
+        auto queryResult = ActiveQueries.getFuture (index);
         addActionMessage (std::move (querycmd));
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
@@ -1925,9 +1924,9 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         querycmd.dest_id = higher_broker_id;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
+        auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
         addActionMessage (querycmd);
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (querycmd.messageID);
         return ret;
     }
@@ -1939,7 +1938,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
+        auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
         if (!global_broker_id.load ().isValid ())
         {
             delayTransmitQueue.push (std::move (querycmd));
@@ -1948,7 +1947,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         {
             transmit (0, querycmd);
         }
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
@@ -1964,7 +1963,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     querycmd.messageID = index;
     querycmd.payload = queryStr;
     querycmd.setStringData (target);
-    auto fut = ActiveQueries.getFuture (querycmd.messageID);
+    auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
     if (!global_broker_id.load ().isValid ())
     {
         delayTransmitQueue.push (std::move (querycmd));
@@ -1974,7 +1973,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         transmit (0, querycmd);
     }
 
-    auto ret = fut.get ();
+    auto ret = queryResult.get ();
     ActiveQueries.finishedWithValue (index);
     return ret;
 }
@@ -2198,7 +2197,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
-            LOG_ERROR (global_broker_id.load (), getIdentifier (), "lost connection with server");
+            LOG_ERROR (global_broker_id_local, getIdentifier (), "lost connection with server");
             sendErrorToFederates (-5);
             processDisconnect ();
             brokerState = broker_state_t::errored;
@@ -2209,7 +2208,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // if (allFedWaiting())
             //{
             ActionMessage png (CMD_PING);
-            png.source_id = global_broker_id.load ();
+            png.source_id = global_broker_id_local;
             png.dest_id = higher_broker_id;
             transmit (0, png);
             waitingForServerPingReply = true;
@@ -2217,16 +2216,16 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_PING:
-        if (command.dest_id == global_broker_id.load ())
+        if (command.dest_id == global_broker_id_local)
         {
             ActionMessage pngrep (CMD_PING_REPLY);
             pngrep.dest_id = command.source_id;
-            pngrep.source_id = global_broker_id.load ();
+            pngrep.source_id = global_broker_id_local;
             routeMessage (pngrep);
         }
         break;
     case CMD_PING_REPLY:
-        if (command.dest_id == global_broker_id.load ())
+        if (command.dest_id == global_broker_id_local)
         {
             waitingForServerPingReply = false;
         }
@@ -2256,7 +2255,7 @@ void CommonCore::processCommand (ActionMessage &&command)
                 brokerState = broker_state_t::terminating;
                 sendDisconnect ();
                 ActionMessage m (CMD_DISCONNECT);
-                m.source_id = global_broker_id.load ();
+                m.source_id = global_broker_id_local;
                 transmit (0, m);
             }
         }
@@ -3483,7 +3482,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
         // now go to the cloning filters
         for (auto &clFilter : filtFunc->cloningDestFilters)
         {
-            if (clFilter->core_id == global_broker_id)
+            if (clFilter->core_id == global_broker_id_local)
             {
                 auto FiltI =
                   filters.find (global_handle (global_broker_id_local, interface_handle (clFilter->handle)));
@@ -3544,7 +3543,7 @@ void CommonCore::processFilterReturn (ActionMessage &cmd)
             for (decltype (cmd.counter) ii = cmd.counter + 1; ii < filtFunc->sourceFilters.size (); ++ii)
             {  // cloning filters come first so we don't need to check for them in this code branch
                 auto filt = filtFunc->sourceFilters[ii];
-                if (filt->core_id == global_broker_id)
+                if (filt->core_id == global_broker_id_local)
                 {
                     // deal with local source filters
                     auto tempMessage = createMessageFromCommand (std::move (cmd));

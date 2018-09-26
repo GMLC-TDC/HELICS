@@ -11,7 +11,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <thread>
 #include <unordered_map>
+#include <array>
 
+#include "helics_includes/any.hpp"
+#include "../common/AirLock.hpp"
 #include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
@@ -96,6 +99,8 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
 	TriggerVariable disconnection; //!< controller for the disconnection process
+	std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
+	std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -107,6 +112,9 @@ class CoreBroker : public Broker, public BrokerBase
     @param[in] command the command to process
     */
     void processPriorityCommand (ActionMessage &&command) override;
+
+	/** process configure commands for the broker*/
+	void processBrokerConfigureCommands(ActionMessage &cmd);
 
     SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
@@ -122,6 +130,8 @@ class CoreBroker : public Broker, public BrokerBase
 
     /** handle initialization operations*/
     void executeInitializationOperations ();
+	/** get an index for an airlock, function is threadsafe*/
+	uint16_t getNextAirlockIndex();
 
   public:
     /** connect the core to its broker

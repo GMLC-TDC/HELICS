@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 {
     //sleep to clear any residual from the previous test
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
 BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
 {
     //sleep to clear any residual from the previous test
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};

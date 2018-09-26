@@ -72,7 +72,7 @@ int32_t CoreBroker::getRoute (global_federate_id_t fedid) const
 
 BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id_t brokerid)
 {
-    if (_isRoot)
+    if (isRootc)
     {
         auto brkNum = brokerid.localIndex ();
         return (isValidIndex (brkNum, _brokers) ? &_brokers[brkNum] : nullptr);
@@ -84,7 +84,7 @@ BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id_t brokerid)
 
 const BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id_t brokerid) const
 {
-    if (_isRoot)
+    if (isRootc)
     {
         auto brkNum = brokerid.localIndex ();
         return (isValidIndex (brkNum, _brokers)) ? &_brokers[brkNum] : nullptr;
@@ -97,8 +97,44 @@ const BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id_t brokerid) c
 void CoreBroker::setLoggingCallback (
   const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {
-    // TODO:: this is not thread safe if done after startup
-    BrokerBase::setLoggerFunction (logFunction);
+	ActionMessage loggerUpdate(CMD_BROKER_CONFIGURE);
+	loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
+	loggerUpdate.source_id = global_broker_id.load();
+	if (logFunction)
+	{
+		auto ii = getNextAirlockIndex();
+		dataAirlocks[ii].load(std::move(logFunction));
+		loggerUpdate.counter = ii;
+	}
+	else
+	{
+		setActionFlag(loggerUpdate, empty_flag);
+	}
+
+	actionQueue.push(loggerUpdate);
+}
+
+uint16_t CoreBroker::getNextAirlockIndex()
+{
+	uint16_t index = nextAirLock++;
+	if (index > 2)
+	{  // this is an atomic operation if the nextAirLock was not adjusted this could result in an out of bounds
+	   // exception if this check were not done
+		index %= 2;
+	}
+	if (index == 2)
+	{
+		decltype (index) exp = 3;
+
+		while (exp > 2)
+		{  // doing a lock free modulus we need to make sure the nextAirLock<4
+			if (nextAirLock.compare_exchange_weak(exp, exp % 3))
+			{
+				break;
+			}
+		}
+	}
+	return index;
 }
 
 void CoreBroker::dataConnect (const std::string &source, const std::string &target)
@@ -196,7 +232,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                              static_cast<global_federate_id_t::base_type> (_federates.size ())),
                            command.name);
         _federates.back ().route_id = getRoute (command.source_id);
-        if (!_isRoot)
+        if (!isRootc)
         {
             if (global_broker_id_local.isValid ())
             {
@@ -245,7 +281,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         {
             ActionMessage badInit (CMD_BROKER_ACK);
             setActionFlag (badInit, error_flag);
-            badInit.source_id = global_broker_id.load ();
+            badInit.source_id = global_broker_id_local;
             badInit.name = command.name;
             transmit (command.source_id, badInit);
             return;
@@ -255,6 +291,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                          command.name);
         if (command.source_id == 0)
         {
+			//TODO:: this will need to be updated when we enable mesh routing
             _brokers.back ().route_id = static_cast<decltype (_brokers.back ().route_id)> (_brokers.size ());
             addRoute (_brokers.back ().route_id, command.getString (targetStringLoc));
         }
@@ -264,11 +301,11 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.back ()._nonLocal = true;
         }
         _brokers.back ()._core = checkActionFlag (command, core_flag);
-        if (!_isRoot)
+        if (!isRootc)
         {
-            if (global_broker_id.load () != parent_broker_id)
+            if (global_broker_id_local != parent_broker_id)
             {
-                command.source_id = global_broker_id.load ();
+                command.source_id = global_broker_id_local;
                 transmit (0, command);
             }
             else
@@ -288,7 +325,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
 
             // sending the response message
             ActionMessage brokerReply (CMD_BROKER_ACK);
-            brokerReply.source_id = global_broker_id.load ();  // source is global root
+            brokerReply.source_id = global_broker_id_local;  // source is global root
             brokerReply.dest_id = global_id;  // the new id
             brokerReply.name = command.name;  // the identifier of the broker
             transmit (route_id, brokerReply);
@@ -327,11 +364,12 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 // generate an error message
+				LOG_ERROR(global_broker_id_local, identifier, std::string("unable to register broker ") + command.payload);
                 return;
             }
 
-            global_broker_id = global_broker_id_t (command.dest_id);
-            global_broker_id_local = global_broker_id.load ();
+			global_broker_id_local = global_broker_id_t (command.dest_id);
+            global_broker_id.store(global_broker_id_local);
             higher_broker_id = global_broker_id_t (command.source_id);
             timeCoord->source_id = global_federate_id_t (global_broker_id_local);
             transmitDelayedMessages ();
@@ -346,7 +384,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.addSearchTerm (global_broker_id_t (command.dest_id), broker->name);
             routing_table.emplace (broker->global_id, route);
             command.source_id =
-              global_broker_id.load ();  // we want the intermediate broker to change the source_id
+              global_broker_id_local;  // we want the intermediate broker to change the source_id
             transmit (route, command);
         }
         else
@@ -367,10 +405,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         }
         if (allDisconnected ())
         {
-            if (!_isRoot)
+            if (!isRootc)
             {
                 ActionMessage dis (CMD_PRIORITY_DISCONNECT);
-                dis.source_id = global_broker_id.load ();
+                dis.source_id = global_broker_id_local;
                 transmit (0, dis);
             }
             addActionMessage (CMD_STOP);
@@ -384,7 +422,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         {
             processLocalQuery (command);
         }
-        else if ((isRoot ()) && (command.dest_id == 0))
+        else if ((isRootc) && (command.dest_id == 0))
         {
             processLocalQuery (command);
         }
@@ -447,7 +485,7 @@ void CoreBroker::transmitDelayedMessages ()
     auto msg = delayTransmitQueue.pop ();
     while (msg)
     {
-        msg->source_id = global_broker_id.load ();
+        msg->source_id = global_broker_id_local;
         transmit (0, *msg);
         msg = delayTransmitQueue.pop ();
     }
@@ -501,7 +539,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
 
     case CMD_TICK:
-        if (!_isRoot)
+        if (!isRootc)
         {
             if (waitingForServerPingReply)
             {
@@ -518,7 +556,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 // if (allFedWaiting())
                 //{
                 ActionMessage png (CMD_PING);
-                png.source_id = global_broker_id.load ();
+                png.source_id = global_broker_id_local;
                 png.dest_id = higher_broker_id;
                 transmit (0, png);
                 waitingForServerPingReply = true;
@@ -527,11 +565,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_PING:
-        if (command.dest_id == global_broker_id.load ())
+        if (command.dest_id == global_broker_id_local)
         {
             ActionMessage pngrep (CMD_PING_REPLY);
             pngrep.dest_id = command.source_id;
-            pngrep.source_id = global_broker_id.load ();
+            pngrep.source_id = global_broker_id_local;
             routeMessage (pngrep);
         }
         else
@@ -540,7 +578,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_PING_REPLY:
-        if (command.dest_id == global_broker_id.load ())
+        if (command.dest_id == global_broker_id_local)
         {
             waitingForServerPingReply = false;
         }
@@ -558,7 +596,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         if (allInitReady ())
         {
-            if (_isRoot)
+            if (isRootc)
             {
                 LOG_TIMING (global_broker_id_local, "root", "entering initialization mode");
                 LOG_SUMMARY (global_broker_id_local, "root", generateFederationSummary ());
@@ -568,7 +606,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 LOG_TIMING (global_broker_id_local, getIdentifier (), "entering initialization mode");
                 checkDependencies ();
-                command.source_id = global_broker_id.load ();
+                command.source_id = global_broker_id_local;
                 transmit (0, command);
             }
         }
@@ -616,7 +654,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 break;
             }
         }
-        if (isRoot ())
+        if (isRootc)
         {
             delayedDependencies.emplace_back (command.name, command.source_id);
         }
@@ -641,7 +679,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             auto input = handles.getInput (command.getString (targetStringLoc));
             if (input == nullptr)
             {
-                if (isRoot ())
+                if (isRootc)
                 {
                     // TODO:: not decided what to do here yet need a buffer
                 }
@@ -674,7 +712,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             auto ept = handles.getEndpoint (command.getString (targetStringLoc));
             if (ept == nullptr)
             {
-                if (isRoot ())
+                if (isRootc)
                 {
                     // TODO:: not decided what to do here yet need a buffer
                 }
@@ -705,9 +743,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         /* FALLTHROUGH */
     case CMD_DISCONNECT:
     {
-        if ((command.dest_id == 0) || (command.dest_id == global_broker_id.load ()))
+        if ((command.dest_id == 0) || (command.dest_id == global_broker_id_local))
         {
-            if (!isRoot ())
+            if (!isRootc)
             {
                 if (command.source_id == higher_broker_id)
                 {
@@ -745,10 +783,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (allDisconnected ())
             {
                 timeCoord->disconnect ();
-                if (!_isRoot)
+                if (!isRootc)
                 {
                     ActionMessage dis (CMD_DISCONNECT);
-                    dis.source_id = global_broker_id.load ();
+                    dis.source_id = global_broker_id_local;
                     transmit (0, dis);
                 }
                 addActionMessage (CMD_STOP);
@@ -768,17 +806,17 @@ void CoreBroker::processCommand (ActionMessage &&command)
         if (!allDisconnected ())
         {  // only send a disconnect message if we haven't done so already
             timeCoord->disconnect ();
-            if (!_isRoot)
+            if (!isRootc)
             {
                 ActionMessage m (CMD_DISCONNECT);
-                m.source_id = global_broker_id.load ();
+                m.source_id = global_broker_id_local;
                 transmit (0, m);
             }
         }
         break;
     case CMD_EXEC_REQUEST:
     case CMD_EXEC_GRANT:
-        if (command.dest_id == global_broker_id.load ())
+        if (command.dest_id == global_broker_id_local)
         {
             timeCoord->processTimeMessage (command);
             if (!enteredExecutionMode)
@@ -848,9 +886,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
 
     case CMD_LOG:
-        if (_isRoot)
+        if (isRootc)
         {
-            // do some logging
+			sendToLogger(global_federate_id_t(command.source_id), command.counter, "", command.payload);
         }
         else
         {
@@ -858,9 +896,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_ERROR:
-        if (_isRoot)
+        if (isRootc)
         {
-            // do some logging
+			sendToLogger(global_federate_id_t(command.source_id),LOG_LEVEL_ERROR, "", command.payload);
         }
         else
         {
@@ -868,7 +906,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_REG_PUB:
-        if ((!_isRoot) && (command.dest_id != 0))
+        if ((!isRootc) && (command.dest_id != 0))
         {
             routeMessage (command);
             break;
@@ -876,7 +914,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         addPublication (command);
         break;
     case CMD_REG_INPUT:
-        if ((!_isRoot) && (command.dest_id != 0))
+        if ((!isRootc) && (command.dest_id != 0))
         {
             routeMessage (command);
             break;
@@ -884,7 +922,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         addInput (command);
         break;
     case CMD_REG_ENDPOINT:
-        if ((!_isRoot) && (command.dest_id != 0))
+        if ((!isRootc) && (command.dest_id != 0))
         {
             routeMessage (command);
             break;
@@ -892,7 +930,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         addEndpoint (command);
         break;
     case CMD_REG_FILTER:
-        if ((!_isRoot) && (command.dest_id != 0))
+        if ((!isRootc) && (command.dest_id != 0))
         {
             routeMessage (command);
             break;
@@ -924,12 +962,66 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ADD_NAMED_FILTER:
         checkForNamedInterface (command);
         break;
+	case CMD_BROKER_CONFIGURE:
+		processBrokerConfigureCommands(command);
+		break;
     default:
         if (command.dest_id != global_broker_id_local)
         {
             routeMessage (command);
         }
     }
+}
+
+void CoreBroker::processBrokerConfigureCommands(ActionMessage &cmd)
+{
+	switch (cmd.messageID)
+	{
+	case ENABLE_INIT_ENTRY:
+		/*if (delayInitCounter <= 1)
+		{
+			delayInitCounter = 0;
+			if (allInitReady())
+			{
+				broker_state_t exp = connected;
+				if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
+				{  // make sure we only do this once
+					checkDependencies();
+					cmd.setAction(CMD_INIT);
+					cmd.source_id = global_broker_id_local;
+					cmd.dest_id = 0;
+					transmit(0, cmd);
+				}
+			}
+		}
+		else
+		{
+			--delayInitCounter;
+		}
+		break;
+		*/
+	case LOG_LEVEL_PROPERTY:
+		setLogLevel(cmd.counter);
+		break;
+	case UPDATE_LOGGING_CALLBACK:
+		if (checkActionFlag(cmd, empty_flag))
+		{
+			setLoggerFunction(nullptr);
+		}
+		else
+		{
+			auto op = dataAirlocks[cmd.counter].try_unload();
+			if (op)
+			{
+				auto M = stx::any_cast<std::function<void(int, const std::string &, const std::string &)>> (
+					std::move(*op));
+				setLoggerFunction(std::move(M));
+			}
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 void CoreBroker::checkForNamedInterface (ActionMessage &command)
@@ -1026,7 +1118,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
     }
     if (!foundInterface)
     {
-        if (isRoot ())
+        if (isRootc)
         {
             switch (command.action ())
             {
@@ -1111,7 +1203,7 @@ void CoreBroker::addPublication (ActionMessage &m)
                                    handle_type_t::publication, m.name, m.getString (0), m.getString (1));
 
     addLocalInfo (pub, m);
-    if (!_isRoot)
+    if (!isRootc)
     {
         transmit (0, m);
     }
@@ -1136,7 +1228,7 @@ void CoreBroker::addInput (ActionMessage &m)
                                    handle_type_t::input, m.name, m.getString (0), m.getString (1));
 
     addLocalInfo (inp, m);
-    if (!_isRoot)
+    if (!isRootc)
     {
         transmit (0, m);
     }
@@ -1164,7 +1256,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
 
     addLocalInfo (ept, m);
 
-    if (!_isRoot)
+    if (!isRootc)
     {
         transmit (0, m);
         if (!hasTimeDependency)
@@ -1202,7 +1294,7 @@ void CoreBroker::addFilter (ActionMessage &m)
                                     m.getString (typeOutStringLoc));
     addLocalInfo (filt, m);
 
-    if (!_isRoot)
+    if (!isRootc)
     {
         transmit (0, m);
         if (!hasFilters)
@@ -1211,7 +1303,7 @@ void CoreBroker::addFilter (ActionMessage &m)
             if (timeCoord->addDependent (higher_broker_id))
             {
                 hasTimeDependency = true;
-                ActionMessage add (CMD_ADD_DEPENDENCY, global_broker_id.load (), higher_broker_id);
+                ActionMessage add (CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
                 transmit (0, add);
             }
         }
@@ -1222,7 +1314,7 @@ void CoreBroker::addFilter (ActionMessage &m)
     }
 }
 
-CoreBroker::CoreBroker (bool setAsRootBroker) noexcept : _isRoot (setAsRootBroker) {}
+CoreBroker::CoreBroker (bool setAsRootBroker) noexcept : _isRoot (setAsRootBroker),isRootc(setAsRootBroker) {}
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
 
@@ -1530,73 +1622,81 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
     }
 }
 
-void CoreBroker::setLoggingLevel (int logLevel) { setLogLevel (logLevel); }
+void CoreBroker::setLoggingLevel (int logLevel) 
+{ 
+	ActionMessage cmd(CMD_BROKER_CONFIGURE);
+	cmd.dest_id = global_broker_id.load();
+	cmd.messageID = LOG_LEVEL_PROPERTY;
+	cmd.counter = logLevel;
+	addActionMessage(cmd);
+}
 
 // public query function
 std::string CoreBroker::query (const std::string &target, const std::string &queryStr)
 {
+	auto gid = global_broker_id.load();
     if ((target == "broker") || (target == getIdentifier ()))
     {
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load ();
-        querycmd.dest_id = global_broker_id.load ();
+        querycmd.source_id = querycmd.dest_id=gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (index);
+        auto queryResult = ActiveQueries.getFuture (index);
         addActionMessage (std::move (querycmd));
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
     else if (target == "parent")
     {
-        if (isRoot ())
+        if (isRootc)
         {
-            return "#invalid";
+            return "#na";
         }
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load ();
+        querycmd.source_id = gid;
         querycmd.dest_id = 0;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
+        auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
         addActionMessage (querycmd);
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (querycmd.messageID);
         return ret;
     }
     else if ((target == "root") || (target == "rootbroker"))
     {
         ActionMessage querycmd (CMD_BROKER_QUERY);
-        querycmd.source_id = global_broker_id.load ();
+        querycmd.source_id = gid;
         querycmd.dest_id = 0;
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
-        if (!global_broker_id.load ().isValid ())
+        auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
+        if (!gid.isValid ())
         {
+			//TODO:: this has potential for deadlock
             delayTransmitQueue.push (std::move (querycmd));
         }
         else
         {
             transmit (0, querycmd);
         }
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
     else
     {
         ActionMessage querycmd (CMD_QUERY);
-        querycmd.source_id = global_broker_id.load ();
+        querycmd.source_id = gid;
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
         querycmd.setStringData (target);
-        auto fut = ActiveQueries.getFuture (querycmd.messageID);
-        if (!global_broker_id.load ().isValid ())
+        auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
+        if (!gid.isValid ())
         {
             delayTransmitQueue.push (std::move (querycmd));
         }
@@ -1605,7 +1705,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
             transmit (0, querycmd);
         }
 
-        auto ret = fut.get ();
+        auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
@@ -1730,7 +1830,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         Json_helics::Value base;
         base["name"] = getIdentifier ();
         base["id"] = static_cast<int> (global_broker_id_local);
-        if (!isRoot ())
+        if (!isRootc)
         {
             base["parent"] = static_cast<int> (higher_broker_id);
         }
@@ -1754,7 +1854,7 @@ void CoreBroker::initializeFederateMap ()
     Json_helics::Value &base = fedMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = static_cast<int> (global_broker_id_local);
-    if (!isRoot ())
+    if (!isRootc)
     {
         base["parent"] = static_cast<int> (higher_broker_id);
     }
@@ -1794,7 +1894,7 @@ void CoreBroker::initializeDependencyGraph ()
     Json_helics::Value &base = depMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = static_cast<int> (global_broker_id_local);
-    if (!isRoot ())
+    if (!isRootc)
     {
         base["parent"] = static_cast<int> (higher_broker_id);
     }
@@ -1842,7 +1942,7 @@ void CoreBroker::initializeDataFlowGraph ()
     Json_helics::Value &base = depMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = static_cast<int> (global_broker_id_local);
-    if (!isRoot ())
+    if (!isRootc)
     {
         base["parent"] = static_cast<int> (higher_broker_id);
     }
@@ -1925,7 +2025,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
     {
         processLocalQuery (m);
     }
-    else if ((isRoot ()) && ((target == "root") || (target == "federation")))
+    else if ((isRootc) && ((target == "root") || (target == "federation")))
     {
         processLocalQuery (m);
     }
@@ -1945,7 +2045,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
                 route = broker->route_id;
             }
         }
-        if ((route == 0) && (isRoot ()))
+        if ((route == 0) && (isRootc))
         {
             ActionMessage queryResp (CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
@@ -2043,7 +2143,7 @@ void CoreBroker::processQueryResponse (const ActionMessage &m)
 
 void CoreBroker::checkDependencies ()
 {
-    if (_isRoot)
+    if (isRootc)
     {
         for (const auto &newdep : delayedDependencies)
         {

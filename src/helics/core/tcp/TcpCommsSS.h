@@ -59,6 +59,10 @@ class TcpCommsSS final : public CommsInterface
     void setPortNumber (int localPortNumber);
     /** set the controls to be running a server, or running connections*/
     void setServerMode(bool mode = true);
+	/** add a connection to the connection list*/
+	void addConnection(const std::string &newConn);
+	/** add a vector of connections to the connection list*/
+	void addConnections(const std::vector<std::string> &newConnections);
   private:
     int brokerPort = -1;
     int localPort = -1;

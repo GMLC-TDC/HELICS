@@ -8,25 +8,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 bool TriggerVariable::activate ()
 {
-    std::unique_lock<std::mutex> lock (stateLock);
+    std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
         // we are already activated so this function did nothing so return false
         return false;
     }
     activated = true;
-    lock.unlock ();
     cv_active.notify_all ();
     return true;
 }
 
 bool TriggerVariable::trigger ()
 {
-    std::unique_lock<std::mutex> lock (stateLock);
+    std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
         triggered.store (true);
-        lock.unlock ();
         cv_trigger.notify_all ();
         return true;
     }

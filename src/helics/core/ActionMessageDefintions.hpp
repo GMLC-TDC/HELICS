@@ -217,6 +217,7 @@ enum class action_t : int32_t
 #define CMD_FED_CONFIGURE_FLAG action_message_def::action_t::cmd_fed_configure_flag
 
 #define CMD_CORE_CONFIGURE action_message_def::action_t::cmd_core_configure
+#define CMD_BROKER_CONFIGURE action_message_def::action_t::cmd_broker_configure
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack

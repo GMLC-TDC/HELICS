@@ -425,7 +425,7 @@ void UdpComms::queue_tx_function ()
                 {
                 case NEW_ROUTE:
                 {
-                    auto newroute = cmd.payload;
+                    auto &newroute = cmd.payload;
 
                     try
                     {

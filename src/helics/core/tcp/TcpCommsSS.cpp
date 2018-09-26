@@ -85,6 +85,32 @@ void TcpCommsSS::setServerMode(bool mode)
     }
 }
 
+void TcpCommsSS::addConnection(const std::string &newConn)
+{
+	if (propertyLock())
+	{
+		connections.emplace_back(newConn);
+		propertyUnLock();
+	}
+}
+
+void TcpCommsSS::addConnections(const std::vector<std::string> &newConnections)
+{
+	if (propertyLock())
+	{
+		if (connections.empty())
+		{
+			connections = newConnections;
+		}
+		else
+		{
+			connections.reserve(connections.size() + newConnections.size());
+			connections.insert(connections.end(), newConnections.begin(), newConnections.end());
+		}
+		propertyUnLock();
+	}
+}
+
 int TcpCommsSS::processIncomingMessage (ActionMessage &M)
 {
     if (isProtocolCommand (M))
