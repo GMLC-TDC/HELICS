@@ -173,7 +173,6 @@ void CommonCore::unregister ()
     {
         if (keepCoreAlive.get () == this)
         {
-            keepCoreAlive = nullptr;
             CoreFactory::unregisterCore (identifier);
         }
     }
@@ -185,7 +184,6 @@ void CommonCore::unregister ()
         {
             if (keepCoreAlive2.get () == this)
             {
-                keepCoreAlive2 = nullptr;
                 CoreFactory::unregisterCore (prevIdentifier);
             }
         }
@@ -193,7 +191,6 @@ void CommonCore::unregister ()
 }
 CommonCore::~CommonCore ()
 {
-    // make sure everything is synced up so just run the lock
     joinAllThreads ();
 }
 

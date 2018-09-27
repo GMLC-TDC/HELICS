@@ -547,12 +547,11 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
 
     auto f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    auto f2 = fFed->registerFilter ("filter2");
-    fFed->addSourceTarget (f2, "port2");
+    fFed->addSourceTarget (f1, "port2");
     BOOST_CHECK (f1.value () != helics::invalid_id_value);
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
-    fFed->setFilterOperator ({f1, f2}, timeOperator);
+    fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();

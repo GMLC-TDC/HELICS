@@ -1132,12 +1132,9 @@ void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator
     coreObject->setFilterOperator (interface_handle (id.value ()), std::move (mo));
 }
 
-void Federate::setFilterOperator (const std::vector<filter_id_t> &filter_ids, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOption(filter_id_t id, int32_t option, bool option_value)
 {
-    for (auto id : filter_ids)
-    {
-        coreObject->setFilterOperator (interface_handle (id.value ()), mo);
-    }
+	coreObject->setHandleOption(interface_handle(id.value()), option,option_value);
 }
 
 }  // namespace helics

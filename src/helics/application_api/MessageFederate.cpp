@@ -433,4 +433,10 @@ void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t>
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
 
+
+void MessageFederate::setEndpointOption(endpoint_id_t id, int32_t option, bool option_value)
+{
+	mfManager->setEndpointOption(id, option, option_value);
+}
+
 }  // namespace helics

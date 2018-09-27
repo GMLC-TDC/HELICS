@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
+#include "helics/core/core-exceptions.hpp"
 #include <cassert>
 
 namespace helics
@@ -232,8 +233,20 @@ const std::string &MessageFederateManager::getEndpointType (endpoint_id_t id) co
 
 int MessageFederateManager::getEndpointCount () const
 {
-    std::lock_guard<std::mutex> eLock (endpointLock);
     return static_cast<int> (endpointCount);
+}
+
+void MessageFederateManager::setEndpointOption(endpoint_id_t id, int32_t option, bool option_value)
+{
+	auto eptHandle = local_endpoints.lock_shared();
+	if (isValidIndex(id.value(), *eptHandle))
+	{
+		coreObject->setHandleOption((*eptHandle)[id.value()]->handle, option, option_value);
+	}
+	else
+	{
+		throw(InvalidIdentifier("Endpoint Id is invalid"));
+	}
 }
 
 void MessageFederateManager::registerCallback (const std::function<void(endpoint_id_t, Time)> &callback)

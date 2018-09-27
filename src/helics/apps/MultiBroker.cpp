@@ -4,7 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#pragma once
 #include "MultiBroker.hpp"
 #include "../core/CommsInterface.hpp"
 #include <atomic>

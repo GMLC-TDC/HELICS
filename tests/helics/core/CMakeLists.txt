@@ -56,7 +56,7 @@ add_test(
   COMMAND
     core-tests
     --run_test=@ci
-    --log_level=message
+    --log_level=test_suite
     --report_level=short
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
