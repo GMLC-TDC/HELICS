@@ -144,6 +144,7 @@ jobs:
         - BUILD_TYPE=Coverage
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
+        - CTEST_VERBOSE=true
     # GCC 5 build
     - <<: *daily_linux
       name: "GCC 5"
@@ -251,6 +252,7 @@ install:
   - if [[ "$RUN_TSAN" ]]; then TEST_FLAGS_ARR+=("--tsan") ; fi
   - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
   - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
+  - if [[ "$CTEST_VERBOSE" ]]; then TEST_FLAGS_ARR+=("--ctest-verbose") ; fi
   - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
   - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
 
