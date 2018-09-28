@@ -3,34 +3,35 @@ import java.util.*;
 
 import com.java.helics.SWIGTYPE_p_void;
 import com.java.helics.helics;
-import com.java.helics.helics_status;
+import com.java.helics.federate_state;
 import com.java.helics.message_t;
 
 public class TestMessageFederate {
+	
 	public static SWIGTYPE_p_void createMessageFederate(final String fedName, final double timeDelta) {
 		String fedinitstring = "--broker=mainbroker --federates=1";
 		// Create Federate Info object that describes the federate properties 
-		SWIGTYPE_p_void fi = helics.helicsFederateInfoCreate();
-		helics_status rv = helics.helicsFederateInfoSetFederateName(fi,fedName);
-		rv = helics.helicsFederateInfoSetTimeDelta(fi, timeDelta);
-		rv = helics.helicsFederateInfoSetCoreTypeFromString(fi, "zmq");
+		SWIGTYPE_p_void fi = helics.helicsCreateFederateInfo();
+		//TIME_DELTA_PROPERTY = 137
+		helics.helicsFederateInfoSetTimeProperty(fi, 137, timeDelta);
+	    helics.helicsFederateInfoSetCoreTypeFromString(fi, "zmq");
 		// Federate init string 
-	    helics_status status = helics.helicsFederateInfoSetCoreInitString(fi, fedinitstring);
-		SWIGTYPE_p_void msgFed = helics.helicsCreateMessageFederate(fi);
+		helics.helicsFederateInfoSetCoreInitString(fi, fedinitstring);
+		SWIGTYPE_p_void msgFed = helics.helicsCreateMessageFederate(fedName, fi);
 		//Wait for sometime
 		
 		return msgFed;
 	}
-	
+
 	public static void test_message_federate_initialize(SWIGTYPE_p_void msgFederate) {
 		int[] state = new int[1];
-	    helics_status status = helics.helicsFederateGetState(msgFederate, state);
-	    assert state[0] == 0;
+	    federate_state status = helics.helicsFederateGetState(msgFederate);
+	    assert status.swigValue() == 0;
 
-	    helics.helicsFederateEnterExecutionMode(msgFederate);
+	    helics.helicsFederateEnterExecutingMode(msgFederate);
 
-	    status = helics.helicsFederateGetState(msgFederate, state);
-	    assert state[0] == 2;		
+	    status = helics.helicsFederateGetState(msgFederate);
+	    assert status.swigValue() == 3;		
 	}
 	
     public static void test_message_federate_endpoint_registration(SWIGTYPE_p_void msgFederate) {
@@ -39,29 +40,26 @@ public class TestMessageFederate {
 		SWIGTYPE_p_void epid2 = helics.helicsFederateRegisterGlobalEndpoint(msgFederate, 
 						"ep2", "random");
 		
-		helics.helicsFederateEnterExecutionMode(msgFederate);
+		helics.helicsFederateEnterExecutingMode(msgFederate);
 		int maxLen = 100;
-		byte[] endpoint_name = new byte[100];
-		helics_status status = helics.helicsEndpointGetName(epid1, endpoint_name);
-		assert status == helics_status.helics_ok;
-		String ep = new String(endpoint_name);
-		assert ep == "TestA Federate/ep1";
+		//byte[] endpoint_name = new byte[100];
+		String endpoint_name = helics.helicsEndpointGetName(epid1);
 		
-		status = helics.helicsEndpointGetName(epid2, endpoint_name);
-		assert status == helics_status.helics_ok;
-		String ep2 = new String(endpoint_name);
-		assert ep2 == "ep2";
+		// String ep = new String(endpoint_name);
+		assert endpoint_name == "TestA Federate/ep1";
 		
-		byte[] endpoint_type = new byte[100];
-		status = helics.helicsEndpointGetType(epid1, endpoint_type);
-		assert status == helics_status.helics_ok;
-		String et = new String(endpoint_type);
-		assert et == "";
+		endpoint_name = helics.helicsEndpointGetName(epid2);
+		//assert status == helics_status.helics_ok;
+		// String ep2 = new String(endpoint_name);
+		// assert ep2 == "ep2";
 		
-		status = helics.helicsEndpointGetType(epid2, endpoint_type);
-		assert status == helics_status.helics_ok;
-		String et2 = new String(endpoint_type);
-		assert et2 == "random";
+	    String endpoint_type = helics.helicsEndpointGetType(epid1);
+		// String et = new String(endpoint_type);
+		assert endpoint_type == "";
+		
+		endpoint_type = helics.helicsEndpointGetType(epid2);
+		// String et2 = new String(endpoint_type);
+		assert endpoint_type == "random";
     	
     }
     
@@ -71,16 +69,16 @@ public class TestMessageFederate {
 		SWIGTYPE_p_void epid2 = helics.helicsFederateRegisterGlobalEndpoint(msgFederate, 
 						"ep2", "random");
 		double timeDelta = 1.0;
-		helics_status status = helics.helicsFederateInfoSetTimeDelta(msgFederate, timeDelta);
-        helics.helicsFederateEnterExecutionMode(msgFederate);
+		//TIME_DELTA_PROPERTY = 137
+		helics.helicsFederateInfoSetTimeProperty(msgFederate, 137, timeDelta);
+        helics.helicsFederateEnterExecutingMode(msgFederate);
 
         //String data = "random-data";
 		SWIGTYPE_p_void data = null;
-        status = helics.helicsEndpointSendEventRaw(epid1, "ep2", data, 10, 1.0);
+		helics.helicsEndpointSendEventRaw(epid1, "ep2", data, 10, 1.0);
         
         double request_time = 1.0;
-        double[] timeout = {1.0};
-        status = helics.helicsFederateRequestTime(msgFederate, request_time, timeout);
+        double timeout = helics.helicsFederateRequestTime(msgFederate, request_time);
 
         int res = helics.helicsFederateHasMessage(msgFederate);
         assert res == 1;
@@ -120,10 +118,9 @@ public class TestMessageFederate {
 		
 		//
 		// Wait for sometime
-		helics_status status = helics.helicsFederateFinalize(myFederate);
-		int[] state = new int[1];
-		status =  helics.helicsFederateGetState(myFederate, state);
-	    assert state[0] == 3;
+		helics.helicsFederateFinalize(myFederate);
+		federate_state state = helics.helicsFederateGetState(myFederate);
+		assert state.swigValue() == 3;
 	    while (helics.helicsBrokerIsConnected(broker) == 1) {
 	    	try {
 	    	    Thread.sleep(1000);                 //1000 milliseconds is one second.
@@ -136,4 +133,5 @@ public class TestMessageFederate {
 	    
 	    // Test 
 	}
+	
 }

@@ -3,7 +3,7 @@ import java.util.*;
 
 import com.java.helics.SWIGTYPE_p_void;
 import com.java.helics.helics;
-import com.java.helics.helics_status;
+import com.java.helics.federate_state;
 import com.java.helics.helics_filter_type_t;
 
 public class TestMessageFilter {
@@ -21,33 +21,32 @@ public class TestMessageFilter {
 			int count, double deltat, String name_prefix) {
 
 	    // Create Federate Info object that describes the federate properties #
-	    SWIGTYPE_p_void fedinfo = helics.helicsFederateInfoCreate();
-
-	    // Set Federate name 
-	    helics_status status = helics.helicsFederateInfoSetFederateName(fedinfo, name_prefix + "TestA Federate");
+	    SWIGTYPE_p_void fedinfo = helics.helicsCreateFederateInfo();
 
 	    // Set core type from string 
-	    status = helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
+	    helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
 
 	    // Federate init string 
 	    String fedinitstring = "--broker=mainbroker --federates="+ Integer.toString(count);
-	    status = helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
+	    helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
 
 	    // Set one second message interval 
-	    status = helics.helicsFederateInfoSetTimeDelta(fedinfo, deltat);
+		//TIME_DELTA_PROPERTY = 137
+		helics.helicsFederateInfoSetTimeProperty(fedinfo, 137, deltat);
+	    //status = helics.helicsFederateInfoSetTimeDelta(fedinfo, deltat);
+		//LOG_LEVEL_PROPERTY = 271
+	    helics.helicsFederateInfoSetIntegerProperty(fedinfo, 271, 1);
 
-	    status = helics.helicsFederateInfoSetLoggingLevel(fedinfo, 1);
-
-	    SWIGTYPE_p_void mFed = helics.helicsCreateMessageFederate(fedinfo);
+	    SWIGTYPE_p_void mFed = helics.helicsCreateMessageFederate(name_prefix + "TestA Federate", fedinfo);
 	    
 	    return mFed;
 	}
 	
 	public static void FreeFederate(SWIGTYPE_p_void fed) {
-	    helics_status status = helics.helicsFederateFinalize(fed);
-	    int[] state = new int[1];
-	    status = helics.helicsFederateGetState(fed, state);
-	    assert state[0] == 3;
+	    helics.helicsFederateFinalize(fed);
+
+	    federate_state status = helics.helicsFederateGetState(fed);
+	    assert status.swigValue() == 3;
 
 	    helics.helicsFederateFree(fed);
 	}
@@ -60,10 +59,10 @@ public class TestMessageFilter {
 	    helics.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "");
 	    helics.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "");
 
-	    SWIGTYPE_p_void f1 = helics.helicsFederateRegisterSourceFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter1", "port1");
-	    SWIGTYPE_p_void f2 = helics.helicsFederateRegisterDestinationFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter2", "port2");
+	    //SWIGTYPE_p_void f1 = helics.helicsFederateRegisterFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter1", "port1");
+	    //SWIGTYPE_p_void f2 = helics.helicsFederateRegisterGlobalFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter2", "port2");
 	    SWIGTYPE_p_void ep1 = helics.helicsFederateRegisterEndpoint (fFed, "fout", "");
-	    SWIGTYPE_p_void f3 = helics.helicsFederateRegisterSourceFilter (fFed, helics_filter_type_t.helics_custom_filter, "", "filter0/fout");
+	    //SWIGTYPE_p_void f3 = helics.helicsFederateRegisterFilter (fFed, helics_filter_type_t.helics_custom_filter, "", "filter0/fout");
 
 	    FreeFederate(fFed);
 	    FreeFederate(mFed);
@@ -73,15 +72,10 @@ public class TestMessageFilter {
 	public static void main(String[] args) {
 		SWIGTYPE_p_void broker = AddBroker("zmq");
 		String initstring = "--broker=";
-		byte[] identifier = new byte[100];
-		helics_status status = helics.helicsBrokerGetIdentifier(broker, identifier);
-		assert status == helics_status.helics_ok;
-		String id = new String(identifier);
+		String id = helics.helicsBrokerGetIdentifier(broker);
 		initstring = initstring + id;
 		initstring = initstring + " --broker_address";
-		byte[] address = new byte[100];
-		status = helics.helicsBrokerGetAddress(broker, address);
-		assert status == helics_status.helics_ok;
+		String address = helics.helicsBrokerGetAddress(broker);
 		test_message_filter_registration(broker);
 		helics.helicsBrokerDisconnect(broker);
 		helics.helicsCloseLibrary();
