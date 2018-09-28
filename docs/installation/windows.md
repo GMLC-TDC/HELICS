@@ -159,3 +159,69 @@ Out[2]: '1.0.2 (04-28-18)'
 ```
 
 ![](../img/windows-python-success.png)
+
+## Building HELICS From Source on Windows with MSYS2 ##
+### Overview ###
+This section will layout the setting up of MSYS2 to compile and install HELICS. This guide will describe all the packages and install instructions for a 64bit build.
+
+### Setting up MSYS2 ###
+MSYS2 provides a linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
+- base-devel
+- mingw-w64-x86_64-toolchain
+- git
+- mingw-w64-x86_64-cmake
+- mingw-w64-x86_64-boost
+- mingw-w64-x86_64-qt5 (only if you want to be able to run cmake-gui which this guide recommends.)
+- mingw-w64-x86_64-zeromq
+
+All packages can be installed by typing the following:
+```bash
+$ pacman -S --needed base-devel mingw-w64_x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-qt5
+```
+After all this has been done /mingw64/bin must be in the PATH environment variable. If it isn't then it must be added. Please note that this is only necessary if you are compiling in MSYS2 shell. If you are compiling in the MSYS2 MINGW-64bit shell then /ming64/bin will be automatically added to the PATH environment variable.
+```bash
+$ export PATH=$PATH:/mingw64/bin
+```
+
+### Download HELICS Source Code ###
+Now that the MSYS2 environment has been setup and all prerequisite packages have been installed the source code can be compiled and installed. The HELICS source code can be cloned from GitHub by performing the following:
+```bash
+$ git clone https://github.com/GMLC-TDC/HELICS-src.git
+```
+git will clone the source code into a folder in the current working directory called HELICS-src. This path will be refered to by this guide as HELICS_ROOT_DIR.
+
+### Compiling HELICS From Source ###
+Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
+```bash
+$ cmake-gui ../
+```
+If this failes that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makesfiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
+
+* BUILD_CXX_SHARED_LIB should be checked as GridLAB-D dynamically links with the shared c++ library of HELICS
+* Boost_CHRONO_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_chrono-mt.dll
+* Boost_DATE_TIME_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_date_time-mt.dll
+* Boost_FILESYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_filesystem-mt.dll
+* Boost_INCLUDE_DIR C:/msys64/mingw64/include
+* Boost_LIBRARY_DIR_DEBUG/RELEASE C:/msys64/mingw64/bin
+* Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_program_options-mt.dll
+* Boost_SYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_system-mt.dll
+* Boost_TIMER_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_timer-mt.dll
+* Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_unit_test_framework-mt.dll
+* CMAKE_CXX_FLAGS -std=gnu++14
+* CMAKE_INSTALL_PREFIX /usr/local or location of your choice
+* ZeroMQ_INCLUDE_DIR C:/msys64/mingw64/include
+* ZeroMQ_INSTALL_PATH C:/msys64/mingw64
+* ZeroMQ_LIBRARY C:/msys64/mingw64/bin/libzmq.dll
+* ZeroMQ_ROOT_DIR C:/msys64/mingw64
+
+Once these cmake variables have been correctly varified click Configure. Once that is complete click Generate then once that is complete the CMake gui can be closed.
+
+Back in the MSYS2 command window type:
+```bash
+$ make -j x
+```
+where x is the number of threads you can give the make process to speed up the build. Then once that is complete type:
+```bash
+$ make install
+```
+unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_1_3_0. This install path will be refered to as HELICS_INSTALL for the next section.
