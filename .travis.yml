@@ -106,6 +106,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
+        - ENABLE_CPACK=true
         - UPLOAD_BINTRAY_ARTIFACT=true
 
     - <<: *linux_base
@@ -237,6 +238,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON") ; fi
 
   - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=("-DDISABLE_SWIG=ON") ; fi
+  - if [[ "$ENABLE_CPACK" ]] ; then HELICS_OPTION_FLAGS+=("-DENABLE_PACKAGE_BUILD=ON") ; fi
   - if [[ "$BUILD_TYPE" ]]; then OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}") ; fi
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON") ; fi
   - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=("-DENABLE_CXX_17=ON") ; fi
