@@ -4,7 +4,7 @@ if [[ "$1" ]]; then
     subcmd=$(tr '[:upper:]' '[:lower:]' <<< $1)
     case "${subcmd}" in
         setup-counters)
-            lcov --directory . -- zerocounters > /dev/null
+            lcov --directory . --zerocounters > /dev/null
             lcov --no-external --capture --initial --directory . --output-file coverage.base > /dev/null
             ;;
         gather-coverage-info)
