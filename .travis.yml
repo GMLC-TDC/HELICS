@@ -278,7 +278,7 @@ script:
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
 
   # Upload artifact to Bintray
-  - if [[ "$UPLOAD_BINTRAY_ARTIFACT" ]]; then cpack -G STGZ -B cpack-output && curl -T $(ls cpack-output/Helics*.sh) -u${BT_USER}:${BT_APIKEY} "https://api.bintray.com/content/helics/develop/snapshot/${TRAVIS_BRANCH}/${TRAVIS_BRANCH}/helics-install-$(uname -s).sh?publish=1&override=1" ; fi 
+  - if [[ "$UPLOAD_BINTRAY_ARTIFACT" ]]; then cpack -G STGZ -B $(pwd)/cpack-output && curl -T $(ls cpack-output/Helics*.sh) -u${BT_USER}:${BT_APIKEY} "https://api.bintray.com/content/helics/develop/snapshot/${TRAVIS_BRANCH}/${TRAVIS_BRANCH}/helics-install-$(uname -s).sh?publish=1&override=1" ; fi 
 notifications:
     email: false
 
