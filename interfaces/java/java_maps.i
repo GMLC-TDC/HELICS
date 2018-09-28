@@ -1,3 +1,6 @@
+%{
+  #include "api-data.h"
+%}
 
 //typemap for short maxlen strings
 %typemap(in) (char *outputString, int maxlen) {
@@ -64,6 +67,19 @@
 %typemap(jstype) (int argc, char **argv) "String[]"
 
 %typemap(javain) (int argc, char **argv) "$javainput"
+
+%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+	etemp=helicsErrorInitialize();
+	$1=&etemp;
+}
+
+%typemap(freearg) helics_error *
+{
+	if ($1->error_code!=helics_ok)
+	{
+		// do nothing
+	}
+}
 
 //
 //// typemap for vector input functions
