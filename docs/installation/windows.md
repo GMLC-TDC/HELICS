@@ -96,7 +96,7 @@ location will need to be manually given to cmake.
 
 ## Windows Installers
 
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS-src/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.  
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS-src/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.
 
 ## Testing
 
@@ -154,7 +154,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.0.2 (04-28-18)'
+Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
