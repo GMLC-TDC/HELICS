@@ -19,10 +19,10 @@ do
         --msan)
             echo "Tests using memory sanitizer"
             ;;
-	--tsan)
-	    echo "Tests using thread sanitizer"
-	    CTEST_OPTIONS+=" --verbose"
-	    ;;
+        --tsan)
+            echo "Tests using thread sanitizer"
+            CTEST_OPTIONS+=" --verbose"
+            ;;
         --ubsan)
             echo "Tests using undefined behavior sanitizer"
             export UBSAN_OPTIONS=print_stacktrace=1
@@ -37,6 +37,9 @@ do
             ;;
         --ctest-xml-output)
             CTEST_OPTIONS+=" -T Test"
+            ;;
+        --ctest-verbose)
+            CTEST_OPTIONS+=" --verbose"
             ;;
         *)
             TEST_CONFIG=$i
