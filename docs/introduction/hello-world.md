@@ -35,12 +35,12 @@ Windows CMD:
 
 Next, make a new source file and call it `hello_world_sender.c`. Copy
 the contents from
-[hello\_world\_sender.c](https://github.com/GMLC-TDC/HELICS-src/blob/master/examples/CInterface/hello_world_sender.c)
+[hello\_world\_sender.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/bdbdf4e/c/hello_world/hello_world_sender.c)
 and paste it into the file.
 
 Next, create a new source file and call it `hello_world_receiver.c`.
 Copy the contents from
-[hello\_world\_receiver.c](https://github.com/GMLC-TDC/HELICS-src/blob/master/examples/CInterface/hello_world_receiver.c)
+[hello\_world\_receiver.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/bdbdf4e/c/hello_world/hello_world_receiver.c)
 and paste it into the file.
 
 We will go through in more detail the contents of these files. For now,
@@ -119,7 +119,7 @@ helicsFederateEnterInitializationMode(vfed);
 helicsFederateEnterExecutionMode(vfed);
 ```
 
-These functions publish a String and make a RequestTime function call to 
+These functions publish a String and make a RequestTime function call to
 advance time in the simulation
 
 ```c
@@ -150,7 +150,7 @@ sub = helicsFederateRegisterSubscription (vfed, "hello", "string", "");
 
 helicsFederateEnterInitializationMode (vfed);
 helicsFederateEnterExecutionMode (vfed);
-    
+
 /** request that helics grant the federate a time of 1.0
     the new time will be returned in currentime*/
 helicsFederateRequestTime (vfed, 1.0, &currenttime);
