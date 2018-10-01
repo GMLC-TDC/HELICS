@@ -21,8 +21,7 @@ TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
 
 
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{ { "server"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Core should be a server"s },
-{ "connector"s,ArgDescriptor::arg_type_t::flag_type, "specify that the Core should be a connector"s },
+static const ArgDescriptors extraArgs{
 { "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s } };
 
 void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
@@ -38,10 +37,6 @@ void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
             {
                 connections = vm["connections"].as<std::vector<std::string>>();
             }
-            if (vm.count("server") > 0)
-            {
-                serverMode = true;
-            }
         }
         lock.unlock();
         NetworkCore::initializeFromArgs(argc, argv);
@@ -51,7 +46,6 @@ void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 bool TcpCoreSS::brokerConnect ()
 {
     std::unique_lock<std::mutex> lock (dataMutex);
-    comms->setServerMode(serverMode);
 	if (!connections.empty())
 	{
 		comms->addConnections(connections);

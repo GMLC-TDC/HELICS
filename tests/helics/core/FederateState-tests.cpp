@@ -145,28 +145,28 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
 
     // Check first endpoint
     info = fs->interfaces().getEndpoint ("first!");
-    BOOST_CHECK_EQUAL (info->id, interface_handle(0));
+    BOOST_CHECK_EQUAL (info->id.handle, interface_handle(0));
 
     info = fs->interfaces().getEndpoint (interface_handle(0));
     BOOST_CHECK_EQUAL (info->key, "first!");
 
     // Check second endpoint
     info = fs->interfaces().getEndpoint ("second");
-    BOOST_CHECK_EQUAL (info->id, interface_handle(1));
+    BOOST_CHECK_EQUAL (info->id.handle, interface_handle(1));
 
     info = fs->interfaces().getEndpoint (interface_handle(1));
     BOOST_CHECK_EQUAL (info->key, "second");
 
     // Check the out of order endpoint
     info = fs->interfaces().getEndpoint ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id, interface_handle(2));
+    BOOST_CHECK_EQUAL (info->id.handle, interface_handle(2));
 
     info = fs->interfaces().getEndpoint (interface_handle(2));
     BOOST_CHECK_EQUAL (info->key, "cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->interfaces().getEndpoint ("last");
-    BOOST_CHECK_EQUAL (info->id, interface_handle(3));
+    BOOST_CHECK_EQUAL (info->id.handle, interface_handle(3));
 
     info = fs->interfaces().getEndpoint (interface_handle(3));
     BOOST_CHECK_EQUAL (info->key, "last");

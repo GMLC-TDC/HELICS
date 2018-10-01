@@ -22,9 +22,15 @@ static const ArgDescriptors extraArgs{
   {"broker,b"s, "identifier for the broker"s},
   {"broker_address", "location of the broker i.e network address"},
   { "brokername", "the name of the broker" },
+  { "max_size", ArgDescriptor::arg_type_t::int_type,"maximum message buffer size (16*1024)" },
+  { "max_count", ArgDescriptor::arg_type_t::int_type,"max queue size for the message (256)" },
   { "local", ArgDescriptor::arg_type_t::flag_type,"use local interface(default)" },
   {"ipv4", ArgDescriptor::arg_type_t::flag_type,"use external ipv4 addresses"},
   { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
+  { "server"s, ArgDescriptor::arg_type_t::flag_type,
+  "specify that the network connection should be a server"s },
+  { "client"s, ArgDescriptor::arg_type_t::flag_type,
+  "specify that the network connection should be a client"s },
   {"reuse_address", ArgDescriptor::arg_type_t::flag_type, "allow the server to reuse a bound address"},
   { "external", ArgDescriptor::arg_type_t::flag_type,"use all external interfaces" },
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
@@ -126,7 +132,49 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     {
         brokerName = vm["brokername"].as<std::string> ();
     }
-
+	if (vm.count("max_size") > 0)
+	{
+		 auto bsize= vm["max_size"].as<int>();
+		 if (bsize > 0)
+		 {
+			 maxMessageSize = bsize;
+		 }
+		 
+	}
+	if (vm.count("max_count") > 0)
+	{
+		auto msize = vm["max_count"].as<int>();
+		if (msize > 0)
+		{
+			maxMessageSize = msize;
+		}
+	}
+	if (vm.count("server") > 0)
+	{
+		switch (server_mode)
+		{
+		case server_mode_options::unspecified:
+		case server_mode_options::server_default_active:
+		case server_mode_options::server_default_deactivated:
+			server_mode = server_mode_options::server_active;
+			break;
+		default:
+			break;
+		}
+	}
+	if (vm.count("client") > 0)
+	{
+		switch (server_mode)
+		{
+		case server_mode_options::unspecified:
+		case server_mode_options::server_default_active:
+		case server_mode_options::server_default_deactivated:
+			server_mode = server_mode_options::server_deactivated;
+			break;
+		default:
+			break;
+		}
+	}
     if (vm.count ("interface") > 0)
     {
         auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
@@ -204,8 +252,11 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
 std::string makePortAddress (const std::string &networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;
-    newAddress.push_back (':');
-    newAddress.append (std::to_string (portNumber));
+	if (portNumber >= 0)
+	{
+		newAddress.push_back(':');
+		newAddress.append(std::to_string(portNumber));
+	}
     return newAddress;
 }
 

@@ -19,16 +19,14 @@ class EndpointInfo
 {
   public:
     /** constructor from all data*/
-    EndpointInfo (global_federate_id_t fed_id_, 
-                  interface_handle id_,
+    EndpointInfo (global_handle id_,
                   const std::string &key_,
                   const std::string &type_)
-        :  fed_id (fed_id_), id(id_), key (key_), type (type_)
+        :  id (id_), key (key_), type (type_)
     {
     }
 
-    const global_federate_id_t fed_id;  //!< local federate id
-    const interface_handle id;  //!< identifier for the endpoint
+	const global_handle id;  //!< identifier for the handle
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:

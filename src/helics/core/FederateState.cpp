@@ -233,7 +233,7 @@ std::unique_ptr<Message> FederateState::receiveAny (interface_handle &id)
     if (earliest_time <= time_granted)
     {
         auto result = endpointI->getMessage (time_granted);
-        id = endpointI->id;
+        id = endpointI->id.handle;
         return result;
     }
     id = interface_handle ();

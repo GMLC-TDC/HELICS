@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template class NetworkBroker<tcp::TcpComms, NetworkBrokerData::interface_type::tcp, 6>;
+template class NetworkBroker<tcp::TcpComms, NetworkBrokerData::interface_type::tcp, static_cast<int>(core_type::TCP)>;
 namespace tcp
 {
 

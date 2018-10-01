@@ -45,7 +45,6 @@ class TcpCoreSS final : public NetworkCore<TcpCommsSS, NetworkBrokerData::interf
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   private:
-    bool serverMode = false;
     std::vector<std::string> connections;  //!< defined connections 
     virtual bool brokerConnect () override;
 };

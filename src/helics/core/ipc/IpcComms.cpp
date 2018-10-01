@@ -26,6 +26,11 @@ namespace helics
 namespace ipc
 {
 
+IpcComms::IpcComms()
+{
+	//override the default value for this comm system
+	maxMessageCount_ = 256;
+}
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
 
@@ -282,6 +287,9 @@ void IpcComms::closeReceiver ()
         }
     }
 }
+
+
+std::string IpcComms::getAddress() const { return localTarget_; }
 
 }  // namespace ipc
 }  // namespace helics

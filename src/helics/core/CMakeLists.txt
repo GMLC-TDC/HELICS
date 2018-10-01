@@ -20,6 +20,7 @@ set(
 	core-types.cpp
 	core-data.cpp
 	TimeCoordinator.cpp
+	NetworkCommsInterface.cpp
 	ForwardingTimeCoordinator.cpp
 	TimeDependencies.cpp
 	CommsInterface.cpp
@@ -100,6 +101,7 @@ set(
 	ActionMessage.hpp
 	CommonCore.hpp
 	CommsInterface.hpp
+	NetworkCommsInterface.hpp
 	FederateState.hpp
 	PublicationInfo.hpp
 	NamedInputInfo.hpp

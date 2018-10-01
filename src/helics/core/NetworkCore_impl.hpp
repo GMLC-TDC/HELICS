@@ -12,12 +12,14 @@ namespace helics
 template <class COMMS, NetworkBrokerData::interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
 {
+	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
 template <class COMMS, NetworkBrokerData::interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
     : CommsBroker<COMMS, CommonCore> (core_name)
 {
+	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
 template <class COMMS, NetworkBrokerData::interface_type baseline>

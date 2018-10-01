@@ -5,62 +5,70 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "NetworkBroker.hpp"
 #include "../core/core-types.hpp"
+#include "NetworkBroker.hpp"
 namespace helics
 {
+constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",      "interprocess",
+                                "TCP",     "UDP",    "undef", "nng",    "ZMQ_test", "TCPSS",
+                                "undef",   "undef",  "http",  "unknown"};
 
-constexpr const char* tstr[] = { "default","ZeroMQ","MPI","TEST","Interprocess","interprocess","TCP", "UDP","undef","nng","ZMQ_test","TCPSS","undef","undef","http","unknown" };
+constexpr const char *tcodeStr (int tcode) { return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15]; }
 
-constexpr const char * tcodeStr(int tcode)
+constexpr const char *defInterface[] = {"tcp://127.0.0.1", "udp://127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
+
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (bool rootBroker) noexcept
+    : CommsBroker<COMMS, CoreBroker> (rootBroker)
 {
-    return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15];
+	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline,int tcode>
-NetworkBroker<COMMS, baseline,tcode>::NetworkBroker(bool rootBroker) noexcept : CommsBroker<COMMS, CoreBroker>(rootBroker) {}
-
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
-NetworkBroker<COMMS, baseline,tcode>::NetworkBroker(const std::string &broker_name) : CommsBroker<COMMS, CoreBroker>(broker_name) {}
-
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline,tcode>::displayHelp(bool local_only)
+NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (const std::string &broker_name)
+    : CommsBroker<COMMS, CoreBroker> (broker_name)
 {
-    std::cout << " Help for "<<tcodeStr(tcode)<<" Broker: \n";
-    NetworkBrokerData::displayHelp();
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
+}
+
+template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+void NetworkBroker<COMMS, baseline, tcode>::displayHelp (bool local_only)
+{
+    std::cout << " Help for " << tcodeStr (tcode) << " Broker: \n";
+    NetworkBrokerData::displayHelp ();
     if (!local_only)
     {
-        CoreBroker::displayHelp();
+        CoreBroker::displayHelp ();
     }
 }
 
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline,tcode>::initializeFromArgs(int argc, const char *const *argv)
+void NetworkBroker<COMMS, baseline, tcode>::initializeFromArgs (int argc, const char *const *argv)
 {
     if (BrokerBase::brokerState == BrokerBase::created)
     {
-        std::lock_guard<std::mutex> lock(dataMutex);
+        std::lock_guard<std::mutex> lock (dataMutex);
         if (BrokerBase::brokerState == BrokerBase::created)
         {
-            netInfo.initializeFromArgs(argc, argv, "tcp://127.0.0.1");
-            CoreBroker::initializeFromArgs(argc, argv);
+            netInfo.initializeFromArgs (argc, argv, defInterface[static_cast<int> (baseline)]);
+            CoreBroker::initializeFromArgs (argc, argv);
         }
     }
 }
 
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
-bool NetworkBroker<COMMS, baseline,tcode>::brokerConnect()
+bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock(dataMutex);
-    if (netInfo.brokerAddress.empty())
+    std::lock_guard<std::mutex> lock (dataMutex);
+    if (netInfo.brokerAddress.empty ())
     {
-        CoreBroker::setAsRoot();
+        CoreBroker::setAsRoot ();
     }
     // zmqContextManager::startContext();
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
     CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
     CommsBroker<COMMS, CoreBroker>::comms->setTimeout (BrokerBase::networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
+
     auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)
     {
@@ -73,7 +81,7 @@ bool NetworkBroker<COMMS, baseline,tcode>::brokerConnect()
 }
 
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
-std::string NetworkBroker<COMMS, baseline,tcode>::generateLocalAddressString() const
+std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString () const
 {
     std::string add;
     if (CommsBroker<COMMS, CoreBroker>::comms->isConnected ())
@@ -82,18 +90,18 @@ std::string NetworkBroker<COMMS, baseline,tcode>::generateLocalAddressString() c
     }
     else
     {
-
-        std::lock_guard<std::mutex> lock(dataMutex);
-        if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*'))
+        std::lock_guard<std::mutex> lock (dataMutex);
+        if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
         {
-            add=makePortAddress(netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1), netInfo.portNumber);
+            add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
+                                   netInfo.portNumber);
         }
         else
         {
-            add=makePortAddress(netInfo.localInterface, netInfo.portNumber);
+            add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
         }
     }
     return add;
 }
 
-} //namespace helics
+}  // namespace helics

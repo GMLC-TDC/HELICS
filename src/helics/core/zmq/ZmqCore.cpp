@@ -13,9 +13,12 @@ namespace helics
 {
 namespace zeromq
 {
-ZmqCore::ZmqCore () noexcept {}
+ZmqCore::ZmqCore () noexcept { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated; }
 
-ZmqCore::ZmqCore (const std::string &core_name) : NetworkCore (core_name) {}
+ZmqCore::ZmqCore (const std::string &core_name) : NetworkCore (core_name)
+{
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+}
 
 bool ZmqCore::brokerConnect ()
 {

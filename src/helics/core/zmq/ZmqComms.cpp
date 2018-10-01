@@ -263,7 +263,7 @@ void ZmqComms::queue_rx_function ()
     }
     catch (const zmq::error_t &e)
     {
-        std::cerr << "binding error on internal comms socket:" << e.what () << std::endl;
+        logError(std::string("binding error on internal comms socket:")+ e.what ());
         setRxStatus (connection_status::error);
         return;
     }
@@ -330,8 +330,7 @@ void ZmqComms::queue_rx_function ()
         pullSocket.close ();
         repSocket.close ();
         disconnecting = true;
-        std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, repPortNumber)
-                  << '\n';
+        logError(std::string("Unable to bind zmq reply socket giving up ")+makePortAddress (localTarget_, repPortNumber));
         setRxStatus (connection_status::error);
         return;
     }
@@ -342,8 +341,7 @@ void ZmqComms::queue_rx_function ()
         pullSocket.close ();
         repSocket.close ();
         disconnecting = true;
-        std::cerr << " unable to bind zmq socket giving up " << makePortAddress (localTarget_, pullPortNumber)
-                  << '\n';
+		logError(std::string("Unable to bind zmq reply socket giving up ") + makePortAddress (localTarget_, pullPortNumber));
         setRxStatus (connection_status::error);
         return;
     }
@@ -355,7 +353,7 @@ void ZmqComms::queue_rx_function ()
     poller[1].events = ZMQ_POLLIN;
     poller[2].socket = static_cast<void *> (repSocket);
     poller[2].events = ZMQ_POLLIN;
-    setRxStatus (connection_status::connected);  // this is a atomic indicator that the rx queue is ready
+    setRxStatus (connection_status::connected);
     while (true)
     {
         auto rc = zmq::poll (poller);
@@ -420,8 +418,8 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         }
         catch (zmq::error_t &ze)
         {
-            std::cerr << "unable to connect with broker at " << makePortAddress (brokerTarget_, brokerReqPort)
-                      << ":("<<name<<")" << ze.what () << '\n';
+            logError(std::string("unable to connect with broker at ")+makePortAddress (brokerTarget_, brokerReqPort)
+                      +":("+name+")"+ze.what ());
             setTxStatus (connection_status::error);
             ActionMessage M (CMD_PROTOCOL);
             M.messageID = DISCONNECT_ERROR;
@@ -449,12 +447,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (connectionTimeout));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with zmq broker\n";
+                    logError("unable to connect with zmq broker");
                     setTxStatus (connection_status::error);
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "zmq broker connection timed out\n";
+                    logError("zmq broker connection timed out");
                     setTxStatus (connection_status::error);
                 }
                 if (getTxStatus () == connection_status::error)
@@ -515,12 +513,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
                 if (rc < 0)
                 {
-                    std::cerr << "unable to connect with zmq broker (2)\n";
+                    logError("unable to connect with zmq broker (2)");
                     setTxStatus (connection_status::error);
                 }
                 else if (rc == 0)
                 {
-                    std::cerr << "zmq broker connection timed out (2)\n";
+                    logError("zmq broker connection timed out (2)");
                     setTxStatus (connection_status::error);
                 }
                 if (getTxStatus () == connection_status::error)

@@ -13,7 +13,7 @@ void InterfaceInfo::createPublication(interface_handle handle,
                                        const std::string &type,
                                        const std::string &units)
 {
-    publications.lock ()->insert (key, handle, global_id, handle, key, type, units);
+    publications.lock ()->insert (key, handle, global_handle(global_id, handle), key, type, units);
 }
 
 void InterfaceInfo::createInput(interface_handle handle,
@@ -30,7 +30,7 @@ void InterfaceInfo::createEndpoint(interface_handle handle,
     const std::string &endpointName,
     const std::string &type)
 {
-    endpoints.lock ()->insert (endpointName, handle, global_id, handle, endpointName, type);
+    endpoints.lock ()->insert (endpointName, handle, global_handle(global_id, handle), endpointName, type);
 }
 
 void InterfaceInfo::setChangeUpdateFlag (bool updateFlag)

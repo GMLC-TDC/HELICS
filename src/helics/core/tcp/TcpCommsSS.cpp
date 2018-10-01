@@ -74,14 +74,6 @@ void TcpCommsSS::setPortNumber (int localPortNumber)
     }
 }
 
-void TcpCommsSS::setServerMode (bool mode)
-{
-    if (propertyLock ())
-    {
-        serverMode = mode;
-        propertyUnLock ();
-    }
-}
 
 void TcpCommsSS::addConnection (const std::string &newConn)
 {

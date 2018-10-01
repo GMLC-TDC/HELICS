@@ -30,6 +30,19 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         brokerTarget_ = netInfo.brokerAddress;
         brokerName_ = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
+		maxMessageSize_ = netInfo.maxMessageSize;
+		maxMessageCount_ = netInfo.maxMessageCount;
+		switch (netInfo.server_mode)
+		{
+		case NetworkBrokerData::server_mode_options::server_active:
+		case NetworkBrokerData::server_mode_options::server_default_active:
+			serverMode = true;
+			break;
+		case NetworkBrokerData::server_mode_options::server_deactivated:
+		case NetworkBrokerData::server_mode_options::server_default_deactivated:
+			serverMode = false;
+			break;
+		}
         propertyUnLock ();
     }
 }
@@ -409,6 +422,25 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
         }
         propertyUnLock ();
     }
+}
+
+void CommsInterface::setTimeout(int timeout) 
+{ 
+	if (propertyLock())
+	{
+		connectionTimeout = timeout;
+		propertyUnLock();
+	}
+}
+
+
+void CommsInterface::setServerMode(bool serverActive)
+{
+	if (propertyLock())
+	{
+		serverMode = serverActive;
+		propertyUnLock();
+	}
 }
 
 bool CommsInterface::isConnected () const

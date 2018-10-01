@@ -13,9 +13,9 @@ namespace helics
 {
 namespace zeromq
 {
-ZmqBroker::ZmqBroker (bool rootBroker) noexcept : NetworkBroker (rootBroker) {}
+ZmqBroker::ZmqBroker(bool rootBroker) noexcept : NetworkBroker(rootBroker) { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active; }
 
-ZmqBroker::ZmqBroker (const std::string &broker_name) : NetworkBroker (broker_name) {}
+ZmqBroker::ZmqBroker (const std::string &broker_name) : NetworkBroker (broker_name) { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active; }
 
 bool ZmqBroker::brokerConnect ()
 {

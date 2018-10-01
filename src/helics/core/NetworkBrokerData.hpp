@@ -26,20 +26,32 @@ class NetworkBrokerData
     /** define keys for particular interfaces*/
     enum class interface_type:char
     {
-        tcp,  //!< using tcp ports for communication
-        udp,  //!< using udp ports for communication
-        both,  //!< using both types of ports for communication
+        tcp=0,  //!< using tcp ports for communication
+        udp=1,  //!< using udp ports for communication
+        both=2,  //!< using both types of ports for communication
+		ipc=3, //!< using ipc locations
     };
    
-    
+	enum class server_mode_options :char
+	{
+		unspecified = 0,
+		server_default_active=1,
+		server_default_deactivated=2,
+		server_active = 3,
+		server_deactivated=4,
+	};
+
     std::string brokerName;  //!< the identifier for the broker
     std::string brokerAddress;  //!< the address or domain name of the broker
-    std::string localInterface;  //!< the interface to use for the local receive ports
+    std::string localInterface;  //!< the interface to use for the local connection
     int portNumber = -1;  //!< the port number for the local interface
     int brokerPort = -1;  //!< the port number to use for the main broker interface
     int portStart = -1;  //!< the starting port for automatic port definitions
+	int maxMessageSize = 16 * 256; //!< maximum message size
+	int maxMessageCount = 256; //!< maximum message count
     interface_networks interfaceNetwork = interface_networks::local;
     bool reuse_address = false; //!< allow reuse of binding address
+	server_mode_options server_mode = server_mode_options::unspecified; //!< setup a server mode
   public:
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/

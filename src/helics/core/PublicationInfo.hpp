@@ -23,13 +23,11 @@ class PublicationInfo
 {
   public:
     /** constructor from the basic information*/
-    PublicationInfo (global_federate_id_t fed_id_, 
-                        interface_handle id_,
-                     
+    PublicationInfo (global_handle id_, 
                      const std::string &key_,
                      const std::string &type_,
                      const std::string &units_)
-        :  id (fed_id_, id_), key (key_), type (type_), units (units_)
+        :  id (id_), key (key_), type (type_), units (units_)
     {
     }
     const global_handle id;  //!< the identifier for the containing federate
