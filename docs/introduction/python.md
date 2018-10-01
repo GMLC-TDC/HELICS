@@ -73,7 +73,7 @@ You should see something like the following in the PI RECEIVER window (2nd one i
 
 ```
 $ python pireceiver.py
-PI RECEIVER: Helics version = 1.x.x (XX-XX-XX)
+PI RECEIVER: Helics version = x.x.x (XX-XX-XX)
 PI RECEIVER: Creating Federate Info
 PI RECEIVER: Setting Federate Info Name
 PI RECEIVER: Setting Federate Info Core Type

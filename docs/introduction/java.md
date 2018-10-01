@@ -28,7 +28,7 @@ java -Djava.library.path="/Library/Java/Extensions:/Network/Library/Java/Extensi
 You should see the output that is similar to the following.
 
 ```
-HELICS Version: 1.x.x (XX-XX-XX)
+HELICS Version: x.x.x (XX-XX-XX)
 ```
 
 creating a jar file.

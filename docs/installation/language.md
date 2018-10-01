@@ -27,7 +27,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.x.x (XX-XX-XX)'
+Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
@@ -58,7 +58,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.x.x (XX-XX-XX)'
+Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
@@ -183,7 +183,7 @@ add the octave folder in the install directory to the octave path
 ```
 >>helics
 >> helicsGetVersion()
-ans = 1.x.x (XX-XX-XX)
+ans = x.x.x (XX-XX-XX)
 ```
 
 #### Notes

@@ -154,7 +154,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.x.x (XX-XX-XX)'
+Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
