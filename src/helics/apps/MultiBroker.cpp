@@ -41,18 +41,13 @@ static void loadTypeSpecificArgs(helics::core_type ctype, CommsInterface *comm, 
 #ifndef DISABLE_TCP_CORE
 	case core_type::TCP_SS:
 	{
-		static const ArgDescriptors extraArgs{ { "server"s, ArgDescriptor::arg_type_t::flag_type,
-			"specify that the Broker should be a server"s },
+		static const ArgDescriptors extraArgs{
 			{ "connections"s, ArgDescriptor::arg_type_t::vector_string,
 			"target link connections"s } };
 		variable_map vm;
 		argumentParser(argc, argv, vm, extraArgs);
 
 		auto cm = dynamic_cast<tcp::TcpCommsSS *>(comm);
-		if (vm.count("server") > 0)
-		{
-			cm->setServerMode(true);
-		}
 		if (vm.count("connections") > 0)
 		{
 			cm->addConnections(vm["connections"].as<std::vector<std::string>>());
@@ -90,6 +85,7 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 		case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
 			comm = std::make_unique<tcp::TcpCommsSS>();
+            loadTypeSpecificArgs (ctype, comm.get (), cmdargs.getArgCount (), cmdargs.getArgV ());
 #endif
 			break;
 		case core_type::UDP:

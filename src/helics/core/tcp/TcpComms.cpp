@@ -41,8 +41,8 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     PortNumber = netInfo.portNumber;
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
-            (brokerTarget_ == "localhost"))
+        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost") ||
+            (brokerTarget_ == "tcp://localhost") || (brokerTarget_ == "tcp://127.0.0.1"))
         {
             localTarget_ = "localhost";
         }

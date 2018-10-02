@@ -400,10 +400,11 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (!brokerTarget_.empty ())
     {
-        if (brokerTarget_ == "localhost")
-        {
-            brokerTarget_ = "tcp://localhost";
-        }
+		if (brokerTarget_.find("://", 3) == std::string::npos)
+		{
+            brokerTarget_.insert (0, "tcp://");
+		}
+        
         auto ctx = zmqContextManager::getContextPointer ();
         if (brokerReqPort < 0)
         {

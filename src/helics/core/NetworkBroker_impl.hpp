@@ -15,7 +15,7 @@ constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",  
 
 constexpr const char *tcodeStr (int tcode) { return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15]; }
 
-constexpr const char *defInterface[] = {"tcp://127.0.0.1", "udp://127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
+constexpr const char *defInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
 
 template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (bool rootBroker) noexcept
