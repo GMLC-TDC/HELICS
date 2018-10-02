@@ -34,6 +34,34 @@ IpcComms::IpcComms()
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
 
+void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
+{
+    CommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
+    {
+        return;
+    }
+    //brokerPort = netInfo.brokerPort;
+    //PortNumber = netInfo.portNumber;
+    if (localTarget_.empty ())
+    {
+        if (serverMode)
+        {
+            localTarget_ = "_ipc_broker";
+        }
+		else
+		{
+            localTarget_ = name;
+		}
+    }
+    
+    //if (PortNumber > 0)
+    //{
+    //    autoPortNumber = false;
+    //}
+    propertyUnLock ();
+}
+
 void IpcComms::queue_rx_function ()
 {
     ownedQueue rxQueue;

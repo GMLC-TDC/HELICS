@@ -9,6 +9,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+
+constexpr const char *defBrokerInterface[] = {"tcp://127.0.0.1", "udp://127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
+constexpr const char *defLocalInterface[] = {"tcp://127.0.0.1", "udp://127.0.0.1", "tcp://127.0.0.1",
+                                              ""};
+
+
 template <class COMMS, NetworkBrokerData::interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
 {
@@ -30,7 +36,7 @@ void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *con
         std::lock_guard<std::mutex> lock (dataMutex);
         if (BrokerBase::brokerState == BrokerBase::created)
         {
-            netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
+            netInfo.initializeFromArgs (argc, argv, defLocalInterface[static_cast<int> (baseline)]);
             CommonCore::initializeFromArgs (argc, argv);
         }
     }
@@ -42,10 +48,10 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     std::lock_guard<std::mutex> lock (dataMutex);
     if (netInfo.brokerAddress.empty())  // cores require a broker
     {
-        netInfo.brokerAddress = "localhost";
+        netInfo.brokerAddress = defBrokerInterface[static_cast<int> (baseline)];
     }
-    CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
+    CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setTimeout (BrokerBase::networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();

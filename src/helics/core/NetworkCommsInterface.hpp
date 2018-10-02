@@ -47,6 +47,7 @@ class NetworkCommsInterface : public CommsInterface
     int getPort () const { return PortNumber; };
 
     std::string getAddress () const;
+    virtual int getDefaultBrokerPort () const = 0;
 };
 
 }  // namespace helics

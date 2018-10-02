@@ -82,7 +82,7 @@ int NetworkCommsInterface::findOpenPort ()
     int start = openPortStart;
     if (openPortStart < 0)
     {
-        //start = (hasBroker) ? BEGIN_OPEN_PORT_RANGE_SUBBROKER : BEGIN_OPEN_PORT_RANGE;
+        start = (hasBroker) ? getDefaultBrokerPort () + 100 : getDefaultBrokerPort () + 2;
     }
     while (usedPortNumbers.find (start) != usedPortNumbers.end ())
     {

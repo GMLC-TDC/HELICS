@@ -123,8 +123,10 @@ class CoreBroker : public Broker, public BrokerBase
     /**function for routing a message,  it will override the destination id with the specified argument
      */
     void routeMessage (ActionMessage &cmd, global_federate_id_t dest);
+    void routeMessage (ActionMessage &&cmd, global_federate_id_t dest);
     /** function for routing a message from based on the destination specified in the ActionMessage*/
     void routeMessage (const ActionMessage &cmd);
+    void routeMessage (const ActionMessage &&cmd);
 
     int32_t fillMessageRouteInformation (ActionMessage &mess);
 

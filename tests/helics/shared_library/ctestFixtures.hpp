@@ -182,5 +182,4 @@ struct FederateTestFixture
   private:
     bool hasIndexCode (const std::string &type_name);
     int getIndexCode (const std::string &type_name);
-    auto AddBrokerImp (const std::string &core_type_name, std::string initialization_string);
 };

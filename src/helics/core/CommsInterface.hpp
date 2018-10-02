@@ -17,7 +17,8 @@ namespace helics
 {
 enum class interface_networks : char;
 
-/** implementation of a generic communications interface
+constexpr int control_route = (-1);
+  /** implementation of a generic communications interface
  */
 class CommsInterface
 {
@@ -45,6 +46,7 @@ class CommsInterface
     @return true if the connection was successful false otherwise
     */
     bool connect ();
+
     /** disconnected the comms interface
      */
     void disconnect ();

@@ -18,7 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/zmq/ZmqComms.h"
 #endif
 #if HELICS_HAVE_MPI!=0
-#include "../core/mpi/MpiComms.h
+#include "../core/mpi/MpiComms.h"
 #endif
 #include "../core/ipc/IpcComms.h"
 #include "../common/argParser.h"
@@ -81,6 +81,7 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 				comm = std::make_unique<tcp::TcpComms>();
 #endif
 			break;
+        case core_type::DEFAULT:
 		case core_type::ZMQ:
 #if HELICS_HAVE_ZEROMQ!=0
 			comm = std::make_unique<zeromq::ZmqComms>();
@@ -105,6 +106,9 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 #endif
 		case core_type::HTTP:
 		case core_type::ZMQ_TEST:
+        case core_type::TEST:
+        case core_type::NNG:
+        case core_type::UNRECOGNIZED:
 			break;
 
 	}

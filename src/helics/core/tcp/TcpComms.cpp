@@ -29,7 +29,7 @@ static inline auto tcpnet(interface_networks net)
 
 TcpComms::TcpComms () noexcept {}
 
-   /** load network information into the comms object*/
+/** load network information into the comms object*/
 void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
     CommsInterface::loadNetworkInfo (netInfo);

@@ -42,6 +42,8 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 		case NetworkBrokerData::server_mode_options::server_default_deactivated:
 			serverMode = false;
 			break;
+        case NetworkBrokerData::server_mode_options::unspecified:
+            break;
 		}
         propertyUnLock ();
     }
@@ -109,7 +111,7 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     rt.payload = routeInfo;
     rt.messageID = NEW_ROUTE;
     rt.dest_id = route_id;
-    transmit (-1, rt);
+    transmit (control_route, rt);
 }
 
 void CommsInterface::setTxStatus (connection_status txStatus)
@@ -477,21 +479,21 @@ void CommsInterface::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = DISCONNECT;
-    transmit (-1, rt);
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = RECONNECT;
-    transmit (-1, rt);
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
     cmd.messageID = RECONNECT_RECEIVER;
-    transmit (-1, cmd);
+    transmit (control_route, cmd);
 }
 
 }  // namespace helics

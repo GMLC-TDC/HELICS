@@ -1457,6 +1457,10 @@ void CoreBroker::disconnect ()
 
 void CoreBroker::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
+    if (!dest.isValid ())
+    {
+        return;
+    }
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
@@ -1479,6 +1483,37 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
     {
         auto route = getRoute (global_federate_id_t (cmd.dest_id));
         transmit (route, cmd);
+    }
+}
+
+void CoreBroker::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
+{
+    if (!dest.isValid ())
+    {
+        return;
+    }
+    cmd.dest_id = dest;
+    if ((dest == 0) || (dest == higher_broker_id))
+    {
+        transmit (0, std::move(cmd));
+    }
+    else
+    {
+        auto route = getRoute (dest);
+        transmit (route, std::move(cmd));
+    }
+}
+
+void CoreBroker::routeMessage (const ActionMessage &&cmd)
+{
+    if ((cmd.dest_id == 0) || (cmd.dest_id == higher_broker_id))
+    {
+        transmit (0, std::move(cmd));
+    }
+    else
+    {
+        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        transmit (route, std::move(cmd));
     }
 }
 

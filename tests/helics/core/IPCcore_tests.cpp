@@ -172,52 +172,52 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     comm.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     if (counter2 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (350));
+        std::this_thread::sleep_for (350ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (0, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     if (counter2 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (350));
+        std::this_thread::sleep_for (350ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (3, localLocB);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(100ms);
     comm2.transmit (3, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     if (counter3 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (350));
+        std::this_thread::sleep_for (350ms);
     }
     if (counter3 != 1)
     {
         std::cout << "ipc core extra sleep required\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(350));
+        std::this_thread::sleep_for(350ms);
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (4, localLoc);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     comm2.transmit (4, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     if (counter.load () != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (350));
+        std::this_thread::sleep_for (350ms);
     }
     BOOST_REQUIRE_EQUAL (counter.load (), 1);
     BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     comm.disconnect ();
     comm2.disconnect ();
     comm3.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
 
     auto broker = helics::BrokerFactory::create (helics::core_type::INTERPROCESS, initializationString);
 
-    auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, initializationString);
+    auto core = helics::CoreFactory::create (helics::core_type::IPC, initializationString);
     bool connected = broker->isConnected ();
     BOOST_CHECK (connected);
     connected = core->connect ();

@@ -235,16 +235,37 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
     case interface_type::both:
         if ((brokerAddress == "udp://*") || (brokerAddress == "udp"))
         {  // the broker address can't use a wild card
-            brokerAddress = std::string ("udp://") + localAddress;
+			if (localAddress.compare(3, 3, "://") == 0)
+			{
+                brokerAddress = std::string ("udp://") + localAddress.substr(6);
+			}
+			else
+			{
+                brokerAddress = std::string ("udp://") + localAddress;
+			}
+            
         }
         else if ((brokerAddress == "tcp://*") || (brokerAddress == "tcp"))
         {  // the broker address can't use a wild card
-            brokerAddress = std::string ("tcp://") + localAddress;
+            if (localAddress.compare (3, 3, "://") == 0)
+            {
+                brokerAddress = std::string ("tcp://") + localAddress.substr (6);
+            }
+            else
+            {
+                brokerAddress = std::string ("tcp://") + localAddress;
+            }
+            
         }
         else if (brokerAddress == "*")
         {
             brokerAddress = localAddress;
         }
+    case interface_type::ipc:
+		if ((brokerAddress.empty())&&(!localAddress.empty()))
+		{
+            brokerAddress = localAddress;
+		}
         break;
     }
 }

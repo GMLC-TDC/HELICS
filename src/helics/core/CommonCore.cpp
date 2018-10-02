@@ -2970,7 +2970,7 @@ void CommonCore::checkDependencies ()
             brkid = global_broker_id_t (dep);
         }
     }
-    if (localcnt > 1)
+    if (localcnt != 1)
     {
         return;
     }
@@ -3281,6 +3281,10 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
+	if (!dest.isValid())
+	{
+        return;
+	}
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
@@ -3332,6 +3336,10 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
 {
+    if (!dest.isValid ())
+    {
+        return;
+    }
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
