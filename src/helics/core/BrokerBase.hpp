@@ -38,6 +38,7 @@ class BrokerBase
     int32_t tickTimer = 4000;  //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
+    int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
 
     std::unique_ptr<Logger>
@@ -102,8 +103,6 @@ class BrokerBase
     */
     void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
 
-    /** process a disconnect signal*/
-    virtual void processDisconnect (bool skipUnregister = false) = 0;
     /** check if the main processing loop of a broker is running*/
     bool isRunning () const { return mainLoopIsRunning.load (); }
     /** set the logging level */
@@ -119,6 +118,8 @@ class BrokerBase
     void queueProcessingLoop ();
 
   protected:
+    /** process a disconnect signal*/
+    virtual void processDisconnect (bool skipUnregister = false) = 0;
     /** in the case of connection failure with a broker this function will try a reconnect procedure
      */
     virtual bool tryReconnect () = 0;

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include <cctype>
+#include <iostream>
 
 bool hasIndexCode (const std::string &type_name)
 {
@@ -26,14 +27,25 @@ int getIndexCode (const std::string &type_name) { return static_cast<int> (type_
 
 auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
+    helics::core_type type;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        auto core_type = helics::coreTypeFromString (new_type);
-        return helics::BrokerFactory::create (core_type, initialization_string);
+        type = helics::coreTypeFromString (new_type);
     }
-    auto core_type = helics::coreTypeFromString (core_type_name);
-    return helics::BrokerFactory::create (core_type, initialization_string);
+    else
+    {
+        type = helics::coreTypeFromString(core_type_name);
+    }
+    if (type == helics::core_type::TCP)
+    {
+        return helics::BrokerFactory::create(type, initialization_string+" --reuse_address");
+    }
+    else
+    {
+        return helics::BrokerFactory::create(type, initialization_string);
+    }
+    
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -56,15 +68,24 @@ int FederateTestFixture::getIndexCode (const std::string &type_name)
 auto FederateTestFixture::AddBrokerImp (const std::string &core_type_name,
                                         const std::string &initialization_string)
 {
+    helics::core_type type;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        auto core_type = helics::coreTypeFromString (new_type);
-        return helics::BrokerFactory::create (core_type, initialization_string);
+        type = helics::coreTypeFromString (new_type);
     }
-
-    auto core_type = helics::coreTypeFromString (core_type_name);
-    return helics::BrokerFactory::create (core_type, initialization_string);
+    else
+    {
+        type = helics::coreTypeFromString(core_type_name);
+    }
+    if (type == helics::core_type::TCP)
+    {
+        return helics::BrokerFactory::create(type, initialization_string + " --reuse_address");
+    }
+    else
+    {
+        return helics::BrokerFactory::create(type, initialization_string);
+    }
 }
 
 FederateTestFixture::~FederateTestFixture ()
@@ -78,8 +99,21 @@ FederateTestFixture::~FederateTestFixture ()
     }
     federates.clear ();
     for (auto &broker : brokers)
-    {
-        broker->disconnect ();
+    { 
+        if (ctype.compare(0, 3, "tcp") == 0)
+        {
+            broker->waitForDisconnect(2000);
+        }
+        else
+        {
+            broker->waitForDisconnect(200);
+        }
+        
+		if (broker->isConnected())
+		{
+            std::cout << "forcing disconnect\n";
+            broker->disconnect ();
+		}
     }
     brokers.clear ();
     helics::cleanupHelicsLibrary ();

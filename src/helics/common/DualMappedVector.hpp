@@ -340,6 +340,8 @@ class DualMappedVector
     {
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
     }
+    auto begin () { return dataStorage.begin (); }
+    auto end (){ return dataStorage.end (); }
     auto begin () const { return dataStorage.cbegin (); }
     auto end () const { return dataStorage.cend (); }
 

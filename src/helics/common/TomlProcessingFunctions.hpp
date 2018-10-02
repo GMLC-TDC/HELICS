@@ -14,13 +14,13 @@ using the toml library
 
 #include "../core/helics-time.hpp"
 /** load a Toml string or filename that points to a TOML file and return a
-json::Value to the root object
+JSON::Value to the root object
 */
 toml::Value loadToml (const std::string &tomlString);
 
 bool hasTomlExtension (const std::string &tomlString);
-  /** load a JSON object in a string
-*/
+/** load a JSON object in a string
+ */
 toml::Value loadTomlStr (const std::string &tomlString);
 
 /** read a time from a JSON value element*/
@@ -29,8 +29,8 @@ helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnit
 /** get a name or key from the element*/
 std::string getKey (const toml::Value &element);
 
-template<class X>
-inline X tomlGetOrDefault(const toml::Value &element, const std::string &key, const X &defVal)
+template <class X>
+inline X tomlGetOrDefault (const toml::Value &element, const std::string &key, const X &defVal)
 {
     auto val = element.find (key);
     return (val != nullptr) ? val->as<X> () : defVal;
@@ -41,7 +41,7 @@ inline void tomlReplaceIfMember (const toml::Value &element, const std::string &
     auto val = element.find (key);
     if (val != nullptr)
     {
-        timeVal = loadTomlTime(*val);
+        timeVal = loadTomlTime (*val);
     }
 }
 
@@ -49,10 +49,10 @@ template <class X>
 inline void tomlReplaceIfMember (const toml::Value &element, const std::string &key, X &loc)
 {
     auto val = element.find (key);
-	if (val != nullptr)
-	{
+    if (val != nullptr)
+    {
         loc = val->as<X> ();
-	}
+    }
 }
 
 inline bool isMember (const toml::Value &element, const std::string &key)

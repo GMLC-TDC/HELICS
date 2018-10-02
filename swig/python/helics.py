@@ -387,6 +387,10 @@ def helicsBrokerIsConnected(broker: 'helics_broker') -> "int":
     """
     return _helics.helicsBrokerIsConnected(broker)
 
+def helicsBrokerWaitForDisconnect(broker: 'helics_broker', msToWait: 'int') -> "helics_status":
+    return _helics.helicsBrokerWaitForDisconnect(broker, msToWait)
+helicsBrokerWaitForDisconnect = _helics.helicsBrokerWaitForDisconnect
+
 def helicsCoreIsConnected(core: 'helics_core') -> "int":
     """
 
@@ -516,6 +520,18 @@ def helicsBrokerDisconnect(broker: 'helics_broker') -> "helics_status":
     """
     return _helics.helicsBrokerDisconnect(broker)
 
+def helicsDestroyFederate(fed: 'helics_federate') -> "void":
+    return _helics.helicsDestroyFederate(fed)
+helicsDestroyFederate = _helics.helicsDestroyFederate
+
+def helicsDestroyBroker(broker: 'helics_broker') -> "void":
+    return _helics.helicsDestroyBroker(broker)
+helicsDestroyBroker = _helics.helicsDestroyBroker
+
+def helicsDestroyCore(core: 'helics_core') -> "void":
+    return _helics.helicsDestroyCore(core)
+helicsDestroyCore = _helics.helicsDestroyCore
+
 def helicsCoreFree(core: 'helics_core') -> "void":
     """
 
@@ -555,7 +571,7 @@ def helicsCreateValueFederate(fi: 'helics_federate_info_t const') -> "helics_fed
     """
     return _helics.helicsCreateValueFederate(fi)
 
-def helicsCreateValueFederateFromJson(json: 'char const *') -> "helics_federate":
+def helicsCreateValueFederateFromJson(JSON: 'char const *') -> "helics_federate":
     """
 
 
@@ -575,7 +591,7 @@ def helicsCreateValueFederateFromJson(json: 'char const *') -> "helics_federate"
     an opaque value federate object
 
     """
-    return _helics.helicsCreateValueFederateFromJson(json)
+    return _helics.helicsCreateValueFederateFromJson(JSON)
 
 def helicsCreateMessageFederate(fi: 'helics_federate_info_t const') -> "helics_federate":
     """
@@ -598,7 +614,7 @@ def helicsCreateMessageFederate(fi: 'helics_federate_info_t const') -> "helics_f
     """
     return _helics.helicsCreateMessageFederate(fi)
 
-def helicsCreateMessageFederateFromJson(json: 'char const *') -> "helics_federate":
+def helicsCreateMessageFederateFromJson(JSON: 'char const *') -> "helics_federate":
     """
 
 
@@ -618,7 +634,7 @@ def helicsCreateMessageFederateFromJson(json: 'char const *') -> "helics_federat
     an opaque message federate object
 
     """
-    return _helics.helicsCreateMessageFederateFromJson(json)
+    return _helics.helicsCreateMessageFederateFromJson(JSON)
 
 def helicsCreateCombinationFederate(fi: 'helics_federate_info_t const') -> "helics_federate":
     """
@@ -642,7 +658,7 @@ def helicsCreateCombinationFederate(fi: 'helics_federate_info_t const') -> "heli
     """
     return _helics.helicsCreateCombinationFederate(fi)
 
-def helicsCreateCombinationFederateFromJson(json: 'char const *') -> "helics_federate":
+def helicsCreateCombinationFederateFromJson(JSON: 'char const *') -> "helics_federate":
     """
 
 
@@ -663,7 +679,7 @@ def helicsCreateCombinationFederateFromJson(json: 'char const *') -> "helics_fed
     an opaque combination federate object
 
     """
-    return _helics.helicsCreateCombinationFederateFromJson(json)
+    return _helics.helicsCreateCombinationFederateFromJson(JSON)
 
 def helicsFederateClone(fed: 'helics_federate') -> "helics_federate":
     return _helics.helicsFederateClone(fed)

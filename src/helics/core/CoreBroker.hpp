@@ -12,17 +12,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 #include <unordered_map>
 
+#include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
-#include "../common/DelayedObjects.hpp"
 
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
-#include "TimeDependencies.hpp"
 #include "JsonMapBuilder.hpp"
+#include "TimeDependencies.hpp"
+#include "../common/TriggerVariable.hpp"
 
 namespace helics
 {
@@ -91,13 +92,13 @@ class CoreBroker : public Broker, public BrokerBase
     std::unordered_map<std::string, int32_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
-    std::atomic<int> queryCounter{ 1 }; //counter for active queries going to the local API
-    DelayedObjects<std::string> ActiveQueries;  //!< holder for 
-    JsonMapBuilder fedMap; //!< builder for the federate_map 
-    std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
-    JsonMapBuilder depMap; //!< builder for the dependency graph
-    std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
-
+    std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
+    DelayedObjects<std::string> ActiveQueries;  //!< holder for
+    JsonMapBuilder fedMap;  //!< builder for the federate_map
+    std::vector<ActionMessage> fedMapRequestors;  //!< list of requesters for the active federate map
+    JsonMapBuilder depMap;  //!< builder for the dependency graph
+    std::vector<ActionMessage> depMapRequestors;  //!< list of requesters for the dependency graph
+	TriggerVariable disconnection; //!< controller for the disconnection process
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -155,7 +156,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-	virtual void waitForDisconnect () const override final;
+    virtual void waitForDisconnect (int msToWait = -1) const override final;
 
   private:
     /** implementation details of the connection process
@@ -204,7 +205,8 @@ class CoreBroker : public Broker, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
-    virtual std::string query(const std::string &target, const std::string &queryStr) override final;
+    virtual std::string query (const std::string &target, const std::string &queryStr) override final;
+
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -222,7 +224,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
     /** answer a query or route the message the appropriate location*/
-    void processQueryResponse(const ActionMessage &m);
+    void processQueryResponse (const ActionMessage &m);
     /** generate an answer to a local query*/
     void processLocalQuery (const ActionMessage &m);
     /** generate an actual response string to a query*/
@@ -239,11 +241,18 @@ class CoreBroker : public Broker, public BrokerBase
     void addEndpoint (ActionMessage &m);
     void addDestFilter (ActionMessage &m);
     void addSourceFilter (ActionMessage &m);
- //   bool updateSourceFilterOperator (ActionMessage &m);
-    /** generate a json string containing the federate/broker/Core Map*/
+    //   bool updateSourceFilterOperator (ActionMessage &m);
+    /** generate a JSON string containing the federate/broker/Core Map*/
     void initializeFederateMap ();
-    /** generate a json string containing the dependency information for all federation object*/
-    void initializeDependencyGraph();
+    /** generate a JSON string containing the dependency information for all federation object*/
+    void initializeDependencyGraph ();
+
+    /** send an error code to all direct cores*/
+    void sendErrorToImmediateBrokers (int error_code);
+    /** send a disconnect message to time dependencies and child brokers*/
+	void sendDisconnect ();
+    /** generate a string about the federation summarizing connections*/
+    std::string generateFederationSummary () const;
 };
 
 }  // namespace helics

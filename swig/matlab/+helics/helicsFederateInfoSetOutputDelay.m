@@ -1,4 +1,4 @@
 function varargout = helicsFederateInfoSetOutputDelay(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(67, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(71, varargin{:});
 end

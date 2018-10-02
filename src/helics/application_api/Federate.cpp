@@ -23,8 +23,9 @@ namespace helics
 {
 void cleanupHelicsLibrary ()
 {
-    BrokerFactory::cleanUpBrokers (200);
+    BrokerFactory::cleanUpBrokers (100);
     CoreFactory::cleanUpCores (200);
+    BrokerFactory::cleanUpBrokers (100);
 }
 
 Federate::Federate (const FederateInfo &fi) : Federate (fi.name, fi) {}
@@ -501,11 +502,16 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             updateTime (newTime, oldTime);
             return newTime;
         }
-        catch (FunctionExecutionFailure &fee)
+        catch (const FunctionExecutionFailure &fee)
         {
             state = op_states::error;
             throw;
         }
+		catch (const HelicsTerminated &ht)
+		{
+            state = op_states::finalize;
+            throw;
+		}
     }
     else
     {
@@ -681,35 +687,15 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
     {
         for (const auto &filt : doc["filters"])
         {
-            std::string name;
-            bool useTypes = false;
-            if (filt.isMember ("name"))
-            {
-                name = filt["name"].asString ();
-            }
-            std::string target;
-            if (filt.isMember ("target"))
-            {
-                target = filt["target"].asString ();
-            }
-            std::string inputType;
-            if (filt.isMember ("inputType"))
-            {
-                inputType = filt["inputType"].asString ();
-                useTypes = true;
-            }
-            std::string outputType;
-            if (filt.isMember ("outputType"))
-            {
-                outputType = filt["outputType"].asString ();
-                useTypes = true;
-            }
 
-            std::string mode = "source";
-            if (filt.isMember ("mode"))
-            {
-                mode = filt["mode"].asString ();
-            }
+
+            std::string name = jsonGetOrDefault(filt, "name", std::string());
+            std::string target = jsonGetOrDefault(filt, "target", std::string());
+            std::string inputType = jsonGetOrDefault(filt, "inputType", std::string());
+            std::string outputType = jsonGetOrDefault(filt, "outputType", std::string());
+            bool useTypes = !((inputType.empty()) && (outputType.empty()));
+            std::string mode = jsonGetOrDefault(filt, "mode", "source");
+
             std::string operation ("custom");
             if (filt.isMember ("operation"))
             {
@@ -837,9 +823,9 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         {
             std::string name = tomlGetOrDefault (filt, "name", std::string ());
 			std::string target = tomlGetOrDefault (filt, "target", std::string ());
-            std::string inputType = tomlGetOrDefault (filt, "target", std::string ());
-            std::string outputType = tomlGetOrDefault (filt, "target", std::string ());
-            bool useTypes = ((inputType.empty ()) && (outputType.empty ()));
+            std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
+            std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
+            bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
             std::string mode =tomlGetOrDefault (filt, "mode", std::string ("source"));
           

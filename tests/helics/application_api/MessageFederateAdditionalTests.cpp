@@ -33,6 +33,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
     mFed1->finalize ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
@@ -202,7 +203,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     auto mend = [&](const helics::Endpoint *ept, helics::Time rtime) {
         rxend = ept->getID ();
         timeRx = rtime;
-    };
+    }; 
 
     ep2.setCallback (mend);
 
@@ -217,6 +218,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     auto time = mFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (time, 1.0);
+
 
     auto res = ep2.hasMessage ();
     BOOST_CHECK (res);
@@ -442,10 +444,10 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     }
     AddBroker (core_type, "3");
 
-    auto ctype = helics::coreTypeFromString (core_type);
-    PingPongFed p1 ("fedA", 0.5, ctype);
-    PingPongFed p2 ("fedB", 0.5, ctype);
-    PingPongFed p3 ("fedC", 0.5, ctype);
+    auto crtype = helics::coreTypeFromString (core_type);
+    PingPongFed p1 ("fedA", 0.5, crtype);
+    PingPongFed p2 ("fedB", 0.5, crtype);
+    PingPongFed p3 ("fedC", 0.5, crtype);
 
     p1.addTrigger (0.5, "fedB/port");
     p1.addTrigger (0.5, "fedC/port");

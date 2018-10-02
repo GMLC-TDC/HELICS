@@ -12,5 +12,5 @@ function varargout = helicsFederateGetCurrentTime(varargin)
     %-------
     %helics_status object indicating success or error
     %
-  [varargout{1:nargout}] = helicsMEX(104, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(108, varargin{:});
 end

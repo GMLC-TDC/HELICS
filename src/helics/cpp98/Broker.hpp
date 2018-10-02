@@ -9,56 +9,52 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
+#include <stdexcept>
 #include <string>
-#include <exception>
 
 namespace helics98
 {
-
 class Broker
 {
   public:
     // Default constructor, not meant to be used
-    Broker ():broker(NULL) {};
+    Broker () : broker (NULL){};
 
     Broker (std::string type, std::string name, std::string initString)
     {
-        broker = helicsCreateBroker (type.c_str(), name.c_str(), initString.c_str());
+        broker = helicsCreateBroker (type.c_str (), name.c_str (), initString.c_str ());
         if (broker == NULL)
         {
-            throw(std::runtime_error("broker creation failed"));
+            throw (std::runtime_error ("broker creation failed"));
         }
-        if (helicsBrokerIsConnected(broker) != helics_true)
+        if (helicsBrokerIsConnected (broker) != helics_true)
         {
-            throw(std::runtime_error("broker creation failed"));
+            throw (std::runtime_error ("broker creation failed"));
         }
     }
 
     Broker (std::string type, std::string name, int argc, const char **argv)
     {
-        broker = helicsCreateBrokerFromArgs (type.c_str(), name.c_str(), argc, argv);
+        broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv);
         if (broker == NULL)
         {
-            throw(std::runtime_error("broker creation failed"));
+            throw (std::runtime_error ("broker creation failed"));
         }
     }
 
-    Broker(const Broker &brk)
+    Broker (const Broker &brk) { broker = helicsBrokerClone (brk.broker); }
+    Broker &operator= (const Broker &brk)
     {
-        broker = helicsBrokerClone(brk.broker);
-    }
-    Broker &operator=(const Broker &brk)
-    {
-        broker = helicsBrokerClone(brk.broker);
+        broker = helicsBrokerClone (brk.broker);
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Broker(Broker &&brk) noexcept
+    Broker (Broker &&brk) noexcept
     {
         broker = brk.broker;
         brk.broker = NULL;
     }
-    Broker &operator=(Broker &&brk) noexcept
+    Broker &operator= (Broker &&brk) noexcept
     {
         broker = brk.broker;
         brk.broker = NULL;
@@ -69,39 +65,35 @@ class Broker
     {
         if (broker != NULL)
         {
-            helicsBrokerFree(broker);
+            helicsBrokerFree (broker);
         }
     }
 
-    operator helics_broker() { return broker; }
+    operator helics_broker () { return broker; }
 
-    helics_broker baseObject() const { return broker; }
+    helics_broker baseObject () const { return broker; }
 
-    bool isConnected () const
-    {
-        return helicsBrokerIsConnected (broker);
-    }
-    void disconnect()
-    {
-        helicsBrokerDisconnect(broker);
-    }
-    std::string getIdentifier() const
+    bool isConnected () const { return helicsBrokerIsConnected (broker); }
+    void disconnect () { helicsBrokerDisconnect (broker); }
+    bool waitForDisconnect (int msToWait=-1) { return (helicsBrokerWaitForDisconnect (broker, msToWait) == helics_ok); }
+    std::string getIdentifier () const
     {
         char str[255];
-        helicsBrokerGetIdentifier(broker, &str[0], sizeof(str));
-        std::string result(str);
+        helicsBrokerGetIdentifier (broker, &str[0], sizeof (str));
+        std::string result (str);
         return result;
     }
-    std::string getAddress() const
+    std::string getAddress () const
     {
         char str[255];
-        helicsBrokerGetAddress(broker, &str[0], sizeof(str));
-        std::string result(str);
+        helicsBrokerGetAddress (broker, &str[0], sizeof (str));
+        std::string result (str);
         return result;
     }
+
   protected:
     helics_broker broker;
 };
 
-} //namespace helics
+}  // namespace helics
 #endif

@@ -8,14 +8,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-CommsInterface::CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork)
-    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork(targetNetwork)
+CommsInterface::CommsInterface (const std::string &localTarget,
+                                const std::string &brokerTarget,
+                                interface_networks targetNetwork)
+    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork (targetNetwork)
 {
 }
 
 CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
     : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
-      brokerName_ (netInfo.brokerName), interfaceNetwork(netInfo.interfaceNetwork)
+      brokerName_ (netInfo.brokerName), interfaceNetwork (netInfo.interfaceNetwork)
 {
 }
 
@@ -54,6 +56,75 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     transmit (-1, rt);
 }
 
+void CommsInterface::setTxStatus (connection_status txStatus)
+{
+    if (tx_status == txStatus)
+    {
+        return;
+    }
+    switch (txStatus)
+    {
+    case connection_status::connected:
+        if (tx_status == connection_status::startup)
+        {
+            tx_status = txStatus;
+            txTrigger.activate ();
+        }
+        break;
+    case connection_status::terminated:
+    case connection_status::error:
+        if (tx_status == connection_status::startup)
+        {
+            tx_status = txStatus;
+            txTrigger.activate ();
+            txTrigger.trigger ();
+        }
+        else
+        {
+            tx_status = txStatus;
+            txTrigger.trigger ();
+        }
+        break;
+    default:
+        tx_status = txStatus;
+    }
+}
+
+void CommsInterface::setRxStatus (connection_status rxStatus)
+{
+    if (rx_status == rxStatus)
+    {
+        return;
+    }
+    switch (rxStatus)
+    {
+    case connection_status::connected:
+        if (rx_status == connection_status::startup)
+        {
+            rx_status = rxStatus;
+            rxTrigger.activate ();
+        }
+        break;
+    case connection_status::terminated:
+    case connection_status::error:
+        if (rx_status == connection_status::startup)
+        {
+            rx_status = rxStatus;
+            rxTrigger.activate ();
+            rxTrigger.trigger ();
+        }
+        else
+        {
+            rx_status = rxStatus;
+            rxTrigger.trigger ();
+        }
+
+        break;
+    default:
+        rx_status = rxStatus;
+    }
+}
+
 bool CommsInterface::connect ()
 {
     if (isConnected ())
@@ -71,7 +142,7 @@ bool CommsInterface::connect ()
     // bool exp = false;
     if (!ActionCallback)
     {
-        std::cerr << "no callback specified, the receiver cannot start\n";
+        logError ("no callback specified, the receiver cannot start");
         return false;
     }
     std::lock_guard<std::mutex> syncLock (threadSyncLock);
@@ -85,18 +156,11 @@ bool CommsInterface::connect ()
     }
     queue_watcher = std::thread ([this] { queue_rx_function (); });
     queue_transmitter = std::thread ([this] { queue_tx_function (); });
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    while (rx_status == connection_status::startup)
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-    }
-    while (tx_status == connection_status::startup)
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
-    }
+    txTrigger.waitActivation ();
+    rxTrigger.waitActivation ();
     if (rx_status != connection_status::connected)
     {
-        // std::cerr << "receiver connection failure" << std::endl;
+        logError ("receiver connection failure");
         if (tx_status == connection_status::connected)
         {
             if (queue_transmitter.joinable ())
@@ -111,7 +175,7 @@ bool CommsInterface::connect ()
 
     if (tx_status != connection_status::connected)
     {
-        std::cerr << "transmitter connection failure" << std::endl;
+        logError ("transmitter connection failure");
         if (rx_status == connection_status::connected)
         {
             if (queue_watcher.joinable ())
@@ -146,16 +210,19 @@ void CommsInterface::disconnect ()
     int cnt = 0;
     while (rx_status.load () <= connection_status::connected)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        if (rxTrigger.wait_for (std::chrono::milliseconds (800)))
+        {
+            continue;
+        }
         ++cnt;
-        if ((cnt & 31) == 0)  // call this every 32*50 milliseconds
+        if ((cnt & 3) == 0)  // call this every 2400 milliseconds
         {
             // try calling closeReceiver again
             closeReceiver ();
         }
-        if (cnt == 400)  // Eventually give up
+        if (cnt == 14)  // Eventually give up
         {
-            std::cerr << "unable to terminate connection\n";
+            logError ("unable to terminate receiver connection");
             break;
         }
         // check the trip detector
@@ -169,16 +236,19 @@ void CommsInterface::disconnect ()
     cnt = 0;
     while (tx_status.load () <= connection_status::connected)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-        ++cnt;
-        if ((cnt & 31) == 0)
+        if (txTrigger.wait_for (std::chrono::milliseconds (800)))
         {
-            // try calling closeTransmitter again
+            continue;
+        }
+        ++cnt;
+        if ((cnt & 3) == 0)  // call this every 2400 milliseconds
+        {
+            // try calling closeReceiver again
             closeTransmitter ();
         }
-        if (cnt == 400)
+        if (cnt == 14)  // Eventually give up
         {
-            std::cerr << "unable to terminate connection\n";
+            logError ("unable to terminate transmit connection");
             break;
         }
         // check the trip detector
@@ -204,7 +274,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)  // Eventually give up
         {
-            std::cerr << "unable to reconnect\n";
+            logError ("unable to reconnect");
             break;
         }
     }
@@ -215,7 +285,7 @@ bool CommsInterface::reconnect ()
         ++cnt;
         if (cnt == 400)
         {
-            std::cerr << "unable to reconnect\n";
+            logError ("unable to reconnect");
             break;
         }
     }
@@ -227,6 +297,12 @@ bool CommsInterface::reconnect ()
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
     ActionCallback = std::move (callback);
+}
+
+void CommsInterface::setLoggingCallback (
+  std::function<void(int level, const std::string &name, const std::string &message)> callback)
+{
+    loggingCallback = std::move (callback);
 }
 
 void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
@@ -244,6 +320,31 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
 bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
+}
+
+
+void CommsInterface::logWarning(const std::string &message) const
+{ 
+	if (loggingCallback)
+    {
+        loggingCallback (1, name, message);
+    }
+	else
+	{
+        std::cerr << "commWarning||" << name << ":" << message << std::endl;
+	}
+}
+
+void CommsInterface::logError(const std::string &message) const
+{
+    if (loggingCallback)
+    {
+        loggingCallback (0, name, message);
+    }
+    else
+    {
+        std::cerr <<"commERROR||"<<name<<":"<< message << std::endl;
+    }
 }
 
 void CommsInterface::closeTransmitter ()

@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../flag-definitions.h"
 #include <algorithm>
 #include "../common/fmt_format.h"
+#include <set>
 
 namespace helics
 {
@@ -57,9 +58,32 @@ void TimeCoordinator::enteringExecMode (iteration_request mode)
 
 void TimeCoordinator::disconnect ()
 {
-    ActionMessage bye (CMD_DISCONNECT);
-    bye.source_id = source_id;
-    transmitTimingMessage (bye);
+    if (sendMessageFunction)
+    {
+        ActionMessage bye (CMD_DISCONNECT);
+        bye.source_id = source_id;
+        std::set<Core::federate_id_t> connections (dependents.begin (), dependents.end ());
+        for (auto dep : dependencies)
+        {
+            if (dep.Tnext < Time::maxVal ())
+            {
+                connections.insert (dep.fedID);
+            }
+        }
+        for (auto fed : connections)
+        {
+            bye.dest_id = fed;
+			if (fed == source_id)
+			{
+                processTimeMessage (bye);
+			}
+			else
+			{
+                sendMessageFunction (bye);
+			}
+           
+        }
+    }
 }
 
 void TimeCoordinator::timeRequest (Time nextTime,
@@ -338,10 +362,7 @@ message_processing_result TimeCoordinator::checkTimeGrant ()
         {
             time_granted = Time::maxVal();
             time_grantBase = Time::maxVal();
-
-            ActionMessage treq(CMD_DISCONNECT);
-            treq.source_id = source_id;
-            transmitTimingMessage(treq);
+            disconnect ();
             return message_processing_result::halted;
         }
     }
@@ -597,12 +618,12 @@ static bool isDelayableMessage (const ActionMessage &cmd, Core::federate_id_t lo
 
 message_process_result TimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-    if ((cmd.action () == CMD_TIME_BLOCK) || (cmd.action () == CMD_TIME_UNBLOCK))
-    {
+	switch (cmd.action())
+	{
+    case CMD_TIME_BLOCK:
+    case CMD_TIME_UNBLOCK:
         return processTimeBlockMessage (cmd);
-    }
-    if (cmd.action() == CMD_FORCE_TIME_GRANT)
-    {
+    case CMD_FORCE_TIME_GRANT:
         if (time_granted < cmd.actionTime)
         {
             time_granted = cmd.actionTime;
@@ -615,7 +636,13 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
             return message_process_result::processed;
         }
         return message_process_result::no_effect;
-    }
+    case CMD_DISCONNECT:
+		//this command requires removing dependents as well as dealing with dependency processing
+        removeDependent (cmd.source_id);
+        break;
+    default:
+        break;
+	}
     if (isDelayableMessage (cmd, source_id))
     {
         auto dep = dependencies.getDependencyInfo (cmd.source_id);

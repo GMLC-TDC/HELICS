@@ -1,5 +1,5 @@
 # LLNS Copyright Start
-# Copyright (c) 2017, Lawrence Livermore National Security
+# Copyright (c) 2018, Lawrence Livermore National Security
 # This work was performed under the auspices of the U.S. Department
 # of Energy by Lawrence Livermore National Laboratory in part under
 # Contract W-7405-Eng-48 and in part under Contract DE-AC52-07NA27344.
@@ -27,11 +27,11 @@ try_compile(STRING_VIEW_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/chec
 #try_compile(CLAMP_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_clamp.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 #try_compile(HYPOT3_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_hypot3.cpp  COMPILE_DEFINITIONS ${VERSION_OPTION})
 
-try_compile(IFCONSTEXPR_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_constexpr_if.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} )
+set(IFCONSTEXPR_AVAILABLE TRUE)
 
-try_compile(FALLTHROUGH_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_fallthrough.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} ${VERSION_OPTION})
+set(FALLTHROUGH_AVAILABLE TRUE)
 
-try_compile(UNUSED_AVAILABLE ${CMAKE_BINARY_DIR} ${TEST_CXX_DIRECTORY}/check_unused.cpp  COMPILE_DEFINITIONS ${WERROR_FLAG} ${VERSION_OPTION})
+set(UNUSED_AVAILABLE TRUE)
 
 endif(ENABLE_CXX_17)
 

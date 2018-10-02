@@ -120,6 +120,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     {
     case CMD_REG_FED:
     {
+        
         if (brokerState != operating)
         {
             if (allInitReady ())
@@ -178,6 +179,8 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             fedReply.dest_id = global_id;
             fedReply.name = command.name;
             transmit (route_id, fedReply);
+            LOG_CONNECTIONS (global_broker_id, getIdentifier (),
+                             fmt::format ("registering federate {}({}) on route {}", command.name,global_id,route_id));
         }
     }
     break;
@@ -239,6 +242,9 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             brokerReply.dest_id = global_id;  // the new id
             brokerReply.name = command.name;  // the identifier of the broker
             transmit (route_id, brokerReply);
+            LOG_CONNECTIONS (global_broker_id, getIdentifier (),
+                             fmt::format ("registering broker {}({}) on route {}", command.name, global_id,
+                                          route_id));
         }
     }
     break;
@@ -353,6 +359,36 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     }
 }
 
+std::string CoreBroker::generateFederationSummary () const 
+{
+    int pubs = 0;
+    int epts = 0;
+    int subs = 0;
+    int filt = 0;
+	for (auto &hand : handles)
+	{
+		switch (hand.handle_type)
+		{
+        case handle_type_t::publication:
+            ++pubs;
+            break;
+        case handle_type_t::subscription:
+            ++subs;
+            break;
+        case handle_type_t::endpoint:
+            ++epts;
+            break;
+        default:
+            ++filt;
+            break;
+		}
+	}
+    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t {}brokers/cores\n\t{} "
+                                      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+                                      _federates.size (), _brokers.size (), pubs, subs, epts, filt);
+    return output;
+	}
+
 void CoreBroker::transmitDelayedMessages ()
 {
     auto msg = delayTransmitQueue.pop ();
@@ -364,15 +400,53 @@ void CoreBroker::transmitDelayedMessages ()
     }
 }
 
+void CoreBroker::sendDisconnect ()
+{
+    ActionMessage bye (CMD_DISCONNECT);
+    bye.source_id = global_broker_id;
+    for (auto &brk : _brokers)
+    {
+        if (!brk._nonLocal)
+        {
+            routeMessage (bye, brk.global_id);
+            brk._disconnected = true;
+        }
+        if (hasTimeDependency)
+        {
+            timeCoord->removeDependency (brk.global_id);
+            timeCoord->removeDependent (brk.global_id);
+        }
+    }
+    if (hasTimeDependency)
+    {
+        timeCoord->disconnect ();
+    }
+}
+
+void CoreBroker::sendErrorToImmediateBrokers (int error_code)
+{
+    ActionMessage errorCom (CMD_ERROR);
+    errorCom.counter = static_cast<int16_t> (error_code);
+    for (auto &brk : _brokers)
+    {
+        if (!brk._nonLocal)
+        {
+            routeMessage (errorCom, brk.global_id);
+        }
+    }
+}
+
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id, getIdentifier (),
-               fmt::format ("|| cmd:{} from {}", prettyPrintString (command), command.source_id));
+               fmt::format ("|| cmd:{} from {} to ", prettyPrintString (command), command.source_id,
+                            command.dest_id));
     switch (command.action ())
     {
     case CMD_IGNORE:
     case CMD_PROTOCOL:
         break;
+
     case CMD_TICK:
         if (!_isRoot)
         {
@@ -380,6 +454,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 // try to reset the connection to the broker
                 // brokerReconnect()
+                LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
+                sendErrorToImmediateBrokers (-5);
+                disconnect ();
+                brokerState = broker_state_t::errored;
+                addActionMessage (CMD_STOP);
             }
             else
             {
@@ -428,10 +507,13 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             if (_isRoot)
             {
+                LOG_TIMING (global_broker_id, "root", "entering initialization mode");
+                LOG_SUMMARY (global_broker_id, "root", generateFederationSummary ());
                 executeInitializationOperations ();
             }
             else
             {
+                LOG_TIMING (global_broker_id, getIdentifier(), "entering initialization mode");
                 checkDependencies ();
                 command.source_id = global_broker_id;
                 transmit (0, command);
@@ -497,7 +579,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             auto brk = _brokers.find (command.payload);
             if (brk != _brokers.end ())
             {
-                brk->_disconnected = true;
+                command.source_id = brk->global_id;
             }
         }
         FALLTHROUGH
@@ -506,13 +588,44 @@ void CoreBroker::processCommand (ActionMessage &&command)
     {
         if ((command.dest_id == 0) || (command.dest_id == global_broker_id))
         {
+            if (!isRoot ())
+            {
+                if (command.source_id == higher_broker_id)
+                {
+                    sendDisconnect ();
+                    addActionMessage (CMD_STOP);
+                    return;
+                }
+            }
+
             auto brk = getBrokerById (command.source_id);
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
             }
+            if (hasTimeDependency)
+            {
+                if (!enteredExecutionMode)
+                {
+                    timeCoord->processTimeMessage (command);
+                    auto res = timeCoord->checkExecEntry ();
+                    if (res == message_processing_result::next_step)
+                    {
+                        enteredExecutionMode = true;
+                    }
+                }
+                else
+                {
+                    if (timeCoord->processTimeMessage (command))
+                    {
+                        timeCoord->updateTimeFactors ();
+                    }
+                }
+            }
+
             if (allDisconnected ())
             {
+                timeCoord->disconnect ();
                 if (!_isRoot)
                 {
                     ActionMessage dis (CMD_DISCONNECT);
@@ -528,12 +641,20 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
     }
     break;
+    case CMD_USER_DISCONNECT:
+        sendDisconnect ();
+        addActionMessage (CMD_STOP);
+        break;
     case CMD_STOP:
-        if ((!allDisconnected ()) && (!_isRoot))
+        if (!allDisconnected ())
         {  // only send a disconnect message if we haven't done so already
-            ActionMessage m (CMD_DISCONNECT);
-            m.source_id = global_broker_id;
-            transmit (0, m);
+            timeCoord->disconnect ();
+            if (!_isRoot)
+            {
+                ActionMessage m (CMD_DISCONNECT);
+                m.source_id = global_broker_id;
+                transmit (0, m);
+            }
         }
         break;
     case CMD_EXEC_REQUEST:
@@ -547,8 +668,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 if (res == message_processing_result::next_step)
                 {
                     enteredExecutionMode = true;
-                    LOG_DEBUG (global_broker_id, getIdentifier (), "entering Exec Mode");
-                    LOG_DEBUG (global_broker_id, getIdentifier (), "entering Exec Mode");
+                    LOG_TIMING (global_broker_id, getIdentifier (), "entering Exec Mode");
                 }
             }
         }
@@ -569,7 +689,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_TIME_GRANT:
         if (command.source_id == global_broker_id)
         {
-            LOG_DEBUG (global_broker_id, getIdentifier (),
+            LOG_TIMING(global_broker_id, getIdentifier (),
                        fmt::format ("time request update {}", prettyPrintString (command)));
             for (auto dep : timeCoord->getDependents ())
             {
@@ -681,6 +801,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
         else
         {
             timeCoord->processDependencyUpdateMessage (command);
+            if (!hasTimeDependency)
+            {
+                hasTimeDependency = true;
+            }
         }
         break;
     default:
@@ -907,11 +1031,11 @@ bool CoreBroker::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
-            LOG_NORMAL (0, getIdentifier (), "connecting");
+            LOG_CONNECTIONS (0, getIdentifier (), "connecting");
             auto res = brokerConnect ();
             if (res)
             {
-                LOG_NORMAL (0, getIdentifier (), fmt::format ("||connected on {}", getAddress ()));
+                LOG_CONNECTIONS (0, getIdentifier (), fmt::format ("||connected on {}", getAddress ()));
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);
@@ -923,6 +1047,7 @@ bool CoreBroker::connect ()
                 {
                     timeCoord->source_id = global_broker_id;
                 }
+                disconnection.activate ();
                 brokerState = broker_state_t::connected;
             }
             else
@@ -944,27 +1069,21 @@ bool CoreBroker::connect ()
 
 bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
 
-void CoreBroker::waitForDisconnect () const
+void CoreBroker::waitForDisconnect (int msToWait) const
 {
-    // TODO:: this should really be a future that gets triggered when isConnected changes
-    bool sleep_toggle = false;
-    while (isConnected ())
+    if (msToWait <= 0)
     {
-        if (!sleep_toggle)
-        {
-            std::this_thread::yield ();
-        }
-        else
-        {
-            std::this_thread::sleep_for (std::chrono::milliseconds (200));
-        }
-        sleep_toggle = !sleep_toggle;
+        disconnection.wait ();
+    }
+    else
+    {
+        disconnection.wait_for (std::chrono::milliseconds (msToWait));
     }
 }
 
 void CoreBroker::processDisconnect (bool skipUnregister)
 {
-    LOG_NORMAL (0, getIdentifier (), "||disconnecting");
+    LOG_CONNECTIONS (0, getIdentifier (), "||disconnecting");
     if (brokerState > broker_state_t::initialized)
     {
         brokerState = broker_state_t::terminating;
@@ -976,6 +1095,7 @@ void CoreBroker::processDisconnect (bool skipUnregister)
     {
         unregister ();
     }
+    disconnection.trigger ();
 }
 
 void CoreBroker::unregister ()
@@ -999,7 +1119,12 @@ void CoreBroker::unregister ()
     }
 }
 
-void CoreBroker::disconnect () { processDisconnect (); }
+void CoreBroker::disconnect ()
+{
+    ActionMessage udisconnect (CMD_USER_DISCONNECT);
+    addActionMessage (udisconnect);
+    waitForDisconnect ();
+}
 
 void CoreBroker::routeMessage (ActionMessage &cmd, Core::federate_id_t dest)
 {
@@ -1334,6 +1459,10 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
         cnts += '}';
         return cnts;
     }
+	if (request == "summary")
+	{
+        return generateFederationSummary ();
+	}
     if (request == "federates")
     {
         return generateStringVector (_federates, [](auto &fed) { return fed.name; });
@@ -1806,7 +1935,8 @@ bool CoreBroker::allInitReady () const
 
 bool CoreBroker::allDisconnected () const
 {
-    return std::all_of (_brokers.begin (), _brokers.end (), [](const auto &brk) { return brk._disconnected; });
+    return std::all_of (_brokers.begin (), _brokers.end (),
+                        [](const auto &brk) { return ((brk._nonLocal) || (brk._disconnected)); });
 }
 
 }  // namespace helics

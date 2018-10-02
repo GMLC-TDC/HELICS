@@ -120,26 +120,53 @@ install_boost () {
     local boost_toolset=$3
 
     local b2_extra_options=""
-    if [[ "${BOOST_CXX_FLAGS}" ]]; then
-        b2_extra_options="cxxflags=${BOOST_CXX_FLAGS} ${b2_extra_options}"
+    local cxxflags_var=""
+    local cxxflags_arr=()
+    if [[ "${BOOST_CXXFLAGS}" ]]; then
+        cxxflags_arr+=("${BOOST_CXXFLAGS}")
+    fi
+
+    local linkflags_var=""
+    local linkflags_arr=()
+    if [[ "${BOOST_LINKFLAGS}" ]]; then
+        linkflags_arr+=("${BOOST_LINKFLAGS}")
     fi
 
     local b2_link_type=shared
     if [[ "${BOOST_USE_STATIC}" ]]; then
         b2_link_type=static
+        cxxflags_arr+=("-fPIC")
     fi
+
+    if [[ "${BOOST_SANITIZER}" ]]; then
+        cxxflags_arr+=("-fsanitize=${BOOST_SANITIZER}")
+        linkflags_arr+=("-fsanitize=${BOOST_SANITIZER}")
+    fi
+
+    if [[ "${cxxflags_arr[@]}" ]]; then
+        cxxflags_var="cxxflags=${cxxflags_arr[@]}"
+    fi
+
+    if [[ "${linkflags_arr[@]}" ]]; then
+        linkflags_var="linkflags=${linkflags_arr[@]}"
+    fi
+
+    echo Boost link type: $b2_link_type
+
+    echo Boost b2 extra options ${b2_extra_options}
 
     fetch_and_untar ${boost_version_str}.tar.gz \
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
     cd ${boost_version_str}/;
-    ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test;
-    ./b2 -j2 \
+    ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test --with-toolset=${boost_toolset};
+    ./b2 install -j2 --prefix=${install_path} \
+        variant=release \
         link=${b2_link_type} \
         threading=multi \
-        variant=release \
         toolset=${boost_toolset} \
-        ${b2_extra_options} > /dev/null;
-    ./b2 install --prefix=${install_path} > /dev/null;
+        "${cxxflags_var}" \
+        "${linkflags_var}" \
+        ${b2_extra_options} >/dev/null;
 }
 
 install_cmake () {
@@ -169,7 +196,7 @@ else
 fi
 
 compiler_toolset=$4
-if [[ -z ${compiler_toolset+x} ]]; then
+if [[ -z ${compiler_toolset} ]]; then
     case $COMPILER in
         gcc*)
             compiler_toolset=gcc

@@ -30,14 +30,16 @@ using boost::asio::ip::tcp;
 using helics::Core;
 
 #define TCP_BROKER_PORT 24160
+#define TCP_BROKER_PORT_STRING "24160"
 #define TCP_SECONDARY_PORT 24180
 BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 {
     std::atomic<int> counter{0};
-    std::string host = "localhost";
+    std::string host = "127.0.0.1";
 
     auto srv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host,TCP_BROKER_PORT);
+    BOOST_REQUIRE (server->isReady ());
     auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<bool> validData{true};
@@ -72,15 +74,18 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     auto conn2 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
     auto conn3 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
     auto conn4 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
-
+    BOOST_REQUIRE (conn1);
+    BOOST_REQUIRE (conn2);
+    BOOST_REQUIRE (conn3);
+    BOOST_REQUIRE (conn4);
     auto res = conn1->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn2->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn3->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
     res = conn4->waitUntilConnected (1000);
-    BOOST_CHECK_EQUAL (res, 0);
+    BOOST_CHECK_EQUAL (res, true);
 
     auto transmitFunc = [](helics::tcp::TcpConnection::pointer obj) {
         std::vector<char> dataB (20);
@@ -170,7 +175,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     helics::tcp::TcpComms comm (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host,TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall (
@@ -180,6 +185,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
           ++counter;
           return data_Size;
       });
+    BOOST_REQUIRE (server->isReady ());
     server->start ();
 
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
@@ -218,12 +224,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::atomic<int> CommCounter{0};
     std::atomic<size_t> len{0};
     helics::ActionMessage act;
-    std::string host = "localhost";
+    std::string host = "127.0.0.1";
     helics::tcp::TcpComms comm (host, host);
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (),host, TCP_BROKER_PORT_STRING);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall ([&data, &ServerCounter, &len](helics::tcp::TcpRxConnection::pointer, const char *data_rec,
@@ -233,6 +239,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
         ++ServerCounter;
         return data_Size;
     });
+    BOOST_REQUIRE (server->isReady ());
     server->start ();
 
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
@@ -249,7 +256,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 
     auto txconn = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
     auto res = txconn->waitUntilConnected (1000);
-    BOOST_REQUIRE_EQUAL (res, 0);
+    BOOST_REQUIRE_EQUAL (res, true);
 
     BOOST_REQUIRE (txconn->isConnected ());
 
@@ -280,10 +287,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     helics::tcp::TcpComms comm (host, host);
     helics::tcp::TcpComms comm2 (host, std::string ());
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (TCP_BROKER_PORT+1);
     comm.setName ("tests");
     comm2.setName ("test2");
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (TCP_BROKER_PORT+1);
     comm.setPortNumber (TCP_SECONDARY_PORT);
 
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
@@ -296,14 +303,16 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-
-    bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
-    connected = connected_fut.get ();
-    BOOST_REQUIRE (connected);
+    bool connected1 = comm2.connect();
+    BOOST_REQUIRE(connected1);
+    bool connected2 = connected_fut.get ();
+    if (!connected2)
+    { //lets just try again if it is not connected
+        connected2 = comm.connect();
+    }
+    BOOST_REQUIRE (connected2);
 
     comm.transmit (0, helics::CMD_ACK);
-    BOOST_CHECK (connected);
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     if (counter2 != 1)
     {
@@ -332,13 +341,13 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     helics::tcp::TcpComms comm2 (host, "");
     helics::tcp::TcpComms comm3 (host, host);
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (TCP_BROKER_PORT+2);
     comm.setName ("tests");
     comm2.setName ("broker");
     comm3.setName ("test3");
-    comm3.setBrokerPort (TCP_BROKER_PORT);
+    comm3.setBrokerPort (TCP_BROKER_PORT+2);
 
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (TCP_BROKER_PORT+2);
     comm.setPortNumber (TCP_SECONDARY_PORT);
     comm3.setPortNumber (23920);
 
@@ -419,7 +428,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     BOOST_CHECK (core->isInitialized ());
     auto srv = AsioServiceManager::getServicePointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseService (),"localhost", TCP_BROKER_PORT);
     srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};

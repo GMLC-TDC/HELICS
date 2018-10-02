@@ -203,7 +203,8 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
     auto in_len = encoded_string.size ();
     int i = 0;
     int in_ = 0;
-    unsigned char char_array_4[4], char_array_3[3];
+    unsigned char char_array_4[4] = {'\0', '\0', '\0', '\0'};
+    unsigned char char_array_3[3] = {'\0', '\0', '\0'};
     unsigned char *outData = reinterpret_cast<unsigned char *> (data);
     size_t dataIndex = 0;
     while (((in_len--) != 0u) && (encoded_string[in_] != '=') && is_base64 (encoded_string[in_]))

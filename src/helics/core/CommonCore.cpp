@@ -82,6 +82,7 @@ bool CommonCore::connect ()
                 setActionFlag (m, core_flag);
                 transmit (0, m);
                 brokerState = broker_state_t::connected;
+                disconnection.activate ();
             }
             else
             {
@@ -110,6 +111,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         if (brokerState < broker_state_t::terminating)
         {
             brokerState = broker_state_t::terminating;
+            sendDisconnect ();
             if (global_broker_id != 0)
             {
                 ActionMessage dis (CMD_DISCONNECT);
@@ -132,9 +134,27 @@ void CommonCore::processDisconnect (bool skipUnregister)
     {
         unregister ();
     }
+    disconnection.trigger ();
 }
 
-void CommonCore::disconnect () { processDisconnect (); }
+void CommonCore::disconnect ()
+{
+    ActionMessage udisconnect (CMD_USER_DISCONNECT);
+    addActionMessage (udisconnect);
+    waitForDisconnect ();
+}
+
+void CommonCore::waitForDisconnect (int msToWait) const
+{
+    if (msToWait <= 0)
+    {
+        disconnection.wait ();
+    }
+    else
+    {
+        disconnection.wait_for (std::chrono::milliseconds (msToWait));
+    }
+}
 
 void CommonCore::unregister ()
 {
@@ -311,7 +331,15 @@ bool CommonCore::allDisconnected () const
         auto state = fed->getState ();
         return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
     };
-    return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    auto afed = std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    if ((hasTimeDependency) || (hasFilters))
+    {
+        return (afed) && (!timeCoord->hasActiveTimeDependencies ());
+    }
+    else
+    {
+        return (afed);
+    }
 }
 
 void CommonCore::setCoreReadyToInit ()
@@ -505,11 +533,15 @@ Time CommonCore::timeRequest (federate_id_t federateID, Time next)
     if (HELICS_EXECUTING == fed->getState ())
     {
         auto ret = fed->requestTime (next, iteration_request::no_iterations);
-        if (ret.state != iteration_result::error)
+        switch (ret.state)
         {
+        case iteration_result::error:
+            throw (FunctionExecutionFailure (fed->lastErrorString ()));
+        case iteration_result::halted:
+            throw (HelicsTerminated ("federate has terminated"));
+        default:
             return ret.grantedTime;
         }
-        throw (FunctionExecutionFailure ("federate has an error"));
     }
     throw (InvalidFunctionCall ("time request may only be called in execution state"));
 }
@@ -780,7 +812,7 @@ handle_id_t CommonCore::registerSubscription (federate_id_t federateID,
     auto handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::subscription, key, type, units,
                                      (check_mode == handle_check_mode::required));
 
-    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering SUB {}", key));
+    LOG_INTERFACES (0, fed->getIdentifier (), fmt::format ("registering SUB {}", key));
     auto id = handle->handle;
     fed->interfaces ().createSubscription (id, key, type, units, check_mode);
 
@@ -823,7 +855,7 @@ handle_id_t CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (InvalidFunctionCall ("publications must be registered before calling enterInitializationMode"));
     }
-    LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
+    LOG_INTERFACES (0, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
     if (pub != nullptr)  // this key is already found
     {
@@ -960,7 +992,8 @@ void CommonCore::setValue (handle_id_t handle, const char *data, uint64_t len)
     auto fed = getFederateAt (handleInfo->local_fed_id);
     if (fed->checkAndSetValue (handle, data, len))
     {
-        LOG_DEBUG (0, fed->getIdentifier (), fmt::format ("setting Value for {} size {}", handleInfo->key, len));
+        LOG_DATA_MESSAGES (0, fed->getIdentifier (),
+                           fmt::format ("setting Value for {} size {}", handleInfo->key, len));
         ActionMessage mv (CMD_PUB);
         mv.source_id = handleInfo->fed_id;
         mv.source_handle = handle;
@@ -2020,7 +2053,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
-    //default into a federate query
+    // default into a federate query
     auto fed = (target != "federate") ? getFederate (target) : getFederateAt (0);
     if (fed != nullptr)
     {
@@ -2120,14 +2153,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         addRoute (command.dest_handle, command.payload);
         break;
     case CMD_PRIORITY_DISCONNECT:
-        if (allDisconnected ())
-        {
-            brokerState = broker_state_t::terminating;
-            ActionMessage dis (CMD_DISCONNECT);
-            dis.source_id = global_broker_id;
-            transmit (0, dis);
-            addActionMessage (CMD_STOP);
-        }
+        checkDisconnect ();
         break;
     case CMD_BROKER_QUERY:
         if (command.dest_id == global_broker_id)
@@ -2272,7 +2298,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             // brokerReconnect()
             LOG_ERROR (global_broker_id, getIdentifier (), "lost connection with server");
             sendErrorToFederates (-5);
-            disconnect ();
+            processDisconnect ();
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
@@ -2303,11 +2329,30 @@ void CommonCore::processCommand (ActionMessage &&command)
             waitingForServerPingReply = false;
         }
         break;
-    case CMD_STOP:
+    case CMD_USER_DISCONNECT:
         if (isConnected ())
         {
-            if (!allDisconnected ())
+            if (brokerState < broker_state_t::terminating)
             {  // only send a disconnect message if we haven't done so already
+                brokerState = broker_state_t::terminating;
+                sendDisconnect ();
+                ActionMessage m (CMD_DISCONNECT);
+                m.source_id = global_broker_id;
+                transmit (0, m);
+            }
+        }
+        addActionMessage (CMD_STOP);
+        // we can't just fall through since this may have generated other messages that need to be forwarded or
+        // processed
+        break;
+    case CMD_STOP:
+
+        if (isConnected ())
+        {
+            if (brokerState < broker_state_t::terminating)
+            {  // only send a disconnect message if we haven't done so already
+                brokerState = broker_state_t::terminating;
+                sendDisconnect ();
                 ActionMessage m (CMD_DISCONNECT);
                 m.source_id = global_broker_id;
                 transmit (0, m);
@@ -2374,20 +2419,16 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == 0)
         {
-            if (allDisconnected ())
-            {
-                brokerState = broker_state_t::terminated;
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
-                addActionMessage (CMD_STOP);
-            }
+            checkDisconnect ();
         }
         else
         {
             routeMessage (command);
         }
 
+        break;
+    case CMD_DISCONNECT_CHECK:
+        checkDisconnect ();
         break;
     case CMD_SEARCH_DEPENDENCY:
     {
@@ -2466,7 +2507,14 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id)
         {
-            sendToLogger (0, 0, getFederateNameNoThrow (command.source_id), command.payload);
+            if (command.source_id == higher_broker_id)
+            {
+                sendErrorToFederates (command.counter);
+            }
+            else
+            {
+                sendToLogger (0, 0, getFederateNameNoThrow (command.source_id), command.payload);
+            }
         }
         else
         {
@@ -2854,12 +2902,13 @@ void CommonCore::checkDependencies ()
         }
     }
 
-    // if we have filters we need to be a timeCoordinator
+    // if the core has filters we need to be a timeCoordinator
     if (hasFilters)
     {
         return;
     }
-    // if there is more than 2 dependents(higher broker + 2 or more federates then we need to be a timeCoordinator
+    // if there is more than 2 dependents or dependencies (higher broker + 2 or more federates) then we need to be
+    // a timeCoordinator
     if (timeCoord->getDependents ().size () > 2)
     {
         return;
@@ -2890,19 +2939,9 @@ void CommonCore::checkDependencies ()
     // check to make sure the dependencies match
     for (auto &dep : timeCoord->getDependencies ())
     {
-        if (isLocal (dep))
+        if (!((dep == fedid) || (dep == brkid)))
         {
-            if (dep != fedid)
-            {
-                return;
-            }
-        }
-        else
-        {
-            if (brkid != dep)
-            {
-                return;
-            }
+            return;
         }
     }
     // remove the core from the time dependency chain since it is just adding to the communication noise in this
@@ -2911,7 +2950,7 @@ void CommonCore::checkDependencies ()
     timeCoord->removeDependency (fedid);
     timeCoord->removeDependent (brkid);
     timeCoord->removeDependent (fedid);
-
+    hasTimeDependency = false;
     ActionMessage rmdep (CMD_REMOVE_INTERDEPENDENCY);
 
     rmdep.source_id = global_broker_id;
@@ -3110,13 +3149,31 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
         }
         if (cmd.action () == CMD_DISCONNECT)
         {
-            if (allDisconnected ())
+            if (cmd.source_id == higher_broker_id)
             {
-                brokerState = broker_state_t::terminated;
-                ActionMessage dis (CMD_DISCONNECT);
-                dis.source_id = global_broker_id;
-                transmit (0, dis);
+                brokerState = broker_state_t::terminating;
+                if (hasTimeDependency || hasFilters)
+                {
+                    timeCoord->disconnect ();
+                }
+                ActionMessage bye (CMD_DISCONNECT);
+                for (auto &fed : loopFederates)
+                {
+                    auto state = fed->getState ();
+                    if ((HELICS_FINISHED == state) || (HELICS_ERROR == state))
+                    {
+                        continue;
+                    }
+                    bye.source_id = fed->global_id;
+                    bye.dest_id = fed->global_id;
+                    fed->addAction (bye);
+                }
+
                 addActionMessage (CMD_STOP);
+            }
+            else
+            {
+                checkDisconnect ();
             }
         }
     }
@@ -3130,6 +3187,38 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
     }
 }
 
+void CommonCore::checkDisconnect ()
+{
+    if (allDisconnected ())
+    {
+        brokerState = broker_state_t::terminating;
+        timeCoord->disconnect ();
+        ActionMessage dis (CMD_DISCONNECT);
+        dis.source_id = global_broker_id;
+        transmit (0, dis);
+        addActionMessage (CMD_STOP);
+    }
+}
+
+void CommonCore::sendDisconnect ()
+{
+    LOG_CONNECTIONS (global_broker_id, "core", "sending disconnect");
+    ActionMessage bye (CMD_STOP);
+    bye.source_id = global_broker_id;
+    for (auto &fed : loopFederates)
+    {
+        fed->addAction (bye);
+        if (hasTimeDependency)
+        {
+            timeCoord->removeDependency (fed->global_id);
+            timeCoord->removeDependent (fed->global_id);
+        }
+    }
+    if (hasTimeDependency)
+    {
+        timeCoord->disconnect ();
+    }
+}
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {
     auto handlelock = handles.lock_shared ();

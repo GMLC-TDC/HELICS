@@ -1,4 +1,8 @@
-
+#
+# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
+# file and DISCLAIMER for more details.
+#
 option(ENABLE_EXTRA_COMPILER_WARNINGS "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON)
 option(ENABLE_ERROR_ON_WARNINGS "generate a compiler error for any warning encountered" OFF)
 
@@ -31,7 +35,8 @@ if(UNIX)
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wundef>)
   if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-      add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
+	#this produces a lot of noise on newer compilers
+      #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
       add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)
   endif()
   #this options produces lots of warning but is useful for checking every once in a while with Clang, GCC warning notices with this aren't as useful
@@ -47,6 +52,9 @@ if(UNIX)
   endif()
   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2>)
+  endif()
+   if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.9)
+   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wclass-memaccess>)
   endif()
   endif()
   endif(ENABLE_EXTRA_COMPILER_WARNINGS)
@@ -69,7 +77,7 @@ else(UNIX)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wshadow>)
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-aliasing=1>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wunreachable-code>)
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
+  #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
   #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wcast-align>)

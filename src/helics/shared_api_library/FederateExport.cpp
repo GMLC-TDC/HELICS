@@ -135,12 +135,12 @@ helics_federate helicsCreateValueFederate (const helics_federate_info_t fi)
     return (fed);
 }
 
-helics_federate helicsCreateValueFederateFromJson (const char *json)
+helics_federate helicsCreateValueFederateFromJson (const char *JSON)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::ValueFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::ValueFederate> ((JSON != nullptr) ? std::string (JSON) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {
@@ -179,13 +179,13 @@ helics_federate helicsCreateMessageFederate (const helics_federate_info_t fi)
     return (fed);
 }
 
-helics_federate helicsCreateMessageFederateFromJson (const char *json)
+helics_federate helicsCreateMessageFederateFromJson (const char *JSON)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
 
     try
     {
-        FedI->fedptr = std::make_shared<helics::MessageFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::MessageFederate> ((JSON != nullptr) ? std::string (JSON) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {
@@ -224,12 +224,12 @@ helics_federate helicsCreateCombinationFederate (const helics_federate_info_t fi
     return (fed);
 }
 
-helics_federate helicsCreateCombinationFederateFromJson (const char *json)
+helics_federate helicsCreateCombinationFederateFromJson (const char *JSON)
 {
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((json != nullptr) ? std::string (json) : std::string ());
+        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((JSON != nullptr) ? std::string (JSON) : std::string ());
     }
     catch (const helics::RegistrationFailure &)
     {

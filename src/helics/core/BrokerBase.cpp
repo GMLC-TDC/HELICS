@@ -75,6 +75,8 @@ static const ArgDescriptors extraArgs{
   {"logfile", "the file to log message to"},
   {"loglevel", ArgDescriptor::arg_type_t::int_type,
    "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
+  {"log_level", ArgDescriptor::arg_type_t::int_type,
+   "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
   {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
   {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
   {"minbrokers", ArgDescriptor::arg_type_t::int_type,
@@ -84,8 +86,11 @@ static const ArgDescriptors extraArgs{
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
   {"dumplog", ArgDescriptor::arg_type_t::flag_type,
    "capture a record of all messages and dump a complete log to file or console on termination"},
+  {"networktimeout",
+   "milliseconds to wait to establish a network (can also be entered as a time like '500ms' or '2s') "},
   {"timeout",
    "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}};
+
 
 void BrokerBase::displayHelp ()
 {
@@ -144,15 +149,32 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         maxLogLevel = vm["loglevel"].as<int> ();
     }
+    if (vm.count ("log_level") > 0)
+    {
+        maxLogLevel = vm["log_level"].as<int> ();
+    }
     if (vm.count ("logfile") > 0)
     {
         logFile = vm["logfile"].as<std::string> ();
+    }
+    if (vm.count ("networktimeout") > 0)
+    {
+        auto network_to = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
+        networkTimeout = network_to.toCount (timeUnits::ms);
     }
     if (vm.count ("timeout") > 0)
     {
         auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
         timeout = time_out.toCount (timeUnits::ms);
+		if (networkTimeout < 0)
+		{
+            networkTimeout = timeout;
+		}
     }
+	if (networkTimeout < 0)
+	{
+        networkTimeout = 4000;
+	}
     if (vm.count ("tick") > 0)
     {
         auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);
@@ -322,6 +344,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
 
 bool BrokerBase::tryReconnect () { return false; }
 
+//#define DISABLE_TICK 
 void BrokerBase::queueProcessingLoop ()
 {
     std::vector<ActionMessage> dumpMessages;
@@ -366,8 +389,10 @@ void BrokerBase::queueProcessingLoop ()
             }
             if (messagesSinceLastTick == 0)
             {
+#ifndef DISABLE_TICK
                 //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
+#endif
             }
             messagesSinceLastTick = 0;
             // reschedule the timer

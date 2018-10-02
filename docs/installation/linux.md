@@ -86,7 +86,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: '1.3.0 (07-31-18)'
+Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
@@ -100,8 +100,8 @@ A quick test is to double check the versions of the HELICS player and recorder:
 cd /path/to/helics_install/bin
 
 $ helics_player --version
-1.3.0 (07-31-18)
+x.x.x (XX-XX-XX)
 
 $ helics_recorder --version
-1.3.0 (07-31-18)
+x.x.x (XX-XX-XX)
 ```

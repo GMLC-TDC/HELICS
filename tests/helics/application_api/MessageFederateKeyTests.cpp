@@ -403,6 +403,9 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types_all), cor
 
     BOOST_CHECK (mFed1->hasMessage () == false);
     mFed1->finalize ();
+	
+	gtime=mFed2->requestTime (2.0);
+    BOOST_CHECK_EQUAL (gtime, 2.0);
     mFed2->finalize ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);

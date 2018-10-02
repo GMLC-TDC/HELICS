@@ -5,44 +5,50 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include <memory>
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
-#include "helics/core/CoreFactory.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/CoreFactory.hpp"
+#include <memory>
+#include <stdexcept>
+
+#ifdef HELICS_HAVE_ZEROMQ
+#define ZMQTEST "zmq",
+#define ZMQTEST2 "zmq_2",
+#define ZMQTEST3 "zmq_3",
+#define ZMQTEST4 "zmq_4",
+#else
+#define ZMQTEST
+#define ZMQTEST2
+#define ZMQTEST3
+#define ZMQTEST4
+#endif
 
 #ifndef DISABLE_TCP_CORE
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "zmq", "udp", "test_3", "zmq_3"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp", "test_3", "zmq_3", "udp_3", "tcp_3"};
-const std::string core_types_all[] = {"test",   "ipc_2", "tcp",    "test_2", "zmq",   "udp",
-                                      "test_3", "zmq_3", "ipc",    "zmq_2",  "udp_2", "tcp_2",
-                                      "udp_3",  "tcp_3", "test_4", "zmq_4",  "udp_4", "tcp_4"};
-const std::string core_types_extended[] = {"ipc",   "zmq_2",  "udp_2", "tcp_2", "udp_3",
-                                           "tcp_3", "test_4", "zmq_4", "udp_4", "tcp_4"};
+#define TCPTEST "tcp",
+#define TCPTEST2 "tcp_2",
+#define TCPTEST3 "tcp_3",
+#define TCPTEST4 "tcp_4",
 #else
-const std::string core_types[] = {"test", "ipc_2", "tcp", "test_2", "udp", "test_3"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "udp", "test_3", "udp_3", "tcp_3"};
-const std::string core_types_all[] = {"test",  "ipc_2", "tcp",   "test_2", "udp",    "test_3", "ipc",
-                                      "udp_2", "tcp_2", "udp_3", "tcp_3",  "test_4", "udp_4",  "tcp_4"};
-const std::string core_types_extended[] = {"ipc", "udp_2", "tcp_2", "udp_3", "tcp_3", "test_4", "udp_4", "tcp_4"};
+#define TCPTEST
+#define TCPTEST2
+#define TCPTEST3
+#define TCPTEST4
 #endif
 
-#else
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test", "ipc_2", "test_2", "zmq", "udp", "test_3", "zmq_3"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp", "test_3", "zmq_3"};
-const std::string core_types_all[] = {"test",  "ipc_2", "test_2", "zmq",   "udp",    "test_3", "zmq_3", "ipc",
-                                      "zmq_2", "udp_2", "test_3", "udp_3", "test_4", "zmq_4",  "udp_4"};
-const std::string core_types_extended[] = {"ipc", "zmq_2", "udp_2", "test_3", "udp_3", "test_4", "zmq_4", "udp_4"};
-#else
-const std::string core_types[] = {"test", "ipc_2", "test_2", "udp", "test_3"};
-const std::string core_types_single[] = {"test", "ipc", "udp", "test_3", "udp_3"};
-const std::string core_types_all[] = {"test",  "ipc_2",  "test_2", "udp",    "test_3", "ipc",
-                                      "udp_2", "test_3", "udp_3",  "test_4", "udp_4"};
-const std::string core_types_extended[] = {"ipc", "udp_2", "test_3", "udp_3", "test_4", "udp_4"};
-#endif
-#endif
+const std::string ztypes[] = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
+const std::string core_types[] = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
+
+const std::string core_types_2[] = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};
+
+const std::string core_types_simple[] = {"test", "ipc", TCPTEST ZMQTEST "udp"};
+const std::string core_types_single[] = {"test", "ipc", TCPTEST ZMQTEST "udp", "test_3",
+                                         ZMQTEST3 TCPTEST3 "udp_3"};
+const std::string core_types_all[] = {
+  "test",         "ipc_2",          TCPTEST "test_2", ZMQTEST "udp",     "test_3",
+  ZMQTEST3 "ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
+const std::string core_types_extended[] = {"ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4",
+                                           ZMQTEST4 TCPTEST4 "udp_4"};
 
 const std::string defaultNamePrefix = "fed";
 
@@ -61,7 +67,19 @@ struct FederateTestFixture
                     helics::Time time_delta = helics::timeZero,
                     const std::string &name_prefix = defaultNamePrefix)
     {
+        ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
+        if (!broker->isConnected ())
+        {
+            broker->disconnect ();
+            broker = nullptr;
+            helics::cleanupHelicsLibrary ();
+            broker = AddBroker (core_type_name, count);
+            if (!broker->isConnected ())
+            {
+                throw (std::runtime_error ("Unable to connect rootbroker"));
+            }
+        }
         AddFederates<FedType> (core_type_name, count, broker, time_delta, name_prefix);
     }
 
@@ -134,6 +152,10 @@ struct FederateTestFixture
         case 3:
         {
             auto subbroker = AddBroker (core_type_name, initString + " --federates " + std::to_string (count));
+            if (!subbroker->isConnected ())
+            {
+                throw (std::runtime_error ("Unable to connect subbroker"));
+            }
             auto newTypeString = core_type_name;
             newTypeString.push_back ('_');
             newTypeString.push_back ('2');
@@ -151,6 +173,10 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }
@@ -190,6 +216,10 @@ struct FederateTestFixture
                 int fedcnt = (ii > count - 3) ? 4 : (count - ii);
                 auto subbroker =
                   AddBroker (core_type_name, initString + " --federates " + std::to_string (fedcnt));
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, fedcnt, subbroker, time_delta, name_prefix);
             }
         }
@@ -202,6 +232,10 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                if (!subbroker->isConnected ())
+                {
+                    throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
+                }
                 AddFederates<FedType> (newTypeString, 1, subbroker, time_delta, name_prefix);
             }
         }
@@ -221,6 +255,7 @@ struct FederateTestFixture
     std::vector<std::shared_ptr<helics::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
+    std::string ctype;
 
   private:
     bool hasIndexCode (const std::string &type_name);

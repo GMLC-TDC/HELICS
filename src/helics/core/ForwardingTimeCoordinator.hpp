@@ -97,6 +97,8 @@ class ForwardingTimeCoordinator
     @param fedID the identifier of the federate to remove*/
     void removeDependent (Core::federate_id_t fedID);
 
+	 /** disconnect*/
+    void disconnect ();
     /** check if entry to the executing state can be granted*/
     message_processing_result checkExecEntry ();
 
