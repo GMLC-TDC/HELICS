@@ -1457,7 +1457,7 @@ void CoreBroker::disconnect ()
 
 void CoreBroker::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
-    if (!dest.isValid ())
+    if (dest == global_federate_id_t ())
     {
         return;
     }
@@ -1488,7 +1488,7 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
 
 void CoreBroker::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
 {
-    if (!dest.isValid ())
+    if (dest == global_federate_id_t ())
     {
         return;
     }

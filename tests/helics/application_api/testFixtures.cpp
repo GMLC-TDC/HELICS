@@ -48,7 +48,7 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
         broker = helics::BrokerFactory::create (type, initialization_string + " --client");
         break;
     default:
-        helics::BrokerFactory::create (type, initialization_string);
+        broker=helics::BrokerFactory::create (type, initialization_string);
 	}
     return broker;
     
