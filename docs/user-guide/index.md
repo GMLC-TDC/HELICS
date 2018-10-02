@@ -1,9 +1,32 @@
-User Guide
-============
+# User Guide Introduction #
 
-```eval_rst
-.. toctree::
-    :maxdepth: 1
 
-    queries.md
-```
+Co-simulation is a powerful analysis technique that allows simulators of different domains to interact through the course of the simulation, typically by dyanimcally exchanging values that define boundary conditions for other simulators. HELICS is a co-simulation platform that has been designed to allow integration of these simulators across a variety of computation platforms and languages. HELICS has been designed to with power system simulation in mind (and is supported by a number of power system simulators xxxxxxx links) but is general enough to support a wide variety of simulators and co-simulation tasks.
+
+## Who Is This User Guide For? ##
+There are a number of classes of HELICS users: 
+
+* new users that have little to no experience with HELICS and co-simulation in general
+* intermediate users that have run co-simulations with HELICS using simulators in which somebody else implemented the HELICS support
+* experienced users that are incorporating a new simulator and need to know how to use specific features in the HELICS API
+* developers of HELICS who are improving HELICS functionality and contributing to the code base
+
+This manual is primarily targeted to those in the first two categories. Other documentation xxxxxxxx exists that can be helpful for the latter two types of users.
+
+## User Guide Overview ##
+Make each of these links
+
+* **Co-simuation Overview** - A more detailed discussion of what co-simulation is and how it is used.
+* **HELICS Key Concepts** - Key terms and concepts to understand before running co-simulations with HELICS
+* **HELICS Co-Simulation Walk-through** - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
+* **Federates** - Discussion of the different types of federates in HELICS
+* **Message Filters** - How message filters can be implemented natively in HELICS or as stand-alone federates
+* **Cores** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
+* **Broker Hierarchies (tent.)** - Advantages and disadvantages of implmenting hierarchies of brokers and how that is accomplished in HELICS
+* **Reiteration (tent.)** - Discussion of why reiteration is used and how to sucessfully execute it in HELICS
+* **Integrating a New Simulator** - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
+*  **Trouble-Shooting HELICS Co-Simulations (tent.)** - What to do when the co-simulations don't seem to be working corectly.
+* **Large Co-Simulations in HELICS** - How to run HELICS co-simulations with a large (100+) number of federates
+
+## User Manual Table of Contents ##
+xxxxxxx - I may not need this as the above can be done with direct links
