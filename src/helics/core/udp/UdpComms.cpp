@@ -37,10 +37,10 @@ void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     brokerPort = netInfo.brokerPort;
     PortNumber = netInfo.portNumber;
+    stripProtocol(brokerTarget_);
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost") ||
-            (brokerTarget_ == "udp://localhost") || (brokerTarget_ == "udp://127.0.0.1"))
+        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost"))
         {
             localTarget_ = "localhost";
         }
@@ -60,6 +60,10 @@ void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
         {
             localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
         }
+    }
+    else
+    {
+        stripProtocol(localTarget_);
     }
     if (netInfo.portStart > 0)
     {
@@ -372,7 +376,11 @@ void UdpComms::queue_tx_function ()
         }
         catch (std::exception &e)
         {
-            std::cerr << e.what () << std::endl;
+            logError(std::string("error connecting to broker ")+ e.what ());
+            PortNumber = -1;
+            promisePort.set_value(-1);
+            setTxStatus(connection_status::error);
+            return;
         }
     }
     else

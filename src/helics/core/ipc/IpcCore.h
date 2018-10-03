@@ -20,7 +20,7 @@ namespace ipc
 class IpcComms;
 class IpcCommsSS;
 /** implementation for the core that uses tcp messages to communicate*/
-using IpcCore = NetworkCore<IpcComms, NetworkBrokerData::interface_type::ipc>;
+using IpcCore = NetworkCore<IpcComms, interface_type::ipc>;
 
 }  // namespace ipc
 }  // namespace helics

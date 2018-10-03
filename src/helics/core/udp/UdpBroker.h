@@ -13,7 +13,7 @@ namespace helics
 namespace udp
 {
 class UdpComms;
-using UdpBroker = NetworkBroker<UdpComms, NetworkBrokerData::interface_type::udp, 7>;
+using UdpBroker = NetworkBroker<UdpComms, interface_type::udp, 7>;
 
 }  // namespace udp
 }  // namespace helics

@@ -9,5 +9,5 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template class NetworkBroker<ipc::IpcComms, NetworkBrokerData::interface_type::ipc, static_cast<int>(core_type::IPC)>;
+template class NetworkBroker<ipc::IpcComms, interface_type::ipc, static_cast<int>(core_type::IPC)>;
 } //namespace helics

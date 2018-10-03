@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template class NetworkCore<tcp::TcpComms, NetworkBrokerData::interface_type::tcp>;
+template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
 namespace tcp
 {
 

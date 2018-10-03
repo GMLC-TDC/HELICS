@@ -18,19 +18,21 @@ enum class interface_networks :char
     all, //!< use all external ports
 };
 
+/** define keys for particular interfaces*/
+enum class interface_type :char
+{
+    tcp = 0,  //!< using tcp ports for communication
+    udp = 1,  //!< using udp ports for communication
+    ip = 2,  //!< using both types of ports (tcp/or udp) for communication
+    ipc = 3, //!< using ipc locations
+    inproc=4, //!< using inproc sockets for communications
+};
+
 /** helper class designed to contain the common elements between networking brokers and cores
  */
 class NetworkBrokerData
 {
   public:
-    /** define keys for particular interfaces*/
-    enum class interface_type:char
-    {
-        tcp=0,  //!< using tcp ports for communication
-        udp=1,  //!< using udp ports for communication
-        both=2,  //!< using both types of ports for communication
-		ipc=3, //!< using ipc locations
-    };
    
 	enum class server_mode_options :char
 	{
@@ -72,7 +74,7 @@ class NetworkBrokerData
   private:
     /** do some checking on the brokerAddress*/
     void checkAndUpdateBrokerAddress (const std::string &localAddress);
-    interface_type allowedType = interface_type::both;
+    interface_type allowedType = interface_type::ip;
     
 };
 
@@ -102,6 +104,18 @@ or the interface doesn't use port numbers
 @return a pair with 2 strings with the interface name and port number
 */
 std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address);
+
+/** strip any protocol strings from the interface and return a new string
+@example tcp://127.0.0.1 -> 127.0.0.1*/
+std::string stripProtocol(const std::string &interface);
+/** strip any protocol strings from the interface and return a new string*/
+void stripProtocol(std::string &interface);
+
+/** add a protocol url to the interface and return a new string*/
+std::string addProtocol(const std::string &interface, interface_type interfaceT);
+
+/** add a protocol url to the interface modifying the string in place*/
+void addProtocol(std::string &interface, interface_type interfaceT);
 
 /** check if a specfied address is v6 or v4
 @return true if the address is a v6 address

@@ -63,7 +63,7 @@ void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost"))
+        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost")||(brokerTarget_=="localhost"))
         {
             localTarget_ = "tcp://127.0.0.1";
         }
@@ -400,11 +400,8 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (!brokerTarget_.empty ())
     {
-		if (brokerTarget_.find("://", 3) == std::string::npos)
-		{
-            brokerTarget_.insert (0, "tcp://");
-		}
-        
+        addProtocol(brokerTarget_,interface_type::tcp);
+        addProtocol(localTarget_, interface_type::tcp);
         auto ctx = zmqContextManager::getContextPointer ();
         if (brokerReqPort < 0)
         {

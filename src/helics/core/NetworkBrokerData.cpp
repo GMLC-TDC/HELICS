@@ -232,7 +232,7 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
             brokerAddress = localAddress;
         }
         break;
-    case interface_type::both:
+    case interface_type::ip:
         if ((brokerAddress == "udp://*") || (brokerAddress == "udp"))
         {  // the broker address can't use a wild card
 			if (localAddress.compare(3, 3, "://") == 0)
@@ -293,7 +293,7 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
     {
         try
         {
-            if (address[lastColon + 1] != '/')
+            if ((address.size()>lastColon+1)&&(address[lastColon + 1] != '/'))
             {
                 auto val = std::stoi (address.substr (lastColon + 1));
                 ret.first = address.substr (0, lastColon);
@@ -317,6 +317,70 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 {
     auto lastColon = address.find_last_of (':');
     return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+}
+
+std::string stripProtocol(const std::string &interface)
+{
+    auto loc = interface.find("://");
+    if (loc != std::string::npos)
+    {
+        return interface.substr(loc + 2);
+    }
+    return interface;
+}
+
+/** strip any protocol strings from the interface and return a new string*/
+void stripProtocol(std::string &interface)
+{
+    auto loc = interface.find("://");
+    if (loc != std::string::npos)
+    {
+        interface.erase(0,loc + 2);
+    }
+}
+
+std::string addProtocol(const std::string &interface, interface_type interfaceT)
+{
+    if (interface.find("://") == std::string::npos)
+    {
+        switch (interfaceT)
+        {
+        case interface_type::ip:
+        case interface_type::tcp:
+            return std::string("tcp://") + interface;
+        case interface_type::ipc:
+            return std::string("ipc://") + interface;
+        case interface_type::udp:
+            return std::string("udp://") + interface;
+        case interface_type::inproc:
+            return std::string("inproc://") + interface;
+            break;
+        }
+    }
+    return interface;
+}
+
+void addProtocol(std::string &interface, interface_type interfaceT)
+{
+    if (interface.find("://") == std::string::npos)
+    {
+        switch (interfaceT)
+        {
+        case interface_type::ip:
+        case interface_type::tcp:
+            interface.insert(0,"tcp://");
+            break;
+        case interface_type::ipc:
+            interface.insert(0, "ipc://");
+            break;
+        case interface_type::udp:
+            interface.insert(0, "udp://");
+            break;
+        case interface_type::inproc:
+            interface.insert(0, "inproc://");
+            break;
+        }
+    }
 }
 
 bool isipv6(const std::string &address)

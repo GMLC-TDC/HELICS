@@ -15,20 +15,20 @@ constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://12
                                               ""};
 
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
 {
 	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
     : CommsBroker<COMMS, CommonCore> (core_name)
 {
 	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *const *argv)
 {
     if (BrokerBase::brokerState == BrokerBase::created)
@@ -42,7 +42,7 @@ void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *con
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 bool NetworkCore<COMMS, baseline>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
@@ -65,7 +65,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     return res;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
 {
     std::string add;

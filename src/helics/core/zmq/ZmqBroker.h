@@ -9,7 +9,7 @@ namespace helics {
 namespace zeromq {
 class ZmqComms;
 /** implementation for the core that uses zmq messages to communicate*/
-class ZmqBroker final : public NetworkBroker<ZmqComms, NetworkBrokerData::interface_type::tcp,1> {
+class ZmqBroker final : public NetworkBroker<ZmqComms, interface_type::tcp,1> {
 
 public:
     /** default constructor*/

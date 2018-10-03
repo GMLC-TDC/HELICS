@@ -10,5 +10,5 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template class NetworkCore<ipc::IpcComms, NetworkBrokerData::interface_type::ipc>;
+template class NetworkCore<ipc::IpcComms, interface_type::ipc>;
 }  // namespace helics

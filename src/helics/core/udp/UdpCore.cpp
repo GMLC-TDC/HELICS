@@ -10,5 +10,5 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-    template class NetworkCore<udp::UdpComms, NetworkBrokerData::interface_type::udp>;
+    template class NetworkCore<udp::UdpComms, interface_type::udp>;
 }  // namespace helics

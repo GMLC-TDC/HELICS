@@ -39,10 +39,10 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 	}
     brokerPort = netInfo.brokerPort;
     PortNumber = netInfo.portNumber;
+    stripProtocol(brokerTarget_);
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost") ||
-            (brokerTarget_ == "tcp://localhost") || (brokerTarget_ == "tcp://127.0.0.1"))
+        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost"))
         {
             localTarget_ = "localhost";
         }
@@ -62,6 +62,10 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
         {
 			localTarget_ = generateMatchingInterfaceAddress(brokerTarget_, interfaceNetwork);
         }
+    }
+    else
+    {
+        stripProtocol(localTarget_);
     }
     if (netInfo.portStart > 0)
     {

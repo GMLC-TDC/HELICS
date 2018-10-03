@@ -17,21 +17,21 @@ constexpr const char *tcodeStr (int tcode) { return ((tcode >= 0) && (tcode < 15
 
 constexpr const char *defInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (bool rootBroker) noexcept
     : CommsBroker<COMMS, CoreBroker> (rootBroker)
 {
 	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (const std::string &broker_name)
     : CommsBroker<COMMS, CoreBroker> (broker_name)
 {
     netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 void NetworkBroker<COMMS, baseline, tcode>::displayHelp (bool local_only)
 {
     std::cout << " Help for " << tcodeStr (tcode) << " Broker: \n";
@@ -42,7 +42,7 @@ void NetworkBroker<COMMS, baseline, tcode>::displayHelp (bool local_only)
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 void NetworkBroker<COMMS, baseline, tcode>::initializeFromArgs (int argc, const char *const *argv)
 {
     if (BrokerBase::brokerState == BrokerBase::created)
@@ -56,7 +56,7 @@ void NetworkBroker<COMMS, baseline, tcode>::initializeFromArgs (int argc, const 
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
@@ -79,7 +79,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
     return res;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline, int tcode>
+template <class COMMS, interface_type baseline, int tcode>
 std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString () const
 {
     std::string add;
