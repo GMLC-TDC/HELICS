@@ -20,6 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (tracer_tests, *utf::label("ci"))
 
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -100,7 +101,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -120,7 +121,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
     cnt = 0;
     while (lastTime < 1.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -246,12 +247,12 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
+    StringToCmdLine cmdArg ("--name=rec --core=ipc " + exampleFile);
 
     helics::apps::Tracer trace1 (cmdArg.getArgCount (), cmdArg.getArgV ());
     std::atomic<int> counter{0};
@@ -260,7 +261,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
 
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::IPC;
-    fi.coreInitString = "1 --broker=ipc_broker";
+    fi.coreInitString = "1";
 
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
@@ -294,7 +295,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     fut.get ();
     BOOST_CHECK_EQUAL (counter.load (), 4);
     trace1.finalize ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(300ms);
 }
 
 BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
@@ -342,7 +343,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -362,7 +363,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     cnt = 0;
     while (lastTime < 1.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -425,7 +426,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -501,7 +502,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -579,7 +580,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     int cnt = 0;
     while (lastTime < 0.5)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         if (cnt++ > 10)
         {
             break;
@@ -613,18 +614,18 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
-    std::string cmdArg ("--name=tracer --broker=ipc_broker --core=ipc --stop=5 " + exampleFile);
+    std::string cmdArg ("--name=tracer --core=ipc --stop=5 " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
 
     helics::FederateInfo fi (helics::core_type::IPC);
-    fi.coreInitString = "1 --broker=ipc_broker";
+    fi.coreInitString = "1";
 
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);

@@ -319,65 +319,63 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
     return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
 }
 
-std::string stripProtocol(const std::string &interface)
+std::string stripProtocol(const std::string &networkAddress)
 {
-    auto loc = interface.find("://");
+    auto loc = networkAddress.find("://");
     if (loc != std::string::npos)
     {
-        return interface.substr(loc + 2);
+        return networkAddress.substr(loc + 2);
     }
-    return interface;
+    return networkAddress;
 }
 
-/** strip any protocol strings from the interface and return a new string*/
-void stripProtocol(std::string &interface)
+void stripProtocol(std::string &networkAddress)
 {
-    auto loc = interface.find("://");
+    auto loc = networkAddress.find("://");
     if (loc != std::string::npos)
     {
-        interface.erase(0,loc + 2);
+        networkAddress.erase(0,loc + 2);
     }
 }
 
-std::string addProtocol(const std::string &interface, interface_type interfaceT)
+std::string addProtocol (const std::string &networkAddress, interface_type interfaceT)
 {
-    if (interface.find("://") == std::string::npos)
+    if (networkAddress.find("://") == std::string::npos)
     {
         switch (interfaceT)
         {
         case interface_type::ip:
         case interface_type::tcp:
-            return std::string("tcp://") + interface;
+            return std::string("tcp://") + networkAddress;
         case interface_type::ipc:
-            return std::string("ipc://") + interface;
+            return std::string("ipc://") + networkAddress;
         case interface_type::udp:
-            return std::string("udp://") + interface;
+            return std::string("udp://") + networkAddress;
         case interface_type::inproc:
-            return std::string("inproc://") + interface;
-            break;
+            return std::string("inproc://") + networkAddress;
         }
     }
-    return interface;
+    return networkAddress;
 }
 
-void addProtocol(std::string &interface, interface_type interfaceT)
+void addProtocol(std::string &networkAddress, interface_type interfaceT)
 {
-    if (interface.find("://") == std::string::npos)
+    if (networkAddress.find("://") == std::string::npos)
     {
         switch (interfaceT)
         {
         case interface_type::ip:
         case interface_type::tcp:
-            interface.insert(0,"tcp://");
+            networkAddress.insert(0,"tcp://");
             break;
         case interface_type::ipc:
-            interface.insert(0, "ipc://");
+            networkAddress.insert(0, "ipc://");
             break;
         case interface_type::udp:
-            interface.insert(0, "udp://");
+            networkAddress.insert(0, "udp://");
             break;
         case interface_type::inproc:
-            interface.insert(0, "inproc://");
+            networkAddress.insert(0, "inproc://");
             break;
         }
     }
