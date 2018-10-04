@@ -148,4 +148,13 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
 
 std::string NetworkCommsInterface::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 
+ActionMessage  NetworkCommsInterface::generatePortRequest() const
+{
+    ActionMessage req(CMD_PROTOCOL);
+    req.messageID = REQUEST_PORTS;
+    //req.payload = localTarget_;
+    return req;
+
+}
+
 }  // namespace helics

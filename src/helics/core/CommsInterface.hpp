@@ -42,6 +42,8 @@ class CommsInterface
     /** add a new route assigned to the appropriate id
      */
     void addRoute (int route_id, const std::string &routeInfo);
+    /** remove a route from use*/
+    void removeRoute(int route_id);
     /** connect the commsInterface
     @return true if the connection was successful false otherwise
     */
