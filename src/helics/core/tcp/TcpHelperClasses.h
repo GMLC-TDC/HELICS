@@ -116,12 +116,12 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
         });
     }
     /** check if the socket has finished the connection process*/
-    bool isConnected() const { return connected.isActive(); }
+    bool isConnected () const { return (connected.isActive ()) && (!connectionError); }
     /** wait until the socket has finished the connection process
     @param timeOut the number of ms to wait for the connection process to finish (<0) for no limit
     @return true if connected, false if the timeout was reached
     */
-    bool waitUntilConnected(int timeOut);
+    bool waitUntilConnected(std::chrono::milliseconds timeOut);
   private:
     TcpConnection (boost::asio::io_service &io_service, size_t bufferSize)
         : socket_ (io_service), data (bufferSize)
@@ -146,6 +146,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
     TriggerVariable receivingHalt;
+    std::atomic<bool> connectionError{false};
     TriggerVariable connected;  //!< variable indicating connectivity
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorCall;

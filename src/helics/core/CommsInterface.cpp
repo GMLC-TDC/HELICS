@@ -225,7 +225,7 @@ bool CommsInterface::connect ()
         catch (const std::exception &e)
         {
             rx_status = connection_status::error;
-            std::cerr << "error in receiver" << e.what () << std::endl;
+            logError(std::string("error in receiver >")+e.what ());
         }
     });
     queue_transmitter = std::thread ([this] {
@@ -236,7 +236,7 @@ bool CommsInterface::connect ()
         catch (const std::exception &e)
         {
             tx_status = connection_status::error;
-            std::cerr << "error in transmitter" << e.what () << std::endl;
+            logError (std::string ("error in transmitter >") + e.what ());
         }
     });
     txTrigger.waitActivation ();

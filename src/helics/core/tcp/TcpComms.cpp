@@ -352,7 +352,7 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
             }
             else if (m.messageID == DISCONNECT)
             {
-                txQueue.emplace (-1, m);
+                txQueue.emplace (control_route, m);
             }
         }
     }
@@ -367,14 +367,29 @@ bool TcpComms::establishBrokerConnection(std::shared_ptr<AsioServiceManager> &io
 	}
 	try
 	{
+        auto tick = std::chrono::steady_clock::now ();
+        std::chrono::milliseconds timeRemaining (connectionTimeout);
 		brokerConnection = TcpConnection::create(ioserv->getBaseService(), brokerTarget_,
 			std::to_string(brokerPort), maxMessageSize_);
-		int cumsleep = 0;
-		if (!brokerConnection->waitUntilConnected(connectionTimeout))
+        int trycnt = 1;
+        while (!brokerConnection->waitUntilConnected (timeRemaining))
 		{
-			logError("initial connection to broker timed out");
-			setTxStatus(connection_status::terminated);
-			return false;
+            auto tock = std::chrono::steady_clock::now ();
+            timeRemaining = std::chrono::milliseconds (connectionTimeout) - std::chrono::duration_cast<std::chrono::milliseconds>(tock - tick);
+            if ((timeRemaining < std::chrono::milliseconds(0)) && (trycnt > 1))
+			{
+                logError ("initial connection to broker timed out");
+                setTxStatus (connection_status::terminated);
+                return false;
+			}
+			if (timeRemaining < std::chrono::milliseconds(0))
+			{
+                timeRemaining = std::chrono::milliseconds (400);
+			}
+			//lets try to connect again
+			++trycnt;
+            brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
+                                                      std::to_string (brokerPort), maxMessageSize_);
 		}
 
 		if (PortNumber <= 0)
@@ -408,7 +423,7 @@ bool TcpComms::establishBrokerConnection(std::shared_ptr<AsioServiceManager> &io
 					}
 				}
 			});
-			cumsleep = 0;
+			int cumsleep = 0;
 			while (PortNumber < 0)
 			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -489,7 +504,7 @@ void TcpComms::queue_tx_function ()
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == -1)
+            if (route_id == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -553,7 +568,7 @@ void TcpComms::queue_tx_function ()
                 }
             }
         }
-        else if (route_id == -1)
+        else if (route_id == control_route)
         {  // send to rx thread loop
             rxMessageQueue.push (cmd);
         }

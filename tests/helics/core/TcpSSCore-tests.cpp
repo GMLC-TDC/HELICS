@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     BOOST_REQUIRE (connected);
 
     auto txconn = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
-    auto res = txconn->waitUntilConnected (1000);
+    auto res = txconn->waitUntilConnected (1000ms);
     BOOST_REQUIRE_EQUAL (res, true);
 
     BOOST_REQUIRE (txconn->isConnected ());
