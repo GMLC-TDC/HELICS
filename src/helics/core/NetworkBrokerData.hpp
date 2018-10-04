@@ -109,13 +109,13 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 @example tcp://127.0.0.1 -> 127.0.0.1*/
 std::string stripProtocol(const std::string &networkAddress);
 /** strip any protocol strings from the interface and return a new string*/
-void stripProtocol (std::string &networkAddress);
+void removeProtocol (std::string &networkAddress);
 
 /** add a protocol url to the interface and return a new string*/
 std::string addProtocol (const std::string &networkAddress, interface_type interfaceT);
 
 /** add a protocol url to the interface modifying the string in place*/
-void addProtocol (std::string &networkAddress, interface_type interfaceT);
+void insertProtocol (std::string &networkAddress, interface_type interfaceT);
 
 /** check if a specified address is v6 or v4
 @return true if the address is a v6 address

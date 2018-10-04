@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::udp::UdpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:23964");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:23961");
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;

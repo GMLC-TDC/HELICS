@@ -15,9 +15,27 @@ namespace helics
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class NetworkCommsInterface : public CommsInterface
 {
+private:
+
+    class PortAllocator
+    {
+    public:
+        /** get an open port for a particular host*/
+        int findOpenPort(const std::string &host="localhost");
+        void setStartingPortNumber(int startPort) { startingPort = startPort; }
+        int getDefaultStartingPort() const { return startingPort; }
+        void addUsedPort(int port);
+        void addUsedPort(const std::string &host, int port);
+    private:
+        int startingPort=-1;
+        std::map<std::string, std::set<int>> usedPort;
+        std::map<std::string, int> nextPorts;
+        bool isPortUsed(const std::string &host, int port) const;
+    };
+
   public:
     /** default constructor*/
-	  NetworkCommsInterface();
+	  explicit NetworkCommsInterface(interface_type type);
     /** destructor*/
     ~NetworkCommsInterface();
     /** load network information into the comms object*/
@@ -27,17 +45,18 @@ class NetworkCommsInterface : public CommsInterface
     void setPortNumber (int localPortNumber);
     void setAutomaticPortStartPort (int startingPort);
 
-  private:
+  protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
-    std::set<int> usedPortNumbers;
-    int openPortStart = -1;
     bool autoPortNumber = true;
+    const interface_type networkType;
 	interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};
-
+private:
+    PortAllocator openPorts;
+public:
     /** find an open port for a subBroker*/
-    int findOpenPort ();
+    int findOpenPort (const std::string &host);
 	/** for protocol messages some require an immediate reply from the comms interface itself*/
     ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
@@ -47,10 +66,14 @@ class NetworkCommsInterface : public CommsInterface
     int getPort () const { return PortNumber; };
 
     std::string getAddress () const;
+    /** return the default Broker port*/
     virtual int getDefaultBrokerPort () const = 0;
 protected:
     ActionMessage generatePortRequest() const;
+    void loadPortDefinitions(const ActionMessage &M);
 };
+
+
 
 }  // namespace helics
 

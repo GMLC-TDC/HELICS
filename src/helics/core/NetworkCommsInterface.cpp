@@ -9,13 +9,62 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "NetworkBrokerData.hpp"
 #include <memory>
 
-
 namespace helics
 {
+NetworkCommsInterface::NetworkCommsInterface (interface_type type):networkType(type){}
 
-NetworkCommsInterface::NetworkCommsInterface()
+const std::string localHostString = "localhost";
+
+int NetworkCommsInterface::PortAllocator::findOpenPort (const std::string &host)
 {
+    if ((host == "127.0.0.1") || (host == "::1"))
+    {
+        return findOpenPort (localHostString);
+    }
+    auto np = nextPorts.find (host);
+    int nextPort = startingPort;
+    if (np == nextPorts.end ())
+    {
+        nextPorts[host] = startingPort;
+        ++nextPorts[host];
+    }
+    else
+    {
+        nextPort = np->second;
+        ++(np->second);
+    }
+    if (isPortUsed (host, nextPort))
+    {
+        ++nextPort;
+        while (isPortUsed (host, nextPort))
+        {
+            ++nextPort;
+        }
+        nextPorts[host] = nextPort + 1;
+    }
+    addUsedPort (host, nextPort);
+    return nextPort;
+}
 
+void NetworkCommsInterface::PortAllocator::addUsedPort (int port) { usedPort[localHostString].insert (port); }
+
+void NetworkCommsInterface::PortAllocator::addUsedPort (const std::string &host, int port)
+{
+    usedPort[host].insert (port);
+}
+/*
+    int startingPort;
+    std::map<std::string, std::set<int>> usedPort;
+    std::map<std::string, int> nextPorts;
+    */
+bool NetworkCommsInterface::PortAllocator::isPortUsed (const std::string &host, int port) const
+{
+    auto fnd = usedPort.find (host);
+    if (fnd == usedPort.end ())
+    {
+        return false;
+    }
+    return (fnd->second.count (port) != 0);
 }
 
 /** load network information into the comms object*/
@@ -28,19 +77,29 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     brokerPort = netInfo.brokerPort;
     PortNumber = netInfo.portNumber;
+    switch (networkType)
+    {
+    case interface_type::tcp:
+    case interface_type::udp:
+        removeProtocol(brokerTarget_);
+        removeProtocol(localTarget_);
+        break;
+    default:
+        break;
+    }
     if (localTarget_.empty ())
     {
-        if ((brokerTarget_ == "udp://127.0.0.1") || (brokerTarget_ == "udp://localhost") ||
-            (brokerTarget_ == "localhost"))
+        auto bTarget = stripProtocol(brokerTarget_);
+        if ((bTarget == localHostString)||(bTarget=="127.0.0.1"))
         {
-            localTarget_ = "localhost";
+            localTarget_ = localHostString;
         }
-        else if (brokerTarget_.empty ())
+        else if (bTarget.empty ())
         {
             switch (interfaceNetwork)
             {
             case interface_networks::local:
-                localTarget_ = "localhost";
+                localTarget_ = localHostString;
                 break;
             default:
                 localTarget_ = "*";
@@ -54,7 +113,7 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     if (netInfo.portStart > 0)
     {
-        openPortStart = netInfo.portStart;
+        openPorts.setStartingPortNumber (netInfo.portStart);
     }
 
     if (PortNumber > 0)
@@ -64,7 +123,7 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 /** destructor*/
-NetworkCommsInterface::~NetworkCommsInterface() { }
+NetworkCommsInterface::~NetworkCommsInterface () {}
 
 void NetworkCommsInterface::setBrokerPort (int brokerPortNumber)
 {
@@ -75,21 +134,14 @@ void NetworkCommsInterface::setBrokerPort (int brokerPortNumber)
     }
 }
 
-
-
-int NetworkCommsInterface::findOpenPort ()
+int NetworkCommsInterface::findOpenPort (const std::string &host)
 {
-    int start = openPortStart;
-    if (openPortStart < 0)
+    if (openPorts.getDefaultStartingPort () < 0)
     {
-        start = (hasBroker) ? getDefaultBrokerPort () + 100 : getDefaultBrokerPort () + 2;
+        auto start = (hasBroker) ? getDefaultBrokerPort () + 100 : getDefaultBrokerPort () + 60;
+        openPorts.setStartingPortNumber (start);
     }
-    while (usedPortNumbers.find (start) != usedPortNumbers.end ())
-    {
-        start += 2;
-    }
-    usedPortNumbers.insert (start);
-    return start;
+    return openPorts.findOpenPort (host);
 }
 
 void NetworkCommsInterface::setPortNumber (int localPortNumber)
@@ -109,7 +161,7 @@ void NetworkCommsInterface::setAutomaticPortStartPort (int startingPort)
 {
     if (propertyLock ())
     {
-        openPortStart = startingPort;
+        openPorts.setStartingPortNumber (startingPort);
         propertyUnLock ();
     }
 }
@@ -130,7 +182,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
         break;
         case REQUEST_PORTS:
         {
-            auto openPort = findOpenPort ();
+            auto openPort = (M.name.empty ()) ? findOpenPort (localHostString) : findOpenPort (M.name);
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
@@ -148,13 +200,36 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
 
 std::string NetworkCommsInterface::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 
-ActionMessage  NetworkCommsInterface::generatePortRequest() const
+ActionMessage NetworkCommsInterface::generatePortRequest () const
 {
-    ActionMessage req(CMD_PROTOCOL);
+    ActionMessage req (CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
-    //req.payload = localTarget_;
+    // req.payload = localTarget_;
     return req;
+}
 
+
+void NetworkCommsInterface::loadPortDefinitions(const ActionMessage &M)
+{
+    if (M.action() == CMD_PROTOCOL)
+    {
+        if (M.messageID == PORT_DEFINITIONS)
+        {
+            PortNumber = M.source_handle;
+            if ((openPorts.getDefaultStartingPort() < 0))
+            {
+                if (PortNumber < getDefaultBrokerPort()+100)
+                {
+                    openPorts.setStartingPortNumber(getDefaultBrokerPort() + 100 + (PortNumber - getDefaultBrokerPort() - 2) * 6);
+                }
+                else
+                {
+                    openPorts.setStartingPortNumber(getDefaultBrokerPort() + 110 + (PortNumber - getDefaultBrokerPort()-100) * 6);
+
+                }
+            }
+        }
+    }
 }
 
 }  // namespace helics

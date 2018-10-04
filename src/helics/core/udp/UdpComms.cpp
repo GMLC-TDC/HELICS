@@ -11,9 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <boost/asio/ip/udp.hpp>
 
-static const int BEGIN_OPEN_PORT_RANGE = 23964;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24053;
-
 static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
 namespace helics
@@ -21,148 +18,40 @@ namespace helics
 namespace udp
 {
 using boost::asio::ip::udp;
-UdpComms::UdpComms ()
+UdpComms::UdpComms ():NetworkCommsInterface(interface_type::udp)
 {
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
+}
+
+int UdpComms::getDefaultBrokerPort() const
+{
+    return DEFAULT_UDP_BROKER_PORT_NUMBER;
 }
 
 /** load network information into the comms object*/
 void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    CommsInterface::loadNetworkInfo (netInfo);
+    NetworkCommsInterface::loadNetworkInfo (netInfo);
     if (!propertyLock ())
     {
         return;
     }
-    brokerPort = netInfo.brokerPort;
-    PortNumber = netInfo.portNumber;
-    stripProtocol(brokerTarget_);
-    if (localTarget_.empty ())
-    {
-        if ((brokerTarget_ == "127.0.0.1") || (brokerTarget_ == "localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
-        }
-    }
-    else
-    {
-        stripProtocol(localTarget_);
-    }
-    if (netInfo.portStart > 0)
-    {
-        openPortStart = netInfo.portStart;
-    }
 
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
-    if (PortNumber > 0)
-    {
-        autoPortNumber = false;
-    }
+    
     propertyUnLock ();
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }
 
-void UdpComms::setBrokerPort (int brokerPortNumber)
-{
-    if (propertyLock ())
-    {
-        brokerPort = brokerPortNumber;
-        propertyUnLock ();
-    }
-}
 
 static inline auto udpnet (interface_networks net)
 {
     return (net != interface_networks::ipv6) ? udp::v4 () : udp::v6 ();
 }
 
-int UdpComms::findOpenPort ()
-{
-    int start = openPortStart;
-    if (openPortStart < 0)
-    {
-        start = (hasBroker) ? BEGIN_OPEN_PORT_RANGE_SUBBROKER : BEGIN_OPEN_PORT_RANGE;
-    }
-    while (usedPortNumbers.find (start) != usedPortNumbers.end ())
-    {
-        start += 2;
-    }
-    usedPortNumbers.insert (start);
-    return start;
-}
-
-void UdpComms::setPortNumber (int localPortNumber)
-{
-    if (propertyLock ())
-    {
-        PortNumber = localPortNumber;
-        if (PortNumber > 0)
-        {
-            autoPortNumber = false;
-        }
-        propertyUnLock ();
-    }
-}
-
-void UdpComms::setAutomaticPortStartPort (int startingPort)
-{
-    if (propertyLock ())
-    {
-        openPortStart = startingPort;
-        propertyUnLock ();
-    }
-}
-
-ActionMessage UdpComms::generateReplyToIncomingMessage (ActionMessage &M)
-{
-    if (isProtocolCommand (M))
-    {
-        switch (M.messageID)
-        {
-        case QUERY_PORTS:
-        {
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
-            return portReply;
-        }
-        break;
-        case REQUEST_PORTS:
-        {
-            auto openPort = findOpenPort ();
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
-            portReply.source_handle = openPort;
-            return portReply;
-        }
-        break;
-        default:
-            break;
-        }
-    }
-    ActionMessage resp (CMD_IGNORE);
-    return resp;
-}
 
 void UdpComms::queue_rx_function ()
 {
@@ -348,20 +237,7 @@ void UdpComms::queue_tx_function ()
                 {
                     if (m.messageID == PORT_DEFINITIONS)
                     {
-                        PortNumber = m.source_handle;
-                        if (openPortStart < 0)
-                        {
-                            if (PortNumber < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
-                            {
-                                openPortStart =
-                                  BEGIN_OPEN_PORT_RANGE_SUBBROKER + (PortNumber - BEGIN_OPEN_PORT_RANGE) * 10;
-                            }
-                            else
-                            {
-                                openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER +
-                                                (PortNumber - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
-                            }
-                        }
+                        loadPortDefinitions(m);
                         promisePort.set_value (PortNumber);
                     }
                     else if (m.messageID == DISCONNECT)
@@ -547,7 +423,7 @@ void UdpComms::closeReceiver ()
     {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
-        transmit (-1, cmd);
+        transmit (control_route, cmd);
     }
     else if (!disconnecting)
     {
@@ -579,9 +455,6 @@ void UdpComms::closeReceiver ()
         }
     }
 }
-
-std::string UdpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
-
 }  // namespace udp
 
 }  // namespace helics

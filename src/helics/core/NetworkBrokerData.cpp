@@ -329,7 +329,7 @@ std::string stripProtocol(const std::string &networkAddress)
     return networkAddress;
 }
 
-void stripProtocol(std::string &networkAddress)
+void removeProtocol(std::string &networkAddress)
 {
     auto loc = networkAddress.find("://");
     if (loc != std::string::npos)
@@ -358,7 +358,7 @@ std::string addProtocol (const std::string &networkAddress, interface_type inter
     return networkAddress;
 }
 
-void addProtocol(std::string &networkAddress, interface_type interfaceT)
+void insertProtocol(std::string &networkAddress, interface_type interfaceT)
 {
     if (networkAddress.find("://") == std::string::npos)
     {

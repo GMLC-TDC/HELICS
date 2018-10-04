@@ -422,8 +422,8 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (!brokerTarget_.empty ())
     {
-        addProtocol(brokerTarget_,interface_type::tcp);
-        addProtocol(localTarget_, interface_type::tcp);
+        insertProtocol(brokerTarget_,interface_type::tcp);
+        insertProtocol(localTarget_, interface_type::tcp);
         auto ctx = zmqContextManager::getContextPointer ();
         if (brokerReqPort < 0)
         {
