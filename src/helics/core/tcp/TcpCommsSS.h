@@ -57,8 +57,6 @@ class TcpCommsSS final : public CommsInterface
     void setBrokerPort (int brokerPortNumber);
     /** set the port numbers for the local port*/
     void setPortNumber (int localPortNumber);
-    /** set the controls to be running a server, or running connections*/
-    void setServerMode(bool mode = true);
 	/** add a connection to the connection list*/
 	void addConnection(const std::string &newConn);
 	/** add a vector of connections to the connection list*/
@@ -66,7 +64,6 @@ class TcpCommsSS final : public CommsInterface
   private:
     int brokerPort = -1;
     int localPort = -1;
-    bool serverMode = true;
     std::atomic<bool> hasBroker{false};
     std::vector<std::string> connections;  //!< list of connections to make 
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue

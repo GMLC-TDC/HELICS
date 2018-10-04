@@ -17,17 +17,23 @@ class IpcComms final : public CommsInterface
 {
   public:
     /** default constructor*/
-    IpcComms () = default;
+    IpcComms ();
     /** destructor*/
     ~IpcComms ();
+
+	void loadNetworkInfo (const NetworkBrokerData &netInfo);
+
   private:
     std::atomic<int> ipcbackchannel{0};  //!< a back channel message system if the primary is not working
-
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
 
-  private:
+public:
+	/** get the port number of the comms object to push message to*/
+	int getPort() const { return 0; };
+
+	std::string getAddress() const;
 };
 
 #define IPC_BACKCHANNEL_TRY_RESET 2

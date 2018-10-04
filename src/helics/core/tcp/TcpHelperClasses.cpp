@@ -13,7 +13,7 @@ namespace helics
 namespace tcp
 {
 using boost::asio::ip::tcp;
-
+using namespace std::literals::chrono_literals;
 void TcpConnection::start ()
 {
     if (triggerhalt)
@@ -24,7 +24,7 @@ void TcpConnection::start ()
     if (state == connection_state_t::prestart)
     {
         receivingHalt.activate ();
-        connected.activate();
+        connected.activate ();
         state = connection_state_t::halted;
     }
     connection_state_t exp = connection_state_t::halted;
@@ -159,8 +159,8 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
     }
 }
 
-//boost::asio::socket_base::linger optionLinger(true, 2);
-//socket_.set_option(optionLinger, ec);
+// boost::asio::socket_base::linger optionLinger(true, 2);
+// socket_.set_option(optionLinger, ec);
 void TcpConnection::close ()
 {
     triggerhalt = true;
@@ -254,17 +254,19 @@ void TcpConnection::connect_handler (const boost::system::error_code &error)
     else
     {
         std::cerr << "connection error " << error.message () << ": code =" << error.value () << '\n';
+        connectionError = true;
+        connected.activate ();
     }
 }
 size_t TcpConnection::send (const void *buffer, size_t dataLength)
 {
     if (!isConnected ())
     {
-        if (!waitUntilConnected (300))
+        if (!waitUntilConnected (300ms))
         {
             std::cerr << "connection timeout waiting again" << std::endl;
         }
-        if (!waitUntilConnected (200))
+        if (!waitUntilConnected (200ms))
         {
             std::cerr << "connection timeout twice, now returning" << std::endl;
             return 0;
@@ -279,11 +281,11 @@ size_t TcpConnection::send (const std::string &dataString)
 {
     if (!isConnected ())
     {
-        if (!waitUntilConnected (300))
+        if (!waitUntilConnected (300ms))
         {
             std::cerr << "connection timeout waiting again" << std::endl;
         }
-        if (!waitUntilConnected (200))
+        if (!waitUntilConnected (200ms))
         {
             std::cerr << "connection timeout twice, now returning" << std::endl;
             return 0;
@@ -299,20 +301,21 @@ size_t TcpConnection::receive (void *buffer, size_t maxDataLength)
     return socket_.receive (boost::asio::buffer (buffer, maxDataLength));
 }
 
-bool TcpConnection::waitUntilConnected (int timeOut)
+bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
 {
     if (isConnected ())
     {
         return true;
     }
-    if (timeOut < 0)
+    if (timeOut < 0ms)
     {
         connected.waitActivation ();
-        return true;
+        return isConnected();
     }
     else
     {
-        return connected.wait_forActivation (std::chrono::milliseconds (timeOut));
+        connected.wait_forActivation (timeOut);
+        return isConnected ();
     }
 }
 

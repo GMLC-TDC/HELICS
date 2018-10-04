@@ -64,7 +64,7 @@ mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
-option(BUILD_HELICS_TESTS "Enable the test Executables to be built" ON)
+option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 # enable testing
 if(BUILD_HELICS_TESTS)
 	include(CTest)
@@ -72,7 +72,7 @@ endif(BUILD_HELICS_TESTS)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(BUILD_HELICS_EXAMPLES "Enable the example Executables to be built" ON)
+option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 option(
@@ -281,8 +281,8 @@ target_link_libraries(helics_base INTERFACE Boostlibs::core)
 # finding MPI
 # -------------------------------------------------------------
 
-option(MPI_ENABLE "Enable MPI networking library" OFF)
-if(MPI_ENABLE)
+option(ENABLE_MPI "Enable MPI networking library" OFF)
+if(ENABLE_MPI)
 	include(addMPI)
   if(MPI_C_FOUND)
 		set(HELICS_HAVE_MPI TRUE)
@@ -290,9 +290,9 @@ if(MPI_ENABLE)
 	else()
 		set(HELICS_HAVE_MPI FALSE)
   endif(MPI_C_FOUND)
-else(MPI_ENABLE)
+else(ENABLE_MPI)
 	set(HELICS_HAVE_MPI FALSE)
-endif(MPI_ENABLE)
+endif(ENABLE_MPI)
 
 # -------------------------------------------------------------
 # add threading support
@@ -337,7 +337,7 @@ endif(MSYS)
 # Enable ZeroMQ
 # -------------------------------------------------------------
 
-# just check some intenal options
+# just check some internal options
 if(BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
   message(
     fatal
@@ -345,11 +345,11 @@ if(BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
   )
 endif()
 
-option(ZeroMQ_ENABLE "Enable ZeroMQ networking library" ON)
-mark_as_advanced(ZeroMQ_ENABLE)
+option(ENABLE_ZeroMQ "Enable ZeroMQ networking library" ON)
+mark_as_advanced(ENABLE_ZeroMQ)
 # If ZeroMQ library is enabled try to locate it and link against it
 
-if(ZeroMQ_ENABLE)
+if(ENABLE_ZeroMQ)
 	include(addZeroMQ)
 
   if(ZeroMQ_FOUND)
@@ -365,12 +365,12 @@ if(ZeroMQ_ENABLE)
 	else(ZeroMQ_FOUND)
 		set(HELICS_HAVE_ZEROMQ FALSE)
 	endif(ZeroMQ_FOUND)
-else(ZeroMQ_ENABLE)
+else(ENABLE_ZeroMQ)
 	set(HELICS_HAVE_ZEROMQ FALSE)
-  if(ZeroMQ_ENABLE)
+  if(ENABLE_ZeroMQ)
 		message(WARNING "ZeroMQ not found")
    endif()
-endif(ZeroMQ_ENABLE)
+endif(ENABLE_ZeroMQ)
 
 # -------------------------------------------------------------
 # global include directories
@@ -468,6 +468,17 @@ option(
 )
 
 file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
+if (ZMQ_USE_STATIC_LIBRARY)
+	#remove the zmq libraries from the key files list if we are using static zeromq libraries
+	set(NEW_LIST )
+	foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+		if (keyfile MATCHES "zmq")
+		else()
+			list(APPEND NEW_LIST ${keyfile})
+		endif()
+	endforeach()
+	set(KEY_LIBRARY_FILES ${NEW_LIST})
+endif()
 # message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)

@@ -9,18 +9,26 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+
+constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
+constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1",
+                                              ""};
+
+
+template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
 {
+	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
     : CommsBroker<COMMS, CommonCore> (core_name)
 {
+	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *const *argv)
 {
     if (BrokerBase::brokerState == BrokerBase::created)
@@ -28,22 +36,22 @@ void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *con
         std::lock_guard<std::mutex> lock (dataMutex);
         if (BrokerBase::brokerState == BrokerBase::created)
         {
-            netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
+            netInfo.initializeFromArgs (argc, argv, defLocalInterface[static_cast<int> (baseline)]);
             CommonCore::initializeFromArgs (argc, argv);
         }
     }
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 bool NetworkCore<COMMS, baseline>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
     if (netInfo.brokerAddress.empty())  // cores require a broker
     {
-        netInfo.brokerAddress = "localhost";
+        netInfo.brokerAddress = defBrokerInterface[static_cast<int> (baseline)];
     }
-    CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
+    CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setTimeout (BrokerBase::networkTimeout);
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();
@@ -57,7 +65,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     return res;
 }
 
-template <class COMMS, NetworkBrokerData::interface_type baseline>
+template <class COMMS, interface_type baseline>
 std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
 {
     std::string add;

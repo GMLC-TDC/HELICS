@@ -22,9 +22,15 @@ static const ArgDescriptors extraArgs{
   {"broker,b"s, "identifier for the broker"s},
   {"broker_address", "location of the broker i.e network address"},
   { "brokername", "the name of the broker" },
+  { "max_size", ArgDescriptor::arg_type_t::int_type,"maximum message buffer size (16*1024)" },
+  { "max_count", ArgDescriptor::arg_type_t::int_type,"max queue size for the message (256)" },
   { "local", ArgDescriptor::arg_type_t::flag_type,"use local interface(default)" },
   {"ipv4", ArgDescriptor::arg_type_t::flag_type,"use external ipv4 addresses"},
   { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
+  { "server"s, ArgDescriptor::arg_type_t::flag_type,
+  "specify that the network connection should be a server"s },
+  { "client"s, ArgDescriptor::arg_type_t::flag_type,
+  "specify that the network connection should be a client"s },
   {"reuse_address", ArgDescriptor::arg_type_t::flag_type, "allow the server to reuse a bound address"},
   { "external", ArgDescriptor::arg_type_t::flag_type,"use all external interfaces" },
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
@@ -126,7 +132,49 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     {
         brokerName = vm["brokername"].as<std::string> ();
     }
-
+	if (vm.count("max_size") > 0)
+	{
+		 auto bsize= vm["max_size"].as<int>();
+		 if (bsize > 0)
+		 {
+			 maxMessageSize = bsize;
+		 }
+		 
+	}
+	if (vm.count("max_count") > 0)
+	{
+		auto msize = vm["max_count"].as<int>();
+		if (msize > 0)
+		{
+			maxMessageSize = msize;
+		}
+	}
+	if (vm.count("server") > 0)
+	{
+		switch (server_mode)
+		{
+		case server_mode_options::unspecified:
+		case server_mode_options::server_default_active:
+		case server_mode_options::server_default_deactivated:
+			server_mode = server_mode_options::server_active;
+			break;
+		default:
+			break;
+		}
+	}
+	if (vm.count("client") > 0)
+	{
+		switch (server_mode)
+		{
+		case server_mode_options::unspecified:
+		case server_mode_options::server_default_active:
+		case server_mode_options::server_default_deactivated:
+			server_mode = server_mode_options::server_deactivated;
+			break;
+		default:
+			break;
+		}
+	}
     if (vm.count ("interface") > 0)
     {
         auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
@@ -184,19 +232,40 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
             brokerAddress = localAddress;
         }
         break;
-    case interface_type::both:
+    case interface_type::ip:
         if ((brokerAddress == "udp://*") || (brokerAddress == "udp"))
         {  // the broker address can't use a wild card
-            brokerAddress = std::string ("udp://") + localAddress;
+			if (localAddress.compare(3, 3, "://") == 0)
+			{
+                brokerAddress = std::string ("udp://") + localAddress.substr(6);
+			}
+			else
+			{
+                brokerAddress = std::string ("udp://") + localAddress;
+			}
+            
         }
         else if ((brokerAddress == "tcp://*") || (brokerAddress == "tcp"))
         {  // the broker address can't use a wild card
-            brokerAddress = std::string ("tcp://") + localAddress;
+            if (localAddress.compare (3, 3, "://") == 0)
+            {
+                brokerAddress = std::string ("tcp://") + localAddress.substr (6);
+            }
+            else
+            {
+                brokerAddress = std::string ("tcp://") + localAddress;
+            }
+            
         }
         else if (brokerAddress == "*")
         {
             brokerAddress = localAddress;
         }
+    case interface_type::ipc:
+		if ((brokerAddress.empty())&&(!localAddress.empty()))
+		{
+            brokerAddress = localAddress;
+		}
         break;
     }
 }
@@ -204,8 +273,11 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
 std::string makePortAddress (const std::string &networkInterface, int portNumber)
 {
     std::string newAddress = networkInterface;
-    newAddress.push_back (':');
-    newAddress.append (std::to_string (portNumber));
+	if (portNumber >= 0)
+	{
+		newAddress.push_back(':');
+		newAddress.append(std::to_string(portNumber));
+	}
     return newAddress;
 }
 
@@ -221,7 +293,7 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
     {
         try
         {
-            if (address[lastColon + 1] != '/')
+            if ((address.size()>lastColon+1)&&(address[lastColon + 1] != '/'))
             {
                 auto val = std::stoi (address.substr (lastColon + 1));
                 ret.first = address.substr (0, lastColon);
@@ -245,6 +317,68 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 {
     auto lastColon = address.find_last_of (':');
     return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+}
+
+std::string stripProtocol(const std::string &networkAddress)
+{
+    auto loc = networkAddress.find("://");
+    if (loc != std::string::npos)
+    {
+        return networkAddress.substr(loc + 2);
+    }
+    return networkAddress;
+}
+
+void removeProtocol(std::string &networkAddress)
+{
+    auto loc = networkAddress.find("://");
+    if (loc != std::string::npos)
+    {
+        networkAddress.erase(0,loc + 2);
+    }
+}
+
+std::string addProtocol (const std::string &networkAddress, interface_type interfaceT)
+{
+    if (networkAddress.find("://") == std::string::npos)
+    {
+        switch (interfaceT)
+        {
+        case interface_type::ip:
+        case interface_type::tcp:
+            return std::string("tcp://") + networkAddress;
+        case interface_type::ipc:
+            return std::string("ipc://") + networkAddress;
+        case interface_type::udp:
+            return std::string("udp://") + networkAddress;
+        case interface_type::inproc:
+            return std::string("inproc://") + networkAddress;
+        }
+    }
+    return networkAddress;
+}
+
+void insertProtocol(std::string &networkAddress, interface_type interfaceT)
+{
+    if (networkAddress.find("://") == std::string::npos)
+    {
+        switch (interfaceT)
+        {
+        case interface_type::ip:
+        case interface_type::tcp:
+            networkAddress.insert(0,"tcp://");
+            break;
+        case interface_type::ipc:
+            networkAddress.insert(0, "ipc://");
+            break;
+        case interface_type::udp:
+            networkAddress.insert(0, "udp://");
+            break;
+        case interface_type::inproc:
+            networkAddress.insert(0, "inproc://");
+            break;
+        }
+    }
 }
 
 bool isipv6(const std::string &address)

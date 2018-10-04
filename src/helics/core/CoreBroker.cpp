@@ -1457,6 +1457,10 @@ void CoreBroker::disconnect ()
 
 void CoreBroker::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
+    if (dest == global_federate_id_t ())
+    {
+        return;
+    }
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
@@ -1479,6 +1483,37 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
     {
         auto route = getRoute (global_federate_id_t (cmd.dest_id));
         transmit (route, cmd);
+    }
+}
+
+void CoreBroker::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
+{
+    if (dest == global_federate_id_t ())
+    {
+        return;
+    }
+    cmd.dest_id = dest;
+    if ((dest == 0) || (dest == higher_broker_id))
+    {
+        transmit (0, std::move(cmd));
+    }
+    else
+    {
+        auto route = getRoute (dest);
+        transmit (route, std::move(cmd));
+    }
+}
+
+void CoreBroker::routeMessage (const ActionMessage &&cmd)
+{
+    if ((cmd.dest_id == 0) || (cmd.dest_id == higher_broker_id))
+    {
+        transmit (0, std::move(cmd));
+    }
+    else
+    {
+        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        transmit (route, std::move(cmd));
     }
 }
 
@@ -1681,7 +1716,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         }
         else
         {
-            transmit (0, querycmd);
+            transmit (0, std::move(querycmd));
         }
         auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
@@ -1702,7 +1737,7 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         }
         else
         {
-            transmit (0, querycmd);
+            transmit (0, std::move(querycmd));
         }
 
         auto ret = queryResult.get ();
@@ -2014,7 +2049,7 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
     }
     else
     {
-        routeMessage (queryRep, global_federate_id_t (m.source_id));
+        routeMessage (std::move(queryRep), global_federate_id_t (m.source_id));
     }
 }
 
@@ -2116,7 +2151,7 @@ void CoreBroker::processQueryResponse (const ActionMessage &m)
                 else
                 {
                     depMapRequestors.front ().payload = depMap.generate ();
-                    routeMessage (depMapRequestors.front ());
+                    routeMessage (std::move(depMapRequestors.front ()));
                 }
             }
             else
@@ -2131,7 +2166,7 @@ void CoreBroker::processQueryResponse (const ActionMessage &m)
                     else
                     {
                         resp.payload = str;
-                        routeMessage (resp);
+                        routeMessage (std::move(resp));
                     }
                 }
             }

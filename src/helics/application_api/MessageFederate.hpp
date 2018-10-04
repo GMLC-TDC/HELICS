@@ -209,6 +209,10 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     void registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
                                    const std::function<void(endpoint_id_t, Time)> &callback);
 
+	/** set an endpoint option */
+	void setEndpointOption(endpoint_id_t id, int32_t option, bool option_value = true);
+
+
     virtual void disconnect () override;
 
     /**get the number of registered endpoints*/

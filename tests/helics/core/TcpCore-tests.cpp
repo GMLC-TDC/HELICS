@@ -79,13 +79,13 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     BOOST_REQUIRE (conn2);
     BOOST_REQUIRE (conn3);
     BOOST_REQUIRE (conn4);
-    auto res = conn1->waitUntilConnected (1000);
+    auto res = conn1->waitUntilConnected (1000ms);
     BOOST_CHECK_EQUAL (res, true);
-    res = conn2->waitUntilConnected (1000);
+    res = conn2->waitUntilConnected (1000ms);
     BOOST_CHECK_EQUAL (res, true);
-    res = conn3->waitUntilConnected (1000);
+    res = conn3->waitUntilConnected (1000ms);
     BOOST_CHECK_EQUAL (res, true);
-    res = conn4->waitUntilConnected (1000);
+    res = conn4->waitUntilConnected (1000ms);
     BOOST_CHECK_EQUAL (res, true);
 
     auto transmitFunc = [](helics::tcp::TcpConnection::pointer obj) {
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::atomic<int> counter{0};
     std::string host = "localhost";
     helics::tcp::TcpComms comm;
@@ -150,11 +150,11 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setTimeout (1000);
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
     int cnt = 0;
     while (counter != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         ++cnt;
         if (cnt > 30)
         {
@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     int cnt = 0;
     while (counter != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        std::this_thread::sleep_for (100ms);
         ++cnt;
         if (cnt > 30)
         {
@@ -217,12 +217,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     server->close ();
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::atomic<int> ServerCounter{0};
     std::atomic<int> CommCounter{0};
     std::atomic<size_t> len{0};
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     BOOST_REQUIRE (connected);
 
     auto txconn = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
-    auto res = txconn->waitUntilConnected (1000);
+    auto res = txconn->waitUntilConnected (1000ms);
     BOOST_REQUIRE_EQUAL (res, true);
 
     BOOST_REQUIRE (txconn->isConnected ());
@@ -269,19 +269,19 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 
     txconn->send (buffer);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     BOOST_CHECK_EQUAL (CommCounter, 1);
     std::lock_guard<std::mutex> lock (actguard);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     txconn->close ();
     server->close ();
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
 }
 
 BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -319,10 +319,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     BOOST_REQUIRE (connected2);
 
     comm.transmit (0, helics::CMD_ACK);
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     if (counter2 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (500));
+        std::this_thread::sleep_for (500ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
@@ -332,12 +332,12 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     comm.disconnect ();
     BOOST_CHECK (!comm.isConnected ());
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
@@ -486,7 +486,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::TCP, initializationString);

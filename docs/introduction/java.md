@@ -9,10 +9,10 @@ import com.java.helics.helics;
 public class HelloWorld {
 
     public static void main(String[] args) {
-		System.loadLibrary("JNIhelics");
+        System.loadLibrary("JNIhelics");
 
-		System.out.println("HELICS Version: " + helics.helicsGetVersion());
-	}
+        System.out.println("HELICS Version: " + helics.helicsGetVersion());
+    }
 
 }
 ```
@@ -28,7 +28,7 @@ java -Djava.library.path="/Library/Java/Extensions:/Network/Library/Java/Extensi
 You should see the output that is similar to the following.
 
 ```
-HELICS Version: 1.0.2 (04-28-18)
+HELICS Version: x.x.x (XX-XX-XX)
 ```
 
 creating a jar file.

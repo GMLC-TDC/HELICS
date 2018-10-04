@@ -30,6 +30,21 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         brokerTarget_ = netInfo.brokerAddress;
         brokerName_ = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
+		maxMessageSize_ = netInfo.maxMessageSize;
+		maxMessageCount_ = netInfo.maxMessageCount;
+		switch (netInfo.server_mode)
+		{
+		case NetworkBrokerData::server_mode_options::server_active:
+		case NetworkBrokerData::server_mode_options::server_default_active:
+			serverMode = true;
+			break;
+		case NetworkBrokerData::server_mode_options::server_deactivated:
+		case NetworkBrokerData::server_mode_options::server_default_deactivated:
+			serverMode = false;
+			break;
+        case NetworkBrokerData::server_mode_options::unspecified:
+            break;
+		}
         propertyUnLock ();
     }
 }
@@ -96,7 +111,15 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     rt.payload = routeInfo;
     rt.messageID = NEW_ROUTE;
     rt.dest_id = route_id;
-    transmit (-1, rt);
+    transmit (control_route, rt);
+}
+
+void CommsInterface::removeRoute(int route_id)
+{
+    ActionMessage rt(CMD_PROTOCOL);
+    rt.messageID = REMOVE_ROUTE;
+    rt.dest_id = route_id;
+    transmit(control_route, rt);
 }
 
 void CommsInterface::setTxStatus (connection_status txStatus)
@@ -210,7 +233,7 @@ bool CommsInterface::connect ()
         catch (const std::exception &e)
         {
             rx_status = connection_status::error;
-            std::cerr << "error in receiver" << e.what () << std::endl;
+            logError(std::string("error in receiver >")+e.what ());
         }
     });
     queue_transmitter = std::thread ([this] {
@@ -221,7 +244,7 @@ bool CommsInterface::connect ()
         catch (const std::exception &e)
         {
             tx_status = connection_status::error;
-            std::cerr << "error in transmitter" << e.what () << std::endl;
+            logError (std::string ("error in transmitter >") + e.what ());
         }
     });
     txTrigger.waitActivation ();
@@ -411,6 +434,25 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
     }
 }
 
+void CommsInterface::setTimeout(int timeout) 
+{ 
+	if (propertyLock())
+	{
+		connectionTimeout = timeout;
+		propertyUnLock();
+	}
+}
+
+
+void CommsInterface::setServerMode(bool serverActive)
+{
+	if (propertyLock())
+	{
+		serverMode = serverActive;
+		propertyUnLock();
+	}
+}
+
 bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
@@ -445,21 +487,21 @@ void CommsInterface::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = DISCONNECT;
-    transmit (-1, rt);
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = RECONNECT;
-    transmit (-1, rt);
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
     cmd.messageID = RECONNECT_RECEIVER;
-    transmit (-1, cmd);
+    transmit (control_route, cmd);
 }
 
 }  // namespace helics

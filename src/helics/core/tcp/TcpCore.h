@@ -14,7 +14,7 @@ namespace tcp
 class TcpComms;
 class TcpCommsSS;
 /** implementation for the core that uses tcp messages to communicate*/
-using TcpCore = NetworkCore<TcpComms, NetworkBrokerData::interface_type::tcp>;
+using TcpCore = NetworkCore<TcpComms, interface_type::tcp>;
 //class TcpCore final : public CommsBroker<TcpComms, CommonCore>
 //{
 //  public:
@@ -30,12 +30,12 @@ using TcpCore = NetworkCore<TcpComms, NetworkBrokerData::interface_type::tcp>;
  // private:
  //   mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
  //   NetworkBrokerData netInfo{
-  //    NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+  //    interface_type::tcp};  //!< structure containing the networking information
  //   virtual bool brokerConnect () override;
 //};
 
 /** implementation for the core that uses tcp messages to communicate*/
-class TcpCoreSS final : public NetworkCore<TcpCommsSS, NetworkBrokerData::interface_type::tcp>
+class TcpCoreSS final : public NetworkCore<TcpCommsSS, interface_type::tcp>
 {
   public:
     /** default constructor*/
@@ -45,7 +45,6 @@ class TcpCoreSS final : public NetworkCore<TcpCommsSS, NetworkBrokerData::interf
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   private:
-    bool serverMode = false;
     std::vector<std::string> connections;  //!< defined connections 
     virtual bool brokerConnect () override;
 };

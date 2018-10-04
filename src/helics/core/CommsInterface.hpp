@@ -17,7 +17,8 @@ namespace helics
 {
 enum class interface_networks : char;
 
-/** implementation of a generic communications interface
+constexpr int control_route = (-1);
+  /** implementation of a generic communications interface
  */
 class CommsInterface
 {
@@ -41,10 +42,13 @@ class CommsInterface
     /** add a new route assigned to the appropriate id
      */
     void addRoute (int route_id, const std::string &routeInfo);
+    /** remove a route from use*/
+    void removeRoute(int route_id);
     /** connect the commsInterface
     @return true if the connection was successful false otherwise
     */
     bool connect ();
+
     /** disconnected the comms interface
      */
     void disconnect ();
@@ -70,7 +74,10 @@ class CommsInterface
     /** set the timeout for the initial broker connection
     @param timeout the value is in milliseconds
     */
-    void setTimeout (int timeout) { connectionTimeout = timeout; }
+	void setTimeout(int timeout);
+
+	/** enable or disable the server more for the comms*/
+	void setServerMode(bool serverActive);
 
   protected:
     void logWarning (const std::string &message) const;
@@ -103,6 +110,7 @@ class CommsInterface
     TriggerVariable txTrigger;
     std::atomic<bool> operating;  //!< the comms interface is in startup mode
   protected:
+	 bool serverMode = true;  //!< some comms have a server mode and non-server mode
     int connectionTimeout =
       4000;  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)

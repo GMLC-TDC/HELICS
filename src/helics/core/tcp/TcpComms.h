@@ -11,6 +11,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <set>
 #include <string>
 
+class AsioServiceManager;
+
 #if (BOOST_VERSION_LEVEL >= 2)
 namespace boost
 {
@@ -73,6 +75,8 @@ class TcpComms final : public CommsInterface
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
     /** find an open port for a subBroker*/
     int findOpenPort ();
+	/** make the initial connection to a broker and get setup information*/
+	bool establishBrokerConnection(std::shared_ptr<AsioServiceManager> &ioserv, std::shared_ptr<TcpConnection> &brokerConnection);
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &cmd);
@@ -82,10 +86,6 @@ class TcpComms final : public CommsInterface
 
     void txReceive (const char *data, size_t bytes_received, const std::string &errorMessage);
 
-    void txPriorityReceive (std::shared_ptr<TcpConnection> connection,
-                            const char *data,
-                            size_t bytes_received,
-                            const boost::system::error_code &error);
     /** callback function for receiving data asynchronously from the socket
     @param connection pointer to the connection
     @param data the pointer to the data

@@ -5,8 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../CommsBroker.hpp"
-#include "../CoreBroker.hpp"
+#include "../NetworkBroker.hpp"
+#include "IpcComms.h"
 
 namespace helics
 {
@@ -14,27 +14,9 @@ namespace ipc
 {
 class IpcComms;
 
-class IpcBroker final : public CommsBroker<IpcComms, CoreBroker>
-{
-public:
-    /** default constructor*/
-    IpcBroker(bool rootBroker = false) noexcept;
-    IpcBroker(const std::string &broker_name);
+/** implementation for the core that uses IPC messages to communicate*/
+using IpcBroker = NetworkBroker<IpcComms, interface_type::ipc, static_cast<int>(core_type::IPC)>;
 
-    static void displayHelp(bool local_only = false);
-    void initializeFromArgs(int argc, const char *const *argv) override;
-
-   virtual std::string generateLocalAddressString () const override;
-
-private:
-    virtual bool brokerConnect() override;
-
-private:
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    std::string fileloc;  //!< the name of the file that the shared memory queue is located
-    std::string brokerloc;  //!< the name of the shared queue of the broker
-    std::string brokername;  //!< the name of the broker
-};
 } // namespace ipc
 }  // namespace helics
 

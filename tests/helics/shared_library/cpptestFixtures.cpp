@@ -30,6 +30,12 @@ static auto StartBrokerImp (const std::string &core_type_name, std::string initi
     {
         initialization_string += " --reuse_address";
     }
+    else if (core_type_name.compare (0, 3, "ipc") == 0)
+    {
+		//this is to use the name instead of the "_ipc_broker" as the queue name
+		//since we are linking it directly anyway
+        initialization_string += " --client";
+    }
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
@@ -54,12 +60,6 @@ int FederateTestFixture_cpp::getIndexCode (const std::string &type_name)
 {
     return static_cast<int> (type_name.back () - '0');
 }
-
-auto FederateTestFixture_cpp::AddBrokerImp (const std::string &core_type_name,
-                                            const std::string &initialization_string)
-{
-    return StartBrokerImp(core_type_name, initialization_string);
-    }
 
 FederateTestFixture_cpp::~FederateTestFixture_cpp ()
 {

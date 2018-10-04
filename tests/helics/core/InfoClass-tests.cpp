@@ -110,9 +110,9 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     msg_time_one_b->original_source = "bFed";
     msg_time_one_b->time = helics::Time (1);
 
-    helics::EndpointInfo endPI ( helics::global_federate_id_t(5), helics::interface_handle(13), "name", "type");
-    BOOST_CHECK_EQUAL (endPI.id, 13);
-    BOOST_CHECK_EQUAL (endPI.fed_id, 5);
+	helics::EndpointInfo endPI({ helics::global_federate_id_t(5), helics::interface_handle(13) }, "name", "type");
+    BOOST_CHECK_EQUAL (endPI.id.handle, 13);
+    BOOST_CHECK_EQUAL (endPI.id.fed_id, 5);
     BOOST_CHECK (endPI.key.compare ("name") == 0);
     BOOST_CHECK (endPI.type.compare ("type") == 0);
 

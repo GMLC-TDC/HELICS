@@ -4,23 +4,63 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#pragma once
 #include "MultiBroker.hpp"
 #include "../core/CommsInterface.hpp"
 #include <atomic>
 #include <mutex>
 #include <thread>
 #include "../core/udp/UdpComms.h"
+#ifndef DISABLE_TCP_CORE
 #include "../core/tcp/TcpComms.h"
 #include "../core/tcp/TcpCommsSS.h"
+#endif
+#if HELICS_HAVE_ZEROMQ!=0
 #include "../core/zmq/ZmqComms.h"
+#endif
+#if HELICS_HAVE_MPI!=0
+#include "../core/mpi/MpiComms.h"
+#endif
 #include "../core/ipc/IpcComms.h"
 #include "../common/argParser.h"
 #include "../common/stringToCmdLine.h"
 #include "../core/NetworkBrokerData.hpp"
 
+
+using namespace std::string_literals;
+
 namespace helics
 {
+static void loadTypeSpecificArgs(helics::core_type ctype, CommsInterface *comm, int argc, const char * const *argv)
+{
+	if (comm == nullptr)
+	{
+		return;
+	}
+	switch (ctype)
+	{
+#ifndef DISABLE_TCP_CORE
+	case core_type::TCP_SS:
+	{
+		static const ArgDescriptors extraArgs{
+			{ "connections"s, ArgDescriptor::arg_type_t::vector_string,
+			"target link connections"s } };
+		variable_map vm;
+		argumentParser(argc, argv, vm, extraArgs);
+
+		auto cm = dynamic_cast<tcp::TcpCommsSS *>(comm);
+		if (vm.count("connections") > 0)
+		{
+			cm->addConnections(vm["connections"].as<std::vector<std::string>>());
+		}
+	}
+		break;
+#endif
+	case core_type::MPI:
+		break;
+	default:
+		break;
+	}
+}
 
 static std::unique_ptr<CommsInterface> generateComms(const std::string &type, const std::string &initString = std::string())
 {
@@ -32,29 +72,45 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 	switch (ctype)
 	{
 		case core_type::TCP:
-			comm = std::make_unique<tcp::TcpComms>();
-			comm->loadNetworkInfo(nbdata);
+#ifndef DISABLE_TCP_CORE
+				comm = std::make_unique<tcp::TcpComms>();
+#endif
 			break;
+        case core_type::DEFAULT:
 		case core_type::ZMQ:
+#if HELICS_HAVE_ZEROMQ!=0
 			comm = std::make_unique<zeromq::ZmqComms>();
-			comm->loadNetworkInfo(nbdata);
+#endif
 			break;
 		case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
 			comm = std::make_unique<tcp::TcpCommsSS>();
-			comm->loadNetworkInfo(nbdata);
+            loadTypeSpecificArgs (ctype, comm.get (), cmdargs.getArgCount (), cmdargs.getArgV ());
+#endif
 			break;
 		case core_type::UDP:
 			comm = std::make_unique<udp::UdpComms>();
-			comm->loadNetworkInfo(nbdata);
 			break;
 		case core_type::IPC:
+		case core_type::INTERPROCESS:
 			comm = std::make_unique<ipc::IpcComms>();
 			break;
 		case core_type::MPI:
+#if HELICS_HAVE_MPI>0
+			comm = std::make_unique<mpi::MpiComms>();
+			break;
+#endif
 		case core_type::HTTP:
 		case core_type::ZMQ_TEST:
+        case core_type::TEST:
+        case core_type::NNG:
+        case core_type::UNRECOGNIZED:
 			break;
 
+	}
+	if (comm)
+	{
+		comm->loadNetworkInfo(nbdata);
 	}
 	return comm;
 }

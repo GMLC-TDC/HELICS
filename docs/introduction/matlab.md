@@ -36,14 +36,14 @@ mv helicsMEX.* matlab/
 Run the following in two separate windows.
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab/pi-exchange
 pisender
 ```
 The pisender starts a broker so it may work slightly better to start that process first
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab/pi-exchange
 pireceiver
 ```
 

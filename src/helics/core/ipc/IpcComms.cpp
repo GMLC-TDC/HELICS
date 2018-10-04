@@ -26,8 +26,41 @@ namespace helics
 namespace ipc
 {
 
+IpcComms::IpcComms()
+{
+	//override the default value for this comm system
+	maxMessageCount_ = 256;
+}
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
+
+void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
+{
+    CommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
+    {
+        return;
+    }
+    //brokerPort = netInfo.brokerPort;
+    //PortNumber = netInfo.portNumber;
+    if (localTarget_.empty ())
+    {
+        if (serverMode)
+        {
+            localTarget_ = "_ipc_broker";
+        }
+		else
+		{
+            localTarget_ = name;
+		}
+    }
+    
+    //if (PortNumber > 0)
+    //{
+    //    autoPortNumber = false;
+    //}
+    propertyUnLock ();
+}
 
 void IpcComms::queue_rx_function ()
 {
@@ -282,6 +315,9 @@ void IpcComms::closeReceiver ()
         }
     }
 }
+
+
+std::string IpcComms::getAddress() const { return localTarget_; }
 
 }  // namespace ipc
 }  // namespace helics

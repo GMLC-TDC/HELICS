@@ -135,6 +135,9 @@ class MessageFederateManager
     /**get the number of registered endpoints*/
     int getEndpointCount () const;
 
+	/** set an endpoint option */
+	void setEndpointOption(endpoint_id_t id, int32_t option, bool option_value);
+
   private:
     shared_guarded<DualMappedPointerVector<endpoint_info, std::string, interface_handle>>
       local_endpoints;  //!< storage for the local endpoint information

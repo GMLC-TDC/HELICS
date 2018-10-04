@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-template <class COMMS, NetworkBrokerData::interface_type baseline = NetworkBrokerData::interface_type::both>
+template <class COMMS, interface_type baseline = interface_type::ip>
 class NetworkCore :public CommsBroker<COMMS, CommonCore>
 {
 public:

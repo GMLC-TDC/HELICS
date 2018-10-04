@@ -173,7 +173,6 @@ void CommonCore::unregister ()
     {
         if (keepCoreAlive.get () == this)
         {
-            keepCoreAlive = nullptr;
             CoreFactory::unregisterCore (identifier);
         }
     }
@@ -185,44 +184,39 @@ void CommonCore::unregister ()
         {
             if (keepCoreAlive2.get () == this)
             {
-                keepCoreAlive2 = nullptr;
                 CoreFactory::unregisterCore (prevIdentifier);
             }
         }
     }
 }
-CommonCore::~CommonCore ()
-{
-    // make sure everything is synced up so just run the lock
-    joinAllThreads ();
-}
+CommonCore::~CommonCore () { joinAllThreads (); }
 
 FederateState *CommonCore::getFederateAt (federate_id_t federateID) const
 {
-/*
-#ifndef __apple_build_version__
-    static thread_local FederateState *lastV = nullptr;
-    if ((lastV == nullptr) || (lastV->local_id != federateID))
-    {
+    /*
+    #ifndef __apple_build_version__
+        static thread_local FederateState *lastV = nullptr;
+        if ((lastV == nullptr) || (lastV->local_id != federateID))
+        {
+            auto feds = federates.lock ();
+            lastV = (*feds)[federateID];
+        }
+        return lastV;
+    #else
+    #if __clang_major__ >= 8
+        static thread_local FederateState *lastV = nullptr;
+        if ((lastV == nullptr) || (lastV->local_id != federateID))
+        {
+            auto feds = federates.lock ();
+            lastV = (*feds)[federateID];
+        }
+        return lastV;
+    #else
         auto feds = federates.lock ();
-        lastV = (*feds)[federateID];
-    }
-    return lastV;
-#else
-#if __clang_major__ >= 8
-    static thread_local FederateState *lastV = nullptr;
-    if ((lastV == nullptr) || (lastV->local_id != federateID))
-    {
-        auto feds = federates.lock ();
-        lastV = (*feds)[federateID];
-    }
-    return lastV;
-#else
-    auto feds = federates.lock ();
-    return (*feds)[federateID];
-#endif
-#endif
-*/
+        return (*feds)[federateID];
+    #endif
+    #endif
+    */
     auto feds = federates.lock ();
     return (*feds)[federateID];
 }
@@ -1620,7 +1614,7 @@ bool CommonCore::sendToLogger (global_federate_id_t federateID,
     return true;
 }
 
-void CommonCore::setLoggingLevel (int logLevel) 
+void CommonCore::setLoggingLevel (int logLevel)
 {
     ActionMessage cmd (CMD_CORE_CONFIGURE);
     cmd.dest_id = global_broker_id.load ();
@@ -1666,8 +1660,8 @@ uint16_t CommonCore::getNextAirlockIndex ()
 {
     uint16_t index = nextAirLock++;
     if (index > 3)
-    {  // the increment is an atomic operation if the nextAirLock was not adjusted this could result in an out of bounds
-       // exception if this check were not done
+    {  // the increment is an atomic operation if the nextAirLock was not adjusted this could result in an out of
+       // bounds exception if this check were not done
         index %= 4;
     }
     if (index == 3)
@@ -2977,6 +2971,11 @@ void CommonCore::checkDependencies ()
     {
         return;
     }
+    if ((localcnt == 0) && (!brkid.isValid ()))
+    {
+        hasTimeDependency = false;
+        return;
+    }
     // check to make sure the dependencies match
     for (auto &dep : timeCoord->getDependencies ())
     {
@@ -3284,6 +3283,10 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
+    if (dest==global_federate_id_t())
+    {
+        return;
+    }
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
@@ -3335,6 +3338,10 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
 {
+    if (dest == global_federate_id_t ())
+    {
+        return;
+    }
     cmd.dest_id = dest;
     if ((dest == 0) || (dest == higher_broker_id))
     {
