@@ -48,6 +48,8 @@ class NetworkCommsInterface : public CommsInterface
 
     std::string getAddress () const;
     virtual int getDefaultBrokerPort () const = 0;
+protected:
+    ActionMessage generatePortRequest() const;
 };
 
 }  // namespace helics

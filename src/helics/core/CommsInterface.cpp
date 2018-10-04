@@ -114,6 +114,14 @@ void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
     transmit (control_route, rt);
 }
 
+void CommsInterface::removeRoute(int route_id)
+{
+    ActionMessage rt(CMD_PROTOCOL);
+    rt.messageID = REMOVE_ROUTE;
+    rt.dest_id = route_id;
+    transmit(control_route, rt);
+}
+
 void CommsInterface::setTxStatus (connection_status txStatus)
 {
     if (tx_status == txStatus)
