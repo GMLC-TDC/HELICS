@@ -83,6 +83,12 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
         filt->setFilterOperations (std::move (op));
     }
     break;
+    case defined_filter_types::firewall:
+    {
+        auto op = std::make_shared<FirewallFilterOperation> ();
+        filt->setFilterOperations (std::move (op));
+    }
+    break;
     }
 }
 

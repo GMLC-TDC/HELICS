@@ -22,7 +22,8 @@ enum class defined_filter_types
     randomDrop = 3,
     reroute = 4,
     clone = 5,
-    unrecognized = 6
+	firewall=6,
+    unrecognized = 7
 
 };
 

@@ -359,6 +359,31 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
     return dest;
 }
 
+
+FirewallFilterOperation::FirewallFilterOperation ()
+{
+    op = std::make_shared<FirewallOperator> (
+      [this](const Message *mess) { return allowPassed (mess); });
+}
+
+FirewallFilterOperation::~FirewallFilterOperation () = default;
+
+void FirewallFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
+
+void FirewallFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/)
+{
+    
+}
+
+std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator ()
+{
+    return std::static_pointer_cast<FilterOperator> (op);
+}
+
+
+bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const
+{ return true; }
+
 CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
 {
     op = std::make_shared<CloneOperator> ([this](const Message *mess) { sendMessage (mess); });

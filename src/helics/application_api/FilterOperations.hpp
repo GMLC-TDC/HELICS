@@ -10,6 +10,7 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
+#include "libguarded/cow_guarded.hpp"
 #include "../core/Core.hpp"
 #include <atomic>
 #include <set>
@@ -20,6 +21,7 @@ class MessageTimeOperator;
 class MessageConditionalOperator;
 class MessageDestOperator;
 class CloneOperator;
+class FirewallOperator;
 /** class for managing filter operations*/
 class FilterOperations
 {
@@ -112,6 +114,25 @@ class RerouteFilterOperation : public FilterOperations
   private:
     /** function to execute the rerouting operation*/
     std::string rerouteOperation (const std::string &src, const std::string &dest) const;
+};
+
+/** filter for rerouting a packet to a particular endpoint*/
+class FirewallFilterOperation : public FilterOperations
+{
+  private:
+    std::shared_ptr<FirewallOperator> op;  //!< the actual operator
+    libguarded::cow_guarded<std::vector<std::string>> allowed;  //!< the conditions on which the rerouting will occur
+    libguarded::cow_guarded<std::vector<std::string>> blocked;  //!< the conditions that block a message
+  public:
+    FirewallFilterOperation ();
+    ~FirewallFilterOperation ();
+    virtual void set (const std::string &property, double val) override;
+    virtual void setString (const std::string &property, const std::string &val) override;
+    virtual std::shared_ptr<FilterOperator> getOperator () override;
+
+  private:
+    /** function to execute the rerouting operation*/
+    bool allowPassed (const Message *mess) const;
 };
 
 /** filter for rerouting a packet to a particular endpoint*/

@@ -1,10 +1,10 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MessageOperators.hpp"
+#include "../core/flagOperations.hpp"
 
 namespace helics
 {
@@ -110,4 +110,63 @@ std::unique_ptr<Message> CloneOperator::process (std::unique_ptr<Message> messag
     }
     return message;
 }
+
+FirewallOperator::FirewallOperator (std::function<bool(const Message *)> userCheckFunction)
+    : checkFunction (std::move (userCheckFunction))
+{
+}
+
+void FirewallOperator::setCheckFunction (std::function<bool(const Message *)> userCheckFunction)
+{
+    checkFunction = std::move (userCheckFunction);
+}
+
+std::unique_ptr<Message> FirewallOperator::process (std::unique_ptr<Message> message)
+{
+    if (checkFunction)
+    {
+        bool res=checkFunction (message.get ());
+		switch (operation)
+		{
+        case operations::drop:
+			if (res)
+			{
+                message = nullptr;
+			}
+            break;
+        case operations::pass:
+			if (!res)
+			{
+                message = nullptr;
+			}
+            break;
+        case operations::setFlag1:
+			if (res)
+			{
+                setActionFlag (*message, extra_flag1);
+			}
+            break;
+        case operations::setFlag2:
+            if (res)
+            {
+                setActionFlag (*message, extra_flag2);
+            }
+            break;
+        case operations::setFlag3:
+            if (res)
+            {
+                setActionFlag (*message, extra_flag3);
+            }
+            break;
+        case operations::setFlag4:
+            if (res)
+            {
+                setActionFlag (*message, extra_flag4);
+            }
+            break;
+		}
+    }
+    return message;
+}
+
 }  // namespace helics
