@@ -1,7 +1,7 @@
 # HELICS-SRC [![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-src)
-[![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/develop)
+[![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e)](https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS-src)
+[![codecov](https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS-src)
 [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
 [![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](http://gmlc-tdc.github.io/HELICS-src)
 
