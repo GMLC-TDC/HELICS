@@ -28,11 +28,14 @@
   </tr>
   <tr>
   <td>Gitter</td>
-  <td colspan="2" align="center">[![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)</td>
+  <td colspan="2" align="center">
+  <a href="https://gitter.im/GMLC-TDC/HELICS-src"><img src="https://badges.gitter.im/GMLC-TDC/HELICS-src.png" alt="Gitter Chat" /></a>
+  </td>
   </tr>
   <tr>
   <td>Documentation</td>
-  <td colspan="2" align="center"> [![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](http://gmlc-tdc.github.io/HELICS-src)</td>
+  <td colspan="2" align="center">
+  <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a>
   </tr>
 </table>
 
