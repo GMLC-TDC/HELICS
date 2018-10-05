@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-NetworkCommsInterface::NetworkCommsInterface (interface_type type):networkType(type){}
+NetworkCommsInterface::NetworkCommsInterface (interface_type type) noexcept :networkType(type){}
 
 const std::string localHostString = "localhost";
 
@@ -204,7 +204,7 @@ ActionMessage NetworkCommsInterface::generatePortRequest () const
 {
     ActionMessage req (CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
-    // req.payload = localTarget_;
+    req.payload = stripProtocol(localTarget_);
     return req;
 }
 
