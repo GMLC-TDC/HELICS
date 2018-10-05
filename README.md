@@ -8,35 +8,33 @@
   </tr>
   <tr>
   <td>Travis CI</td>
-  <td>[![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-src)</td>
-  <td>[![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=develop)](https://travis-ci.org/GMLC-TDC/HELICS-src)</td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=develop" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Appveyor</td>
-  <td>[![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/master)</td>
-  <td>[![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/develop)</td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/master"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Codacy</td>
-  <td>[![Codacy Badge](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master)](https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=master)</td>
-  <td>[![Codacy Badge](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=develop)</td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
   </tr>
   <tr>
   <td>Coverage</td>
-  <td>[![codecov](https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS-src)</td>
-  <td>[![codecov](https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS-src)</td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
   <tr>
   <td>Gitter</td>
   <td colspan="2" align="center">
-  <a href="https://gitter.im/GMLC-TDC/HELICS-src"><img src="https://badges.gitter.im/GMLC-TDC/HELICS-src.png" alt="Gitter Chat" /></a>
-  </td>
+  <a href="https://gitter.im/GMLC-TDC/HELICS-src"><img src="https://badges.gitter.im/GMLC-TDC/HELICS-src.png" alt="Gitter Chat" /></a></td>
   </tr>
   <tr>
   <td>Documentation</td>
   <td colspan="2" align="center">
-  <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a>
-  </tr>
+  <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
 </table>
 
 <p align="center">
