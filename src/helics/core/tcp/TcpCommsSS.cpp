@@ -10,69 +10,20 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TcpHelperClasses.h"
 #include <memory>
 
-static const int DEFAULT_TCPSS_PORT = 24151;
+static constexpr int DEFAULT_TCPSS_PORT = 24151;
 
 namespace helics
 {
 namespace tcp
 {
 using boost::asio::ip::tcp;
-TcpCommsSS::TcpCommsSS () noexcept {}
-
-void TcpCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
-{
-    CommsInterface::loadNetworkInfo (netInfo);
-    if (!propertyLock ())
-    {
-        return;
-    }
-    if (localTarget_.empty ())
-    {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
-            (brokerTarget_ == "localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
-        }
-    }
-    propertyUnLock ();
-}
+TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp) {}
 
 /** destructor*/
 TcpCommsSS::~TcpCommsSS () { disconnect (); }
 
-void TcpCommsSS::setBrokerPort (int brokerPortNumber)
-{
-    if (propertyLock ())
-    {
-        brokerPort = brokerPortNumber;
-        propertyUnLock ();
-    }
-}
 
-void TcpCommsSS::setPortNumber (int localPortNumber)
-{
-    if (propertyLock ())
-    {
-        localPort = localPortNumber;
-        propertyUnLock ();
-    }
-}
+int TcpCommsSS::getDefaultBrokerPort () const { return DEFAULT_TCPSS_PORT; }
 
 
 void TcpCommsSS::addConnection (const std::string &newConn)
@@ -117,23 +68,6 @@ int TcpCommsSS::processIncomingMessage (ActionMessage &M)
     return 0;
 }
 
-ActionMessage TcpCommsSS::generateReplyToIncomingMessage (ActionMessage &M)
-{
-    if (isProtocolCommand (M))
-    {
-        switch (M.messageID)
-        {
-        case CLOSE_RECEIVER:
-            return M;
-        default:
-            M.messageID = NULL_REPLY;
-            return M;
-        }
-    }
-    ActionCallback (std::move (M));
-    ActionMessage resp (CMD_PRIORITY_ACK);
-    return resp;
-}
 
 void TcpCommsSS::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
                                     const char *data,
@@ -245,14 +179,14 @@ void TcpCommsSS::txReceive (const char *data, size_t bytes_received, const std::
 
 void TcpCommsSS::queue_tx_function ()
 {
-    if (serverMode && (localPort < 0))
+    if (serverMode && (PortNumber < 0))
     {
-        localPort = DEFAULT_TCPSS_PORT;
+        PortNumber = DEFAULT_TCPSS_PORT;
     }
     if (serverMode)
     {
         auto ioserv = AsioServiceManager::getServicePointer ();
-        auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, localPort, true,
+        auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, true,
                                                       maxMessageSize_);
         while (!server->isReady ())
         {
@@ -490,8 +424,6 @@ void TcpCommsSS::closeReceiver ()
     cmd.messageID = CLOSE_RECEIVER;
     transmit (-1, cmd);
 }
-
-std::string TcpCommsSS::getAddress () const { return makePortAddress (localTarget_, localPort); }
 
 }  // namespace tcp
 }  // namespace helics

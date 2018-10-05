@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #pragma once
 
-#include "../CommsInterface.hpp"
+#include "../NetworkCommsInterface.hpp"
 #include <atomic>
 #include <set>
 #include <string>
@@ -19,34 +19,23 @@ class socket_t;
 namespace helics {
 namespace zeromq {
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
-class ZmqComms final:public CommsInterface {
+class ZmqComms final:public NetworkCommsInterface {
 
 public:
 	/** default constructor*/
-	ZmqComms() = default;
+	ZmqComms() noexcept;
 	/** destructor*/
 	~ZmqComms();
     /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
 	/** set the port numbers for the local ports*/
-	void setBrokerPort(int brokerPort);
-	void setPortNumber(int portNumber);
-	void setAutomaticPortStartPort(int startingPort);
-private:
-	int brokerReqPort = -1;
-	int brokerPushPort = -1;
-	std::atomic<int> repPortNumber{ -1 };
-	std::atomic<int> pullPortNumber{ -1 };
 
-	std::set<int> usedPortNumbers;
-	int openPortStart = -1;
-	std::atomic<bool> hasBroker{ false };
-    bool autoPortNumber = true;
+private:
+    virtual int getDefaultBrokerPort () const override;
 	virtual void queue_rx_function() override;	//!< the functional loop for the receive queue
 	virtual void queue_tx_function() override;  //!< the loop for transmitting data
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
-	/** find two open ports for a subBroker*/
-	std::pair<int, int> findOpenPorts();
+	
 	/** process an incoming message
 	return code for required action 0=NONE, -1 TERMINATE*/
 	int processIncomingMessage(zmq::message_t &msg);
@@ -56,10 +45,7 @@ private:
 
 	int initializeBrokerConnections(zmq::socket_t &controlSocket);
 public:
-    /** get the port number of the comms object to push message to*/
-    int getPort() const { return repPortNumber; };
-
-	std::string getAddress() const;
+    
     std::string getPushAddress() const;
 };
 

@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../CommsInterface.hpp"
+#include "../NetworkCommsInterface.hpp"
 #include <atomic>
 #include <set>
 #include <string>
@@ -44,28 +44,21 @@ namespace tcp
 class TcpConnection;
 
 /** implementation for the communication interface that uses TCP messages to communicate*/
-class TcpCommsSS final : public CommsInterface
+class TcpCommsSS final : public NetworkCommsInterface
 {
   public:
     /** default constructor*/
     TcpCommsSS () noexcept;
     /** destructor*/
     ~TcpCommsSS ();
-    /** load network information into the comms object*/
-    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
-    /** set the port numbers for the broker port*/
-    void setBrokerPort (int brokerPortNumber);
-    /** set the port numbers for the local port*/
-    void setPortNumber (int localPortNumber);
+    
 	/** add a connection to the connection list*/
 	void addConnection(const std::string &newConn);
 	/** add a vector of connections to the connection list*/
 	void addConnections(const std::vector<std::string> &newConnections);
   private:
-    int brokerPort = -1;
-    int localPort = -1;
-    std::atomic<bool> hasBroker{false};
     std::vector<std::string> connections;  //!< list of connections to make 
+	virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
@@ -73,8 +66,7 @@ class TcpCommsSS final : public CommsInterface
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &cmd);
-    ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
-    // promise and future for communicating port number from tx_thread to rx_thread
+    
 
     void txReceive (const char *data, size_t bytes_received, const std::string &errorMessage);
 
@@ -92,11 +84,6 @@ class TcpCommsSS final : public CommsInterface
 
     bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const boost::system::error_code &error);
     //  bool errorHandle()
-  public:
-    /** get the port number of the comms object to push message to*/
-    int getPort () const { return localPort; };
-
-    std::string getAddress () const;
 };
 
 }  // namespace tcp

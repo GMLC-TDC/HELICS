@@ -21,7 +21,7 @@ private:
     {
     public:
         /** get an open port for a particular host*/
-        int findOpenPort(const std::string &host="localhost");
+        int findOpenPort(int count, const std::string &host="localhost");
         void setStartingPortNumber(int startPort) { startingPort = startPort; }
         int getDefaultStartingPort() const { return startingPort; }
         void addUsedPort(int port);
@@ -56,7 +56,7 @@ private:
     PortAllocator openPorts;
 public:
     /** find an open port for a subBroker*/
-    int findOpenPort (const std::string &host);
+    int findOpenPort (int count, const std::string &host);
 	/** for protocol messages some require an immediate reply from the comms interface itself*/
     ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
@@ -69,7 +69,7 @@ public:
     /** return the default Broker port*/
     virtual int getDefaultBrokerPort () const = 0;
 protected:
-    ActionMessage generatePortRequest() const;
+    ActionMessage generatePortRequest(int cnt=1) const;
     void loadPortDefinitions(const ActionMessage &M);
 };
 

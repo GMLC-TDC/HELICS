@@ -15,23 +15,23 @@ NetworkCommsInterface::NetworkCommsInterface (interface_type type) noexcept :net
 
 const std::string localHostString = "localhost";
 
-int NetworkCommsInterface::PortAllocator::findOpenPort (const std::string &host)
+int NetworkCommsInterface::PortAllocator::findOpenPort (int count, const std::string &host)
 {
     if ((host == "127.0.0.1") || (host == "::1"))
     {
-        return findOpenPort (localHostString);
+        return findOpenPort (count, localHostString);
     }
     auto np = nextPorts.find (host);
     int nextPort = startingPort;
     if (np == nextPorts.end ())
     {
         nextPorts[host] = startingPort;
-        ++nextPorts[host];
+        nextPorts[host]+=count;
     }
     else
     {
         nextPort = np->second;
-        ++(np->second);
+        (np->second)+=count;
     }
     if (isPortUsed (host, nextPort))
     {
@@ -40,9 +40,12 @@ int NetworkCommsInterface::PortAllocator::findOpenPort (const std::string &host)
         {
             ++nextPort;
         }
-        nextPorts[host] = nextPort + 1;
+        nextPorts[host] = nextPort + count;
     }
-    addUsedPort (host, nextPort);
+	for (int ii = 0; ii < count; ++ii)
+	{
+        addUsedPort (host, nextPort+ii);
+	}
     return nextPort;
 }
 
@@ -134,14 +137,14 @@ void NetworkCommsInterface::setBrokerPort (int brokerPortNumber)
     }
 }
 
-int NetworkCommsInterface::findOpenPort (const std::string &host)
+int NetworkCommsInterface::findOpenPort (int count, const std::string &host)
 {
     if (openPorts.getDefaultStartingPort () < 0)
     {
         auto start = (hasBroker) ? getDefaultBrokerPort () + 100 : getDefaultBrokerPort () + 60;
         openPorts.setStartingPortNumber (start);
     }
-    return openPorts.findOpenPort (host);
+    return openPorts.findOpenPort (count, host);
 }
 
 void NetworkCommsInterface::setPortNumber (int localPortNumber)
@@ -182,11 +185,13 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
         break;
         case REQUEST_PORTS:
         {
-            auto openPort = (M.name.empty ()) ? findOpenPort (localHostString) : findOpenPort (M.name);
+            int cnt = (M.counter<=0)?2:M.counter;
+            auto openPort = (M.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, M.name);
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = PortNumber;
             portReply.source_handle = openPort;
+            portReply.counter = M.counter;
             return portReply;
         }
         break;
@@ -198,13 +203,25 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
     return resp;
 }
 
-std::string NetworkCommsInterface::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
+std::string NetworkCommsInterface::getAddress () const 
+{ 
+	if ((localTarget_ == "tcp://*") || (localTarget_ =="tcp://0.0.0.0"))
+    {
+        return makePortAddress ("tcp://127.0.0.1", PortNumber);
+    }
+    if ((localTarget_ == "*") || (localTarget_ == "0.0.0.0"))
+    {
+        return makePortAddress ("127.0.0.1", PortNumber);
+    }
+	return makePortAddress (localTarget_, PortNumber); 
+}
 
-ActionMessage NetworkCommsInterface::generatePortRequest () const
+ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
 {
     ActionMessage req (CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
     req.payload = stripProtocol(localTarget_);
+    req.counter = cnt;
     return req;
 }
 
@@ -225,7 +242,6 @@ void NetworkCommsInterface::loadPortDefinitions(const ActionMessage &M)
                 else
                 {
                     openPorts.setStartingPortNumber(getDefaultBrokerPort() + 110 + (PortNumber - getDefaultBrokerPort()-100) * 6);
-
                 }
             }
         }

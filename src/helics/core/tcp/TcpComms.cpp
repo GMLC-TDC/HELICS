@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TcpHelperClasses.h"
 #include <memory>
 
-static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
+static constexpr int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
