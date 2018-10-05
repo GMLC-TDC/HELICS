@@ -52,10 +52,18 @@ namespace zeromq
 {
 void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    CommsInterface::loadNetworkInfo (netInfo);
+    NetworkCommsInterface::loadNetworkInfo (netInfo);
     if (!propertyLock ())
     {
         return;
+    }
+    if (!brokerTarget_.empty())
+    {
+        insertProtocol(brokerTarget_, interface_type::tcp);
+    }
+    if (!localTarget_.empty())
+    {
+        insertProtocol(localTarget_, interface_type::tcp);
     }
     if (localTarget_ == "tcp://localhost")
     {
@@ -65,7 +73,14 @@ void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         localTarget_ = "udp://127.0.0.1";
     }
-
+    if (brokerTarget_ == "tcp://localhost")
+    {
+        brokerTarget_ = "tcp://127.0.0.1";
+    }
+    else if (brokerTarget_ == "udp://localhost")
+    {
+        brokerTarget_ = "udp://127.0.0.1";
+    }
     propertyUnLock ();
 }
 
@@ -135,6 +150,7 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
+    
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.setsockopt (ZMQ_LINGER, 200);
@@ -285,10 +301,8 @@ void ZmqComms::queue_rx_function ()
 int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
 {
     zmq::pollitem_t poller;
-    if (!brokerTarget_.empty ())
+    if (hasBroker)
     {
-        insertProtocol (brokerTarget_, interface_type::tcp);
-        insertProtocol (localTarget_, interface_type::tcp);
         auto ctx = zmqContextManager::getContextPointer ();
         if (brokerPort < 0)
         {
@@ -319,7 +333,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         {
             while (PortNumber < 0)
             {
-                ActionMessage getPorts = generatePortRequest ();
+                ActionMessage getPorts = generatePortRequest ((serverMode)?2:1);
                 auto str = getPorts.to_string ();
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
@@ -394,7 +408,10 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
 void ZmqComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-
+    if (!brokerTarget_.empty())
+    {
+        hasBroker = true;
+    }
     auto ctx = zmqContextManager::getContextPointer ();
     // Setup the control socket for comms with the receiver
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
@@ -453,7 +470,7 @@ void ZmqComms::queue_tx_function ()
 
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
-                        zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second + 1));
+                        zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
                         routes.emplace (cmd.dest_id, std::move (zsock));
                     }
                     catch (const zmq::error_t &e)

@@ -21,7 +21,7 @@ class IpcComms final : public CommsInterface
     /** destructor*/
     ~IpcComms ();
 
-	void loadNetworkInfo (const NetworkBrokerData &netInfo);
+	virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
 
   private:
     std::atomic<int> ipcbackchannel{0};  //!< a back channel message system if the primary is not working
