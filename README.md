@@ -1,5 +1,8 @@
-# HELICS
+<p align="center">
+<img src="docs/img/HELICS_Logo.png" width="400">
+</p>
 
+# Build Status
 <table>
   <tr>
     <td><b>Service</b></td>
@@ -37,9 +40,8 @@
   <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
 </table>
 
-<p align="center">
-<img src="docs/img/HELICS_Logo.png" width="400">
-</p>
+
+# Introduction
 
 Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS).  HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OSX). It provides users a high-performance way to have multiple individual simulation model "federates" from various domains interact during execution to create a larger co-simulation "federation" able to capture rich interactions. Written in modern C++ (C++ 2014), HELICS provides includes a rich set of APIs for other languages including Python, C, Java, and MATLAB, and has native support within a growing number of energy simulation tools.
 
