@@ -13,8 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <thread>
 
-/** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
- * threading issues*/
+/** helper class to contain a list of objects that need to be referencable at some level*/
 template <class X>
 class SearchableObjectHolder
 {

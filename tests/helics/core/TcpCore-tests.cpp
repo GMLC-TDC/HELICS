@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:24248");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:24220");
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;

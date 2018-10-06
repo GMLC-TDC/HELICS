@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <map>
 #include <mutex>
 
-/** class holding a map of delayed object*/
+/** class holding a set of delayed object the delayed object are held by promises*/
 template <class X>
 class DelayedObjects
 {

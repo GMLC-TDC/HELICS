@@ -31,7 +31,6 @@ class MpiComms final : public CommsInterface
   private:
 
     std::atomic<bool> shutdown{false};
-
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
@@ -42,7 +41,7 @@ class MpiComms final : public CommsInterface
     /** queue for pending incoming messages*/
     BlockingQueue<ActionMessage> rxMessageQueue;
     /** queue for pending outgoing messages*/
-    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
+    BlockingQueue<std::pair<std::pair<int,int>, std::vector<char>>> txMessageQueue;
 
     std::atomic<bool> hasBroker{false};
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
@@ -52,7 +51,10 @@ class MpiComms final : public CommsInterface
 
     std::string getAddress () { return localTarget_; }
     BlockingQueue<ActionMessage> &getRxMessageQueue () { return rxMessageQueue; }
-    BlockingQueue<std::pair<std::string, std::vector<char>>> &getTxMessageQueue () { return txMessageQueue; }
+    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> &getTxMessageQueue ()
+    {
+        return txMessageQueue;
+    }
 };
 
 }  // namespace mpi

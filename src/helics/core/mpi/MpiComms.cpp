@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MpiComms.h"
-#include "../../common/AsioServiceManager.h"
+//#include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "MpiService.h"
 #include <memory>
@@ -63,7 +63,7 @@ void MpiComms::queue_rx_function ()
         {
             if (!isValidCommand (M.value ()))
             {
-                std::cerr << "invalid command received" << std::endl;
+                logError("invalid command received");
                 continue;
             }
 
@@ -99,11 +99,15 @@ void MpiComms::queue_tx_function ()
 
     auto &mpi_service = MpiService::getInstance ();
 
-    std::map<int, std::string> routes;  // for all the other possible routes
+    std::map<int, std::pair<int,int>> routes;  // for all the other possible routes
 
+	 std::pair<int, int> brokerLocation;
     if (!brokerTarget_.empty())
     {
         hasBroker = true;
+        auto addr_delim_pos = brokerTarget_.find (":");
+        brokerLocation.first = std::stoi (brokerTarget_.substr (0, addr_delim_pos));
+        brokerLocation.second = std::stoi (brokerTarget_.substr (addr_delim_pos + 1, brokerTarget_.length ()));
     }
 
     while (true)
@@ -122,7 +126,13 @@ void MpiComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     // cmd.payload would be the MPI rank of the destination
-                    routes.emplace (cmd.dest_id, cmd.payload);
+                    std::pair<int, int> routeLoc;
+                    auto addr_delim_pos = cmd.payload.find (":");
+                    routeLoc.first = std::stoi (cmd.payload.substr (0, addr_delim_pos));
+                    routeLoc.second =
+                      std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
+
+                    routes.emplace (cmd.dest_id, routeLoc);
                     processed = true;
                 }
                 break;
@@ -143,10 +153,10 @@ void MpiComms::queue_tx_function ()
             {
                 // Send using MPI to broker
                 // std::cout << "send msg to brkr rt: " << prettyPrintString(cmd) << std::endl;
-                mpi_service.sendMessage (brokerTarget_, cmd.to_vector ());
+                mpi_service.sendMessage (brokerLocation, cmd.to_vector ());
             }
         }
-        else if (route_id == -1)
+        else if (route_id == control_route)
         {  // send to rx thread loop
             // Send to ourself -- may need command line option to enable for openmpi
             // std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
@@ -167,7 +177,7 @@ void MpiComms::queue_tx_function ()
                 {
                     // Send using MPI to broker
                     // std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
-                    mpi_service.sendMessage (brokerTarget_, cmd.to_vector ());
+                    mpi_service.sendMessage (brokerLocation, cmd.to_vector ());
                 }
             }
         }

@@ -20,6 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 template <class X>
 class DelayedDestructor
 {
+
   private:
     std::mutex destructionLock;
     std::vector<std::shared_ptr<X>> ElementsToBeDestroyed;
@@ -92,9 +93,10 @@ class DelayedDestructor
 
     size_t destroyObjects (std::chrono::milliseconds delay)
     {
+        using namespace std::literals::chrono_literals;
         std::unique_lock<std::mutex> lock (destructionLock);
-        auto delayTime = (delay < std::chrono::milliseconds(100)) ? delay : std::chrono::milliseconds(50);
-        int delayCount = (delay < std::chrono::milliseconds(100)) ? 1 : (delay / 50).count();
+        auto delayTime = (delay <100ms) ? delay : 50ms;
+        int delayCount = (delay < 100ms) ? 1 : (delay / 50).count();
 
         int cnt = 0;
         while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))

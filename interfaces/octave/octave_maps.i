@@ -1,6 +1,7 @@
 
 %{
 #include "api-data.h"
+#include "CMatrix.h"
 /* throw a helics error */
 static octave_value Helics_ErrorType(helics_error *err) {
 switch (err->error_code)
@@ -93,10 +94,9 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %typemap(argout)(double *real, double *imag)
 {
-	mxArray *out=mxCreateDoubleMatrix(1, 1, mxCOMPLEX);
-	mxSetPr(out,$1);
-	mxSetPi(out,$2);
-	if (--resc>=0) *resv++ =out;
+	ComplexMatrix mat(1,1);
+	mat(1,1)=std::complex<double>($1,$2);
+	if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
 
 

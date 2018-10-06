@@ -269,38 +269,41 @@ void MpiService::sendAndReceiveMessages ()
     auto sendMsg = txMessageQueue.try_pop ();
     while (sendMsg)
     {
-        std::vector<char> msg;
-        std::string address;
-        std::tie (address, msg) = sendMsg.value ();
+       // std::vector<char> msg;
+        //std::string address;
+        //std::tie (address, msg) = sendMsg.value ();
 
         MPI_Request req;
-        auto sendRequestData = std::make_pair (req, msg);
+        auto sendRequestData = std::pair<MPI_Request,std::vector<char>> (req, std::move(sendMsg->second));
 
-        auto addr_delim_pos = address.find (":");
-        int destRank = std::stoi (address.substr (0, addr_delim_pos));
-        ;
-        int destTag = std::stoi (address.substr (addr_delim_pos + 1, address.length ()));
+       
+        int destRank = sendMsg->first.first;
+        int destTag = sendMsg->first.second;
 
         if (destRank != commRank)
         {
+            send_requests.push_back (std::move(sendRequestData));
+            auto &sreq = send_requests.back ();
             // Send the message using asynchronous send
-            MPI_Isend (sendRequestData.second.data (), static_cast<int>(sendRequestData.second.size ()), MPI_CHAR, destRank, destTag,
-                       mpiCommunicator, &sendRequestData.first);
-            send_requests.push_back (sendRequestData);
+            MPI_Isend (sreq.second.data (), static_cast<int> (sreq.second.size ()), MPI_CHAR,
+                       destRank,
+                       destTag,
+                       mpiCommunicator, &sreq.first);
+            
         }
         else
         {
             if (comms[destTag] != nullptr)
             {
                 // Add the message directly to the destination rx queue (same process)
-                ActionMessage M (msg);
+                ActionMessage M (sendRequestData.second);
                 comms[destTag]->getRxMessageQueue ().push (M);
             }
         }
         sendMsg = txMessageQueue.try_pop ();
     }
 
-    send_requests.remove_if ([](std::pair<MPI_Request, std::vector<char>> req) {
+    send_requests.remove_if ([](std::pair<MPI_Request, std::vector<char>> &req) {
         int send_finished;
         MPI_Test (&req.first, &send_finished, MPI_STATUS_IGNORE);
 
@@ -309,7 +312,7 @@ void MpiService::sendAndReceiveMessages ()
             // Any cleanup needed here? Freeing the vector or MPI_Request?
         }
 
-        return send_finished == 1;
+        return (send_finished == 1);
     });
 }
 
