@@ -261,6 +261,11 @@ if(GENERATE_DOXYGEN_DOC)
 	endif(DOXYGEN_FOUND)
 endif(GENERATE_DOXYGEN_DOC)
 
+#if(MINGW)
+#    add_definitions(-DBOOST_USE_WINDOWS_H)
+#	add_definitions(-DWIN32_LEAN_AND_MEAN)
+#endif()
+
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------

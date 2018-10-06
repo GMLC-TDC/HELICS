@@ -41,15 +41,6 @@ enum class interface_visibility
 constexpr interface_visibility GLOBAL = interface_visibility::global;
 constexpr interface_visibility LOCAL = interface_visibility::local;
 
-/** enumeration of a whether a publication is required or is optional*/
-enum class interface_availability
-{
-    required,  //!< the matching interface is required to exist
-    optional  //!< the matching interface is NOT required
-};
-
-constexpr interface_availability OPTIONAL = interface_availability::optional;
-constexpr interface_availability REQUIRED = interface_availability::required;
 
 /** class defining an  identifier type
 @details  the intent of this class is to limit the operations available on an identifier

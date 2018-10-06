@@ -31,6 +31,8 @@ endif ()
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
+
+
 if (MSVC)
 
 set (boost_versions
@@ -160,6 +162,10 @@ if (${Boost_USE_STATIC_LIBS})
 else()
 	add_library(Boostlibs::core UNKNOWN IMPORTED)
 	add_library(Boostlibs::test UNKNOWN IMPORTED)
+#	if(MINGW)
+#		set_property(TARGET Boostlibs::core PROPERTY
+#			INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H)
+#	endif()
 endif()
 
 list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)
