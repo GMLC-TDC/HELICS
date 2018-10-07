@@ -37,7 +37,7 @@ const std::string core_types_single[] = {"test", "ipc", "udp"};
 #endif
 #endif
 
-typedef helics_federate (*FedCreator) (const char *, helics_federate_info_t, helics_error *err);
+typedef helics_federate (*FedCreator) (char const *, helics_federate_info_t, helics_error *err);
 
 struct FederateTestFixture
 {

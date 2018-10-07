@@ -1276,9 +1276,9 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void CommonCore::dataConnect (const std::string &source, const std::string &target)
+void CommonCore::dataLink (const std::string &source, const std::string &target)
 {
-    ActionMessage M (CMD_DATA_CONNECT);
+    ActionMessage M (CMD_DATA_LINK);
     M.name = source;
     M.setStringData (target);
     addActionMessage (std::move (M));
@@ -1286,7 +1286,7 @@ void CommonCore::dataConnect (const std::string &source, const std::string &targ
 
 void CommonCore::filterAddSourceTarget (const std::string &filter, const std::string &target)
 {
-    ActionMessage M (CMD_FILTER_CONNECT);
+    ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
     M.setStringData (target);
     addActionMessage (std::move (M));
@@ -1294,7 +1294,7 @@ void CommonCore::filterAddSourceTarget (const std::string &filter, const std::st
 
 void CommonCore::filterAddDestinationTarget (const std::string &filter, const std::string &target)
 {
-    ActionMessage M (CMD_FILTER_CONNECT);
+    ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
     M.setStringData (target);
     setActionFlag (M, destination_target);
@@ -2418,7 +2418,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
-    case CMD_DATA_CONNECT:
+    case CMD_DATA_LINK:
     {
         auto pub = loopHandles.getPublication (command.name);
         if (pub != nullptr)
@@ -2444,7 +2444,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
     }
     break;
-    case CMD_FILTER_CONNECT:
+    case CMD_FILTER_LINK:
     {
         auto filt = loopHandles.getFilter (command.name);
         if (filt != nullptr)

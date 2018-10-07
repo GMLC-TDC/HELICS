@@ -124,7 +124,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
-    virtual void dataConnect (const std::string &source, const std::string &target) override final;
+    virtual void dataLink (const std::string &source, const std::string &target) override final;
     virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) override final;
     virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) override final;
     virtual void send (interface_handle sourceHandle,
@@ -345,8 +345,6 @@ class CommonCore : public Core, public BrokerBase
     @param[in] global_id the federate global id
     @return 0 if unknown, otherwise returns the route_id*/
     int32_t getRoute (global_federate_id_t global_id) const;
-    /** handle the creation of local filters */
-    void localFilterCreation(ActionMessage &command);
     /** process a message for potential additions to the filter ordering
     @param command the message to process
     */

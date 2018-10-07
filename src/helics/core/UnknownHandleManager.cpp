@@ -8,71 +8,76 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownPublication(const std::string &key, global_handle target, uint16_t flags)
+void UnknownHandleManager::addUnknownPublication (const std::string &key, global_handle target, uint16_t flags)
 {
-	unknown_publications.emplace(key, std::make_pair(target,flags));
+    unknown_publications.emplace (key, std::make_pair (target, flags));
 }
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownInput(const std::string &key, global_handle target, uint16_t flags)
+void UnknownHandleManager::addUnknownInput (const std::string &key, global_handle target, uint16_t flags)
 {
-    unknown_inputs.emplace(key, std::make_pair(target, flags));
+    unknown_inputs.emplace (key, std::make_pair (target, flags));
 }
 
 /** add a missing destination endpoint*/
-void UnknownHandleManager::addUnknownEndpoint(const std::string &key, global_handle target, uint16_t flags)
+void UnknownHandleManager::addUnknownEndpoint (const std::string &key, global_handle target, uint16_t flags)
 {
-    unknown_endpoints.emplace(key, std::make_pair(target, flags));
+    unknown_endpoints.emplace (key, std::make_pair (target, flags));
 }
 /** add a missing filter*/
-void UnknownHandleManager::addUnknownFilter(const std::string &key, global_handle target, uint16_t flags)
+void UnknownHandleManager::addUnknownFilter (const std::string &key, global_handle target, uint16_t flags)
 {
-    unknown_filters.emplace(key, std::make_pair(target, flags));
+    unknown_filters.emplace (key, std::make_pair (target, flags));
 }
 
+void UnknownHandleManager::addDataLink (const std::string &source, const std::string &target)
+{
+    unknown_links.emplace (source, target);
+}
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInputs(const std::string &newInput)
+std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInputs (const std::string &newInput)
 {
     std::vector<targetInfo> targets;
-    auto rp = unknown_inputs.equal_range(newInput);
-    if (rp.first != unknown_inputs.end())
+    auto rp = unknown_inputs.equal_range (newInput);
+    if (rp.first != unknown_inputs.end ())
     {
         auto it = rp.first;
         while (it != rp.second)
         {
-            targets.push_back(it->second);
+            targets.push_back (it->second);
             ++it;
         }
     }
     return targets;
 }
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForPublications(const std::string &newPublication)
-    {
-        std::vector<targetInfo> targets;
-        auto rp = unknown_publications.equal_range(newPublication);
-        if (rp.first != unknown_publications.end())
-        {
-            auto it = rp.first;
-            while (it != rp.second)
-            {
-                targets.push_back(it->second);
-                ++it;
-            }
-        }
-        return targets;
-    }
-
-/** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForEndpoints(const std::string &newEndpoint) {
+std::vector<UnknownHandleManager::targetInfo>
+UnknownHandleManager::checkForPublications (const std::string &newPublication)
+{
     std::vector<targetInfo> targets;
-    auto rp = unknown_endpoints.equal_range(newEndpoint);
-    if (rp.first != unknown_endpoints.end())
+    auto rp = unknown_publications.equal_range (newPublication);
+    if (rp.first != unknown_publications.end ())
     {
         auto it = rp.first;
         while (it != rp.second)
         {
-            targets.push_back(it->second);
+            targets.push_back (it->second);
+            ++it;
+        }
+    }
+    return targets;
+}
+
+std::vector<std::string> UnknownHandleManager::checkForLinks (const std::string &newSource)
+{
+    std::vector<std::string> targets;
+    auto rp = unknown_links.equal_range (newSource);
+    if (rp.first != unknown_links.end ())
+    {
+        auto it = rp.first;
+        while (it != rp.second)
+        {
+            targets.push_back (it->second);
             ++it;
         }
     }
@@ -80,48 +85,61 @@ std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForEndp
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilters(const std::string &newFilter)
+std::vector<UnknownHandleManager::targetInfo>
+UnknownHandleManager::checkForEndpoints (const std::string &newEndpoint)
 {
     std::vector<targetInfo> targets;
-    auto rp = unknown_filters.equal_range(newFilter);
-    if (rp.first != unknown_filters.end())
+    auto rp = unknown_endpoints.equal_range (newEndpoint);
+    if (rp.first != unknown_endpoints.end ())
     {
         auto it = rp.first;
         while (it != rp.second)
         {
-            targets.push_back(it->second);
+            targets.push_back (it->second);
             ++it;
         }
     }
     return targets;
 }
 
-bool UnknownHandleManager::hasUnknowns() const
+/** specify a found input*/
+std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilters (const std::string &newFilter)
 {
-    return (!(unknown_publications.empty() && unknown_endpoints.empty() && unknown_inputs.empty() && unknown_filters.empty()));
+    std::vector<targetInfo> targets;
+    auto rp = unknown_filters.equal_range (newFilter);
+    if (rp.first != unknown_filters.end ())
+    {
+        auto it = rp.first;
+        while (it != rp.second)
+        {
+            targets.push_back (it->second);
+            ++it;
+        }
+    }
+    return targets;
+}
+
+bool UnknownHandleManager::hasUnknowns () const
+{
+    return (!(unknown_publications.empty () && unknown_endpoints.empty () && unknown_inputs.empty () &&
+              unknown_filters.empty ()));
 }
 
 /** specify a found input*/
-void UnknownHandleManager::clearInput(const std::string &newInput)
+void UnknownHandleManager::clearInput (const std::string &newInput) { unknown_inputs.erase (newInput); }
+
+/** specify a found input*/
+void UnknownHandleManager::clearPublication (const std::string &newPublication)
 {
-    unknown_inputs.erase(newInput);
+    unknown_publications.erase (newPublication);
+}
+/** specify a found input*/
+void UnknownHandleManager::clearEndpoint (const std::string &newEndpoint)
+{
+    unknown_endpoints.erase (newEndpoint);
 }
 
 /** specify a found input*/
-void UnknownHandleManager::clearPublication(const std::string &newPublication)
-{
-    unknown_publications.erase(newPublication);
-}
-/** specify a found input*/
-void UnknownHandleManager::clearEndpoint(const std::string &newEndpoint)
-{
-    unknown_endpoints.erase(newEndpoint);
-}
-
-/** specify a found input*/
-void UnknownHandleManager::clearFilter(const std::string &newFilter)
-{
-    unknown_filters.erase(newFilter);
-}
+void UnknownHandleManager::clearFilter (const std::string &newFilter) { unknown_filters.erase (newFilter); }
 
 }  // namespace helics

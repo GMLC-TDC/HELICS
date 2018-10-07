@@ -73,10 +73,10 @@ class Broker
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
 
-    /** create a data connection between a named publication and a named input
+    /** create a data Link between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/
-    virtual void dataConnect (const std::string &source, const std::string &target) = 0;
+    virtual void dataLink (const std::string &source, const std::string &target) = 0;
     /** create a source filter connection between a named filter and a named endpoint
     @param source the name of the filter
     @param target the name of the source target*/

@@ -1,7 +1,7 @@
 function v = HELICS_DATA_TYPE_INT()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183105);
+    vInitialized = helicsMEX(0, 1432107661);
   end
   v = vInitialized;
 end

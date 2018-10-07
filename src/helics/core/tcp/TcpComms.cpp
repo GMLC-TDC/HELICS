@@ -275,13 +275,14 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             tcp::endpoint brk;
             brokerConnection->async_receive (rx.data (), 128,
                                              [this, &rx](const boost::system::error_code &error, size_t bytes) {
-                                                 if (error != boost::asio::error::operation_aborted)
+
+                                                 if (!error)
                                                  {
-                                                     if (!error)
-                                                     {
-                                                         txReceive (rx.data (), bytes, std::string ());
-                                                     }
-                                                     else
+                                                     txReceive (rx.data (), bytes, std::string ());
+                                                 }
+                                                 else
+                                                 {
+                                                     if (error != boost::asio::error::operation_aborted)
                                                      {
                                                          txReceive (rx.data (), bytes, error.message ());
                                                      }

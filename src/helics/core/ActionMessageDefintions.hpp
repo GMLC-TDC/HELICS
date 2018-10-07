@@ -77,8 +77,8 @@ enum class action_t : int32_t
     cmd_add_interdependency = 148,  //!< command to add a federate as both dependent and a dependency
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
-    cmd_data_connect = cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
-    cmd_filter_connect = cmd_info_basis + 709,  //!< command to add a target to a filter
+    cmd_data_link = cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
+    cmd_filter_link = cmd_info_basis + 709,  //!< command to add a target to a filter
 
     cmd_fed_configure_time = 202,  //!< command to update the configuration of a federate a time parameter
     cmd_fed_configure_int = 203,  //!< command to update the configuration of a federate an int parameter
@@ -186,8 +186,8 @@ enum class action_t : int32_t
 #define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
 #define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
 
-#define CMD_DATA_CONNECT action_message_def::action_t::cmd_data_connect
-#define CMD_FILTER_CONNECT action_message_def::action_t::cmd_filter_connect
+#define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
+#define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link
 
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
 

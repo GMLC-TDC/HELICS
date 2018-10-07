@@ -261,12 +261,13 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAdd
         {
             brokerAddress = localAddress;
         }
+        break;
     case interface_type::ipc:
+    case interface_type::inproc:
 		if ((brokerAddress.empty())&&(!localAddress.empty()))
 		{
             brokerAddress = localAddress;
 		}
-        break;
     }
 }
 

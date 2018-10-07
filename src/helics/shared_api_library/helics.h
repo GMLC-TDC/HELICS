@@ -100,7 +100,13 @@ a connected broker implies is attached to cores or cores could reach out to comm
 return 0 if not connected , something else if it is connected*/
 HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker);
 
-/** wait for the broker to disconnect
+/** link a named publication and named input using a broker
+@param broker the broker to generate the connection from
+@param source the name of the publication (cannot be NULL)
+@param target the named of the target to send the publication data (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void helicsBrokerDataLink (helics_broker broker, const char *source, const char *target, helics_error *err);
+  /** wait for the broker to disconnect
 @param broker the broker to wait for
 @param msToWait the time out in millisecond (<0 for infinite timeout)
 */
@@ -110,6 +116,13 @@ HELICS_EXPORT helics_bool_t helicsBrokerWaitForDisconnect (helics_broker broker,
 a connected core implies is attached to federate or federates could be attached to it
 return 0 if not connected , something else if it is connected*/
 HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core);
+
+/** link a named publication and named input using a core
+@param core the core to generate the connection from
+@param source the name of the publication (cannot be NULL)
+@param target the named of the target to send the publication data (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void helicsCoreDataLink (helics_core core, const char *source, const char *target, helics_error *err);
 
 /** get an identifier for the broker
 @param broker the broker to query
@@ -198,7 +211,7 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, 
 /** create a message federate from a JSON file or JSON string or TOML file
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
 argument
-@param JSON  a JSON file or a JSON string that contains setup and configuration information
+@param configFile  a Config(json,toml) file or a JSON string that contains setup and configuration information
 @return an opaque message federate object
 */
 HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, helics_error *err);

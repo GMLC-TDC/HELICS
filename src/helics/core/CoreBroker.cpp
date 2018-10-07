@@ -137,9 +137,9 @@ uint16_t CoreBroker::getNextAirlockIndex()
 	return index;
 }
 
-void CoreBroker::dataConnect (const std::string &source, const std::string &target)
+void CoreBroker::dataLink (const std::string &source, const std::string &target)
 {
-    ActionMessage M (CMD_DATA_CONNECT);
+    ActionMessage M (CMD_DATA_LINK);
     M.name = source;
     M.setStringData (target);
     addActionMessage (std::move (M));
@@ -147,7 +147,7 @@ void CoreBroker::dataConnect (const std::string &source, const std::string &targ
 
 void CoreBroker::filterAddSourceTarget (const std::string &filter, const std::string &target)
 {
-    ActionMessage M (CMD_FILTER_CONNECT);
+    ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
     M.setStringData (target);
     addActionMessage (std::move (M));
@@ -155,7 +155,7 @@ void CoreBroker::filterAddSourceTarget (const std::string &filter, const std::st
 
 void CoreBroker::filterAddDestinationTarget (const std::string &filter, const std::string &target)
 {
-    ActionMessage M (CMD_FILTER_CONNECT);
+    ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
     M.setStringData (target);
     setActionFlag (M, destination_target);
@@ -664,7 +664,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     }
-    case CMD_DATA_CONNECT:
+    case CMD_DATA_LINK:
     {
         auto pub = handles.getPublication (command.name);
         if (pub != nullptr)
@@ -681,7 +681,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 if (isRootc)
                 {
-                    // TODO:: not decided what to do here yet need a buffer
+                    unknownHandles.addDataLink (command.name, command.getString (targetStringLoc));
                 }
                 else
                 {
@@ -697,7 +697,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
     }
     break;
-    case CMD_FILTER_CONNECT:
+    case CMD_FILTER_LINK:
     {
         auto filt = handles.getFilter (command.name);
         if (filt != nullptr)
@@ -1599,6 +1599,14 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
     if (!subHandles.empty ())
     {
         unknownHandles.clearPublication (handleInfo.key);
+    }
+    auto Pubtargets = unknownHandles.checkForLinks (handleInfo.key);
+    for (auto sub : Pubtargets)
+    {
+        ActionMessage m (CMD_ADD_NAMED_INPUT);
+        m.name = sub;
+        m.setSource (handleInfo.handle);
+        checkForNamedInterface (m);
     }
 }
 

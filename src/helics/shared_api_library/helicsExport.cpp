@@ -618,6 +618,46 @@ helics_bool_t helicsBrokerIsConnected (helics_broker broker)
     return (brk->isConnected ()) ? helics_true : helics_false;
 }
 
+static constexpr char invalidDataLinkString[] = "Data link arguments cannot be null";
+
+void helicsBrokerDataLink(helics_broker broker, const char *source, const char *target, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+	if ((source == nullptr)||(target==nullptr))
+	{
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+	}
+    brk->dataLink (source, target);
+}
+
+void helicsCoreDataLink (helics_core core, const char *source, const char *target, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    if ((source == nullptr) || (target == nullptr))
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+    }
+    cr->dataLink (source, target);
+}
+
 helics_bool_t helicsCoreIsConnected (helics_core core)
 {
     auto cr = getCore (core,nullptr);

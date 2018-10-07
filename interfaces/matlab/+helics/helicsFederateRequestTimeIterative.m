@@ -22,5 +22,5 @@ function varargout = helicsFederateRequestTimeIterative(varargin)
     %-------
     %a helics_status object with a return code of the result
     %
-  [varargout{1:nargout}] = helicsMEX(96, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(98, varargin{:});
 end
