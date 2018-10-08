@@ -103,9 +103,27 @@ HELICS_EXPORT helics_bool_t helicsBrokerIsConnected (helics_broker broker);
 /** link a named publication and named input using a broker
 @param broker the broker to generate the connection from
 @param source the name of the publication (cannot be NULL)
-@param target the named of the target to send the publication data (cannot be NULL)
+@param target the name of the target to send the publication data (cannot be NULL)
 @param err a helics_error object, can be NULL if the errors are to be ignored*/
 HELICS_EXPORT void helicsBrokerDataLink (helics_broker broker, const char *source, const char *target, helics_error *err);
+
+/** link a named filter to a source endpoint
+@param broker the broker to generate the connection from
+@param filter the name of the filter (cannot be NULL)
+@param endpoint the name of the endpoint to filter the data from (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
+
+
+/** link a named filter to a destination endpoint
+@param broker the broker to generate the connection from
+@param filter the name of the filter (cannot be NULL)
+@param endpoint the name of the endpoint to filter the data going to (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void
+helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
+
+
   /** wait for the broker to disconnect
 @param broker the broker to wait for
 @param msToWait the time out in millisecond (<0 for infinite timeout)
@@ -123,6 +141,24 @@ HELICS_EXPORT helics_bool_t helicsCoreIsConnected (helics_core core);
 @param target the named of the target to send the publication data (cannot be NULL)
 @param err a helics_error object, can be NULL if the errors are to be ignored*/
 HELICS_EXPORT void helicsCoreDataLink (helics_core core, const char *source, const char *target, helics_error *err);
+
+
+/** link a named filter to a source endpoint
+@param core the core to generate the connection from
+@param filter the name of the filter (cannot be NULL)
+@param endpoint the name of the endpoint to filter the data from (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void
+helicsCoreAddSourceFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err);
+
+/** link a named filter to a destination endpoint
+@param core the core to generate the connection from
+@param filter the name of the filter (cannot be NULL)
+@param endpoint the name of the endpoint to filter the data going to (cannot be NULL)
+@param err a helics_error object, can be NULL if the errors are to be ignored*/
+HELICS_EXPORT void
+helicsCoreAddDestinationFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err);
+
 
 /** get an identifier for the broker
 @param broker the broker to query

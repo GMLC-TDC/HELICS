@@ -315,13 +315,13 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
 {
     int ind = static_cast<int> (callbacks.size ());
     callbacks.push_back (callback);
-    auto cnt = endpointCount.load ();
+   // auto cnt = endpointCount.load ();
     auto eptLock = local_endpoints.lock ();
 	if (eptLock)
 	{
         for (auto id : ids)
         {
-            if (id.value () < cnt)
+            if (isValidIndex (id.value(),*eptLock))
             {
                 (*eptLock)[id.value ()]->callbackIndex = ind;
             }

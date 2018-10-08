@@ -1284,19 +1284,19 @@ void CommonCore::dataLink (const std::string &source, const std::string &target)
     addActionMessage (std::move (M));
 }
 
-void CommonCore::filterAddSourceTarget (const std::string &filter, const std::string &target)
+void CommonCore::addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint)
 {
     ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
-    M.setStringData (target);
+    M.setStringData (endpoint);
     addActionMessage (std::move (M));
 }
 
-void CommonCore::filterAddDestinationTarget (const std::string &filter, const std::string &target)
+void CommonCore::addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint)
 {
     ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
-    M.setStringData (target);
+    M.setStringData (endpoint);
     setActionFlag (M, destination_target);
     addActionMessage (std::move (M));
 }

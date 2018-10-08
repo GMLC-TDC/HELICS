@@ -80,10 +80,10 @@ class Broker
     /** create a source filter connection between a named filter and a named endpoint
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) = 0;
+    virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
     /** create a destination filter connection between a named filter and an endpoint
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) = 0;
+    virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
 };
 }  // namespace helics

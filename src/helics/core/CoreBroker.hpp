@@ -224,11 +224,11 @@ class CoreBroker : public Broker, public BrokerBase
     virtual const std::string &getAddress () const override final;
     virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
-    virtual void dataLink (const std::string &source, const std::string &target) override final;
+    virtual void dataLink (const std::string &publication, const std::string &input) override final;
 
-    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) override final;
+    virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
 
-    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) override final;
+    virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();

@@ -541,11 +541,11 @@ class Core
     /** create a filter connection between a named publication and a named input
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddSourceTarget(const std::string &filter, const std::string &target) = 0;
+    virtual void addSourceFilterToEndpoint(const std::string &filter, const std::string &target) = 0;
     /** create a filter connection between a named publication and a named input
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void filterAddDestinationTarget(const std::string &filter, const std::string &target) = 0;
+    virtual void addDestinationFilterToEndpoint(const std::string &filter, const std::string &target) = 0;
     /**
      * Send data from source to destination.
      *

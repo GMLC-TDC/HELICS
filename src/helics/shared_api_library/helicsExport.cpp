@@ -658,6 +658,86 @@ void helicsCoreDataLink (helics_core core, const char *source, const char *targe
     cr->dataLink (source, target);
 }
 
+void
+helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    if ((filter == nullptr) || (endpoint == nullptr))
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+    }
+    brk->addSourceFilterToEndpoint (filter, endpoint);
+}
+
+void
+helicsBrokerAddDestinationFilterToEndpoint(helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    if ((filter == nullptr) || (endpoint == nullptr))
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+    }
+    brk->addDestinationFilterToEndpoint (filter, endpoint);
+}
+
+
+
+void helicsCoreAddSourceFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    if ((filter == nullptr) || (endpoint == nullptr))
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+    }
+    cr->addSourceFilterToEndpoint (filter, endpoint);
+}
+
+void helicsCoreAddDestinationFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    if ((filter == nullptr) || (endpoint == nullptr))
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidDataLinkString;
+        }
+        return;
+    }
+    cr->addDestinationFilterToEndpoint (filter, endpoint);
+}
+
 helics_bool_t helicsCoreIsConnected (helics_core core)
 {
     auto cr = getCore (core,nullptr);

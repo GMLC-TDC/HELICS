@@ -125,8 +125,8 @@ class CommonCore : public Core, public BrokerBase
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
     virtual void dataLink (const std::string &source, const std::string &target) override final;
-    virtual void filterAddSourceTarget (const std::string &filter, const std::string &target) override final;
-    virtual void filterAddDestinationTarget (const std::string &filter, const std::string &target) override final;
+    virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+    virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
     virtual void send (interface_handle sourceHandle,
                        const std::string &destination,
                        const char *data,

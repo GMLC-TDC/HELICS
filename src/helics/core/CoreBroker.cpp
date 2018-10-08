@@ -137,27 +137,27 @@ uint16_t CoreBroker::getNextAirlockIndex()
 	return index;
 }
 
-void CoreBroker::dataLink (const std::string &source, const std::string &target)
+void CoreBroker::dataLink (const std::string &publication, const std::string &input)
 {
     ActionMessage M (CMD_DATA_LINK);
-    M.name = source;
-    M.setStringData (target);
+    M.name = publication;
+    M.setStringData (input);
     addActionMessage (std::move (M));
 }
 
-void CoreBroker::filterAddSourceTarget (const std::string &filter, const std::string &target)
+void CoreBroker::addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint)
 {
     ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
-    M.setStringData (target);
+    M.setStringData (endpoint);
     addActionMessage (std::move (M));
 }
 
-void CoreBroker::filterAddDestinationTarget (const std::string &filter, const std::string &target)
+void CoreBroker::addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint)
 {
     ActionMessage M (CMD_FILTER_LINK);
     M.name = filter;
-    M.setStringData (target);
+    M.setStringData (endpoint);
     setActionFlag (M, destination_target);
     addActionMessage (std::move (M));
 }

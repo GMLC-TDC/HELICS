@@ -1,3 +1,3 @@
 function varargout = helicsCoreDataLink(varargin)
-  [varargout{1:nargout}] = helicsMEX(50, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(52, varargin{:});
 end

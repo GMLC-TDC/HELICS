@@ -1,3 +1,3 @@
 function varargout = helicsFederateGetInputCount(varargin)
-  [varargout{1:nargout}] = helicsMEX(172, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(176, varargin{:});
 end

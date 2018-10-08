@@ -58,14 +58,14 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    endpoint_id_t registerEndpoint (const std::string &name, const std::string &type = "");
+    endpoint_id_t registerEndpoint (const std::string &name=std::string(), const std::string &type = std::string());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    endpoint_id_t registerGlobalEndpoint (const std::string &name, const std::string &type = "");
+    endpoint_id_t registerGlobalEndpoint (const std::string &name, const std::string &type = std::string());
     virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set Message interfaces

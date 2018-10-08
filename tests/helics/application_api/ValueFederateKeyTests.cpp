@@ -339,6 +339,25 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_late, bdata::make (
     BOOST_CHECK (res);
 }
 
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_late_switch, bdata::make (core_types_all), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    auto core = vFed1->getCorePointer ();
+
+   
+    auto inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    core->dataLink ("pub1", "inp1");
+    core = nullptr;
+    // register the publications
+    auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
+}
+
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_direct1, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 2);
