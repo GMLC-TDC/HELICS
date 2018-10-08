@@ -249,6 +249,34 @@ void MessageFederateManager::setEndpointOption(endpoint_id_t id, int32_t option,
 	}
 }
 
+
+void MessageFederateManager::addSourceFilter(endpoint_id_t id, const std::string &filterName)
+{
+    auto eptHandle = local_endpoints.lock_shared ();
+    if (isValidIndex (id.value (), *eptHandle))
+    {
+        coreObject->addSourceTarget ((*eptHandle)[id.value ()]->handle, filterName);
+    }
+    else
+    {
+        throw (InvalidIdentifier ("Endpoint Id is invalid"));
+    }
+ }
+
+/** add a named filter to an endpoint for all message going to the endpoint*/
+void MessageFederateManager::addDestinationFilter(endpoint_id_t id, const std::string &filterName)
+{
+    auto eptHandle = local_endpoints.lock_shared ();
+    if (isValidIndex (id.value (), *eptHandle))
+    {
+        coreObject->addDestinationTarget ((*eptHandle)[id.value ()]->handle, filterName);
+    }
+    else
+    {
+        throw (InvalidIdentifier ("Endpoint Id is invalid"));
+    }
+ }
+
 void MessageFederateManager::registerCallback (const std::function<void(endpoint_id_t, Time)> &callback)
 {
     std::lock_guard<std::mutex> eLock (endpointLock);

@@ -77,6 +77,18 @@ void TcpConnection::setErrorCall (
     }
 }
 
+void TcpConnection::setLoggingFunction(std::function<void(int loglevel, const std::string &logMessage)> logFunc)
+{
+    if (state == connection_state_t::prestart)
+    {
+        logFunction = std::move (logFunc);
+    }
+    else
+    {
+        throw (std::runtime_error ("cannot set logging function after socket is started"));
+    }
+}
+
 void TcpConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
     if (triggerhalt)
@@ -168,7 +180,7 @@ void TcpConnection::close ()
     boost::system::error_code ec;
     if (socket_.is_open ())
     {
-        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
+        socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
@@ -194,7 +206,7 @@ void TcpConnection::closeNoWait ()
     boost::system::error_code ec;
     if (socket_.is_open ())
     {
-        socket_.shutdown (boost::asio::ip::tcp::socket::shutdown_both, ec);
+        socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
             std::cerr << "error occurred sending shutdown::" << ec << std::endl;
@@ -319,15 +331,15 @@ bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
     }
 }
 
-TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
+TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, tcp::endpoint &ep)
     : acceptor_ (io_service), endpoint_ (ep)
 {
     acceptor_.open (ep.protocol ());
 }
 
 TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, int port)
-    : acceptor_ (io_service, boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), port)),
-      endpoint_ (boost::asio::ip::tcp::v4 (), port), state (accepting_state_t::connected)
+    : acceptor_ (io_service, tcp::endpoint (tcp::v4 (), port)),
+      endpoint_ (tcp::v4 (), port), state (accepting_state_t::connected)
 {
 }
 

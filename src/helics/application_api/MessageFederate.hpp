@@ -212,6 +212,10 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 	/** set an endpoint option */
 	void setEndpointOption(endpoint_id_t id, int32_t option, bool option_value = true);
 
+	/** add a named filter to an endpoint for all message coming from the endpoint*/
+	void addSourceFilter (endpoint_id_t id, const std::string &filterName);
+    /** add a named filter to an endpoint for all message going to the endpoint*/
+    void addDestinationFilter (endpoint_id_t id, const std::string &filterName);
 
     virtual void disconnect () override;
 

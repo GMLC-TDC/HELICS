@@ -57,7 +57,8 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
     void setErrorCall (std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc);
-
+    /** set a logging function */
+    void setLoggingFunction (std::function<void(int loglevel, const std::string &logMessage)> logFunc);
     /** send raw data
     @throws boost::system::system_error on failure*/
     size_t send (const void *buffer, size_t dataLength);
@@ -150,6 +151,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     TriggerVariable connected;  //!< variable indicating connectivity
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorCall;
+    std::function<void(int level, const std::string &logMessage)> logFunction;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
 
     void connect_handler(const boost::system::error_code &error);

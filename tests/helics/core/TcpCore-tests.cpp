@@ -486,7 +486,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 {
-    std::this_thread::sleep_for(500ms);
+    std::this_thread::sleep_for(400ms);
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::TCP, initializationString);
@@ -500,7 +500,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:24220");
+    BOOST_CHECK_EQUAL (ccore->getAddress ().compare(0,13, "localhost:242"),0);
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;

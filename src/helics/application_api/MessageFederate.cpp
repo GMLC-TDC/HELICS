@@ -439,4 +439,14 @@ void MessageFederate::setEndpointOption(endpoint_id_t id, int32_t option, bool o
 	mfManager->setEndpointOption(id, option, option_value);
 }
 
+void MessageFederate::addSourceFilter(endpoint_id_t id, const std::string &filterName)
+{
+    mfManager->addSourceFilter (id, filterName);
+}
+
+void MessageFederate::addDestinationFilter(endpoint_id_t id, const std::string &filterName)
+{
+    mfManager->addDestinationFilter (id, filterName);
+}
+
 }  // namespace helics

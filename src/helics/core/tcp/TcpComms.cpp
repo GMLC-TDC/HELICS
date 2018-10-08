@@ -18,11 +18,6 @@ namespace tcp
 {
 using boost::asio::ip::tcp;
 
-static inline auto tcpnet (interface_networks net)
-{
-    return (net != interface_networks::ipv6) ? tcp::v4 () : tcp::v6 ();
-}
-
 TcpComms::TcpComms () noexcept : NetworkCommsInterface (interface_type::tcp) {}
 
 int TcpComms::getDefaultBrokerPort () const { return DEFAULT_TCP_BROKER_PORT_NUMBER; }
