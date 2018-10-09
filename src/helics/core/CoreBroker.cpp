@@ -714,7 +714,16 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 if (isRootc)
                 {
-                    // TODO:: not decided what to do here yet need a buffer
+					if (checkActionFlag(command, destination_target))
+					{
+                        unknownHandles.addDestinationFilterLink (command.name,
+                                                                 command.getString (targetStringLoc));
+					}
+					else
+					{
+                        unknownHandles.addSourceFilterLink (command.name,
+                                                                 command.getString (targetStringLoc));
+					}
                 }
                 else
                 {
@@ -1596,10 +1605,7 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
         m.setStringData (handleInfo.type, handleInfo.units);
         transmit (getRoute (m.dest_id), std::move (m));
     }
-    if (!subHandles.empty ())
-    {
-        unknownHandles.clearPublication (handleInfo.key);
-    }
+   
     auto Pubtargets = unknownHandles.checkForLinks (handleInfo.key);
     for (auto sub : Pubtargets)
     {
@@ -1607,6 +1613,10 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
         m.name = sub;
         m.setSource (handleInfo.handle);
         checkForNamedInterface (m);
+    }
+    if (!(subHandles.empty () && Pubtargets.empty()))
+    {
+        unknownHandles.clearPublication (handleInfo.key);
     }
 }
 
@@ -1659,7 +1669,26 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
         transmit (getRoute (global_federate_id_t (m.dest_id)), m);
     }
 
-    if (!Handles.empty ())
+	
+    auto FiltDestTargets = unknownHandles.checkForFilterDestTargets (handleInfo.key);
+    for (auto target : FiltDestTargets)
+    {
+        ActionMessage m (CMD_ADD_NAMED_ENDPOINT);
+        m.name = target;
+        m.setSource (handleInfo.handle);
+        setActionFlag (m, destination_target);
+        checkForNamedInterface (m);
+    }
+
+	auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets (handleInfo.key);
+    for (auto target : FiltSourceTargets)
+    {
+        ActionMessage m (CMD_ADD_NAMED_ENDPOINT);
+        m.name = target;
+        m.setSource (handleInfo.handle);
+        checkForNamedInterface (m);
+    }
+    if (!(Handles.empty () && FiltDestTargets.empty () && FiltSourceTargets.empty ()))
     {
         unknownHandles.clearFilter (handleInfo.key);
     }

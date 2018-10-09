@@ -34,29 +34,23 @@ void UnknownHandleManager::addDataLink (const std::string &source, const std::st
     unknown_links.emplace (source, target);
 }
 
-/** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInputs (const std::string &newInput)
+void UnknownHandleManager::addSourceFilterLink(const std::string &filter, const std::string &endpoint)
 {
-    std::vector<targetInfo> targets;
-    auto rp = unknown_inputs.equal_range (newInput);
-    if (rp.first != unknown_inputs.end ())
-    {
-        auto it = rp.first;
-        while (it != rp.second)
-        {
-            targets.push_back (it->second);
-            ++it;
-        }
-    }
-    return targets;
+    unknown_src_filters.emplace (filter, endpoint);
 }
-/** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo>
-UnknownHandleManager::checkForPublications (const std::string &newPublication)
+
+void UnknownHandleManager::addDestinationFilterLink(const std::string &filter, const std::string &endpoint)
 {
-    std::vector<targetInfo> targets;
-    auto rp = unknown_publications.equal_range (newPublication);
-    if (rp.first != unknown_publications.end ())
+    unknown_dest_filters.emplace (filter, endpoint);
+}
+
+static auto
+getTargets (const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo> &tmap,
+            const std::string &target)
+{
+    std::vector<UnknownHandleManager::targetInfo> targets;
+    auto rp = tmap.equal_range (target);
+    if (rp.first != tmap.end ())
     {
         auto it = rp.first;
         while (it != rp.second)
@@ -68,11 +62,12 @@ UnknownHandleManager::checkForPublications (const std::string &newPublication)
     return targets;
 }
 
-std::vector<std::string> UnknownHandleManager::checkForLinks (const std::string &newSource)
+static auto getTargets (const std::unordered_multimap<std::string, std::string> &tmap,
+                        const std::string &target)
 {
     std::vector<std::string> targets;
-    auto rp = unknown_links.equal_range (newSource);
-    if (rp.first != unknown_links.end ())
+    auto rp = tmap.equal_range (target);
+    if (rp.first != tmap.end ())
     {
         auto it = rp.first;
         while (it != rp.second)
@@ -82,47 +77,52 @@ std::vector<std::string> UnknownHandleManager::checkForLinks (const std::string 
         }
     }
     return targets;
+}
+
+  /** specify a found input*/
+std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInputs (const std::string &newInput) const
+{
+    return getTargets (unknown_inputs, newInput);
+}
+/** specify a found input*/
+std::vector<UnknownHandleManager::targetInfo>
+UnknownHandleManager::checkForPublications (const std::string &newPublication) const
+{
+    return getTargets (unknown_publications, newPublication);
+}
+
+std::vector<std::string> UnknownHandleManager::checkForLinks (const std::string &newSource) const
+{
+    return getTargets (unknown_links, newSource);
 }
 
 /** specify a found input*/
 std::vector<UnknownHandleManager::targetInfo>
-UnknownHandleManager::checkForEndpoints (const std::string &newEndpoint)
+UnknownHandleManager::checkForEndpoints (const std::string &newEndpoint) const
 {
-    std::vector<targetInfo> targets;
-    auto rp = unknown_endpoints.equal_range (newEndpoint);
-    if (rp.first != unknown_endpoints.end ())
-    {
-        auto it = rp.first;
-        while (it != rp.second)
-        {
-            targets.push_back (it->second);
-            ++it;
-        }
-    }
-    return targets;
+    return getTargets (unknown_endpoints, newEndpoint);
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilters (const std::string &newFilter)
+std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilters (const std::string &newFilter) const
 {
-    std::vector<targetInfo> targets;
-    auto rp = unknown_filters.equal_range (newFilter);
-    if (rp.first != unknown_filters.end ())
-    {
-        auto it = rp.first;
-        while (it != rp.second)
-        {
-            targets.push_back (it->second);
-            ++it;
-        }
-    }
-    return targets;
+    return getTargets (unknown_filters, newFilter);
+}
+
+std::vector<std::string> UnknownHandleManager::checkForFilterSourceTargets (const std::string &newFilter) const
+{
+    return getTargets (unknown_src_filters, newFilter);
+}
+
+std::vector<std::string> UnknownHandleManager::checkForFilterDestTargets (const std::string &newFilter) const
+{
+    return getTargets (unknown_dest_filters, newFilter);
 }
 
 bool UnknownHandleManager::hasUnknowns () const
 {
     return (!(unknown_publications.empty () && unknown_endpoints.empty () && unknown_inputs.empty () &&
-              unknown_filters.empty ()));
+              unknown_filters.empty () && unknown_links.empty() && unknown_dest_filters.empty() && unknown_src_filters.empty()));
 }
 
 /** specify a found input*/
@@ -132,6 +132,7 @@ void UnknownHandleManager::clearInput (const std::string &newInput) { unknown_in
 void UnknownHandleManager::clearPublication (const std::string &newPublication)
 {
     unknown_publications.erase (newPublication);
+    unknown_links.erase (newPublication);
 }
 /** specify a found input*/
 void UnknownHandleManager::clearEndpoint (const std::string &newEndpoint)
@@ -140,6 +141,11 @@ void UnknownHandleManager::clearEndpoint (const std::string &newEndpoint)
 }
 
 /** specify a found input*/
-void UnknownHandleManager::clearFilter (const std::string &newFilter) { unknown_filters.erase (newFilter); }
+void UnknownHandleManager::clearFilter (const std::string &newFilter) 
+{ 
+	unknown_filters.erase (newFilter);
+    unknown_src_filters.erase (newFilter);
+    unknown_dest_filters.erase (newFilter);
+}
 
 }  // namespace helics

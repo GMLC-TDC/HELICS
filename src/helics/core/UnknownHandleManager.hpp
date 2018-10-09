@@ -26,6 +26,10 @@ class UnknownHandleManager
     std::unordered_multimap<std::string, targetInfo> unknown_filters;  //!< map of all unknown filters
     std::unordered_multimap<std::string, std::string>
       unknown_links;  //!< map where links on either side is not known
+    std::unordered_multimap<std::string, std::string>
+      unknown_src_filters;  //!< map connecting source filters to endpoints
+    std::unordered_multimap<std::string, std::string>
+      unknown_dest_filters;  //!< map connecting destination filters to endpoints
   public:
     /** default constructor*/
     UnknownHandleManager () = default;
@@ -40,18 +44,23 @@ class UnknownHandleManager
     void addUnknownFilter (const std::string &key, global_handle target, uint16_t flags);
     /** add a data link where neither side is known*/
     void addDataLink (const std::string &source, const std::string &target);
+    void addSourceFilterLink (const std::string &filter, const std::string &endpoint);
+    void addDestinationFilterLink (const std::string &filter, const std::string &endpoint);
     /** specify a found input*/
-    std::vector<targetInfo> checkForInputs (const std::string &newInput);
+    std::vector<targetInfo> checkForInputs (const std::string &newInput) const;
     /** specify a found input*/
-    std::vector<targetInfo> checkForPublications (const std::string &newPublication);
+    std::vector<targetInfo> checkForPublications (const std::string &newPublication) const;
     /** specify a found input*/
-    std::vector<targetInfo> checkForEndpoints (const std::string &newEndpoint);
+    std::vector<targetInfo> checkForEndpoints (const std::string &newEndpoint) const;
 
     /** specify a found Source Filter*/
-    std::vector<targetInfo> checkForFilters (const std::string &newFilter);
+    std::vector<targetInfo> checkForFilters (const std::string &newFilter) const;
 
 	/** specify found data links*/
-    std::vector<std::string> checkForLinks (const std::string &newSource);
+    std::vector<std::string> checkForLinks (const std::string &newSource) const;
+
+	std::vector<std::string> checkForFilterSourceTargets (const std::string &newFilter) const;
+    std::vector<std::string> checkForFilterDestTargets (const std::string &newFilter) const;
     /** specify a found input*/
     void clearInput (const std::string &newInput);
     /** specify a found input*/

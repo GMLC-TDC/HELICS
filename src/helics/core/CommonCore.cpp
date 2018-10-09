@@ -2591,16 +2591,7 @@ void CommonCore::registerInterface (ActionMessage &command)
             createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
                           command.getString (typeStringLoc), command.getString (typeOutStringLoc),
                           checkActionFlag (command, clone_flag));
-            if (!hasFilters)
-            {
-                hasFilters = true;
-                if (timeCoord->addDependent (higher_broker_id))
-                {
-                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
-                    transmit (higher_broker_id, add);
-                    timeCoord->addDependency (higher_broker_id);
-                }
-            }
+            
             break;
         default:
             return;
@@ -2704,11 +2695,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
     break;
     case CMD_ADD_NAMED_FILTER:
     {
-        auto pub = loopHandles.getFilter (command.name);
-        if (pub != nullptr)
+        auto filt = loopHandles.getFilter (command.name);
+        if (filt != nullptr)
         {
             command.setAction (CMD_ADD_ENDPOINT);
-            command.setDestination (pub->handle);
+            command.setDestination (filt->handle);
             command.name.clear ();
             addTargetToInterface (command);
             command.setAction (CMD_ADD_FILTER);
@@ -2784,6 +2775,16 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
             if (filthandle != nullptr)
             {
                 filthandle->used = true;
+                if (!hasFilters)
+                {
+                    hasFilters = true;
+                    if (timeCoord->addDependent (higher_broker_id))
+                    {
+                        ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
+                        transmit (higher_broker_id, add);
+                        timeCoord->addDependency (higher_broker_id);
+                    }
+                }
             }
         }
     }
