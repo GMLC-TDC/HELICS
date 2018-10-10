@@ -61,8 +61,11 @@ enum class action_t : int32_t
 
     cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
     cmd_time_unblock = 41,  //!< clear a time block
+	cmd_time_barrier_request=42, //!< request a time barrier
+	cmd_time_barrier=43, //!< setup a global time barrier
+	cmd_time_barrier_clear=44, //!< clear a global time barrier
 
-    cmd_pub = 45,  //!< publish a value
+    cmd_pub = 52,  //!< publish a value
     cmd_bye = 2000,  //!< message stating this is the last communication from a federate
     cmd_log = 55,  //!< log a message with the root broker
     cmd_warning = 9990,  //!< indicate some sort of warning
@@ -161,6 +164,10 @@ enum class action_t : int32_t
 
 #define CMD_TIME_BLOCK action_message_def::action_t::cmd_time_block
 #define CMD_TIME_UNBLOCK action_message_def::action_t::cmd_time_unblock
+
+#define CMD_TIME_BARRIER_REQUEST action_message_def::action_t::cmd_time_barrier_request
+#define CMD_TIME_BARRIER action_message_def::action_t::cmd_time_barrier
+#define CMD_TIME_BARRIER_CLEAR action_message_def::action_t::cmd_time_barrier_clear
 
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
