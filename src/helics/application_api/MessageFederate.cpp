@@ -75,20 +75,12 @@ void MessageFederate::initializeToExecuteStateTransition () { mfManager->initial
 
 endpoint_id_t MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
-    if (state == op_states::startup)
-    {
         return mfManager->registerEndpoint ((!eptName.empty())?(getName () + separator_ + eptName):eptName, type);
-    }
-    throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
 }
 
 endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
 {
-    if (state == op_states::startup)
-    {
-        return mfManager->registerEndpoint (eptName, type);
-    }
-    throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
+    return mfManager->registerEndpoint (eptName, type);
 }
 
 void MessageFederate::registerInterfaces (const std::string &configString)
@@ -99,10 +91,6 @@ void MessageFederate::registerInterfaces (const std::string &configString)
 
 void MessageFederate::registerMessageInterfaces(const std::string &configString)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
-    }
     if (hasTomlExtension(configString))
     {
         registerMessageInterfacesToml (configString);
@@ -169,24 +157,6 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
             }
         }
     }
-    /*
-    // retrieve the known paths
-    if (doc.isMember("knownDestinations"))
-    {
-        auto kp = doc["knownDestinations"];
-        if (kp.isString())
-        {
-           // registerKnownCommunicationPath(epid, kp.asString());
-        }
-        else if (kp.isArray())
-        {
-           for (const auto &path : kp)
-            {
-           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
-            }
-        }
-    }
-    */
 }
 
 void MessageFederate::registerMessageInterfacesToml (const std::string &tomlString)
@@ -256,45 +226,20 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             }
         }
     }
-    /*
-    // retrieve the known paths
-    if (doc.isMember("knownDestinations"))
-    {
-        auto kp = doc["knownDestinations"];
-        if (kp.isString())
-        {
-           // registerKnownCommunicationPath(epid, kp.asString());
-        }
-        else if (kp.isArray())
-        {
-           for (const auto &path : kp)
-            {
-           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
-            }
-        }
-    }
-    */
+   
 }
 
 void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &key)
 {
-    if (state == op_states::startup)
-    {
         mfManager->subscribe (endpoint, key);
         return;
-    }
-    throw (InvalidFunctionCall ("subscriptions can only be created in startup mode"));
 }
 
 void MessageFederate::registerKnownCommunicationPath (endpoint_id_t localEndpoint,
                                                       const std::string &remoteEndpoint)
 {
-    if (state == op_states::startup)
-    {
         mfManager->registerKnownCommunicationPath (localEndpoint, remoteEndpoint);
         return;
-    }
-    throw (InvalidFunctionCall ("paths can only be registered in startup mode"));
 }
 
 bool MessageFederate::hasMessage () const
@@ -360,12 +305,7 @@ std::unique_ptr<Message> MessageFederate::getMessage (endpoint_id_t endpoint)
 
 void MessageFederate::sendMessage (endpoint_id_t source, const std::string &dest, const data_view &data)
 {
-    if (state == op_states::execution)
-    {
         mfManager->sendMessage (source, dest, data);
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
 }
 
 void MessageFederate::sendMessage (endpoint_id_t source,
@@ -373,32 +313,18 @@ void MessageFederate::sendMessage (endpoint_id_t source,
                                    const data_view &data,
                                    Time sendTime)
 {
-    if (state == op_states::execution)
-    {
         mfManager->sendMessage (source, dest, data, sendTime);
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
 }
 
 void MessageFederate::sendMessage (endpoint_id_t source, std::unique_ptr<Message> message)
 {
-    if (state == op_states::execution)
-    {
         mfManager->sendMessage (source, std::move (message));
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
 }
 
 void MessageFederate::sendMessage (endpoint_id_t source, const Message &message)
 {
-    if (state == op_states::execution)
-    {
-        mfManager->sendMessage (source, std::make_unique<Message> (message));
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
+    
+    mfManager->sendMessage (source, std::make_unique<Message> (message));
 }
 
 endpoint_id_t MessageFederate::getEndpointId (const std::string &eptName) const

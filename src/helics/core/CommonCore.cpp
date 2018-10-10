@@ -792,10 +792,6 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     {
         throw (InvalidIdentifier ("federateID not valid (registerNamedInput)"));
     }
-    if (fed->getState () != HELICS_CREATED)
-    {
-        throw (InvalidFunctionCall ("control Inputs must be registered before calling enterInitializingMode"));
-    }
     auto ci = handles.read ([&key](auto &hand) { return hand.getInput (key); });
     if (ci != nullptr)  // this key is already found
     {
@@ -836,10 +832,6 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     if (fed == nullptr)
     {
         throw (InvalidIdentifier ("federateID not valid (registerPublication)"));
-    }
-    if (fed->getState () != HELICS_CREATED)
-    {
-        throw (InvalidFunctionCall ("publications must be registered before calling enterInitializingMode"));
     }
     LOG_INTERFACES (parent_broker_id, fed->getIdentifier (), fmt::format ("registering PUB {}", key));
     auto pub = handles.read ([&key](auto &hand) { return hand.getPublication (key); });
@@ -1118,10 +1110,6 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     {
         throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
     }
-    if (fed->getState () != HELICS_CREATED)
-    {
-        throw (InvalidFunctionCall ("endpoints must be registered before calling enterInitializingMode"));
-    }
     auto ept = handles.read ([&name](auto &hand) { return hand.getEndpoint (name); });
     if (ept != nullptr)
     {
@@ -1157,10 +1145,6 @@ interface_handle CommonCore::getEndpoint (federate_id_t federateID, const std::s
 interface_handle
 CommonCore::registerFilter (const std::string &filterName, const std::string &type_in, const std::string &type_out)
 {
-    if (brokerState == operating)
-    {
-        throw (InvalidFunctionCall ("Core has already entered initialization state"));
-    }
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
@@ -1194,10 +1178,6 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
                                                     const std::string &type_in,
                                                     const std::string &type_out)
 {
-    if (brokerState == operating)
-    {
-        throw (InvalidFunctionCall ("Core has already entered initialization state"));
-    }
     // check to make sure the name isn't already used
     if (!filterName.empty ())
     {
@@ -1306,7 +1286,7 @@ void CommonCore::addDependency (federate_id_t federateID, const std::string &fed
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
     {
-        throw (InvalidIdentifier ("federateID not valid (registerEndpoint)"));
+        throw (InvalidIdentifier ("federateID not valid (registerDependency)"));
     }
     ActionMessage search (CMD_SEARCH_DEPENDENCY);
     search.source_id = fed->global_id.load ();

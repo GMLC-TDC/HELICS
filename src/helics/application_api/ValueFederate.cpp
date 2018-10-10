@@ -67,10 +67,6 @@ ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 publication_id_t
 ValueFederate::registerPublication (const std::string &key, const std::string &type, const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
-    }
     return vfManager->registerPublication ((!key.empty())?(getName () + separator_ + key):key, type, units);
 }
 
@@ -78,29 +74,17 @@ publication_id_t ValueFederate::registerGlobalPublication (const std::string &ke
                                                            const std::string &type,
                                                            const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
-    }
     return vfManager->registerPublication (key, type, units);
 }
 
 input_id_t
 ValueFederate::registerInput(const std::string &key, const std::string &type, const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
-    }
     return vfManager->registerInput ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
 }
 
 input_id_t ValueFederate::registerGlobalInput(const std::string &key, const std::string &type, const std::string &units)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register publication after entering initialization mode"));
-    }
     return vfManager->registerInput (key, type, units);
 }
 
@@ -140,10 +124,6 @@ void ValueFederate::registerInterfaces (const std::string &configString)
 
 void ValueFederate::registerValueInterfaces (const std::string &configString)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
-    }
     if (hasTomlExtension (configString))
 	{
         registerValueInterfacesToml (configString);
