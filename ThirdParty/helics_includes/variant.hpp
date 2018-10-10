@@ -242,7 +242,7 @@ namespace std {
 #define MPARK_TYPE_PACK_ELEMENT
 #endif
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304 && !(defined(_MSC_VER) && _MSC_VER != 1915)
 #define MPARK_CPP14_CONSTEXPR
 #endif
 
@@ -793,7 +793,7 @@ namespace mpark {
 
   class bad_variant_access : public std::exception {
     public:
-    virtual const char *what() const noexcept { return "bad_variant_access"; }
+    virtual const char *what() const noexcept override { return "bad_variant_access"; }
   };
 
   [[noreturn]] inline void throw_bad_variant_access() {
