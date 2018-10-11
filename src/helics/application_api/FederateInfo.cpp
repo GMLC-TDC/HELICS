@@ -28,6 +28,8 @@ static const ArgDescriptors InfoArgs{
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
   {"core,c"s, "type of the core to connect to"s},
+  {"type"s, "type of the core to connect to"s},
+  {"coretype"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
   {"timedelta"s, "the time delta of the federate"s},
@@ -137,6 +139,14 @@ static void loadFlags(FederateInfo &fi, const std::string &flags)
     if (vm.count ("core") > 0)
     {
         coreType = helics::coreTypeFromString (vm["core"].as<std::string> ());
+    }
+    if (vm.count ("type") > 0)
+    {
+        coreType = helics::coreTypeFromString (vm["type"].as<std::string> ());
+    }
+    if (vm.count ("coretype") > 0)
+    {
+        coreType = helics::coreTypeFromString (vm["coretype"].as<std::string> ());
     }
 
     coreInitString = "1";
