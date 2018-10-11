@@ -22,26 +22,8 @@ HELICS defines three specific types of federates defined by the nature of the me
 ## Federate Configuration Options via JSON ##
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. This file will be read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
-As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be suprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
+As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be suprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange and in Section xxxxxxx we'll look at the timing parameter. Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
 
-
-### Timing/Sychronization Options ###
-```
-{ 
-"name":"generic_federate", 
-...
-"uninterruptible":false,
-"period":  1.0,
-"offset": 0.0,
-...
-```
-* **uniterruptible [false]** - Normally, a federate will be granted a time earlier than it requested when it recieves a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag to `true` will prevent premature time grants.
-
-* **period [xxxxxxxx]** - Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. xxxxxxx units? Relatedly...
-
-* **offset [0]** - There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place. xxxxxxx - units?
-
-  Setting both `period` and `offset`, will result in the times granted to the federate in question being constrained to `grantTime = n*period + offset`
 
 ### Data Exchange Options ###
 ```
