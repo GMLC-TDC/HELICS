@@ -1,6 +1,6 @@
 # Federate info
 
-The FederateInfo structure contains information that can be passed to a federation upon construction. Some information can be updated continuously other can be only be changed before initializationMOde is entered.
+The FederateInfo structure contains information that can be passed to a federation upon construction. Some information can be updated continuously other can be only be changed before initializationMode is entered.
 
 **separator [char]**
 
@@ -12,7 +12,8 @@ The name of the core to connect with,  can be left blank to either find an avail
 
 **CoreInitString [string]**
 
-Command line arguments that are passed to the core when starting it.  Some examples are
+Command line arguments that are passed to the core when starting it.  Some examples are:
+
   - "2" to specify 2 federates will connect
   - "1 --broker=192.168.2.3:23444"  to specify a single federate and to connect to a broker at ipaddress 192.168.2.3 port 23444
 
