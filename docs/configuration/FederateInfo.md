@@ -17,6 +17,7 @@ Command line arguments that are passed to the core when starting it.  Some examp
   - "1 --broker=192.168.2.3:23444"  to specify a single federate and to connect to a broker at ipaddress 192.168.2.3 port 23444
 
 **coreType[enum]**
+
 Specify which type of core to use.  see [core types](CoreTypes.md) for more details
   - DEFAULT = 0,  //!< pick a core type depending on compile configuration usually either ZMQ if available or UDP
   - ZMQ = 1,  //!< use the Zero MQ networking protocol
@@ -31,7 +32,7 @@ Specify which type of core to use.  see [core types](CoreTypes.md) for more deta
 
 ## Timing control variables
 
-see [timing](Timing.md) for more details.
+see [timing](./Timing.md) for more details.
 
 **timeDelta[time]**
 
@@ -85,7 +86,6 @@ flag indicating values should be discarded if they are not changed from previous
 flag indicating that the federate should only grant when no more messages can be received at the current time
  - realtime = false
 flag indicating that the federate is required to operate in real time.  the federate must have a non-zero period
-
 
 ## Other Controls
 
