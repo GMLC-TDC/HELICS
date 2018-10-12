@@ -18,7 +18,8 @@ Command line arguments that are passed to the core when starting it.  Some examp
 
 **coreType[enum]**
 
-Specify which type of core to use.  see [core types](CoreTypes.md) for more details
+Specify which type of core to use. See [core types](./CoreTypes) for more details
+
   - DEFAULT = 0,  //!< pick a core type depending on compile configuration usually either ZMQ if available or UDP
   - ZMQ = 1,  //!< use the Zero MQ networking protocol
   - MPI = 2,  //!< use MPI for operation on a parallel cluster
@@ -32,7 +33,7 @@ Specify which type of core to use.  see [core types](CoreTypes.md) for more deta
 
 ## Timing control variables
 
-see [timing](./Timing.md) for more details.
+see [timing](./Timing) for more details.
 
 **timeDelta[time]**
 
