@@ -555,7 +555,7 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateFinalize(fed1);
 			helics.helicsFederateFinalize(fed2);
 			helics.helicsFederateFree(fed1);
-			helics.helicsFederateFinalize(fed1);
+			helics.helicsFederateFinalize(fed2);
 			helics.helicsFederateFree(fed2);
 			helics.helicsFederateInfoFree(fedInfo2);
 			helics.helicsBrokerDisconnect(broker3);

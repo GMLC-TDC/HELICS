@@ -5,6 +5,8 @@ import com.java.helics.SWIGTYPE_p_void;
 import com.java.helics.helics;
 import com.java.helics.federate_state;
 import com.java.helics.helics_filter_type_t;
+import com.java.helics.helics_time_properties;
+import com.java.helics.helics_int_properties;
 
 public class TestMessageFilter {
 	public static SWIGTYPE_p_void AddBroker(String core_type) {
@@ -16,59 +18,61 @@ public class TestMessageFilter {
 		assert isconnected == 1;
 		return broker;
 	}
-	
-	public static SWIGTYPE_p_void AddFederate(SWIGTYPE_p_void broker, String core_type, 
-			int count, double deltat, String name_prefix) {
 
-	    // Create Federate Info object that describes the federate properties #
-	    SWIGTYPE_p_void fedinfo = helics.helicsCreateFederateInfo();
+	public static SWIGTYPE_p_void AddFederate(SWIGTYPE_p_void broker, String core_type, int count, double deltat,
+			String name_prefix) {
 
-	    // Set core type from string 
-	    helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
+		// Create Federate Info object that describes the federate properties #
+		SWIGTYPE_p_void fedinfo = helics.helicsCreateFederateInfo();
 
-	    // Federate init string 
-	    String fedinitstring = "--broker=mainbroker --federates="+ Integer.toString(count);
-	    helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
+		// Set core type from string
+		helics.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
 
-	    // Set one second message interval 
-		//TIME_DELTA_PROPERTY = 137
-		helics.helicsFederateInfoSetTimeProperty(fedinfo, 137, deltat);
-	    //status = helics.helicsFederateInfoSetTimeDelta(fedinfo, deltat);
-		//LOG_LEVEL_PROPERTY = 271
-	    helics.helicsFederateInfoSetIntegerProperty(fedinfo, 271, 1);
+		// Federate init string
+		String fedinitstring = "--broker=mainbroker --federates=" + Integer.toString(count);
+		helics.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring);
 
-	    SWIGTYPE_p_void mFed = helics.helicsCreateMessageFederate(name_prefix + "TestA Federate", fedinfo);
-	    
-	    return mFed;
+		// Set one second message interval
+		helics.helicsFederateInfoSetTimeProperty(fedinfo, helics_time_properties.helics_time_property_time_delta.swigValue(), deltat); 
+		helics.helicsFederateInfoSetIntegerProperty(fedinfo, helics_int_properties.helics_int_property_log_level.swigValue(), 1);
+
+		SWIGTYPE_p_void mFed = helics.helicsCreateMessageFederate(name_prefix + "TestA Federate", fedinfo);
+
+		return mFed;
 	}
-	
+
 	public static void FreeFederate(SWIGTYPE_p_void fed) {
-	    helics.helicsFederateFinalize(fed);
+		helics.helicsFederateFinalize(fed);
 
-	    federate_state status = helics.helicsFederateGetState(fed);
-	    assert status.swigValue() == 3;
+		federate_state status = helics.helicsFederateGetState(fed);
+		assert status.swigValue() == 3;
 
-	    helics.helicsFederateFree(fed);
+		helics.helicsFederateFree(fed);
 	}
 
-	
 	public static void test_message_filter_registration(SWIGTYPE_p_void broker) {
 		SWIGTYPE_p_void fFed = AddFederate(broker, "zmq", 1, 1, "filter");
 		SWIGTYPE_p_void mFed = AddFederate(broker, "zmq", 1, 1, "message");
 
-	    helics.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "");
-	    helics.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "");
+		helics.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "");
+		helics.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "");
 
-	    //SWIGTYPE_p_void f1 = helics.helicsFederateRegisterFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter1", "port1");
-	    //SWIGTYPE_p_void f2 = helics.helicsFederateRegisterGlobalFilter (fFed, helics_filter_type_t.helics_custom_filter, "filter2", "port2");
-	    SWIGTYPE_p_void ep1 = helics.helicsFederateRegisterEndpoint (fFed, "fout", "");
-	    //SWIGTYPE_p_void f3 = helics.helicsFederateRegisterFilter (fFed, helics_filter_type_t.helics_custom_filter, "", "filter0/fout");
-
-	    FreeFederate(fFed);
-	    FreeFederate(mFed);
+		SWIGTYPE_p_void f1 = helics.helicsFederateRegisterFilter(fFed, helics_filter_type_t.helics_filtertype_custom,
+				"filter1");
+		helics.helicsFilterAddSourceTarget(f1, "port1");
+		
+		SWIGTYPE_p_void f2 = helics.helicsFederateRegisterGlobalFilter(fFed, helics_filter_type_t.helics_filtertype_custom,
+				"filter2");
+		helics.helicsFilterAddDestinationTarget(f2, "port2");
+		
+		SWIGTYPE_p_void ep1 = helics.helicsFederateRegisterEndpoint(fFed, "fout", "");
+		SWIGTYPE_p_void f3 = helics.helicsFederateRegisterFilter(fFed, helics_filter_type_t.helics_filtertype_custom, "");
+		helics.helicsFilterAddDestinationTarget(f3, "filter0/fout");
+		
+		FreeFederate(fFed);
+		FreeFederate(mFed);
 	}
 
-	
 	public static void main(String[] args) {
 		SWIGTYPE_p_void broker = AddBroker("zmq");
 		String initstring = "--broker=";
@@ -80,5 +84,5 @@ public class TestMessageFilter {
 		helics.helicsBrokerDisconnect(broker);
 		helics.helicsCloseLibrary();
 	}
-	
+
 }
