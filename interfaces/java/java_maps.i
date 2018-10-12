@@ -1,5 +1,6 @@
 %{
   #include "api-data.h"
+
 %}
 
 //typemap for short maxlen strings
@@ -77,9 +78,11 @@
 {
 	if ($1->error_code!=helics_ok)
 	{
-		// do nothing
+		jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+        (*jenv)->ThrowNew(jenv, clazz, $1->message);
 	}
 }
+
 
 //
 //// typemap for vector input functions
