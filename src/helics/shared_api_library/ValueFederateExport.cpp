@@ -410,7 +410,7 @@ helics_publication helicsFederateGetPublication (helics_federate fed, const char
     try
     {
         auto id = fedObj->getPublicationId (key);
-		if (id == helics::invalid_id_value)
+		if (!id.isValid())
 		{
             err->error_code = helics_error_invalid_argument;
             err->message = invalidPubName;
@@ -442,7 +442,7 @@ helics_input helicsFederateGetInput (helics_federate fed, const char *key, helic
     try
     {
         auto id = fedObj->getInputId (key);
-        if (id == helics::invalid_id_value)
+        if (!id.isValid())
         {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidInputName;
@@ -474,7 +474,7 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
     try
     {
         auto id = fedObj->getSubscriptionId (key);
-        if (id == helics::invalid_id_value)
+        if (!id.isValid())
         {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidSubKey;

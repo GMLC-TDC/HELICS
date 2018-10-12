@@ -179,7 +179,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
         {
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
+            portReply.setExtraData(PortNumber);
             return portReply;
         }
         break;
@@ -189,8 +189,8 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
             auto openPort = (M.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, M.name);
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
-            portReply.source_handle = openPort;
+            portReply.source_id = global_federate_id_t(PortNumber);
+            portReply.setExtraData(openPort);
             portReply.counter = M.counter;
             return portReply;
         }
@@ -232,7 +232,7 @@ void NetworkCommsInterface::loadPortDefinitions(const ActionMessage &M)
     {
         if (M.messageID == PORT_DEFINITIONS)
         {
-            PortNumber = M.source_handle;
+            PortNumber = M.getExtraData();
             if ((openPorts.getDefaultStartingPort() < 0))
             {
                 if (PortNumber < getDefaultBrokerPort()+100)

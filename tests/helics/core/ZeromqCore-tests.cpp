@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     comm.setName ("tests");
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
-    comm.transmit (0, helics::CMD_IGNORE);
+    comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
     zmq::message_t rxmsg;
 
     pullSocket.recv (&rxmsg);
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     connected = connected_fut.get ();
     BOOST_REQUIRE (connected);
 
-    comm.transmit (0, helics::CMD_ACK);
+    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::sleep_for (std::chrono::milliseconds (250));
     if (counter2 != 1)
@@ -464,7 +464,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
 
-    comm.transmit (0, helics::CMD_ACK);
+    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::yield();
     if (counter2 != 1)
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm3.transmit (0, helics::CMD_ACK);
+    comm3.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::yield();
     if (counter2 != 2)
@@ -488,9 +488,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (3, comm3.getAddress ());
+    comm2.addRoute (helics::route_id_t(3), comm3.getAddress ());
 
-    comm2.transmit (3, helics::CMD_ACK);
+    comm2.transmit (helics::route_id_t(3), helics::CMD_ACK);
 
     std::this_thread::yield();
     int lcnt = 0;
@@ -507,9 +507,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (4, comm.getAddress ());
+    comm2.addRoute (helics::route_id_t(4), comm.getAddress ());
 
-    comm2.transmit (4, helics::CMD_ACK);
+    comm2.transmit (helics::route_id_t(4), helics::CMD_ACK);
 
     std::this_thread::yield();
     while (counter != 1)

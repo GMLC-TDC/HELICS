@@ -146,7 +146,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
             auto key = getKey (pub);
 
             auto id = vfManager->getPublicationId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -170,7 +170,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
         {
             auto key = getKey (sub);
             auto id = vfManager->getSubscriptionId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -200,7 +200,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
             auto key = getKey (ipt);
 
             auto id = vfManager->getInputId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -240,7 +240,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             auto key = getKey (pub);
 
             auto id = vfManager->getPublicationId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -265,7 +265,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
         {
             auto key = getKey (sub);
             auto id = vfManager->getSubscriptionId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -294,7 +294,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             auto key = getKey (ipt);
 
             auto id = vfManager->getPublicationId (key);
-            if (id != invalid_id_value)
+            if (!id.isValid())
             {
                 continue;
             }
@@ -379,7 +379,7 @@ const std::string &ValueFederate::getPublicationKey (publication_id_t pub_id) co
 publication_id_t ValueFederate::getPublicationId (const std::string &key) const
 {
     auto id = vfManager->getPublicationId (key);
-    if (id == invalid_id_value)
+    if (!id.isValid())
     {
         id = vfManager->getPublicationId (getName () + separator_ + key);
     }

@@ -201,7 +201,7 @@ void UdpComms::queue_tx_function ()
     }
 
     boost::system::error_code error;
-    std::map<int, udp::endpoint> routes;  // for all the other possible routes
+    std::map<route_id_t, udp::endpoint> routes;  // for all the other possible routes
     udp::endpoint broker_endpoint;
 
     if (!brokerTarget_.empty ())
@@ -274,14 +274,14 @@ void UdpComms::queue_tx_function ()
 
     while (true)
     {
-        int route_id;
+        route_id_t route_id;
         ActionMessage cmd;
 
         std::tie (route_id, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == -1)
+            if (route_id == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -296,7 +296,7 @@ void UdpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         udp::resolver::query queryNew (udpnet (interfaceNetwork), interface, port);
 
-                        routes.emplace (cmd.dest_id, *resolver.resolve (queryNew));
+                        routes.emplace (route_id_t(cmd.getExtraData()), *resolver.resolve (queryNew));
                     }
                     catch (std::exception &e)
                     {
@@ -325,7 +325,7 @@ void UdpComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == 0)
+        if (route_id == parent_route_id)
         {
             if (hasBroker)
             {
@@ -340,7 +340,7 @@ void UdpComms::queue_tx_function ()
                 logWarning ("message directed to broker of comm system with no broker, message dropped");
             }
         }
-        else if (route_id == -1)
+        else if (route_id == control_route)
         {  // send to rx thread loop
             transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
             if (error)
@@ -358,7 +358,7 @@ void UdpComms::queue_tx_function ()
                 if (error)
                 {
                     logWarning (
-                      fmt::format ("transmit failure sending to route {}:{}", route_id, error.message ()));
+                      fmt::format ("transmit failure sending to route {}:{}", route_id.baseValue(), error.message ()));
                 }
             }
             else

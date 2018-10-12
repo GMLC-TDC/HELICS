@@ -26,7 +26,7 @@ class endpoint_info
   public:
     std::string name;
     std::string type;
-    endpoint_id_t id = invalid_id_value;
+    endpoint_id_t id;
     interface_handle handle;
     int callbackIndex = -1;
     endpoint_info () = default;

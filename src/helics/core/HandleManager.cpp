@@ -18,7 +18,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
     interface_handle local_id(static_cast<interface_handle::base_type>(handles.size ()));
     std::string actKey = (!key.empty ()) ? key : generateName (what);
     handles.emplace_back ( fed_id, local_id, what, actKey, type, units);
-    addSearchFields (handles.back (), local_id);
+    addSearchFields (handles.back (), local_id.baseValue());
     return handles.back ();
 }
 
@@ -184,7 +184,7 @@ BasicHandleInfo *HandleManager::getEndpoint (const std::string &name)
     auto fnd = endpoints.find (name);
     if (fnd != endpoints.end ())
     {
-        return &handles[fnd->second];
+        return &handles[fnd->second.baseValue()];
     }
     return nullptr;
 }
@@ -194,7 +194,7 @@ const BasicHandleInfo *HandleManager::getEndpoint(const std::string &name) const
     auto fnd = endpoints.find(name);
     if (fnd != endpoints.end())
     {
-        return &handles[fnd->second];
+        return &handles[fnd->second.baseValue ()];
     }
     return nullptr;
 }
@@ -218,7 +218,7 @@ BasicHandleInfo *HandleManager::getPublication (const std::string &name)
     auto fnd = publications.find (name);
     if (fnd != publications.end ())
     {
-        return &(handles[fnd->second]);
+        return &(handles[fnd->second.baseValue ()]);
     }
     return nullptr;
 }
@@ -228,7 +228,7 @@ const BasicHandleInfo *HandleManager::getPublication(const std::string &name) co
     auto fnd = publications.find(name);
     if (fnd != publications.end())
     {
-        return &(handles[fnd->second]);
+        return &(handles[fnd->second.baseValue ()]);
     }
     return nullptr;
 }
@@ -252,7 +252,7 @@ BasicHandleInfo *HandleManager::getInput(const std::string &name)
     auto fnd = inputs.find(name);
     if (fnd != inputs.end())
     {
-        return &(handles[fnd->second]);
+        return &(handles[fnd->second.baseValue ()]);
     }
     return nullptr;
 }
@@ -262,7 +262,7 @@ const BasicHandleInfo *HandleManager::getInput(const std::string &name) const
     auto fnd = inputs.find(name);
     if (fnd != inputs.end())
     {
-        return &(handles[fnd->second]);
+        return &(handles[fnd->second.baseValue ()]);
     }
     return nullptr;
 }
@@ -274,7 +274,7 @@ BasicHandleInfo *HandleManager::getFilter(const std::string &name)
     {
         return nullptr;
     }
-    return &(handles[ar.first->second]);
+    return &(handles[ar.first->second.baseValue ()]);
 }
 
 const BasicHandleInfo *HandleManager::getFilter(const std::string &name) const
@@ -284,7 +284,7 @@ const BasicHandleInfo *HandleManager::getFilter(const std::string &name) const
     {
         return nullptr;
     }
-    return &(handles[ar.first->second]);
+    return &(handles[ar.first->second.baseValue ()]);
 }
 BasicHandleInfo *HandleManager::getFilter(int32_t index)
 {
@@ -303,7 +303,10 @@ BasicHandleInfo *HandleManager::getFilter(int32_t index)
 federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
 {
     // only activate the lock if we not in an operating state
-    return (isValidIndex (static_cast<interface_handle::base_type>(id_), handles)) ? handles[id_].local_fed_id : federate_id_t();
+    auto index = id_.baseValue ();
+    return (isValidIndex (index, handles)) ?
+                   handles[index].local_fed_id :
+                   federate_id_t ();
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)

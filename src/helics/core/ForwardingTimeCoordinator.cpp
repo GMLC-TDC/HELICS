@@ -53,7 +53,7 @@ void ForwardingTimeCoordinator::disconnect ()
     }
 }
 
-static inline bool isBroker (global_federate_id_t id) { return ((id == 1) || (id >= 0x7000'0000)); }
+static inline bool isBroker (global_federate_id_t id) { return ((id.baseValue() == 1) || (id.baseValue() >= 0x7000'0000)); }
 
 class minTimeSet
 {

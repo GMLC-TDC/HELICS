@@ -149,7 +149,7 @@ void TestBroker::brokerDisconnect ()
     tbroker = nullptr;
 }
 
-void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
+void TestBroker::transmit (route_id_t route_id, const ActionMessage &cmd)
 {
     if (brokerState >= broker_state_t::terminating)
     {
@@ -157,7 +157,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     }
     std::unique_lock<std::mutex> lock (routeMutex);
 
-    if ((tbroker) && (route_id == 0))
+    if ((tbroker) && (route_id == parent_route_id))
     {
         tbroker->addActionMessage (cmd);
         return;
@@ -186,7 +186,7 @@ void TestBroker::transmit (int32_t route_id, const ActionMessage &cmd)
     }
 }
 
-void TestBroker::transmit (int32_t route_id, ActionMessage &&cmd)
+void TestBroker::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
     if (brokerState >= broker_state_t::terminating)
     {
@@ -194,7 +194,7 @@ void TestBroker::transmit (int32_t route_id, ActionMessage &&cmd)
     }
     std::unique_lock<std::mutex> lock (routeMutex);
 
-    if ((tbroker) && (route_id == 0))
+    if ((tbroker) && (route_id == parent_route_id))
     {
         tbroker->addActionMessage (std::move(cmd));
         return;
@@ -223,7 +223,7 @@ void TestBroker::transmit (int32_t route_id, ActionMessage &&cmd)
     }
 }
 
-void TestBroker::addRoute (int route_id, const std::string &routeInfo)
+void TestBroker::addRoute (route_id_t route_id, const std::string &routeInfo)
 {
     auto brk = BrokerFactory::findBroker (routeInfo);
 

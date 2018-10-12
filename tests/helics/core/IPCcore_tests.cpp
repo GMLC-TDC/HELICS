@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
-    comm.transmit (0, helics::CMD_IGNORE);
+    comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
     helics::ActionMessage rM = mq.getMessage ();
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
-    comm.transmit (0, helics::CMD_ACK);
+    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter2, 1);
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
     std::this_thread::sleep_for (100ms);
-    comm.transmit (0, helics::CMD_ACK);
+    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter2 != 1)
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm3.transmit (0, helics::CMD_ACK);
+    comm3.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter2 != 1)
@@ -193,9 +193,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (3, localLocB);
+    comm2.addRoute (helics::route_id_t(3), localLocB);
     std::this_thread::sleep_for(100ms);
-    comm2.transmit (3, helics::CMD_ACK);
+    comm2.transmit (helics::route_id_t(3), helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter3 != 1)
@@ -210,9 +210,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (4, localLoc);
+    comm2.addRoute (helics::route_id_t( 4), localLoc);
     std::this_thread::sleep_for (200ms);
-    comm2.transmit (4, helics::CMD_ACK);
+    comm2.transmit (helics::route_id_t(4), helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter.load () != 1)

@@ -397,7 +397,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             PortNumber = DEFAULT_BROKER_PORT_NUMBER;
             ActionMessage setPorts (CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;
-            setPorts.source_handle = PortNumber;
+            setPorts.setExtraData(PortNumber);
             auto str = setPorts.to_string ();
             controlSocket.send (str);
         }
@@ -436,7 +436,7 @@ void ZmqComms::queue_tx_function ()
 
     zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
     brokerPushSocket.setsockopt (ZMQ_LINGER, 200);
-    std::map<int, zmq::socket_t> routes;  // for all the other possible routes
+    std::map<route_id_t, zmq::socket_t> routes;  // for all the other possible routes
     // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
 
     if (hasBroker)
@@ -448,7 +448,7 @@ void ZmqComms::queue_tx_function ()
     zmq::message_t msg;
     while (true)
     {
-        int route_id;
+        route_id_t route_id;
         ActionMessage cmd;
 
         std::tie (route_id, cmd) = txQueue.pop ();
@@ -471,7 +471,7 @@ void ZmqComms::queue_tx_function ()
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
-                        routes.emplace (cmd.dest_id, std::move (zsock));
+                        routes.emplace (cmd.getExtraData(), std::move (zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
@@ -491,7 +491,7 @@ void ZmqComms::queue_tx_function ()
             continue;
         }
         cmd.to_vector (buffer);
-        if (route_id == 0)
+        if (route_id == parent_route_id)
         {
             if (hasBroker)
             {

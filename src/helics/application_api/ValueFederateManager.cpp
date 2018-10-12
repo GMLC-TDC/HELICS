@@ -39,7 +39,7 @@ publication_id_t ValueFederateManager::registerPublication (const std::string &k
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
     auto pubHandle = publications.lock();
-    publication_id_t id = static_cast<identifier_type> (pubHandle->size ());
+    publication_id_t id(static_cast<publication_id_t::underlyingType> (pubHandle->size ()));
     ++publicationCount;
     pubHandle->insert (key,coreID, key, type, units);
     pubHandle->back ().id = id;
@@ -54,7 +54,7 @@ input_id_t ValueFederateManager::registerInput (const std::string &key,
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock();
-    input_id_t id = static_cast<identifier_type> (inpHandle->size ());
+    input_id_t id(static_cast<input_id_t::underlyingType> (inpHandle->size ()));
     ++inputCount;
 	if (!key.empty())
 	{
@@ -296,7 +296,7 @@ input_id_t ValueFederateManager::getInputId (const std::string &key) const
     {
         return sub->id;
     }
-    return invalid_id_value;
+    return input_id_t();
 }
 
 input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
@@ -306,7 +306,7 @@ input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
 	{
         return res.first->second;
 	}
-    return invalid_id_value;
+    return input_id_t();
 }
 
 const std::string &ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
@@ -324,7 +324,7 @@ publication_id_t ValueFederateManager::getPublicationId (const std::string &key)
         return pub->id;
     }
 
-    return invalid_id_value;
+    return publication_id_t();
 }
 
 const std::string &ValueFederateManager::getInputUnits (input_id_t input_id) const

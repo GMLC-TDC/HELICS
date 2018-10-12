@@ -25,7 +25,7 @@ struct publication_info
     std::string type;  //!< publication type
     std::string units;  //!< publication units
     interface_handle coreID;  //!< Handle from the core
-    publication_id_t id = 0;  //!< the id used as the identifier
+    publication_id_t id;  //!< the id used as the identifier
     int size = -1;  //!< required size of a publication
     bool forward = true;
     publication_info (const std::string &n_name, const std::string &n_type, const std::string &n_units)
@@ -39,7 +39,7 @@ struct input_info
     std::string units;  //!< subscription units
     std::string pubtype;  //!< the listed type of the corresponding publication
     interface_handle coreID;  //!< Handle from the core
-    input_id_t id = 0;  //!< the id used as the identifier
+    input_id_t id;  //!< the id used as the identifier
     Time lastUpdate = Time (0.0);  //!< the time the subscription was last updated
     Time lastQuery = Time (0.0);  //!< the time the query was made
     int callbackIndex = -1;  //!< index for the callback

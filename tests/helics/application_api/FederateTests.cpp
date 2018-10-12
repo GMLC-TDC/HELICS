@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label("ci"))
     BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::op_states::startup);
     BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::op_states::startup);
 
-    BOOST_CHECK_NE (Fed1->getID (), Fed2->getID ());
+    BOOST_CHECK (Fed1->getID ()!=Fed2->getID ());
 
     auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();

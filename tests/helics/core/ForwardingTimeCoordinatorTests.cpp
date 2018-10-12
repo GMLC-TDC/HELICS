@@ -17,141 +17,151 @@ using namespace helics;
 BOOST_AUTO_TEST_CASE (dependency_tests)
 {
     ForwardingTimeCoordinator ftc;
-    ftc.addDependency (global_federate_id_t(2));
-    ftc.addDependency (global_federate_id_t(3));
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    ftc.addDependency (fed2);
+    ftc.addDependency (fed3);
     auto deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
     // test repeated inputs are dealt with correctly
-    ftc.addDependency (global_federate_id_t(3));
+    ftc.addDependency (fed3);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
 
-    ftc.removeDependency (global_federate_id_t(2));
+    ftc.removeDependency (fed2);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
     // remove same one
-    ftc.removeDependency (global_federate_id_t(2));
+    ftc.removeDependency (fed2);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
 }
 
 BOOST_AUTO_TEST_CASE (dependency_test_message)
 {
     ForwardingTimeCoordinator ftc;
     ActionMessage addDep (CMD_ADD_DEPENDENCY);
-    addDep.source_id = 2;
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    addDep.source_id = fed2;
 
     ftc.processDependencyUpdateMessage (addDep);
-    addDep.source_id = 3;
+    addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage (addDep);
     auto deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage (addDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
 
     ActionMessage remDep (CMD_REMOVE_DEPENDENCY);
-    remDep.source_id = 2;
+    remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = 10;
+    remDep.source_id = global_federate_id_t(10);
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] ==fed3);
 }
 
 BOOST_AUTO_TEST_CASE (dependent_tests)
 {
     ForwardingTimeCoordinator ftc;
-    ftc.addDependent (global_federate_id_t(2));
-    ftc.addDependent (global_federate_id_t(3));
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    ftc.addDependent (fed2);
+    ftc.addDependent (fed3);
     auto &deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
     // test repeated inputs are dealt with correctly
-    ftc.addDependent (global_federate_id_t(3));
+    ftc.addDependent (fed3);
     // deps is a reference so it should change automatically
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
 
-    ftc.removeDependent (global_federate_id_t(2));
+    ftc.removeDependent (fed2);
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
     // remove same one
-    ftc.removeDependent (global_federate_id_t(2));
+    ftc.removeDependent (fed2);
 
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
 }
 
 BOOST_AUTO_TEST_CASE (dependent_test_message)
 {
     ForwardingTimeCoordinator ftc;
     ActionMessage addDep (CMD_ADD_DEPENDENT);
-    addDep.source_id = 2;
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    addDep.source_id = fed2;
 
     ftc.processDependencyUpdateMessage (addDep);
-    addDep.source_id = 3;
+    addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage (addDep);
     auto &deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage (addDep);
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] == 2);
-    BOOST_CHECK (deps[1] == 3);
+    BOOST_CHECK (deps[0] == fed2);
+    BOOST_CHECK (deps[1] == fed3);
 
     ActionMessage remDep (CMD_REMOVE_DEPENDENT);
-    remDep.source_id = 2;
+    remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage (remDep);
 
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = 10;
+    remDep.source_id = global_federate_id_t(10);
     ftc.processDependencyUpdateMessage (remDep);
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] == 3);
+    BOOST_CHECK (deps[0] == fed3);
 }
 
 BOOST_AUTO_TEST_CASE (execMode_entry)
 {
     ForwardingTimeCoordinator ftc;
-    ftc.addDependency (global_federate_id_t(2));
-    ftc.addDependency (global_federate_id_t(3));
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    ftc.addDependency (fed2);
+    ftc.addDependency (fed3);
     ftc.enteringExecMode ();
     // message_processing_result
     auto ret = ftc.checkExecEntry ();
     BOOST_CHECK (ret == message_processing_result::continue_processing);
 
     ActionMessage execReady (CMD_EXEC_REQUEST);
-    execReady.source_id = 2;
+    execReady.source_id = fed2;
     auto modified = ftc.processTimeMessage (execReady);
     BOOST_CHECK (modified);
     ret = ftc.checkExecEntry ();
     BOOST_CHECK (ret == message_processing_result::continue_processing);
-    execReady.source_id = 3;
+    execReady.source_id = fed3;
     modified = ftc.processTimeMessage (execReady);
     BOOST_CHECK (modified);
     ret = ftc.checkExecEntry ();
@@ -182,8 +192,10 @@ void getFTCtoExecMode (ForwardingTimeCoordinator &ftc)
 BOOST_AUTO_TEST_CASE (timing_test1)
 {
     ForwardingTimeCoordinator ftc;
-    ftc.addDependency (global_federate_id_t(2));
-    ftc.addDependency (global_federate_id_t(3));
+    global_federate_id_t fed2 (2);
+    global_federate_id_t fed3 (3);
+    ftc.addDependency (fed2);
+    ftc.addDependency (fed3);
     getFTCtoExecMode (ftc);
 
     ftc.addDependent (global_federate_id_t(5));
@@ -191,7 +203,7 @@ BOOST_AUTO_TEST_CASE (timing_test1)
     ftc.source_id = global_federate_id_t(1);
     ftc.setMessageSender ([&lastMessage](const helics::ActionMessage &mess) { lastMessage = mess; });
 
-    ActionMessage timeUpdate (CMD_TIME_REQUEST, 2, 1);
+    ActionMessage timeUpdate (CMD_TIME_REQUEST, fed2, global_federate_id_t(1));
     timeUpdate.actionTime = 1.0;
     timeUpdate.Te = 1.0;
     timeUpdate.Tdemin = 1.0;
@@ -202,7 +214,7 @@ BOOST_AUTO_TEST_CASE (timing_test1)
     // there should be no update yet
     BOOST_CHECK (lastMessage.action () == CMD_INVALID);
 
-    timeUpdate.source_id = 3;
+    timeUpdate.source_id = fed3;
     timeUpdate.actionTime = 0.5;
     timeUpdate.Te = 1.0;
     timeUpdate.Tdemin = 0.5;

@@ -51,7 +51,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             Tdemin = Te;
         }
         forwardEvent = Time::maxVal ();
-        minFed = global_federate_id_t(m.source_handle);
+        minFed = global_federate_id_t(m.source_handle.baseValue());
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -60,7 +60,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
-        minFed = global_federate_id_t(m.source_handle);
+        minFed = global_federate_id_t(m.source_handle.baseValue());
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -213,8 +213,8 @@ bool TimeDependencies::hasActiveTimeDependencies () const
 {
 	for (auto & dep : dependencies)
 	{
-        auto v1 = (dep.fedID >= global_federate_id_shift);
-        auto v2 = (dep.fedID < global_broker_id_shift);
+        auto v1 = (dep.fedID.baseValue() >= global_federate_id_shift);
+        auto v2 = (dep.fedID.baseValue() < global_broker_id_shift);
         auto v3 = (dep.Tnext < Time::maxVal ());
 		if (v1&&v2&&v3)
 		{

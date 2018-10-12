@@ -145,7 +145,7 @@ class BrokerBase
                                const std::string &name,
                                const std::string &message) const;
 
-    /** generate a new random id based on a uuid*/
+    /** generate a new random id*/
     void generateNewIdentifier ();
     /** generate the local address information*/
     virtual std::string generateLocalAddressString () const=0;

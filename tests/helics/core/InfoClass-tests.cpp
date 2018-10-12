@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 
     // Constructor with last parameter default value
     helics::BasicHandleInfo hnd1 ( helics::global_federate_id_t(15), helics::interface_handle(10), helics::handle_type_t::endpoint, "key", "type", "units");
-    BOOST_CHECK_EQUAL (hnd1.getInterfaceHandle(), 10);
-    BOOST_CHECK_EQUAL (hnd1.getFederateId(), 15);
+    BOOST_CHECK_EQUAL (hnd1.getInterfaceHandle().baseValue(), 10);
+    BOOST_CHECK_EQUAL (hnd1.getFederateId().baseValue(), 15);
     BOOST_CHECK(!hnd1.local_fed_id.isValid());
     BOOST_CHECK(hnd1.handle_type==helics::handle_type_t::endpoint);
     BOOST_CHECK_EQUAL(hnd1.flags, 0);
@@ -40,8 +40,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
 
     // Constructor overriding last parameter default value
     helics::BasicHandleInfo hnd2 ( helics::global_federate_id_t(1500), helics::interface_handle(100), helics::handle_type_t::endpoint, "key", "type", "units");
-    BOOST_CHECK_EQUAL (hnd2.getInterfaceHandle(), 100);
-    BOOST_CHECK_EQUAL (hnd2.getFederateId(), 1500);
+    BOOST_CHECK_EQUAL (hnd2.getInterfaceHandle().baseValue(), 100);
+    BOOST_CHECK_EQUAL (hnd2.getFederateId().baseValue(), 1500);
     BOOST_CHECK(!hnd2.local_fed_id.isValid());
     BOOST_CHECK (hnd2.handle_type==helics::handle_type_t::endpoint);
     BOOST_CHECK_EQUAL(hnd1.flags, 0);
@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     // destFilter should be false, and target should be equal to what was passed in for units
     helics::BasicHandleInfo srcFiltHnd ( helics::global_federate_id_t(2), helics::interface_handle(1), helics::handle_type_t::filter, "key", "type_in",
                                         "type_out");
-    BOOST_CHECK_EQUAL (srcFiltHnd.getInterfaceHandle (), 1);
-    BOOST_CHECK_EQUAL (srcFiltHnd.getFederateId(), 2);
+    BOOST_CHECK_EQUAL (srcFiltHnd.getInterfaceHandle ().baseValue(), 1);
+    BOOST_CHECK_EQUAL (srcFiltHnd.getFederateId().baseValue(), 2);
     BOOST_CHECK (!srcFiltHnd.local_fed_id.isValid());
     BOOST_CHECK(srcFiltHnd.handle_type==helics::handle_type_t::filter);
     BOOST_CHECK_EQUAL(hnd1.flags, 0);
@@ -67,8 +67,8 @@ BOOST_AUTO_TEST_CASE (basichandleinfo_test)
     // Destination filter handle
     // destFilter should be true, and target should be equal to what was passed in for units
     helics::BasicHandleInfo dstFiltHnd ( helics::global_federate_id_t(3), helics::interface_handle(7), helics::handle_type_t::filter, "key", "type_in", "type_out");
-    BOOST_CHECK_EQUAL (dstFiltHnd.getInterfaceHandle (), 7);
-    BOOST_CHECK_EQUAL (dstFiltHnd.getFederateId (), 3);
+    BOOST_CHECK_EQUAL (dstFiltHnd.getInterfaceHandle ().baseValue(), 7);
+    BOOST_CHECK_EQUAL (dstFiltHnd.getFederateId ().baseValue(), 3);
     BOOST_CHECK(!dstFiltHnd.local_fed_id.isValid());
     BOOST_CHECK(dstFiltHnd.handle_type==helics::handle_type_t::filter);
     BOOST_CHECK_EQUAL (dstFiltHnd.key,"key");
@@ -111,8 +111,8 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     msg_time_one_b->time = helics::Time (1);
 
 	helics::EndpointInfo endPI({ helics::global_federate_id_t(5), helics::interface_handle(13) }, "name", "type");
-    BOOST_CHECK_EQUAL (endPI.id.handle, 13);
-    BOOST_CHECK_EQUAL (endPI.id.fed_id, 5);
+    BOOST_CHECK_EQUAL (endPI.id.handle.baseValue(), 13);
+    BOOST_CHECK_EQUAL (endPI.id.fed_id.baseValue(), 5);
     BOOST_CHECK (endPI.key.compare ("name") == 0);
     BOOST_CHECK (endPI.type.compare ("type") == 0);
 
@@ -248,8 +248,8 @@ BOOST_AUTO_TEST_CASE (filterinfo_test)
     msg_time_one_b->time = helics::Time (1);
 
     helics::FilterInfo filtI (helics::global_broker_id_t(5), helics::interface_handle(13), "name", "type_in", "type_out", true);
-    BOOST_CHECK_EQUAL (filtI.handle, 13);
-    BOOST_CHECK_EQUAL (filtI.core_id, 5);
+    BOOST_CHECK_EQUAL (filtI.handle.baseValue(), 13);
+    BOOST_CHECK_EQUAL (filtI.core_id.baseValue(), 5);
     BOOST_CHECK_EQUAL(filtI.key,"name");
     BOOST_CHECK_EQUAL(filtI.inputType,"type_in");
     BOOST_CHECK_EQUAL(filtI.outputType,"type_out");
@@ -263,8 +263,8 @@ BOOST_AUTO_TEST_CASE (inputinfo_test)
     std::shared_ptr<const helics::data_block> ret_data;
 
     helics::NamedInputInfo subI ( helics::global_handle(helics::global_federate_id_t(5), helics::interface_handle(13)),"key", "type", "units");
-    BOOST_CHECK_EQUAL (subI.id.handle, 13);
-    BOOST_CHECK_EQUAL (subI.id.fed_id, 5);
+    BOOST_CHECK_EQUAL (subI.id.handle.baseValue(), 13);
+    BOOST_CHECK_EQUAL (subI.id.fed_id.baseValue(), 5);
     BOOST_CHECK_EQUAL(subI.key,"key");
     BOOST_CHECK_EQUAL(subI.type,"type");
     BOOST_CHECK_EQUAL(subI.units,"units");

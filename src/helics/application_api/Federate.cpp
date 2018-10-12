@@ -1032,7 +1032,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
-    return cnt;
+    return query_id_t(cnt);
 }
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
@@ -1042,7 +1042,7 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
-    return cnt;
+    return query_id_t(cnt);
 }
 
 std::string Federate::queryComplete (query_id_t queryIndex)
@@ -1071,29 +1071,36 @@ filter_id_t Federate::registerFilter (const std::string &filterName,
                                       const std::string &inputType,
                                       const std::string &outputType)
 {
-    return filter_id_t (coreObject->registerFilter ((!filterName.empty())?(getName () + separator_ + filterName):filterName, inputType, outputType));
+    auto id =
+      coreObject->registerFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) : filterName,
+                                  inputType, outputType);
+    return filter_id_t (id.baseValue());
 }
 
 filter_id_t Federate::registerCloningFilter (const std::string &filterName,
                                              const std::string &inputType,
                                              const std::string &outputType)
 {
-    return filter_id_t (
-      coreObject->registerCloningFilter ((!filterName.empty())?(getName () + separator_ + filterName):filterName, inputType, outputType));
+    auto id = coreObject->registerCloningFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) :
+                                                                          filterName,
+                                                 inputType, outputType);
+    return filter_id_t (id.baseValue ());
 }
 
 filter_id_t Federate::registerGlobalFilter (const std::string &filterName,
                                             const std::string &inputType,
                                             const std::string &outputType)
 {
-    return filter_id_t (coreObject->registerFilter (filterName, inputType, outputType));
+    auto id = coreObject->registerFilter (filterName, inputType, outputType);
+    return filter_id_t (id.baseValue());
 }
 
 filter_id_t Federate::registerGlobalCloningFilter (const std::string &filterName,
                                                    const std::string &inputType,
                                                    const std::string &outputType)
 {
-    return filter_id_t (coreObject->registerCloningFilter (filterName, inputType, outputType));
+    auto id = coreObject->registerCloningFilter (filterName, inputType, outputType);
+    return filter_id_t (id.baseValue());
 }
 
 void Federate::addSourceTarget (filter_id_t id, const std::string &targetEndpoint)
@@ -1124,7 +1131,7 @@ std::string Federate::getFilterOutputType (filter_id_t id) const
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getFilter (filterName);
-    return (id.isValid ()) ? filter_id_t (id) : invalid_id_value;
+    return (id.isValid ()) ? filter_id_t (id.baseValue()) : filter_id_t();
 }
 
 void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)

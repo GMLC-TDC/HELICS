@@ -120,7 +120,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
     try
     {
         auto id = fedObj->getEndpointId (name);
-        if (id == helics::invalid_id_value)
+        if (!id.isValid())
         {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidEndName;

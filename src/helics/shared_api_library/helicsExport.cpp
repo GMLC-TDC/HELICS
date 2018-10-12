@@ -1078,13 +1078,13 @@ const char *helicsQueryExecuteComplete (helics_query query, helics_error *err)
     {
         return invalidStringConst;
     }
-    if (queryObj->asyncIndexCode != helics::invalid_id_value)
+    if (queryObj->asyncIndexCode.isValid())
     {
         queryObj->response = queryObj->activeFed->queryComplete (queryObj->asyncIndexCode);
     }
     queryObj->activeAsync = false;
     queryObj->activeFed = nullptr;
-    queryObj->asyncIndexCode = helics::invalid_id_value;
+    queryObj->asyncIndexCode = helics::query_id_t();
     return queryObj->response.c_str ();
 }
 
@@ -1095,7 +1095,7 @@ helics_bool_t helicsQueryIsCompleted (helics_query query)
     {
         return helics_false;
     }
-    if (queryObj->asyncIndexCode != helics::invalid_id_value)
+    if (queryObj->asyncIndexCode.isValid())
     {
         auto res = queryObj->activeFed->isQueryCompleted (queryObj->asyncIndexCode);
         return (res) ? helics_true : helics_false;

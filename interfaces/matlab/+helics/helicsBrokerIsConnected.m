@@ -3,5 +3,5 @@ function varargout = helicsBrokerIsConnected(varargin)
     %or cores could reach out to communicate return 0 if not connected , something
     %else if it is connected
     %
-  [varargout{1:nargout}] = helicsMEX(46, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(47, varargin{:});
 end

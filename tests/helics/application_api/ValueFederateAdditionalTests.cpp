@@ -454,7 +454,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
 
-    auto pub2name = vFed.getPublicationKey (1);
+    auto pub2name = vFed.getPublicationKey (helics::publication_id_t(1));
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
     vFed.disconnect ();
 }
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
 
-	auto pub2name = vFed.getPublicationKey (1);
+	auto pub2name = vFed.getPublicationKey (helics::publication_id_t(1));
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
     vFed.disconnect ();
 }

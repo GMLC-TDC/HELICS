@@ -143,7 +143,7 @@ class QueryObject
     std::string query;  //!< the actual query itself
     std::string response;  //!< the response to the query
     std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
-    query_id_t asyncIndexCode = invalid_id_value;  //!< the index to use for the queryComplete call
+    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     bool activeAsync = false;
     int valid = 0;
 };

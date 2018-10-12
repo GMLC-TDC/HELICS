@@ -41,17 +41,16 @@ enum class interface_visibility
 constexpr interface_visibility GLOBAL = interface_visibility::global;
 constexpr interface_visibility LOCAL = interface_visibility::local;
 
-
 /** class defining an  identifier type
 @details  the intent of this class is to limit the operations available on an identifier
 to those that are a actually required and make sense, and make it as low impact as possible.
 it also acts to limit any mistakes of on type of identifier for another
 */
-template <class BaseType, identifiers ID, BaseType invalidValue = (BaseType (-1))>
+template <typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t
 {
   private:
-    BaseType ivalue;  //!< the underlying index value
+    BaseType ivalue=invalidValue;  //!< the underlying index value
 
   public:
     static const identifiers identity{ID};  //!< the type of the identifier
@@ -59,8 +58,7 @@ class identifier_id_t
     /** default constructor*/
     constexpr identifier_id_t () noexcept : ivalue (invalidValue){};
     /** value based constructor*/
-    // cppcheck-suppress noExplicitConstructor
-    /* implicit */ constexpr identifier_id_t (BaseType val) noexcept : ivalue (val){};
+    constexpr explicit identifier_id_t (BaseType val) noexcept : ivalue (val){};
     /** copy constructor*/
     constexpr identifier_id_t (const identifier_id_t &id) noexcept : ivalue (id.ivalue){};
     /** assignment from number*/
@@ -84,8 +82,25 @@ class identifier_id_t
     bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
     /** less than operator for sorting*/
     bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
+	//check if the current value is not the invalidValue
+    bool isValid () const noexcept { return (ivalue != invalidValue); };
 };
+}  // namespace helics
 
+// specialize std::hash
+namespace std
+{
+template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
+struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
+{
+    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;
+    using result_type = std::size_t;
+    result_type operator() (argument_type const &key) const noexcept { return std::hash<BaseType>{}(key.value ());}
+};
+} //namespace std
+
+namespace helics
+{
 using publication_id_t = identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
 using input_id_t = identifier_id_t<identifier_type, identifiers::input, invalid_id_value>;
 using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
@@ -140,9 +155,7 @@ constexpr auto cfloatstr = "complex_f";
 constexpr auto cdoublestr = "complex";
 constexpr auto npstr = "named_point";
 constexpr auto strstr = "string";
-
 }
-
 
 template <>
 inline const char *typeNameString<std::vector<std::string>> ()

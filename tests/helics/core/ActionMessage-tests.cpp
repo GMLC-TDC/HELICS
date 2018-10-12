@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
     */
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
-    m.source_handle = 4;
-    m.source_id = 232324;
-    m.dest_id = 22552215;
-    m.dest_handle = 2322342;
+    m.source_handle = interface_handle(4);
+    m.source_id = global_federate_id_t(232324);
+    m.dest_id = global_federate_id_t(22552215);
+    m.dest_handle = interface_handle(2322342);
 
     std::string data;
     m.to_string (data);
@@ -81,10 +81,10 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     */
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
-    m.source_handle = 4;
-    m.source_id = 232324;
-    m.dest_id = 22552215;
-    m.dest_handle = 2322342;
+    m.source_handle = interface_handle (4);
+    m.source_id = global_federate_id_t (232324);
+    m.dest_id = global_federate_id_t (22552215);
+    m.dest_handle = interface_handle (2322342);
 
     m.setString (sourceStringLoc, "this is a long source string to test");
     m.setString (origSourceStringLoc, "this is a longer alternate source string to test");
@@ -117,10 +117,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // Default constructor
     helics::ActionMessage cmd;
     BOOST_CHECK (cmd.action () == helics::CMD_IGNORE);
-    BOOST_CHECK_EQUAL (cmd.source_id, 0);
-    BOOST_CHECK_EQUAL (cmd.source_handle, 0);
-    BOOST_CHECK_EQUAL (cmd.dest_id, 0);
-    BOOST_CHECK_EQUAL (cmd.dest_handle, 0);
+    BOOST_CHECK (!cmd.source_id.isValid());
+    BOOST_CHECK (!cmd.source_handle.isValid());
+    BOOST_CHECK_EQUAL (cmd.dest_id, parent_broker_id);
+    BOOST_CHECK (!cmd.dest_handle.isValid());
     BOOST_CHECK_EQUAL (cmd.counter, 0);
     BOOST_CHECK_EQUAL (cmd.flags, 0);
     BOOST_CHECK_EQUAL (cmd.actionTime, helics::Time::zeroVal ());
@@ -139,10 +139,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
 BOOST_AUTO_TEST_CASE (copy_constructor_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
-    cmd.source_id = 1;
-    cmd.source_handle = 2;
-    cmd.dest_id = 3;
-    cmd.dest_handle = 4;
+    cmd.source_id = global_federate_id_t(1);
+    cmd.source_handle = interface_handle(2);
+    cmd.dest_id = global_federate_id_t(3);
+    cmd.dest_handle = interface_handle(4);
     cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
@@ -154,10 +154,10 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     // Check operator= override
     helics::ActionMessage cmd_copy (cmd);
     BOOST_CHECK (cmd_copy.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_copy.source_id, 1);
-    BOOST_CHECK_EQUAL (cmd_copy.source_handle, 2);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_id, 3);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_handle, 4);
+    BOOST_CHECK_EQUAL (cmd_copy.source_id.baseValue(), 1);
+    BOOST_CHECK_EQUAL (cmd_copy.source_handle.baseValue(), 2);
+    BOOST_CHECK_EQUAL (cmd_copy.dest_id.baseValue(), 3);
+    BOOST_CHECK_EQUAL (cmd_copy.dest_handle.baseValue(), 4);
     BOOST_CHECK_EQUAL (cmd_copy.flags, 0x1a2F);
     BOOST_CHECK_EQUAL (cmd_copy.actionTime, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_copy.payload, "hello world");
@@ -173,10 +173,10 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
 BOOST_AUTO_TEST_CASE (assignment_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
-    cmd.source_id = 1;
-    cmd.source_handle = 2;
-    cmd.dest_id = 3;
-    cmd.dest_handle = 4;
+    cmd.source_id = global_federate_id_t (1);
+    cmd.source_handle = interface_handle (2);
+    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
@@ -190,10 +190,10 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
     BOOST_CHECK (cmd_assign.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_assign.source_id, 1);
-    BOOST_CHECK_EQUAL (cmd_assign.source_handle, 2);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_id, 3);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_handle, 4);
+    BOOST_CHECK_EQUAL (cmd_assign.source_id.baseValue(), 1);
+    BOOST_CHECK_EQUAL (cmd_assign.source_handle.baseValue(), 2);
+    BOOST_CHECK_EQUAL (cmd_assign.dest_id.baseValue(), 3);
+    BOOST_CHECK_EQUAL (cmd_assign.dest_handle.baseValue(), 4);
     BOOST_CHECK (checkActionFlag (cmd_assign, iteration_requested_flag));
     BOOST_CHECK (checkActionFlag (cmd_assign, required_flag));
     BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
@@ -243,10 +243,10 @@ BOOST_AUTO_TEST_CASE (comparison_test)
 BOOST_AUTO_TEST_CASE (conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = 1;
-    cmd.source_handle = 2;
-    cmd.dest_id = 3;
-    cmd.dest_handle = 4;
+    cmd.source_id = global_federate_id_t (1);
+    cmd.source_handle = interface_handle (2);
+    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
@@ -276,10 +276,10 @@ BOOST_AUTO_TEST_CASE (conversion_test)
 BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = 1;
-    cmd.source_handle = 2;
-    cmd.dest_id = 3;
-    cmd.dest_handle = 4;
+    cmd.source_id = global_federate_id_t (1);
+    cmd.source_handle = interface_handle (2);
+    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
@@ -336,10 +336,10 @@ BOOST_AUTO_TEST_CASE (check_conversions)
 BOOST_AUTO_TEST_CASE (check_packetization)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = 1;
-    cmd.source_handle = 2;
-    cmd.dest_id = 3;
-    cmd.dest_handle = 4;
+    cmd.source_id = global_federate_id_t (1);
+    cmd.source_handle = interface_handle (2);
+    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);

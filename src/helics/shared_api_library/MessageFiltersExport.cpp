@@ -237,7 +237,7 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, he
     try
     {
         auto id = fedObj->getFilterId (name);
-        if (id == helics::invalid_id_value)
+        if (!id.isValid())
         {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidFiltName;

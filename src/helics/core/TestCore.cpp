@@ -96,7 +96,7 @@ bool TestCore::brokerConnect ()
             }
         }
     }
-    if (tbroker)
+    if ((tbroker)&&(!tbroker->isConnected()))
     {
         tbroker->connect ();
     }
@@ -126,10 +126,10 @@ TestCore::~TestCore ()
     std::lock_guard<std::mutex> lock (routeMutex);
 }
 
-void TestCore::transmit (int route_id, const ActionMessage &cmd)
+void TestCore::transmit (route_id_t route_id, const ActionMessage &cmd)
 {
     std::lock_guard<std::mutex> lock (routeMutex);
-    if (route_id == 0)
+    if (route_id == parent_route_id)
     {
         if (tbroker)
         {
@@ -157,10 +157,10 @@ void TestCore::transmit (int route_id, const ActionMessage &cmd)
     }
 }
 
-void TestCore::transmit (int route_id, ActionMessage &&cmd)
+void TestCore::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
     std::lock_guard<std::mutex> lock (routeMutex);
-    if (route_id == 0)
+    if (route_id == parent_route_id)
     {
         if (tbroker)
         {
@@ -188,7 +188,7 @@ void TestCore::transmit (int route_id, ActionMessage &&cmd)
     }
 }
 
-void TestCore::addRoute (int route_id, const std::string &routeInfo)
+void TestCore::addRoute (route_id_t route_id, const std::string &routeInfo)
 {
     auto brk = BrokerFactory::findBroker (routeInfo);
     if (brk)

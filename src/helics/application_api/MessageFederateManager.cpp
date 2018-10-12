@@ -25,7 +25,7 @@ endpoint_id_t MessageFederateManager::registerEndpoint (const std::string &name,
 {
     auto handle = coreObject->registerEndpoint (fedID, name, type);
     auto eptHandle = local_endpoints.lock ();
-    endpoint_id_t id = static_cast<identifier_type> (eptHandle->size ());
+    endpoint_id_t id(static_cast<endpoint_id_t::underlyingType> (eptHandle->size ()));
     ++endpointCount;
     eptHandle->insert (name, handle, name, type, id, handle);
 
@@ -223,7 +223,7 @@ endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) co
 {
     auto sharedEpt = local_endpoints.lock_shared ();
     auto sub = sharedEpt->find (name);
-    return (sub != nullptr) ? sub->id : 0;
+    return (sub != nullptr) ? sub->id : endpoint_id_t();
 }
 
 const std::string &MessageFederateManager::getEndpointType (endpoint_id_t id) const

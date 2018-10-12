@@ -17,7 +17,7 @@ namespace helics
 {
 enum class interface_networks : char;
 
-constexpr int control_route = (-1);
+constexpr route_id_t control_route(-1);
   /** implementation of a generic communications interface
  */
 class CommsInterface
@@ -35,15 +35,15 @@ class CommsInterface
                     interface_networks targetNetwork = interface_networks::local);
     /** transmit a message along a particular route
      */
-    void transmit (int route_id, const ActionMessage &cmd);
+    void transmit (route_id_t route_id, const ActionMessage &cmd);
     /** transmit a message along a particular route
      */
-    void transmit (int route_id, ActionMessage &&cmd);
+    void transmit (route_id_t route_id, ActionMessage &&cmd);
     /** add a new route assigned to the appropriate id
      */
-    void addRoute (int route_id, const std::string &routeInfo);
+    void addRoute (route_id_t route_id, const std::string &routeInfo);
     /** remove a route from use*/
-    void removeRoute(int route_id);
+    void removeRoute (route_id_t route_id);
     /** connect the commsInterface
     @return true if the connection was successful false otherwise
     */
@@ -119,7 +119,7 @@ class CommsInterface
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-    BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
+    BlockingPriorityQueue<std::pair<route_id_t, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{

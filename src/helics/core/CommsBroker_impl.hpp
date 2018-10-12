@@ -91,19 +91,19 @@ bool CommsBroker<COMMS, BrokerT>::tryReconnect ()
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::transmit (int route_id, const ActionMessage &cmd)
+void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, const ActionMessage &cmd)
 {
     comms->transmit (route_id, cmd);
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::transmit (int route_id, ActionMessage &&cmd)
+void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
     comms->transmit (route_id, std::move (cmd));
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::addRoute (int route_id, const std::string &routeInfo)
+void CommsBroker<COMMS, BrokerT>::addRoute (route_id_t route_id, const std::string &routeInfo)
 {
     comms->addRoute (route_id, routeInfo);
 }

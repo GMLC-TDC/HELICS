@@ -1,3 +1,3 @@
 function varargout = helicsBrokerAddDestinationFilterToEndpoint(varargin)
-  [varargout{1:nargout}] = helicsMEX(49, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(50, varargin{:});
 end

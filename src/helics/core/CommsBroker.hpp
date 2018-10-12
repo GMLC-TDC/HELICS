@@ -8,10 +8,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <atomic>
 #include <memory>
 #include <string>
+#include "ActionMessage.hpp"
 
 namespace helics
 {
-class ActionMessage;
 class CommsInterface;
 
 /** helper class defining some common functionality for brokers and cores that use different
@@ -40,9 +40,9 @@ class CommsBroker : public BrokerT
     void commDisconnect();
     void loadComms ();
   public:
-    virtual void transmit (int route_id, const ActionMessage &cmd) override;
-    virtual void transmit (int route_id, ActionMessage &&cmd) override;
+    virtual void transmit (route_id_t route_id, const ActionMessage &cmd) override;
+    virtual void transmit (route_id_t route_id, ActionMessage &&cmd) override;
 
-    virtual void addRoute (int route_id, const std::string &routeInfo) override;
+    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) override;
 };
 }  // namespace helics

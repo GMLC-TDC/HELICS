@@ -189,15 +189,15 @@ class CommonCore : public Core, public BrokerBase
     /** transit an ActionMessage to another core or broker
     @param route_id the identifier for the route information to send the message to
     @param[in] cmd the actionMessage to send*/
-    virtual void transmit (int route_id, const ActionMessage &cmd) = 0;
+    virtual void transmit (route_id_t route_id, const ActionMessage &cmd) = 0;
     /** transit an ActionMessage to another core or broker
     @param route_id the identifier for the route information to send the message to
     @param[in] cmd the actionMessage to send*/
-    virtual void transmit (int route_id, ActionMessage &&cmd) = 0;
+    virtual void transmit (route_id_t route_id, ActionMessage &&cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param route_id the identification of the route
     @param routeInfo a string containing the information necessary to connect*/
-    virtual void addRoute (int route_id, const std::string &routeInfo) = 0;
+    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) = 0;
     /** get the federate Information from the federateID*/
     FederateState *getFederateAt (federate_id_t federateID) const;
     /** get the federate Information from the federateID*/
@@ -232,11 +232,11 @@ class CommonCore : public Core, public BrokerBase
 
   private:
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-    std::map<global_federate_id_t, int32_t>
+    std::map<global_federate_id_t, route_id_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
     SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delays for a certain time
-    std::unordered_map<std::string, int32_t>
+    std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
 
     /** actually transmit messages that were delayed until the core was actually registered*/
@@ -343,8 +343,8 @@ class CommonCore : public Core, public BrokerBase
     bool isLocal (global_federate_id_t global_id) const;
     /** get a route id for a non-local federate
     @param[in] global_id the federate global id
-    @return 0 if unknown, otherwise returns the route_id*/
-    int32_t getRoute (global_federate_id_t global_id) const;
+    @return parent_route if unknown, otherwise returns the route_id*/
+    route_id_t getRoute (global_federate_id_t global_id) const;
     /** process a message for potential additions to the filter ordering
     @param command the message to process
     */

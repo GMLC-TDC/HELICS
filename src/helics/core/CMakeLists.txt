@@ -31,6 +31,7 @@ set(
 	UnknownHandleManager.cpp
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
+	federate_id.cpp
 )
 
 set(TESTCORE_SOURCE_FILES TestBroker.cpp TestCore.cpp)

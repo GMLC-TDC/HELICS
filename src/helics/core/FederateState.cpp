@@ -783,7 +783,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
         break;
     case CMD_EXEC_REQUEST:
-        if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == 0))
+        if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == parent_broker_id))
         {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
             if (checkActionFlag (cmd, iteration_requested_flag))
@@ -860,7 +860,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
 			{
                 setState (HELICS_FINISHED);
                 timeCoord->disconnect ();
-                cmd.dest_id = 0;
+                cmd.dest_id = parent_broker_id;
                 if (parent_ != nullptr)
                 {
                     parent_->addActionMessage (cmd);
@@ -898,7 +898,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
         break;
     case CMD_TIME_REQUEST:
-        if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == 0))
+        if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == parent_broker_id))
         {  // this sets up a time request
             iteration_request iterate = iteration_request::no_iterations;
             if (checkActionFlag (cmd, iteration_requested_flag))
@@ -1324,7 +1324,7 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     if ((loggerFunction) && (level <= logLevel))
     {
         loggerFunction (level,
-                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id.load ()) + ')' :
+                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id.load ().baseValue()) + ')' :
                                                       logMessageSource,
                         message);
     }
@@ -1347,11 +1347,11 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [](auto &dep) { return std::to_string (dep); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue()); });
     }
     if (query == "dependents")
     {
-        return generateStringVector (timeCoord->getDependents (), [](auto &dep) { return std::to_string (dep); });
+        return generateStringVector (timeCoord->getDependents (), [](auto &dep) { return std::to_string (dep.baseValue()); });
     }
     if (queryCallback)
     {

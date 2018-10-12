@@ -33,10 +33,10 @@ class ActionMessage
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t messageID = 0;  //!< 8 -- message ID for a variety of purposes
-    int32_t source_id = 0;  //!< 12 -- for federate_id or route_id
-    int32_t source_handle = 0;  //!< 16 -- for local handle or local code
-    int32_t dest_id = 0;  //!< 20 fed_id for a targeted message
-    int32_t dest_handle = 0;  //!< 24 local handle for a targeted message
+    global_federate_id_t source_id;  //!< 12 -- for federate_id or route_id
+    interface_handle source_handle;  //!< 16 -- for local handle or local code
+    global_federate_id_t dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
+    interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
     // 4 byte gap
@@ -59,7 +59,7 @@ class ActionMessage
     /* implicit */ ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
      */
-    ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId);
+    ActionMessage (action_message_def::action_t startingAction, global_federate_id_t sourceId, global_federate_id_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -101,7 +101,7 @@ class ActionMessage
     }
     const std::vector<std::string> &getStringData () const { return stringData; }
 
-	void clearStringData() { stringData.clear ();}
+    void clearStringData () { stringData.clear (); }
     // most use cases for this involve short strings, or already have references that need to be copied so
     // supporting move isn't  going to be that useful here, the long strings are going in the payload
     void setStringData (const std::string &string1)
@@ -139,12 +139,12 @@ class ActionMessage
     /** get the source global_handle*/
     global_handle getSource () const
     {
-        return global_handle (global_federate_id_t (source_id), interface_handle (source_handle));
+        return global_handle (source_id, source_handle);
     }
     /** get the global destination handle*/
     global_handle getDest () const
     {
-        return global_handle (global_federate_id_t (dest_id), interface_handle (dest_handle));
+        return global_handle (dest_id, dest_handle);
     }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
@@ -152,11 +152,16 @@ class ActionMessage
         std::swap (source_id, dest_id);
         std::swap (source_handle, dest_handle);
     }
+    /** set some extra piece of data if the full destination is not used*/
+    void setExtraData (int32_t data) { dest_handle = interface_handle (data); }
+    /** get the extra piece of integer data*/
+	int32_t getExtraData() const { return dest_handle.baseValue ();
+	}
     /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (messageAction, messageID, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, messageID, source_id.baseValue(), source_handle.baseValue(), dest_id.baseValue(), dest_handle.baseValue());
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
@@ -170,7 +175,13 @@ class ActionMessage
     template <class Archive>
     void load (Archive &ar)
     {
-        ar (messageAction, messageID, source_id, source_handle, dest_id, dest_handle);
+        ar (messageAction, messageID);
+		identififier_base_type sid,sh, did,dh; 
+		ar(sid,sh,did,dh);
+		source_id=global_federate_id_t(sid);
+		source_handle=interface_handle(sh);
+		dest_id=global_federate_id_t(did);
+        dest_handle = interface_handle (dh);
 
         ar (counter, flags);
 

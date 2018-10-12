@@ -221,11 +221,11 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
         }
         if (loggerFunction)
         {
-            loggerFunction (logLevel, name + '(' + std::to_string (federateID) + ')', message);
+            loggerFunction (logLevel, fmt::format ("{} ({})", name, federateID.baseValue ()), message);
         }
         else if (loggingObj)
         {
-            loggingObj->log (logLevel, name + '(' + std::to_string (federateID) + ")::" + message);
+            loggingObj->log (logLevel, fmt::format ("{} ({})::{}", name, federateID.baseValue (),message));
         }
         return true;
     }
@@ -376,7 +376,7 @@ void BrokerBase::queueProcessingLoop ()
             {
                 sendToLogger (parent_broker_id, -10, identifier,
                               fmt::format ("|| dl cmd:{} from {} to {}", prettyPrintString (act),
-                               act.source_id, act.dest_id));
+                               act.source_id.baseValue(), act.dest_id.baseValue()));
             }
         }
     };

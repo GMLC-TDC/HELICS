@@ -127,7 +127,7 @@ Filter::Filter (Core *cr,const std::string &name) : corePtr (cr)
 	if (corePtr != nullptr)
 	{
         id = corePtr->registerFilter (name, std::string (), std::string ());
-        fid = id;
+        fid = id.baseValue();
 	}
     
 }
@@ -228,8 +228,8 @@ CloningFilter::CloningFilter (Core *cr, const std::string &name)
     corePtr = cr;
     if (corePtr != nullptr)
     {
-        fid =corePtr->registerCloningFilter (name,std::string(),std::string());
-        id = interface_handle (fid.value ());
+        id =corePtr->registerCloningFilter (name,std::string(),std::string());
+        fid = id.baseValue();
     }
     setFilterOperations(std::make_shared<CloneFilterOperation> (cr));
 }

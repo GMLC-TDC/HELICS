@@ -206,24 +206,25 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test CMD_FED_ACK message when no error
     cmd.setAction (helics::CMD_FED_ACK);
-    cmd.dest_id = 22;
+    global_federate_id_t fed22 (22);
+    cmd.dest_id = fed22;
     cmd.name = "fed_name";
     clearActionFlag (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::next_step);
-    BOOST_CHECK_EQUAL (fs->global_id.load(), 22);
+    BOOST_CHECK_EQUAL (fs->global_id.load(), fed22);
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
-    cmd.dest_id = 23;
+    cmd.dest_id = global_federate_id_t(23);
     setActionFlag (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::error);
-    BOOST_CHECK_EQUAL (fs->global_id.load(), 22);
+    BOOST_CHECK_EQUAL (fs->global_id.load(), fed22);
     BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_ERROR);
 
     // Return to initializing state

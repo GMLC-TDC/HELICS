@@ -25,10 +25,10 @@ class TestBroker : public CoreBroker
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   protected:
-    virtual void transmit (int32_t route, const ActionMessage &command) override;
-    virtual void transmit (int32_t route, ActionMessage &&command) override;
+    virtual void transmit (route_id_t route, const ActionMessage &command) override;
+    virtual void transmit (route_id_t route, ActionMessage &&command) override;
 
-    virtual void addRoute (int route_id, const std::string &routeInfo) override;
+    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) override;
 
   public:
     virtual std::string generateLocalAddressString () const override;
@@ -45,8 +45,8 @@ class TestBroker : public CoreBroker
     std::string brokerInitString;  //!< the initialization string for the higher level broker
     std::shared_ptr<CoreBroker> tbroker;  // the parent broker;
                                           // void computeDependencies();
-    std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the routes to other brokers
-    std::map<int32_t, std::shared_ptr<CommonCore>> coreRoutes;  //!< map of the routes to other cores
+    std::map<route_id_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the routes to other brokers
+    std::map<route_id_t, std::shared_ptr<CommonCore>> coreRoutes;  //!< map of the routes to other cores
     mutable std::mutex routeMutex;  //!< mutex lock protecting the route maps
 };
 } // namespace testcore

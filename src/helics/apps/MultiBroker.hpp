@@ -43,10 +43,10 @@ private:
 	void commDisconnect();
 	void loadComms();
 public:
-	virtual void transmit(int route_id, const ActionMessage &cmd) override;
-	virtual void transmit(int route_id, ActionMessage &&cmd) override;
+	virtual void transmit(route_id_t route_id, const ActionMessage &cmd) override;
+	virtual void transmit(route_id_t route_id, ActionMessage &&cmd) override;
 
-	virtual void addRoute(int route_id, const std::string &routeInfo) override;
+	virtual void addRoute(route_id_t route_id, const std::string &routeInfo) override;
 };
 }  // namespace helics
 

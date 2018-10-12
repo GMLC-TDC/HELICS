@@ -154,7 +154,7 @@ void IpcComms::queue_tx_function ()
 {
     sendToQueue brokerQueue;  //!< the queue of the broker
     sendToQueue rxQueue;
-    std::map<int, sendToQueue> routes;  //!< table of the routes to other brokers
+    std::map<route_id_t, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
     if (!brokerTarget_.empty ())
@@ -218,12 +218,12 @@ void IpcComms::queue_tx_function ()
     bool IPCoperating = false;
     while (true)
     {
-        int route_id;
+        route_id_t route_id;
         ActionMessage cmd;
         std::tie (route_id, cmd) = txQueue.pop ();
         if (isProtocolCommand (cmd))
         {
-            if (route_id == -1)
+            if (route_id == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -233,7 +233,7 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-                        routes.emplace (cmd.dest_id, std::move (newQueue));
+                        routes.emplace (cmd.getExtraData(), std::move (newQueue));
                     }
                     continue;
                 }
@@ -253,14 +253,14 @@ void IpcComms::queue_tx_function ()
         }
         std::string buffer = cmd.to_string ();
         int priority = isPriorityCommand (cmd) ? 3 : 1;
-        if (route_id == 0)
+        if (route_id == parent_route_id)
         {
             if (hasBroker)
             {
                 brokerQueue.sendMessage (cmd, priority);
             }
         }
-        else if (route_id == -1)
+        else if (route_id == control_route)
         {
             rxQueue.sendMessage (cmd, priority);
         }
@@ -294,7 +294,7 @@ void IpcComms::closeReceiver ()
     cmd.messageID = CLOSE_RECEIVER;
     if (getTxStatus () == connection_status::connected)
     {
-        transmit (-1, cmd);
+        transmit (control_route, cmd);
     }
     else if (!disconnecting)
     {

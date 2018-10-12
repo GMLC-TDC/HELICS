@@ -181,19 +181,19 @@ bool MultiBroker::tryReconnect()
 }
 
 
-void MultiBroker::transmit(int route_id, const ActionMessage &cmd)
+void MultiBroker::transmit(route_id_t route_id, const ActionMessage &cmd)
 {
 	masterComm->transmit(route_id, cmd);
 }
 
 
-void MultiBroker::transmit(int route_id, ActionMessage &&cmd)
+void MultiBroker::transmit(route_id_t route_id, ActionMessage &&cmd)
 {
 	masterComm->transmit(route_id, std::move(cmd));
 }
 
 
-void MultiBroker::addRoute(int route_id, const std::string &routeInfo)
+void MultiBroker::addRoute(route_id_t route_id, const std::string &routeInfo)
 {
 	masterComm->addRoute(route_id, routeInfo);
 }

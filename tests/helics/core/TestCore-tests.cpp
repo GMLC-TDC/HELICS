@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     BOOST_CHECK_EQUAL (core->getFederationSize (), 1);
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
-    BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
+    BOOST_CHECK (core->getFederateId ("sim1")==id);
 
     core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
     BOOST_CHECK_EQUAL (core->getUnits (sub1), "units");
 
     auto pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
-    BOOST_CHECK_EQUAL (core->getPublication (id, "sim1_pub"), pub1);
+    BOOST_CHECK (core->getPublication (id, "sim1_pub")==pub1);
     BOOST_CHECK_EQUAL (core->getType (pub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (pub1), "units");
 
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     auto id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
-    BOOST_CHECK_EQUAL (core->getFederateId ("sim1"), id);
+    BOOST_CHECK (core->getFederateId ("sim1")==id);
 
     core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
 

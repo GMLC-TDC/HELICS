@@ -37,7 +37,7 @@ class BasicFedInfo
   public:
     const std::string name;  //!< name of the federate
     global_federate_id_t global_id;  //!< the identification code for the federate
-    int32_t route_id = -10;  //!< the routing information for data to be sent to the federate
+    route_id_t route_id;  //!< the routing information for data to be sent to the federate
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -48,7 +48,7 @@ class BasicBrokerInfo
     const std::string name;  //!< the name of the broker
 
     global_broker_id_t global_id;  //!< the global identifier for the broker
-    int32_t route_id = -10;  //!< the identifier for the route to take to the broker
+    route_id_t route_id;  //!< the identifier for the route to take to the broker
 
     bool _initRequested = false;  //!< flag indicating the broker has requesting initialization
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
@@ -81,12 +81,12 @@ class CoreBroker : public Broker, public BrokerBase
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
     UnknownHandleManager unknownHandles; //!< structure containing unknown targeted handles
-    std::vector<std::pair<std::string, int32_t>>
+    std::vector<std::pair<std::string, global_federate_id_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
     std::map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
-    std::map<global_federate_id_t, int32_t>
+    std::map<global_federate_id_t, route_id_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
-    std::unordered_map<std::string, int32_t>
+    std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{ 1 }; //counter for active queries going to the local API
@@ -128,7 +128,7 @@ class CoreBroker : public Broker, public BrokerBase
     void routeMessage (const ActionMessage &cmd);
     void routeMessage (const ActionMessage &&cmd);
 
-    int32_t fillMessageRouteInformation (ActionMessage &mess);
+    route_id_t fillMessageRouteInformation (ActionMessage &mess);
 
     /** handle initialization operations*/
     void executeInitializationOperations ();
@@ -182,21 +182,21 @@ class CoreBroker : public Broker, public BrokerBase
     @param[in] route -the identifier for the routing information
     @param[in] command the actionMessage to transmit
     */
-    virtual void transmit (int32_t route, const ActionMessage &command) = 0;
+    virtual void transmit (route_id_t route, const ActionMessage &command) = 0;
     /** this function is the one that will change for various flavors of broker communication
     @details it takes a route info- a code of where to send the data and an action message
     and proceeds to transmit it to the appropriate location, this variant does a move operation instead of copy
     @param[in] route -the identifier for the routing information
     @param[in] command the actionMessage to transmit
     */
-    virtual void transmit (int32_t route, ActionMessage &&command) = 0;
+    virtual void transmit (route_id_t route, ActionMessage &&command) = 0;
     /** add a route to the type specific routing information and establish the connection
     @details add a route to a table, the connection information is contained in the string with the described
     identifier
     @param[in] route_id  the identifier for the route
     @param[in] routeInfo  a string describing the connection info
     */
-    virtual void addRoute (int route_id, const std::string &routeInfo) = 0;
+    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) = 0;
 
   public:
     /**default constructor
@@ -249,9 +249,9 @@ class CoreBroker : public Broker, public BrokerBase
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer (const std::string &query);
     /** locate the route to take to a particular federate*/
-    int32_t getRoute (global_federate_id_t fedid) const;
+    route_id_t getRoute (global_federate_id_t fedid) const;
     /** locate the route to take to a particular federate*/
-    int32_t getRoute(int32_t fedid) const { return getRoute(global_federate_id_t(fedid)); }
+    route_id_t getRoute(int32_t fedid) const { return getRoute(global_federate_id_t(fedid)); }
 
     const BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid) const;
 

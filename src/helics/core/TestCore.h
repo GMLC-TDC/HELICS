@@ -30,9 +30,9 @@ public:
     virtual void initializeFromArgs(int argc, const char * const *argv) override;
 
 protected:
-    virtual void transmit(int route_id, const ActionMessage &cmd) override;
-  virtual void transmit (int route_id, ActionMessage &&cmd) override;
-    virtual void addRoute(int route_id, const std::string &routeInfo) override;
+    virtual void transmit(route_id_t route_id, const ActionMessage &cmd) override;
+  virtual void transmit (route_id_t route_id, ActionMessage &&cmd) override;
+    virtual void addRoute(route_id_t route_id, const std::string &routeInfo) override;
 public:
     virtual std::string generateLocalAddressString () const override;
 
@@ -47,8 +47,8 @@ private:
     std::string brokerInitString;  //!< the initialization string to use for the Broker
     std::string brokerName;  //!< the name of the broker to connect to
     // void computeDependencies();
-    std::map<int32_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the different brokers
-    std::map<int32_t, std::shared_ptr<CommonCore>> coreRoutes;  //!< map of the different cores that can be routed to
+    std::map<route_id_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the different brokers
+    std::map<route_id_t, std::shared_ptr<CommonCore>> coreRoutes;  //!< map of the different cores that can be routed to
     mutable std::mutex routeMutex;  //!< mutex that protects the routing info
 };
 
