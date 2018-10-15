@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "MessageTimer.hpp"
 #include "helics/helics-config.h"
-#include <boost/foreach.hpp>
+#include "../common/fmt_format.h"
 
 static const std::string nullStr;
 #define LOG_ERROR(message) logMessage (LOG_LEVEL_ERROR, nullStr, message)
@@ -25,40 +25,40 @@ static const std::string nullStr;
 
 #ifndef LOGGING_DISABLED
 
-#define LOG_SUMMARY(message)                                                                                       \
+#define LOG_SUMMARY(message)                                                                                      \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_SUMMARY)                                                                                        \
+        if (logLevel >= LOG_LEVEL_SUMMARY)                                                                        \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_SUMMARY, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_SUMMARY, nullStr, message);                                                     \
         }                                                                                                         \
     } while (false)
 
-#define LOG_INTERFACES(message)                                                                                       \
+#define LOG_INTERFACES(message)                                                                                   \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_INTERFACES)                                                                                        \
+        if (logLevel >= LOG_LEVEL_INTERFACES)                                                                     \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_INTERFACES, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_INTERFACES, nullStr, message);                                                  \
         }                                                                                                         \
     } while (false)
 
 #ifndef DEBUG_LOGGING_DISABLED
-#define LOG_TIMING(message)                                                                                        \
+#define LOG_TIMING(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_TIMING)                                                                                        \
+        if (logLevel >= LOG_LEVEL_TIMING)                                                                         \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_TIMING, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_TIMING, nullStr, message);                                                      \
         }                                                                                                         \
     } while (false)
 
-#define LOG_DATA(message)                                                                                       \
+#define LOG_DATA(message)                                                                                         \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_DATA)                                                                         \
+        if (logLevel >= LOG_LEVEL_DATA)                                                                           \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_DATA, nullStr, message);                                                      \
+            logMessage (LOG_LEVEL_DATA, nullStr, message);                                                        \
         }                                                                                                         \
     } while (false)
 #else
@@ -70,9 +70,9 @@ static const std::string nullStr;
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_TRACE)                                                                                        \
+        if (logLevel >= LOG_LEVEL_TRACE)                                                                          \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_TRACE, nullStr, message);                                                                     \
+            logMessage (LOG_LEVEL_TRACE, nullStr, message);                                                       \
         }                                                                                                         \
     } while (false)
 #else
@@ -85,6 +85,8 @@ static const std::string nullStr;
 #define LOG_DATA(message) ((void)0)
 #define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
+
+using namespace std::chrono_literals;
 
 namespace helics
 {
@@ -280,7 +282,7 @@ iteration_result FederateState::waitSetup ()
 
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+        std::this_thread::sleep_for (50ms);
     }
     iteration_result ret;
     switch (getState ())
@@ -322,7 +324,7 @@ iteration_result FederateState::enterInitializingMode ()
 
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+        std::this_thread::sleep_for (50ms);
     }
     iteration_result ret;
     switch (getState ())
@@ -411,7 +413,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     // done but it isn't really an error so we need to deal with it.
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        std::this_thread::sleep_for (50ms);
     }
     iteration_result ret;
     switch (getState ())
@@ -441,7 +443,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
         events.clear ();  // clear the event queue
-        LOG_TRACE(timeCoord->printTimeStatus ());
+        LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
         ActionMessage treq (CMD_TIME_REQUEST);
@@ -461,7 +463,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         }
 
         addAction (treq);
-        LOG_TRACE(timeCoord->printTimeStatus ());
+        LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         if ((realtime) && (rt_lag < Time::maxVal ()))
         {
@@ -553,7 +555,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     // but the area must protect itself and should return something sensible
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+        std::this_thread::sleep_for (50ms);
     }
     iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED)
@@ -622,7 +624,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
 
     while (!processing.compare_exchange_weak (expected, true))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+        std::this_thread::sleep_for (50ms);
     }
     processing = false;
     return iteration_result::next_step;
@@ -745,7 +747,7 @@ message_processing_result FederateState::processQueue ()
 
 message_processing_result FederateState::processActionMessage (ActionMessage &cmd)
 {
-    LOG_TRACE("processing cmd " + prettyPrintString (cmd));
+    LOG_TRACE (fmt::format ("processing cmd {}", prettyPrintString (cmd)));
     switch (cmd.action ())
     {
     case CMD_IGNORE:
@@ -856,8 +858,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id.load ())
         {
-			if (state != HELICS_FINISHED)
-			{
+            if (state != HELICS_FINISHED)
+            {
                 setState (HELICS_FINISHED);
                 timeCoord->disconnect ();
                 cmd.dest_id = parent_broker_id;
@@ -865,7 +867,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 {
                     parent_->addActionMessage (cmd);
                 }
-			}
+            }
             return message_processing_result::halted;
         }
         else
@@ -944,7 +946,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 time_granted = timeCoord->getGrantedTime ();
                 allowed_send_time = timeCoord->allowedSendTime ();
-                LOG_TIMING (std::string ("Granted Time=") + std::to_string (time_granted));
+                LOG_TIMING (fmt::format ("Granted Time={}", time_granted));
                 timeGranted_mode = true;
                 return ret;
             }
@@ -960,17 +962,17 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         timeCoord->processTimeMessage (cmd);
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-        LOG_WARNING (std::string ("forced Granted Time=") + std::to_string (time_granted));
+        LOG_WARNING (fmt::format ("forced Granted Time={}", time_granted));
         timeGranted_mode = true;
         return message_processing_result::next_step;
     }
     case CMD_SEND_MESSAGE:
     {
-        auto epi = interfaceInformation.getEndpoint (interface_handle (cmd.dest_handle));
+        auto epi = interfaceInformation.getEndpoint (cmd.dest_handle);
         if (epi != nullptr)
         {
             timeCoord->updateMessageTime (cmd.actionTime);
-            LOG_DATA ("receive_message " + prettyPrintString (cmd));
+            LOG_DATA (fmt::format ("receive_message {}", prettyPrintString (cmd)));
             epi->addMessage (createMessageFromCommand (std::move (cmd)));
         }
     }
@@ -989,8 +991,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 subI->addData (src, cmd.actionTime, cmd.counter,
                                std::make_shared<const data_block> (std::move (cmd.payload)));
                 timeCoord->updateValueTime (cmd.actionTime);
-            LOG_DATA ("receive publication " + prettyPrintString (cmd));
-                LOG_TRACE(timeCoord->printTimeStatus ());
+                LOG_DATA (fmt::format ("receive publication {}", prettyPrintString (cmd)));
+                LOG_TRACE (timeCoord->printTimeStatus ());
             }
         }
     }
@@ -1009,13 +1011,13 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         return message_processing_result::error;
     case CMD_ADD_PUBLISHER:
     {
-        auto subI = interfaceInformation.getInput (interface_handle (cmd.dest_handle));
+        auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-			subI->addSource(cmd.getSource(),cmd.getString(0),cmd.getString(1));
+            subI->addSource (cmd.getSource (), cmd.getString (0), cmd.getString (1));
             if (subI->inputType.empty ())
             {
-                subI->inputType = cmd.getString(typeStringLoc);
+                subI->inputType = cmd.getString (typeStringLoc);
             }
             addDependency (global_federate_id_t (cmd.source_id));
         }
@@ -1023,12 +1025,12 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     break;
     case CMD_ADD_SUBSCRIBER:
     {
-        auto pubI = interfaceInformation.getPublication (interface_handle (cmd.dest_handle));
+        auto pubI = interfaceInformation.getPublication (cmd.dest_handle);
         if (pubI != nullptr)
         {
-            pubI->subscribers.emplace_back (global_federate_id_t (cmd.source_id),
-                                            interface_handle (cmd.source_handle));
-            addDependent (global_federate_id_t (cmd.source_id));
+            pubI->subscribers.emplace_back (cmd.source_id,
+                                            cmd.source_handle);
+            addDependent (cmd.source_id);
         }
     }
     break;
@@ -1079,43 +1081,43 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
 
 void FederateState::setProperties (const ActionMessage &cmd)
 {
-	if (state == HELICS_CREATED)
-	{
+    if (state == HELICS_CREATED)
+    {
         bool expected = false;
-            switch (cmd.action ())
+        switch (cmd.action ())
+        {
+        case CMD_FED_CONFIGURE_FLAG:
+            while (!processing.compare_exchange_weak (expected, true))
             {
-            case CMD_FED_CONFIGURE_FLAG:
-                while (!processing.compare_exchange_weak (expected, true))
-                {
-                    ;
-                }
-                setOptionFlag(cmd.messageID,checkActionFlag(cmd,indicator_flag));
-                processing = false;
-                break;
-            case CMD_FED_CONFIGURE_TIME:
-                while (!processing.compare_exchange_weak (expected, true))
-                {
-                    ;
-                }
-                setTimeProperty (cmd.messageID, cmd.actionTime);
-                processing = false;
-                break;
-            case CMD_FED_CONFIGURE_INT:
-                while (!processing.compare_exchange_weak (expected, true))
-                {
-                    ;
-                }
-                setIntegerProperty (cmd.messageID, cmd.counter);
-                processing = false;
-                break;
-            default:
-                break;
+                ;
             }
-	}
-	else
-	{
-		switch (cmd.action())
-		{
+            setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
+            processing = false;
+            break;
+        case CMD_FED_CONFIGURE_TIME:
+            while (!processing.compare_exchange_weak (expected, true))
+            {
+                ;
+            }
+            setTimeProperty (cmd.messageID, cmd.actionTime);
+            processing = false;
+            break;
+        case CMD_FED_CONFIGURE_INT:
+            while (!processing.compare_exchange_weak (expected, true))
+            {
+                ;
+            }
+            setIntegerProperty (cmd.messageID, cmd.counter);
+            processing = false;
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (cmd.action ())
+        {
         case CMD_FED_CONFIGURE_FLAG:
         case CMD_FED_CONFIGURE_TIME:
         case CMD_FED_CONFIGURE_INT:
@@ -1123,8 +1125,8 @@ void FederateState::setProperties (const ActionMessage &cmd)
             break;
         default:
             break;
-		}
-	}
+        }
+    }
 }
 
 void FederateState::setTimeProperty (int timeProperty, Time propertyVal)
@@ -1324,8 +1326,9 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     if ((loggerFunction) && (level <= logLevel))
     {
         loggerFunction (level,
-                        (logMessageSource.empty ()) ? name + '(' + std::to_string (global_id.load ().baseValue()) + ')' :
-                                                      logMessageSource,
+                        (logMessageSource.empty ()) ?
+                          fmt::format ("{} ({})", name, global_id.load ().baseValue ()):
+                          logMessageSource,
                         message);
     }
 }
@@ -1347,11 +1350,12 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [](auto &dep) { return std::to_string (dep.baseValue()); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (query == "dependents")
     {
-        return generateStringVector (timeCoord->getDependents (), [](auto &dep) { return std::to_string (dep.baseValue()); });
+        return generateStringVector (timeCoord->getDependents (),
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (queryCallback)
     {

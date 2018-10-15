@@ -2350,10 +2350,10 @@ void CommonCore::processCommand (ActionMessage &&command)
         // route the message to all the subscribers
         if (command.dest_id == parent_broker_id)
         {
-            auto fed = getFederateCore (global_federate_id_t (command.source_id));
+            auto fed = getFederateCore (command.source_id);
             if (fed != nullptr)
             {
-                auto pubInfo = fed->interfaces ().getPublication (interface_handle (command.source_handle));
+                auto pubInfo = fed->interfaces ().getPublication (command.source_handle);
                 if (pubInfo != nullptr)
                 {
                     for (auto &subscriber : pubInfo->subscribers)
@@ -2375,7 +2375,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         if (command.dest_id == global_broker_id_local)
         {
             sendToLogger (parent_broker_id, command.messageID,
-                          getFederateNameNoThrow (global_federate_id_t (command.source_id)), command.payload);
+                          getFederateNameNoThrow (command.source_id), command.payload);
         }
         else
         {
@@ -2392,7 +2392,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             else
             {
                 sendToLogger (parent_broker_id, 0,
-                              getFederateNameNoThrow (global_federate_id_t (command.source_id)), command.payload);
+                              getFederateNameNoThrow (command.source_id), command.payload);
             }
         }
         else
@@ -2513,7 +2513,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
 
     case CMD_SEND_MESSAGE:
-        if ((command.dest_id == parent_broker_id) && (isLocal (global_federate_id_t (command.source_id))))
+        if ((command.dest_id == parent_broker_id) && (isLocal (command.source_id)))
         {
             deliverMessage (processMessage (command));
         }
@@ -2570,10 +2570,19 @@ void CommonCore::registerInterface (ActionMessage &command)
             break;
         case CMD_REG_FILTER:
 
-            createFilter (global_broker_id_local, interface_handle (command.source_handle), command.name,
+            createFilter (global_broker_id_local, command.source_handle, command.name,
                           command.getString (typeStringLoc), command.getString (typeOutStringLoc),
                           checkActionFlag (command, clone_flag));
-            
+            if (!hasFilters)
+            {
+                hasFilters = true;
+                if (timeCoord->addDependent (higher_broker_id))
+                {
+                    ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
+                    transmit (getRoute (higher_broker_id), add);
+                    timeCoord->addDependency (higher_broker_id);
+                }
+            }
             break;
         default:
             return;
@@ -2711,6 +2720,16 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         {
             routeMessage (std::move (command));
         }
+        if (!hasFilters)
+        {
+            hasFilters = true;
+            if (timeCoord->addDependent (higher_broker_id))
+            {
+                ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
+                transmit (getRoute (higher_broker_id), add);
+                timeCoord->addDependency (higher_broker_id);
+            }
+        }
     }
     break;
     default:
@@ -2725,7 +2744,7 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         processFilterInfo (command);
         if ((command.source_id != global_broker_id_local) && (!checkActionFlag (command, destination_target)))
         {
-            auto fed = getFederateCore (global_federate_id_t (command.dest_id));
+            auto fed = getFederateCore (command.dest_id);
             if (fed != nullptr)
             {
                 command.setAction (CMD_ADD_DEPENDENT);
@@ -2757,22 +2776,12 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
             if (filthandle != nullptr)
             {
                 filthandle->used = true;
-                if (!hasFilters)
-                {
-                    hasFilters = true;
-                    if (timeCoord->addDependent (higher_broker_id))
-                    {
-                        ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
-                        transmit (getRoute(higher_broker_id), add);
-                        timeCoord->addDependency (higher_broker_id);
-                    }
-                }
             }
         }
     }
     else
     {
-        auto fed = getFederateCore (global_federate_id_t (command.dest_id));
+        auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (command);
@@ -2787,7 +2796,7 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
 
 void CommonCore::processFilterInfo (ActionMessage &command)
 {
-    auto filterInfo = getFilterCoordinator (interface_handle (command.dest_handle));
+    auto filterInfo = getFilterCoordinator (command.dest_handle);
     if (filterInfo == nullptr)
     {
         return;
@@ -2841,7 +2850,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             if (newFilter == nullptr)
             {
                 newFilter =
-                  createFilter (global_broker_id_t (command.source_id), interface_handle (command.source_handle),
+                  createFilter (global_broker_id_t (command.source_id), command.source_handle,
                                 command.name, command.getString (typeStringLoc),
                                 command.getString (typeOutStringLoc), checkActionFlag (command, clone_flag));
             }
@@ -3304,9 +3313,9 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     {
         processCommandsForCore (cmd);
     }
-    else if (isLocal (global_federate_id_t (cmd.dest_id)))
+    else if (isLocal (cmd.dest_id))
     {
-        auto fed = getFederateCore (global_federate_id_t (cmd.dest_id));
+        auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
             fed->addAction (cmd);
@@ -3314,7 +3323,7 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
     }
     else
     {
-        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        auto route = getRoute (cmd.dest_id);
         transmit (route, cmd);
     }
 }
@@ -3475,7 +3484,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
             if (clFilter->core_id == global_broker_id_local)
             {
                 auto FiltI =
-                  filters.find (global_handle (global_broker_id_local, interface_handle (clFilter->handle)));
+                  filters.find (global_handle (global_broker_id_local, clFilter->handle));
                 if (FiltI != nullptr)
                 {
                     if (FiltI->filterOp != nullptr)
@@ -3676,7 +3685,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     }
     else
     {
-        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        auto route = getRoute (cmd.dest_id);
         transmit (route, cmd);
     }
 }

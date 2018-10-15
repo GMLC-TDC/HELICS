@@ -364,7 +364,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             if (checkActionFlag (command, error_flag))
             {
                 // generate an error message
-				LOG_ERROR(global_broker_id_local, identifier, std::string("unable to register broker ") + command.payload);
+				LOG_ERROR(global_broker_id_local, identifier, fmt::format("unable to register broker {}",command.payload));
                 return;
             }
 
@@ -803,7 +803,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else
         {
-            transmit (getRoute (global_federate_id_t (command.dest_id)), command);
+            transmit (getRoute (command.dest_id), command);
         }
     }
     break;
@@ -880,24 +880,24 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_SEND_FOR_FILTER_AND_RETURN:
     case CMD_FILTER_RESULT:
     case CMD_NULL_MESSAGE:
-        if (command.dest_id == global_broker_id)
+        if (command.dest_id == parent_broker_id)
         {
             auto route = fillMessageRouteInformation (command);
             transmit (route, command);
         }
         else
         {
-            transmit (getRoute (global_federate_id_t (command.dest_id)), command);
+            transmit (getRoute (command.dest_id), command);
         }
         break;
     case CMD_PUB:
-        transmit (getRoute (global_federate_id_t (command.dest_id)), command);
+        transmit (getRoute (command.dest_id), command);
         break;
 
     case CMD_LOG:
         if (isRootc)
         {
-			sendToLogger(global_federate_id_t(command.source_id), command.counter, "", command.payload);
+			sendToLogger(command.source_id, command.counter, std::string(), command.payload);
         }
         else
         {
@@ -907,7 +907,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (isRootc)
         {
-			sendToLogger(global_federate_id_t(command.source_id),LOG_LEVEL_ERROR, "", command.payload);
+			sendToLogger(global_federate_id_t(command.source_id),LOG_LEVEL_ERROR, std::string(), command.payload);
         }
         else
         {
