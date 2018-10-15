@@ -37,7 +37,7 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 /** destructor*/
 TcpComms::~TcpComms () { disconnect (); }
 
-int TcpComms::processIncomingMessage (ActionMessage &M)
+int TcpComms::processIncomingMessage (ActionMessage &&M)
 {
     if (isProtocolCommand (M))
     {
@@ -475,7 +475,7 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-                    assert (false);
+					logWarning("unknown message destination message dropped");
                 }
             }
         }

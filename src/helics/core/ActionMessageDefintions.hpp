@@ -241,6 +241,7 @@ enum class action_t : int32_t
 #define CLOSE_RECEIVER 23425215
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
+#define CONNECTION_INFORMATION 299
 #define DISCONNECT 2523
 #define DISCONNECT_ERROR 2623
 

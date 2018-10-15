@@ -14,6 +14,9 @@ namespace tcp
 {
 using boost::asio::ip::tcp;
 using namespace std::literals::chrono_literals;
+
+std::atomic<int> TcpConnection::idcounter{ 10 };
+
 void TcpConnection::start ()
 {
     if (triggerhalt)
@@ -248,7 +251,7 @@ TcpConnection::TcpConnection (boost::asio::io_service &io_service,
                               const std::string &connection,
                               const std::string &port,
                               size_t bufferSize)
-    : socket_ (io_service), data (bufferSize)
+    : socket_ (io_service), data (bufferSize),idcode(idcounter++)
 {
     tcp::resolver resolver (io_service);
     tcp::resolver::query query (tcp::v4 (), connection, port);
@@ -745,6 +748,17 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
     {
         new_connection->close ();
     }
+}
+
+
+TcpConnection::pointer TcpServer::findSocket(int connectorID) const
+{
+	auto ptr = std::find_if(connections.begin(), connections.end(), [connectorID](const auto &conn) {return (conn->getIdentifier() == connectorID); });
+	if (ptr != connections.end())
+	{
+		return *ptr;
+	}
+	return nullptr;
 }
 
 void TcpServer::close ()
