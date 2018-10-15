@@ -27,6 +27,7 @@ series simulation.
 
  installation/index
  introduction/index
+ configuration/index
  developer-guide/index
  apps/index
  c-api-reference/index

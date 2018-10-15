@@ -14,9 +14,9 @@ HELICS into their application using the C Shared Library API using FFI.
 In addition, the team has leveraged a development tool called SWIG to
 build interfaces in the high level programming languages listed below.
 
-1)  Python
-2)  MATLAB
-3)  Java
+- Python
+- MATLAB
+- Java
 
 SWIG allows cross platform support, i.e. extensions will work for
 Windows, Mac and Linux. The user does not necessarily need to install
