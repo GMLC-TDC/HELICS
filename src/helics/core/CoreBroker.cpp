@@ -289,7 +289,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _brokers.insert (command.name,
                          global_broker_id_t (static_cast<global_broker_id_t::base_type> (_brokers.size ())),
                          command.name);
-        if (command.source_id == parent_broker_id)
+        if (!command.source_id.isValid())
         {
 			//TODO:: this will need to be updated when we enable mesh routing
             _brokers.back ().route_id = route_id_t(static_cast<route_id_t::base_type>(_brokers.size ()));
@@ -303,7 +303,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _brokers.back ()._core = checkActionFlag (command, core_flag);
         if (!isRootc)
         {
-            if (global_broker_id_local != parent_broker_id)
+            if (global_broker_id_local.isValid())
             {
                 command.source_id = global_broker_id_local;
                 transmit (parent_route_id, command);
@@ -474,7 +474,7 @@ std::string CoreBroker::generateFederationSummary () const
             break;
         }
     }
-    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t {}brokers/cores\n\t{} "
+    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t{} brokers/cores\n\t{} "
                                       "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
                                       _federates.size (), _brokers.size (), pubs, ipts, epts, filt);
     return output;
@@ -1383,6 +1383,7 @@ bool CoreBroker::connect ()
 				if (!_isRoot)
 				{
 					ActionMessage m(CMD_REG_BROKER);
+                    m.source_id = global_federate_id_t ();
 					m.name = getIdentifier();
 					m.setStringData(getAddress());
 					transmit(parent_route_id, m);
@@ -1530,11 +1531,13 @@ void CoreBroker::executeInitializationOperations ()
 {
     checkDependencies ();
     ActionMessage m (CMD_INIT_GRANT);
+    m.source_id = global_broker_id_local;
     brokerState = broker_state_t::operating;
     for (auto &broker : _brokers)
     {
         if (!broker._nonLocal)
         {
+            m.dest_id = broker.global_id;
             transmit (broker.route_id, m);
         }
     }

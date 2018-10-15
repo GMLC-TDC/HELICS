@@ -69,7 +69,7 @@ class TcpComms final : public NetworkCommsInterface
 	bool establishBrokerConnection(std::shared_ptr<AsioServiceManager> &ioserv, std::shared_ptr<TcpConnection> &brokerConnection);
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
-    int processIncomingMessage (ActionMessage &cmd);
+    int processIncomingMessage (ActionMessage &&cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
     BlockingQueue<ActionMessage> rxMessageQueue;
 

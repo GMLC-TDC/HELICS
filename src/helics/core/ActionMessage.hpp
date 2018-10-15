@@ -33,7 +33,7 @@ class ActionMessage
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t messageID = 0;  //!< 8 -- message ID for a variety of purposes
-    global_federate_id_t source_id;  //!< 12 -- for federate_id or route_id
+    global_federate_id_t source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
     interface_handle source_handle;  //!< 16 -- for local handle or local code
     global_federate_id_t dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
     interface_handle dest_handle;  //!< 24 local handle for a targeted message

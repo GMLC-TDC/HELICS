@@ -1058,8 +1058,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 errorString = commandErrorString (cmd.messageID);
                 return message_processing_result::error;
             }
-            global_id = global_federate_id_t (cmd.dest_id);
-            interfaceInformation.setGlobalId (global_federate_id_t (cmd.dest_id));
+            global_id = cmd.dest_id;
+            interfaceInformation.setGlobalId (cmd.dest_id);
             timeCoord->source_id = global_id;
             return message_processing_result::next_step;
         }

@@ -65,15 +65,8 @@ class TcpCommsSS final : public NetworkCommsInterface
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
-    int processIncomingMessage (ActionMessage &cmd);
+    int processIncomingMessage (ActionMessage &&cmd);
     
-
-    void txReceive (const char *data, size_t bytes_received, const std::string &errorMessage);
-
-    void txPriorityReceive (std::shared_ptr<TcpConnection> connection,
-                            const char *data,
-                            size_t bytes_received,
-                            const boost::system::error_code &error);
     /** callback function for receiving data asynchronously from the socket
     @param connection pointer to the connection
     @param data the pointer to the data

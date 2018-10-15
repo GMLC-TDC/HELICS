@@ -123,9 +123,10 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     @return true if connected, false if the timeout was reached
     */
     bool waitUntilConnected(std::chrono::milliseconds timeOut);
+	int getIdentifier() const { return idcode; };
   private:
     TcpConnection (boost::asio::io_service &io_service, size_t bufferSize)
-        : socket_ (io_service), data (bufferSize)
+        : socket_ (io_service), data (bufferSize),idcode(idcounter++)
     {
     }
     TcpConnection(boost::asio::io_service &io_service,
@@ -142,6 +143,8 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     {
         callback(shared_from_this(), data.data(), message_size, error);
     }
+	static std::atomic<int> idcounter;
+
     std::atomic<size_t> residBufferSize{0};
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
@@ -153,7 +156,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorCall;
     std::function<void(int level, const std::string &logMessage)> logFunction;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
-
+	const int idcode;
     void connect_handler(const boost::system::error_code &error);
 };
 
@@ -275,7 +278,8 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
         errorCall = std::move (errorFunc);
     }
     void handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer new_connection);
-
+	/** get a socket by it identification code*/
+	TcpConnection::pointer findSocket(int connectorID) const;
   private:
     TcpServer (boost::asio::io_service &io_service,
                const std::string &address,
@@ -300,7 +304,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     std::atomic<bool> halted{false};
     bool reuse_address = false;
     // this data structure is protected by the accepting mutex
-    std::vector<std::shared_ptr<TcpConnection>> connections;
+    std::vector<TcpConnection::pointer> connections;
 };
 
 }  // namespace tcp

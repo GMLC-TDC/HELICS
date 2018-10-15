@@ -74,6 +74,7 @@ bool CommonCore::connect ()
                 // now register this core object as a broker
 
                 ActionMessage m (CMD_REG_BROKER);
+                m.source_id = global_federate_id_t ();
                 m.name = getIdentifier ();
                 m.setStringData (getAddress ());
                 setActionFlag (m, core_flag);
@@ -2011,8 +2012,8 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             }
             else
             {
-                fed->global_id = global_federate_id_t (command.dest_id);
-                loopFederates.addSearchTerm (global_federate_id_t (command.dest_id), command.name);
+                fed->global_id = command.dest_id;
+                loopFederates.addSearchTerm (command.dest_id, command.name);
             }
 
             // push the command to the local queue
@@ -2043,7 +2044,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
                 queryResp.messageID = command.messageID;
                 queryResp.payload = std::move (repStr);
                 queryResp.counter = command.counter;
-                transmit (getRoute (global_federate_id_t (queryResp.dest_id)), queryResp);
+                transmit (getRoute (queryResp.dest_id), queryResp);
             }
         }
         else
@@ -2072,7 +2073,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         }
 
         queryResp.payload = std::move (repStr);
-        transmit (getRoute (global_federate_id_t (queryResp.dest_id)), queryResp);
+        transmit (getRoute (queryResp.dest_id), queryResp);
     }
     break;
     case CMD_QUERY_REPLY:
@@ -2474,7 +2475,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_INIT:
     {
-        auto fed = getFederateCore (global_federate_id_t (command.source_id));
+        auto fed = getFederateCore (command.source_id);
         if (fed != nullptr)
         {
             fed->init_transmitted = true;
