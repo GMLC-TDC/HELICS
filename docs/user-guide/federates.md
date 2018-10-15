@@ -22,7 +22,7 @@ HELICS defines three specific types of federates defined by the nature of the me
 ## Federate Configuration Options via JSON ##
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. This file will be read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
-As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be suprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange and in Section xxxxxxx we'll look at the timing parameter. Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
+As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be suprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange and in [Timing section](./timing.md) we'll look at the timing parameters. Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
 
 
 ### Data Exchange Options ###
@@ -35,9 +35,9 @@ As the fundamental role of the co-simulation platform is to manage the synchroni
 "source_only":false,
 "observer":false,
 ```
-* **only_update_on_change [false]** - It can easily be the case that a co-simulated system xxxxxxx
+* **only_update_on_change [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one. 
 
-* **only_transmit_on_change [false]** - Similarly, xxxxxxx
+* **only_transmit_on_change [false]** - Complementarily to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
 
 * **source_only [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true` because xxxxxxx
 
@@ -71,7 +71,7 @@ xxxxxxx - message and broker topology diagrams
 
 This simulation is run for 24 hours.
 
-Let's make a comparison between running these two simulators independently and running them as a co-simulation. To run them independently, simply turn off the publications and subscriptions by xxxxxxx and to run as a co-sim just xxxxxxx.
+Let's make a comparison between running these two simulators independently and running them as a co-simulation. To run them independently, simply turn off the publications and subscriptions by xxxxxxx and to run as a co-sim just xxxxxxx (helics-cli?).
 
 We can compare the results of the two simulations to see the impact of the interaction between the two. The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day. As you can see xxxxxxx
 
