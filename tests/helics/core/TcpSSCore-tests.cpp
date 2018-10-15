@@ -29,9 +29,11 @@ BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label("cip"))
 using boost::asio::ip::tcp;
 using helics::Core;
 
-#define TCP_BROKER_PORT 24151
-#define TCP_BROKER_PORT_STRING "24151"
+#define TCP_BROKER_PORT 33133
+#define TCP_BROKER_PORT_STRING "33133"
 
+#define TCP_BROKER_PORT_ALT 33134
+#define TCP_BROKER_PORT_ALT_STRING "33134"
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
 {
@@ -56,11 +58,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
     comm.setTimeout (1000);
+    comm.setServerMode(false);
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
     std::this_thread::sleep_for (100ms);
     int cnt = 0;
-    while (counter != 1)
+    while (counter <1)
     {
         std::this_thread::sleep_for (100ms);
         ++cnt;
@@ -102,13 +105,14 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
+    comm.setServerMode(false);
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
     boost::system::error_code error;
     int cnt = 0;
-    while (counter != 1)
+    while (counter < 2)
     {
         std::this_thread::sleep_for (100ms);
         ++cnt;
@@ -117,7 +121,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
             break;
         }
     }
-    BOOST_CHECK_EQUAL (counter, 1);
+    BOOST_CHECK_EQUAL (counter, 2);
 
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
@@ -129,7 +133,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 
 BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(500ms);
     std::atomic<int> ServerCounter{0};
     std::atomic<int> CommCounter{0};
     std::atomic<size_t> len{0};
@@ -160,6 +164,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
+    comm.setServerMode(false);
 
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);

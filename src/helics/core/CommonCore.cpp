@@ -2508,6 +2508,10 @@ void CommonCore::processCommand (ActionMessage &&command)
             {
                 enteredExecutionMode = true;
             }
+            if (!timeCoord->hasActiveTimeDependencies())
+            {
+                timeCoord->disconnect();
+            }
         }
     }
     break;
@@ -2719,16 +2723,6 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         else
         {
             routeMessage (std::move (command));
-        }
-        if (!hasFilters)
-        {
-            hasFilters = true;
-            if (timeCoord->addDependent (higher_broker_id))
-            {
-                ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
-                transmit (getRoute (higher_broker_id), add);
-                timeCoord->addDependency (higher_broker_id);
-            }
         }
     }
     break;

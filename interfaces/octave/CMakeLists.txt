@@ -17,15 +17,8 @@ if(NOT MKOCTFILE_EXECUTABLE)
   )
 endif()
 
-if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/helicsOCTAVE_wrap.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp COPYONLY
-  )
-
-else()
-
-  # Compile OCT file add_custom_target("helicsOCT" ALL)
+if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+    # Compile OCT file add_custom_target("helicsOCT" ALL)
   file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
   # custom command for building the wrap file
@@ -48,6 +41,14 @@ else()
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cxx
   )
 
+
+else()
+
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/helicsOCTAVE_wrap.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp COPYONLY
+  )
 endif()
 
 add_custom_command(

@@ -11,22 +11,8 @@ include(UseJava)
 include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JNI_INCLUDE_DIRS})
 
-if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
-  file(
-    COPY
-    ${CMAKE_CURRENT_SOURCE_DIR}/interface/
-    DESTINATION
-    ${CMAKE_CURRENT_BINARY_DIR}
-  )
-  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    # Update if necessary
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long")
-  endif()
-  add_library(JNIhelics SHARED interface/helicsJavaJAVA_wrap.c)
-  target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
-  set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-else(DISABLE_SWIG)
-  # Enable generation using swig
+if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+# Enable generation using swig
 
   set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
 
@@ -42,7 +28,23 @@ else(DISABLE_SWIG)
 
   set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
 
-endif() # DISABLE_SWIG
+
+else()
+  
+  file(
+    COPY
+    ${CMAKE_CURRENT_SOURCE_DIR}/interface/
+    DESTINATION
+    ${CMAKE_CURRENT_BINARY_DIR}
+  )
+  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    # Update if necessary
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long")
+  endif()
+  add_library(JNIhelics SHARED interface/helicsJavaJAVA_wrap.c)
+  target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
+  set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
+endif() # ENABLE_SWIG
 
 configure_file(
   MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY

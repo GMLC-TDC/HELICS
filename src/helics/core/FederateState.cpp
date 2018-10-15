@@ -23,7 +23,7 @@ static const std::string nullStr;
 #define LOG_ERROR(message) logMessage (LOG_LEVEL_ERROR, nullStr, message)
 #define LOG_WARNING(message) logMessage (LOG_LEVEL_WARNING, nullStr, message)
 
-#ifndef LOGGING_DISABLED
+#ifdef ENABLE_LOGGING
 
 #define LOG_SUMMARY(message)                                                                                      \
     do                                                                                                            \
@@ -43,7 +43,7 @@ static const std::string nullStr;
         }                                                                                                         \
     } while (false)
 
-#ifndef DEBUG_LOGGING_DISABLED
+#ifdef ENABLE_DEBUG_LOGGING
 #define LOG_TIMING(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
@@ -66,7 +66,7 @@ static const std::string nullStr;
 #define LOG_DATA(message)
 #endif
 
-#ifndef TRACE_LOGGING_DISABLED
+#ifdef ENABLE_TRACE_LOGGING
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \

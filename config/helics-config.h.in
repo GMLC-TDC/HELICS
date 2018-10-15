@@ -13,9 +13,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #cmakedefine DISABLE_TCP_CORE
 
-#cmakedefine DISABLE_LOGGING
-#cmakedefine DISABLE_TRACE_LOGGING
-#cmakedefine DISABLE_DEBUG_LOGGING
+#cmakedefine ENABLE_LOGGING
+#cmakedefine ENABLE_TRACE_LOGGING
+#cmakedefine ENABLE_DEBUG_LOGGING
 
 #cmakedefine BOOST_STATIC
 

@@ -236,6 +236,7 @@ void TcpCommsSS::queue_tx_function ()
                     return;
                 }
             }
+            brokerConnection->send(cstring);
         }
         catch (std::exception &e)
         {

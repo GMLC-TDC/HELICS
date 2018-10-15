@@ -110,9 +110,9 @@ cmake_dependent_option(
   ON
 )
 option(
-  DISABLE_SWIG
-  "disable the use of the swig executable to generate interface code and use repository code instead"
-  OFF
+  ENABLE_SWIG
+  "enable the use of the swig executable to generate interface code and use repository code instead"
+  ON
 )
 option(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
 
@@ -184,7 +184,7 @@ endif()
 if(MSVC)
 	option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
 	mark_as_advanced(EMBEDDED_DEBUG_INFO)
-  if(EMBEDDED_DEBUG_INFO)
+    if(EMBEDDED_DEBUG_INFO)
 		ucm_set_embedded_debug(EMBEDDED)
 	else()
 		ucm_set_embedded_debug(EXTERNAL)
@@ -293,7 +293,7 @@ if(ENABLE_MPI)
 		set(HELICS_HAVE_MPI TRUE)
 		target_link_libraries(helics_base INTERFACE MPI::MPI_C)
 	else()
-		set(HELICS_HAVE_MPI FALSE)
+		message(SEND_ERROR "MPI not found")
   endif(MPI_C_FOUND)
 else(ENABLE_MPI)
 	set(HELICS_HAVE_MPI FALSE)
@@ -373,7 +373,7 @@ if(ENABLE_ZeroMQ)
 else(ENABLE_ZeroMQ)
 	set(HELICS_HAVE_ZEROMQ FALSE)
   if(ENABLE_ZeroMQ)
-		message(WARNING "ZeroMQ not found")
+		message(SEND_ERROR "ZeroMQ not found")
    endif()
 endif(ENABLE_ZeroMQ)
 
@@ -486,24 +486,24 @@ if (ZMQ_USE_STATIC_LIBRARY)
 endif()
 # message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
-option(DISABLE_LOGGING "disable all normal, debug, and trace logging in HELICS" OFF)
+option(ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
 
 cmake_dependent_option(
-  DISABLE_TRACE_LOGGING
-  "disable trace logging"
-  OFF
-  "NOT DISABLE_LOGGING"
-  OFF
+  ENABLE_TRACE_LOGGING
+  "enable trace logging"
+  ON
+  "ENABLE_LOGGING"
+  ON
 )
 cmake_dependent_option(
-  DISABLE_DEBUG_LOGGING
-  "disable debug logging"
-  OFF
-  "NOT DISABLE_LOGGING"
-  OFF
+  ENABLE_DEBUG_LOGGING
+  "enable debug logging"
+  ON
+  "ENABLE_LOGGING"
+  ON
 )
-mark_as_advanced(DISABLE_TRACE_LOGGING)
-mark_as_advanced(DISABLE_DEBUG_LOGGING)
+mark_as_advanced(ENABLE_TRACE_LOGGING)
+mark_as_advanced(ENABLE_DEBUG_LOGGING)
 
 # -----------------------------------------------------------------------------
 # create the fmt header only targets

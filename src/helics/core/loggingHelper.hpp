@@ -32,7 +32,7 @@ enum log_level : int
 #define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);
 #define LOG_WARNING(id, ident, message) sendToLogger (id, log_level::warning, ident, message);
 
-#ifndef LOGGING_DISABLED
+#ifdef ENABLE_LOGGING
 #define LOG_SUMMARY(id, ident, message)                                                                           \
     if (maxLogLevel >= log_level::summary)                                                                        \
     {                                                                                                             \
@@ -51,7 +51,7 @@ enum log_level : int
         sendToLogger (id, log_level::interfaces, ident, message);                                                 \
     }
 
-#ifndef DEBUG_LOGGING_DISABLED
+#ifdef ENABLE_DEBUG_LOGGING
 #define LOG_TIMING(id, ident, message)                                                                            \
     if (maxLogLevel >= log_level::timing)                                                                         \
     {                                                                                                             \
@@ -67,7 +67,7 @@ enum log_level : int
 #define LOG_DATA_MESSAGES(id, ident, message)
 #endif
 
-#ifndef TRACE_LOGGING_DISABLED
+#ifdef ENABLE_TRACE_LOGGING
 #define LOG_TRACE(id, ident, message)                                                                             \
     if (maxLogLevel >= log_level::trace)                                                                          \
     {                                                                                                             \

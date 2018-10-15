@@ -205,6 +205,10 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
 
 std::string NetworkCommsInterface::getAddress () const 
 { 
+    if ((PortNumber < 0)&&(!serverMode))
+    {
+        return name;
+    }
 	if ((localTarget_ == "tcp://*") || (localTarget_ =="tcp://0.0.0.0"))
     {
         return makePortAddress ("tcp://127.0.0.1", PortNumber);

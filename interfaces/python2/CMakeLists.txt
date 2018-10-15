@@ -4,7 +4,7 @@
 # file and DISCLAIMER for more details.
 #
 
-if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
+if(NOT ENABLE_SWIG OR NOT SWIG_EXECUTABLE)
 
   message(ERROR "Python 2 build requires swig")
 

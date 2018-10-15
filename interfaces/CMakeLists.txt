@@ -4,7 +4,7 @@
 # file and DISCLAIMER for more details.
 #
 
-if(NOT DISABLE_SWIG)
+if(ENABLE_SWIG)
   if(WIN32 AND NOT MSYS)
     if(NOT CMAKE_PROGRAM_PATH)
       set(

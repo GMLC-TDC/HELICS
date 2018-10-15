@@ -5,8 +5,21 @@
 #
 
 
-if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
-  file(
+if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+   # Enable generation using swig
+
+  set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
+  #set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
+  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc.helics")
+
+  swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
+
+  swig_link_libraries(CShelics helicsSharedLib)
+
+  set_target_properties(CShelics PROPERTIES FOLDER interfaces)
+
+else()
+ file(
     COPY
     ${CMAKE_CURRENT_SOURCE_DIR}/interface/
     DESTINATION
@@ -19,20 +32,7 @@ if(DISABLE_SWIG OR NOT SWIG_EXECUTABLE)
   #add_library(JNIhelics SHARED interface/helicsJavaJAVA_wrap.c)
   #target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
   #set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-else(DISABLE_SWIG)
-  # Enable generation using swig
-
-  set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
-  #set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
-  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc.helics")
-
-  swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
-
-  swig_link_libraries(CShelics helicsSharedLib)
-
-  set_target_properties(CShelics PROPERTIES FOLDER interfaces)
-
-endif() # DISABLE_SWIG
+endif() # ENABLE_SWIG
 
 if(WIN32)
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
