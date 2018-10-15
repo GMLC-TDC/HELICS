@@ -43,6 +43,8 @@ As the fundamental role of the co-simulation platform is to manage the synchroni
 
 * **observer [false]** - Conversely, some federates may only participate in the federation by recording values (perhaps for diagnostic purposes or for logging results). If using such a federate, set the `observer` flag to `true` because xxxxxxx
 
+(xxxxxxx - How do we configure a subscription so that the subscribing federate is only woken up if the value changes by, say, 10%?)
+
 ## Value Federate Configuration in JSON ##
 
 (xxxxxxx - publication and subscription examples)
@@ -53,10 +55,10 @@ As the fundamental role of the co-simulation platform is to manage the synchroni
 
 To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [here](xxxxxxx) but to use them you'll need to get some specific software installed; here are the instructions:
 
-  1. [HELICS](xxxxxxx)
-  2. [GridLAB-D](xxxxxxx) with the HELICS extensions enabled
-  3. [Python](xxxxxxx) if you haven't already
-  4. [PyPower](xxxxxxx)
+  1. [HELICS](https://gmlc-tdc.github.io/HELICS-src/installation/index.html)
+  2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
+  3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed
+  4. [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
 
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
