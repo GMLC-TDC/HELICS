@@ -172,7 +172,6 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("fed3 == null");
 			}
 			helics.helicsFederateSetFlagOption(fed2, 1, helics.getHelics_false());
-			int delay = helics_time_properties.helics_time_property_input_delay.swigValue();
 			
 			helics.helicsFederateSetTimeProperty(fed2,
 					helics_time_properties.helics_time_property_input_delay.swigValue(), 1.0);
@@ -355,7 +354,15 @@ public class JavaHelicsApiTests {
 
 			String ep1NameString = helics.helicsEndpointGetName(ep1);
 			String ep1TypeString = helics.helicsEndpointGetType(ep1);
+			
+			if(!ep1NameString.contains("fed1/Ep1")) {
+				javaHelicsApiTests.helicsAssert("!ep1NameString.contains(\"fed1/Ep1\")");
+			}
 
+			if(!ep1TypeString.contains("string")) {
+				javaHelicsApiTests.helicsAssert("!ep1TypeString.contains(\"string\")");
+			}
+			
 			SWIGTYPE_p_void coreFed1 = helics.helicsFederateGetCoreObject(fed1);
 			if (coreFed1 == null) {
 				javaHelicsApiTests.helicsAssert("coreFed1 == null");
@@ -479,8 +486,8 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("!msg3OriginalDestination.equals(\"\")");
 			}
 
-			String sub1TypeString = "";
-			sub1TypeString = helics.helicsInputGetType(sub1);
+//			String sub1TypeString = "";
+//			sub1TypeString = helics.helicsInputGetType(sub1);
 			// Commented for now till C APIs for HELICS 2.0 are completely tested.
 //			if (!sub1TypeString.contains("double")) {
 //				javaHelicsApiTests.helicsAssert("!sub1TypeString.equals(\"double\")");
