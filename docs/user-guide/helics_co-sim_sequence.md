@@ -8,9 +8,11 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
   
   If you're familiar with transmission and distribution system simulation tools, you might have already realized that there is a bit of a mis-match in how those tools operate that creates a small problem in our design: typically transmision system solvers assuming a balanced (positive-sequence only) network while distribution systems are often more comprehesive and model all three phases and support imbalanced operation. This implies that the the voltages being supplied to the distribution system will always be balanced and only the positive-sequence component of the distribution system load can be used by the transmission system. When defining the values that will be sent as messages between federates, it is important that these modeling differences be taken into account.
   
-  Given the fact that only two federates are being used (the minimum number ofr any co-simulation), only a single broker is required
-  
-  (xxxxxxx insert graphic showing the message topology and the broker topology)
+  Given the fact that only two federates are being used (the minimum number for any co-simulation), only a single broker is required.
+
+![message topology 1](../img/ditl_message_topology.png)
+
+![broker topology 1](../img/ditl_broker_topology.png)
 
 2. **Configure the federates** - Every federate (instance of a simulator) will require configuration so that it correctly integrates with the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON file; for simulators you might be integrating the configuration can be done programatically in code or via a JSON file as well. The essential information that HELICS configuration defines is:
   
