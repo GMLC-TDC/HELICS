@@ -42,7 +42,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     /** get the underlying socket object*/
     boost::asio::ip::tcp::socket &socket () { return socket_; }
     /** start the receiving loop*/
-    void start ();
+    void startReceive ();
     /** cancel ongoing socket operations*/
     void cancel() { socket_.cancel(); }
     /** close the socket*/

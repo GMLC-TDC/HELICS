@@ -22,9 +22,7 @@ TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp)
 /** destructor*/
 TcpCommsSS::~TcpCommsSS () { disconnect (); }
 
-
 int TcpCommsSS::getDefaultBrokerPort () const { return DEFAULT_TCPSS_PORT; }
-
 
 void TcpCommsSS::addConnection (const std::string &newConn)
 {
@@ -68,28 +66,27 @@ int TcpCommsSS::processIncomingMessage (ActionMessage &&M)
     return 0;
 }
 
-
 size_t TcpCommsSS::dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received)
 {
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
         ActionMessage m;
-		auto used = m.depacketize(data + used_total, bytes_received - used_total);
+        auto used = m.depacketize (data + used_total, bytes_received - used_total);
         if (used == 0)
         {
             break;
         }
-		if (isProtocolCommand(m))
+        if (isProtocolCommand (m))
         {
-			m.setExtraData( connection->getIdentifier());
-			txQueue.emplace(control_route, std::move(m));
-            }
+            m.setExtraData (connection->getIdentifier ());
+            txQueue.emplace (control_route, std::move (m));
+        }
         else
         {
             if (ActionCallback)
             {
-				ActionCallback(std::move(m));
+                ActionCallback (std::move (m));
             }
         }
         used_total += used;
@@ -107,7 +104,8 @@ bool TcpCommsSS::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/
         {
             if (error != boost::asio::error::connection_reset)
             {
-				logError("error message while connected " + error.message() + "code " + std::to_string(error.value()));
+                logError ("error message while connected " + error.message () + "code " +
+                          std::to_string (error.value ()));
             }
         }
     }
@@ -119,23 +117,21 @@ void TcpCommsSS::queue_rx_function ()
     // this function does nothing since everything is handled in the other thread
 }
 
-static TcpConnection::pointer generateConnection(std::shared_ptr<AsioServiceManager> &ioserv,const std::string &address)
+static TcpConnection::pointer
+generateConnection (std::shared_ptr<AsioServiceManager> &ioserv, const std::string &address)
 {
-
-	try
+    try
     {
-		std::string interface;
-		std::string port;
-		std::tie(interface, port) = extractInterfaceandPortString(address);
-		return TcpConnection::create(ioserv->getBaseService(), interface, port);
-
-
-	}
-	catch (std::exception &e)
-        {
-		// TODO:: do something???
-            }
-	return nullptr;
+        std::string interface;
+        std::string port;
+        std::tie (interface, port) = extractInterfaceandPortString (address);
+        return TcpConnection::create (ioserv->getBaseService (), interface, port);
+    }
+    catch (std::exception &e)
+    {
+        // TODO:: do something???
+    }
+    return nullptr;
 }
 
 void TcpCommsSS::queue_tx_function ()
@@ -144,22 +140,20 @@ void TcpCommsSS::queue_tx_function ()
     {
         PortNumber = DEFAULT_TCPSS_PORT;
     }
-	TcpServer::pointer server;
-	auto ioserv = AsioServiceManager::getServicePointer();
-	auto serviceLoop = ioserv->runServiceLoop();
-	auto dataCall= [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
-		return dataReceive(connection, data, datasize);
-	};
+    TcpServer::pointer server;
+    auto ioserv = AsioServiceManager::getServicePointer ();
+    auto serviceLoop = ioserv->runServiceLoop ();
+    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
+        return dataReceive (connection, data, datasize);
+    };
 
-	auto errorCall= [this](TcpConnection::pointer connection, const boost::system::error_code &error) {
-		return commErrorHandler(connection, error);
-	};
+    auto errorCall = [this](TcpConnection::pointer connection, const boost::system::error_code &error) {
+        return commErrorHandler (connection, error);
+    };
 
     if (serverMode)
     {
-        
-        server = TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, true,
-                                                      maxMessageSize_);
+        server = TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, true, maxMessageSize_);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");
@@ -177,36 +171,34 @@ void TcpCommsSS::queue_tx_function ()
         server->setErrorCall (errorCall);
         server->start ();
     }
-	
-	//generate a local protocol connection string
-	ActionMessage cmessage(CMD_PROTOCOL);
-	cmessage.messageID = CONNECTION_INFORMATION;
-	cmessage.payload = getAddress();
-	auto cstring = cmessage.to_string();
 
-	std::vector<std::pair<std::string, TcpConnection::pointer>> made_connections;
-	std::map<std::string, route_id_t> established_routes;
+    // generate a local protocol connection string
+    ActionMessage cmessage (CMD_PROTOCOL);
+    cmessage.messageID = CONNECTION_INFORMATION;
+    cmessage.payload = getAddress ();
+    auto cstring = cmessage.packetize ();
 
-	for (const auto &conn : connections)
-	{
-		auto new_connect = generateConnection(ioserv, conn);
-		
-		if (new_connect)
-		{
-			
-			new_connect->setDataCall(dataCall);
-			new_connect->setErrorCall(errorCall);
-			new_connect->send(cstring);
-			new_connect->start();
-			
-			made_connections.emplace_back(conn, std::move(new_connect));
-		}
-	}
+    std::vector<std::pair<std::string, TcpConnection::pointer>> made_connections;
+    std::map<std::string, route_id_t> established_routes;
 
-	setRxStatus(connection_status::connected);
+    for (const auto &conn : connections)
+    {
+        auto new_connect = generateConnection (ioserv, conn);
+
+        if (new_connect)
+        {
+            new_connect->setDataCall (dataCall);
+            new_connect->setErrorCall (errorCall);
+            new_connect->send (cstring);
+            new_connect->startReceive ();
+
+            made_connections.emplace_back (conn, std::move (new_connect));
+        }
+    }
+
+    setRxStatus (connection_status::connected);
     std::vector<char> buffer;
 
-   
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id_t, TcpConnection::pointer> routes;  // for all the other possible routes
@@ -236,13 +228,17 @@ void TcpCommsSS::queue_tx_function ()
                     return;
                 }
             }
-            brokerConnection->send(cstring);
+            brokerConnection->setDataCall (dataCall);
+            brokerConnection->setErrorCall (errorCall);
+            
+            brokerConnection->send (cstring);
+            brokerConnection->startReceive ();
         }
         catch (std::exception &e)
         {
             logError (e.what ());
         }
-		established_routes[makePortAddress(brokerTarget_,brokerPort)] = parent_route_id;
+        established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
     }
 
     setTxStatus (connection_status::connected);
@@ -259,76 +255,72 @@ void TcpCommsSS::queue_tx_function ()
         {
             if (route_id == control_route)
             {
-				processed = true;
+                processed = true;
                 switch (cmd.messageID)
                 {
-				case CONNECTION_INFORMATION:
-					if (server)
-					{
-						auto conn = server->findSocket(cmd.getExtraData());
-						if (conn)
-						{
-							made_connections.emplace_back(cmd.payload, std::move(conn));
-						}
-					}
-					break;
+                case CONNECTION_INFORMATION:
+                    if (server)
+                    {
+                        auto conn = server->findSocket (cmd.getExtraData ());
+                        if (conn)
+                        {
+                            made_connections.emplace_back (cmd.payload, std::move (conn));
+                        }
+                    }
+                    break;
                 case NEW_ROUTE:
                 {
-					bool established = false;
+                    bool established = false;
 
-					for (auto &mc : made_connections)
+                    for (auto &mc : made_connections)
                     {
-						if ((mc.second)&&(cmd.payload == mc.first))
-						{
-							routes.emplace(cmd.getExtraData(), std::move(mc.second));
-							established = true;
-							established_routes[mc.first] = route_id_t(cmd.getExtraData());
-							
+                        if ((mc.second) && (cmd.payload == mc.first))
+                        {
+                            routes.emplace (cmd.getExtraData (), std::move (mc.second));
+                            established = true;
+                            established_routes[mc.first] = route_id_t (cmd.getExtraData ());
+                        }
                     }
-					}
-					if (!established)
+                    if (!established)
                     {
-						auto efind = established_routes.find(cmd.payload);
-						if (efind != established_routes.end())
-						{
-							established = true;
-							if (efind->second == parent_route_id)
-							{
-								routes.emplace(cmd.getExtraData(), brokerConnection);
+                        auto efind = established_routes.find (cmd.payload);
+                        if (efind != established_routes.end ())
+                        {
+                            established = true;
+                            if (efind->second == parent_route_id)
+                            {
+                                routes.emplace (cmd.getExtraData (), brokerConnection);
+                            }
+                            else
+                            {
+                                routes.emplace (cmd.getExtraData (), routes[efind->second]);
+                            }
+                        }
                     }
-							else
-							{
-								routes.emplace(cmd.getExtraData(), routes[efind->second]);
-                }
-							
-						}
-					}
-					
-					if (!established)
-					{
-						auto new_connect = generateConnection(ioserv, cmd.payload);
-						if (new_connect)
-						{
-							new_connect->setDataCall(dataCall);
-							new_connect->setErrorCall(errorCall);
-							new_connect->send(cstring);
-							new_connect->start();
-							routes.emplace(cmd.getExtraData(), std::move(new_connect));
-							established_routes[cmd.payload] = route_id_t(cmd.getExtraData());
-						}
-					}
-					
-                    
+
+                    if (!established)
+                    {
+                        auto new_connect = generateConnection (ioserv, cmd.payload);
+                        if (new_connect)
+                        {
+                            new_connect->setDataCall (dataCall);
+                            new_connect->setErrorCall (errorCall);
+                            new_connect->send (cstring);
+                            new_connect->startReceive ();
+                            routes.emplace (cmd.getExtraData (), std::move (new_connect));
+                            established_routes[cmd.payload] = route_id_t (cmd.getExtraData ());
+                        }
+                    }
                 }
                 break;
                 case CLOSE_RECEIVER:
-					setRxStatus(connection_status::terminated);
+                    setRxStatus (connection_status::terminated);
                     break;
                 case DISCONNECT:
                     goto CLOSE_TX_LOOP;  // break out of loop
-				default:
-					logWarning("unrecognized control command");
-					break;
+                default:
+                    logWarning ("unrecognized control command");
+                    break;
                 }
             }
         }
@@ -344,8 +336,7 @@ void TcpCommsSS::queue_tx_function ()
                 try
                 {
                     brokerConnection->send (cmd.packetize ());
-                    
-                    }
+                }
                 catch (const boost::system::system_error &se)
                 {
                     if (se.code () != boost::asio::error::connection_aborted)
@@ -357,8 +348,8 @@ void TcpCommsSS::queue_tx_function ()
                         }
                     }
                 }
-                }
             }
+        }
         else
         {
             //  txlist.push_back(cmd);
@@ -368,14 +359,15 @@ void TcpCommsSS::queue_tx_function ()
                 try
                 {
                     rt_find->second->send (cmd.packetize ());
-                    }
+                }
                 catch (const boost::system::system_error &se)
                 {
                     if (se.code () != boost::asio::error::connection_aborted)
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue()) + "::" + se.what ());
+                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue ()) +
+                                      "::" + se.what ());
                         }
                     }
                 }
@@ -387,15 +379,14 @@ void TcpCommsSS::queue_tx_function ()
                     try
                     {
                         brokerConnection->send (cmd.packetize ());
-                       
-                        }
+                    }
                     catch (const boost::system::system_error &se)
                     {
                         if (se.code () != boost::asio::error::connection_aborted)
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError (std::string ("broker send ") + std::to_string (route_id.baseValue()) +
+                                logError (std::string ("broker send ") + std::to_string (route_id.baseValue ()) +
                                           " ::" + se.what ());
                             }
                         }
@@ -403,7 +394,7 @@ void TcpCommsSS::queue_tx_function ()
                 }
                 else
                 {
-					logWarning("unknown message destination message dropped");
+                    logWarning ("unknown message destination message dropped");
                 }
             }
         }
@@ -413,10 +404,15 @@ CLOSE_TX_LOOP:
     {
         rt.second->close ();
     }
+	if (brokerConnection)
+	{
+        brokerConnection->close ();
+	}
     routes.clear ();
+    brokerConnection = nullptr;
     if (getRxStatus () == connection_status::connected)
     {
-		setRxStatus(connection_status::terminated);
+        setRxStatus (connection_status::terminated);
     }
     setTxStatus (connection_status::terminated);
 }

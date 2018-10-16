@@ -17,7 +17,7 @@ using namespace std::literals::chrono_literals;
 
 std::atomic<int> TcpConnection::idcounter{ 10 };
 
-void TcpConnection::start ()
+void TcpConnection::startReceive ()
 {
     if (triggerhalt)
     {
@@ -117,7 +117,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
             data.assign (data.size (), 0);
         }
         state = connection_state_t::halted;
-        start ();
+        startReceive ();
     }
     else if (error == boost::asio::error::operation_aborted)
     {
@@ -149,7 +149,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
             if (errorCall (shared_from_this (), error))
             {
                 state = connection_state_t::halted;
-                start ();
+                startReceive ();
             }
             else
             {
@@ -698,7 +698,7 @@ void TcpServer::start ()
                 {
                     if (!conn->isReceiving ())
                     {
-                        conn->start ();
+                        conn->startReceive ();
                     }
                 }
             }
@@ -727,7 +727,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
     {
         new_connection->setDataCall (dataCall);
         new_connection->setErrorCall (errorCall);
-        new_connection->start ();
+        new_connection->startReceive ();
         {  // scope for the lock_guard
 
             std::unique_lock<std::mutex> lock (accepting);
