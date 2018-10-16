@@ -379,7 +379,7 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (cmd.getExtraData(), std::move (new_connect));
+                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (new_connect));
                     }
                     catch (std::exception &e)
                     {

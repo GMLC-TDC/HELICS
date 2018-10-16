@@ -276,7 +276,7 @@ void TcpCommsSS::queue_tx_function ()
                     {
                         if ((mc.second) && (cmd.payload == mc.first))
                         {
-                            routes.emplace (cmd.getExtraData (), std::move (mc.second));
+                            routes.emplace (route_id_t(cmd.getExtraData ()), std::move (mc.second));
                             established = true;
                             established_routes[mc.first] = route_id_t (cmd.getExtraData ());
                         }
@@ -289,11 +289,11 @@ void TcpCommsSS::queue_tx_function ()
                             established = true;
                             if (efind->second == parent_route_id)
                             {
-                                routes.emplace (cmd.getExtraData (), brokerConnection);
+                                routes.emplace (route_id_t(cmd.getExtraData ()), brokerConnection);
                             }
                             else
                             {
-                                routes.emplace (cmd.getExtraData (), routes[efind->second]);
+                                routes.emplace (route_id_t(cmd.getExtraData ()), routes[efind->second]);
                             }
                         }
                     }
