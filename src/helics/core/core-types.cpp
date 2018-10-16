@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <unordered_map>
 
 namespace helics
 {
@@ -42,46 +43,49 @@ std::string to_string (core_type type)
     }
 }
 
-static const std::map<std::string, core_type> coreTypes{{"default", core_type::DEFAULT},
-                                                        {"def", core_type::DEFAULT},
-                                                        {"mpi", core_type::MPI},
-                                                        {"message_passing_interface", core_type::MPI},
-                                                        {"MPI", core_type::MPI},
-                                                        {"ZMQ", core_type::ZMQ},
-                                                        {"0mq", core_type::ZMQ},
-                                                        {"zmq", core_type::ZMQ},
-                                                        {"zeromq", core_type::ZMQ},
-                                                        {"zeromq_test", core_type::ZMQ_TEST},
-                                                        {"zmq_test", core_type::ZMQ_TEST},
-                                                        {"zeromq2", core_type::ZMQ_TEST},
-                                                        {"zmq2", core_type::ZMQ_TEST},
-                                                        {"ZMQ2", core_type::ZMQ_TEST},
-                                                        {"interprocess", core_type::INTERPROCESS},
-                                                        {"ZeroMQ", core_type::ZMQ},
-                                                        {"ipc", core_type::INTERPROCESS},
-                                                        {"interproc", core_type::INTERPROCESS},
-                                                        {"IPC", core_type::INTERPROCESS},
-                                                        {"tcp", core_type::TCP},
-                                                        {"tcpip", core_type::TCP},
-                                                        {"TCP", core_type::TCP},
-                                                        {"TCPIP", core_type::TCP},
-                                                        {"tcpss", core_type::TCP_SS},
-                                                        {"tcpipss", core_type::TCP_SS},
-                                                        {"TCPSS", core_type::TCP_SS},
-                                                        {"TCPIPSS", core_type::TCP_SS},
-                                                        {"tcp_ss", core_type::TCP_SS},
-                                                        {"tcpip_ss", core_type::TCP_SS},
-                                                        {"TCP_SS", core_type::TCP_SS},
-                                                        {"TCPIP_SS", core_type::TCP_SS},
-                                                        {"udp", core_type::UDP},
-                                                        {"test", core_type::TEST},
-                                                        {"UDP", core_type::UDP},
-                                                        {"local", core_type::TEST},
-                                                        {"inprocess", core_type::TEST},
-{ "http", core_type::HTTP },
-{ "HTTP", core_type::HTTP },
-{ "web", core_type::HTTP },
-                                                        {"test1", core_type::TEST}};
+static const std::unordered_map<std::string, core_type> coreTypes{{"default", core_type::DEFAULT},
+                                                                  {"def", core_type::DEFAULT},
+                                                                  {"mpi", core_type::MPI},
+                                                                  {"message_passing_interface", core_type::MPI},
+                                                                  {"MPI", core_type::MPI},
+                                                                  {"ZMQ", core_type::ZMQ},
+                                                                  {"0mq", core_type::ZMQ},
+                                                                  {"zmq", core_type::ZMQ},
+                                                                  {"zeromq", core_type::ZMQ},
+                                                                  {"zeromq_test", core_type::ZMQ_TEST},
+                                                                  {"zmq_test", core_type::ZMQ_TEST},
+                                                                  {"zeromq2", core_type::ZMQ_TEST},
+                                                                  {"zmq2", core_type::ZMQ_TEST},
+                                                                  {"ZMQ2", core_type::ZMQ_TEST},
+                                                                  {"interprocess", core_type::INTERPROCESS},
+                                                                  {"ZeroMQ", core_type::ZMQ},
+                                                                  {"ipc", core_type::INTERPROCESS},
+                                                                  {"interproc", core_type::INTERPROCESS},
+                                                                  {"IPC", core_type::INTERPROCESS},
+                                                                  {"tcp", core_type::TCP},
+                                                                  {"tcpip", core_type::TCP},
+                                                                  {"TCP", core_type::TCP},
+                                                                  {"TCPIP", core_type::TCP},
+                                                                  {"tcpss", core_type::TCP_SS},
+                                                                  {"tcpipss", core_type::TCP_SS},
+                                                                  {"TCPSS", core_type::TCP_SS},
+                                                                  {"TCPIPSS", core_type::TCP_SS},
+                                                                  {"tcp_ss", core_type::TCP_SS},
+                                                                  {"tcpip_ss", core_type::TCP_SS},
+                                                                  {"TCP_SS", core_type::TCP_SS},
+                                                                  {"TCPIP_SS", core_type::TCP_SS},
+                                                                  {"single_socket", core_type::TCP_SS},
+                                                                  {"single socket", core_type::TCP_SS},
+                                                                  {"ss", core_type::TCP_SS},
+                                                                  {"udp", core_type::UDP},
+                                                                  {"test", core_type::TEST},
+                                                                  {"UDP", core_type::UDP},
+                                                                  {"local", core_type::TEST},
+                                                                  {"inprocess", core_type::TEST},
+                                                                  {"http", core_type::HTTP},
+                                                                  {"HTTP", core_type::HTTP},
+                                                                  {"web", core_type::HTTP},
+                                                                  {"test1", core_type::TEST}};
 
 core_type coreTypeFromString (std::string type) noexcept
 {
@@ -128,7 +132,7 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return core_type::UDP;
     }
-    if (type.compare(0, 4, "http") == 0)
+    if (type.compare (0, 4, "http") == 0)
     {
         return core_type::HTTP;
     }
@@ -162,7 +166,7 @@ bool isCoreTypeAvailable (core_type type) noexcept
 #endif
         break;
     case core_type::MPI:
-        available = (HELICS_HAVE_MPI!=0);
+        available = (HELICS_HAVE_MPI != 0);
         break;
     case core_type::TEST:
         available = true;

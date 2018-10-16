@@ -256,7 +256,7 @@ void ZmqComms::queue_rx_function ()
     setRxStatus (connection_status::connected);
     while (true)
     {
-        auto rc = zmq::poll (poller);
+        auto rc = zmq::poll (poller, std::chrono::milliseconds(1000));
         if (rc > 0)
         {
             zmq::message_t msg;
@@ -292,6 +292,10 @@ void ZmqComms::queue_rx_function ()
                     continue;
                 }
             }
+        }
+        if (requestDisconnect.load(std::memory_order::memory_order_acquire))
+        {
+            break;
         }
     }
     disconnecting = true;

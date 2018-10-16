@@ -117,6 +117,20 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         throw (HelicsException ("TCP core is not available"));
 #endif
         break;
+    case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
+        if (name.empty())
+        {
+            core = std::make_shared<tcp::TcpCoreSS>();
+        }
+        else
+        {
+            core = std::make_shared<tcp::TcpCoreSS>(name);
+        }
+#else
+        throw (HelicsException("TCP single socket core is not available"));
+#endif
+        break;
     default:
         throw (HelicsException ("unrecognized core type"));
     }

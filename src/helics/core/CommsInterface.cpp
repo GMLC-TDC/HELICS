@@ -292,6 +292,7 @@ void CommsInterface::setName (const std::string &name_)
 
 void CommsInterface::disconnect ()
 {
+   
     if (!operating)
     {
         if (propertyLock())
@@ -308,6 +309,7 @@ void CommsInterface::disconnect ()
         setTxStatus(connection_status::terminated);
         return;
     }
+    requestDisconnect.store(true, std::memory_order::memory_order_release);
     if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();

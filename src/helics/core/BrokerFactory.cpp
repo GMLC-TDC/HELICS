@@ -124,6 +124,20 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("tcp broker type is not available"));
 #endif
         break;
+    case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
+        if (name.empty())
+        {
+            broker = std::make_shared<tcp::TcpBrokerSS>();
+        }
+        else
+        {
+            broker = std::make_shared<tcp::TcpBrokerSS>(name);
+        }
+#else
+        throw (HelicsException("tcp single socket broker type is not available"));
+#endif
+        break;
     default:
         throw (HelicsException ("unrecognized broker type"));
     }

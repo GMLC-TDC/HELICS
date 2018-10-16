@@ -460,14 +460,12 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
     if (state != accepting_state_t::connected)
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
-        try
+        boost::system::error_code ec;
+        if (new_connection->socket().is_open())
         {
-            new_connection->socket ().set_option (optionLinger);
+            new_connection->socket().set_option(optionLinger, ec);
+            new_connection->close();
         }
-        catch (...)
-        {
-        }
-        new_connection->close ();
         accepting.reset ();
         return;
     }

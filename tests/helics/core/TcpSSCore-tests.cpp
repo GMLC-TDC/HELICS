@@ -24,7 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label ("cip"))
+BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label ("ci"))
 
 using boost::asio::ip::tcp;
 using helics::Core;
@@ -325,10 +325,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
 
 BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 {
-    std::this_thread::sleep_for (500ms);
+    std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
     std::string initializationString =
-      "1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1";
+      "1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, initializationString);
 
     BOOST_REQUIRE (core);
@@ -369,13 +369,29 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
         helics::ActionMessage rM (data.data (), len);
 
         BOOST_CHECK_EQUAL (rM.name, "core1");
-        BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
+        BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+        while (counter != 2)
+        {
+            std::this_thread::sleep_for(100ms);
+            ++cnt;
+            if (cnt > 30)
+            {
+                break;
+            }
+        }
+        BOOST_CHECK_EQUAL(counter, 2);
+
+        BOOST_CHECK_GT(len, 32);
+        rM=helics::ActionMessage(data.data(), len);
+
+        BOOST_CHECK_EQUAL(rM.name, "core1");
+        BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
         // helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
         //  rxSocket.send_to (boost::asio::buffer (resp.packetize ()), remote_endpoint, 0, error);
         // BOOST_CHECK (!error);
     }
+    core->disconnect();
     server->close ();
-    core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores (100ms);
 }
@@ -386,7 +402,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 {
-    std::this_thread::sleep_for (std::chrono::milliseconds (500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (400));
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::TCP_SS, initializationString);
@@ -400,7 +416,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:24228");
+    BOOST_CHECK_EQUAL (ccore->getAddress (), ccore->getIdentifier());
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;
