@@ -307,7 +307,7 @@ void TcpCommsSS::queue_tx_function ()
                             new_connect->setErrorCall (errorCall);
                             new_connect->send (cstring);
                             new_connect->startReceive ();
-                            routes.emplace (cmd.getExtraData (), std::move (new_connect));
+                            routes.emplace (route_id_t(cmd.getExtraData ()), std::move (new_connect));
                             established_routes[cmd.payload] = route_id_t (cmd.getExtraData ());
                         }
                     }
