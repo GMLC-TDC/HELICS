@@ -471,7 +471,7 @@ void ZmqComms::queue_tx_function ()
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
-                        routes.emplace (cmd.getExtraData(), std::move (zsock));
+                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
