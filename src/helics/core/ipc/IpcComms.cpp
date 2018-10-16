@@ -233,7 +233,7 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-                        routes.emplace (cmd.getExtraData(), std::move (newQueue));
+                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (newQueue));
                     }
                     continue;
                 }
