@@ -2736,7 +2736,7 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
     if (command.action () == CMD_ADD_FILTER)
     {
         processFilterInfo (command);
-        if ((command.source_id != global_broker_id_local) && (!checkActionFlag (command, destination_target)))
+        if (command.source_id != global_broker_id_local)
         {
             auto fed = getFederateCore (command.dest_id);
             if (fed != nullptr)
@@ -2762,8 +2762,8 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 else
                 {
                     filtI->sourceTargets.emplace_back (command.getSource ());
-                    timeCoord->addDependency (command.source_id);
                 }
+                timeCoord->addDependency (command.source_id);
             }
 
             auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue());

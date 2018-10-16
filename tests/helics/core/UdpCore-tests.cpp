@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 
 #include "helics/common/AsioServiceManager.h"
+#include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -15,7 +16,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"
 #include <boost/asio/ip/udp.hpp>
-#include "helics/common/GuardedTypes.hpp"
 
 //#include "boost/process.hpp"
 #include <future>
@@ -23,7 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (UdpCore_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (UdpCore_tests, *utf::label ("ci"))
 
 using boost::asio::ip::udp;
 using helics::Core;
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     std::atomic<int> counter{0};
     std::string host = "localhost";
     helics::udp::UdpComms comm;
-	comm.loadTargetInfo(host, host);
+    comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
 
@@ -64,12 +64,12 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     BOOST_CHECK (!connected);
     rxSocket.close ();
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
     std::string host = "localhost";
     helics::udp::UdpComms comm;
@@ -98,12 +98,12 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     rxSocket.close ();
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (udpComms_rx_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
     std::string host = "localhost";
@@ -139,15 +139,15 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
 
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
     rxSocket.close ();
     comm.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -184,29 +184,29 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     if (counter2 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (500));
+        std::this_thread::sleep_for (500ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
 
     std::string host = "localhost";
     helics::udp::UdpComms comm, comm2, comm3;
-	comm.loadTargetInfo(host, host);
+    comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, "");
     comm3.loadTargetInfo (host, host);
 
@@ -247,47 +247,47 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
 
-    comm.transmit (helics::route_id_t(0), helics::CMD_ACK);
+    comm.transmit (helics::route_id_t (0), helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm3.transmit (helics::route_id_t(0), helics::CMD_ACK);
+    comm3.transmit (helics::route_id_t (0), helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (helics::route_id_t(3), comm3.getAddress ());
-    std::this_thread::sleep_for(std::chrono::milliseconds(250));
-    comm2.transmit (helics::route_id_t(3), helics::CMD_ACK);
+    comm2.addRoute (helics::route_id_t (3), comm3.getAddress ());
+    std::this_thread::sleep_for (250ms);
+    comm2.transmit (helics::route_id_t (3), helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     if (counter3 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (250));
+        std::this_thread::sleep_for (250ms);
     }
     BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (helics::route_id_t(4), comm.getAddress ());
+    comm2.addRoute (helics::route_id_t (4), comm.getAddress ());
 
-    comm2.transmit (helics::route_id_t(4), helics::CMD_ACK);
+    comm2.transmit (helics::route_id_t (4), helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
     comm3.disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 }
 
 BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::string initializationString =
       "1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
@@ -328,7 +328,7 @@ also tests the automatic port determination for cores
 
 BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 {
-    std::this_thread::sleep_for(500ms);
+    std::this_thread::sleep_for (500ms);
     std::string initializationString = "1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::UDP, initializationString);

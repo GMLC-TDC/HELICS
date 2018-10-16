@@ -1491,7 +1491,7 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
     }
     else
     {
-        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        auto route = getRoute (cmd.dest_id);
         transmit (route, cmd);
     }
 }
@@ -1522,7 +1522,7 @@ void CoreBroker::routeMessage (const ActionMessage &&cmd)
     }
     else
     {
-        auto route = getRoute (global_federate_id_t (cmd.dest_id));
+        auto route = getRoute (cmd.dest_id);
         transmit (route, std::move(cmd));
     }
 }
@@ -1597,7 +1597,7 @@ void CoreBroker::FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo)
         m.setDestination (handleInfo.handle);
         m.flags = sub.second;
 
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        transmit (getRoute( m.dest_id), m);
 
         // notify the subscriber about its publisher
         m.setAction (CMD_ADD_PUBLISHER);
@@ -1633,14 +1633,14 @@ void CoreBroker::FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo)
         m.setSource (handleInfo.handle);
         m.setDestination (target.first);
         m.flags = target.second;
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        transmit (getRoute (m.dest_id), m);
 
         // notify the endpoint about its filter
         m.setAction (CMD_ADD_FILTER);
         m.swapSourceDest ();
 
         m.flags = target.second;
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        transmit (getRoute (m.dest_id), m);
     }
 
     if (!Handles.empty ())
@@ -1663,13 +1663,13 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
         {
             m.setStringData (handleInfo.type_in, handleInfo.type_out);
         }
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        transmit (getRoute (m.dest_id), m);
 
         // notify the filter about an endpoint
         m.setAction (CMD_ADD_ENDPOINT);
         m.swapSourceDest ();
         m.clearStringData ();
-        transmit (getRoute (global_federate_id_t (m.dest_id)), m);
+        transmit (getRoute (m.dest_id), m);
     }
 
 	

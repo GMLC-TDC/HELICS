@@ -337,7 +337,7 @@ void UdpComms::queue_tx_function ()
             }
             else
             {
-                logWarning ("message directed to broker of comm system with no broker, message dropped");
+                logWarning (fmt::format("message directed to broker of comm system with no broker, message dropped {}",prettyPrintString(cmd)));
             }
         }
         else if (route_id == control_route)

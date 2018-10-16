@@ -43,8 +43,9 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
+    repSocket.setsockopt (ZMQ_LINGER, 200);
     repSocket.bind (defServer);
-
+    
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (23405);
     comm.setName ("tests");
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
-    
+    repSocket.close ();
 }
 
 /** test the request set class with various scenarios*/
@@ -470,6 +471,10 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     if (counter2 != 1)
     {
         std::this_thread::sleep_for(200ms);
+    }
+    if (counter2 != 1)
+    {
+        std::this_thread::sleep_for (200ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);

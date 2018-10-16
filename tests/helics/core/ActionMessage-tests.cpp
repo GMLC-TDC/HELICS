@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // Default constructor
     helics::ActionMessage cmd;
     BOOST_CHECK (cmd.action () == helics::CMD_IGNORE);
-    BOOST_CHECK (!cmd.source_id.isValid());
+    BOOST_CHECK_EQUAL (cmd.source_id, parent_broker_id);
     BOOST_CHECK (!cmd.source_handle.isValid());
     BOOST_CHECK_EQUAL (cmd.dest_id, parent_broker_id);
     BOOST_CHECK (!cmd.dest_handle.isValid());

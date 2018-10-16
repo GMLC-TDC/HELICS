@@ -732,7 +732,7 @@ message_processing_result FederateState::processQueue ()
         auto cmd = queue.pop ();
         if (messageShouldBeDelayed (cmd))
         {
-            delayQueues[static_cast<global_federate_id_t> (cmd.source_id)].push_back (cmd);
+            delayQueues[cmd.source_id].push_back (cmd);
             continue;
         }
         //    messLog.push_back(cmd);

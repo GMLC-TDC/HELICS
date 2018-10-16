@@ -59,7 +59,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
 
     BOOST_CHECK (mFed1->getEndpointId ("ep1") == epid);
-    BOOST_CHECK (mFed1->getEndpointId ("test1/ep1") == epid);
+    BOOST_CHECK (mFed1->getEndpointId ("fed0/ep1") == epid);
     BOOST_CHECK (mFed1->getEndpointId ("ep2") == epid2);
     mFed1->finalize ();
 

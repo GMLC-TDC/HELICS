@@ -332,7 +332,7 @@ endpoint_id_t MessageFederate::getEndpointId (const std::string &eptName) const
     auto id = mfManager->getEndpointId (eptName);
     if (!id.isValid())
     {
-        id = mfManager->getEndpointId (getName () + '.' + eptName);
+        id = mfManager->getEndpointId (getName () + separator_ + eptName);
     }
     return id;
 }

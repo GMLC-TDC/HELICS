@@ -146,7 +146,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
             auto key = getKey (pub);
 
             auto id = vfManager->getPublicationId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
@@ -170,7 +170,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
         {
             auto key = getKey (sub);
             auto id = vfManager->getSubscriptionId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
@@ -200,7 +200,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
             auto key = getKey (ipt);
 
             auto id = vfManager->getInputId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
@@ -240,7 +240,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             auto key = getKey (pub);
 
             auto id = vfManager->getPublicationId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
@@ -265,7 +265,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
         {
             auto key = getKey (sub);
             auto id = vfManager->getSubscriptionId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
@@ -294,7 +294,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             auto key = getKey (ipt);
 
             auto id = vfManager->getPublicationId (key);
-            if (!id.isValid())
+            if (id.isValid())
             {
                 continue;
             }
