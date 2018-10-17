@@ -354,7 +354,7 @@ void CommsInterface::disconnect ()
         ++cnt;
         if ((cnt & 3) == 0)  // call this every 2400 milliseconds
         {
-            // try calling closeReceiver again
+            // try calling closeTransmitter again
             closeTransmitter ();
         }
         if (cnt == 14)  // Eventually give up

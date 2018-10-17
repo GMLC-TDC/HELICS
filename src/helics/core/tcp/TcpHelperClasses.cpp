@@ -186,7 +186,7 @@ void TcpConnection::close ()
         socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
-            if (ec.value() != 107) //107 is not_connected error but translated to system error somehow
+            if (ec.value() != boost::asio::error::not_connected)
             {
                 std::cerr << "error occurred sending shutdown::" << ec << std::endl;
             }
@@ -467,11 +467,8 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
         boost::system::error_code ec;
-        if (new_connection->socket().is_open())
-        {
-            new_connection->socket().set_option(optionLinger, ec);
-            new_connection->close();
-        }
+        new_connection->socket().set_option(optionLinger, ec);
+        new_connection->close();
         accepting.reset ();
         return;
     }

@@ -162,9 +162,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
         }
     }
     BOOST_CHECK_EQUAL (counter, 1);
-
-    server->close ();
     comm.disconnect ();
+    server->close ();
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
@@ -215,8 +215,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
-    server->close ();
+    
     comm.disconnect ();
+    server->close ();
     std::this_thread::sleep_for (100ms);
 }
 
@@ -274,8 +275,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::lock_guard<std::mutex> lock (actguard);
     BOOST_CHECK (act.action () == helics::action_message_def::action_t::cmd_ack);
     txconn->close ();
-    server->close ();
     comm.disconnect ();
+    server->close ();
+    
     std::this_thread::sleep_for (200ms);
 }
 

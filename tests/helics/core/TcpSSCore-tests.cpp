@@ -327,8 +327,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
-    std::string initializationString =
-      "1 --name=core1";
+    std::string initializationString = "1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, initializationString);
 
     BOOST_REQUIRE (core);
@@ -341,10 +340,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     std::atomic<size_t> len{0};
     server->setDataCall (
       [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
-          std::copy (data_rec, data_rec + data_Size, data.begin ());
-          len = data_Size;
+          std::copy (data_rec, data_rec + data_Size, data.begin () + len);
+          len += data_Size;
           ++counter;
-          return data_Size;
+          return len.load ();
       });
     server->start ();
     BOOST_TEST_PASSPOINT ();
@@ -354,7 +353,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     if (connected)
     {
         int cnt = 0;
-        while (counter != 1)
+        while (counter == 0)
         {
             std::this_thread::sleep_for (100ms);
             ++cnt;
@@ -363,34 +362,49 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
                 break;
             }
         }
-        BOOST_CHECK_EQUAL (counter, 1);
+        BOOST_CHECK_GE (counter, 1);
 
         BOOST_CHECK_GT (len, 32);
-        helics::ActionMessage rM (data.data (), len);
-
+        helics::ActionMessage rM;
+        helics::ActionMessage rM2;
+        auto used = rM.depacketize (data.data (), len);
+        if (used < len)
+        {
+            auto use2 = rM2.depacketize (data.data () + used, len - used);
+            if (use2 == 0)
+            {
+                while (counter != 2)
+                {
+                    std::this_thread::sleep_for (100ms);
+                    ++cnt;
+                    if (cnt > 30)
+                    {
+                        break;
+                    }
+                }
+            }
+            rM2.depacketize (data.data () + used, len - used);
+        }
+        else
+        {
+            while (counter != 2)
+            {
+                std::this_thread::sleep_for (100ms);
+                ++cnt;
+                if (cnt > 30)
+                {
+                    break;
+                }
+            }
+            rM2.depacketize (data.data () + used, len - used);
+        }
         BOOST_CHECK_EQUAL (rM.name, "core1");
         BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
-        while (counter != 2)
-        {
-            std::this_thread::sleep_for(100ms);
-            ++cnt;
-            if (cnt > 30)
-            {
-                break;
-            }
-        }
-        BOOST_CHECK_EQUAL(counter, 2);
 
-        BOOST_CHECK_GT(len, 32);
-        rM=helics::ActionMessage(data.data(), len);
-
-        BOOST_CHECK_EQUAL(rM.name, "core1");
-        BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_reg_broker);
-        // helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
-        //  rxSocket.send_to (boost::asio::buffer (resp.packetize ()), remote_endpoint, 0, error);
-        // BOOST_CHECK (!error);
+        BOOST_CHECK_EQUAL (rM2.name, "core1");
+        BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
     }
-    core->disconnect();
+    core->disconnect ();
     server->close ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores (100ms);
@@ -416,7 +430,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), ccore->getIdentifier());
+    BOOST_CHECK_EQUAL (ccore->getAddress (), ccore->getIdentifier ());
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;
