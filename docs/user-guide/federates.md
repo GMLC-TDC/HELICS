@@ -49,6 +49,8 @@ As the fundamental role of the co-simulation platform is to manage the synchroni
 
 (xxxxxxx - publication and subscription examples)
 
+(xxxxxxxx - data type conversion discussion)
+
 (xxxxxxxx - directed input and output)
 
 ## Example 1a - Basic transmission and distribution powerflow ##
@@ -63,7 +65,9 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
-xxxxxxx - message and broker topology diagrams
+![Ex. 1a message topology](../img/ex1a_message_topology.pdf)
+
+![Ex. 1a broker topology](../img/ex1a_broker_topology.pdf)
 
 * **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this  model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are redispatchted every fifteen mintues by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every 1 minute a powerflow is run the update the state of the system.
 
@@ -84,16 +88,15 @@ Next we can compare the substation voltage at the feeder head of the distributio
 ## Message Federate Endpoints ##
 As previously discussed, message federates interact with the federation by defining an "endpoint" that acts as their address to receive messages. Message federates are typically sending and receiving measurements, control signals, commands, and other discrete data with HELICS acting as a perfect communciation system (infinite bandwidth, virtually no latency, guaranteed delivery). 
 
-In fact, as you'll see in [a later section](./filters.md), it is possible to create more realistic communication-system effects natively in HELICS (as well as use a full-blown communication simulator like [ns-3](https://github.com/GMLC-TDC/ns-3-dev-git) to do the same). This is relevant now, though, becuase it influences how the endpoints are created and, as a consequence, how the simulator handles messages. You could, for example, have a system with three federates that are in communication: a remote voltage sensor, a voltage controller, and a voltage regulation actuator (we'll pretend for the case of this example that the last two are physically separated though they often aren't). In this case, you could imagine that the voltage sensor only sends messages to the votlage controller and the voltage controller only sends messages to the voltage regulation actuator. That is, those two paths between the three entities are distinct, have no interaction, and have unique properties (though they may not be modeled). Given this, the voltage sensor could have one endpoint to send the voltage signal, the voltage regulator could recieve the measurement at one endpoint and send the control signal on another, and the votlage regulation actuator would recieve the control signal on its own endpoint (see the figure below).
+In fact, as you'll see in [a later section](./filters.md), it is possible to create more realistic communication-system effects natively in HELICS (as well as use a full-blown communication simulator like [ns-3](https://github.com/GMLC-TDC/ns-3-dev-git) to do the same). This is relevant now, though, becuase it influences how the endpoints are created and, as a consequence, how the simulator handles messages. You could, for example, have a system with three federates that are in communication: a remote voltage sensor, a voltage controller, and a voltage regulation actuator (we'll pretend for the case of this example that the last two are physically separated though they often aren't). In this case, you could imagine that the voltage sensor only sends messages to the votlage controller and the voltage controller only sends messages to the voltage regulation actuator. That is, those two paths between the three entities are distinct, have no interaction, and have unique properties (though they may not be modeled). Given this, refering to the figure below, the voltage sensor could have one endpoint ("Endpoint 1") to send the voltage signal, the voltage regulator could recieve the measurement at one endpoint ("Endpoint 2") and send the control signal on another ("Endpoint 3"), and the votlage regulation actuator would recieve the control signal on its own endpoint ("Endpoint 4").
 
-(xxxxxxx - voltage regulation diagram showing the federates as well as the message topology)
+![voltage regulation message federates](../img/voltage_reg_message_federate.pdf)
 
 The federate code handling these messages can be relatively simple because the data coming in or going out of each endpoint is unique. The voltage controller always receives (and only receives) the voltage measurement at one endpoint and similarly only sends the control signal on another.
 
 Consider a counter-example: automated meter-reading (AMI) using a wireless network from all meters in a distribution system to a data-aggregator in the substation (where, presumably, the data travels over a dedicated wired connection to a control room). All meters will have a single endpoint over which they will send their data but what about the receiver? The co-simulation could be designed with the data-aggregator having a unique endpoint for each meter but this implies come kind of dedicated communication channel for each meter; this is not the case with wireless communication. Instead, it is probably better to create a single endpoint representing the wireless connection the data aggregator has with the AMI network. In this case, messages from any of the meters in the system will be flowing through the same endpoint and to differentiate the messages from each other, the federate will have to be written to examine the metadata with the message to determine its original source.
 
-(xxxxxxx - AMI diagram the federates as well as the message topology)
-
+![ami message federates](../img/ami_message_federate.pdf)
 
 
 ## Message Federate Configuration in JSON ##
@@ -118,9 +121,9 @@ Keeping in mind that this a model for demonstration purposes (which is to say, d
 
 The message topology (including the endpoints) and the not very interesting broker topology are shown below.
 
-(xxxxxxx - EV charge controller exmaple message topology)
+![Ex. 1b message topology](../img/ex1b_message_topology.pdf)
 
-(xxxxxxx - EV charge controller example broker topology
+![Ex. 1b message topology](../img/ex1b_broker_topology.pdf)
 
 
 Taking these assumptions and specifications, it is not too dificult to write a simple charge controller as a Python script. And just by opening the JSON configuration file we can learn important details about how the controller works.
@@ -135,4 +138,5 @@ Running the example (located at xxxxxxxx) and looking at the output file (xxxxxx
 
 As you can see in the data, every time the load on the system exceeded the transformer rating by xxxxxxxx% (xxxxxxxx - specific value), the EV charge controller  disconnected the appropriate number of EVs to drop the load below the limit. Conversely, as the load droped below the rated limit, the EV charge controller was able to connect more EVs for charging. 
 
+(xxxxxxxx - Look at impacts of EV charge controller on transmission system; this is why we do co-simulation )
 
