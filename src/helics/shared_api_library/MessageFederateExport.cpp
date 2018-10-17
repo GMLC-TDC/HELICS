@@ -129,7 +129,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
         auto end = std::make_unique<helics::EndpointObject> ();
         end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), id.value ());
         end->fedptr = std::move (fedObj);
-        auto ret = reinterpret_cast<helics_input> (end.get ());
+        auto ret = reinterpret_cast<helics_endpoint> (end.get ());
         addEndpoint (fed, std::move (end));
         return ret;
     }

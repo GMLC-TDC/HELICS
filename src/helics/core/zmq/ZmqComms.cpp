@@ -508,7 +508,23 @@ void ZmqComms::queue_tx_function ()
         }
         else if (route_id == control_route)
         {  // send to rx thread loop
-            controlSocket.send (buffer.data (), buffer.size ());
+            try
+            {
+                controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+            }
+            catch (const zmq::error_t &e)
+            {
+                if ((getRxStatus () == connection_status::terminated) ||
+                    (getRxStatus () == connection_status::error))
+                {
+                    goto CLOSE_TX_LOOP;  // break out of loop
+                }
+                else
+                {
+                    std::cerr << e.what () << '\n';
+                }
+            }
+            continue;
         }
         else
         {
@@ -536,7 +552,14 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (getRxStatus () == connection_status::connected)
     {
-        controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+		try
+		{
+            controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+		}
+        catch (const zmq::error_t &)
+		{
+			//this probably just means it got closed simultaneously which would be unusual but not impossible
+		}
     }
 
     controlSocket.close ();

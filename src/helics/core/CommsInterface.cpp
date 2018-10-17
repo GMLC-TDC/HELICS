@@ -302,14 +302,14 @@ void CommsInterface::disconnect ()
             return;
         }
     }
-	
+    requestDisconnect.store (true, std::memory_order::memory_order_release);
     if (tripDetector.isTripped ())
     {
         setRxStatus(connection_status::terminated);
         setTxStatus(connection_status::terminated);
         return;
     }
-    requestDisconnect.store(true, std::memory_order::memory_order_release);
+   
     if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
