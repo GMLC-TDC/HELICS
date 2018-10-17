@@ -186,7 +186,10 @@ void TcpConnection::close ()
         socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
-            std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            if (ec.value() != 107) //107 is not_connected error but translated to system error somehow
+            {
+                std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            }
             ec.clear ();
         }
         socket_.close (ec);
@@ -212,7 +215,10 @@ void TcpConnection::closeNoWait ()
         socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
-            std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            if (ec.value() != 107)
+            {
+                std::cerr << "error occurred sending shutdown::" << ec << std::endl;
+            }
             ec.clear ();
         }
         socket_.close (ec);
