@@ -16,11 +16,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label("ci"))
-
+BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test registration of filters*/
-
 
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
@@ -34,16 +32,26 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     helicsFederateRegisterGlobalEndpoint (mFed, "port1", "");
     helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL);
 
-    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "filter1", "port1");
+    auto f1 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "port1", "filter1");
     BOOST_CHECK (f1 != NULL);
-    auto f2 = helicsFederateRegisterDestinationFilter (fFed, helics_custom_filter, "filter2", "port2");
+    auto f2 = helicsFederateRegisterDestinationFilter (fFed, helics_custom_filter, "port2", "filter2");
     BOOST_CHECK (f2 != f1);
     auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "");
     BOOST_CHECK (ep1 != NULL);
-    auto f3 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "", "filter0/fout");
+    auto f3 = helicsFederateRegisterSourceFilter (fFed, helics_custom_filter, "filter0/fout", "");
     BOOST_CHECK (f3 != f2);
     CE (helicsFederateFinalize (mFed));
     CE (helicsFederateFinalize (fFed));
+
+    auto f1_b = helicsFederateGetFilter (fFed, "filter1");
+    char tmp[100];
+    CE (helicsFilterGetTarget (f1_b, tmp, 100));
+    BOOST_CHECK_EQUAL (tmp, "port1");
+
+	 auto f1_c = helicsFederateGetFilterByIndex (fFed, 2);
+    CE (helicsFilterGetTarget (f1_c, tmp, 100));
+     BOOST_CHECK_EQUAL (tmp, "filter0/fout");
+
     federate_state state;
     CE (helicsFederateGetState (fFed, &state));
     BOOST_CHECK (state == helics_finalize_state);
@@ -52,7 +60,6 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-
 
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
@@ -194,7 +201,6 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-
 
 BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
 {

@@ -55,7 +55,6 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
 
     CE (helicsFederateSetPeriod (vFed1, 0.5, 0.0));
     CE (helicsFederateSetPeriod (vFed1, 0.5, 0.0));
-
    auto pub = helicsFederateRegisterGlobalPublication (vFed1, "pub1", "double", "");
     helicsFederateRegisterSubscription (vFed2, "pub1", "", "");
 
@@ -75,6 +74,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     BOOST_CHECK_EQUAL (gtime, 0.5);  // the result should show up at the next available time point
     CE (helicsFederateRequestTime (vFed2, 2.0, &gtime));
     BOOST_CHECK_EQUAL (gtime, 2.0);
+
+	CE (helicsFederateRequestNextStep (vFed2, &gtime));
+    BOOST_CHECK_EQUAL (gtime, 2.5);
 
      CE (helicsFederateFinalize (vFed1));
     CE (helicsFederateFinalize (vFed2));

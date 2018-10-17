@@ -62,6 +62,14 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK_EQUAL (sv, "");
     BOOST_CHECK_EQUAL (sv2, "random");
 
+	auto epid_b = helicsFederateGetEndpoint (mFed1, "ep2");
+    CE (helicsEndpointGetType (epid_b, sv, 32));
+    BOOST_CHECK_EQUAL (sv, "random");
+
+	auto epid_c = helicsFederateGetEndpointByIndex (mFed1, 0);
+    CE (helicsEndpointGetName(epid_c, sv2, 32));
+    BOOST_CHECK_EQUAL (sv2, "fed0/ep1");
+
     CE (helicsFederateFinalize (mFed1));
 
     mFed1State = federate_state::helics_finalize_state;

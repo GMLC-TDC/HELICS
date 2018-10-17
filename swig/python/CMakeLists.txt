@@ -70,7 +70,9 @@ else()
   endif()
 
   swig_link_libraries(helics helicsSharedLib)
-
+  if (MSVC)
+	target_compile_options(_helics PRIVATE "/wd4100")
+  endif(MSVC)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
     set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")

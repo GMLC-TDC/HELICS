@@ -239,8 +239,31 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name)
         }
         auto filt = std::make_unique<helics::FilterObject> ();
         filt->filtptr = fedObj->getFilterObject (id.value ());
+		if (!filt->filtptr)
+		{
+			for (auto &efilt : reinterpret_cast<helics::FedObject *>(fed)->filters)
+			{
+				if (efilt->filtptr)
+				{
+					if (efilt->filtptr->getName() == name)
+					{
+                        filt->filtptr = efilt->filtptr;
+                        filt->type = efilt->type;
+                        break;
+					}
+				}
+			}
+		}
+		else
+		{
+            filt->type = determineFilterType (filt->filtptr);
+		}
+		if (!filt->filtptr)
+		{
+            return nullptr;
+		}
         filt->fedptr = std::move (fedObj);
-        filt->type = determineFilterType (filt->filtptr);
+        
         filt->valid = filterValidationIdentifier;
         auto ret = reinterpret_cast<helics_filter> (filt.get ());
         federateAddFilter (fed, std::move (filt));
@@ -254,6 +277,10 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name)
 
 helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index)
 {
+	if (index < 0)
+	{
+        return nullptr;
+	}
     auto fedObj = getFedSharedPtr (fed);
     if (!fedObj)
     {
@@ -263,8 +290,24 @@ helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index)
     {
         auto filt = std::make_unique<helics::FilterObject> ();
         filt->filtptr = fedObj->getFilterObject (index);
+		if (!filt->filtptr)
+		{
+            auto fobj = reinterpret_cast<helics::FedObject *> (fed);
+			if (index < fobj->filters.size())
+			{
+                filt->filtptr = fobj->filters[index]->filtptr;
+                filt->type = fobj->filters[index]->type;
+			}
+		}
+		else
+		{
+            filt->type = determineFilterType (filt->filtptr);
+		}
+		if (!filt->filtptr)
+		{
+            return nullptr;
+		}
         filt->fedptr = std::move (fedObj);
-        filt->type = determineFilterType (filt->filtptr);
         filt->valid = filterValidationIdentifier;
         auto ret = reinterpret_cast<helics_filter> (filt.get ());
         federateAddFilter (fed, std::move (filt));
