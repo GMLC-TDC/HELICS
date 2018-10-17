@@ -193,6 +193,7 @@ bool CommsInterface::connect ()
 void CommsInterface::setName (const std::string &name_) { name = name_; }
 void CommsInterface::disconnect ()
 {
+    requestDisconnect.store (true, std::memory_order::memory_order_release);
     if (tripDetector.isTripped ())
     {
         rx_status = connection_status::terminated;
