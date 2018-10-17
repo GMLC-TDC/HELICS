@@ -442,6 +442,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     bool expected = false;
     if (processing.compare_exchange_strong (expected, true))
     {  // only enter this loop once per federate
+        Time lastTime = timeCoord->getGrantedTime ();
         events.clear ();  // clear the event queue
         LOG_TRACE (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
@@ -549,6 +550,16 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         }
 
         processing = false;
+        if ((retTime.grantedTime > nextTime)
+            &&(nextTime>lastTime))
+		{
+			if (!ignore_time_mismatch_warnings)
+			{
+                LOG_WARNING (fmt::format ("Time mismatch detected granted time >requested time {} vs {}",
+                                          static_cast<double> (retTime.grantedTime),
+                                          static_cast<double> (nextTime)));
+			}
+		}
         return retTime;
     }
     // this would not be good practice to get into this part of the function
@@ -962,7 +973,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         timeCoord->processTimeMessage (cmd);
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-        LOG_WARNING (fmt::format ("forced Granted Time={}", time_granted));
+		if (!ignore_time_mismatch_warnings)
+		{
+            LOG_WARNING (fmt::format ("forced Granted Time={}", time_granted));
+		}
         timeGranted_mode = true;
         return message_processing_result::next_step;
     }
@@ -1207,7 +1221,9 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
             }
         }
         break;
-
+    case IGNORE_TIME_MISMATCH_WARNINGS:
+        ignore_time_mismatch_warnings = value;
+        break;
     default:
         timeCoord->setOptionFlag (optionFlag, value);
         break;

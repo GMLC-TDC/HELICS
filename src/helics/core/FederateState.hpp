@@ -61,6 +61,7 @@ class FederateState
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false}; //!< flag indicating the federate is a source_only
+    bool ignore_time_mismatch_warnings{false}; //!< flag indicating that time mismatches should be ignored
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:

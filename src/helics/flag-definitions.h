@@ -42,6 +42,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** used to clear the DELAY_INIT_ENTRY flag in cores*/
 #define ENABLE_INIT_ENTRY 47
 
+/** used to not display warnings on mismatched requested times*/
+#define IGNORE_TIME_MISMATCH_WARNINGS 67
+
 
 /* log level definitions*/
 #define LOG_LEVEL_NO_PRINT (-1)

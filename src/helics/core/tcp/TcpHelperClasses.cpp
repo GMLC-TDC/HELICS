@@ -215,7 +215,7 @@ void TcpConnection::closeNoWait ()
         socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
-            if (ec.value() != 107)
+            if (ec.value() != boost::asio::error::not_connected)
             {
                 std::cerr << "error occurred sending shutdown::" << ec << std::endl;
             }

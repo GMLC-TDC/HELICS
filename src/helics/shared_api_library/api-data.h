@@ -124,7 +124,8 @@ typedef enum {
     helics_flag_wait_for_current_time_update = WAIT_FOR_CURRENT_TIME_UPDATE_FLAG,
     helics_flag_rollback = ROLLBACK_FLAG,
     helics_flag_forward_compute = FORWARD_COMPUTE_FLAG,
-    helics_flag_realtime = REALTIME_FLAG
+    helics_flag_realtime = REALTIME_FLAG,
+	helics_flag_ignore_time_mismatch_warnings=IGNORE_TIME_MISMATCH_WARNINGS
 } helics_federate_flags;
 
 typedef enum {
