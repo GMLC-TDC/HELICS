@@ -97,6 +97,14 @@ HELICS_EXPORT helics_subscription helicsFederateRegisterOptionalTypeSubscription
                                                                                   int type,
                                                                                   const char *units);
 
+
+/** get a subscription by its key typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param key key can be a name, key, or a shortcut created through the interface creation process
+@return a helics_subscription, which will be NULL if an invalid key is used
+*/
+HELICS_EXPORT helics_subscription helicsFederateGetSubscription (helics_federate fed, const char *key);
+
 /** get a subscription by its index typically already created via registerInterfaces file or something of that nature
 @param fed the federate object in which to create a publication
 @param index the index of the publication to get
@@ -159,6 +167,13 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication (he
                                                                               const char *key,
                                                                               int type,
                                                                               const char *units);
+
+/** get a subscription by its key typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param key key can be a name, key, or a shortcut created through the interface creation process
+@return a helics_subscription, which will be NULL if an invalid key is used
+*/
+HELICS_EXPORT helics_publication helicsFederateGetPublication (helics_federate fed, const char *key);
 
 /** get a publication by its index typically already created via registerInterfaces file or something of that nature
 @param fed the federate object in which to create a publication

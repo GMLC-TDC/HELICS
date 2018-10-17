@@ -41,6 +41,13 @@ helicsCreateCombinationFederate
 */
 HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const char *name, const char *type);
 
+/** get an endpoint by its name typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param name the name of the endpoint to retrieve
+@return a helics_endpoint, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name);
+
 /** get an endpoint by its index typically already created via registerInterfaces file or something of that nature
 @param fed the federate object in which to create a publication
 @param index the index of the publication to get

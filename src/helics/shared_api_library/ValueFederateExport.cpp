@@ -193,6 +193,33 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
 }
 
 
+helics_subscription helicsFederateGetSubscription (helics_federate fed, const char *key)
+{
+    auto fedObj = getValueFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getSubscriptionId (key);
+        if (id==helics::invalid_id_value)
+        {
+            return nullptr;
+        }
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
+        sub->subptr = std::make_unique<helics::Subscription> (fedObj.get (), id.value ());
+        sub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
+}
+
 helics_subscription helicsFederateGetSubscriptionByIndex (helics_federate fed, int index)
 {
     auto fedObj = getValueFedSharedPtr (fed);
@@ -335,6 +362,33 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     return nullptr;
 }
 
+
+helics_publication helicsFederateGetPublication (helics_federate fed, const char *key)
+{
+    auto fedObj = getValueFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto id = fedObj->getPublicationId (key);
+        if (id==helics::invalid_id_value)
+        {
+            return nullptr;
+        }
+        auto pub = std::make_unique<helics::PublicationObject> ();
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), id.value ());
+        pub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
+}
 
 helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int index)
 {
