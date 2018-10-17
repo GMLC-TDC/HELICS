@@ -547,6 +547,24 @@ helics_status helicsFederateRequestTime (helics_federate fed, helics_time_t requ
     }
 }
 
+helics_status helicsFederateRequestNextStep (helics_federate fed, helics_time_t *timeOut)
+{
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
+    try
+    {
+        *timeOut = static_cast<double> (fedObj->requestNextStep());
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
+}
+
 helics_status helicsFederateRequestTimeIterative (helics_federate fed,
                                                   helics_time_t requestTime,
                                                   helics_iteration_request iterate,

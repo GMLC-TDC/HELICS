@@ -444,6 +444,15 @@ HELICS_EXPORT helics_core helicsFederateGetCoreObject (helics_federate fed);
 invalid*/
 HELICS_EXPORT helics_status helicsFederateRequestTime (helics_federate fed, helics_time_t requestTime, helics_time_t *timeOut);
 
+/** request the next time step for federate execution
+@details feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current time plus the minimum time step
+@param fed the federate to make the request of
+@param[out]  timeOut the time granted to the federate
+@return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
+invalid*/
+HELICS_EXPORT helics_status helicsFederateRequestNextStep (helics_federate fed, helics_time_t *timeOut);
+
+
 /** request an iterative time
 @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
 iteration request and return a time and iteration status
