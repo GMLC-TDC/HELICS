@@ -192,6 +192,28 @@ helics_subscription helicsFederateRegisterOptionalTypeSubscription (helics_feder
     return nullptr;
 }
 
+
+helics_subscription helicsFederateGetSubscriptionByIndex (helics_federate fed, int index)
+{
+    auto fedObj = getValueFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto sub = std::make_unique<helics::SubscriptionObject> ();
+        sub->subptr = std::make_unique<helics::Subscription> ( fedObj.get(), index);
+        sub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_subscription> (sub.get ());
+        addSubscription (fed, std::move (sub));
+        return ret;
+    }
+    catch (...)
+    {
+    }
+    return nullptr;
+}
 helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, const char *type, const char *units)
 {
     auto htype = (type != nullptr) ? helics::getTypeFromString (type) : helics::helics_type_t::helicsInvalid;
@@ -300,7 +322,7 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     try
     {
         auto pub = std::make_unique<helics::PublicationObject> ();
-        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj.get (), key, static_cast<helics::helics_type_t> (type),
+        pub->pubptr = std::make_unique<helics::Publication> (helics::GLOBAL, fedObj, key, static_cast<helics::helics_type_t> (type),
                                                              (units == nullptr) ? nullStr : std::string (units));
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
@@ -313,7 +335,30 @@ helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate 
     return nullptr;
 }
 
-/* getting and publishing values */
+
+helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int index)
+{
+    auto fedObj = getValueFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto pub = std::make_unique<helics::PublicationObject> ();
+        pub->pubptr = std::make_unique<helics::Publication> ( fedObj.get (), index);
+        pub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
+    }
+    catch (...)
+    {
+    }
+    return nullptr;
+}
+
+  /* getting and publishing values */
 helics_status helicsPublicationPublishRaw (helics_publication pub, const void *data, int datalen)
 {
     if (pub == nullptr)

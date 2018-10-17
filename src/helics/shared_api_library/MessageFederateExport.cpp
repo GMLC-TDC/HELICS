@@ -70,6 +70,29 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed, const
     return nullptr;
 }
 
+
+helics_endpoint helicsFederateGetEndpointByIndex (helics_federate fed, int index)
+{
+    auto fedObj = getMessageFedSharedPtr (fed);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto end = std::make_unique<helics::EndpointObject> ();
+        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), index);
+        end->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_endpoint> (end.get ());
+        addEndpoint (fed, std::move (end));
+        return ret;
+    }
+    catch (...)
+    {
+    }
+    return nullptr;
+}
+
 helics_status helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest)
 {
     if (endpoint == nullptr)

@@ -275,6 +275,29 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
     return retcore;
 }
 
+
+helics_status helicsFederateLoadInterfaces (helics_federate fed, const char *file)
+{
+    auto fedObj = getFed (fed);
+    if (fedObj == nullptr)
+    {
+        return helics_invalid_object;
+    }
+	if (file == nullptr)
+	{
+        return helics_invalid_argument;
+	}
+    try
+    {
+        fedObj->registerInterfaces (file);
+        return helics_ok;
+    }
+    catch (...)
+    {
+        return helicsErrorHandler ();
+    }
+}
+
 helics_status helicsFederateFinalize (helics_federate fed)
 {
     auto fedObj = getFed (fed);

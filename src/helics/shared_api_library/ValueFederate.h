@@ -97,6 +97,14 @@ HELICS_EXPORT helics_subscription helicsFederateRegisterOptionalTypeSubscription
                                                                                   int type,
                                                                                   const char *units);
 
+/** get a subscription by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_subscription, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_subscription helicsFederateGetSubscriptionByIndex (helics_federate fed, int index);
+
+
 /** register a publication with an arbitrary type
 @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
 for subscriptions and publications
@@ -152,7 +160,14 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication (he
                                                                               int type,
                                                                               const char *units);
 
-/**
+/** get a publication by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_publication
+*/
+HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex (helics_federate fed, int index);
+
+  /**
 * \defgroup publications Publication functions
 @details functions for publishing data of various kinds
 The data will get translated to the type specified when the publication was constructed automatically
