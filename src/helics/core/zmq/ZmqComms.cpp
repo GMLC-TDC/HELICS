@@ -743,7 +743,22 @@ void ZmqComms::queue_tx_function ()
             if (route_id == -1)
             {  // send to rx thread loop
                 cmd.to_vector (buffer);
-                controlSocket.send (buffer.data (), buffer.size ());
+                try
+                {
+                    controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                }
+                catch (const zmq::error_t &e)
+                {
+                    if ((getRxStatus () == connection_status::terminated) ||
+                        (getRxStatus () == connection_status::error))
+                    {
+                        goto CLOSE_TX_LOOP;  // break out of loop
+                    }
+                    else
+                    {
+                        std::cerr << e.what () << '\n';
+                    }
+                }
                 continue;
             }
             if (priority_routes.transmit (route_id, cmd))
@@ -761,7 +776,21 @@ void ZmqComms::queue_tx_function ()
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            controlSocket.send (buffer.data (), buffer.size ());
+			try
+			{
+                controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+			}
+			catch (const zmq::error_t &e)
+			{
+				if ((getRxStatus() == connection_status::terminated)||(getRxStatus()==connection_status::error))
+				{
+                    goto CLOSE_TX_LOOP;  // break out of loop
+				}
+				else
+				{
+                    std::cerr << e.what () << '\n';
+				}
+			}
         }
         else
         {
