@@ -12,5 +12,5 @@ function varargout = helicsQueryExecuteAsync(varargin)
     %-------
     %a helics status enumeration with the result of the query specification
     %
-  [varargout{1:nargout}] = helicsMEX(113, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(115, varargin{:});
 end

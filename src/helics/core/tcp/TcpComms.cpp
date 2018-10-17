@@ -411,19 +411,30 @@ void TcpComms::queue_tx_function ()
         }
         try
         {
+            using namespace std::chrono;
+            auto tick = steady_clock::now ();
+            milliseconds timeRemaining (connectionTimeout);
             brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
                                                       std::to_string (brokerPort), maxMessageSize_);
-            int cumsleep = 0;
-            while (!brokerConnection->isConnected ())
+            int trycnt = 1;
+            while (!brokerConnection->waitUntilConnected (timeRemaining.count()))
             {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                cumsleep += 100;
-                if (cumsleep >= connectionTimeout)
+                auto tock = steady_clock::now ();
+                timeRemaining = milliseconds (connectionTimeout) - duration_cast<milliseconds> (tock - tick);
+                if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
                 {
-                    logError("initial connection to broker timed out");
+                    logError ("initial connection to broker timed out");
                     setTxStatus (connection_status::terminated);
                     return;
                 }
+                if (timeRemaining < milliseconds (0))
+                {
+                    timeRemaining = milliseconds (400);
+                }
+                // lets try to connect again
+                ++trycnt;
+                brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
+                                                          std::to_string (brokerPort), maxMessageSize_);
             }
 
             if (PortNumber <= 0)
@@ -457,7 +468,7 @@ void TcpComms::queue_tx_function ()
                                                          }
                                                      }
                                                  });
-                cumsleep = 0;
+                int cumsleep = 0;
                 while (PortNumber < 0)
                 {
                     std::this_thread::sleep_for (std::chrono::milliseconds (100));

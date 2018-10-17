@@ -814,7 +814,14 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (getRxStatus () == connection_status::connected)
     {
-        controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+        try
+        {
+			controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+		}
+        catch (const zmq::error_t &)
+        {
+            // this probably just means it got closed simultaneously which would be unusual but not impossible
+        }
     }
 
     controlSocket.close ();

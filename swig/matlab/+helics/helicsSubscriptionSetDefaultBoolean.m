@@ -1,3 +1,3 @@
 function varargout = helicsSubscriptionSetDefaultBoolean(varargin)
-  [varargout{1:nargout}] = helicsMEX(148, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(154, varargin{:});
 end
