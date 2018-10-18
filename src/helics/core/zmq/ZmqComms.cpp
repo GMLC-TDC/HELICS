@@ -385,7 +385,7 @@ void ZmqComms::queue_rx_function ()
     setRxStatus ( connection_status::connected);  // this is a atomic indicator that the rx queue is ready
     while (true)
     {
-        auto rc = zmq::poll (poller);
+        auto rc = zmq::poll (poller, std::chrono::milliseconds (1000));
         if (rc > 0)
         {
             zmq::message_t msg;
@@ -418,6 +418,10 @@ void ZmqComms::queue_rx_function ()
                 }
                 continue;
             }
+        }
+        if (requestDisconnect.load (std::memory_order::memory_order_acquire))
+        {
+            break;
         }
     }
     disconnecting = true;
@@ -739,7 +743,22 @@ void ZmqComms::queue_tx_function ()
             if (route_id == -1)
             {  // send to rx thread loop
                 cmd.to_vector (buffer);
-                controlSocket.send (buffer.data (), buffer.size ());
+                try
+                {
+                    controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                }
+                catch (const zmq::error_t &e)
+                {
+                    if ((getRxStatus () == connection_status::terminated) ||
+                        (getRxStatus () == connection_status::error))
+                    {
+                        goto CLOSE_TX_LOOP;  // break out of loop
+                    }
+                    else
+                    {
+                        std::cerr << e.what () << '\n';
+                    }
+                }
                 continue;
             }
             if (priority_routes.transmit (route_id, cmd))
@@ -757,7 +776,21 @@ void ZmqComms::queue_tx_function ()
         }
         else if (route_id == -1)
         {  // send to rx thread loop
-            controlSocket.send (buffer.data (), buffer.size ());
+			try
+			{
+                controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+			}
+			catch (const zmq::error_t &e)
+			{
+				if ((getRxStatus() == connection_status::terminated)||(getRxStatus()==connection_status::error))
+				{
+                    goto CLOSE_TX_LOOP;  // break out of loop
+				}
+				else
+				{
+                    std::cerr << e.what () << '\n';
+				}
+			}
         }
         else
         {
@@ -781,7 +814,14 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (getRxStatus () == connection_status::connected)
     {
-        controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+        try
+        {
+			controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+		}
+        catch (const zmq::error_t &)
+        {
+            // this probably just means it got closed simultaneously which would be unusual but not impossible
+        }
     }
 
     controlSocket.close ();

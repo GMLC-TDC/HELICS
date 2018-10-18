@@ -20,26 +20,26 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/foreach.hpp>
 
 static const std::string nullStr;
-#define LOG_ERROR(message) logMessage (LOG_LEVEL_ERROR, nullStr, message)
-#define LOG_WARNING(message) logMessage (LOG_LEVEL_WARNING, nullStr, message)
+#define LOG_ERROR(message) logMessage (HELICS_LOG_LEVEL_ERROR, nullStr, message)
+#define LOG_WARNING(message) logMessage (HELICS_LOG_LEVEL_WARNING, nullStr, message)
 
 #ifndef LOGGING_DISABLED
 
 #define LOG_SUMMARY(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_SUMMARY)                                                                                        \
+        if (logLevel >= HELICS_LOG_LEVEL_SUMMARY)                                                                                        \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_SUMMARY, nullStr, message);                                                                     \
+            logMessage (HELICS_LOG_LEVEL_SUMMARY, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 
 #define LOG_INTERFACES(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_INTERFACES)                                                                                        \
+        if (logLevel >= HELICS_LOG_LEVEL_INTERFACES)                                                                                        \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_INTERFACES, nullStr, message);                                                                     \
+            logMessage (HELICS_LOG_LEVEL_INTERFACES, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 
@@ -47,18 +47,18 @@ static const std::string nullStr;
 #define LOG_TIMING(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_TIMING)                                                                                        \
+        if (logLevel >= HELICS_LOG_LEVEL_TIMING)                                                                                        \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_TIMING, nullStr, message);                                                                     \
+            logMessage (HELICS_LOG_LEVEL_TIMING, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 
 #define LOG_DATA(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_DATA)                                                                         \
+        if (logLevel >= HELICS_LOG_LEVEL_DATA)                                                                         \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_DATA, nullStr, message);                                                      \
+            logMessage (HELICS_LOG_LEVEL_DATA, nullStr, message);                                                      \
         }                                                                                                         \
     } while (false)
 #else
@@ -70,9 +70,9 @@ static const std::string nullStr;
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= LOG_LEVEL_TRACE)                                                                                        \
+        if (logLevel >= HELICS_LOG_LEVEL_TRACE)                                                                                        \
         {                                                                                                         \
-            logMessage (LOG_LEVEL_TRACE, nullStr, message);                                                                     \
+            logMessage (HELICS_LOG_LEVEL_TRACE, nullStr, message);                                                                     \
         }                                                                                                         \
     } while (false)
 #else

@@ -35,7 +35,7 @@ class BrokerBase
     int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
     int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
     int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
-    int32_t tickTimer = 4000;  //!< counter for the length of a keep alive tick in milliseconds
+    int32_t tickTimer = 5000;  //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
     int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up

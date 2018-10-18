@@ -1691,6 +1691,27 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetLogg
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateLoadInterfaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jint jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (helics_status)helicsFederateLoadInterfaces(arg1,(char const *)arg2);
+  jresult = (jint)result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateFinalize(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jint jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -1980,6 +2001,39 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateRequestTime
   {
     jdouble jvalue = (jdouble)temp3;
     (*jenv)->SetDoubleArrayRegion(jenv, jarg3, 0, 1, &jvalue);
+  }
+  
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateRequestNextStep(JNIEnv *jenv, jclass jcls, jlong jarg1, jdoubleArray jarg2) {
+  jint jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  helics_time_t temp2 ;
+  helics_status result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  {
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+      return 0;
+    }
+    if ((*jenv)->GetArrayLength(jenv, jarg2) == 0) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+      return 0;
+    }
+    temp2 = (helics_time_t)0;
+    arg2 = &temp2; 
+  }
+  result = (helics_status)helicsFederateRequestNextStep(arg1,arg2);
+  jresult = (jint)result; 
+  {
+    jdouble jvalue = (jdouble)temp2;
+    (*jenv)->SetDoubleArrayRegion(jenv, jarg2, 0, 1, &jvalue);
   }
   
   return jresult;
@@ -2710,6 +2764,43 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterOp
 }
 
 
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetSubscription(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_subscription result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (helics_subscription)helicsFederateGetSubscription(arg1,(char const *)arg2);
+  *(helics_subscription *)&jresult = result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetSubscriptionByIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_subscription result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (helics_subscription)helicsFederateGetSubscriptionByIndex(arg1,arg2);
+  *(helics_subscription *)&jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterPublication(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2, jstring jarg3, jstring jarg4) {
   jlong jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -2836,6 +2927,43 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
   *(helics_publication *)&jresult = result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   if (arg4) (*jenv)->ReleaseStringUTFChars(jenv, jarg4, (const char *)arg4);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetPublication(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_publication result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (helics_publication)helicsFederateGetPublication(arg1,(char const *)arg2);
+  *(helics_publication *)&jresult = result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetPublicationByIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_publication result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (helics_publication)helicsFederateGetPublicationByIndex(arg1,arg2);
+  *(helics_publication *)&jresult = result; 
   return jresult;
 }
 
@@ -3787,6 +3915,43 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterGl
 }
 
 
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetEndpoint(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_endpoint result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (helics_endpoint)helicsFederateGetEndpoint(arg1,(char const *)arg2);
+  *(helics_endpoint *)&jresult = result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetEndpointByIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_endpoint result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (helics_endpoint)helicsFederateGetEndpointByIndex(arg1,arg2);
+  *(helics_endpoint *)&jresult = result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetDefaultDestination(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   jint jresult = 0 ;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
@@ -4215,6 +4380,43 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCoreRegisterClonin
   result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2);
   *(helics_filter *)&jresult = result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetFilter(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_filter result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return 0;
+  }
+  result = (helics_filter)helicsFederateGetFilter(arg1,(char const *)arg2);
+  *(helics_filter *)&jresult = result; 
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetFilterByIndex(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  jlong jresult = 0 ;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_filter result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  result = (helics_filter)helicsFederateGetFilterByIndex(arg1,arg2);
+  *(helics_filter *)&jresult = result; 
   return jresult;
 }
 

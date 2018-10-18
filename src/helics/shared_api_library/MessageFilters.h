@@ -91,7 +91,21 @@ through other functions
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint);
 
-/** get the target of the filter and store in the given string
+/** get a filter by its name typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param name the name of the filter to retrieve
+@return a helics_filter, which will be NULL if an invalid name
+*/
+HELICS_EXPORT helics_filter helicsFederateGetFilter (helics_federate fed, const char *name);
+
+/** get a filter by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_filter, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index);
+
+  /** get the target of the filter and store in the given string
 @param filt the given filter
 @param[out] outputString storage for the name of the target
 @param maxlen the maximum length of string that str can store
