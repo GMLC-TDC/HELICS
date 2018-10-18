@@ -180,11 +180,11 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetCoreName(SWIGTYPE_p_void.getCPtr(fi), corename));
   }
 
-  public static helics_status helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void fi, String coreInit) {
+  public static helics_status helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void fi, String coreInit, SWIGTYPE_p_void err) {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fi), coreInit));
   }
 
-  public static helics_status helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void fi, String coretype) {
+  public static void helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void fi, String coretype) {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void.getCPtr(fi), coretype));
   }
 
