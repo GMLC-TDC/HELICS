@@ -13,37 +13,37 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 /** flag indicating that a federate is observe only*/
-#define OBSERVER_FLAG 0
+#define HELICS_OBSERVER_FLAG 0
 /** flag indicating that a federate can only return requested times*/
-#define UNINTERRUPTIBLE_FLAG 1
+#define HELICS_UNINTERRUPTIBLE_FLAG 1
 /** flag indicating that a federate can be interrupted*/
-#define INTERRUPTIBLE_FLAG 2
+#define HELICS_INTERRUPTIBLE_FLAG 2
 /** flag indicating that a federate/interface is a signal generator only*/
-#define SOURCE_ONLY_FLAG 4
+#define HELICS_SOURCE_ONLY_FLAG 4
 /** flag indicating a federate/interface should only transmit values if they have changed(binary equivalence)*/
-#define ONLY_TRANSMIT_ON_CHANGE_FLAG 6
+#define HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG 6
 /** flag indicating a federate/interface should only trigger an update if a value has changed (binary
  * equivalence)*/
-#define ONLY_UPDATE_ON_CHANGE_FLAG 8
+#define HELICS_ONLY_UPDATE_ON_CHANGE_FLAG 8
 /** flag indicating a federate should only grant time if all other federates have already passed the requested
  * time*/
-#define WAIT_FOR_CURRENT_TIME_UPDATE_FLAG 10
+#define HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG 10
 
 /** flag indicating that a federate has rollback capability*/
-#define ROLLBACK_FLAG 12
+#define HELICS_ROLLBACK_FLAG 12
 /** flag indicating that a federate performs forward computation and does internal rollback*/
-#define FORWARD_COMPUTE_FLAG 14
+#define HELICS_FORWARD_COMPUTE_FLAG 14
 
 /** flag indicating that a federate needs to run in real time*/
-#define REALTIME_FLAG 16
+#define HELICS_REALTIME_FLAG 16
 
 /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
-#define DELAY_INIT_ENTRY 45
-/** used to clear the DELAY_INIT_ENTRY flag in cores*/
-#define ENABLE_INIT_ENTRY 47
+#define HELICS_DELAY_INIT_ENTRY 45
+/** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
+#define HELICS_ENABLE_INIT_ENTRY 47
 
 /** used to not display warnings on mismatched requested times*/
-#define IGNORE_TIME_MISMATCH_WARNINGS 67
+#define HELICS_IGNORE_TIME_MISMATCH_WARNINGS 67
 
 
 /* log level definitions*/

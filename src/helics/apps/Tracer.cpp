@@ -32,7 +32,7 @@ namespace helics
 {
 namespace apps
 {
-Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName,fi) { fed->setFlagOption (OBSERVER_FLAG); }
+Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName,fi) { fed->setFlagOption (HELICS_OBSERVER_FLAG); }
 
 static const ArgDescriptors InfoArgs{
   {"tags", ArgDescriptor::arg_type_t::vector_string,
@@ -56,7 +56,7 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (OBSERVER_FLAG);
+        fed->setFlagOption (HELICS_OBSERVER_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -73,12 +73,12 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
 Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName,core, fi)
 {
-    fed->setFlagOption (OBSERVER_FLAG);
+    fed->setFlagOption (HELICS_OBSERVER_FLAG);
 }
 
 Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlagOption (OBSERVER_FLAG);
+    fed->setFlagOption (HELICS_OBSERVER_FLAG);
     loadJsonFile (jsonString);
 }
 

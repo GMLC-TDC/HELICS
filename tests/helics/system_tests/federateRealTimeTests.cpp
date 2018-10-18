@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "cdelay";
     fi.coreInitString = std::string ("1 --broker=") + broker->getIdentifier ();
-    fi.setFlagOption (REALTIME_FLAG);
+    fi.setFlagOption (HELICS_REALTIME_FLAG);
     fi.setTimeProperty (RT_LEAD_PROPERTY, 0.1);
     fi.setTimeProperty(PERIOD_PROPERTY, 0.5);
     auto fed = std::make_shared<helics::ValueFederate> ("test1",fi);
@@ -71,12 +71,12 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
 
     fi.coreName = "adelay";
     fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
-    fi.setFlagOption (REALTIME_FLAG);
+    fi.setFlagOption (HELICS_REALTIME_FLAG);
     fi.setTimeProperty (RT_LAG_PROPERTY, 0.1);
     fi.setTimeProperty (RT_LEAD_PROPERTY, 0.1);
     fi.setTimeProperty(PERIOD_PROPERTY, 0.5);
     auto fed = std::make_shared<helics::ValueFederate> ("test1",fi);
-    fi.setFlagOption (REALTIME_FLAG,false);
+    fi.setFlagOption (HELICS_REALTIME_FLAG,false);
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2",fi);
     helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
     std::atomic<int> warnCounter{0};
@@ -123,14 +123,14 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "ctrig";
     fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
-    fi.setFlagOption (REALTIME_FLAG);
+    fi.setFlagOption (HELICS_REALTIME_FLAG);
     fi.setTimeProperty (RT_LAG_PROPERTY, 0.1);
     fi.setTimeProperty (RT_LEAD_PROPERTY, 0.1);
     fi.setTimeProperty(PERIOD_PROPERTY, 0.5);
     fi.setIntegerProperty (LOG_LEVEL_PROPERTY, 0);
 
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
-    fi.setFlagOption (REALTIME_FLAG,false);
+    fi.setFlagOption (HELICS_REALTIME_FLAG,false);
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
     helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
 

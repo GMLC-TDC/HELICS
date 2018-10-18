@@ -1,7 +1,7 @@
 function v = helics_handle_option_multiple_connections_allowed()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1432107646);
+    vInitialized = helicsMEX(0, 1432107647);
   end
   v = vInitialized;
 end

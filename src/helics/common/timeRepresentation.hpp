@@ -23,7 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <limits>
 #include <type_traits>
-
+#include <iosfwd>
 #ifdef __cpp_lib_chrono
 #define CHRONO_CONSTEXPR constexpr
 #else
@@ -571,6 +571,11 @@ class TimeRepresentation
         timecode_ = timecodeval;
         DOUBLETIME
     }
+    friend std::ostream &operator<< (std::ostream &os, const TimeRepresentation &t1)
+    {
+        os << Tconv::toDouble (t1.timecode_) << 's';
+        return os;
+    }
 };
 
 /** defining some additional operators for TimeRepresentation that were not covered
@@ -701,10 +706,4 @@ inline bool operator<= (double lhs, TimeRepresentation<Tconv> t1)
     return (TimeRepresentation<Tconv> (lhs) <= t1);
 }
 
-template <class Tconv>
-inline std::ostream &operator <<(std::ostream &os, TimeRepresentation<Tconv> t1)
-{
-    os << static_cast<double>(t1)<<'s';
-    return os;
-}
 #endif

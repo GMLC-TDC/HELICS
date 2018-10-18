@@ -36,7 +36,7 @@ namespace apps
 {
 Recorder::Recorder (const std::string &appName, FederateInfo &fi) : App (appName,fi)
 {
-    fed->setFlagOption (OBSERVER_FLAG);
+    fed->setFlagOption (HELICS_OBSERVER_FLAG);
 }
 
 static const ArgDescriptors InfoArgs{
@@ -64,7 +64,7 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (OBSERVER_FLAG);
+        fed->setFlagOption (HELICS_OBSERVER_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -81,12 +81,12 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
 Recorder::Recorder (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName,core, fi)
 {
-    fed->setFlagOption (OBSERVER_FLAG);
+    fed->setFlagOption (HELICS_OBSERVER_FLAG);
 }
 
 Recorder::Recorder (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
-    fed->setFlagOption (OBSERVER_FLAG);
+    fed->setFlagOption (HELICS_OBSERVER_FLAG);
     Recorder::loadJsonFile (jsonString);
 }
 

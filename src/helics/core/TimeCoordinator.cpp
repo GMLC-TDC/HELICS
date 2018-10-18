@@ -798,10 +798,10 @@ void TimeCoordinator::setOptionFlag (int optionFlag, bool value)
 {
     switch (optionFlag)
     {
-    case UNINTERRUPTIBLE_FLAG:
+    case HELICS_UNINTERRUPTIBLE_FLAG:
         info.uninterruptible = value;
         break;
-    case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+    case HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
         info.wait_for_current_time_updates = value;
         break;
     default:
@@ -846,11 +846,11 @@ bool TimeCoordinator::getOptionFlag (int optionFlag) const
 {
     switch (optionFlag)
     {
-    case UNINTERRUPTIBLE_FLAG:
+    case HELICS_UNINTERRUPTIBLE_FLAG:
         return info.uninterruptible;
-    case INTERRUPTIBLE_FLAG:
+    case HELICS_INTERRUPTIBLE_FLAG:
         return !info.uninterruptible;
-    case WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+    case HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
         return info.wait_for_current_time_updates;
     default:
         throw (std::invalid_argument ("flag not recognized"));

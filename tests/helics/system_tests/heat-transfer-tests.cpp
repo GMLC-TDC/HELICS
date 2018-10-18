@@ -194,7 +194,7 @@ class observer
         std::string name = "observer";
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.setFlagOption(OBSERVER_FLAG);
+        fi.setFlagOption(HELICS_OBSERVER_FLAG);
         fi.setTimeProperty (TIME_DELTA_PROPERTY, 10.0);
         vFed = std::make_unique<helics::ValueFederate> (name,fi);
         vSub = helics::VectorSubscription2d<double> (vFed.get (), subName, 0, m_count, 0, 1, 0.0);

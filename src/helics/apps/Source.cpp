@@ -38,7 +38,7 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (SOURCE_ONLY_FLAG);
+        fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
         argumentParser (argc, argv, vm_map, InfoArgs, "input"s);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -54,18 +54,18 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
 
 Source::Source (const std::string &appName, const FederateInfo &fi) : App (appName,fi)
 {
-    fed->setFlagOption (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
 }
 
 Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName,core, fi)
 {
-    fed->setFlagOption (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
 }
 
 Source::Source (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlagOption (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
 
     Source::loadJsonFile (jsonString);
 }

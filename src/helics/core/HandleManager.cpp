@@ -102,7 +102,7 @@ void HandleManager::setHandleOption(int32_t index, int option, bool val)
     {
         switch (option)
         {
-        case ONLY_UPDATE_ON_CHANGE_FLAG:
+        case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
             if (val)
             {
                 setActionFlag(handles[index], extra_flag1);
@@ -112,7 +112,7 @@ void HandleManager::setHandleOption(int32_t index, int option, bool val)
                 clearActionFlag(handles[index], extra_flag1);
             }
             break;
-        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+        case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
             if (val)
             {
                 setActionFlag(handles[index], extra_flag2);
@@ -162,9 +162,9 @@ bool HandleManager::getHandleOption(int32_t index, int option) const
     {
         switch (option)
         {
-        case ONLY_UPDATE_ON_CHANGE_FLAG:
+        case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
             return checkActionFlag(handles[index], extra_flag1);
-        case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+        case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
             return checkActionFlag(handles[index], extra_flag2);
         case CONNECTION_REQUIRED_OPTION:
            return checkActionFlag(handles[index], required_flag);

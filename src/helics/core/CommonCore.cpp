@@ -369,7 +369,7 @@ bool CommonCore::allDisconnected () const
 void CommonCore::setCoreReadyToInit ()
 {
     // use the flag mechanics that do the same thing
-    setFlagOption (local_core_id, ENABLE_INIT_ENTRY);
+    setFlagOption (local_core_id, HELICS_ENABLE_INIT_ENTRY);
 }
 
 /** this function will generate an appropriate exception for the error
@@ -704,7 +704,7 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
 {
     if (federateID == local_core_id)
     {
-        if (flag == DELAY_INIT_ENTRY)
+        if (flag == HELICS_DELAY_INIT_ENTRY)
         {
             if (flagValue)
             {
@@ -713,7 +713,7 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
             else
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
-                cmd.messageID = DELAY_INIT_ENTRY;
+                cmd.messageID = HELICS_DELAY_INIT_ENTRY;
                 if (flagValue)
                 {
                     setActionFlag (cmd, indicator_flag);
@@ -721,10 +721,10 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
                 addActionMessage (cmd);
             }
         }
-        else if (flag == ENABLE_INIT_ENTRY)
+        else if (flag == HELICS_ENABLE_INIT_ENTRY)
         {
             ActionMessage cmd (CMD_CORE_CONFIGURE);
-            cmd.messageID = ENABLE_INIT_ENTRY;
+            cmd.messageID = HELICS_ENABLE_INIT_ENTRY;
             if (flagValue)
             {
                 setActionFlag (cmd, indicator_flag);
@@ -2900,7 +2900,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            if (fed->getOptionFlag (OBSERVER_FLAG))
+            if (fed->getOptionFlag (HELICS_OBSERVER_FLAG))
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2910,7 +2910,7 @@ void CommonCore::checkDependencies ()
                 fed->addAction (rmdep);
                 isobs = true;
             }
-            else if (fed->getOptionFlag (SOURCE_ONLY_FLAG))
+            else if (fed->getOptionFlag (HELICS_SOURCE_ONLY_FLAG))
             {
                 timeCoord->removeDependent (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENCY);
@@ -3095,7 +3095,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
 {
     switch (cmd.messageID)
     {
-    case ENABLE_INIT_ENTRY:
+    case HELICS_ENABLE_INIT_ENTRY:
         if (delayInitCounter <= 1)
         {
             delayInitCounter = 0;

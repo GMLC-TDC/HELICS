@@ -986,7 +986,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage &cmd)
 {
 	switch (cmd.messageID)
 	{
-	case ENABLE_INIT_ENTRY:
+	case HELICS_ENABLE_INIT_ENTRY:
 		/*if (delayInitCounter <= 1)
 		{
 			delayInitCounter = 0;

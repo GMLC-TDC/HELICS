@@ -28,10 +28,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     BOOST_CHECK_EQUAL (fs->getTimeProperty (OUTPUT_DELAY_PROPERTY), helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getTimeProperty (INPUT_DELAY_PROPERTY), helics::Time::zeroVal ());
     BOOST_CHECK_EQUAL (fs->getTimeProperty (PERIOD_PROPERTY), helics::Time::zeroVal ());
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (OBSERVER_FLAG), false);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (UNINTERRUPTIBLE_FLAG), false);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (INTERRUPTIBLE_FLAG), true);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (SOURCE_ONLY_FLAG), false);
+    BOOST_CHECK_EQUAL (fs->getOptionFlag (HELICS_OBSERVER_FLAG), false);
+    BOOST_CHECK_EQUAL (fs->getOptionFlag (HELICS_UNINTERRUPTIBLE_FLAG), false);
+    BOOST_CHECK_EQUAL (fs->getOptionFlag (HELICS_INTERRUPTIBLE_FLAG), true);
+    BOOST_CHECK_EQUAL (fs->getOptionFlag (HELICS_SOURCE_ONLY_FLAG), false);
 
     // Check other default state values
     BOOST_CHECK_EQUAL (fs->getQueueSize (), 0);

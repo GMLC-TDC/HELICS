@@ -1181,13 +1181,13 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
 {
     switch (optionFlag)
     {
-    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+    case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
         only_transmit_on_change = value;
         break;
-    case ONLY_UPDATE_ON_CHANGE_FLAG:
+    case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
         interfaceInformation.setChangeUpdateFlag (value);
         break;
-    case REALTIME_FLAG:
+    case HELICS_REALTIME_FLAG:
         if (value)
         {
             if (state < HELICS_EXECUTING)
@@ -1201,7 +1201,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         }
 
         break;
-    case SOURCE_ONLY_FLAG:
+    case HELICS_SOURCE_ONLY_FLAG:
         if (state == HELICS_CREATED)
         {
             source_only = value;
@@ -1211,7 +1211,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
             }
         }
         break;
-    case OBSERVER_FLAG:
+    case HELICS_OBSERVER_FLAG:
         if (state == HELICS_CREATED)
         {
             observer = value;
@@ -1221,7 +1221,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
             }
         }
         break;
-    case IGNORE_TIME_MISMATCH_WARNINGS:
+    case HELICS_IGNORE_TIME_MISMATCH_WARNINGS:
         ignore_time_mismatch_warnings = value;
         break;
     default:
@@ -1250,15 +1250,15 @@ bool FederateState::getOptionFlag (int optionFlag) const
 {
     switch (optionFlag)
     {
-    case ONLY_TRANSMIT_ON_CHANGE_FLAG:
+    case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
         return only_transmit_on_change;
-    case ONLY_UPDATE_ON_CHANGE_FLAG:
+    case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
         return interfaceInformation.getChangeUpdateFlag ();
-    case REALTIME_FLAG:
+    case HELICS_REALTIME_FLAG:
         return realtime;
-    case OBSERVER_FLAG:
+    case HELICS_OBSERVER_FLAG:
         return observer;
-    case SOURCE_ONLY_FLAG:
+    case HELICS_SOURCE_ONLY_FLAG:
         return source_only;
     default:
         return timeCoord->getOptionFlag (optionFlag);

@@ -115,17 +115,17 @@ typedef enum {
 } helics_filter_type_t;
 
 typedef enum {
-    helics_flag_observer = OBSERVER_FLAG,
-    helics_flag_uninterruptible = UNINTERRUPTIBLE_FLAG,
-    helics_flag_interruptible = INTERRUPTIBLE_FLAG,
-    helics_flag_source_only = SOURCE_ONLY_FLAG,
-    helics_flag_only_transmit_on_change = ONLY_TRANSMIT_ON_CHANGE_FLAG,
-    helics_flag_only_update_on_change = ONLY_UPDATE_ON_CHANGE_FLAG,
-    helics_flag_wait_for_current_time_update = WAIT_FOR_CURRENT_TIME_UPDATE_FLAG,
-    helics_flag_rollback = ROLLBACK_FLAG,
-    helics_flag_forward_compute = FORWARD_COMPUTE_FLAG,
-    helics_flag_realtime = REALTIME_FLAG,
-	helics_flag_ignore_time_mismatch_warnings=IGNORE_TIME_MISMATCH_WARNINGS
+    helics_flag_observer = HELICS_OBSERVER_FLAG,
+    helics_flag_uninterruptible = HELICS_UNINTERRUPTIBLE_FLAG,
+    helics_flag_interruptible = HELICS_INTERRUPTIBLE_FLAG,
+    helics_flag_source_only = HELICS_SOURCE_ONLY_FLAG,
+    helics_flag_only_transmit_on_change = HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG,
+    helics_flag_only_update_on_change = HELICS_ONLY_UPDATE_ON_CHANGE_FLAG,
+    helics_flag_wait_for_current_time_update = HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG,
+    helics_flag_rollback = HELICS_ROLLBACK_FLAG,
+    helics_flag_forward_compute = HELICS_FORWARD_COMPUTE_FLAG,
+    helics_flag_realtime = HELICS_REALTIME_FLAG,
+	helics_flag_ignore_time_mismatch_warnings=HELICS_IGNORE_TIME_MISMATCH_WARNINGS
 } helics_federate_flags;
 
 typedef enum {
@@ -150,8 +150,8 @@ helics_handle_option_connection_required=CONNECTION_REQUIRED_OPTION,
 	helics_handle_option_single_connection_only=SINGLE_CONNECTION_ONLY_OPTION,
 	helics_handle_option_multiple_connections_allowed=MULTIPLE_CONNECTIONS_ALLOWED_OPTION,
 	helics_handle_option_only_transmit_on_change =
-      ONLY_TRANSMIT_ON_CHANGE_FLAG,
-    helics_handle_option_only_update_on_change = ONLY_UPDATE_ON_CHANGE_FLAG
+      HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG,
+    helics_handle_option_only_update_on_change = HELICS_ONLY_UPDATE_ON_CHANGE_FLAG
 } helics_handle_options;
 
   /**
