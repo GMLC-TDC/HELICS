@@ -18,15 +18,15 @@ using elsewhere is probably not going to work.
 /** enumeration of defined print levels*/
 enum log_level : int
 {
-    no_print = LOG_LEVEL_NO_PRINT,  //!< never print
-    error = LOG_LEVEL_ERROR,  //!< only print errors
-    warning = LOG_LEVEL_WARNING,  //!< print/log warning and errors
-    summary = LOG_LEVEL_SUMMARY,  //!< print/log summary information
-    connections = LOG_LEVEL_CONNECTIONS,  //!< print summary+ federate level connection information
-    interfaces = LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
-    timing = LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
-    data = LOG_LEVEL_DATA,  //!< print timing+data transmissions
-    trace = LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)
+    no_print = HELICS_LOG_LEVEL_NO_PRINT,  //!< never print
+    error = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
+    warning = HELICS_LOG_LEVEL_WARNING,  //!< print/log warning and errors
+    summary = HELICS_LOG_LEVEL_SUMMARY,  //!< print/log summary information
+    connections = HELICS_LOG_LEVEL_CONNECTIONS,  //!< print summary+ federate level connection information
+    interfaces = HELICS_LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
+    timing = HELICS_LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
+    data = HELICS_LOG_LEVEL_DATA,  //!< print timing+data transmissions
+    trace = HELICS_LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)
 };
 
 #define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);

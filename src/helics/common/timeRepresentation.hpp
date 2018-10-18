@@ -701,4 +701,10 @@ inline bool operator<= (double lhs, TimeRepresentation<Tconv> t1)
     return (TimeRepresentation<Tconv> (lhs) <= t1);
 }
 
+template <class Tconv>
+inline std::ostream &operator <<(std::ostream &os, TimeRepresentation<Tconv> t1)
+{
+    os << static_cast<double>(t1)<<'s';
+    return os;
+}
 #endif

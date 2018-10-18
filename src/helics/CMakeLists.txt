@@ -23,7 +23,7 @@ add_library(
 target_link_libraries(helics-static PUBLIC helics_base)
 # add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
-if(BUILD_CXX_SHARED_LIB)
+if(BUILD_SHARED_LIBS)
   add_library(
     helics-shared
     SHARED
@@ -56,7 +56,7 @@ install(
   COMPONENT libs
 )
 
-if(BUILD_CXX_SHARED_LIB)
+if(BUILD_SHARED_LIBS)
   install(
     TARGETS helics-shared
     EXPORT helics-targets
@@ -76,7 +76,7 @@ if(BUILD_CXX_SHARED_LIB)
     COMPONENT libs
   )
 
-endif(BUILD_CXX_SHARED_LIB)
+endif(BUILD_SHARED_LIBS)
 
 add_subdirectory(apps)
 

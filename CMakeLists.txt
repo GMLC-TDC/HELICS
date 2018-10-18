@@ -114,21 +114,21 @@ option(
   "enable the use of the swig executable to generate interface code and use repository code instead"
   ON
 )
-option(BUILD_CXX_SHARED_LIB "Build a Shared Libraries of the CXX interface" OFF)
+option(BUILD_SHARED_LIBS "install shared libraries for the CXX interface" OFF)
 
-if(INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_CXX_SHARED_LIB)
-	set(BUILD_SHARED_LIBS ON)
+if(INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_SHARED_LIBS)
+	set(BUILD_HELICS_SHARED_LIBS ON)
 endif()
 
 cmake_dependent_option(
   USE_POSITION_INDEPENDENT_CODE
   "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library"
   OFF
-  "NOT BUILD_SHARED_LIBS"
+  "NOT BUILD_HELICS_SHARED_LIBS"
   ON
 )
 
-if(BUILD_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
+if(BUILD_HELICS_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
@@ -599,7 +599,7 @@ set(
   helics_static_file_debug
   "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
 )
-if(BUILD_CXX_SHARED_LIB)
+if(BUILD_SHARED_LIBS)
   set(
     helics_cxx_shared_file
     "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -608,10 +608,10 @@ if(BUILD_CXX_SHARED_LIB)
     helics_cxx_shared_file_debug
     "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
   )
-else(BUILD_CXX_SHARED_LIB)
+else(BUILD_SHARED_LIBS)
   set(helics_cxx_shared_file)
   set(helics_cxx_shared_file_debug)
-endif(BUILD_CXX_SHARED_LIB)
+endif(BUILD_SHARED_LIBS)
 
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
   set(

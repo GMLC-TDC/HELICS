@@ -4,22 +4,21 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpBroker.h"
-#include "TcpComms.h"
-#include "TcpCommsSS.h"
 #include "../../common/argParser.h"
 #include "../NetworkBroker_impl.hpp"
+#include "TcpComms.h"
+#include "TcpCommsSS.h"
 
 namespace helics
 {
-template class NetworkBroker<tcp::TcpComms, interface_type::tcp, static_cast<int>(core_type::TCP)>;
+template class NetworkBroker<tcp::TcpComms, interface_type::tcp, static_cast<int> (core_type::TCP)>;
 namespace tcp
 {
-
 using namespace std::string_literals;
-static const ArgDescriptors extraArgs{{"server"s, ArgDescriptor::arg_type_t::flag_type,
-                                       "specify that the Broker should be a server"s},
-                                      {"connections"s, ArgDescriptor::arg_type_t::vector_string,
-                                       "target link connections"s}};
+static const ArgDescriptors extraArgs{{"connections"s, ArgDescriptor::arg_type_t::vector_string,
+                                       "target link connections"s},
+                                      {"no_outgoing_connections"s, ArgDescriptor::arg_type_t::flag_type,
+                                       "disable outgoing connections"s}};
 
 TcpBrokerSS::TcpBrokerSS (bool rootBroker) noexcept : NetworkBroker (rootBroker) {}
 
@@ -47,9 +46,9 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
             {
                 connections = vm["connections"].as<std::vector<std::string>> ();
             }
-            if (vm.count ("server") > 0)
+            if (vm.count("no_outgoing_connections") > 0)
             {
-                serverMode = true;
+                no_outgoing_connections = true;
             }
         }
         lock.unlock ();
@@ -60,12 +59,14 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
 bool TcpBrokerSS::brokerConnect ()
 {
     std::unique_lock<std::mutex> lock (dataMutex);
-    comms->setServerMode (serverMode);
-	if (!connections.empty())
-	{
-		comms->addConnections(connections);
-	}
-	
+    if (!connections.empty ())
+    {
+        comms->addConnections (connections);
+    }
+    if (no_outgoing_connections)
+    {
+        comms->allowOutgoingConnections(false);
+    }
     lock.unlock ();
     return NetworkBroker::brokerConnect ();
 }

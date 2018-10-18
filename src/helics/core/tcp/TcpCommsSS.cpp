@@ -50,6 +50,15 @@ void TcpCommsSS::addConnections (const std::vector<std::string> &newConnections)
     }
 }
 
+void TcpCommsSS::allowOutgoingConnections (bool value)
+{
+    if (propertyLock ())
+    {
+        outgoingConnectionsAllowed = value;
+        propertyUnLock ();
+    }
+}
+
 int TcpCommsSS::processIncomingMessage (ActionMessage &&M)
 {
     if (isProtocolCommand (M))
@@ -140,6 +149,13 @@ void TcpCommsSS::queue_tx_function ()
     {
         PortNumber = DEFAULT_TCPSS_PORT;
     }
+    if (!serverMode && !outgoingConnectionsAllowed)
+    {
+        logError ("no server and no outgoing connections, no way to connect to comms");
+        setRxStatus (connection_status::error);
+        setTxStatus (connection_status::error);
+        return;
+    }
     TcpServer::pointer server;
     auto ioserv = AsioServiceManager::getServicePointer ();
     auto serviceLoop = ioserv->runServiceLoop ();
@@ -164,6 +180,7 @@ void TcpCommsSS::queue_tx_function ()
                 logError ("unable to bind to tcp connection socket");
                 server->close ();
                 setRxStatus (connection_status::error);
+                setTxStatus (connection_status::error);
                 return;
             }
         }
@@ -180,22 +197,23 @@ void TcpCommsSS::queue_tx_function ()
 
     std::vector<std::pair<std::string, TcpConnection::pointer>> made_connections;
     std::map<std::string, route_id_t> established_routes;
-
-    for (const auto &conn : connections)
+    if (outgoingConnectionsAllowed)
     {
-        auto new_connect = generateConnection (ioserv, conn);
-
-        if (new_connect)
+        for (const auto &conn : connections)
         {
-            new_connect->setDataCall (dataCall);
-            new_connect->setErrorCall (errorCall);
-            new_connect->send (cstring);
-            new_connect->startReceive ();
+            auto new_connect = generateConnection (ioserv, conn);
 
-            made_connections.emplace_back (conn, std::move (new_connect));
+            if (new_connect)
+            {
+                new_connect->setDataCall (dataCall);
+                new_connect->setErrorCall (errorCall);
+                new_connect->send (cstring);
+                new_connect->startReceive ();
+
+                made_connections.emplace_back (conn, std::move (new_connect));
+            }
         }
     }
-
     setRxStatus (connection_status::connected);
     std::vector<char> buffer;
 
@@ -212,45 +230,48 @@ void TcpCommsSS::queue_tx_function ()
         {
             brokerPort = DEFAULT_TCPSS_PORT;
         }
-        try
+        if (outgoingConnectionsAllowed)
         {
-            using namespace std::chrono;
-            auto tick = steady_clock::now ();
-            milliseconds timeRemaining (connectionTimeout);
-            brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                      std::to_string (brokerPort), maxMessageSize_);
-            int trycnt = 1;
-            while (!brokerConnection->waitUntilConnected (timeRemaining))
+            try
             {
-                auto tock = steady_clock::now ();
-                timeRemaining = milliseconds (connectionTimeout) - duration_cast<milliseconds> (tock - tick);
-                if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
-                {
-                    logError ("initial connection to broker timed out");
-                    setTxStatus (connection_status::terminated);
-                    return;
-                }
-                if (timeRemaining < milliseconds (0))
-                {
-                    timeRemaining = milliseconds (400);
-                }
-                // lets try to connect again
-                ++trycnt;
+                using namespace std::chrono;
+                auto tick = steady_clock::now ();
+                milliseconds timeRemaining (connectionTimeout);
                 brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
                                                           std::to_string (brokerPort), maxMessageSize_);
-            }
+                int trycnt = 1;
+                while (!brokerConnection->waitUntilConnected (timeRemaining))
+                {
+                    auto tock = steady_clock::now ();
+                    timeRemaining = milliseconds (connectionTimeout) - duration_cast<milliseconds> (tock - tick);
+                    if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
+                    {
+                        logError ("initial connection to broker timed out");
+                        setTxStatus (connection_status::terminated);
+                        return;
+                    }
+                    if (timeRemaining < milliseconds (0))
+                    {
+                        timeRemaining = milliseconds (400);
+                    }
+                    // lets try to connect again
+                    ++trycnt;
+                    brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
+                                                              std::to_string (brokerPort), maxMessageSize_);
+                }
 
-            brokerConnection->setDataCall (dataCall);
-            brokerConnection->setErrorCall (errorCall);
-            
-            brokerConnection->send (cstring);
-            brokerConnection->startReceive ();
+                brokerConnection->setDataCall (dataCall);
+                brokerConnection->setErrorCall (errorCall);
+
+                brokerConnection->send (cstring);
+                brokerConnection->startReceive ();
+            }
+            catch (std::exception &e)
+            {
+                logError (e.what ());
+            }
+            established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
         }
-        catch (std::exception &e)
-        {
-            logError (e.what ());
-        }
-        established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
     }
 
     setTxStatus (connection_status::connected);
@@ -288,7 +309,7 @@ void TcpCommsSS::queue_tx_function ()
                     {
                         if ((mc.second) && (cmd.payload == mc.first))
                         {
-                            routes.emplace (route_id_t(cmd.getExtraData ()), std::move (mc.second));
+                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (mc.second));
                             established = true;
                             established_routes[mc.first] = route_id_t (cmd.getExtraData ());
                         }
@@ -301,26 +322,33 @@ void TcpCommsSS::queue_tx_function ()
                             established = true;
                             if (efind->second == parent_route_id)
                             {
-                                routes.emplace (route_id_t(cmd.getExtraData ()), brokerConnection);
+                                routes.emplace (route_id_t (cmd.getExtraData ()), brokerConnection);
                             }
                             else
                             {
-                                routes.emplace (route_id_t(cmd.getExtraData ()), routes[efind->second]);
+                                routes.emplace (route_id_t (cmd.getExtraData ()), routes[efind->second]);
                             }
                         }
                     }
 
                     if (!established)
                     {
-                        auto new_connect = generateConnection (ioserv, cmd.payload);
-                        if (new_connect)
+                        if (outgoingConnectionsAllowed)
                         {
-                            new_connect->setDataCall (dataCall);
-                            new_connect->setErrorCall (errorCall);
-                            new_connect->send (cstring);
-                            new_connect->startReceive ();
-                            routes.emplace (route_id_t(cmd.getExtraData ()), std::move (new_connect));
-                            established_routes[cmd.payload] = route_id_t (cmd.getExtraData ());
+                            auto new_connect = generateConnection (ioserv, cmd.payload);
+                            if (new_connect)
+                            {
+                                new_connect->setDataCall (dataCall);
+                                new_connect->setErrorCall (errorCall);
+                                new_connect->send (cstring);
+                                new_connect->startReceive ();
+                                routes.emplace (route_id_t (cmd.getExtraData ()), std::move (new_connect));
+                                established_routes[cmd.payload] = route_id_t (cmd.getExtraData ());
+                            }
+                        }
+                        else
+                        {
+                            logWarning (std::string ("unable to make connection ") + cmd.payload);
                         }
                     }
                 }
@@ -416,10 +444,10 @@ CLOSE_TX_LOOP:
     {
         rt.second->close ();
     }
-	if (brokerConnection)
-	{
+    if (brokerConnection)
+    {
         brokerConnection->close ();
-	}
+    }
     routes.clear ();
     brokerConnection = nullptr;
     if (getRxStatus () == connection_status::connected)

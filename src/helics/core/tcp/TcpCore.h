@@ -15,24 +15,7 @@ class TcpComms;
 class TcpCommsSS;
 /** implementation for the core that uses tcp messages to communicate*/
 using TcpCore = NetworkCore<TcpComms, interface_type::tcp>;
-//class TcpCore final : public CommsBroker<TcpComms, CommonCore>
-//{
-//  public:
-    /** default constructor*/
-//    TcpCore () noexcept;
-//    TcpCore (const std::string &core_name);
 
-//    virtual void initializeFromArgs (int argc, const char *const *argv) override;
-
- // protected:
-  //  virtual std::string generateLocalAddressString () const override;
-
- // private:
- //   mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
- //   NetworkBrokerData netInfo{
-  //    interface_type::tcp};  //!< structure containing the networking information
- //   virtual bool brokerConnect () override;
-//};
 
 /** implementation for the core that uses tcp messages to communicate*/
 class TcpCoreSS final : public NetworkCore<TcpCommsSS, interface_type::tcp>
@@ -46,6 +29,7 @@ class TcpCoreSS final : public NetworkCore<TcpCommsSS, interface_type::tcp>
 
   private:
     std::vector<std::string> connections;  //!< defined connections 
+    bool no_outgoing_connections = false; //!< disable outgoing connections if true;
     virtual bool brokerConnect () override;
 };
 

@@ -30,7 +30,7 @@ class TcpBrokerSS final : public NetworkBroker<TcpCommsSS, interface_type::tcp, 
 
   private:
     virtual bool brokerConnect () override;
-    bool serverMode = true;  //!< flag determining if the comms should be placed in server mode
+    bool no_outgoing_connections = false; //!< disable outgoing connections if true;
     std::vector<std::string> connections;  //!< defined connections These are connections that the comm section reaches out to regardless of whether it is a broker/core/ or server
 };
 

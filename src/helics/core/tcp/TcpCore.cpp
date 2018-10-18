@@ -22,7 +22,8 @@ TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
 
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{
-{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s } };
+{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s },
+{"no_outgoing_connections"s, ArgDescriptor::arg_type_t::flag_type,"disable outgoing connections"s} };
 
 void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 {
@@ -37,6 +38,10 @@ void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
             {
                 connections = vm["connections"].as<std::vector<std::string>>();
             }
+            if (vm.count("no_outgoing_connections") > 0)
+            {
+                no_outgoing_connections = true;
+            }
         }
         lock.unlock();
         NetworkCore::initializeFromArgs(argc, argv);
@@ -50,6 +55,10 @@ bool TcpCoreSS::brokerConnect ()
 	{
 		comms->addConnections(connections);
 	}
+    if (no_outgoing_connections)
+    {
+        comms->allowOutgoingConnections(false);
+    }
     lock.unlock();
     return NetworkCore::brokerConnect();
 }

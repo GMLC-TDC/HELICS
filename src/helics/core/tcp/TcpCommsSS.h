@@ -56,7 +56,10 @@ class TcpCommsSS final : public NetworkCommsInterface
 	void addConnection(const std::string &newConn);
 	/** add a vector of connections to the connection list*/
 	void addConnections(const std::vector<std::string> &newConnections);
+    /** allow outgoing connections*/
+    void allowOutgoingConnections(bool value);
   private:
+      bool outgoingConnectionsAllowed{true}; //!< disable all outgoing connections- allow only incoming connections
     std::vector<std::string> connections;  //!< list of connections to make 
 	virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
