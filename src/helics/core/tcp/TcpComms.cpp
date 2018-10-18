@@ -414,6 +414,7 @@ void TcpComms::queue_tx_function ()
             using namespace std::chrono;
             auto tick = steady_clock::now ();
             milliseconds timeRemaining (connectionTimeout);
+            milliseconds timeRemPrev (connectionTimeout);
             brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
                                                       std::to_string (brokerPort), maxMessageSize_);
             int trycnt = 1;
@@ -426,6 +427,11 @@ void TcpComms::queue_tx_function ()
                     logError ("initial connection to broker timed out");
                     setTxStatus (connection_status::terminated);
                     return;
+                }
+                // make sure we slow down and sleep for a little bit
+                if (timeRemPrev - timeRemaining < milliseconds (100))
+                {
+                    std::this_thread::sleep_for (milliseconds (200));
                 }
                 if (timeRemaining < milliseconds (0))
                 {
