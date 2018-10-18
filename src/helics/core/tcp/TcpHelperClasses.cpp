@@ -266,6 +266,7 @@ TcpConnection::TcpConnection (boost::asio::io_service &io_service,
                            [this](const boost::system::error_code &error) { connect_handler (error); });
 }
 
+
 void TcpConnection::connect_handler (const boost::system::error_code &error)
 {
     if (!error)

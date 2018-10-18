@@ -42,10 +42,12 @@ namespace helics
             {
                 std::this_thread::sleep_for (milliseconds (200));
             }
+            timeRemPrev = timeRemaining;
             if (timeRemaining < milliseconds (0))
             {
                 timeRemaining = milliseconds (400);
             }
+			
             // lets try to connect again
             ++trycnt;
             connectionPtr = TcpConnection::create (io_service, connection, port, bufferSize);
