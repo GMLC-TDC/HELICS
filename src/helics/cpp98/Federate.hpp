@@ -168,6 +168,14 @@ class Federate
         return fedState;
     }
 
+	void registerInterfaces (const std::string &configFile)
+    {
+        if (helics_ok != helicsFederateLoadInterfaces (fed,configFile.c_str()))
+        {
+            throw (std::runtime_error ("error in processing config file"));
+        }
+    }
+
     void enterInitializationMode ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
@@ -246,6 +254,13 @@ class Federate
     {
         helics_time_t grantedTime;
         helicsFederateRequestTime (fed, time, &grantedTime);
+        return grantedTime;
+    }
+
+	 helics_time_t requestNextStep ()
+    {
+        helics_time_t grantedTime;
+        helicsFederateRequestNextStep (fed, &grantedTime);
         return grantedTime;
     }
 
