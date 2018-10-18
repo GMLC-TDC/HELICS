@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -151,7 +152,7 @@ void TcpCommsSS::queue_tx_function ()
     }
     if (!serverMode && !outgoingConnectionsAllowed)
     {
-        logError ("no server and no outgoing connections, no way to connect to comms");
+        logError ("no server and no outgoing connections-> no way to connect to comms");
         setRxStatus (connection_status::error);
         setTxStatus (connection_status::error);
         return;
@@ -234,30 +235,15 @@ void TcpCommsSS::queue_tx_function ()
         {
             try
             {
-                using namespace std::chrono;
-                auto tick = steady_clock::now ();
-                milliseconds timeRemaining (connectionTimeout);
-                brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                          std::to_string (brokerPort), maxMessageSize_);
-                int trycnt = 1;
-                while (!brokerConnection->waitUntilConnected (timeRemaining))
+                brokerConnection =
+                  makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
+                                  maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+                if (!brokerConnection)
                 {
-                    auto tock = steady_clock::now ();
-                    timeRemaining = milliseconds (connectionTimeout) - duration_cast<milliseconds> (tock - tick);
-                    if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
-                    {
-                        logError ("initial connection to broker timed out");
-                        setTxStatus (connection_status::terminated);
-                        return;
-                    }
-                    if (timeRemaining < milliseconds (0))
-                    {
-                        timeRemaining = milliseconds (400);
-                    }
-                    // lets try to connect again
-                    ++trycnt;
-                    brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                              std::to_string (brokerPort), maxMessageSize_);
+                    logError ("initial connection to broker timed out");
+                    setTxStatus (connection_status::terminated);
+                    setRxStatus (connection_status::terminated);
+                    return;
                 }
 
                 brokerConnection->setDataCall (dataCall);
@@ -297,7 +283,18 @@ void TcpCommsSS::queue_tx_function ()
                         auto conn = server->findSocket (cmd.getExtraData ());
                         if (conn)
                         {
-                            made_connections.emplace_back (cmd.payload, std::move (conn));
+                            if (!brokerConnection)
+                            {  // check if the connection matches the broker
+                                if ((cmd.payload == brokerName_) ||
+                                    (cmd.payload == makePortAddress (brokerTarget_, brokerPort)))
+                                {
+                                    brokerConnection = std::move (conn);
+                                }
+                            }
+                            if (conn)
+                            {
+                                made_connections.emplace_back (cmd.payload, std::move (conn));
+                            }
                         }
                     }
                     break;
@@ -371,7 +368,7 @@ void TcpCommsSS::queue_tx_function ()
 
         if (route_id == parent_route_id)
         {
-            if (hasBroker)
+            if ((hasBroker) && (brokerConnection))
             {
                 try
                 {
@@ -388,6 +385,11 @@ void TcpCommsSS::queue_tx_function ()
                         }
                     }
                 }
+            }
+            else
+            {
+                logWarning (std::string ("no route to broker for message, message dropped :") +
+                            actionMessageType (cmd.action ()));
             }
         }
         else

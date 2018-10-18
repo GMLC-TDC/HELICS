@@ -5,37 +5,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include "../../common/AsioServiceManagerFwd.hpp"
 #include "../NetworkCommsInterface.hpp"
 #include <atomic>
 #include <set>
 #include <string>
-
-#if (BOOST_VERSION_LEVEL >= 2)
-namespace boost
-{
-namespace asio
-{
-class io_context;
-using io_service = io_context;
-}  // namespace asio
-}  // namespace boost
-#else
-namespace boost
-{
-namespace asio
-{
-class io_service;
-}
-}  // namespace boost
-#endif
-
-namespace boost
-{
-namespace system
-{
-class error_code;
-}
-}  // namespace boost
 
 namespace helics
 {
@@ -51,17 +25,18 @@ class TcpCommsSS final : public NetworkCommsInterface
     TcpCommsSS () noexcept;
     /** destructor*/
     ~TcpCommsSS ();
-    
-	/** add a connection to the connection list*/
-	void addConnection(const std::string &newConn);
-	/** add a vector of connections to the connection list*/
-	void addConnections(const std::vector<std::string> &newConnections);
+
+    /** add a connection to the connection list*/
+    void addConnection (const std::string &newConn);
+    /** add a vector of connections to the connection list*/
+    void addConnections (const std::vector<std::string> &newConnections);
     /** allow outgoing connections*/
-    void allowOutgoingConnections(bool value);
+    void allowOutgoingConnections (bool value);
+
   private:
-      bool outgoingConnectionsAllowed{true}; //!< disable all outgoing connections- allow only incoming connections
-    std::vector<std::string> connections;  //!< list of connections to make 
-	virtual int getDefaultBrokerPort () const override;
+    bool outgoingConnectionsAllowed{true};  //!< disable all outgoing connections- allow only incoming connections
+    std::vector<std::string> connections;  //!< list of connections to make
+    virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
@@ -69,7 +44,7 @@ class TcpCommsSS final : public NetworkCommsInterface
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &&cmd);
-    
+
     /** callback function for receiving data asynchronously from the socket
     @param connection pointer to the connection
     @param data the pointer to the data

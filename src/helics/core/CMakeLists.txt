@@ -32,6 +32,7 @@ set(
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
 	federate_id.cpp
+
 )
 
 set(TESTCORE_SOURCE_FILES TestBroker.cpp TestCore.cpp)
@@ -69,6 +70,7 @@ set(
 	tcp/TcpComms.cpp
 	tcp/TcpCommsSS.cpp
 	tcp/TcpHelperClasses.cpp
+	tcp/TcpCommsCommon.cpp
 )
 
 set(
@@ -140,6 +142,7 @@ set(
 	tcp/TcpComms.h
 	tcp/TcpCommsSS.h
 	tcp/TcpHelperClasses.h
+	tcp/TcpCommsCommon.h
 )
 
 list(

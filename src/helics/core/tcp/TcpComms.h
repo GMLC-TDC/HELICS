@@ -6,39 +6,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../../common/BlockingQueue.hpp"
+#include "../../common/AsioServiceManagerFwd.hpp"
 #include "../NetworkCommsInterface.hpp"
 #include <atomic>
 #include <set>
 #include <string>
-
-class AsioServiceManager;
-
-#if (BOOST_VERSION_LEVEL >= 2)
-namespace boost
-{
-namespace asio
-{
-class io_context;
-using io_service = io_context;
-}  // namespace asio
-}  // namespace boost
-#else
-namespace boost
-{
-namespace asio
-{
-class io_service;
-}
-}  // namespace boost
-#endif
-
-namespace boost
-{
-namespace system
-{
-class error_code;
-}
-}  // namespace boost
 
 namespace helics
 {

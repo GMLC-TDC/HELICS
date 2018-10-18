@@ -3,10 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "TcpCommsCommon.h"
+#include "TcpComms.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -226,30 +227,13 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     }
     try
     {
-        using namespace std::chrono;
-        auto tick = steady_clock::now ();
-        milliseconds timeRemaining (connectionTimeout);
-        brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                  std::to_string (brokerPort), maxMessageSize_);
-        int trycnt = 1;
-        while (!brokerConnection->waitUntilConnected (timeRemaining))
+        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
+                                           maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+        if (!brokerConnection)
         {
-            auto tock = steady_clock::now ();
-            timeRemaining = milliseconds (connectionTimeout) - duration_cast<milliseconds> (tock - tick);
-            if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
-            {
-                logError ("initial connection to broker timed out");
-                setTxStatus (connection_status::terminated);
-                return false;
-            }
-            if (timeRemaining < milliseconds (0))
-            {
-                timeRemaining = milliseconds (400);
-            }
-            // lets try to connect again
-            ++trycnt;
-            brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                      std::to_string (brokerPort), maxMessageSize_);
+            logError ("initial connection to broker timed out");
+            setTxStatus (connection_status::terminated);
+            return false;
         }
 
         if (PortNumber <= 0)
@@ -286,7 +270,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             int cumsleep = 0;
             while (PortNumber < 0)
             {
-                std::this_thread::sleep_for (milliseconds (100));
+                std::this_thread::sleep_for (std::chrono::milliseconds (100));
                 auto mess = txQueue.try_pop ();
                 if (mess)
                 {
@@ -348,7 +332,7 @@ void TcpComms::queue_tx_function ()
             PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
             ActionMessage m (CMD_PROTOCOL);
             m.messageID = PORT_DEFINITIONS;
-            m.setExtraData(PortNumber);
+            m.setExtraData (PortNumber);
             rxMessageQueue.push (m);
         }
     }
@@ -379,7 +363,7 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (new_connect));
+                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -448,7 +432,8 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue()) + "::" + se.what ());
+                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue ()) +
+                                      "::" + se.what ());
                         }
                     }
                 }
@@ -467,7 +452,7 @@ void TcpComms::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError (std::string ("broker send") + std::to_string (route_id.baseValue()) +
+                                logError (std::string ("broker send") + std::to_string (route_id.baseValue ()) +
                                           " ::" + se.what ());
                             }
                         }
@@ -475,7 +460,7 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-					logWarning("unknown message destination message dropped");
+                    logWarning ("unknown message destination message dropped");
                 }
             }
         }

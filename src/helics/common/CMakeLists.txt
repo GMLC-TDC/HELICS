@@ -77,6 +77,7 @@ set(
   JsonProcessingFunctions.hpp
   stringToCmdLine.h
   AsioServiceManager.h
+  AsioServiceManagerFwd.hpp
   logger.h
   stringOps.h
   MapTraits.hpp
