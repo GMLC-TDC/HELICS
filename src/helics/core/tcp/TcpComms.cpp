@@ -433,6 +433,7 @@ void TcpComms::queue_tx_function ()
                 {
                     std::this_thread::sleep_for (milliseconds (200));
                 }
+                timeRemPrev = timeRemaining;
                 if (timeRemaining < milliseconds (0))
                 {
                     timeRemaining = milliseconds (400);

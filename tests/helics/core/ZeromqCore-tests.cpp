@@ -464,6 +464,10 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
+    if (counter2 != 1)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
