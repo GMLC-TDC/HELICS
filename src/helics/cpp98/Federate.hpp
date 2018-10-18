@@ -344,6 +344,14 @@ class Federate
         return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str ()));
     }
 
+	Filter getFilter (const std::string &name)
+    {
+        return Filter (helicsFederateGetFilter (fed, name.c_str ()));
+    }
+    Filter getSubscription (int index)
+    {
+        return Filter (helicsFederateGetFilterByIndex (fed, index));
+    }
   protected:
     helics_federate fed;
     bool exec_async_iterate;
