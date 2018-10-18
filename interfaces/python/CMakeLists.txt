@@ -86,6 +86,10 @@ else()
   # Set directories to use as defaults in setup.py for the location of ZeroMQ
   set(ZMQ_INCLUDE_DIR ${ZeroMQ_INCLUDE_DIR})
   get_filename_component(ZMQ_LIB_DIR ${ZeroMQ_LIBRARY} DIRECTORY)
+  set(PYTHON_ZMQ_LINK_FLAG "-lzmq")
+  if(ZMQ_USE_STATIC_LIBRARY)
+      set(PYTHON_ZMQ_LINK_FLAG "")
+  endif()
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
@@ -113,7 +117,7 @@ else()
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Building Python extension"
   )
-  
+
 endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
