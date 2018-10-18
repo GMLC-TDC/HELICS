@@ -96,7 +96,7 @@ bool TestCore::brokerConnect ()
             }
         }
     }
-    if ((tbroker)&&(!tbroker->isConnected()))
+    if (tbroker)
     {
         tbroker->connect ();
     }
