@@ -9,12 +9,13 @@
 package com.java.helics;
 
 public final class helics_filter_type_t {
-  public final static helics_filter_type_t helics_custom_filter = new helics_filter_type_t("helics_custom_filter", helicsJNI.helics_custom_filter_get());
-  public final static helics_filter_type_t helics_delay_filter = new helics_filter_type_t("helics_delay_filter", helicsJNI.helics_delay_filter_get());
-  public final static helics_filter_type_t helics_randomDelay_filter = new helics_filter_type_t("helics_randomDelay_filter", helicsJNI.helics_randomDelay_filter_get());
-  public final static helics_filter_type_t helics_randomDrop_filter = new helics_filter_type_t("helics_randomDrop_filter", helicsJNI.helics_randomDrop_filter_get());
-  public final static helics_filter_type_t helics_reroute_filter = new helics_filter_type_t("helics_reroute_filter", helicsJNI.helics_reroute_filter_get());
-  public final static helics_filter_type_t helics_clone_filter = new helics_filter_type_t("helics_clone_filter", helicsJNI.helics_clone_filter_get());
+  public final static helics_filter_type_t helics_filtertype_custom = new helics_filter_type_t("helics_filtertype_custom", helicsJNI.helics_filtertype_custom_get());
+  public final static helics_filter_type_t helics_filtertype_delay = new helics_filter_type_t("helics_filtertype_delay", helicsJNI.helics_filtertype_delay_get());
+  public final static helics_filter_type_t helics_filtertype_random_delay = new helics_filter_type_t("helics_filtertype_random_delay", helicsJNI.helics_filtertype_random_delay_get());
+  public final static helics_filter_type_t helics_filtertype_random_drop = new helics_filter_type_t("helics_filtertype_random_drop", helicsJNI.helics_filtertype_random_drop_get());
+  public final static helics_filter_type_t helics_filtertype_reroute = new helics_filter_type_t("helics_filtertype_reroute", helicsJNI.helics_filtertype_reroute_get());
+  public final static helics_filter_type_t helics_filtertype_clone = new helics_filter_type_t("helics_filtertype_clone", helicsJNI.helics_filtertype_clone_get());
+  public final static helics_filter_type_t helics_filtertype_firewall = new helics_filter_type_t("helics_filtertype_firewall", helicsJNI.helics_filtertype_firewall_get());
 
   public final int swigValue() {
     return swigValue;
@@ -50,7 +51,7 @@ public final class helics_filter_type_t {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_filter_type_t[] swigValues = { helics_custom_filter, helics_delay_filter, helics_randomDelay_filter, helics_randomDrop_filter, helics_reroute_filter, helics_clone_filter };
+  private static helics_filter_type_t[] swigValues = { helics_filtertype_custom, helics_filtertype_delay, helics_filtertype_random_delay, helics_filtertype_random_drop, helics_filtertype_reroute, helics_filtertype_clone, helics_filtertype_firewall };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

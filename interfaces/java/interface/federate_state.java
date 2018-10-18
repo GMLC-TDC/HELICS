@@ -9,15 +9,15 @@
 package com.java.helics;
 
 public final class federate_state {
-  public final static federate_state helics_startup_state = new federate_state("helics_startup_state", helicsJNI.helics_startup_state_get());
-  public final static federate_state helics_initialization_state = new federate_state("helics_initialization_state");
-  public final static federate_state helics_execution_state = new federate_state("helics_execution_state");
-  public final static federate_state helics_finalize_state = new federate_state("helics_finalize_state");
-  public final static federate_state helics_error_state = new federate_state("helics_error_state");
-  public final static federate_state helics_pending_init_state = new federate_state("helics_pending_init_state");
-  public final static federate_state helics_pending_exec_state = new federate_state("helics_pending_exec_state");
-  public final static federate_state helics_pending_time_state = new federate_state("helics_pending_time_state");
-  public final static federate_state helics_pending_iterative_time_state = new federate_state("helics_pending_iterative_time_state");
+  public final static federate_state helics_state_startup = new federate_state("helics_state_startup", helicsJNI.helics_state_startup_get());
+  public final static federate_state helics_state_initialization = new federate_state("helics_state_initialization");
+  public final static federate_state helics_state_execution = new federate_state("helics_state_execution");
+  public final static federate_state helics_state_finalize = new federate_state("helics_state_finalize");
+  public final static federate_state helics_state_error = new federate_state("helics_state_error");
+  public final static federate_state helics_state_pending_init = new federate_state("helics_state_pending_init");
+  public final static federate_state helics_state_pending_exec = new federate_state("helics_state_pending_exec");
+  public final static federate_state helics_state_pending_time = new federate_state("helics_state_pending_time");
+  public final static federate_state helics_state_pending_iterative_time = new federate_state("helics_state_pending_iterative_time");
 
   public final int swigValue() {
     return swigValue;
@@ -53,7 +53,7 @@ public final class federate_state {
     swigNext = this.swigValue+1;
   }
 
-  private static federate_state[] swigValues = { helics_startup_state, helics_initialization_state, helics_execution_state, helics_finalize_state, helics_error_state, helics_pending_init_state, helics_pending_exec_state, helics_pending_time_state, helics_pending_iterative_time_state };
+  private static federate_state[] swigValues = { helics_state_startup, helics_state_initialization, helics_state_execution, helics_state_finalize, helics_state_error, helics_state_pending_init, helics_state_pending_exec, helics_state_pending_time, helics_state_pending_iterative_time };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

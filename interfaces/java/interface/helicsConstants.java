@@ -17,6 +17,8 @@ public interface helicsConstants {
   public final static int HELICS_CORE_TYPE_IPC = helicsJNI.HELICS_CORE_TYPE_IPC_get();
   public final static int HELICS_CORE_TYPE_TCP = helicsJNI.HELICS_CORE_TYPE_TCP_get();
   public final static int HELICS_CORE_TYPE_UDP = helicsJNI.HELICS_CORE_TYPE_UDP_get();
+  public final static int HELICS_CORE_TYPE_ZMQ_TEST = helicsJNI.HELICS_CORE_TYPE_ZMQ_TEST_get();
+  public final static int HELICS_CORE_TYPE_TCP_SS = helicsJNI.HELICS_CORE_TYPE_TCP_SS_get();
   public final static int HELICS_DATA_TYPE_STRING = helicsJNI.HELICS_DATA_TYPE_STRING_get();
   public final static int HELICS_DATA_TYPE_DOUBLE = helicsJNI.HELICS_DATA_TYPE_DOUBLE_get();
   public final static int HELICS_DATA_TYPE_INT = helicsJNI.HELICS_DATA_TYPE_INT_get();
@@ -25,4 +27,5 @@ public interface helicsConstants {
   public final static int HELICS_DATA_TYPE_NAMEDPOINT = helicsJNI.HELICS_DATA_TYPE_NAMEDPOINT_get();
   public final static int HELICS_DATA_TYPE_BOOLEAN = helicsJNI.HELICS_DATA_TYPE_BOOLEAN_get();
   public final static int HELICS_DATA_TYPE_RAW = helicsJNI.HELICS_DATA_TYPE_RAW_get();
+  public final static int HELICS_DATA_TYPE_ANY = helicsJNI.HELICS_DATA_TYPE_ANY_get();
 }
