@@ -51,7 +51,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
     virtual void updateTime (Time newTime, Time oldTime) override;
-
+    virtual std::string localQuery(const std::string &queryStr) const override;
   public:
     /** register an endpoint
     @details call is only valid in startup mode

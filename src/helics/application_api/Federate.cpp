@@ -1006,22 +1006,42 @@ void Federate::addFilterObject (std::shared_ptr<Filter> obj) { localFilters.push
 
 int Federate::filterObjectCount () const { return static_cast<int> (localFilters.size ()); }
 
+
+std::string Federate::localQuery(const std::string & /*queryStr*/) const
+{
+    return std::string();
+}
+
 std::string Federate::query (const std::string &queryStr)
 {
+    std::string res;
     if (queryStr == "name")
     {
-        return getName ();
+        res=getName ();
     }
-    return coreObject->query (getName (), queryStr);
+    else
+    {
+        res = localQuery(queryStr);
+    }
+    if (res.empty())
+    {
+        res = coreObject->query(getName(), queryStr);
+    }
+    return res;
 }
 
 std::string Federate::query (const std::string &target, const std::string &queryStr)
 {
-    if ((target.empty ()) || (target == "federate"))
+    std::string res;
+    if ((target.empty ()) || (target == "federate")||(target==getName()))
     {
-        return query (queryStr);
+        res=query (queryStr);
     }
-    return coreObject->query (target, queryStr);
+    else
+    {
+        res = coreObject->query(target, queryStr);
+    }
+    return res;
 }
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)

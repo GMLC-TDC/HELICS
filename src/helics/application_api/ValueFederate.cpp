@@ -339,6 +339,12 @@ void ValueFederate::updateTime (Time newTime, Time oldTime) { vfManager->updateT
 void ValueFederate::startupToInitializeStateTransition () { vfManager->startupToInitializeStateTransition (); }
 void ValueFederate::initializeToExecuteStateTransition () { vfManager->initializeToExecuteStateTransition (); }
 
+
+std::string ValueFederate::localQuery(const std::string &queryStr) const
+{
+    return vfManager->localQuery(queryStr);
+}
+
 std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
 const std::string &ValueFederate::getInputKey (input_id_t ipt_id) const

@@ -73,6 +73,12 @@ void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updat
 void MessageFederate::startupToInitializeStateTransition () { mfManager->startupToInitializeStateTransition (); }
 void MessageFederate::initializeToExecuteStateTransition () { mfManager->initializeToExecuteStateTransition (); }
 
+
+std::string MessageFederate::localQuery(const std::string &queryStr) const
+{
+    return mfManager->localQuery(queryStr);
+}
+
 endpoint_id_t MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
         return mfManager->registerEndpoint ((!eptName.empty())?(getName () + separator_ + eptName):eptName, type);

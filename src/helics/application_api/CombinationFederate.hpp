@@ -48,7 +48,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
-
+    virtual std::string localQuery(const std::string &queryStr) const override;
   public:
     virtual void registerInterfaces (const std::string &jsonString) override;
 };

@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../common/DualMappedPointerVector.hpp"
+#include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
@@ -24,8 +24,8 @@ class Core;
 class endpoint_info
 {
   public:
-    std::string name;
-    std::string type;
+    const std::string name;
+    const std::string type;
     endpoint_id_t id;
     interface_handle handle;
     int callbackIndex = -1;
@@ -99,7 +99,8 @@ class MessageFederateManager
     void startupToInitializeStateTransition ();
     /** transition from initialize to execution State*/
     void initializeToExecuteStateTransition ();
-
+    /** generate results for a local query */
+    std::string localQuery(const std::string &queryStr) const;
     /** get the name of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed*/
@@ -142,7 +143,7 @@ class MessageFederateManager
     /** add a named filter to an endpoint for all message going to the endpoint*/
     void addDestinationFilter (endpoint_id_t id, const std::string &filterName);
   private:
-    shared_guarded<DualMappedPointerVector<endpoint_info, std::string, interface_handle>>
+    shared_guarded<DualMappedVector<endpoint_info, std::string, interface_handle>>
       local_endpoints;  //!< storage for the local endpoint information
     std::vector<std::function<void(endpoint_id_t, Time)>> callbacks;  //!< vector of callbacks
     Time CurrentTime;  //!< the current simulation time

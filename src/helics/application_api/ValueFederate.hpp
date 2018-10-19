@@ -410,7 +410,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
-
+    virtual std::string localQuery(const std::string &queryStr) const override;
   public:
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated

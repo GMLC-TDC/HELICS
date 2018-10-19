@@ -1357,7 +1357,7 @@ std::string FederateState::processQuery (const std::string &query) const
     }
     if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getInputs (), [](auto &sub) { return sub->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [](auto &inp) { return inp->key; });
     }
     if (query == "endpoints")
     {

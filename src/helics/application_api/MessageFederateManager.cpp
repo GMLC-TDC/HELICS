@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "../core/queryHelpers.hpp"
 #include <cassert>
 
 namespace helics
@@ -38,7 +39,7 @@ void MessageFederateManager::registerKnownCommunicationPath (endpoint_id_t local
     auto sharedElock = local_endpoints.lock_shared ();
     if (localEndpoint.value () < endpointCount)
     {
-        coreObject->registerFrequentCommunicationsPair ((*sharedElock)[localEndpoint.value ()]->name,
+        coreObject->registerFrequentCommunicationsPair ((*sharedElock)[localEndpoint.value ()].name,
                                                         remoteEndpoint);
     }
 }
@@ -47,7 +48,7 @@ void MessageFederateManager::subscribe (endpoint_id_t endpoint, const std::strin
 {
     if (endpoint.value () < endpointCount)
     {
-        coreObject->addSourceTarget ((*local_endpoints.lock_shared ())[endpoint.value ()]->handle, name);
+        coreObject->addSourceTarget ((*local_endpoints.lock_shared ())[endpoint.value ()].handle, name);
     }
     else
     {
@@ -128,12 +129,12 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, const std::strin
 {
     if (source.value () < endpointCount)
     {
-        coreObject->send ((*local_endpoints.lock_shared ())[source.value ()]->handle, dest, message.data (),
+        coreObject->send ((*local_endpoints.lock_shared ())[source.value ()].handle, dest, message.data (),
                           message.size ());
     }
     else
     {
-        throw (std::invalid_argument ("endpoint id is invalid"));
+        throw (InvalidIdentifier("endpoint id is invalid"));
     }
 }
 
@@ -144,12 +145,12 @@ void MessageFederateManager::sendMessage (endpoint_id_t source,
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared ())[source.value ()]->handle, dest,
+        coreObject->sendEvent (sendTime, (*local_endpoints.lock_shared ())[source.value ()].handle, dest,
                                message.data (), message.size ());
     }
     else
     {
-        throw (std::invalid_argument ("endpoint id is invalid"));
+        throw (InvalidIdentifier("endpoint id is invalid"));
     }
 }
 
@@ -157,11 +158,11 @@ void MessageFederateManager::sendMessage (endpoint_id_t source, std::unique_ptr<
 {
     if (source.value () < endpointCount)
     {
-        coreObject->sendMessage ((*local_endpoints.lock_shared ())[source.value ()]->handle, std::move (message));
+        coreObject->sendMessage ((*local_endpoints.lock_shared ())[source.value ()].handle, std::move (message));
     }
     else
     {
-        throw (std::invalid_argument ("endpoint id is invalid"));
+        throw (InvalidIdentifier ("endpoint id is invalid"));
     }
 }
 
@@ -182,8 +183,9 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-        auto fid = (local_endpoints.lock ())->find (endpoint_id);
-        if (fid != nullptr)
+        auto epts = local_endpoints.lock();
+        auto fid = epts->find (endpoint_id);
+        if (fid != epts->end())
         {  // assign the data
 
             auto localEndpointIndex = fid->id.value ();
@@ -212,23 +214,37 @@ void MessageFederateManager::startupToInitializeStateTransition () { messageQueu
 
 void MessageFederateManager::initializeToExecuteStateTransition () {}
 
+
+std::string MessageFederateManager::localQuery(const std::string &queryStr) const
+{
+    std::string ret;
+    if (queryStr == "endpoints")
+    {
+        ret=generateStringVector_if(local_endpoints.lock_shared(), [](const auto &info) { return info.name; },
+            [](const auto &info) {
+            return (!info.name.empty());
+        });
+    }
+    return ret;
+}
+
 static const std::string nullStr;
 
 const std::string &MessageFederateManager::getEndpointName (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->name : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()].name : nullStr;
 }
 
 endpoint_id_t MessageFederateManager::getEndpointId (const std::string &name) const
 {
     auto sharedEpt = local_endpoints.lock_shared ();
     auto sub = sharedEpt->find (name);
-    return (sub != nullptr) ? sub->id : endpoint_id_t();
+    return (sub != sharedEpt.end()) ? sub->id : endpoint_id_t();
 }
 
 const std::string &MessageFederateManager::getEndpointType (endpoint_id_t id) const
 {
-    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()]->type : nullStr;
+    return (id.value () < endpointCount) ? (*local_endpoints.lock_shared ())[id.value ()].type : nullStr;
 }
 
 int MessageFederateManager::getEndpointCount () const
@@ -241,7 +257,7 @@ void MessageFederateManager::setEndpointOption(endpoint_id_t id, int32_t option,
 	auto eptHandle = local_endpoints.lock_shared();
 	if (isValidIndex(id.value(), *eptHandle))
 	{
-		coreObject->setHandleOption((*eptHandle)[id.value()]->handle, option, option_value);
+		coreObject->setHandleOption((*eptHandle)[id.value()].handle, option, option_value);
 	}
 	else
 	{
@@ -255,7 +271,7 @@ void MessageFederateManager::addSourceFilter(endpoint_id_t id, const std::string
     auto eptHandle = local_endpoints.lock_shared ();
     if (isValidIndex (id.value (), *eptHandle))
     {
-        coreObject->addSourceTarget ((*eptHandle)[id.value ()]->handle, filterName);
+        coreObject->addSourceTarget ((*eptHandle)[id.value ()].handle, filterName);
     }
     else
     {
@@ -269,7 +285,7 @@ void MessageFederateManager::addDestinationFilter(endpoint_id_t id, const std::s
     auto eptHandle = local_endpoints.lock_shared ();
     if (isValidIndex (id.value (), *eptHandle))
     {
-        coreObject->addDestinationTarget ((*eptHandle)[id.value ()]->handle, filterName);
+        coreObject->addDestinationTarget ((*eptHandle)[id.value ()].handle, filterName);
     }
     else
     {
@@ -299,14 +315,14 @@ void MessageFederateManager::registerCallback (endpoint_id_t id,
         auto eplock = local_endpoints.lock ();
 		if (eplock)
 		{
-            (*eplock)[id.value ()]->callbackIndex = static_cast<int> (callbacks.size ());
+            (*eplock)[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
             callbacks.push_back (callback);
 		}
        
     }
     else
     {
-        throw (std::invalid_argument ("endpoint id is invalid"));
+        throw (InvalidIdentifier("endpoint id is invalid"));
     }
 }
 
@@ -323,7 +339,7 @@ void MessageFederateManager::registerCallback (const std::vector<endpoint_id_t> 
         {
             if (isValidIndex (id.value(),*eptLock))
             {
-                (*eptLock)[id.value ()]->callbackIndex = ind;
+                (*eptLock)[id.value ()].callbackIndex = ind;
             }
         }
 	}

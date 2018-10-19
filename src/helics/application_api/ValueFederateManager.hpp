@@ -112,7 +112,8 @@ class ValueFederateManager
     void startupToInitializeStateTransition ();
     /** transition from initialize to execution State*/
     void initializeToExecuteStateTransition ();
-
+    /** generate results for a local query */
+    std::string localQuery(const std::string &queryStr) const;
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
     */

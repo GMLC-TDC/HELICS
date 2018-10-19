@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ValueFederateManager.hpp"
-#include "helics/core/core-exceptions.hpp"
-
+#include "../core/core-exceptions.hpp"
+#include "../core/queryHelpers.hpp"
 namespace helics
 {
 ValueFederateManager::ValueFederateManager (Core *coreOb, federate_id_t id) : coreObject (coreOb), fedID (id)
@@ -175,12 +175,12 @@ void ValueFederateManager::publish (publication_id_t id, const data_view &block)
         }
         else
         {
-            throw (std::invalid_argument ("publication size is invalid"));
+            throw (InvalidIdentifier("publication size is invalid"));
         }
     }
     else
     {
-        throw (std::invalid_argument ("publication id is invalid"));
+        throw (InvalidIdentifier("publication id is invalid"));
     }
 }
 
@@ -254,6 +254,31 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
+
+
+std::string ValueFederateManager::localQuery(const std::string &queryStr) const
+{
+    std::string ret;
+    if (queryStr == "inputs")
+    {
+        ret = generateStringVector_if(inputs.lock_shared(), [](const auto &info) { return info.name; },
+            [](const auto &info) {
+            return (!info.name.empty());
+        });
+    }
+    else if (queryStr == "publications")
+    {
+        ret = generateStringVector_if(publications.lock_shared(), [](const auto &info) { return info.name; },
+            [](const auto &info) {
+            return (!info.name.empty());
+        });
+    }
+    else if (queryStr == "subscriptions")
+    {
+            ret = generateStringVector(targetIDs, [](const auto &target) { return target.first; });
+    }
+    return ret;
+}
 
 std::vector<input_id_t> ValueFederateManager::queryUpdates ()
 {

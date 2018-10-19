@@ -432,7 +432,9 @@ class Federate
     virtual void startupToInitializeStateTransition ();
     /** function to deal with any operations that need to occur on the transition from startup to initialize*/
     virtual void initializeToExecuteStateTransition ();
-
+    /** function to generate results for a local Query
+    @details should return an empty string if the query is not recognized*/
+    virtual std::string localQuery(const std::string &queryStr) const;
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode

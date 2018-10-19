@@ -60,6 +60,16 @@ void CombinationFederate::initializeToExecuteStateTransition ()
     MessageFederate::initializeToExecuteStateTransition ();
 }
 
+std::string CombinationFederate::localQuery(const std::string &queryStr) const
+{
+    std::string res = ValueFederate::localQuery(queryStr);
+    if (res.empty())
+    {
+        res= MessageFederate::localQuery(queryStr);
+    }
+    return res;
+}
+
 void CombinationFederate::registerInterfaces (const std::string &configString)
 {
     ValueFederate::registerValueInterfaces (configString);

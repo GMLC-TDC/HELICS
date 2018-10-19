@@ -283,6 +283,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                         {
                             brokerConnection->cancel ();
                             setTxStatus (connection_status::terminated);
+                            brokerConnection->close();
                             return false;
                         }
                     }
@@ -293,6 +294,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                     brokerConnection->cancel ();
                     logError ("port number query to broker timed out");
                     setTxStatus (connection_status::terminated);
+                    brokerConnection->close();
                     return false;
                 }
             }
@@ -321,6 +323,9 @@ void TcpComms::queue_tx_function ()
     {
         if (!establishBrokerConnection (ioserv, brokerConnection))
         {
+            ActionMessage m(CMD_PROTOCOL);
+            m.messageID = CLOSE_RECEIVER;
+            rxMessageQueue.push(m);
             return;
         }
     }
