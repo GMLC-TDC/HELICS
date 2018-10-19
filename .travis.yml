@@ -106,6 +106,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
+        - JOB_OPTION_FLAGS="-DCMAKE_EXE_LINKER_FLAGS='-static-libgcc -static-libstdc++' -DCMAKE_SHARED_LINKER_FLAGS='-static-libgcc -static-libstdc++'"
         - ENABLE_CPACK=true
         - UPLOAD_BINTRAY_ARTIFACT=true
 
