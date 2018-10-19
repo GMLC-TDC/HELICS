@@ -8,6 +8,8 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
  - Jason Fuller*
  - Shwetha Niddodi*
  - Monish Mukherjee*
+ - Jacob Hansen*
+ - Mark Eberleim*
 
 ### Lawrence Livermore National Lab
  - Ryan Mast*
@@ -38,7 +40,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
   The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source.  Cppzmp is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
 
 ### [jsoncpp](https://github.com/open-source-parsers/jsoncpp)
-  JsonCPP is used for parsing json files, it was chosen for easy inclusion the project and its support for comments. Jsoncpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE)
+  JsonCPP is used for parsing json files, it was chosen for easy inclusion the project and its support for comments. Jsoncpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).  The amalgamated file version was used and the namespace changed to not interfere with other applications using the same library.  
 
 ### [tinytoml](https://github.com/mayah/tinytoml)
   Tinytoml is used for parsing toml files.  TinyToml is licensed under [BSD 2-clause](https://github.com/mayah/tinytoml/blob/master/LICENSE)  The header file is included in HELICS source
@@ -62,7 +64,7 @@ While not used directly much of the inspiration for HELICS comes from three sepa
 HELICS makes use of C++17 headers, but due to C++14 compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std::any, std::optional and std::string_view.  These fall under the boost license, this library is an aggregate from a number of different sources, see the readme at the above link for more details.  The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used.  When the minimum boost version and compiler is updated this code will likely be removed.     
 
 ### [mpark/variant](https://github.com/mpark/variant)
-this variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available.  The single header version is included with the source.  [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md)
+this variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available.  The single header version is included with the source.  [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md).  Some recent modification are used to fix some compile errors on some versions of MSVC.  
 
 ### cmake scripts
 Several cmake scripts came from other sources and were either used of modified for use in HELICS.
