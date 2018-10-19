@@ -15,6 +15,9 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 **Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.  It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
+# Versions
+The 1.3.2 branch is the most stable.  The 2.0 version in HELICS_2_0 is currently in active development and functional though somewhat unstable yet, in terms of API and capabilities.  This will be the next version, and 1.3.X will only be updated for bug fixes.  
+
 # Installation Instructions
 
 [Windows](https://gmlc-tdc.github.io/HELICS-src/installation/windows.html)

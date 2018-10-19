@@ -3584,7 +3584,7 @@ fail:
 }
 
 
-int _wrap_helicsFederateLoadInterfaces(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateRegisterInterfaces(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
@@ -3594,19 +3594,19 @@ int _wrap_helicsFederateLoadInterfaces(int resc, mxArray *resv[], int argc, mxAr
   mxArray * _out;
   helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateLoadInterfaces",argc,2,2,0)) {
+  if (!SWIG_check_num_args("helicsFederateRegisterInterfaces",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateLoadInterfaces" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterInterfaces" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateLoadInterfaces" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterInterfaces" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateLoadInterfaces(arg1,(char const *)arg2);
+  result = (helics_status)helicsFederateRegisterInterfaces(arg1,(char const *)arg2);
   _out = SWIG_From_int(static_cast< int >(result));
   if (_out) --resc, *resv++ = _out;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -8426,7 +8426,7 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 75: return "_wrap_helicsFederateInfoSetPeriod";
   case 76: return "_wrap_helicsFederateInfoSetMaxIterations";
   case 77: return "_wrap_helicsFederateInfoSetLoggingLevel";
-  case 78: return "_wrap_helicsFederateLoadInterfaces";
+  case 78: return "_wrap_helicsFederateRegisterInterfaces";
   case 79: return "_wrap_helicsFederateFinalize";
   case 80: return "_wrap_helicsFederateFree";
   case 81: return "_wrap_helicsCloseLibrary";
@@ -8687,7 +8687,7 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 75: flag=_wrap_helicsFederateInfoSetPeriod(resc,resv,argc,(mxArray**)(argv)); break;
   case 76: flag=_wrap_helicsFederateInfoSetMaxIterations(resc,resv,argc,(mxArray**)(argv)); break;
   case 77: flag=_wrap_helicsFederateInfoSetLoggingLevel(resc,resv,argc,(mxArray**)(argv)); break;
-  case 78: flag=_wrap_helicsFederateLoadInterfaces(resc,resv,argc,(mxArray**)(argv)); break;
+  case 78: flag=_wrap_helicsFederateRegisterInterfaces(resc,resv,argc,(mxArray**)(argv)); break;
   case 79: flag=_wrap_helicsFederateFinalize(resc,resv,argc,(mxArray**)(argv)); break;
   case 80: flag=_wrap_helicsFederateFree(resc,resv,argc,(mxArray**)(argv)); break;
   case 81: flag=_wrap_helicsCloseLibrary(resc,resv,argc,(mxArray**)(argv)); break;

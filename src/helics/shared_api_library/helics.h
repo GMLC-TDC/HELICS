@@ -349,7 +349,7 @@ HELICS_EXPORT helics_status helicsFederateInfoSetLoggingLevel (helics_federate_i
 @param fed the federate to which to load interfaces
 @param file the name of a file to load the interfaces from either JSON, or TOML
 */
-HELICS_EXPORT helics_status helicsFederateLoadInterfaces (helics_federate fed, const char *file);
+HELICS_EXPORT helics_status helicsFederateRegisterInterfaces (helics_federate fed, const char *file);
   /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
 HELICS_EXPORT helics_status helicsFederateFinalize (helics_federate fed);

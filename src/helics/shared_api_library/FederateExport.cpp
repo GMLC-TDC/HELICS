@@ -276,7 +276,7 @@ helics_core helicsFederateGetCoreObject (helics_federate fed)
 }
 
 
-helics_status helicsFederateLoadInterfaces (helics_federate fed, const char *file)
+helics_status helicsFederateRegisterInterfaces (helics_federate fed, const char *file)
 {
     auto fedObj = getFed (fed);
     if (fedObj == nullptr)
