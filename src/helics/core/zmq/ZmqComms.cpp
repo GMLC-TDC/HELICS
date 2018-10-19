@@ -226,19 +226,6 @@ void ZmqComms::queue_rx_function ()
         }
     }
 
-    auto bindsuccess = bindzmqSocket (pullSocket, localTarget_, PortNumber, connectionTimeout);
-
-    if (!bindsuccess)
-    {
-        pullSocket.close ();
-        repSocket.close ();
-        disconnecting = true;
-        logError (std::string ("Unable to bind zmq reply socket giving up ") +
-                  makePortAddress (localTarget_, PortNumber));
-        setRxStatus (connection_status::error);
-        return;
-    }
-
     std::vector<zmq::pollitem_t> poller (3);
     poller[0].socket = static_cast<void *> (controlSocket);
     poller[0].events = ZMQ_POLLIN;
@@ -256,7 +243,7 @@ void ZmqComms::queue_rx_function ()
     setRxStatus (connection_status::connected);
     while (true)
     {
-        auto rc = zmq::poll (poller, std::chrono::milliseconds(1000));
+        auto rc = zmq::poll (poller, std::chrono::milliseconds (1000));
         if (rc > 0)
         {
             zmq::message_t msg;
@@ -292,8 +279,8 @@ void ZmqComms::queue_rx_function ()
                     continue;
                 }
             }
-        }
-        if (requestDisconnect.load(std::memory_order::memory_order_acquire))
+		}
+        if (requestDisconnect.load (std::memory_order::memory_order_acquire))
         {
             break;
         }

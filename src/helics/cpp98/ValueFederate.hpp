@@ -132,15 +132,22 @@ private:
     }
 
     Publication
-    registerPublicationIndexed (const std::string &name, int index1, int index2,int type, const std::string &units = "")
+    registerPublicationIndexed (const std::string &name, int index1, int index2,int type, const std::string &units = std::string())
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
         return registerGlobalPublication (indexed_name, type, units);
     }
 
+	Publication getPublication (const std::string &name){
+        return Publication (helicsFederateGetPublication (fed, name.c_str (), hThrowOnError ()));
+	}
+    Publication getPublication (int index)
+    {
+        return Publication (helicsFederateGetPublicationByIndex (fed, index, hThrowOnError ()));
+    }
     /** Methods to register subscriptions **/
     Input
-    registerSubscription (const std::string &name,  const std::string &units = "")
+    registerSubscription (const std::string &name,  const std::string &units = std::string())
     {
         helics_input sub = helicsFederateRegisterSubscription (fed, name.c_str(), units.c_str(),hThrowOnError());
         ipts.push_back(sub);
@@ -162,6 +169,15 @@ private:
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
         return registerSubscription (indexed_name, units);
+    }
+
+	Input getInput (const std::string &name)
+    {
+        return Input (helicsFederateGetInput (fed, name.c_str (), hThrowOnError ()));
+    }
+    Input getSubscription (int index)
+    {
+        return Input (helicsFederateGetInputByIndex (fed, index, hThrowOnError ()));
     }
 
     int getInputCount() const

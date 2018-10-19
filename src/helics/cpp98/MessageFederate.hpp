@@ -46,6 +46,15 @@ class MessageFederate : public virtual Federate
         return Endpoint (ep);
     }
 
+	Endpoint getEndpoint (const std::string &name)
+    {
+        return Endpoint (helicsFederateGetEndpoint (fed, name.c_str (), hThrowOnError ()));
+    }
+    Endpoint getEndpoint (int index)
+    {
+        return Endpoint (helicsFederateGetEndpointByIndex (fed, index, hThrowOnError ()));
+    }
+
     /** Checks if federate has any messages **/
     bool hasMessage () const
     {

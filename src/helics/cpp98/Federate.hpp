@@ -17,9 +17,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <vector>
 
-// defines for setFlag values in core/flag-definitions.h
-// enum for core_type:int in core/core-types.h
-
 namespace helicscpp
 {
 class FederateInfo
@@ -132,6 +129,10 @@ class Federate
         return helicsFederateGetTimeProperty (fed, tProperty,hThrowOnError ());
     }
 
+	void registerInterfaces (const std::string &configFile)
+    {
+        helicsFederateLoadInterfaces (fed, configFile.c_str (), hThrowOnError ());
+    }
     int getIntegerProperty (int intProperty) const
     {
         return helicsFederateGetIntegerProperty (fed, intProperty, hThrowOnError ());
@@ -208,6 +209,11 @@ class Federate
     helics_time_t requestTime (helics_time_t time)
     {
         return helicsFederateRequestTime (fed, time, hThrowOnError ());
+    }
+
+	 helics_time_t requestNextStep ()
+    { 
+		 return helicsFederateRequestNextStep (fed, hThrowOnError ());
     }
 
     helics_iteration_time requestTimeIterative (helics_time_t time, helics_iteration_request iterate)
@@ -301,6 +307,14 @@ class Federate
             hThrowOnError()));
     }
 
+	Filter getFilter (const std::string &name)
+    {
+        return Filter (helicsFederateGetFilter (fed, name.c_str (),hThrowOnError()));
+    }
+    Filter getSubscription (int index)
+    {
+        return Filter (helicsFederateGetFilterByIndex (fed, index, hThrowOnError ()));
+    }
   protected:
     helics_federate fed;
     bool exec_async_iterate;

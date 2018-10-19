@@ -82,7 +82,7 @@ through other functions
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint, helics_error *err);
 
-/** get a filter object from a name
+/** get a filter by its name typically already created via registerInterfaces file or something of that nature
 @param fed the federate object to use to get the filter
 @param name the name of the filter
 @param err the error object to complete if there is an error
@@ -90,6 +90,12 @@ HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, c
 name exists
 */
 HELICS_EXPORT helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, helics_error *err);
+/** get a filter by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_filter, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index, helics_error *err);
 
 /** get the name of the filter and store in the given string
 @param filt the given filter

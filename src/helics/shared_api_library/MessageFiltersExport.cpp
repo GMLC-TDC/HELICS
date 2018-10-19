@@ -257,6 +257,46 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, he
     }
 }
 
+helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index, helics_error *err)
+{
+	if (index < 0)
+	{
+        return nullptr;
+	}
+    auto fedObj = getFedSharedPtr (fed,err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto filt = std::make_unique<helics::FilterObject> ();
+        filt->filtptr = fedObj->getFilterObject (index);
+		if (!filt->filtptr)
+		{
+            auto fobj = reinterpret_cast<helics::FedObject *> (fed);
+			if (index < fobj->filters.size())
+			{
+                filt->filtptr = fobj->filters[index]->filtptr;
+			}
+		}
+		if (!filt->filtptr)
+		{
+            return nullptr;
+		}
+        filt->fedptr = std::move (fedObj);
+        filt->valid = filterValidationIdentifier;
+        auto ret = reinterpret_cast<helics_filter> (filt.get ());
+        federateAddFilter (fed, std::move (filt));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
 static helics::Filter *getFilter (helics_filter filt, helics_error *err)
 {
     auto fObj = getFilterObj(filt,err);

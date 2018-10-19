@@ -122,12 +122,47 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
         auto id = fedObj->getEndpointId (name);
         if (!id.isValid())
         {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidEndName;
+			if (err != nullptr)
+			{
+                err->error_code = helics_error_invalid_argument;
+                err->message = invalidEndName;
+			}
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject> ();
         end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), id.value ());
+        end->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_endpoint> (end.get ());
+        addEndpoint (fed, std::move (end));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
+helics_endpoint helicsFederateGetEndpointByIndex (helics_federate fed, int index, helics_error *err)
+{
+    auto fedObj = getMessageFedSharedPtr (fed,err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto end = std::make_unique<helics::EndpointObject> ();
+        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), index);
+		if (!end->endptr)
+		{
+            if (err != nullptr)
+            {
+                err->error_code = helics_error_invalid_argument;
+                err->message = invalidEndName;
+            }
+            return nullptr;
+		}
         end->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_endpoint> (end.get ());
         addEndpoint (fed, std::move (end));

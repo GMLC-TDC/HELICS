@@ -130,7 +130,7 @@ class FilterObject
   public:
     bool cloning=false;  //indicator that the filter is a cloning filter
     int valid = 0;
-    std::unique_ptr<Filter> filtptr;
+    std::shared_ptr<Filter> filtptr;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };

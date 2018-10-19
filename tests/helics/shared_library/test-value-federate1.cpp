@@ -157,7 +157,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     // register the publications
     auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "",&err);
-    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "",&err);
+    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "volts",&err);
 
     auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3","double", "V",&err);
 
@@ -183,6 +183,15 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     auto units=helicsInputGetUnits (subid3);
     BOOST_CHECK_EQUAL (units, "V");
 
+	//check the getSubscription function
+    const char *tmp;
+	auto subid_b = helicsFederateGetSubscription (vFed1, "sub1",&err);
+    tmp=helicsSubscriptionGetKey (subid_b);
+    BOOST_CHECK_EQUAL (tmp, "sub1");
+	//check the getSubscriptionByIndex function
+    auto subid_c = helicsFederateGetInputByIndex (vFed1, 2,&err);
+    tmp=helicsSubscriptionGetKey (subid_c);
+    BOOST_CHECK_EQUAL (tmp, "sub3");
     // check publications
 
     sv=helicsPublicationGetKey (pubid);
@@ -196,6 +205,16 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK_EQUAL (type, "double");
     units=helicsPublicationGetUnits (pubid3);
     BOOST_CHECK_EQUAL (units, "V");
+
+	// check the getSubscription function
+    
+    auto pubid_b = helicsFederateGetPublication (vFed1, "fed0/pub1",&err);
+    tmp=helicsPublicationGetType (pubid_b);
+    BOOST_CHECK_EQUAL (tmp, "string");
+    // check the getSubscriptionByIndex function
+    auto pubid_c = helicsFederateGetPublicationByIndex (vFed1, 1,&err);
+    tmp=helicsPublicationGetUnits (pubid_c);
+    BOOST_CHECK_EQUAL (tmp, "volts");
     CE(helicsFederateFinalize (vFed1,&err));
 
     CE(state=helicsFederateGetState (vFed1, &err));

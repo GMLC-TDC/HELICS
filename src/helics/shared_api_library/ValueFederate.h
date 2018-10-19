@@ -166,6 +166,13 @@ HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypeInput(helics_fe
 */
 HELICS_EXPORT helics_publication helicsFederateGetPublication (helics_federate fed, const char *key, helics_error *err);
 
+/** get a publication by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_publication
+*/
+HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex (helics_federate fed, int index, helics_error *err);
+
 /** get an input object from a key
 @param fed the value federate object to use to get the publication
 @param key the name of the input
@@ -174,6 +181,13 @@ HELICS_EXPORT helics_publication helicsFederateGetPublication (helics_federate f
 key exists
 */
 HELICS_EXPORT helics_input helicsFederateGetInput (helics_federate fed, const char *key, helics_error *err);
+
+/** get an input by its index typically already created via registerInterfaces file or something of that nature
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_input, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_input helicsFederateGetInputByIndex (helics_federate fed, int index, helics_error *err);
 
 /** get an input object from a subscription target
 @param fed the value federate object to use to get the publication

@@ -56,7 +56,7 @@ PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (
     auto cnt = fed->getPublicationCount ();
     if ((pubIndex >= cnt) || (cnt < 0))
     {
-        throw (helics::InvalidParameter ("no subscription with the specified index"));
+        throw (helics::InvalidParameter ("no publication with the specified index"));
     }
     id = static_cast<publication_id_t> (pubIndex);
     loadFromId();

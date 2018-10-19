@@ -361,7 +361,12 @@ helicsFederateInfoSetTimeProperty (helics_federate_info_t fi, int timeProperty, 
 */
 HELICS_EXPORT void helicsFederateInfoSetIntegerProperty (helics_federate_info_t fi, int intProperty, int propertyValue, helics_error *err);
 
-/** finalize the federate this halts all communication in the federate and disconnects it from the core
+/** load interfaces from a file
+@param fed the federate to which to load interfaces
+@param file the name of a file to load the interfaces from either JSON, or TOML
+*/
+HELICS_EXPORT void helicsFederateLoadInterfaces (helics_federate fed, const char *file, helics_error *err);
+  /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
 HELICS_EXPORT void helicsFederateFinalize (helics_federate fed, helics_error *err);
 /** release the memory associated withe a federate*/
@@ -460,6 +465,15 @@ invalid*/
 HELICS_EXPORT helics_time_t helicsFederateRequestTime (helics_federate fed,
                                                        helics_time_t requestTime,
                                                        helics_error *err);
+
+/** request the next time step for federate execution
+@details feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current time plus the minimum time step
+@param fed the federate to make the request of
+@param[out]  timeOut the time granted to the federate
+@return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
+invalid*/
+HELICS_EXPORT helics_time_t helicsFederateRequestNextStep (helics_federate fed, helics_error *err);
+
 
 /** request an iterative time
 @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and

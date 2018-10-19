@@ -179,13 +179,18 @@ class Federate
     @example setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
     setSeparator('/') will result in fedName/endpoint
     the default is '/'  any character can be used though many will not make that much sense.  This call is not
-    thread safe.
+    thread safe and should be called before any local interfaces are created otherwise it may not be possible to retrieve them without using the 
+	full name.  recommended possibilities are ('.','/', ':','-','_') 
      */
     void setSeparator (char separator) { separator_ = separator; }
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
     Time requestTime (Time nextInternalTimeStep);
+
+    /** request a time advancement to the next allowed time
+  @return the granted time step*/
+    Time requestNextStep () { return requestTime (timeZero); }
 
     /** request a time advancement
     @param[in] the next requested time step

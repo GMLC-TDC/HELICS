@@ -1,3 +1,3 @@
 function varargout = helicsFederateRegisterTypeInput(varargin)
-  [varargout{1:nargout}] = helicsMEX(132, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(134, varargin{:});
 end

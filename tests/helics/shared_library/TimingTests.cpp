@@ -75,8 +75,12 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     BOOST_CHECK_EQUAL (gtime, 0.5);  // the result should show up at the next available time point
     CE(gtime=helicsFederateRequestTime(vFed2, 2.0,&err));
     BOOST_CHECK_EQUAL (gtime, 2.0);
+    CE (helicsFederateFinalize (vFed1, &err));
+	//just test the next step function with no others
+	CE (gtime=helicsFederateRequestNextStep (vFed2, &err));
+    BOOST_CHECK_EQUAL (gtime, 2.5);
 
-     CE(helicsFederateFinalize (vFed1,&err));
+     
     CE(helicsFederateFinalize (vFed2,&err));
 }
 

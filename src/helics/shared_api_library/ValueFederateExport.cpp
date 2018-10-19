@@ -401,7 +401,6 @@ static constexpr char invalidPubName[] = "the specified publication name is a no
 
 helics_publication helicsFederateGetPublication (helics_federate fed, const char *key, helics_error *err)
 {
-	
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
@@ -410,24 +409,50 @@ helics_publication helicsFederateGetPublication (helics_federate fed, const char
     try
     {
         auto id = fedObj->getPublicationId (key);
-		if (!id.isValid())
-		{
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidPubName;
+        if (!id.isValid ())
+        {
+			if (err != nullptr)
+			{
+                err->error_code = helics_error_invalid_argument;
+                err->message = invalidPubName;
+			} 
             return nullptr;
-		}
+        }
         auto pub = std::make_unique<helics::PublicationObject> ();
-        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get(),id.value());
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), id.value ());
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
         addPublication (fed, std::move (pub));
         return ret;
     }
-	catch (...)
-	{
+    catch (...)
+    {
         helicsErrorHandler (err);
         return nullptr;
-	}
+    }
+}
+
+helics_publication helicsFederateGetPublicationByIndex (helics_federate fed, int index, helics_error *err)
+{
+    auto fedObj = getValueFedSharedPtr (fed,err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto pub = std::make_unique<helics::PublicationObject> ();
+        pub->pubptr = std::make_unique<helics::Publication> (fedObj.get (), index);
+        pub->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_publication> (pub.get ());
+        addPublication (fed, std::move (pub));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
 }
 
 static constexpr char invalidInputName[] = "the specified input name is a not a recognized input";
@@ -442,14 +467,40 @@ helics_input helicsFederateGetInput (helics_federate fed, const char *key, helic
     try
     {
         auto id = fedObj->getInputId (key);
-        if (!id.isValid())
+        if (!id.isValid ())
         {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidInputName;
+            if (err != nullptr)
+            {
+                err->error_code = helics_error_invalid_argument;
+                err->message = invalidInputName;
+            }
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject> ();
         inp->inputPtr = std::make_unique<helics::Input> (fedObj.get (), id.value ());
+        inp->fedptr = std::move (fedObj);
+        auto ret = reinterpret_cast<helics_input> (inp.get ());
+        addInput (fed, std::move (inp));
+        return ret;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
+}
+
+helics_input helicsFederateGetInputByIndex (helics_federate fed, int index, helics_error *err)
+{
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return nullptr;
+    }
+    try
+    {
+        auto inp = std::make_unique<helics::InputObject> ();
+        inp->inputPtr = std::make_unique<helics::Input> (fedObj.get (), index);
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());
         addInput (fed, std::move (inp));
@@ -474,7 +525,7 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
     try
     {
         auto id = fedObj->getSubscriptionId (key);
-        if (!id.isValid())
+        if (!id.isValid ())
         {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidSubKey;
@@ -988,7 +1039,7 @@ double helicsInputGetDouble (helics_input inp, helics_error *err)
     }
 }
 
-void helicsInputGetComplex(helics_input inp, double *real, double *imag, helics_error *err)
+void helicsInputGetComplex (helics_input inp, double *real, double *imag, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)

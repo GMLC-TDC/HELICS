@@ -16,11 +16,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label("ci"))
-
+BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test registration of filters*/
-
 
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), core_type)
 {
@@ -42,19 +40,32 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     BOOST_CHECK (f2 != f1);
     CE(auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "",&err));
     BOOST_CHECK (ep1 != NULL);
-    CE(auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "",&err));
+    CE(auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "c4",&err));
     helicsFilterAddSourceTarget(f3, "filter0/fout",nullptr);
     BOOST_CHECK (f3 != f2);
-    CE(helicsFederateFinalize (mFed,&err));
-    CE(helicsFederateFinalize (fFed,&err));
-    CE(federate_state state=helicsFederateGetState (fFed, &err));
+
+
+    auto f1_b = helicsFederateGetFilter (fFed, "filter1",&err);
+    const char *tmp;
+    tmp=helicsFilterGetName(f1_b);
+    BOOST_CHECK_EQUAL (tmp, "filter1");
+
+	 auto f1_c = helicsFederateGetFilterByIndex (fFed, 2,&err);
+    tmp=helicsFilterGetName (f1_c);
+     BOOST_CHECK_EQUAL (tmp, "c4");
+
+    CE (helicsFederateFinalize (mFed,&err));
+    CE (helicsFederateFinalize (fFed,&err));
+
+    CE (federate_state state= helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
+
+
 }
 
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-
 
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
@@ -200,7 +211,6 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 /** test two filter operators
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-
 
 BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_type)
 {

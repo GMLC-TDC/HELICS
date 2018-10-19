@@ -52,8 +52,16 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_feder
 name exists
 */
 HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name, helics_error *err);
+/** get an endpoint by its index typically already created via registerInterfaces file or something of that nature
 
-  /** set the default destination for an endpoint if no other endpoint is given
+@param fed the federate object in which to create a publication
+@param index the index of the publication to get
+@return a helics_endpoint, which will be NULL if an invalid index
+*/
+HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex (helics_federate fed, int index, helics_error *err);
+
+/** set the default destination for an endpoint if no other endpoint is given
+
 @param endpoint the endpoint to set the destination for
 @param dest a string naming the desired default endpoint
 */

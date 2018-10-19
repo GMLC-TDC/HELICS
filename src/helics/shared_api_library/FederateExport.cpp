@@ -354,6 +354,34 @@ helics_core helicsFederateGetCoreObject (helics_federate fed, helics_error *err)
     return retcore;
 }
 
+static constexpr char invalidFile[] = "Invalid File specification";
+
+void helicsFederateLoadInterfaces (helics_federate fed, const char *file, helics_error *err)
+{
+    auto fedObj = getFed (fed,err);
+    if (fedObj == nullptr)
+    {
+        return ;
+    }
+	if (file == nullptr)
+	{
+		if (err != nullptr)
+		{
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidFile;
+		}
+        return;
+	}
+    try
+    {
+        fedObj->registerInterfaces (file);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
 void helicsFederateFinalize (helics_federate fed, helics_error *err)
 {
     auto fedObj = getFed (fed, err);
@@ -588,30 +616,56 @@ helics_time_t helicsFederateRequestTime (helics_federate fed, helics_time_t requ
     }
 }
 
+helics_time_t helicsFederateRequestNextStep (helics_federate fed, helics_error *err)
+{
+    auto fedObj = getFed (fed,err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
+        return static_cast<helics_time_t> (fedObj->requestNextStep());
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_time_invalid;
+    }
+}
+
 helics_time_t helicsFederateRequestTimeIterative (helics_federate fed,
                                                   helics_time_t requestTime,
                                                   helics_iteration_request iterate,
-                                                  helics_iteration_status *outIteration,
+                                                  helics_iteration_status *outIterate,
                                                   helics_error *err)
 {
     auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
     {
-        return helics_error_invalid_object;
+        if (outIterate != nullptr)
+        {
+            *outIterate = iteration_error;
+        }
+        return helics_time_invalid;
     }
     try
     {
         auto val = fedObj->requestTimeIterative (requestTime, getIterationRequest (iterate));
-        if (outIteration != nullptr)
+        if (outIterate != nullptr)
         {
-            *outIteration = getIterationStatus (val.state);
+            *outIterate = getIterationStatus (val.state);
         }
         return static_cast<double> (val.grantedTime);
     }
     catch (...)
     {
         helicsErrorHandler (err);
-        return iteration_error;
+        if (outIterate != nullptr)
+        {
+            *outIterate = iteration_error;
+        }
+        return helics_time_invalid;
     }
 }
 

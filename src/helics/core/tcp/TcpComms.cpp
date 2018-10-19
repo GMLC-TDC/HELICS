@@ -235,7 +235,6 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             setTxStatus (connection_status::terminated);
             return false;
         }
-
         if (PortNumber <= 0)
         {
             ActionMessage m (CMD_PROTOCOL_PRIORITY);
