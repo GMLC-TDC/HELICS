@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project (HELICS VERSION 1.3.1)
+project (HELICS VERSION 1.3.2)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set (HELICS_DATE "09-23-18")
+set (HELICS_DATE "10-20-18")
 
 set(
   HELICS_VERSION_UNDERSCORE

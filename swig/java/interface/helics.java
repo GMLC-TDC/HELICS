@@ -228,8 +228,8 @@ public class helics implements helicsConstants {
     return helics_status.swigToEnum(helicsJNI.helicsFederateInfoSetLoggingLevel(SWIGTYPE_p_void.getCPtr(fi), logLevel));
   }
 
-  public static helics_status helicsFederateLoadInterfaces(SWIGTYPE_p_void fed, String file) {
-    return helics_status.swigToEnum(helicsJNI.helicsFederateLoadInterfaces(SWIGTYPE_p_void.getCPtr(fed), file));
+  public static helics_status helicsFederateRegisterInterfaces(SWIGTYPE_p_void fed, String file) {
+    return helics_status.swigToEnum(helicsJNI.helicsFederateRegisterInterfaces(SWIGTYPE_p_void.getCPtr(fed), file));
   }
 
   public static helics_status helicsFederateFinalize(SWIGTYPE_p_void fed) {

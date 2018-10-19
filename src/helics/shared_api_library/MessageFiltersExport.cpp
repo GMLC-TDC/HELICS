@@ -293,7 +293,7 @@ helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index)
 		if (!filt->filtptr)
 		{
             auto fobj = reinterpret_cast<helics::FedObject *> (fed);
-			if (index < fobj->filters.size())
+			if (index < static_cast<int>(fobj->filters.size()))
 			{
                 filt->filtptr = fobj->filters[index]->filtptr;
                 filt->type = fobj->filters[index]->type;

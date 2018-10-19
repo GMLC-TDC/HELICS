@@ -5450,7 +5450,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_helicsFederateLoadInterfaces(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_helicsFederateRegisterInterfaces(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
@@ -5462,17 +5462,17 @@ SWIGINTERN PyObject *_wrap_helicsFederateLoadInterfaces(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   helics_status result;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateLoadInterfaces",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateRegisterInterfaces",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateLoadInterfaces" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterInterfaces" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateLoadInterfaces" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterInterfaces" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (helics_status)helicsFederateLoadInterfaces(arg1,(char const *)arg2);
+  result = (helics_status)helicsFederateRegisterInterfaces(arg1,(char const *)arg2);
   resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;
@@ -10288,7 +10288,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
-	 { (char *)"helicsFederateLoadInterfaces", _wrap_helicsFederateLoadInterfaces, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterInterfaces", _wrap_helicsFederateRegisterInterfaces, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"

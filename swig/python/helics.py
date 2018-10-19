@@ -881,9 +881,9 @@ def helicsFederateInfoSetLoggingLevel(fi: 'helics_federate_info_t', logLevel: 'i
     """
     return _helics.helicsFederateInfoSetLoggingLevel(fi, logLevel)
 
-def helicsFederateLoadInterfaces(fed: 'helics_federate', file: 'char const *') -> "helics_status":
-    return _helics.helicsFederateLoadInterfaces(fed, file)
-helicsFederateLoadInterfaces = _helics.helicsFederateLoadInterfaces
+def helicsFederateRegisterInterfaces(fed: 'helics_federate', file: 'char const *') -> "helics_status":
+    return _helics.helicsFederateRegisterInterfaces(fed, file)
+helicsFederateRegisterInterfaces = _helics.helicsFederateRegisterInterfaces
 
 def helicsFederateFinalize(fed: 'helics_federate') -> "helics_status":
     """

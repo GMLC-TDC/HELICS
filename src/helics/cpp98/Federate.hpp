@@ -170,7 +170,7 @@ class Federate
 
 	void registerInterfaces (const std::string &configFile)
     {
-        if (helics_ok != helicsFederateLoadInterfaces (fed,configFile.c_str()))
+        if (helics_ok != helicsFederateRegisterInterfaces (fed,configFile.c_str()))
         {
             throw (std::runtime_error ("error in processing config file"));
         }

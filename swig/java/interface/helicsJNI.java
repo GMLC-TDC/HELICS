@@ -9,6 +9,7 @@
 package com.java.helics;
 
 public class helicsJNI {
+
   public final static native int helics_ok_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
@@ -98,7 +99,7 @@ public class helicsJNI {
   public final static native int helicsFederateInfoSetPeriod(long jarg1, double jarg2);
   public final static native int helicsFederateInfoSetMaxIterations(long jarg1, int jarg2);
   public final static native int helicsFederateInfoSetLoggingLevel(long jarg1, int jarg2);
-  public final static native int helicsFederateLoadInterfaces(long jarg1, String jarg2);
+  public final static native int helicsFederateRegisterInterfaces(long jarg1, String jarg2);
   public final static native int helicsFederateFinalize(long jarg1);
   public final static native void helicsFederateFree(long jarg1);
   public final static native void helicsCloseLibrary();

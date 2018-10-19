@@ -1691,7 +1691,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetLogg
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateLoadInterfaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterInterfaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   jint jresult = 0 ;
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
@@ -1705,7 +1705,7 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFederateLoadInterfa
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return 0;
   }
-  result = (helics_status)helicsFederateLoadInterfaces(arg1,(char const *)arg2);
+  result = (helics_status)helicsFederateRegisterInterfaces(arg1,(char const *)arg2);
   jresult = (jint)result; 
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   return jresult;
