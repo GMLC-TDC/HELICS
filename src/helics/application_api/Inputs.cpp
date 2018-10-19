@@ -64,7 +64,7 @@ InputBase::InputBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
     auto cnt = fed->getInputCount ();
     if ((subIndex >= cnt) || (cnt < 0))
     {
-        throw (helics::InvalidParameter ("no subscription with the specified index"));
+        throw (helics::InvalidParameter ("no input with the specified index"));
     }
     id = static_cast<input_id_t> (subIndex);
     loadFromId ();

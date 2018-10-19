@@ -70,7 +70,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 
     /** register a set Message interfaces
     @details call is only valid in startup mode it is a protected call to add an
-    @param[in] configString  the location of the file or JSON String to load to generate the interfaces
+    @param[in] configString  the location of the file(TOML or JSON) or JSON String to load to generate the interfaces
     */
     void registerMessageInterfaces (const std::string &configString);
 

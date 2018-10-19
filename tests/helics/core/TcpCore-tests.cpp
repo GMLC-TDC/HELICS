@@ -310,10 +310,10 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
         act2 = m;
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
+    
     bool connected1 = comm2.connect();
     BOOST_REQUIRE(connected1);
-    bool connected2 = connected_fut.get ();
+    bool connected2 = comm.connect();
     if (!connected2)
     { //lets just try again if it is not connected
         connected2 = comm.connect();
@@ -377,8 +377,6 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
         act3 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on eachother in this case
-    // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect ();
     BOOST_REQUIRE (connected);

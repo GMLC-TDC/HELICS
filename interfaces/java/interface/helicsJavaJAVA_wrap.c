@@ -2880,7 +2880,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetInte
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateLoadInterfaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterInterfaces(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
@@ -2898,7 +2898,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateLoadInterfa
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return ;
   }
-  helicsFederateLoadInterfaces(arg1,(char const *)arg2,arg3);
+  helicsFederateRegisterInterfaces(arg1,(char const *)arg2,arg3);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   {
     if (arg3->error_code!=helics_ok)

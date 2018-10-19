@@ -131,7 +131,7 @@ class Federate
 
 	void registerInterfaces (const std::string &configFile)
     {
-        helicsFederateLoadInterfaces (fed, configFile.c_str (), hThrowOnError ());
+        helicsFederateRegisterInterfaces (fed, configFile.c_str (), hThrowOnError ());
     }
     int getIntegerProperty (int intProperty) const
     {

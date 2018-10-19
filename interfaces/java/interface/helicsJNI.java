@@ -155,7 +155,7 @@ public class helicsJNI {
   public final static native void helicsFederateInfoSetSeparator(long jarg1, char jarg2);
   public final static native void helicsFederateInfoSetTimeProperty(long jarg1, int jarg2, double jarg3);
   public final static native void helicsFederateInfoSetIntegerProperty(long jarg1, int jarg2, int jarg3);
-  public final static native void helicsFederateLoadInterfaces(long jarg1, String jarg2);
+  public final static native void helicsFederateRegisterInterfaces(long jarg1, String jarg2);
   public final static native void helicsFederateFinalize(long jarg1);
   public final static native void helicsFederateFree(long jarg1);
   public final static native void helicsCloseLibrary();

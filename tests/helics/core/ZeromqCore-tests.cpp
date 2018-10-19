@@ -392,12 +392,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
         act2 = m;
     });
 
-    // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-
     bool connected = comm2.connect ();
     BOOST_REQUIRE (connected);
-    connected = connected_fut.get ();
+    connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);

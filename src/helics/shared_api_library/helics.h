@@ -365,7 +365,7 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty (helics_federate_info_t 
 @param fed the federate to which to load interfaces
 @param file the name of a file to load the interfaces from either JSON, or TOML
 */
-HELICS_EXPORT void helicsFederateLoadInterfaces (helics_federate fed, const char *file, helics_error *err);
+HELICS_EXPORT void helicsFederateRegisterInterfaces (helics_federate fed, const char *file, helics_error *err);
   /** finalize the federate this halts all communication in the federate and disconnects it from the core
  */
 HELICS_EXPORT void helicsFederateFinalize (helics_federate fed, helics_error *err);

@@ -356,7 +356,7 @@ helics_core helicsFederateGetCoreObject (helics_federate fed, helics_error *err)
 
 static constexpr char invalidFile[] = "Invalid File specification";
 
-void helicsFederateLoadInterfaces (helics_federate fed, const char *file, helics_error *err)
+void helicsFederateRegisterInterfaces (helics_federate fed, const char *file, helics_error *err)
 {
     auto fedObj = getFed (fed,err);
     if (fedObj == nullptr)

@@ -248,8 +248,8 @@ public class helics implements helicsConstants {
     helicsJNI.helicsFederateInfoSetIntegerProperty(SWIGTYPE_p_void.getCPtr(fi), intProperty, propertyValue);
   }
 
-  public static void helicsFederateLoadInterfaces(SWIGTYPE_p_void fed, String file) {
-    helicsJNI.helicsFederateLoadInterfaces(SWIGTYPE_p_void.getCPtr(fed), file);
+  public static void helicsFederateRegisterInterfaces(SWIGTYPE_p_void fed, String file) {
+    helicsJNI.helicsFederateRegisterInterfaces(SWIGTYPE_p_void.getCPtr(fed), file);
   }
 
   public static void helicsFederateFinalize(SWIGTYPE_p_void fed) {

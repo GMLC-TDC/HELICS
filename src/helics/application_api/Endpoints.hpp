@@ -27,7 +27,7 @@ class Endpoint
     @param[in] name the name of the endpoint
     @param[in] type a named type associated with the endpoint
     */
-    Endpoint(MessageFederate *mFed, const std::string &name, const std::string &type = std::string());
+    Endpoint (MessageFederate *mFed, const std::string &name, const std::string &type = std::string ());
     /**constructor to build an endpoint object
     @param[in] mFed  the MessageFederate to use
     @param[in] name the name of the endpoint
@@ -35,7 +35,7 @@ class Endpoint
     */
     template <class FedPtr>
     Endpoint (FedPtr &mFed, const std::string &name, const std::string &type = std::string ())
-        : Endpoint (std::addressof (*mFed),name,type)
+        : Endpoint (std::addressof (*mFed), name, type)
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
                        "first argument must be a pointer to a MessageFederate");
@@ -45,10 +45,10 @@ class Endpoint
     @param[in] name the name of the endpoint
     @param[in] type a named type associated with the endpoint
     */
-    Endpoint(interface_visibility locality,
-        MessageFederate *mFed,
-        const std::string &name,
-        const std::string &type = std::string());
+    Endpoint (interface_visibility locality,
+              MessageFederate *mFed,
+              const std::string &name,
+              const std::string &type = std::string ());
     /**constructor to build an endpoint object
     @param[in] mFed  the MessageFederate to use
     @param[in] name the name of the endpoint
@@ -59,7 +59,7 @@ class Endpoint
               FedPtr &mFed,
               const std::string &name,
               const std::string &type = std::string ())
-        : Endpoint (locality,std::addressof (*mFed),name,type)
+        : Endpoint (locality, std::addressof (*mFed), name, type)
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
                        "second argument must be a pointer to a MessageFederate");
@@ -162,6 +162,11 @@ class Endpoint
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
     void setCallback (std::function<void(const Endpoint *, Time)> callback);
+
+    /** add a named filter to an endpoint for all message coming from the endpoint*/
+    void addSourceFilter (const std::string &filterName) { fed->addSourceFilter (id, filterName); }
+    /** add a named filter to an endpoint for all message going to the endpoint*/
+    void addDestinationFilter (const std::string &filterName) { fed->addDestinationFilter (id, filterName); }
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
     /** get the name of the endpoint*/
