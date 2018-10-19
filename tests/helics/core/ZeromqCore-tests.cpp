@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     });
 
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    BOOST_CHECK (connected);
 
     zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
     pushSocket.connect ("tcp://127.0.0.1:23407");
@@ -348,15 +348,19 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     try
     {
         auto cnt = pushSocket.send (buffer, ZMQ_DONTWAIT);
-        BOOST_REQUIRE_EQUAL (cnt, buffer.size ());
+        BOOST_CHECK_EQUAL (cnt, buffer.size ());
     }
     catch (const zmq::error_t &ze)
     {
-        BOOST_REQUIRE_MESSAGE (false, "Message failed to send");
+        BOOST_CHECK_MESSAGE (false, "Message failed to send");
     }
 
     std::this_thread::sleep_for (200ms);
-    BOOST_REQUIRE_EQUAL (counter, 1);
+    if (counter != 1)
+    {
+        std::this_thread::sleep_for(200ms);
+    }
+    BOOST_CHECK_EQUAL (counter, 1);
     BOOST_CHECK (act.lock()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
     repSocket.close ();
@@ -393,19 +397,23 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    BOOST_CHECK (connected);
     connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    BOOST_CHECK (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
-    std::this_thread::sleep_for (std::chrono::milliseconds (250));
+    std::this_thread::sleep_for (250ms);
     if (counter2 != 1)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (500));
+        std::this_thread::sleep_for (500ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
+    BOOST_CHECK_EQUAL (counter2, 1);
+    if (counter2 == 1)
+    {
+        BOOST_CHECK(act2.lock()->action() == helics::action_message_def::action_t::cmd_ack);
+    }
+   
 
     comm.disconnect ();
     comm2.disconnect ();

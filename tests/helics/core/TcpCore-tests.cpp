@@ -154,12 +154,12 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.disconnect ();
     server->close ();
     
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(100ms);
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
     std::atomic<size_t> len{0};
     std::string host = "localhost";
@@ -185,7 +185,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     comm.setPortNumber (TCP_SECONDARY_PORT);
     comm.setName ("tests");
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    BOOST_CHECK_MESSAGE (connected,"connection has failedbb");
+    if (connected)
+    {
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
     boost::system::error_code error;
@@ -204,7 +206,8 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
-    
+    }
+
     comm.disconnect ();
     server->close ();
     std::this_thread::sleep_for (100ms);
