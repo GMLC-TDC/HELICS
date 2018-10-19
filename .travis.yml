@@ -107,6 +107,7 @@ jobs:
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
         - ENABLE_CPACK=true
+        - INSTALL_SYSTEM_LIBRARIES=true
         - UPLOAD_BINTRAY_ARTIFACT=true
 
     - <<: *linux_base
@@ -239,6 +240,7 @@ install:
 
   - if [[ "$USE_SWIG" == 'false' ]] ; then OPTION_FLAGS_ARR+=("-DENABLE_SWIG=OFF") ; fi
   - if [[ "$ENABLE_CPACK" ]] ; then OPTION_FLAGS_ARR+=("-DENABLE_PACKAGE_BUILD=ON") ; fi
+  - if [[ "$INSTALL_SYSTEM_LIBRARIES" ]] ; then OPTION_FLAGS_ARR+=("-DINSTALL_SYSTEM_LIBRARIES=ON") ; fi
   - if [[ "$BUILD_TYPE" ]]; then OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}") ; fi
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON") ; fi
   - if [[ "$CXX_STANDARD" == 17 ]] ; then OPTION_FLAGS+=("-DENABLE_CXX_17=ON") ; fi

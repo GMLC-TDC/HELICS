@@ -767,6 +767,11 @@ if(ENABLE_PACKAGE_BUILD)
     "helics_player"
     "Helics Player"
   )
+
+  if(INSTALL_SYSTEM_LIBRARIES)
+    include(InstallRequiredSystemLibraries)
+  endif()
+
   if(WIN32)
 	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
 	set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
