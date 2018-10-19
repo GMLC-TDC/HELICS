@@ -4,6 +4,8 @@ All notable changes to this project after the 1.0.0 release will be documented i
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [1.3.2] - 2018-10-20
+- The 1.3.X branch is now in maintenance mode, this is the last expected update for the 1.X series of HELICS.  Development is expected on the 2.0 branch and only bug fixes until the 2.0 branch is fully released are expected.  
+
 ### Fixed
  - Log level defines were interfering with other applications a HELICS_* was prepending to the definitions
  - ZMQ comms were not shutting down properly for some combinations of ZMQ version and compiler, a termination flag and timeout was added to fix the situation
