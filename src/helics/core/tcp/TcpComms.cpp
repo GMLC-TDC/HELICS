@@ -284,6 +284,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                             brokerConnection->cancel ();
                             setTxStatus (connection_status::terminated);
                             brokerConnection->close();
+                            brokerConnection = nullptr;
                             return false;
                         }
                     }
@@ -295,6 +296,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                     logError ("port number query to broker timed out");
                     setTxStatus (connection_status::terminated);
                     brokerConnection->close();
+                    brokerConnection = nullptr;
                     return false;
                 }
             }
@@ -302,7 +304,10 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     }
     catch (std::exception &e)
     {
-        logError (e.what ());
+        brokerConnection->close ();
+        brokerConnection = nullptr;
+        logError (std::string("error connecting with Broker")+e.what());
+        setTxStatus (connection_status::terminated);
     }
     return true;
 }
