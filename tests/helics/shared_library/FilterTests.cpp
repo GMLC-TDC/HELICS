@@ -44,15 +44,14 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     helicsFilterAddSourceTarget(f3, "filter0/fout",nullptr);
     BOOST_CHECK (f3 != f2);
 
-
     auto f1_b = helicsFederateGetFilter (fFed, "filter1",&err);
     const char *tmp;
     tmp=helicsFilterGetName(f1_b);
-    BOOST_CHECK_EQUAL (tmp, "filter1");
+    BOOST_CHECK_EQUAL (tmp, "filter0/filter1");
 
 	 auto f1_c = helicsFederateGetFilterByIndex (fFed, 2,&err);
     tmp=helicsFilterGetName (f1_c);
-     BOOST_CHECK_EQUAL (tmp, "c4");
+     BOOST_CHECK_EQUAL (tmp, "filter0/c4");
 
     CE (helicsFederateFinalize (mFed,&err));
     CE (helicsFederateFinalize (fFed,&err));
@@ -76,6 +75,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     auto fFed = GetFederateAt (0);
     auto mFed = GetFederateAt (1);
 
+	CE(helicsFederateSetFlagOption (mFed, helics_flag_ignore_time_mismatch_warnings, helics_true,&err));
     auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", nullptr,&err);
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "",&err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);

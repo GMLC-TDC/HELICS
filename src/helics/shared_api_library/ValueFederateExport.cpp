@@ -411,11 +411,11 @@ helics_publication helicsFederateGetPublication (helics_federate fed, const char
         auto id = fedObj->getPublicationId (key);
         if (!id.isValid ())
         {
-			if (err != nullptr)
-			{
+            if (err != nullptr)
+            {
                 err->error_code = helics_error_invalid_argument;
                 err->message = invalidPubName;
-			} 
+            }
             return nullptr;
         }
         auto pub = std::make_unique<helics::PublicationObject> ();
@@ -434,7 +434,7 @@ helics_publication helicsFederateGetPublication (helics_federate fed, const char
 
 helics_publication helicsFederateGetPublicationByIndex (helics_federate fed, int index, helics_error *err)
 {
-    auto fedObj = getValueFedSharedPtr (fed,err);
+    auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
@@ -532,7 +532,7 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject> ();
-        inp->inputPtr = std::make_unique<helics::Input> (fedObj.get (), id.value ());
+        inp->inputPtr = std::make_unique<helics::Subscription> (fedObj.get (), id.value ());
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());
         addInput (fed, std::move (inp));
@@ -1564,6 +1564,7 @@ const char *helicsSubscriptionGetKey (helics_input sub)
                 const std::string &key = subPtr->getTarget ();
                 return key.c_str ();
             }
+            
             return nullStr.c_str ();
         }
     }

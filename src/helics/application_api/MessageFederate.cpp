@@ -250,7 +250,7 @@ void MessageFederate::registerKnownCommunicationPath (endpoint_id_t localEndpoin
 
 bool MessageFederate::hasMessage () const
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->hasMessage ();
     }
@@ -259,7 +259,7 @@ bool MessageFederate::hasMessage () const
 
 bool MessageFederate::hasMessage (endpoint_id_t id) const
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->hasMessage (id);
     }
@@ -271,7 +271,7 @@ bool MessageFederate::hasMessage (endpoint_id_t id) const
  */
 uint64_t MessageFederate::pendingMessages (endpoint_id_t id) const
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->pendingMessages (id);
     }
@@ -284,7 +284,7 @@ prefer to just use getMessage until it returns an invalid Message.
 */
 uint64_t MessageFederate::pendingMessages () const
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->pendingMessages ();
     }
@@ -293,7 +293,7 @@ uint64_t MessageFederate::pendingMessages () const
 
 std::unique_ptr<Message> MessageFederate::getMessage ()
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->getMessage ();
     }
@@ -302,7 +302,7 @@ std::unique_ptr<Message> MessageFederate::getMessage ()
 
 std::unique_ptr<Message> MessageFederate::getMessage (endpoint_id_t endpoint)
 {
-    if (state == op_states::execution)
+    if (state >= op_states::initialization)
     {
         return mfManager->getMessage (endpoint);
     }

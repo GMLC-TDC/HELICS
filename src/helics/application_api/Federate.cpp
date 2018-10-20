@@ -1151,6 +1151,10 @@ std::string Federate::getFilterOutputType (filter_id_t id) const
 filter_id_t Federate::getFilterId (const std::string &filterName) const
 {
     auto id = coreObject->getFilter (filterName);
+	if (!id.isValid())
+	{
+        id = coreObject->getFilter ((getName () + separator_ + filterName));
+	}
     return (id.isValid ()) ? filter_id_t (id.baseValue()) : filter_id_t();
 }
 

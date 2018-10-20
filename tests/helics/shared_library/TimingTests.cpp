@@ -27,6 +27,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test)
 	CE(helicsFederateSetTimeProperty (vFed1,PERIOD_PROPERTY, 0.5,&err));
     CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5,&err));
 
+	CE (helicsFederateSetFlagOption (vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+    CE (helicsFederateSetFlagOption (vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+
     auto pub=helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", "double", "",&err);
     CE(helicsFederateRegisterSubscription (vFed2, "pub1", "",&err));
     CE(helicsFederateEnterExecutingModeAsync (vFed1,&err));
@@ -52,6 +55,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     SetupTest (helicsCreateValueFederate, "test", 2);
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
+
+	CE (helicsFederateSetFlagOption (vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+    CE (helicsFederateSetFlagOption (vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
 
    CE(helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.5,&err));
     CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.5,&err));
@@ -93,6 +99,9 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message)
 	CE(helicsFederateSetTimeProperty (vFed1, PERIOD_PROPERTY, 0.6,&err));
     CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.45,&err));
 
+	CE (helicsFederateSetFlagOption (vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+    CE (helicsFederateSetFlagOption (vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+
 	auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "",&err);
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "",&err);
     BOOST_REQUIRE_EQUAL (err.error_code, 0);
@@ -133,6 +142,9 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay)
     CE(helicsFederateSetTimeProperty (vFed2, PERIOD_PROPERTY, 0.1,&err));
 
 	CE(helicsFederateSetTimeProperty (vFed2, INPUT_DELAY_PROPERTY, 0.1,&err));
+
+	CE (helicsFederateSetFlagOption (vFed1, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+    CE (helicsFederateSetFlagOption (vFed2, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
 
    auto ept1 = helicsFederateRegisterGlobalEndpoint (vFed1, "e1", "",nullptr);
     helicsFederateRegisterGlobalEndpoint (vFed2, "e2", "",nullptr);
@@ -189,6 +201,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
 	 SetupTest (helicsCreateValueFederate, "test",1);
     auto vFed = GetFederateAt (0);
 
+	CE (helicsFederateSetFlagOption (vFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
     CE(helicsFederateSetTimeProperty (vFed, PERIOD_PROPERTY, 1.0,&err));
     CE(helicsFederateEnterExecutingMode (vFed,&err));
 

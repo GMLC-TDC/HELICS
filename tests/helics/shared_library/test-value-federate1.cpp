@@ -190,8 +190,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK_EQUAL (tmp, "sub1");
 	//check the getSubscriptionByIndex function
     auto subid_c = helicsFederateGetInputByIndex (vFed1, 2,&err);
-    tmp=helicsSubscriptionGetKey (subid_c);
-    BOOST_CHECK_EQUAL (tmp, "sub3");
+    tmp=helicsInputGetUnits(subid_c);
+    BOOST_CHECK_EQUAL (tmp, "V");
     // check publications
 
     sv=helicsPublicationGetKey (pubid);

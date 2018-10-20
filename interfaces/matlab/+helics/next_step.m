@@ -1,7 +1,7 @@
 function v = next_step()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1432107603);
+    vInitialized = helicsMEX(0, 1936535370);
   end
   v = vInitialized;
 end
