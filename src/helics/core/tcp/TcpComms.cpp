@@ -6,8 +6,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
-#include "TcpCommsCommon.h"
 #include "TcpComms.h"
+#include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -221,6 +221,16 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
 bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
+    auto terminate = [&,this](connection_status status) -> bool {
+        if (brokerConnection)
+        {
+            brokerConnection->close ();
+            brokerConnection = nullptr;
+        }
+        setTxStatus (status);
+        return false;
+    };
+
     if (brokerPort < 0)
     {
         brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
@@ -232,8 +242,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
         if (!brokerConnection)
         {
             logError ("initial connection to broker timed out");
-            setTxStatus (connection_status::terminated);
-            return false;
+            return terminate (connection_status::error);
         }
         if (PortNumber <= 0)
         {
@@ -246,8 +255,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             catch (const boost::system::system_error &error)
             {
                 logError (std::string ("error in initial send to broker ") + error.what ());
-                setTxStatus (connection_status::terminated);
-                return false;
+                return terminate (connection_status::error);
             }
             std::vector<char> rx (512);
             tcp::endpoint brk;
@@ -281,33 +289,23 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                         }
                         else if (mess->second.messageID == DISCONNECT)
                         {
-                            brokerConnection->cancel ();
-                            setTxStatus (connection_status::terminated);
-                            brokerConnection->close();
-                            brokerConnection = nullptr;
-                            return false;
+                            return terminate (connection_status::terminated);
                         }
                     }
                 }
                 cumsleep += 100;
                 if (cumsleep >= connectionTimeout)
                 {
-                    brokerConnection->cancel ();
                     logError ("port number query to broker timed out");
-                    setTxStatus (connection_status::terminated);
-                    brokerConnection->close();
-                    brokerConnection = nullptr;
-                    return false;
+                    return terminate (connection_status::error);
                 }
             }
         }
     }
     catch (std::exception &e)
     {
-        brokerConnection->close ();
-        brokerConnection = nullptr;
-        logError (std::string("error connecting with Broker")+e.what());
-        setTxStatus (connection_status::terminated);
+        logError (std::string ("error connecting with Broker") + e.what ());
+        return terminate (connection_status::error);
     }
     return true;
 }
@@ -328,9 +326,9 @@ void TcpComms::queue_tx_function ()
     {
         if (!establishBrokerConnection (ioserv, brokerConnection))
         {
-            ActionMessage m(CMD_PROTOCOL);
+            ActionMessage m (CMD_PROTOCOL);
             m.messageID = CLOSE_RECEIVER;
-            rxMessageQueue.push(m);
+            rxMessageQueue.push (m);
             return;
         }
     }

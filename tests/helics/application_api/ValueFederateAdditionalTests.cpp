@@ -42,7 +42,8 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
+//BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztypes), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
