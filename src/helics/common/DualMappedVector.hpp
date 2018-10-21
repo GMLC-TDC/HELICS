@@ -6,11 +6,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 #include "MapTraits.hpp"
 #include <algorithm>
+#include <deque>
 #include <map>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
-#include <deque>
 #include <vector>
 
 /** class to create a searchable vector by defined unique indices.
@@ -26,97 +26,100 @@ class DualMappedVector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    decltype(auto) insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
-        if (fnd != lookup1.end())
+        if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
-                return false;
+                return dataStorage.end ();
             }
         }
-        auto index = dataStorage.size();
-        dataStorage.emplace_back(std::forward<Us>(data)...);
+        auto index = dataStorage.size ();
+        auto &ref=dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1[searchValue1] = index;
         lookup2[searchValue2] = index;
-        return true;
+        return dataStorage.end ()-1;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    decltype (auto) insert (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            return false;
+            return dataStorage.end();
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1.emplace (searchValue1, index);
-        return true;
+        return dataStorage.end ()-1;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    decltype(auto) insert (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup2.find (searchValue2);
         if (fnd != lookup2.end ())
         {
-            return false;
+            return dataStorage.end();
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup2.emplace (searchValue2, index);
-        return true;
+        return dataStorage.end()-1;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    Vtype &insert_or_assign (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
-                dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+                dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
                 lookup2[searchValue2] = fnd->second;
-                return;
+                return dataStorage[fnd->second];
             }
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1[searchValue1] = index;
         lookup2[searchValue2] = index;
+        return dataStorage.back ();
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    Vtype &insert_or_assign (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
+            return dataStorage[fnd->second];
         }
         else
         {
             auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
+            Vtype &ret=dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup1.emplace (searchValue1, index);
+            return ret;
         }
     }
 
@@ -124,18 +127,20 @@ class DualMappedVector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    Vtype &insert_or_assign (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup2.find (searchValue2);
         if (fnd != lookup2.end ())
         {
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
+            return dataStorage[fnd->second];
         }
         else
         {
             auto index = dataStorage.size ();
-            dataStorage.emplace_back (std::forward<Us> (data)...);
+            Vtype &ret=dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup2.emplace (searchValue2, index);
+            return ret;
         }
     }
     /** add an additional index term for searching
@@ -342,7 +347,7 @@ class DualMappedVector
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
     }
     auto begin () { return dataStorage.begin (); }
-    auto end (){ return dataStorage.end (); }
+    auto end () { return dataStorage.end (); }
     auto begin () const { return dataStorage.cbegin (); }
     auto end () const { return dataStorage.cend (); }
 

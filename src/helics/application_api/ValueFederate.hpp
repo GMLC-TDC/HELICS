@@ -9,6 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Federate.hpp"
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
+#include "Publications.hpp"
+#include "Inputs.hpp"
 #include <functional>
 
 namespace helics
@@ -63,7 +65,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
-    publication_id_t registerPublication (const std::string &key,
+    Publication &registerPublication (const std::string &key,
                                           const std::string &type,
                                           const std::string &units = std::string ());
     /** register a publication
@@ -73,7 +75,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerPublication (const std::string &key, const std::string &units = std::string ())
+    Publication &registerPublication (const std::string &key, const std::string &units = std::string ())
     {
         return registerPublication (key, ValueConverter<X>::type (), units);
     }
@@ -85,7 +87,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
-    publication_id_t registerGlobalPublication (const std::string &key,
+    Publication &registerGlobalPublication (const std::string &key,
                                                 const std::string &type,
                                                 const std::string &units = std::string ());
     /** register a publication
@@ -95,7 +97,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerGlobalPublication (const std::string &key, const std::string &units = std::string ())
+    Publication &registerGlobalPublication (const std::string &key, const std::string &units = std::string ())
     {
         return registerGlobalPublication (key, ValueConverter<X>::type (), units);
     }
@@ -109,7 +111,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t
+    Publication &
     registerPublicationIndexed (const std::string &key, int index1, const std::string &units = std::string ())
     {
         return registerGlobalPublication<X> (key + '_' + std::to_string (index1), units);
@@ -124,7 +126,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an identifier for use with this publication
     */
     template <typename X>
-    publication_id_t registerPublicationIndexed (const std::string &key,
+    Publication &registerPublicationIndexed (const std::string &key,
                                                  int index1,
                                                  int index2,
                                                  const std::string &units = std::string ())
@@ -139,7 +141,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] type a string describing the type of the publication
     @param[in] units a string describing the units on the publication
     */
-    input_id_t
+    Input &
     registerInput (const std::string &key, const std::string &type, const std::string &units = std::string ());
 
     /** register a globally named input
@@ -149,20 +151,20 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units a string defining the units of the input [optional]
     @return a input id object for use as an identifier
     */
-    input_id_t registerGlobalInput (const std::string &key,
+    Input &registerGlobalInput (const std::string &key,
                                     const std::string &type,
                                     const std::string &units = std::string ());
     /** register a named input
      */
     template <typename X>
-    input_id_t registerInput (const std::string &key, const std::string &units = std::string ())
+    Input & registerInput (const std::string &key, const std::string &units = std::string ())
     {
         return registerInput (key, ValueConverter<X>::type (), units);
     }
     /** register a global named input
      */
     template <typename X>
-    input_id_t registerGlobalInput (const std::string &key, const std::string &units = std::string ())
+    Input &registerGlobalInput (const std::string &key, const std::string &units = std::string ())
     {
         return registerGlobalInput (key, ValueConverter<X>::type (), units);
     }
@@ -174,7 +176,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <typename X>
-    input_id_t registerInputIndexed (const std::string &key, int index1, const std::string &units = std::string ())
+    Input &registerInputIndexed (const std::string &key, int index1, const std::string &units = std::string ())
     {
         return registerGlobalInput<X> (key + '_' + std::to_string (index1), units);
     }
@@ -189,7 +191,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
   @return an identifier for use with this publication
   */
     template <typename X>
-    input_id_t registerInputIndexed (const std::string &key,
+    Input &registerInputIndexed (const std::string &key,
                                      int index1,
                                      int index2,
                                      const std::string &units = std::string ())
@@ -202,7 +204,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] type the type of the subscription
     @param[in] units the units associated with the desired output
     */
-    input_id_t registerSubscription (const std::string &target, const std::string &units = std::string ());
+    Input &registerSubscription (const std::string &target, const std::string &units = std::string ());
 
     /** register a subscription
     @details register a subscription for a 1D array of values
@@ -210,7 +212,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] index1 the index into a 1 dimensional array of values
     @param[in] units the optional units on the subscription
     */
-    input_id_t
+    Input &
     registerSubscriptionIndexed (const std::string &target, int index1, const std::string &units = std::string ())
     {
         return registerSubscription (target + '_' + std::to_string (index1), units);
@@ -223,7 +225,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] index2 the 2nd index of a 2-D value structure
     @param[in] units the optional units on the subscription
     */
-    input_id_t registerSubscriptionIndexed (const std::string &target,
+    Input &registerSubscriptionIndexed (const std::string &target,
                                             int index1,
                                             int index2,
                                             const std::string &units = std::string ())
@@ -237,7 +239,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] subid the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (input_id_t subid, const std::string &shortcutName);
+    void addShortcut (const Input &inp, const std::string &shortcutName);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
@@ -245,14 +247,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] block the data view representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (input_id_t id, data_view block);
+    void setDefaultValue (Input &inp, data_view block);
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param[in] id the input identifier
     @param[in] block the data block representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (input_id_t id, const data_block &block) { setDefaultValue (id, data_view (block)); }
+    void setDefaultValue (Input &inp, const data_block &block) { setDefaultValue (inp, data_view (block)); }
 
     /** set a default value for a subscription
     @param[in] id  the identifier for the subscription
@@ -260,9 +262,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    void setDefaultValue (input_id_t id, const X &val)
+    void setDefaultValue (Input &inp, const X &val)
     {
-        setDefaultValue (id, data_view (ValueConverter<X>::convert (val)));
+        setDefaultValue (Inp, data_view (ValueConverter<X>::convert (val)));
     }
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode to add an toml files must have extension .toml or .TOML
@@ -289,7 +291,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a constant data block
     @throw std::invalid_argument if id is invalid
     */
-    data_view getValueRaw (input_id_t id);
+    data_view getValueRaw (const Input &inp);
 
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
@@ -298,9 +300,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    void getValue (input_id_t id, X &obj)
+    void getValue (const Input &inp, X &obj)
     {
-        ValueConverter<X>::interpret (getValueRaw (id), obj);
+        ValueConverter<X>::interpret (getValueRaw (inp), obj);
     }
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
@@ -309,7 +311,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    X getValue (input_id_t id)
+    X getValue (const Input &inp)
     {
         return ValueConverter<X>::interpret (getValueRaw (id));
     }
@@ -319,7 +321,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] a data block containing the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (publication_id_t id, data_view block);
+    void publish (const Publication &pub, data_view block);
 
     /** publish a data block
     @details this function is primarily to prevent data blocks from falling through to the template
@@ -327,14 +329,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] a data block containing the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (publication_id_t id, const data_block &block) { publish (id, data_view (block)); }
+    void publish (const Publication &pub, const data_block &block) { publish (pub, data_view (block)); }
 
     /** publish a string
     @param[in] id the publication identifier
     @param[in] data a const char pointer to a string
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (publication_id_t id, const char *data) { publish (id, data_view{data, strlen (data)}); }
+    void publish (const Publication &pub, const char *data) { publish (pub, data_view{data, strlen (data)}); }
 
     /** publish data
     @param[in] id the publication identifier
@@ -342,9 +344,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] data_size the length of the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (publication_id_t id, const char *data, size_t data_size)
+    void publish (const Publication &pub, const char *data, size_t data_size)
     {
-        publish (id, data_view{data, data_size});
+        publish (pub, data_view{data, data_size});
     }
 
     /** publish a value
@@ -354,7 +356,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw invalid_argument if the publication id is invalid
     */
     template <typename X>
-    void publish (publication_id_t id, const X &value)
+    void publish (const Publication &pub, const X &value)
     {
         publish (id, data_view (ValueConverter<X>::convert (value)));
     }
@@ -362,12 +364,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param id the identifier of the input
     target the name of the input to send the data to
     */
-    void addTarget (publication_id_t id, const std::string &target);
+    void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param id the identifier of the publication
     target the name of the input to send the data to
     */
-    void addTarget (input_id_t id, const std::string &target);
+    void addTarget (const Publication &pub, const std::string &target);
     /** register an optional subscription
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param[in] target the name of the target
@@ -376,7 +378,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
    */
     template <class iType>
     void
-    addTargetIndexed (iType id, const std::string &target, int index1, const std::string &units = std::string ())
+    addTargetIndexed (const iType &id, const std::string &target, int index1, const std::string &units = std::string ())
     {
         return addTarget (id, target + '_' + std::to_string (index1), units);
     }
@@ -389,7 +391,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <class iType>
-    input_id_t addTargetIndexed (iType id,
+    input_id_t addTargetIndexed (const iType &id,
                                  const std::string &target,
                                  int index1,
                                  int index2,
@@ -400,9 +402,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** check if a given subscription has an update
     @return true if the subscription id is valid and has an update*/
-    bool isUpdated (input_id_t sub_id) const;
+    bool isUpdated (const Input &inp) const;
     /** get the time of the last update*/
-    Time getLastUpdateTime (input_id_t sub_id) const;
+    Time getLastUpdateTime (const Input &inp) const;
 
     virtual void disconnect () override;
 
@@ -419,94 +421,88 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** get the key or the string identifier of an from its id
     @return empty string if an invalid id is passed*/
-    std::string getTarget (input_id_t id) const;
+    const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &name) const;
+    Input &getInput(const std::string &name) const;
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &name, int index1) const;
+    Input &getInput (const std::string &name, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &name, int index1, int index2) const;
+    Input &getInput (const std::string &name, int index1, int index2) const;
 
     /** get the input id based on target
     @return an input_id_t from the object, or invalid_id if no input was found
     */
-    input_id_t getSubscriptionId (const std::string &key) const;
+    Input &getSubscription (const std::string &key) const;
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
-    const std::string &getPublicationKey (publication_id_t id) const;
+    const std::string &getPublicationKey (const Publication &pub) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &key) const;
+    Publication &getPublicationId (const std::string &key) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &key, int index1) const;
+    Publication &getPublicationId (const std::string &key, int index1) const;
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &key, int index1, int index2) const;
+    Publication &getPublicationId (const std::string &key, int index1, int index2) const;
 
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
     @return the name or empty string on unrecognized id*/
-    const std::string &getInputUnits (input_id_t id) const;
+    const std::string &getInputUnits (const Input &inp) const;
 
     /** get the units of a publication from its id
     @param[in] id the publication id to query
     @return the units or empty string on unrecognized id*/
-    const std::string &getPublicationUnits (publication_id_t id) const;
+    const std::string &getPublicationUnits (const Publication &pub) const;
 
     /** get the key of an input from its id
     @param[in] id the input id to query
     @return the type or empty string on unrecognized id*/
-    const std::string &getInputKey (input_id_t id) const;
+    const std::string &getInputKey (const Input &inp) const;
 
     /** get the type of a input from its id
     @param[in] id the input id to query
     @return the type or empty string on unrecognized id*/
-    const std::string &getInputType (input_id_t id) const;
+    const std::string &getInputType (const Input &inp) const;
 
     /** get the type of a publication from its id
     @param[in] id the publication id to query
     @return the type or empty string on unrecognized id*/
-    const std::string &getPublicationType (publication_id_t id) const;
+    const std::string &getPublicationType (const Publication &pub) const;
 
     /** get the type of the publication of a particular subscription
     @param[in] id the subscription id to query
     @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (input_id_t id) const;
+    std::string getPublicationType (const Input &inp) const;
 
     /** set a publication option */
-    void setPublicationOption (publication_id_t id, int32_t option, bool option_value = true);
+    void setPublicationOption (const Publication &pub, int32_t option, bool option_value = true);
 
     /** get a handle option*/
     void setInputOption (input_id_t id, int32_t option, bool option_value = true);
     /** get an option values for an input*/
     bool getInputOption (input_id_t id, int32_t option) const;
     /** get an option values for a publication*/
-    bool getPublicationOption (publication_id_t id, int32_t option) const;
+    bool getPublicationOption (const Publication &pubd, int32_t option) const;
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call signature void(input_id_t, Time)
     */
-    void registerInputNotificationCallback (std::function<void(input_id_t, Time)> callback);
+    void registerInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerInputNotificationCallback (input_id_t id, std::function<void(input_id_t, Time)> callback);
-    /** register a callback function to call when the specified subscription is updated
-    @param[in] ids  the set of ids to register the callback for
-    @param[in] callback the function to call
-    */
-    void registerInputNotificationCallback (const std::vector<input_id_t> &ids,
-                                            std::function<void(input_id_t, Time)> callback);
+    void registerInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;
@@ -527,7 +523,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 template <class... Us>
 void publish (std::shared_ptr<ValueFederate> &fed, const std::string &pubKey, Us... pargs)
 {
-    fed->publish (fed->getPublicationId (pubKey), pargs...);
+    fed->publish (fed->getPublication (pubKey), pargs...);
 }
 
 /** publish directly from the publication key name
@@ -541,7 +537,7 @@ operation vs the member publish calls
 template <class... Us>
 void publish (ValueFederate &fed, const std::string &pubKey, Us... pargs)
 {
-    fed.publish (fed.getPublicationId (pubKey), pargs...);
+    fed.publish (fed.getPublication (pubKey), pargs...);
 }
 
 /** get a value directly from the subscription key name
@@ -554,7 +550,7 @@ operation vs the member getValue calls
 template <class X>
 X getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key)
 {
-    return fed->getValue<X> (fed->getInputId (Key));
+    return fed->getValue<X> (fed->getInput (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -568,7 +564,7 @@ operation vs the member getValue calls
 template <class X>
 void getValue (std::shared_ptr<ValueFederate> &fed, const std::string &Key, X &obj)
 {
-    obj = fed->getValue<X> (fed->getInputId (Key));
+    obj = fed->getValue<X> (fed->getInput (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -581,7 +577,7 @@ operation vs the member getValue calls
 template <class X>
 X getValue (ValueFederate &fed, const std::string &Key)
 {
-    return fed.getValue<X> (fed.getInputId (Key));
+    return fed.getValue<X> (fed.getInput (Key));
 }
 
 /** get a value directly from the subscription key name
@@ -595,6 +591,6 @@ operation vs the member getValue calls
 template <class X>
 void getValue (ValueFederate &fed, const std::string &Key, X &obj)
 {
-    obj = fed.getValue<X> (fed.getInputId (Key));
+    obj = fed.getValue<X> (fed.getInput (Key));
 }
 }  // namespace helics
