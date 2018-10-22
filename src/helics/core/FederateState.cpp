@@ -170,15 +170,14 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     {
         return true;
     }
-    bool expected = false;
-    while (!processing.compare_exchange_weak (expected, true))
+    while (!processing.test_and_set ())
     {
-        ;
+        ; //spin
     }
     // this function could be called externally in a multi-threaded context
     auto pub = interfaceInformation.getPublication (pub_id);
     auto res = pub->CheckSetValue (data, len);
-    processing = false;
+    processing.clear(std::memory_order_release);
     return res;
 }
 
@@ -272,15 +271,14 @@ void FederateState::addAction (ActionMessage &&action)
 
 iteration_result FederateState::waitSetup ()
 {
-    bool expected = false;
-    if (processing.compare_exchange_strong (expected, true))
+    if (!processing.test_and_set())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing = false;
+        processing.clear(std::memory_order_release);
         return static_cast<iteration_result> (ret);
     }
 
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -289,7 +287,7 @@ iteration_result FederateState::waitSetup ()
     {
     case HELICS_CREATED:
     {  // we are still in the created state
-        processing = false;
+        processing.clear(std::memory_order_release);
         return waitSetup ();
     }
     case HELICS_ERROR:
@@ -303,17 +301,16 @@ iteration_result FederateState::waitSetup ()
         break;
     }
 
-    processing = false;
+    processing.clear(std::memory_order_release);
     return ret;
 }
 
 iteration_result FederateState::enterInitializingMode ()
 {
-    bool expected = false;
-    if (processing.compare_exchange_strong (expected, true))
+    if (!processing.test_and_set())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing = false;
+        processing.clear(std::memory_order_release);
         if (ret == message_processing_result::next_step)
         {
             time_granted = initialTime;
@@ -322,7 +319,7 @@ iteration_result FederateState::enterInitializingMode ()
         return static_cast<iteration_result> (ret);
     }
 
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -337,21 +334,20 @@ iteration_result FederateState::enterInitializingMode ()
         break;
     case HELICS_CREATED:
     {
-        processing = false;
+        processing.clear(std::memory_order_release);
         return enterInitializingMode ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
     }
-    processing = false;
+    processing.clear(std::memory_order_release);
     return ret;
 }
 
 iteration_result FederateState::enterExecutingMode (iteration_request iterate)
 {
-    bool expected = false;
-    if (processing.compare_exchange_strong (expected, true))
+    if (!processing.test_and_set())
     {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec (CMD_EXEC_REQUEST);
@@ -397,7 +393,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             break;
         }
 
-        processing = false;
+        processing.clear(std::memory_order_release);
         if ((realtime) && (ret == message_processing_result::next_step))
         {
             if (!mTimer)
@@ -411,7 +407,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
     // done but it isn't really an error so we need to deal with it.
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -433,14 +429,13 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         ret = iteration_result::next_step;
         break;
     }
-    processing = false;
+    processing.clear(std::memory_order_release);
     return ret;
 }
 
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
-    bool expected = false;
-    if (processing.compare_exchange_strong (expected, true))
+    if (!processing.test_and_set())
     {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime ();
         events.clear ();  // clear the event queue
@@ -549,7 +544,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
             }
         }
 
-        processing = false;
+        processing.clear(std::memory_order_release);
         if ((retTime.grantedTime > nextTime)
             &&(nextTime>lastTime))
 		{
@@ -564,7 +559,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -578,7 +573,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         ret = iteration_result::error;
     }
     iteration_time retTime = {time_granted, ret};
-    processing = false;
+    processing.clear(std::memory_order_release);
     return retTime;
 }
 
@@ -623,21 +618,20 @@ void FederateState::fillEventVectorNextIteration (Time currentTime)
 
 iteration_result FederateState::genericUnspecifiedQueueProcess ()
 {
-    bool expected = false;
-    if (processing.compare_exchange_strong (expected, true))
+    if (!processing.test_and_set())
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-        processing = false;
+        processing.clear(std::memory_order_release);
         return static_cast<iteration_result> (ret);
     }
 
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
         std::this_thread::sleep_for (50ms);
     }
-    processing = false;
+    processing.clear(std::memory_order_release);
     return iteration_result::next_step;
 }
 
@@ -645,11 +639,7 @@ const std::vector<interface_handle> emptyHandles;
 
 const std::vector<interface_handle> &FederateState::getEvents () const
 {
-    if (!processing)
-    {  //!< if we are processing this vector is in an undefined state
-        return events;
-    }
-    return emptyHandles;
+    return events;
 }
 
 message_processing_result FederateState::processDelayQueue ()
@@ -1097,32 +1087,31 @@ void FederateState::setProperties (const ActionMessage &cmd)
 {
     if (state == HELICS_CREATED)
     {
-        bool expected = false;
         switch (cmd.action ())
         {
         case CMD_FED_CONFIGURE_FLAG:
-            while (!processing.compare_exchange_weak (expected, true))
+            while (processing.test_and_set())
             {
-                ;
+                ; //spin
             }
             setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
-            processing = false;
+            processing.clear(std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_TIME:
-            while (!processing.compare_exchange_weak (expected, true))
+            while (processing.test_and_set())
             {
-                ;
+                ; //spin
             }
             setTimeProperty (cmd.messageID, cmd.actionTime);
-            processing = false;
+            processing.clear(std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_INT:
-            while (!processing.compare_exchange_weak (expected, true))
+            while (processing.test_and_set())
             {
-                ;
+                ; //spin
             }
             setIntegerProperty (cmd.messageID, cmd.counter);
-            processing = false;
+            processing.clear(std::memory_order_release);
             break;
         default:
             break;
@@ -1328,13 +1317,12 @@ Time FederateState::nextMessageTime () const
 
 void FederateState::setCoreObject (CommonCore *parent)
 {
-    bool expected = false;
-    while (!processing.compare_exchange_weak (expected, true))
+    while (processing.test_and_set())
     {
-        ;
+        ; //spin
     }
     parent_ = parent;
-    processing = false;
+    processing.clear(std::memory_order_release);
 }
 
 void FederateState::logMessage (int level, const std::string &logMessageSource, const std::string &message) const
