@@ -165,6 +165,7 @@ if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     brew install python3
     echo "brew upgrade python"
     brew upgrade python
+    pip install pytest
     pip3 install pytest
 else
     if hash pyenv; then
