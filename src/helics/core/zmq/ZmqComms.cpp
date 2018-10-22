@@ -16,12 +16,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const int DEFAULT_BROKER_PORT_NUMBER = 23404;
 
+using namespace std::chrono;
 /** bind a zmq socket, with a timeout and timeout period*/
 static bool
-bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, int timeout, int period = 200)
+bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, milliseconds timeout, milliseconds period = milliseconds(200))
 {
     bool bindsuccess = false;
-    int tcount = 0;
+    milliseconds tcount{ 0 };
     while (!bindsuccess)
     {
         try
@@ -31,7 +32,7 @@ bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, int 
         }
         catch (const zmq::error_t &)
         {
-            if (tcount == 0)
+            if (tcount == milliseconds(0))
             {
                 std::cerr << "zmq binding error on socket sleeping then will try again \n";
             }
@@ -39,7 +40,7 @@ bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, int 
             {
                 break;
             }
-            std::this_thread::sleep_for (std::chrono::milliseconds (period));
+            std::this_thread::sleep_for (period);
             tcount += period;
         }
     }

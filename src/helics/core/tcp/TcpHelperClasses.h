@@ -189,7 +189,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** connect the acceptor to the socket*/
     bool connect ();
     /** connect the acceptor to the socket if disconnected and try up to timeout*/
-    bool connect (int timeout);
+    bool connect (std::chrono::milliseconds timeOut);
     /** start the acceptor*/
     bool start (TcpConnection::pointer conn);
     /** cancel pending operations*/
@@ -266,7 +266,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     /** check if the server is ready to start*/
     bool isReady () const { return !(halted.load ()); }
     /** reConnect the server with the same address*/
-    bool reConnect (int timeout);
+    bool reConnect (std::chrono::milliseconds timeOut);
     /** set the data callback*/
     void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc)
     {

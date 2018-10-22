@@ -371,7 +371,7 @@ bool TcpAcceptor::connect ()
     return (state == accepting_state_t::connected);
 }
 
-bool TcpAcceptor::connect (int timeout)
+bool TcpAcceptor::connect (std::chrono::milliseconds timeOut)
 {
     if (state == accepting_state_t::halted)
     {
@@ -381,20 +381,20 @@ bool TcpAcceptor::connect (int timeout)
     if (state.compare_exchange_strong (exp, accepting_state_t::connecting))
     {
         bool bindsuccess = false;
-        int tcount = 0;
+        std::chrono::milliseconds tcount{ 0 };
         while (!bindsuccess)
         {
             boost::system::error_code ec;
             acceptor_.bind (endpoint_, ec);
             if (ec)
             {
-                if (tcount > timeout)
+                if (tcount > timeOut)
                 {
                     state = accepting_state_t::opened;
                     break;
                 }
                 std::this_thread::sleep_for (std::chrono::milliseconds (200));
-                tcount += 200;
+                tcount += std::chrono::milliseconds(200);
             }
             else
             {
@@ -632,7 +632,7 @@ void TcpServer::initialConnect ()
     }
 }
 
-bool TcpServer::reConnect (int timeout)
+bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
 {
     halted = false;
     bool partialConnect = false;
@@ -640,7 +640,7 @@ bool TcpServer::reConnect (int timeout)
     {
         if (!acc->isConnected ())
         {
-            if (!acc->connect (timeout))
+            if (!acc->connect (timeOut))
             {
                 if (partialConnect)
                 {

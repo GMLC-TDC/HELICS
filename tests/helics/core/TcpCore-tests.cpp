@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
-    comm.setTimeout (400);
+    comm.setTimeout (400ms);
     bool connected=comm.connect();
     BOOST_CHECK(!connected);
     BOOST_CHECK_EQUAL (counter, 1);

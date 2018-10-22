@@ -67,7 +67,7 @@ void UdpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer ();
     udp::socket socket (ioserv->getBaseService ());
     socket.open (udpnet (interfaceNetwork));
-    int t_cnt = 0;
+    std::chrono::milliseconds t_cnt{ 0 };
     bool bindsuccess = false;
     while (!bindsuccess)
     {
@@ -112,13 +112,13 @@ void UdpComms::queue_rx_function ()
                     return;
                 }
             }
-            if (t_cnt == 0)
+            if (t_cnt == std::chrono::milliseconds(0))
             {
                 logWarning (fmt::format ("bind error on UDP socket {} :{}",
                                          makePortAddress (localTarget_, PortNumber), error.what ()));
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (200));
-            t_cnt += 200;
+            t_cnt += std::chrono::milliseconds(200);
             if (t_cnt > connectionTimeout)
             {
                 disconnecting = true;

@@ -274,7 +274,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                                                      }
                                                  }
                                              });
-            int cumsleep = 0;
+            std::chrono::milliseconds cumsleep{ 0 };
             while (PortNumber < 0)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -293,7 +293,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                         }
                     }
                 }
-                cumsleep += 100;
+                cumsleep += std::chrono::milliseconds(100);
                 if (cumsleep >= connectionTimeout)
                 {
                     logError ("port number query to broker timed out");

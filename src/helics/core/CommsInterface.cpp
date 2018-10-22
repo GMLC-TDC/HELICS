@@ -436,11 +436,11 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
     }
 }
 
-void CommsInterface::setTimeout(int timeout) 
+void CommsInterface::setTimeout(std::chrono::milliseconds timeOut) 
 { 
 	if (propertyLock())
 	{
-		connectionTimeout = timeout;
+		connectionTimeout = timeOut;
 		propertyUnLock();
 	}
 }

@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
-    comm.setTimeout (1000);
+    comm.setTimeout (1000ms);
     comm.setServerMode (false);
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 

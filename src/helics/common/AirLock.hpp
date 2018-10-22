@@ -33,7 +33,7 @@ class AirLock
     template <class Z>
     bool try_load (Z &&val)
     { //all modifications to loaded should be insde the mutex otherwise this will contain race conditions
-        if (!loaded.load(std::memory_order.acquire)
+        if (!loaded.load(std::memory_order_acquire))
         {
             std::lock_guard<std::mutex> lock (door);
             //We can use relaxed here since we are behind the mutex
