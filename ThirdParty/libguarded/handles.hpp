@@ -33,7 +33,10 @@ public:
     void unlock()
     {
         data = nullptr;
-        m_handle_lock.unlock();
+        if (m_handle_lock.owns_lock())
+		{
+			m_handle_lock.unlock()
+		};
     }
     T* operator-> () const noexcept
     {  // return pointer to class object
@@ -180,7 +183,10 @@ public:
     void unlock()
     {
         data = nullptr;
-        m_handle_lock.unlock();
+        if (m_handle_lock.owns_lock())
+        {
+            m_handle_lock.unlock ();
+		}
     }
     const T* operator-> () const noexcept
     {  // return pointer to class object

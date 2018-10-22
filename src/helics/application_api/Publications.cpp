@@ -9,21 +9,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-PublicationBase::PublicationBase(ValueFederate *valueFed,
-    const std::string &key,
-    const std::string &type,
-    const std::string &units)
-    : fed(valueFed), key_(key), type_(type), units_(units)
+PublicationBase::PublicationBase (ValueFederate *valueFed,
+                                  interface_handle id,
+                                  const std::string &key,
+                                  const std::string &type,
+                                  const std::string &units)
+    : fed(valueFed), handle(id), key_(key), type_(type), units_(units)
 {
-    try
-    {
-        id = fed->registerPublication(key_, type_, units_);
-    }
-    catch (const RegistrationFailure &)
-    {
-        id = fed->getPublicationId(key_);
-        loadFromId();
-    }
+    pubType = getTypeFromString (type_);
 }
 
 PublicationBase::PublicationBase(interface_visibility locality,

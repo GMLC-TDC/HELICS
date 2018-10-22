@@ -17,6 +17,7 @@ namespace helics
 {
 /** forward declaration of Core*/
 class Core;
+class ValueFederate;
 
 /** structure used to contain information about a publication*/
 struct publication_info
@@ -34,15 +35,18 @@ struct publication_info
 /** structure used to contain information about a subscription*/
 struct input_info
 {
+    data_view lastData;  //!< the last published data from a target
+    Time lastUpdate = Time (0.0);  //!< the time the subscription was last updated
+    Time lastQuery = Time (0.0);  //!< the time the query was made
     std::string name;  //!< subscription name
     std::string type;  //!< subscription type
     std::string units;  //!< subscription units
     std::string pubtype;  //!< the listed type of the corresponding publication
     interface_handle coreID;  //!< Handle from the core
     input_id_t id;  //!< the id used as the identifier
-    Time lastUpdate = Time (0.0);  //!< the time the subscription was last updated
-    Time lastQuery = Time (0.0);  //!< the time the query was made
-    int callbackIndex = -1;  //!< index for the callback
+    
+    
+    std::function<void(Input &, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
     input_info (const std::string &n_name, const std::string &n_type, const std::string &n_units)
         : name (n_name), type (n_type), units (n_units){};
@@ -52,15 +56,15 @@ struct input_info
 class ValueFederateManager
 {
   public:
-    ValueFederateManager (Core *coreOb, federate_id_t id);
+    ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id);
     ~ValueFederateManager ();
 
-    publication_id_t
+      Publication &
     registerPublication (const std::string &key, const std::string &type, const std::string &units);
     /** register a subscription
     @details call is only valid in startup mode
     */
-    input_id_t
+    Input &
     registerInput (const std::string &key, const std::string &type, const std::string &units);
 
 
@@ -70,38 +74,38 @@ class ValueFederateManager
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (input_id_t subid, const std::string &shortcutName);
+    void addShortcut (Input &inp, const std::string &shortcutName);
     /** add a destination target to a publication
    @param id the identifier of the input
    target the name of the input to send the data to
    */
-    void addTarget (publication_id_t id, const std::string &target);
+    void addTarget (Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param id the identifier of the publication
     target the name of the input to send the data to
     */
-    void addTarget (input_id_t id, const std::string &target);
+    void addTarget (Input &inp, const std::string &target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param[in] id the subscription identifier
     @param[in] block the data block representing the default value
     */
-    void setDefaultValue (input_id_t id, const data_view &block);
+    void setDefaultValue (Input &inp, const data_view &block);
 
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
     @return a constant data block
     */
-    data_view getValue (input_id_t id);
+    data_view getValue (Input &inp);
 
     /** publish a value*/
-    void publish (publication_id_t id, const data_view &block);
+    void publish (Publication &pub, const data_view &block);
 
     /** check if a given subscription has and update*/
-    bool hasUpdate (input_id_t sub_id) const;
+    bool hasUpdate (const Input &inp) const;
     /** get the time of the last update*/
-    Time getLastUpdateTime (input_id_t sub_id) const;
+    Time getLastUpdateTime (const Input &inp) const;
 
     /** update the time from oldTime to newTime
     @param[in] newTime the newTime of the federate
@@ -120,81 +124,78 @@ class ValueFederateManager
     std::vector<input_id_t> queryUpdates ();
 
     /** get the target of a input*/
-    std::string getTarget(input_id_t id) const;
+    const std::string &getTarget (const Input &inp) const;
 
     /** get the key of a subscription from its id
     @return empty string if an invalid id is passed*/
-    const std::string &getInputKey (input_id_t id) const;
+    const std::string &getInputKey (const Input &inp) const;
     /** get the id of an input
 	@param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
-    input_id_t getInputId (const std::string &name) const;
-
+    Input &getInput (const std::string &name);
+    const Input &getInput (const std::string &name) const;
 	 /** get the id of a subscription
 	 @param key the target of a subscription
    @return ivalid_input_id if name is not a recognized*/
-    input_id_t getSubscriptionId (const std::string &key) const;
+    const Input & getSubscription (const std::string &key) const;
+    Input &getSubscription (const std::string &key);
 
     /** get the key of a publication from its id
     @return empty string if an invalid id is passed*/
-    const std::string &getPublicationKey (publication_id_t id) const;
+    const std::string &getPublicationKey (const Publication &pub) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    publication_id_t getPublicationId (const std::string &key) const;
+    Publication &getPublication (const std::string &key);
+    const Publication &getPublication (const std::string &key) const;
 
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
     @return the name or empty string on unrecognized id*/
-    const std::string &getInputUnits (input_id_t id) const;
+    const std::string &getInputUnits (const Input &inp) const;
 
     /** get the units of a publication from its id
     @param[in] id the publication id to query
     @return the units or empty string on unrecognized id*/
-    const std::string &getPublicationUnits (publication_id_t id) const;
+    const std::string &getPublicationUnits (const Publication &pub) const;
 
-    /** get the type of a subscription from its id
-    @param[in] id the subscription id to query
+    /** get the declared type of a n input
+    @param[in] inp the input to query
     @return the type or empty string on unrecognized id*/
-    const std::string &getInputType (input_id_t id) const;
+    const std::string &getInputType (const Input &inp) const;
 
     /** get the type of a publication from its id
     @param[in] id the publication id to query
     @return the type or empty string on unrecognized id*/
-    const std::string &getPublicationType (publication_id_t id) const;
+    const std::string &getPublicationType (const Publication &pub) const;
 
     /** get the type of a publication from its subscription
     @param[in] id the subscription id to query
     @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (input_id_t id) const;
+    std::string getPublicationType (const Input &inp) const;
 
     /** set a publication option */
-    void setPublicationOption(publication_id_t id, int32_t option, bool option_value);
+    void setPublicationOption (Publication &pub, int32_t option, bool option_value);
 
     /** get a handle option*/
-    void setInputOption(input_id_t id, int32_t option, bool option_value);
+    void setInputOption(Input &inp, int32_t option, bool option_value);
     /** get an option values for an input*/
-    bool getInputOption(input_id_t id, int32_t option) const;
+    bool getInputOption (const Input &inp, int32_t option) const;
     /** get an option values for a publication*/
-    bool getPublicationOption(publication_id_t id, int32_t option) const;
+    bool getPublicationOption (const Publication &pub, int32_t option) const;
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call
     */
-    void registerCallback (std::function<void(input_id_t, Time)> callback);
+    void registerCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (input_id_t id, std::function<void(input_id_t, Time)> callback);
-    /** register a callback function to call when the specified subscription is updated
-    @param[in] ids  the set of ids to register the callback for
-    @param[in] callback the function to call
-    */
-    void registerCallback (const std::vector<input_id_t> &ids,
-                           std::function<void(input_id_t, Time)> callback);
+    void registerCallback (Input &inp, std::function<void(Input &, Time)> callback);
+
     /** disconnect from the coreObject*/
     void disconnect ();
 
@@ -204,19 +205,21 @@ class ValueFederateManager
     int getInputCount () const;
 
   private:
-    shared_guarded_m<DualMappedVector<input_info, std::string, interface_handle>> inputs;
-    shared_guarded_m<DualMappedVector<publication_info,std::string, interface_handle>> publications;
-
-    std::atomic<publication_id_t::underlyingType> publicationCount{0};  //!< the count of actual endpoints
-    std::vector<std::function<void(input_id_t, Time)>> callbacks;  //!< the all callback function
-    std::vector<data_view> lastData;  //!< the last data to arrive
+    shared_guarded_m<
+      DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
+      inputs;
+    shared_guarded_m<
+      DualMappedVector<Publication, std::string, interface_handle,  reference_stability::stable>>
+      publications;
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
+    ValueFederate *fed; //!< pointer back to the value Federate for creation of the Publication/Inputs
     federate_id_t fedID;  //!< the federation ID from the core API
-    std::atomic<input_id_t::underlyingType> inputCount{0};  //!< the count of actual endpoints
-    int allCallbackIndex = -1;  //!< index of the allCallback function
-    std::multimap<std::string, input_id_t> targetIDs; //!<container for the target identifications
-    std::multimap<input_id_t, std::string> inputTargets; //!< container for the specified input targets
+    atomic_guarded<std::function<void(Input &, Time)>> allCallback; //!< the global callback function
+    shared_guarded<std::vector<std::unique_ptr<input_info>>>
+      inputData;  //!< the storage for the message queues and other unique Endpoint information
+    std::multimap<std::string, interface_handle> targetIDs; //!<container for the target identifications
+    std::multimap<interface_handle, std::string> inputTargets; //!< container for the specified input targets
   private:
     void getUpdateFromCore (interface_handle handle);
 };

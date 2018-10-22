@@ -9,14 +9,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "Federate.hpp"
 #include "ValueConverter.hpp"
 #include "data_view.hpp"
-#include "Publications.hpp"
-#include "Inputs.hpp"
 #include <functional>
 
 namespace helics
 {
-/** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
-class ValueFederateManager;
+class Publication;
+class Input;
+  /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
+  class ValueFederateManager;
 /** class defining the value based interface */
 class ValueFederate : public virtual Federate  // using virtual inheritance to allow combination federate
 {
@@ -66,8 +66,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a publication id object for use as an identifier
     */
     Publication &registerPublication (const std::string &key,
-                                          const std::string &type,
-                                          const std::string &units = std::string ());
+                                      const std::string &type,
+                                      const std::string &units = std::string ());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param[in] key the name of the publication
@@ -88,8 +88,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a publication id object for use as an identifier
     */
     Publication &registerGlobalPublication (const std::string &key,
-                                                const std::string &type,
-                                                const std::string &units = std::string ());
+                                            const std::string &type,
+                                            const std::string &units = std::string ());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param[in] key the name of the publication
@@ -127,9 +127,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <typename X>
     Publication &registerPublicationIndexed (const std::string &key,
-                                                 int index1,
-                                                 int index2,
-                                                 const std::string &units = std::string ())
+                                             int index1,
+                                             int index2,
+                                             const std::string &units = std::string ())
     {
         return registerGlobalPublication<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2),
                                              units);
@@ -152,12 +152,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return a input id object for use as an identifier
     */
     Input &registerGlobalInput (const std::string &key,
-                                    const std::string &type,
-                                    const std::string &units = std::string ());
+                                const std::string &type,
+                                const std::string &units = std::string ());
     /** register a named input
      */
     template <typename X>
-    Input & registerInput (const std::string &key, const std::string &units = std::string ())
+    Input &registerInput (const std::string &key, const std::string &units = std::string ())
     {
         return registerInput (key, ValueConverter<X>::type (), units);
     }
@@ -192,9 +192,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
   */
     template <typename X>
     Input &registerInputIndexed (const std::string &key,
-                                     int index1,
-                                     int index2,
-                                     const std::string &units = std::string ())
+                                 int index1,
+                                 int index2,
+                                 const std::string &units = std::string ())
     {
         return registerGlobalInput<X> (key + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
     }
@@ -226,9 +226,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     Input &registerSubscriptionIndexed (const std::string &target,
-                                            int index1,
-                                            int index2,
-                                            const std::string &units = std::string ())
+                                        int index1,
+                                        int index2,
+                                        const std::string &units = std::string ())
     {
         return registerSubscription (target + '_' + std::to_string (index1) + '_' + std::to_string (index2),
                                      units);
@@ -377,8 +377,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
    @param[in] units the optional units on the subscription
    */
     template <class iType>
-    void
-    addTargetIndexed (const iType &id, const std::string &target, int index1, const std::string &units = std::string ())
+    void addTargetIndexed (const iType &id,
+                           const std::string &target,
+                           int index1,
+                           const std::string &units = std::string ())
     {
         return addTarget (id, target + '_' + std::to_string (index1), units);
     }
@@ -412,7 +414,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
-    virtual std::string localQuery(const std::string &queryStr) const override;
+    virtual std::string localQuery (const std::string &queryStr) const override;
+
   public:
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
@@ -424,7 +427,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput(const std::string &name) const;
+    Input &getInput (const std::string &name) const;
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
     Input &getInput (const std::string &name, int index1) const;

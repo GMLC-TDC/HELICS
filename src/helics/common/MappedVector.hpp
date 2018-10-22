@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 #include "MapTraits.hpp"
 #include "helics_includes/optional.hpp"
@@ -18,7 +17,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
 expensive operation
 */
-template <class VType, class searchType = std::string>
+template <class VType,
+          class searchType = std::string,
+          reference_stability STABILITY = reference_stability::unstable>
 class MappedVector
 {
   public:
@@ -170,7 +171,8 @@ class MappedVector
     }
 
   private:
-    std::deque<VType> dataStorage;
+    std::conditional_t<STABILITY == reference_stability::unstable, std::vector<VType>, std::deque<VType>>
+      dataStorage;  //!< primary storage for data
     std::conditional_t<is_easily_hashable<searchType>::value,
                        std::unordered_map<searchType, size_t>,
                        std::map<searchType, size_t>>

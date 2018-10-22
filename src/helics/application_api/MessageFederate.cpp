@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/core-exceptions.hpp"
 #include "MessageFederateManager.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "Endpoints.hpp"
 
 
 namespace helics
@@ -79,12 +80,12 @@ std::string MessageFederate::localQuery(const std::string &queryStr) const
     return mfManager->localQuery(queryStr);
 }
 
-endpoint_id_t MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
+Endpoint &MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
         return mfManager->registerEndpoint ((!eptName.empty())?(getName () + separator_ + eptName):eptName, type);
 }
 
-endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
+Endpoint &MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
 {
     return mfManager->registerEndpoint (eptName, type);
 }
@@ -235,13 +236,13 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
    
 }
 
-void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &key)
+void MessageFederate::subscribe (Endpoint &ept, const std::string &key)
 {
-        mfManager->subscribe (endpoint, key);
+        mfManager->subscribe (ept, key);
         return;
 }
 
-void MessageFederate::registerKnownCommunicationPath (endpoint_id_t localEndpoint,
+void MessageFederate::registerKnownCommunicationPath (const Endpoint &localEndpoint,
                                                       const std::string &remoteEndpoint)
 {
         mfManager->registerKnownCommunicationPath (localEndpoint, remoteEndpoint);
@@ -257,11 +258,11 @@ bool MessageFederate::hasMessage () const
     return false;
 }
 
-bool MessageFederate::hasMessage (endpoint_id_t id) const
+bool MessageFederate::hasMessage (const Endpoint &ept) const
 {
     if (state >= op_states::initialization)
     {
-        return mfManager->hasMessage (id);
+        return mfManager->hasMessage (ept);
     }
     return false;
 }
@@ -269,11 +270,11 @@ bool MessageFederate::hasMessage (endpoint_id_t id) const
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-uint64_t MessageFederate::pendingMessages (endpoint_id_t id) const
+uint64_t MessageFederate::pendingMessages (const Endpoint &ept) const
 {
     if (state >= op_states::initialization)
     {
-        return mfManager->pendingMessages (id);
+        return mfManager->pendingMessages (ept);
     }
     return 0;
 }
@@ -300,21 +301,21 @@ std::unique_ptr<Message> MessageFederate::getMessage ()
     return nullptr;
 }
 
-std::unique_ptr<Message> MessageFederate::getMessage (endpoint_id_t endpoint)
+std::unique_ptr<Message> MessageFederate::getMessage (Endpoint &ept)
 {
     if (state >= op_states::initialization)
     {
-        return mfManager->getMessage (endpoint);
+        return mfManager->getMessage (ept);
     }
     return nullptr;
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, const std::string &dest, const data_view &data)
+void MessageFederate::sendMessage (const Endpoint &source, const std::string &dest, const data_view &data)
 {
         mfManager->sendMessage (source, dest, data);
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source,
+void MessageFederate::sendMessage (const Endpoint &source,
                                    const std::string &dest,
                                    const data_view &data,
                                    Time sendTime)
@@ -322,63 +323,61 @@ void MessageFederate::sendMessage (endpoint_id_t source,
         mfManager->sendMessage (source, dest, data, sendTime);
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, std::unique_ptr<Message> message)
+void MessageFederate::sendMessage (const Endpoint &source, std::unique_ptr<Message> message)
 {
         mfManager->sendMessage (source, std::move (message));
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, const Message &message)
+void MessageFederate::sendMessage (const Endpoint &source, const Message &message)
 {
     
     mfManager->sendMessage (source, std::make_unique<Message> (message));
 }
 
-endpoint_id_t MessageFederate::getEndpointId (const std::string &eptName) const
+Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 {
-    auto id = mfManager->getEndpointId (eptName);
+    auto id = mfManager->getEndpoint (eptName);
     if (!id.isValid())
     {
-        id = mfManager->getEndpointId (getName () + separator_ + eptName);
+        id = mfManager->getEndpoint (getName () + separator_ + eptName);
     }
     return id;
 }
 
-const std::string &MessageFederate::getEndpointName (endpoint_id_t id) const { return mfManager->getEndpointName (id); }
+Endpoint &MessageFederate::getEndpoint(int index) const
+{ return mfManager->getEndpoint (index); }
 
-const std::string &MessageFederate::getEndpointType (endpoint_id_t ep) { return mfManager->getEndpointType (ep); }
+const std::string &MessageFederate::getEndpointName (const Endpoint &ept) const { return ept.getName (); }
 
-void MessageFederate::registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &func)
+const std::string &MessageFederate::getEndpointType (const Endpoint &ept) const { return mfManager->getEndpointType (ept); }
+
+void MessageFederate::registerEndpointCallback (const std::function<void(Endpoint &ept, Time)> &func)
 {
     mfManager->registerCallback (func);
 }
-void MessageFederate::registerEndpointCallback (endpoint_id_t ep,
-                                                const std::function<void(endpoint_id_t, Time)> &func)
+void MessageFederate::registerEndpointCallback (Endpoint &ept,
+                                                const std::function<void(Endpoint &ept, Time)> &func)
 {
-    mfManager->registerCallback (ep, func);
-}
-void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
-                                                const std::function<void(endpoint_id_t, Time)> &func)
-{
-    mfManager->registerCallback (ep, func);
+    mfManager->registerCallback (ept, func);
 }
 
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
 
 
-void MessageFederate::setEndpointOption(endpoint_id_t id, int32_t option, bool option_value)
+void MessageFederate::setEndpointOption(Endpoint &ept, int32_t option, bool option_value)
 {
-	mfManager->setEndpointOption(id, option, option_value);
+	mfManager->setEndpointOption(ept, option, option_value);
 }
 
-void MessageFederate::addSourceFilter(endpoint_id_t id, const std::string &filterName)
+void MessageFederate::addSourceFilter(Endpoint &ept, const std::string &filterName)
 {
-    mfManager->addSourceFilter (id, filterName);
+    mfManager->addSourceFilter (ept, filterName);
 }
 
-void MessageFederate::addDestinationFilter(endpoint_id_t id, const std::string &filterName)
+void MessageFederate::addDestinationFilter(Endpoint &ept, const std::string &filterName)
 {
-    mfManager->addDestinationFilter (id, filterName);
+    mfManager->addDestinationFilter (ept, filterName);
 }
 
 }  // namespace helics

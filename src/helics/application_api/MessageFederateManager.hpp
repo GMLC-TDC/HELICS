@@ -22,7 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 class Core;
-
+class MessageFederate;
 /** class handling the implementation details of a value Federate
 @details the functions will parallel those in message Federate and contain the actual implementation details
 */
@@ -31,7 +31,7 @@ class MessageFederateManager
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    MessageFederateManager (Core *coreOb, federate_id_t id);
+    MessageFederateManager (Core *coreOb, MessageFederate *mFed, federate_id_t id);
     ~MessageFederateManager ();
     /** register an endpoint
     @details call is only valid in startup mode
@@ -45,7 +45,7 @@ class MessageFederateManager
     @param[in] localEndpoint the local endpoint of a known communication pair
     @param[in] remoteEndpoint of a communication pair
     */
-    void registerKnownCommunicationPath (Endpoint &localEndpoint, const std::string &remoteEndpoint);
+    void registerKnownCommunicationPath (const Endpoint &localEndpoint, const std::string &remoteEndpoint);
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
     @param[in] endpoint the specified endpoint to deliver the values
     @param[in] name the name of the publication to subscribe
@@ -55,7 +55,7 @@ class MessageFederateManager
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/
-    bool hasMessage (Endpoint &ept) const;
+    bool hasMessage (const Endpoint &ept) const;
 
     /**
      * Returns the number of pending receives for the specified destination endpoint.
@@ -73,11 +73,11 @@ class MessageFederateManager
     std::unique_ptr<Message> getMessage ();
 
     /**/
-    void sendMessage (Endpoint &source, const std::string &dest, data_view message);
+    void sendMessage (const Endpoint &source, const std::string &dest, data_view message);
 
-    void sendMessage (Endpoint &source, const std::string &dest, data_view message, Time sendTime);
+    void sendMessage (const Endpoint &source, const std::string &dest, data_view message, Time sendTime);
 
-    void sendMessage (Endpoint &source, std::unique_ptr<Message> message);
+    void sendMessage (const Endpoint &source, std::unique_ptr<Message> message);
 
     /** update the time from oldTime to newTime
     @param[in] newTime the newTime of the federate
@@ -98,7 +98,8 @@ class MessageFederateManager
     /** get the id of a registered publication from its id
     @param[in] name the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    endpoint_id_t getEndpointId (const std::string &name) const;
+    Endpoint &getEndpoint (const std::string &name);
+    const Endpoint &getEndpoint (const std::string &name) const;
     /** get the type of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed or no type was specified*/
@@ -127,17 +128,21 @@ class MessageFederateManager
     void addDestinationFilter (Endpoint &ept, const std::string &filterName);
 
   private:
-    shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle>>
+	  class EndpointData
+	  {
+        public:
+          SimpleQueue<std::unique_ptr<Message>> messages;
+          std::function<void(Endpoint &, Time)> callback;
+	  };
+    shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle,reference_stability::stable>>
       local_endpoints;  //!< storage for the local endpoint information
-    std::vector<std::function<void(Endpoint &, Time)>> callbacks;  //!< vector of callbacks
+      atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
-    std::atomic<int> endpointCount{0};  //!< the count of actual endpoints
+    MessageFederate *mFed; //!< pointer back to the message Federate
     const federate_id_t fedID;  //!< storage for the federate ID
-    mutable std::mutex endpointLock;  //!< lock for protecting the endpoint list
-    std::vector<SimpleQueue<std::unique_ptr<Message>>> messageQueues;  //!< the storage for the message queues
+    shared_guarded<std::vector<std::unique_ptr<EndpointData>>> eptData;  //!< the storage for the message queues and other unique Endpoint information
     guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
-    int allCallbackIndex = -1;  //!< index of the all callback function
   private:  // private functions
     void removeOrderedMessage (unsigned int index);
 };
