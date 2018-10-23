@@ -44,6 +44,11 @@ void TcpConnection::startReceive ()
                                    [this](const boost::system::error_code &error, size_t bytes_transferred) {
                                        handle_read (error, bytes_transferred);
                                    });
+            if (triggerhalt)
+            {
+                //cancel previous operation if triggerhalt is now active
+                socket_.cancel();
+            }
         }
         else
         {
