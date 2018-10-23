@@ -213,7 +213,7 @@ void TcpConnection::close ()
 
 void TcpConnection::closeNoWait ()
 {
-    triggerhalt = true;
+    triggerhalt.store(true);
     state = connection_state_t::closed;
     boost::system::error_code ec;
     if (socket_.is_open ())
