@@ -55,12 +55,12 @@ add_test(
   NAME core-ci-tests
   COMMAND
     core-tests
-    --run_test=@ci
+    --run_test=@cic
     --log_level=test_suite
     --report_level=short
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
-
+set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
   add_custom_command(
     TARGET

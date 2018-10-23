@@ -89,7 +89,7 @@ else
                 TEST_CONFIG="Daily"
                 ;;
             *)
-                TEST_CONFIG="Continuous"
+                TEST_CONFIG="DebugTest"
 		CTEST_OPTIONS+=" --timeout 220"
                 ;;
         esac

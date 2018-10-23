@@ -238,8 +238,13 @@ void TcpConnection::closeNoWait ()
 /** wait on the closing actions*/
 void TcpConnection::waitOnClose ()
 {
+   
     if (triggerhalt.load())
     {
+        if (connecting)
+        {
+            connected.waitActivation();
+        }
         receivingHalt.wait ();
     }
     else
@@ -467,7 +472,7 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
                                  TcpConnection::pointer new_connection,
                                  const boost::system::error_code &error)
 {
-    if (state != accepting_state_t::connected)
+    if (state.load() != accepting_state_t::connected)
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
         boost::system::error_code ec;
