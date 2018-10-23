@@ -123,6 +123,7 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         autoPortNumber = false;
     }
+    useOsPortAllocation = netInfo.use_os_port;
     propertyUnLock ();
 }
 /** destructor*/

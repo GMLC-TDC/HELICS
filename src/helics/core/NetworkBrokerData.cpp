@@ -12,6 +12,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+#include <iostream>
+
 using namespace std::string_literals;
 
 namespace helics
@@ -29,12 +31,14 @@ static const ArgDescriptors extraArgs{
   { "ipv6", ArgDescriptor::arg_type_t::flag_type,"use external ipv6 addresses" },
   { "server"s, ArgDescriptor::arg_type_t::flag_type,
   "specify that the network connection should be a server"s },
+{ "os_port"s, ArgDescriptor::arg_type_t::flag_type,
+"specify that the ports should be allocated by the host operating system"s },
   { "client"s, ArgDescriptor::arg_type_t::flag_type,
   "specify that the network connection should be a client"s },
   {"reuse_address", ArgDescriptor::arg_type_t::flag_type, "allow the server to reuse a bound address"},
   { "external", ArgDescriptor::arg_type_t::flag_type,"use all external interfaces" },
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
-  {"localport"s, ArgDescriptor::arg_type_t::int_type, "port number for the local receive port"s},
+  {"localport"s, "port number for the local receive port"s},
   {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
   {"portstart"s, ArgDescriptor::arg_type_t::int_type, "starting port for automatic port definitions"s}};
 
@@ -83,7 +87,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
             brkprt = extractInterfaceandPort (addr.substr (sc + 1));
             if (brkprt.first != brokerAddress)
             {
-                // TODO::Print a message?
+                std::cerr << "it is not recommended to specify multiple addresses from different servers" << std::endl;
             }
         }
         checkAndUpdateBrokerAddress (localAddress);
@@ -118,7 +122,7 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
                 brkprt = extractInterfaceandPort (addr.substr (sc + 1));
                 if (brkprt.first != brokerAddress)
                 {
-                    // TODO::Print a message?
+                    std::cerr << "it is not recommended to specify multiple addresses from different servers" << std::endl;
                 }
             }
             checkAndUpdateBrokerAddress (localAddress);
@@ -149,6 +153,10 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
 			maxMessageSize = msize;
 		}
 	}
+    if (vm.count("os_port") > 0)
+    {
+        use_os_port = true;
+    }
 	if (vm.count("server") > 0)
 	{
 		switch (server_mode)
@@ -199,7 +207,26 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
     }
     if (vm.count ("localport") > 0)
     {
-        portNumber = vm["localport"].as<int> ();
+        auto pstring = vm["localport"].as<std::string>();
+        if (pstring == "os")
+        {
+            use_os_port = true;
+        }
+        else if (pstring == "auto")
+        {
+            portNumber = -1;
+        }
+        else
+        {
+            try
+            {
+                portNumber = std::stoi(pstring);
+            }
+            catch (...)
+            {
+                std::cerr << "failed to convert " << pstring << " to a valid port number";
+            }
+        }
     }
     if (vm.count ("portstart") > 0)
     {

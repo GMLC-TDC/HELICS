@@ -49,6 +49,7 @@ private:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
     bool autoPortNumber = true;
+    bool useOsPortAllocation = false;
     const interface_type networkType;
 	interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};
