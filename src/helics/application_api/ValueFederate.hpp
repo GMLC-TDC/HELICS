@@ -431,6 +431,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
     Input &getInput (const std::string &name);
+    /** get the id of a subscription
+    @return ivalid_subscription_id if name is not a recognized*/
+    const Input &getInput (int index) const;
+    /** get the id of a subscription
+    @return ivalid_subscription_id if name is not a recognized*/
+    Input &getInput (int index);
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
     const Input &getInput (const std::string &name, int index1) const;
@@ -446,6 +452,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an input_id_t from the object, or invalid_id if no input was found
     */
     Input &getSubscription (const std::string &key);
+
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
     const std::string &getPublicationKey (const Publication &pub) const;
@@ -458,6 +465,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     const Publication &getPublication (const std::string &key) const;
+    /** get the id of a registered publication from its id
+   @param[in] name the name of the publication
+   @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    Publication &getPublication (int index);
+    /** get the id of a registered publication from its id
+    @param[in] name the name of the publication
+    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    const Publication &getPublication (int index) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication

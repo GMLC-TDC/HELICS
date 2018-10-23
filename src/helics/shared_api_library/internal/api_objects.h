@@ -95,20 +95,18 @@ FedObject *getFedObject (helics_federate fed, helics_error *err);
 class InputObject
 {
   public:
-    Input *inputPtr;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Input *inputPtr;
 };
 
 /** object wrapping a publication*/
 class PublicationObject
 {
   public:
-    Publication *pubPtr;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Publication *pubPtr;
 };
 /** object wrapping and endpoint*/
 class EndpointObject

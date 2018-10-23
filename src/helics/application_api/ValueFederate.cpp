@@ -391,7 +391,7 @@ Publication &ValueFederate::getPublication (const std::string &key)
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid ())
     {
-        pub = vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + separator_ + key);
     }
     return pub;
 }
@@ -401,9 +401,19 @@ const Publication & ValueFederate::getPublication (const std::string &key) const
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid())
     {
-        pub = vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + separator_ + key);
     }
     return pub;
+}
+
+Publication &ValueFederate::getPublication (int index)
+{
+    return vfManager->getPublication (index);
+}
+
+const Publication &ValueFederate::getPublication (int index) const
+{
+    return vfManager->getPublication (index);
 }
 
 const Publication & ValueFederate::getPublication (const std::string &key, int index1) const

@@ -320,6 +320,28 @@ Input &ValueFederateManager::getInput (const std::string &key)
     return invalidIptNC;
 }
 
+const Input &ValueFederateManager::getInput (int index) const
+{
+    auto inpHandle = inputs.lock_shared ();
+    if (isValidIndex (index, *inpHandle))
+    {
+        return (*inpHandle)[index];
+    }
+    return invalidIpt;
+   
+}
+
+Input &ValueFederateManager::getInput (int index)
+{
+    auto inpHandle = inputs.lock();
+    if (isValidIndex (index, *inpHandle))
+    {
+        return (*inpHandle)[index];
+    }
+    return invalidIptNC;
+}
+
+
 const Input &ValueFederateManager::getSubscription (const std::string &key) const
 {
     auto res = targetIDs.equal_range (key);
@@ -375,6 +397,26 @@ Publication &ValueFederateManager::getPublication (const std::string &key)
     if (pubF != pubHandle->end ())
     {
         return *pubF;
+    }
+    return invalidPubNC;
+}
+
+const Publication &ValueFederateManager::getPublication (int index) const
+{
+    auto pubHandle = publications.lock_shared ();
+	if (isValidIndex(index, *pubHandle))
+	{
+        return (*pubHandle)[index];
+	}
+    return invalidPub;
+}
+
+Publication &ValueFederateManager::getPublication (int index)
+{
+    auto pubHandle = publications.lock();
+    if (isValidIndex (index, *pubHandle))
+    {
+        return (*pubHandle)[index];
     }
     return invalidPubNC;
 }

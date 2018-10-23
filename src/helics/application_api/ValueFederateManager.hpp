@@ -131,11 +131,14 @@ class ValueFederateManager
     /** get the key of a subscription from its id
     @return empty string if an invalid id is passed*/
     const std::string &getInputKey (const Input &inp) const;
-    /** get the id of an input
+    /** get an Input from Its Name
 	@param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
     Input &getInput (const std::string &name);
     const Input &getInput (const std::string &name) const;
+    /** get an input by index*/
+    Input &getInput (int index);
+    const Input &getInput (int index) const;
 	 /** get the id of a subscription
 	 @param key the target of a subscription
    @return ivalid_input_id if name is not a recognized*/
@@ -146,11 +149,14 @@ class ValueFederateManager
     @return empty string if an invalid id is passed*/
     const std::string &getPublicationKey (const Publication &pub) const;
 
-    /** get the id of a registered publication from its id
-    @param[in] name the publication id
+    /** get a publication based on its key
+    @param key the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     Publication &getPublication (const std::string &key);
     const Publication &getPublication (const std::string &key) const;
+
+	Publication &getPublication (int index);
+    const Publication &getPublication (int index) const;
 
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
