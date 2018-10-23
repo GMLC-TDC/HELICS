@@ -276,10 +276,6 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                                                      {
                                                          txReceive (rx.data (), bytes, error.message ());
                                                      }
-                                                     else
-                                                     {
-
-                                                     }
                                                  }
                                              });
             std::chrono::milliseconds cumsleep{ 0 };
@@ -292,13 +288,23 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                     {
                         if (mess->second.messageID == PORT_DEFINITIONS)
                         {
-                            rxMessageQueue.push (mess->second);
+                            rxMessageQueue.push(mess->second);
                             break;
                         }
-                        else if (mess->second.messageID == DISCONNECT)
+                        
+                         else if (mess->second.messageID == DISCONNECT)
                         {
-                            return terminate (connection_status::terminated);
+                            return terminate(connection_status::terminated);
                         }
+                         else
+                         {
+                             rxMessageQueue.push(mess->second);
+                         }
+                        
+                    }
+                    else
+                    {
+                        logWarning("unexpected message received in transmit queue");
                     }
                 }
                 cumsleep += std::chrono::milliseconds(100);
