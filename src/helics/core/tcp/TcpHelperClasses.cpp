@@ -184,16 +184,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
 void TcpConnection::close ()
 {
     closeNoWait();
-  
-    if (connecting)
-    {
-        connected.waitActivation();
-    }
-
-    if (receivingHalt.isActive ())
-    {
-         receivingHalt.wait ();
-    }
+    waitOnClose();
 }
 
 void TcpConnection::closeNoWait ()
@@ -249,7 +240,10 @@ void TcpConnection::waitOnClose ()
             connected.waitActivation();
         }
         std::cout << "wait on receiving halt" << std::endl;
-        receivingHalt.wait ();
+        while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
+        {
+            std::cout << "wait timeout" << std::endl;
+        }
     }
     else
     {

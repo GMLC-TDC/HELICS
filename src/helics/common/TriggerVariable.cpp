@@ -46,7 +46,7 @@ bool TriggerVariable::wait_for (const std::chrono::milliseconds &duration) const
     std::unique_lock<std::mutex> lk (stateLock);
     if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        return cv_trigger.wait_for (lk, duration, [this] { return triggered.load (std::memory_order_acquire); });
+        return cv_trigger.wait_for(lk, duration, [this] { return triggered.load(std::memory_order_acquire); });
     }
     return true;
 }
