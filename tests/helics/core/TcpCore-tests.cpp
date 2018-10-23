@@ -33,6 +33,39 @@ using helics::Core;
 #define TCP_BROKER_PORT 24160
 #define TCP_BROKER_PORT_STRING "24160"
 #define TCP_SECONDARY_PORT 24180
+
+BOOST_AUTO_TEST_CASE(tcpComms_broker_test)
+{
+    std::this_thread::sleep_for(500ms);
+    std::atomic<int> counter{ 0 };
+    std::string host = "localhost";
+    helics::tcp::TcpComms comm;
+    comm.loadTargetInfo(host, host);
+
+    auto srv = AsioServiceManager::getServicePointer();
+
+    auto server = helics::tcp::TcpServer::create(srv->getBaseService(), TCP_BROKER_PORT);
+    auto serviceLoop = srv->runServiceLoop();
+    std::vector<char> data(1024);
+    server->setDataCall([&counter](helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
+        ++counter;
+        return data_avail;
+    });
+    server->start();
+
+    comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setBrokerPort(TCP_BROKER_PORT);
+    comm.setName("tests");
+    comm.setTimeout(400ms);
+    bool connected = comm.connect();
+    BOOST_CHECK(!connected);
+    BOOST_CHECK_EQUAL(counter, 1);
+    comm.disconnect();
+    server->close();
+
+    std::this_thread::sleep_for(100ms);
+}
+
 BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
 {
     std::atomic<int> counter{0};
@@ -123,38 +156,6 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     conn3->close ();
     conn4->close ();
     server->close ();
-}
-
-BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
-{
-    std::this_thread::sleep_for(500ms);
-    std::atomic<int> counter{0};
-    std::string host = "localhost";
-    helics::tcp::TcpComms comm;
-	comm.loadTargetInfo(host, host);
-
-    auto srv = AsioServiceManager::getServicePointer ();
-
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
-    auto serviceLoop = srv->runServiceLoop ();
-    std::vector<char> data (1024);
-    server->setDataCall ([&counter](helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
-        ++counter;
-        return data_avail;
-    });
-    server->start ();
-
-    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
-    comm.setBrokerPort (TCP_BROKER_PORT);
-    comm.setName ("tests");
-    comm.setTimeout (400ms);
-    bool connected=comm.connect();
-    BOOST_CHECK(!connected);
-    BOOST_CHECK_EQUAL (counter, 1);
-    comm.disconnect ();
-    server->close ();
-    
-    std::this_thread::sleep_for(100ms);
 }
 
 BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
