@@ -179,6 +179,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
 void TcpConnection::close ()
 {
     triggerhalt.store(true);
+   
     state = connection_state_t::closed;
     boost::system::error_code ec;
     if (socket_.is_open ())
@@ -197,6 +198,11 @@ void TcpConnection::close ()
     else
     {
         socket_.close(ec);
+    }
+
+    if (connecting)
+    {
+        connected.waitActivation();
     }
 
     if (receivingHalt.isActive ())
@@ -254,7 +260,7 @@ TcpConnection::TcpConnection (boost::asio::io_service &io_service,
                               const std::string &connection,
                               const std::string &port,
                               size_t bufferSize)
-    : socket_ (io_service), data (bufferSize),idcode(idcounter++)
+    : socket_ (io_service), data (bufferSize),connecting(true),idcode(idcounter++)
 {
     tcp::resolver resolver (io_service);
     tcp::resolver::query query (tcp::v4 (), connection, port);

@@ -118,9 +118,11 @@ BOOST_AUTO_TEST_CASE(tcpComms_broker_test_transmit)
         helics::ActionMessage rM(data.data(), len);
         BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     }
-
+    std::cout << "starting disconnect"<<std::endl;
     comm.disconnect();
+    std::cout << "closing server"<<std::endl;
     server->close();
+    std::cout << "final sleep"<<std::endl;
     std::this_thread::sleep_for(100ms);
 }
 

@@ -149,6 +149,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     boost::asio::ip::tcp::socket socket_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
+    const bool connecting{ false };
     TriggerVariable receivingHalt;
     std::atomic<bool> connectionError{false};
     TriggerVariable connected;  //!< variable indicating connectivity
