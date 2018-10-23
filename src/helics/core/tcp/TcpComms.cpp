@@ -296,6 +296,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                 cumsleep += std::chrono::milliseconds(100);
                 if (cumsleep >= connectionTimeout)
                 {
+                    brokerConnection->cancel();
                     logError ("port number query to broker timed out");
                     return terminate (connection_status::error);
                 }

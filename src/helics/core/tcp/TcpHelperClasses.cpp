@@ -178,7 +178,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
 // socket_.set_option(optionLinger, ec);
 void TcpConnection::close ()
 {
-    triggerhalt = true;
+    triggerhalt.store(true);
     state = connection_state_t::closed;
     boost::system::error_code ec;
     if (socket_.is_open ())
@@ -193,15 +193,15 @@ void TcpConnection::close ()
             ec.clear ();
         }
         socket_.close (ec);
-        receivingHalt.wait ();
     }
     else
     {
-        if (receivingHalt.isActive ())
-        {
-            socket_.close (ec);
-            receivingHalt.wait ();
-        }
+        socket_.close(ec);
+    }
+
+    if (receivingHalt.isActive ())
+    {
+         receivingHalt.wait ();
     }
 }
 
@@ -225,17 +225,14 @@ void TcpConnection::closeNoWait ()
     }
     else
     {
-        if (receivingHalt.isActive ())
-        {
-            socket_.close (ec);
-        }
+        socket_.close (ec);
     }
 }
 
 /** wait on the closing actions*/
 void TcpConnection::waitOnClose ()
 {
-    if (triggerhalt)
+    if (triggerhalt.load())
     {
         receivingHalt.wait ();
     }
