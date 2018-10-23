@@ -248,6 +248,7 @@ void TcpConnection::waitOnClose ()
         {
             connected.waitActivation();
         }
+        std::cout << "wait on receiving halt" << std::endl;
         receivingHalt.wait ();
     }
     else
@@ -799,10 +800,12 @@ void TcpServer::close ()
         {
             connections[ii]->closeNoWait();
         }
+        std::cout << "connections closing <" << sz << std::endl;
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->waitOnClose();
         }
+        std::cout << "connections closed" << std::endl;
         connections.clear();
     }
     
