@@ -141,26 +141,33 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
         auto ptr = fnd->second;
         servelock.unlock();
         ++ptr->runCounter;
-        std::lock_guard<std::mutex> nullLock(ptr->runningLoopLock);
-        if (!ptr->running)
+       
+        bool exp = false;
+        if (ptr->running.compare_exchange_strong(exp,true))
         {
+            std::lock_guard<std::mutex> nullLock(ptr->runningLoopLock);
             // std::cout << "run Service loop " << ptr->runCounter << "\n";
             ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
-            ptr->running = true;
             ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
         }
         else
         {
             if (ptr->getBaseService ().stopped ())
             {
+                std::unique_lock<std::mutex> nullLock(ptr->runningLoopLock);
                 // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
                 if (ptr->loopRet.valid ())
                 {
                     ptr->loopRet.get ();
                 }
-                ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
-                ptr->running = true;
-                ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+                nullLock.unlock();
+                exp = false;
+                if (ptr->running.compare_exchange_strong(exp, true))
+                {
+                    nullLock.lock();
+                    ptr->nullwork = std::make_unique<boost::asio::io_service::work>(ptr->getBaseService());
+                    ptr->loopRet = std::async(std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+                }
             }
         }
         return std::make_unique<servicer> (ptr);

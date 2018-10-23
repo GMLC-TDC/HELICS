@@ -792,18 +792,23 @@ void TcpServer::close ()
     }
 
     acceptors.clear ();
+    std::cout << "cleared acceptors" << std::endl;
     std::unique_lock<std::mutex> lock (accepting);
+    std::cout << "accepting lock" << std::endl;
     auto sz = connections.size ();
     lock.unlock ();
     for (decltype (sz) ii = 0; ii < sz; ++ii)
     {
         connections[ii]->closeNoWait ();
     }
+    std::cout << "connections closing <" <<sz<< std::endl;
     for (decltype (sz) ii = 0; ii < sz; ++ii)
     {
         connections[ii]->waitOnClose ();
     }
+    std::cout << "connections closed" << std::endl;
     connections.clear ();
+    std::cout << "connections cleared" << std::endl;
 }
 
 }  // namespace tcp
