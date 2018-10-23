@@ -243,8 +243,10 @@ void TcpConnection::waitOnClose ()
     {
         if (connecting)
         {
+            std::cout << "wait on connect activation" << std::endl;
             connected.waitActivation();
         }
+        std::cout << "wait on receiving halt" << std::endl;
         receivingHalt.wait ();
     }
     else
@@ -792,9 +794,7 @@ void TcpServer::close ()
     }
 
     acceptors.clear ();
-    std::cout << "cleared acceptors" << std::endl;
     std::unique_lock<std::mutex> lock (accepting);
-    std::cout << "accepting lock" << std::endl;
     auto sz = connections.size ();
     lock.unlock ();
     for (decltype (sz) ii = 0; ii < sz; ++ii)
@@ -808,7 +808,6 @@ void TcpServer::close ()
     }
     std::cout << "connections closed" << std::endl;
     connections.clear ();
-    std::cout << "connections cleared" << std::endl;
 }
 
 }  // namespace tcp
