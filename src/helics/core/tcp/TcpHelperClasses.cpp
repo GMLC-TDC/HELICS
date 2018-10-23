@@ -242,7 +242,7 @@ void TcpConnection::waitOnClose ()
         std::cout << "wait on receiving halt" << std::endl;
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
         {
-            std::cout << "wait timeout" << std::endl;
+            std::cout << "wait timeout " << static_cast<int>(state.load())<< std::endl;
         }
     }
     else
