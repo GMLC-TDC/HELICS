@@ -95,8 +95,7 @@ FedObject *getFedObject (helics_federate fed, helics_error *err);
 class InputObject
 {
   public:
-    std::unique_ptr<Input> inputPtr;
-    input_id_t id;
+    Input *inputPtr;
     int valid = 0;
     bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
@@ -106,8 +105,7 @@ class InputObject
 class PublicationObject
 {
   public:
-    std::unique_ptr<Publication> pubptr;
-    publication_id_t id;
+    Publication *pubPtr;
     int valid = 0;
     bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
@@ -116,7 +114,7 @@ class PublicationObject
 class EndpointObject
 {
   public:
-    std::unique_ptr<Endpoint> endptr;
+    Endpoint *endPtr;
     std::shared_ptr<MessageFederate> fedptr;
     std::unique_ptr<Message> lastMessage;
     int valid = 0;
@@ -130,7 +128,7 @@ class FilterObject
   public:
     bool cloning=false;  //indicator that the filter is a cloning filter
     int valid = 0;
-    std::shared_ptr<Filter> filtptr;
+    Filter *filtPtr;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };

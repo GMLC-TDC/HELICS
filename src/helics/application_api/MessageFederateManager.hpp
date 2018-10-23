@@ -51,7 +51,7 @@ class MessageFederateManager
     @param[in] name the name of the publication to subscribe
     @param[in] type the type of publication
     */
-    void subscribe (Endpoint &ept, const std::string &pubName);
+    void subscribe (const Endpoint &ept, const std::string &pubName);
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/
@@ -68,7 +68,7 @@ class MessageFederateManager
     /** receive a packet from a particular endpoint
     @param[in] endpoint the identifier for the endpoint
     @return a message object*/
-    std::unique_ptr<Message> getMessage (Endpoint &ept);
+    std::unique_ptr<Message> getMessage (const Endpoint &ept);
     /* receive a communication message for any endpoint in the federate*/
     std::unique_ptr<Message> getMessage ();
 
@@ -100,6 +100,9 @@ class MessageFederateManager
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     Endpoint &getEndpoint (const std::string &name);
     const Endpoint &getEndpoint (const std::string &name) const;
+
+	Endpoint &getEndpoint (int index);
+    const Endpoint &getEndpoint (int index) const;
     /** get the type of an endpoint from its id
     @param[in] id the endpoint to query
     @return empty string if an invalid id is passed or no type was specified*/
@@ -113,7 +116,7 @@ class MessageFederateManager
     @param[in] id  the endpoint id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void registerCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
     /**disconnect from the coreObject*/
     void disconnect ();
@@ -121,11 +124,11 @@ class MessageFederateManager
     int getEndpointCount () const;
 
     /** set an endpoint option */
-    void setEndpointOption (Endpoint &ept, int32_t option, bool option_value);
+    void setEndpointOption (const Endpoint &ept, int32_t option, bool option_value);
     /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter (Endpoint &ept, const std::string &filterName);
+    void addSourceFilter (const Endpoint &ept, const std::string &filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter (Endpoint &ept, const std::string &filterName);
+    void addDestinationFilter (const Endpoint &ept, const std::string &filterName);
 
   private:
 	  class EndpointData

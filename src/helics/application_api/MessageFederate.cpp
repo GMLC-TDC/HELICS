@@ -16,25 +16,25 @@ namespace helics
 {
 MessageFederate::MessageFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName,fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (),this, getID ());
 }
 MessageFederate::MessageFederate (const std::string &fedName,
                                   const std::shared_ptr<Core> &core,
                                   const FederateInfo &fi)
     : Federate (fedName,core, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (),this, getID ());
 }
 MessageFederate::MessageFederate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (),this, getID ());
     MessageFederate::registerInterfaces (configString);
 }
 
 MessageFederate::MessageFederate (const std::string &fedName, const std::string &configString)
     : Federate (fedName,loadFederateInfo (configString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (),this, getID ());
     MessageFederate::registerInterfaces (configString);
 }
 
@@ -46,7 +46,7 @@ MessageFederate::MessageFederate ()
 MessageFederate::MessageFederate (bool)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
 }
 MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
@@ -120,15 +120,8 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
             auto eptName = getKey (ept);
             auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
             bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
-            endpoint_id_t epid;
-            if (global)
-            {
-                epid = registerGlobalEndpoint (eptName, type);
-            }
-            else
-            {
-                epid = registerEndpoint (eptName, type);
-            }
+            Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
+            
 
             // retrieve the known paths
             if (ept.isMember ("knownDestinations"))
@@ -136,13 +129,13 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                 auto kp = ept["knownDestinations"];
                 if (kp.isString ())
                 {
-                    registerKnownCommunicationPath (epid, kp.asString ());
+                    registerKnownCommunicationPath (epObj, kp.asString ());
                 }
                 else if (kp.isArray ())
                 {
                     for (const auto &path : kp)
                     {
-                        registerKnownCommunicationPath (epid, path.asString ());
+                        registerKnownCommunicationPath (epObj, path.asString ());
                     }
                 }
             }
@@ -152,13 +145,13 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                 auto subs = ept["subscriptions"];
                 if (subs.isString ())
                 {
-                    subscribe (epid, subs.asString ());
+                    subscribe (epObj, subs.asString ());
                 }
                 else if (subs.isArray ())
                 {
                     for (const auto &sub : subs)
                     {
-                        subscribe (epid, sub.asString ());
+                        subscribe (epObj, sub.asString ());
                     }
                 }
             }
@@ -188,16 +181,8 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             auto key = getKey (ept);
             auto type = tomlGetOrDefault (ept, "type", std::string ());
             bool global = tomlGetOrDefault(ept,"global",false);
-            endpoint_id_t epid;
-            if (global)
-            {
-                epid = registerGlobalEndpoint (key, type);
-            }
-            else
-            {
-                epid = registerEndpoint (key, type);
-            }
-
+            Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
+            
             // retrieve the known paths
             auto kp = ept.find("knownDestinations");
             if (kp!=nullptr)
@@ -206,13 +191,13 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
                 {
                     for (const auto &path : kp->as<toml::Array>())
                     {
-                        registerKnownCommunicationPath (epid, path.as<std::string> ());
+                        registerKnownCommunicationPath (epObj, path.as<std::string> ());
                     }
                     
                 }
                 else if (kp->is<std::string>())
                 {
-                    registerKnownCommunicationPath (epid, kp->as<std::string> ());
+                    registerKnownCommunicationPath (epObj, kp->as<std::string> ());
                 }
             }
             auto subs = ept.find ("subscriptions");
@@ -221,13 +206,13 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             {
                 if (subs->is<std::string> ())
                 {
-                    subscribe (epid, subs->as<std::string> ());
+                    subscribe (epObj, subs->as<std::string> ());
                 }
                 else if (subs->is<toml::Array> ())
                 {
                     for (const auto &sub : subs->as<toml::Array>())
                     {
-                        subscribe (epid, sub.as<std::string> ());
+                        subscribe (epObj, sub.as<std::string> ());
                     }
                 }
             }
@@ -236,7 +221,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
    
 }
 
-void MessageFederate::subscribe (Endpoint &ept, const std::string &key)
+void MessageFederate::subscribe (const Endpoint &ept, const std::string &key)
 {
         mfManager->subscribe (ept, key);
         return;
@@ -301,7 +286,7 @@ std::unique_ptr<Message> MessageFederate::getMessage ()
     return nullptr;
 }
 
-std::unique_ptr<Message> MessageFederate::getMessage (Endpoint &ept)
+std::unique_ptr<Message> MessageFederate::getMessage (const Endpoint &ept)
 {
     if (state >= op_states::initialization)
     {
@@ -336,10 +321,10 @@ void MessageFederate::sendMessage (const Endpoint &source, const Message &messag
 
 Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 {
-    auto id = mfManager->getEndpoint (eptName);
+    auto &id = mfManager->getEndpoint (eptName);
     if (!id.isValid())
     {
-        id = mfManager->getEndpoint (getName () + separator_ + eptName);
+        return mfManager->getEndpoint (getName () + separator_ + eptName);
     }
     return id;
 }
@@ -355,7 +340,7 @@ void MessageFederate::registerEndpointCallback (const std::function<void(Endpoin
 {
     mfManager->registerCallback (func);
 }
-void MessageFederate::registerEndpointCallback (Endpoint &ept,
+void MessageFederate::registerEndpointCallback (const Endpoint &ept,
                                                 const std::function<void(Endpoint &ept, Time)> &func)
 {
     mfManager->registerCallback (ept, func);
@@ -365,17 +350,17 @@ void MessageFederate::registerEndpointCallback (Endpoint &ept,
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
 
 
-void MessageFederate::setEndpointOption(Endpoint &ept, int32_t option, bool option_value)
+void MessageFederate::setEndpointOption(const Endpoint &ept, int32_t option, bool option_value)
 {
 	mfManager->setEndpointOption(ept, option, option_value);
 }
 
-void MessageFederate::addSourceFilter(Endpoint &ept, const std::string &filterName)
+void MessageFederate::addSourceFilter(const Endpoint &ept, const std::string &filterName)
 {
     mfManager->addSourceFilter (ept, filterName);
 }
 
-void MessageFederate::addDestinationFilter(Endpoint &ept, const std::string &filterName)
+void MessageFederate::addDestinationFilter(const Endpoint &ept, const std::string &filterName)
 {
     mfManager->addDestinationFilter (ept, filterName);
 }

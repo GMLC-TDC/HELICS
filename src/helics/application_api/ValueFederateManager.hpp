@@ -12,6 +12,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helicsTypes.hpp"
 #include <atomic>
 #include "../common/GuardedTypes.hpp"
+#include "Inputs.hpp"
+#include "Publications.hpp"
 
 namespace helics
 {
@@ -74,33 +76,33 @@ class ValueFederateManager
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (Input &inp, const std::string &shortcutName);
+    void addShortcut (const Input &inp, const std::string &shortcutName);
     /** add a destination target to a publication
    @param id the identifier of the input
    target the name of the input to send the data to
    */
-    void addTarget (Publication &pub, const std::string &target);
+    void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param id the identifier of the publication
     target the name of the input to send the data to
     */
-    void addTarget (Input &inp, const std::string &target);
+    void addTarget (const Input &inp, const std::string &target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param[in] id the subscription identifier
     @param[in] block the data block representing the default value
     */
-    void setDefaultValue (Input &inp, const data_view &block);
+    void setDefaultValue (const Input &inp, const data_view &block);
 
     /** get a value as raw data block from the system
     @param[in] id the identifier for the subscription
     @return a constant data block
     */
-    data_view getValue (Input &inp);
+    data_view getValue (const Input &inp);
 
     /** publish a value*/
-    void publish (Publication &pub, const data_view &block);
+    void publish (const Publication &pub, const data_view &block);
 
     /** check if a given subscription has and update*/
     bool hasUpdate (const Input &inp) const;
@@ -176,10 +178,10 @@ class ValueFederateManager
     std::string getPublicationType (const Input &inp) const;
 
     /** set a publication option */
-    void setPublicationOption (Publication &pub, int32_t option, bool option_value);
+    void setPublicationOption (const Publication &pub, int32_t option, bool option_value);
 
     /** get a handle option*/
-    void setInputOption(Input &inp, int32_t option, bool option_value);
+    void setInputOption(const Input &inp, int32_t option, bool option_value);
     /** get an option values for an input*/
     bool getInputOption (const Input &inp, int32_t option) const;
     /** get an option values for a publication*/
@@ -194,7 +196,7 @@ class ValueFederateManager
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (Input &inp, std::function<void(Input &, Time)> callback);
+    void registerCallback (const Input &inp, std::function<void(Input &, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect ();

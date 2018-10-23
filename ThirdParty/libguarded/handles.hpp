@@ -35,7 +35,7 @@ public:
         data = nullptr;
         if (m_handle_lock.owns_lock())
 		{
-			m_handle_lock.unlock()
+            m_handle_lock.unlock ();
 		};
     }
     T* operator-> () const noexcept

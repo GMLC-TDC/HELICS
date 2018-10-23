@@ -119,7 +119,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
     }
     try
     {
-        auto id = fedObj->getEndpointId (name);
+        auto &id = fedObj->getEndpoint (name);
         if (!id.isValid())
         {
 			if (err != nullptr)
@@ -130,7 +130,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
             return nullptr;
         }
         auto end = std::make_unique<helics::EndpointObject> ();
-        end->endptr = std::make_unique<helics::Endpoint> (fedObj.get (), id.value ());
+        end->endptr = std::make_unique<helics::Endpoint>(id);
         end->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_endpoint> (end.get ());
         addEndpoint (fed, std::move (end));

@@ -40,6 +40,17 @@ class MappedVector
         lookup.emplace (searchValue, index);
         return index;
     }
+    /** insert an element into the mapped vector
+    @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @return the index of the value placed
+    */
+    template <typename... Us>
+    size_t insert (std::nullptr_t /*searchValue*/, Us &&... data)
+    {
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        return index;
+    }
 
     /** insert an element into the mapped vector
     @param searchValue the unique index to use for the value if it exists the existing value is replaced
@@ -150,9 +161,9 @@ class MappedVector
     {
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
     }
-    /*NOTE:: only constant iterators allowed since this would introduce the possibilty
+    /*NOTE:: only constant iterators allowed since this would introduce the possibility
     of using iterators for various algorithms which could cause the object to go to a indeterminate state
-    therefore constant iterators are allowed but not modifable iterators
+    therefore constant iterators are allowed but not modifiable iterators
     someone determined to screw it up could still easily do so*/
 
     /** get a const iterator to the beginning of the data vector*/

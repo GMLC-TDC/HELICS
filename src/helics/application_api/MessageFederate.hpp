@@ -102,7 +102,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] name the name of the publication to subscribe
     @param[in] type the type of publication
     */
-    void subscribe (Endpoint &ept, const std::string &name);
+    void subscribe (const Endpoint &ept, const std::string &name);
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/
@@ -119,7 +119,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** receive a packet from a particular endpoint
     @param[in] endpoint the identifier for the endpoint
     @return a message object*/
-    std::unique_ptr<Message> getMessage (Endpoint &ept);
+    std::unique_ptr<Message> getMessage (const Endpoint &ept);
     /** receive a communication message for any endpoint in the federate
     @details the return order will be in order of endpoint creation then order of arrival
     all messages for the first endpoint, then all for the second, and so on
@@ -207,15 +207,15 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] ep the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
-    void registerEndpointCallback (Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void registerEndpointCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
 	/** set an endpoint option */
-	void setEndpointOption(Endpoint &ept, int32_t option, bool option_value = true);
+	void setEndpointOption(const Endpoint &ept, int32_t option, bool option_value = true);
 
 	/** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter (Endpoint &ept, const std::string &filterName);
+    void addSourceFilter (const Endpoint &ept, const std::string &filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter (Endpoint &ept, const std::string &filterName);
+    void addDestinationFilter (const Endpoint &ept, const std::string &filterName);
 
     virtual void disconnect () override;
 

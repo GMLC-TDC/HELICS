@@ -134,7 +134,7 @@ namespace apps
         Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
-        std::vector<Subscription> subscriptions;    //!< the actual subscription objects
+        std::vector<Input> subscriptions;    //!< the actual subscription objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages; //!< list of messages

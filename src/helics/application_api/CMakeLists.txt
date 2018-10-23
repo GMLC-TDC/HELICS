@@ -29,6 +29,7 @@ set(
   ValueFederateManager.hpp
   AsyncFedCallInfo.hpp
   FilterOperations.hpp
+  FilterFederateManager.hpp
 )
 
 set(
@@ -45,6 +46,7 @@ set(
   Publications.cpp
   Filters.cpp
   FilterOperations.cpp
+  FilterFederateManager.cpp
   Endpoints.cpp
   helicsTypes.cpp
   queryFunctions.cpp

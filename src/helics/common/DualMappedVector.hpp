@@ -82,6 +82,18 @@ class DualMappedVector
         return true;
     }
 
+	/** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    bool insert (std::nullptr_t /*searchValue1*/, std::nullptr_t /*searchValue2*/, Us &&... data)
+    {
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        lookup1.emplace (searchValue1, index);
+        return true;
+    }
+
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/

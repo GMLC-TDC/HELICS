@@ -49,7 +49,7 @@ void MessageFederateManager::registerKnownCommunicationPath (const Endpoint &loc
     coreObject->registerFrequentCommunicationsPair (localEndpoint.getName (), remoteEndpoint);
 }
 
-void MessageFederateManager::subscribe (Endpoint &ept, const std::string &name)
+void MessageFederateManager::subscribe (const Endpoint &ept, const std::string &name)
 {
     coreObject->addSourceTarget (ept.handle, name);
 }
@@ -111,7 +111,7 @@ uint64_t MessageFederateManager::pendingMessages () const
     return sz;
 }
 
-std::unique_ptr<Message> MessageFederateManager::getMessage (Endpoint &ept)
+std::unique_ptr<Message> MessageFederateManager::getMessage (const Endpoint &ept)
 {
   
     if (ept.dataReference != nullptr)
@@ -224,8 +224,9 @@ std::string MessageFederateManager::localQuery (const std::string &queryStr) con
     std::string ret;
     if (queryStr == "endpoints")
     {
-        ret = generateStringVector_if (local_endpoints.lock_shared (), [](const auto &info) { return info.name; },
-                                       [](const auto &info) { return (!info.name.empty ()); });
+        ret = generateStringVector_if (local_endpoints.lock_shared (),
+                                       [](const auto &info) { return info.actualName; },
+                                       [](const auto &info) { return (!info.actualName.empty ()); });
     }
     return ret;
 }
@@ -250,6 +251,26 @@ const Endpoint &MessageFederateManager::getEndpoint (const std::string &name) co
     return (ept != sharedEpt.end ()) ? (*ept) : invalidEpt;
 }
 
+Endpoint &MessageFederateManager::getEndpoint (int index)
+{
+
+    auto sharedEpt = local_endpoints.lock ();
+	if (isValidIndex(index, *sharedEpt))
+	{
+        return (*sharedEpt)[index];
+	}
+   return invalidEptNC;
+}
+const Endpoint &MessageFederateManager::getEndpoint (int index) const
+{
+    auto sharedEpt = local_endpoints.lock_shared ();
+    if (isValidIndex (index, *sharedEpt))
+    {
+        return (*sharedEpt)[index];
+    }
+    return invalidEpt;
+}
+
 const std::string &MessageFederateManager::getEndpointType (const Endpoint &ept) const
 {
     return coreObject->getType (ept.handle);
@@ -260,18 +281,18 @@ int MessageFederateManager::getEndpointCount () const
     return static_cast<int> (local_endpoints.lock_shared ()->size ());
 }
 
-void MessageFederateManager::setEndpointOption (Endpoint &ept, int32_t option, bool option_value)
+void MessageFederateManager::setEndpointOption (const Endpoint &ept, int32_t option, bool option_value)
 {
     coreObject->setHandleOption (ept.handle, option, option_value);
 }
 
-void MessageFederateManager::addSourceFilter (Endpoint &ept, const std::string &filterName)
+void MessageFederateManager::addSourceFilter (const Endpoint &ept, const std::string &filterName)
 {
     coreObject->addSourceTarget (ept.handle, filterName);
 }
 
 /** add a named filter to an endpoint for all message going to the endpoint*/
-void MessageFederateManager::addDestinationFilter (Endpoint &ept, const std::string &filterName)
+void MessageFederateManager::addDestinationFilter (const Endpoint &ept, const std::string &filterName)
 {
     coreObject->addDestinationTarget (ept.handle, filterName);
 }
@@ -281,7 +302,7 @@ void MessageFederateManager::registerCallback (const std::function<void(Endpoint
     allCallback.store (callback);
 }
 
-void MessageFederateManager::registerCallback (Endpoint &ept,
+void MessageFederateManager::registerCallback (const Endpoint &ept,
                                                const std::function<void(Endpoint &, Time)> &callback)
 {
     if (ept.dataReference != nullptr)

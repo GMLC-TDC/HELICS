@@ -27,6 +27,7 @@ static const std::map<std::string, defined_filter_types> filterTypes{{"clone", d
                                                                       defined_filter_types::randomDrop},
                                                                      {"reroute", defined_filter_types::reroute},
                                                                      {"redirect", defined_filter_types::reroute},
+                                                                     {"firewall", defined_filter_types::firewall},
                                                                      {"custom", defined_filter_types::custom}};
 
 defined_filter_types filterTypeFromString (const std::string &filterType) noexcept
@@ -93,62 +94,45 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
 }
 
 
-Filter::Filter (Federate *fed, const std::string &name)
+Filter::Filter (Federate *fed, const std::string &filtName) : Filter (fed->registerFilter (filtName))
+{
+   
+}
+
+
+Filter::Filter (Federate *fed, const std::string &filtName, interface_handle handle) : id (handle), name (filtName)
 {
     if (fed != nullptr)
     {
         corePtr = fed->getCorePointer ().get ();
-        fid = fed->registerFilter (name);
-        id = interface_handle (fid.value ());
     }
-   
 }
 
-Filter::Filter(interface_visibility locality, Federate *fed, const std::string &name)
+Filter::Filter(interface_visibility locality, Federate *fed, const std::string &filtName)
 {
     if (fed != nullptr)
     {
         corePtr = fed->getCorePointer().get();
         if (locality == interface_visibility::global)
         {
-            fid = fed->registerGlobalFilter(name);
+            operator=(fed->registerGlobalFilter(filtName));
         }
         else
         {
-            fid = fed->registerFilter(name);
+            operator=(fed->registerFilter(filtName));
         }
-        id = interface_handle(fid.value());
     }
 
 }
 
-Filter::Filter (Core *cr,const std::string &name) : corePtr (cr) 
+Filter::Filter (Core *cr, const std::string &filtName) : corePtr (cr), name (filtName)
 {
 	if (corePtr != nullptr)
 	{
-        id = corePtr->registerFilter (name, std::string (), std::string ());
-        fid = id.baseValue();
+        id = corePtr->registerFilter (filtName, std::string (), std::string ());
+        fed = nullptr;
 	}
     
-}
-
-Filter::Filter(Federate *fed, int filtInd)
-{
-    if (fed != nullptr)
-    {
-        corePtr = fed->getCorePointer ().get ();
-        fid = filter_id_t (filtInd);
-        id = interface_handle (fid.value ());
-    }
-}
-
-Filter::Filter(Core *cr, int filtInd)
-{ 
-	if (cr!=nullptr)
-    {
-        corePtr = cr;
-        id = interface_handle (filtInd);
-    }
 }
 
 void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
@@ -223,30 +207,23 @@ void Filter::setString (const std::string &property, const std::string &val)
 
 
 
-CloningFilter::CloningFilter (Core *cr, const std::string &name)
+CloningFilter::CloningFilter (Core *cr, const std::string &filtName)
 {
     corePtr = cr;
     if (corePtr != nullptr)
     {
-        id =corePtr->registerCloningFilter (name,std::string(),std::string());
-        fid = id.baseValue();
+        id =corePtr->registerCloningFilter (filtName,std::string(),std::string());
+        name = filtName;
     }
     setFilterOperations(std::make_shared<CloneFilterOperation> (cr));
 }
 
-CloningFilter::CloningFilter (Federate *fed, const std::string &name)
+CloningFilter::CloningFilter (Federate *fed, const std::string &name) : Filter (fed->registerCloningFilter (name))
 {
-    if (fed != nullptr)
-    {
-        corePtr = fed->getCorePointer ().get ();
-        fid = fed->registerCloningFilter (name);
-        id = interface_handle (fid.value ());
 		if (corePtr != nullptr)
 		{
             setFilterOperations(std::make_shared<CloneFilterOperation> (corePtr));
 		}
-    }
-    
 }
 
 CloningFilter::CloningFilter(interface_visibility locality, Federate *fed, const std::string &name)
@@ -256,18 +233,14 @@ CloningFilter::CloningFilter(interface_visibility locality, Federate *fed, const
         corePtr = fed->getCorePointer().get();
         if (locality == interface_visibility::global)
         {
-            fid = fed->registerGlobalCloningFilter(name);
+            operator=(fed->registerGlobalCloningFilter(name));
         }
         else
         {
-            fid = fed->registerCloningFilter(name);
+            operator=(fed->registerCloningFilter(name));
         }
-        
-        id = interface_handle(fid.value());
-        if (corePtr != nullptr)
-        {
-            setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));
-        }
+       
+        setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));
     }
 
 }
@@ -333,42 +306,44 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     }
 }
 
-std::unique_ptr<Filter> make_filter (defined_filter_types type,
+Filter & make_filter (defined_filter_types type,
                                                             Federate *mFed,
                                                             const std::string &name)
 
 {
     if (type == defined_filter_types::clone)
     {
-        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter> (mFed, name);
-        addOperations (dfilt.get (), type, mFed->getCorePointer ().get ());
-        dfilt->setString ("delivery", name);
+        Filter &dfilt = mFed->registerCloningFilter (name);
+        addOperations (&dfilt, type, mFed->getCorePointer ().get ());
+        dfilt.setString ("delivery", name);
         return dfilt;
     }
     else
     {
-        auto dfilt = std::make_unique<Filter> (mFed, name);
-        addOperations (dfilt.get (), type, nullptr);
+        auto &dfilt = mFed->registerFilter (name);
+        addOperations (&dfilt, type, nullptr);
         return dfilt;
     }
 }
 
-std::unique_ptr<Filter> make_filter(interface_visibility locality, defined_filter_types type,
+Filter &make_filter(interface_visibility locality, defined_filter_types type,
     Federate *mFed,
     const std::string &name)
 
 {
     if (type == defined_filter_types::clone)
     {
-        std::unique_ptr<Filter> dfilt = std::make_unique<CloningFilter>(locality, mFed, name);
-        addOperations(dfilt.get(), type, mFed->getCorePointer().get());
-        dfilt->setString("delivery", name);
+        Filter &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalCloningFilter (name) :
+                                                                     mFed->registerCloningFilter (name); 
+        addOperations(&dfilt, type, mFed->getCorePointer().get());
+        dfilt.setString("delivery", name);
         return dfilt;
     }
     else
     {
-        auto dfilt = std::make_unique<Filter>(locality, mFed, name);
-        addOperations(dfilt.get(), type, nullptr);
+        auto &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalFilter (name) :
+                                                                   mFed->registerFilter (name);
+        addOperations(&dfilt, type, nullptr);
         return dfilt;
     }
 }
@@ -394,21 +369,26 @@ make_filter (defined_filter_types type, Core *cr, const std::string &name)
 }
 
 
-std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
+CloningFilter &make_cloning_filter (defined_filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
 
 {
-        auto dfilt = std::make_unique<CloningFilter> (mFed, name);
-        addOperations (dfilt.get (), type, mFed->getCorePointer ().get ());
-        dfilt->addDeliveryEndpoint (delivery);
+    auto &dfilt = mFed->registerCloningFilter (name);
+        addOperations (&dfilt, type, mFed->getCorePointer ().get ());
+        dfilt.addDeliveryEndpoint (delivery);
         return dfilt;
 }
 
-std::unique_ptr<CloningFilter> make_cloning_filter(interface_visibility locality, defined_filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
+CloningFilter & make_cloning_filter (interface_visibility locality,
+                                    defined_filter_types type,
+                                    Federate *mFed,
+                                    const std::string &delivery,
+                                    const std::string &name)
 
 {
-    auto dfilt = std::make_unique<CloningFilter>(locality, mFed, name);
-    addOperations(dfilt.get(), type, mFed->getCorePointer().get());
-    dfilt->addDeliveryEndpoint(delivery);
+    auto &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalCloningFilter (name) :
+                                                               mFed->registerCloningFilter (name); 
+    addOperations(&dfilt, type, mFed->getCorePointer().get());
+    dfilt.addDeliveryEndpoint(delivery);
     return dfilt;
 }
 

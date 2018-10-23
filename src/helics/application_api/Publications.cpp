@@ -9,58 +9,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-PublicationBase::PublicationBase (ValueFederate *valueFed,
+Publication::Publication(ValueFederate *valueFed,
                                   interface_handle id,
                                   const std::string &key,
                                   const std::string &type,
                                   const std::string &units)
-    : fed(valueFed), handle(id), key_(key), type_(type), units_(units)
+    : fed(valueFed), handle(id), key_(key), units_(units)
 {
-    pubType = getTypeFromString (type_);
-}
-
-PublicationBase::PublicationBase(interface_visibility locality,
-    ValueFederate *valueFed,
-    const std::string &key,
-    const std::string &type,
-    const std::string &units)
-    : fed(valueFed), key_(key), type_(type), units_(units)
-{
-    try
-    {
-        if (locality == GLOBAL)
-        {
-            id = fed->registerGlobalPublication(key, type, units);
-        }
-        else
-        {
-            id = fed->registerPublication(key, type, units);
-        }
-    }
-    catch (const RegistrationFailure &)
-    {
-        id = fed->getPublicationId(key_);
-        loadFromId();
-    }
-}
-
-PublicationBase::PublicationBase (ValueFederate *valueFed, int pubIndex) : fed (valueFed)
-{
-    auto cnt = fed->getPublicationCount ();
-    if ((pubIndex >= cnt) || (cnt < 0))
-    {
-        throw (helics::InvalidParameter ("no publication with the specified index"));
-    }
-    id = static_cast<publication_id_t> (pubIndex);
-    loadFromId();
-}
-
-void PublicationBase::loadFromId()
-{
-    key_ = fed->getPublicationKey(id);
-
-    type_ = fed->getPublicationType(id);
-    units_ = fed->getPublicationUnits(id);
+    pubType = getTypeFromString (type);
 }
 
 void Publication::publish (double val) const
@@ -80,7 +36,7 @@ void Publication::publish (double val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 void Publication::publish (int64_t val) const
@@ -100,7 +56,7 @@ void Publication::publish (int64_t val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 void Publication::publish (bool val) const
@@ -121,7 +77,7 @@ void Publication::publish (bool val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, bstring);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 
@@ -142,7 +98,7 @@ void Publication::publish (const char *val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 void Publication::publish (const std::string &val) const
@@ -162,7 +118,7 @@ void Publication::publish (const std::string &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 void Publication::publish (const std::vector<double> &val) const
@@ -182,7 +138,7 @@ void Publication::publish (const std::vector<double> &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 
@@ -203,7 +159,7 @@ void Publication::publish (const std::vector<std::complex<double>> &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 
@@ -224,7 +180,7 @@ void Publication::publish (const double *vals, int size) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, vals, size);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 
@@ -245,7 +201,7 @@ void Publication::publish (std::complex<double> val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 
@@ -266,7 +222,7 @@ void Publication::publish(const named_point &np) const
     if (doPublish)
     {
         auto db = typeConvert(pubType,np);
-        fed->publish(id, db);
+        fed->publish(*this, db);
     }
 }
 
@@ -288,7 +244,7 @@ void Publication::publish(const std::string &name,double val) const
     if (doPublish)
     {
         auto db = typeConvert(pubType, name,val);
-        fed->publish(id, db);
+        fed->publish(*this, db);
     }
 }
 
@@ -310,7 +266,7 @@ void Publication::publish(const char *name, double val) const
     if (doPublish)
     {
         auto db = typeConvert(pubType, name,val);
-        fed->publish(id, db);
+        fed->publish(*this, db);
     }
 }
 
@@ -353,7 +309,7 @@ void Publication::publish (const defV &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (id, db);
+        fed->publish (*this, db);
     }
 }
 }  // namespace helics

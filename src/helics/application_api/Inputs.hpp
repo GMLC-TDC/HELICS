@@ -138,12 +138,12 @@ class Input
     template <class X>
     void getValue_impl (std::true_type /*V*/, X &out)
     {
-        if (fed->isUpdated (id) || (hasUpdate && !changeDetectionEnabled))
+        if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
         {
-            auto dv = fed->getValueRaw (id);
+            auto dv = fed->getValueRaw (*this);
             if (type == helics_type_t::helicsInvalid)
             {
-                type = getTypeFromString (fed->getPublicationType (id));
+                type = getTypeFromString (fed->getPublicationType (*this));
             }
             if (type != helics_type_t::helicsInvalid)
             {

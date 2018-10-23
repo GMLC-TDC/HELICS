@@ -247,14 +247,14 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] block the data view representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (Input &inp, data_view block);
+    void setDefaultValue (const Input &inp, data_view block);
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param[in] id the input identifier
     @param[in] block the data block representing the default value
     @throw std::invalid_argument if id is invalid
     */
-    void setDefaultValue (Input &inp, const data_block &block) { setDefaultValue (inp, data_view (block)); }
+    void setDefaultValue (const Input &inp, const data_block &block) { setDefaultValue (inp, data_view (block)); }
 
     /** set a default value for a subscription
     @param[in] id  the identifier for the subscription
@@ -262,7 +262,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     template <typename X>
-    void setDefaultValue (Input &inp, const X &val)
+    void setDefaultValue (const Input &inp, const X &val)
     {
         setDefaultValue (Inp, data_view (ValueConverter<X>::convert (val)));
     }
@@ -369,7 +369,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param id the identifier of the publication
     target the name of the input to send the data to
     */
-    void addTarget (const Publication &pub, const std::string &target);
+    void addTarget (const Input &inp, const std::string &target);
     /** register an optional subscription
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param[in] target the name of the target
@@ -427,18 +427,25 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput (const std::string &name) const;
+    const Input &getInput (const std::string &name) const;
+    /** get the id of a subscription
+    @return ivalid_subscription_id if name is not a recognized*/
+    Input &getInput (const std::string &name);
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput (const std::string &name, int index1) const;
+    const Input &getInput (const std::string &name, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput (const std::string &name, int index1, int index2) const;
+    const Input &getInput (const std::string &name, int index1, int index2) const;
 
     /** get the input id based on target
     @return an input_id_t from the object, or invalid_id if no input was found
     */
-    Input &getSubscription (const std::string &key) const;
+    const Input &getSubscription (const std::string &key) const;
+    /** get the input id based on target
+    @return an input_id_t from the object, or invalid_id if no input was found
+    */
+    Input &getSubscription (const std::string &key);
     /** get the name of a publication from its id
     @return empty string if an invalid id is passed*/
     const std::string &getPublicationKey (const Publication &pub) const;
@@ -446,16 +453,20 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    Publication &getPublicationId (const std::string &key) const;
+    Publication &getPublication (const std::string &key);
+    /** get the id of a registered publication from its id
+    @param[in] name the name of the publication
+    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    const Publication &getPublication (const std::string &key) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    Publication &getPublicationId (const std::string &key, int index1) const;
+    const Publication &getPublication (const std::string &key, int index1) const;
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    Publication &getPublicationId (const std::string &key, int index1, int index2) const;
+    const Publication &getPublication (const std::string &key, int index1, int index2) const;
 
     /** get the units of a subscriptions from its id
     @param[in] id the subscription id to query
@@ -491,9 +502,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void setPublicationOption (const Publication &pub, int32_t option, bool option_value = true);
 
     /** get a handle option*/
-    void setInputOption (input_id_t id, int32_t option, bool option_value = true);
+    void setInputOption (const Input &inp, int32_t option, bool option_value = true);
     /** get an option values for an input*/
-    bool getInputOption (input_id_t id, int32_t option) const;
+    bool getInputOption (const Input &inp, int32_t option) const;
     /** get an option values for a publication*/
     bool getPublicationOption (const Publication &pubd, int32_t option) const;
     /** register a callback function to call when any subscribed value is updated
