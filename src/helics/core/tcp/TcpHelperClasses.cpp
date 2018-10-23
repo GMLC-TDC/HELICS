@@ -183,28 +183,8 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
 // socket_.set_option(optionLinger, ec);
 void TcpConnection::close ()
 {
-    triggerhalt.store(true);
-   
-    state = connection_state_t::closed;
-    boost::system::error_code ec;
-    if (socket_.is_open ())
-    {
-        socket_.shutdown (tcp::socket::shutdown_both, ec);
-        if (ec)
-        {
-            if (ec.value() != boost::asio::error::not_connected)
-            {
-                std::cerr << "error occurred sending shutdown::" << ec << std::endl;
-            }
-            ec.clear ();
-        }
-        socket_.close (ec);
-    }
-    else
-    {
-        socket_.close(ec);
-    }
-
+    closeNoWait();
+  
     if (connecting)
     {
         connected.waitActivation();
@@ -219,7 +199,25 @@ void TcpConnection::close ()
 void TcpConnection::closeNoWait ()
 {
     triggerhalt.store(true);
-    state = connection_state_t::closed;
+    if (state == connection_state_t::prestart)
+    {
+        state = connection_state_t::closed;
+        if (receivingHalt.isActive())
+        {
+            receivingHalt.trigger();
+        }
+        connected.activate();
+    }
+    else if (state == connection_state_t::halted)
+    {
+        state = connection_state_t::closed;
+        receivingHalt.trigger();
+    }
+    else
+    {
+        state = connection_state_t::closed;
+    }
+
     boost::system::error_code ec;
     if (socket_.is_open ())
     {
@@ -248,7 +246,6 @@ void TcpConnection::waitOnClose ()
     {
         if (connecting)
         {
-            std::cout << "wait on connect activation" << std::endl;
             connected.waitActivation();
         }
         std::cout << "wait on receiving halt" << std::endl;
@@ -734,13 +731,12 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
     boost::asio::socket_base::linger optionLinger (true, 0);
     new_connection->socket ().set_option (optionLinger);
     // Set options here
-    if (halted)
+    if (halted.load())
     {
         new_connection->close ();
         return;
     }
-
-    if (!halted)
+    else
     {
         new_connection->setDataCall (dataCall);
         new_connection->setErrorCall (errorCall);
@@ -748,7 +744,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
         {  // scope for the lock_guard
 
             std::unique_lock<std::mutex> lock (accepting);
-            if (!halted)
+            if (!halted.load())
             {
                 connections.push_back (std::move (new_connection));
             }
@@ -760,10 +756,6 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
             }
         }
         acc->start (TcpConnection::create (ioserv, bufferSize));
-    }
-    else
-    {
-        new_connection->close ();
     }
 }
 
@@ -802,17 +794,22 @@ void TcpServer::close ()
     std::unique_lock<std::mutex> lock (accepting);
     auto sz = connections.size ();
     lock.unlock ();
-    for (decltype (sz) ii = 0; ii < sz; ++ii)
+    if (sz > 0)
     {
-        connections[ii]->closeNoWait ();
+        for (decltype (sz) ii = 0; ii < sz; ++ii)
+        {
+            connections[ii]->closeNoWait();
+        }
+        std::cout << "connections closing <" << sz << std::endl;
+        for (decltype (sz) ii = 0; ii < sz; ++ii)
+        {
+            connections[ii]->waitOnClose();
+        }
+        std::cout << "connections closed" << std::endl;
+        connections.clear();
     }
-    std::cout << "connections closing <" <<sz<< std::endl;
-    for (decltype (sz) ii = 0; ii < sz; ++ii)
-    {
-        connections[ii]->waitOnClose ();
-    }
-    std::cout << "connections closed" << std::endl;
-    connections.clear ();
+    
+   
 }
 
 }  // namespace tcp
