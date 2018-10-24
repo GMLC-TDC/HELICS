@@ -484,11 +484,11 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
         boost::system::error_code ec;
-        std::cout << " handle acceptor closing socket" << std::endl;
+        std::cout << " handle acceptor closing socket non-connected" << std::endl;
         new_connection->socket().set_option(optionLinger, ec);
         new_connection->close();
         accepting.reset ();
-        std::cout << " handle acceptor socket closed" << std::endl;
+        std::cout << " handle acceptor socket closed non-connected" << std::endl;
         return;
     }
     if (!error)
@@ -793,7 +793,9 @@ void TcpServer::close ()
     halted = true;
     if (acceptors.size () == 1)
     {
+        std::cout << "closing acceptors " << std::endl;
         acceptors[0]->close ();
+        std::cout << "acceptors closed " << std::endl;
     }
     else if (!acceptors.empty ())
     {
