@@ -693,14 +693,13 @@ TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int P
     return pointer (new TcpServer (io_service, PortNum, nominalBufferSize));
 }
 
-void TcpServer::start ()
+bool TcpServer::start ()
 {
-    if (halted)
+    if (halted.load(std::memory_order_acquire))
     {
-        return;
+        return false;
     }
-
-    if (!halted)
+    else
     {
         {  // scope for the lock_guard
             std::lock_guard<std::mutex> lock (accepting);
@@ -715,12 +714,17 @@ void TcpServer::start ()
                 }
             }
         }
-
+        bool success = true;
         for (auto &acc : acceptors)
         {
-            acc->start (TcpConnection::create (ioserv, bufferSize));
+            if (!acc->start(TcpConnection::create(ioserv, bufferSize)))
+            {
+                success = false;
+            }
         }
+        return success;
     }
+    
 }
 
 void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer new_connection)

@@ -261,8 +261,9 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     ~TcpServer ();
     /**set the port reuse flag */
     void setPortReuse (bool reuse) { reuse_address = reuse; }
-    /** start accepting new connections*/
-    void start ();
+    /** start accepting new connections
+    @return true if the start up was successful*/
+    bool start ();
     /** close the server*/
     void close ();
     /** check if the server is ready to start*/

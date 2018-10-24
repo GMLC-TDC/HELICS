@@ -348,8 +348,9 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
           ++counter;
           return len.load ();
       });
-    server->start ();
-    BOOST_TEST_PASSPOINT ();
+    auto started=server->start ();
+
+    BOOST_CHECK(started);
     bool connected = core->connect ();
     BOOST_CHECK (connected);
 
