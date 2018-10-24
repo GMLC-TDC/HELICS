@@ -325,7 +325,6 @@ static void haltTimer(activeProtector &active, boost::asio::steady_timer &tickTi
 
 static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const boost::system::error_code &error)
 {
-    std::cout << " going into tickHandler" << std::endl;
     auto p = active.lock ();
     if (p->first)
     {
@@ -348,7 +347,6 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
         }
     }
     p->second = false;
-    std::cout << " leaving tickHandler" << std::endl;
 }
 
 bool BrokerBase::tryReconnect () { return false; }

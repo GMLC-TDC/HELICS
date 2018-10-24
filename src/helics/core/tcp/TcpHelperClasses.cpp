@@ -798,28 +798,32 @@ void TcpServer::close ()
     else if (!acceptors.empty ())
     {
         // cancel first to give the threads some time to process
+        std::cout << "canceling acceptors " << std::endl;
         for (auto &acc : acceptors)
         {
             acc->cancel ();
         }
+        std::cout << "closing acceptors " << std::endl;
         for (auto &acc : acceptors)
         {
             acc->close ();
         }
+        std::cout << "acceptors closed " << std::endl;
+        acceptors.clear();
     }
 
-    acceptors.clear ();
+    
     std::unique_lock<std::mutex> lock (accepting);
     auto sz = connections.size ();
     lock.unlock ();
     if (sz > 0)
     {
-        std::cout << "closing server connections "<<sz<<"\n";
+        std::cout << "closing server connections "<<sz<<std::endl;
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->closeNoWait();
         }
-        
+        std::cout << "waiting on server connections " << std::endl;
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->waitOnClose();
