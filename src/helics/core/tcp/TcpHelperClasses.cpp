@@ -245,8 +245,7 @@ void TcpConnection::waitOnClose ()
         {
             std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<socket_.is_open()<<" "<<receivingHalt.isTriggered()<< std::endl;
             auto &ioserv = socket_.get_io_service();
-            
-            std::cout << "wait info " << ioserv.stopped() << std::endl;
+            std::cout << "wait info " << ioserv.stopped() <<" "<<connecting<< std::endl;
         }
     }
     else
