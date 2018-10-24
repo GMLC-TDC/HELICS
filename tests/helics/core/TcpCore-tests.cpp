@@ -25,7 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (TcpCore_tests, *utf::label("cic"))
+BOOST_AUTO_TEST_SUITE (TcpCore_tests, *utf::label("ci"))
 
 using boost::asio::ip::tcp;
 using helics::Core;
@@ -175,11 +175,8 @@ BOOST_AUTO_TEST_CASE(tcpComms_rx_test)
     BOOST_CHECK_EQUAL(CommCounter, 1);
     std::lock_guard<std::mutex> lock(actguard);
     BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
-    std::cout << "closing connection" << std::endl;
     txconn->close();
-    std::cout << "disconnect comm" << std::endl;
     comm.disconnect();
-    std::cout << "close server" << std::endl;
     server->close();
     std::this_thread::sleep_for(200ms);
 }

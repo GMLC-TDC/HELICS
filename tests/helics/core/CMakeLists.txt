@@ -55,7 +55,7 @@ add_test(
   NAME core-ci-tests
   COMMAND
     core-tests
-    --run_test=@cic
+    --run_test=@ci
     --log_level=test_suite
     --report_level=short
 )

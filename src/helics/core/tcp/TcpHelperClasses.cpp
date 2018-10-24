@@ -24,7 +24,6 @@ void TcpConnection::startReceive ()
         receivingHalt.trigger ();
         return;
     }
-    std::cout << "startReceiver " <<std::this_thread::get_id()<< std::endl;
     if (state == connection_state_t::prestart)
     {
         receivingHalt.activate ();
@@ -40,7 +39,6 @@ void TcpConnection::startReceive ()
         }
         if (!triggerhalt)
         {
-            std::cout << "receiver calling async_receive " << std::endl;
             socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
                                                         data.size () - residBufferSize),
                                    [this](const boost::system::error_code &error, size_t bytes_transferred) {
@@ -50,7 +48,6 @@ void TcpConnection::startReceive ()
             {
                 //cancel previous operation if triggerhalt is now active
                 socket_.cancel();
-                std::cout << "triger halt after call" << std::endl;
                 //receivingHalt.trigger();
             }
         }
@@ -105,7 +102,6 @@ void TcpConnection::setLoggingFunction(std::function<void(int loglevel, const st
 
 void TcpConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
-    std::cout << "read thread=" << std::this_thread::get_id() << std::endl;
     if (triggerhalt.load(std::memory_order_acquire))
     {
         state = connection_state_t::halted;
@@ -254,7 +250,6 @@ void TcpConnection::waitOnClose ()
     }
     else
     {
-        std::cout << "running to full close from wait on Close" << std::endl;
         close ();
     }
     state.store(connection_state_t::closed);
@@ -425,7 +420,6 @@ bool TcpAcceptor::connect (std::chrono::milliseconds timeOut)
 /** start the acceptor*/
 bool TcpAcceptor::start (TcpConnection::pointer conn)
 {
-    std::cout << "starting acceptor" << std::endl;
     if (!conn)
     {
         if (accepting.isActive ())
@@ -448,7 +442,6 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         auto &socket = conn->socket ();
         acceptor_.listen ();
         auto ptr = shared_from_this ();
-        std::cout << "starting acceptor async connect call" << std::endl;
         acceptor_.async_accept (socket, [this, apointer = std::move (ptr),
                                          connection = std::move (conn)](const boost::system::error_code &error) {
             handle_accept (apointer, connection, error);
@@ -481,16 +474,13 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
                                  TcpConnection::pointer new_connection,
                                  const boost::system::error_code &error)
 {
-    std::cout << " handle acceptor callback" << std::endl;
     if (state.load() != accepting_state_t::connected)
     {
         boost::asio::socket_base::linger optionLinger (true, 0);
         boost::system::error_code ec;
-        std::cout << " handle acceptor closing socket non-connected" << std::endl;
         new_connection->socket().set_option(optionLinger, ec);
         new_connection->close();
         accepting.reset ();
-        std::cout << " handle acceptor socket closed non-connected" << std::endl;
         return;
     }
     if (!error)
@@ -506,7 +496,6 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
         }
         else
         {
-            std::cout << " handle acceptor closing socket 2" << std::endl;
             boost::asio::socket_base::linger optionLinger (true, 0);
             try
             {
@@ -517,21 +506,18 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
             }
             new_connection->close ();
             accepting.reset ();
-            std::cout << " handle acceptor socket closed 2" << std::endl;
         }
     }
     else if (error != boost::asio::error::operation_aborted)
     {
         if (errorCall)
         {
-            std::cout << " handle acceptor making error call" << std::endl;
             errorCall (std::move (ptr), error);
         }
         else
         {
             std::cerr << " error in accept::" << error.message () << std::endl;
         }
-        std::cout << " handle acceptor closing socket 3" << std::endl;
         boost::asio::socket_base::linger optionLinger (true, 0);
         try
         {
@@ -542,14 +528,11 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
         }
         new_connection->close ();
         accepting.reset ();
-        std::cout << " handle acceptor socket closed 3" << std::endl;
     }
     else
     {
-        std::cout << " handle acceptor closing socket 4" << std::endl;
         new_connection->close ();
         accepting.reset ();
-        std::cout << " handle acceptor socket closed 4" << std::endl;
     }
 }
 
@@ -742,16 +725,13 @@ void TcpServer::start ()
 
 void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer new_connection)
 {
-    std::cout << " accepting connection" << std::endl;
     /*setting linger to 1 second*/
     boost::asio::socket_base::linger optionLinger (true, 0);
     new_connection->socket ().set_option (optionLinger);
     // Set options here
     if (halted.load())
     {
-        std::cout << " acceptor closing connection 1" << std::endl;
         new_connection->close ();
-        std::cout << " acceptor connection closed 1" << std::endl;
         return;
     }
     else
@@ -769,9 +749,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
             else
             {
                 lock.unlock ();
-                std::cout << " acceptor closing connection 2" << std::endl;
                 new_connection->close ();
-                std::cout << " acceptor connection closed 2" << std::endl;
                 return;
             }
         }
@@ -795,24 +773,19 @@ void TcpServer::close ()
     halted = true;
     if (acceptors.size () == 1)
     {
-        std::cout << "closing acceptors single " << std::endl;
         acceptors[0]->close ();
-        std::cout << "acceptors closed single" << std::endl;
     }
     else if (!acceptors.empty ())
     {
         // cancel first to give the threads some time to process
-        std::cout << "canceling acceptors multi" << std::endl;
         for (auto &acc : acceptors)
         {
             acc->cancel ();
         }
-        std::cout << "closing acceptors multi" << std::endl;
         for (auto &acc : acceptors)
         {
             acc->close ();
         }
-        std::cout << "acceptors closed " << std::endl;
         acceptors.clear();
     }
 
@@ -822,17 +795,14 @@ void TcpServer::close ()
     lock.unlock ();
     if (sz > 0)
     {
-        std::cout << "closing server connections "<<sz<<std::endl;
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->closeNoWait();
         }
-        std::cout << "waiting on server connections " << std::endl;
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->waitOnClose();
         }
-        std::cout << "server closed" << std::endl;
         connections.clear();
     }
     
