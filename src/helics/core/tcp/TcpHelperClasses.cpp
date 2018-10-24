@@ -24,6 +24,7 @@ void TcpConnection::startReceive ()
         receivingHalt.trigger ();
         return;
     }
+    std::cout << "startReceiver " <<std::this_thread::get_id()<< std::endl;
     if (state == connection_state_t::prestart)
     {
         receivingHalt.activate ();
