@@ -243,7 +243,10 @@ void TcpConnection::waitOnClose ()
         
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
         {
-            std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
+            std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<socket_.is_open()<<" "<<receivingHalt.isTriggered()<< std::endl;
+            auto &ioserv = socket_.get_io_service();
+            
+            std::cout << "wait info " << ioserv.stopped() << std::endl;
         }
     }
     else
