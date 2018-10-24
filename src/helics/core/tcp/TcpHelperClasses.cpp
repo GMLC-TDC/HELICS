@@ -254,6 +254,7 @@ void TcpConnection::waitOnClose ()
     }
     else
     {
+        std::cout << "running to full close from wait on Close" << std::endl;
         close ();
     }
     state.store(connection_state_t::closed);
@@ -793,19 +794,19 @@ void TcpServer::close ()
     halted = true;
     if (acceptors.size () == 1)
     {
-        std::cout << "closing acceptors " << std::endl;
+        std::cout << "closing acceptors single " << std::endl;
         acceptors[0]->close ();
-        std::cout << "acceptors closed " << std::endl;
+        std::cout << "acceptors closed single" << std::endl;
     }
     else if (!acceptors.empty ())
     {
         // cancel first to give the threads some time to process
-        std::cout << "canceling acceptors " << std::endl;
+        std::cout << "canceling acceptors multi" << std::endl;
         for (auto &acc : acceptors)
         {
             acc->cancel ();
         }
-        std::cout << "closing acceptors " << std::endl;
+        std::cout << "closing acceptors multi" << std::endl;
         for (auto &acc : acceptors)
         {
             acc->close ();
