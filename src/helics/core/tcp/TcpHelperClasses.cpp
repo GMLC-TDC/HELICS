@@ -448,6 +448,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         auto &socket = conn->socket ();
         acceptor_.listen ();
         auto ptr = shared_from_this ();
+        std::cout << "starting acceptor async connect call" << std::endl;
         acceptor_.async_accept (socket, [this, apointer = std::move (ptr),
                                          connection = std::move (conn)](const boost::system::error_code &error) {
             handle_accept (apointer, connection, error);
