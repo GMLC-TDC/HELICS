@@ -28,9 +28,9 @@ void TcpConnection::startReceive ()
     {
         receivingHalt.activate ();
         connected.activate ();
-        state = connection_state_t::halted;
+        state = connection_state_t::waiting;
     }
-    connection_state_t exp = connection_state_t::halted;
+    connection_state_t exp = connection_state_t::waiting;
     if (state.compare_exchange_strong (exp, connection_state_t::operating))
     {
         if (!receivingHalt.isActive ())
@@ -48,23 +48,26 @@ void TcpConnection::startReceive ()
             {
                 //cancel previous operation if triggerhalt is now active
                 socket_.cancel();
-                receivingHalt.trigger();
+                std::cout << "triger halt after call" << std::endl;
+                //receivingHalt.trigger();
             }
         }
         else
         {
+            state = connection_state_t::halted;
             receivingHalt.trigger ();
         }
     }
     else if (exp != connection_state_t::operating)
     {
+        /*either halted or closed*/
         receivingHalt.trigger ();
     }
 }
 
 void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc)
 {
-    if (state == connection_state_t::prestart)
+    if (state.load() == connection_state_t::prestart)
     {
         dataCall = std::move (dataFunc);
     }
@@ -76,7 +79,7 @@ void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, c
 void TcpConnection::setErrorCall (
   std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc)
 {
-    if (state == connection_state_t::prestart)
+    if (state.load() == connection_state_t::prestart)
     {
         errorCall = std::move (errorFunc);
     }
@@ -88,7 +91,7 @@ void TcpConnection::setErrorCall (
 
 void TcpConnection::setLoggingFunction(std::function<void(int loglevel, const std::string &logMessage)> logFunc)
 {
-    if (state == connection_state_t::prestart)
+    if (state.load() == connection_state_t::prestart)
     {
         logFunction = std::move (logFunc);
     }
@@ -100,9 +103,9 @@ void TcpConnection::setLoggingFunction(std::function<void(int loglevel, const st
 
 void TcpConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
-    if (triggerhalt)
+    if (triggerhalt.load(std::memory_order_acquire))
     {
-        state = connection_state_t::closed;
+        state = connection_state_t::halted;
         receivingHalt.trigger ();
         return;
     }
@@ -122,7 +125,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
             residBufferSize = 0;
             data.assign (data.size (), 0);
         }
-        state = connection_state_t::halted;
+        state = connection_state_t::waiting;
         startReceive ();
     }
     else if (error == boost::asio::error::operation_aborted)
@@ -131,7 +134,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
         receivingHalt.trigger ();
         return;
     }
-    else
+    else // there was an error
     {
         if (bytes_transferred > 0)
         {
@@ -154,7 +157,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
         {
             if (errorCall (shared_from_this (), error))
             {
-                state = connection_state_t::halted;
+                state = connection_state_t::waiting;
                 startReceive ();
             }
             else
@@ -163,7 +166,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
                 receivingHalt.trigger ();
             }
         }
-        else if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
+        else if (error != boost::asio::error::eof)
         {
             if (error != boost::asio::error::connection_reset)
             {
@@ -199,6 +202,7 @@ void TcpConnection::closeNoWait ()
             receivingHalt.trigger();
         }
         break;
+    case connection_state_t::halted:
     case connection_state_t::closed:
         receivingHalt.trigger();
         break;
@@ -230,7 +234,7 @@ void TcpConnection::closeNoWait ()
 void TcpConnection::waitOnClose ()
 {
    
-    if (triggerhalt.load())
+    if (triggerhalt.load(std::memory_order_acquire))
     {
         if (connecting)
         {
@@ -239,13 +243,14 @@ void TcpConnection::waitOnClose ()
         
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
         {
-           // std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
+            std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
         }
     }
     else
     {
         close ();
     }
+    state.store(connection_state_t::closed);
 }
 
 TcpConnection::pointer TcpConnection::create (boost::asio::io_service &io_service,
@@ -799,7 +804,6 @@ void TcpServer::close ()
         connections.clear();
     }
     
-   
 }
 
 }  // namespace tcp

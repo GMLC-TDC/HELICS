@@ -21,12 +21,13 @@ namespace tcp
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
   public:
-    enum class connection_state_t
-    {
+      enum class connection_state_t
+      {
         prestart = -1,
-        halted = 0,
+        waiting = 0,
         operating = 1,
-        closed = 2,
+        halted = 3,
+        closed = 4,
     };
 
     typedef std::shared_ptr<TcpConnection> pointer;
@@ -117,7 +118,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
         });
     }
     /** check if the socket has finished the connection process*/
-    bool isConnected () const { return (connected.isActive ()) && (!connectionError); }
+    bool isConnected () const { return (connected.isActive ()) && (!connectionError.load(std::memory_order_acquire)); }
     /** wait until the socket has finished the connection process
     @param timeOut the number of ms to wait for the connection process to finish (<0) for no limit
     @return true if connected, false if the timeout was reached
