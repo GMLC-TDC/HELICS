@@ -40,6 +40,7 @@ void TcpConnection::startReceive ()
         }
         if (!triggerhalt)
         {
+            std::cout << "receiver calling async_receive " << std::endl;
             socket_.async_receive (boost::asio::buffer (data.data () + residBufferSize,
                                                         data.size () - residBufferSize),
                                    [this](const boost::system::error_code &error, size_t bytes_transferred) {
