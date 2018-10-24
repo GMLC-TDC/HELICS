@@ -236,10 +236,10 @@ void TcpConnection::waitOnClose ()
         {
             connected.waitActivation();
         }
-        std::cout << "wait on receiving halt" << std::endl;
+        
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
         {
-            std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
+           // std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
         }
     }
     else
@@ -791,12 +791,11 @@ void TcpServer::close ()
         {
             connections[ii]->closeNoWait();
         }
-        std::cout << "connections closing <" << sz << std::endl;
+        
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             connections[ii]->waitOnClose();
         }
-        std::cout << "connections closed" << std::endl;
         connections.clear();
     }
     

@@ -118,9 +118,7 @@ BOOST_AUTO_TEST_CASE(tcpComms_broker_test_transmit)
         BOOST_CHECK(rM.action() == helics::action_message_def::action_t::cmd_ignore);
     }
     comm.disconnect();
-    std::cout << "cloing server" << std::endl;
     server->close();
-    std::cout << "server closed" << std::endl;
     std::this_thread::sleep_for(100ms);
 }
 
@@ -179,9 +177,7 @@ BOOST_AUTO_TEST_CASE(tcpComms_rx_test)
     BOOST_CHECK(act.action() == helics::action_message_def::action_t::cmd_ack);
     txconn->close();
     comm.disconnect();
-    std::cout << "cloing server" << std::endl;
     server->close();
-    std::cout << "server closed" << std::endl;
     std::this_thread::sleep_for(200ms);
 }
 
