@@ -103,6 +103,7 @@ void TcpConnection::setLoggingFunction(std::function<void(int loglevel, const st
 
 void TcpConnection::handle_read (const boost::system::error_code &error, size_t bytes_transferred)
 {
+    std::cout << "read thread=" << std::this_thread::get_id() << std::endl;
     if (triggerhalt.load(std::memory_order_acquire))
     {
         state = connection_state_t::halted;
@@ -245,6 +246,7 @@ void TcpConnection::waitOnClose ()
         {
             std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<socket_.is_open()<<" "<<receivingHalt.isTriggered()<< std::endl;
             auto &ioserv = socket_.get_io_service();
+
             std::cout << "wait info " << ioserv.stopped() <<" "<<connecting<< std::endl;
         }
     }
