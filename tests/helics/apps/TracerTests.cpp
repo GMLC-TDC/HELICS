@@ -630,7 +630,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
-    helics::Endpoint &e1 = mfed.registerGlobalEndpoint ("d1");
+    helics::Endpoint &e1 = cfed.registerGlobalEndpoint ("d1");
 
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);

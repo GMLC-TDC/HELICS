@@ -313,7 +313,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     template <typename X>
     X getValue (const Input &inp)
     {
-        return ValueConverter<X>::interpret (getValueRaw (id));
+        return ValueConverter<X>::interpret (getValueRaw (inp));
     }
 
     /** publish a value
@@ -358,7 +358,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     template <typename X>
     void publish (const Publication &pub, const X &value)
     {
-        publish (id, data_view (ValueConverter<X>::convert (value)));
+        publish (pub, data_view (ValueConverter<X>::convert (value)));
     }
     /** add a destination target to a publication
     @param id the identifier of the input

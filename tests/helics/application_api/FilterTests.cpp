@@ -34,17 +34,17 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
     mFed->registerGlobalEndpoint ("port1");
     mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
-    auto f2 = fFed->registerFilter ("filter2");
+    BOOST_CHECK (f1.getHandle ().isValid());
+    auto &f2 = fFed->registerFilter ("filter2");
     fFed->addDestinationTarget (f2, "port2");
-    BOOST_CHECK (f2 != f1);
-    auto ep1 = fFed->registerEndpoint ("fout");
-    BOOST_CHECK (ep1.value () != helics::invalid_id_value);
-    auto f3 = fFed->registerFilter ();
+    BOOST_CHECK (f2.getHandle().isValid());
+    auto &ep1 = fFed->registerEndpoint ("fout");
+    BOOST_CHECK (ep1.getHandle().isValid());
+    auto &f3 = fFed->registerFilter ();
     fFed->addSourceTarget (f3, "filter0/fout");
-    BOOST_CHECK (f3 != f2);
+    BOOST_CHECK (f3.getHandle() != f2.getHandle());
     mFed->finalize ();
     fFed->finalize ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
@@ -62,12 +62,12 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle ().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
@@ -130,12 +130,12 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto Filt = helics::make_filter (helics::defined_filter_types::delay, fFed.get ());
-    Filt->addSourceTarget ("port1");
-    Filt->set ("delay", 2.5);
+    auto &Filt = helics::make_filter (helics::defined_filter_types::delay, fFed.get ());
+    Filt.addSourceTarget ("port1");
+    Filt.set ("delay", 2.5);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -189,12 +189,12 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addDestinationTarget (f1, "port2");
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle ().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
@@ -250,12 +250,12 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed1->registerGlobalEndpoint ("port1");
-    auto p2 = mFed2->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed1->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed2->registerGlobalEndpoint ("port2");
 
-    auto f1 = mFed2->registerFilter ("filter1");
+    auto &f1 = mFed2->registerFilter ("filter1");
     mFed2->addSourceTarget (f1, "port1");
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle ().isValid());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
     timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     mFed2->setFilterOperator (f1, timeOperator);
@@ -467,11 +467,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle () != helics::invalid_id_value);
 
     auto &f2 = fFed2->registerFilter ("filter2");
     fFed2->addSourceTarget (f2, "port1");
-    BOOST_CHECK (f2.value () != helics::invalid_id_value);
+    BOOST_CHECK (f2.getHandle () != helics::invalid_id_value);
 
     bool res = two_stage_filter_test (mFed, fFed, fFed2, p1, p2, f1, f2);
     BOOST_CHECK (res);
@@ -497,11 +497,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target,
 
     auto &f1 = fFed->registerGlobalFilter ("filter1");
 
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle () != helics::invalid_id_value);
 
     auto &f2 = fFed2->registerGlobalFilter ("filter2");
 
-    BOOST_CHECK (f2.value () != helics::invalid_id_value);
+    BOOST_CHECK (f2.getHandle () != helics::invalid_id_value);
 
     bool res = two_stage_filter_test (mFed, fFed, fFed2, p1, p2, f1, f2);
     BOOST_CHECK (res);
@@ -528,11 +528,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target_dest,
 
     auto &f1 = fFed->registerGlobalFilter ("filter1");
 
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle() != helics::invalid_id_value);
 
     auto &f2 = fFed2->registerGlobalFilter ("filter2");
 
-    BOOST_CHECK (f2.value () != helics::invalid_id_value);
+    BOOST_CHECK (f2.getHandle () != helics::invalid_id_value);
 
     bool res = two_stage_filter_test (mFed, fFed, fFed2, p1, p2, f1, f2);
     BOOST_CHECK (res);
@@ -559,11 +559,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link,
 
       auto &f1 = fFed->registerGlobalFilter ("filter1");
 
-    BOOST_CHECK (f1.value () != helics::invalid_id_value);
+    BOOST_CHECK (f1.getHandle() != helics::invalid_id_value);
 
     auto &f2 = fFed2->registerGlobalFilter ("filter2");
 
-    BOOST_CHECK (f2.value () != helics::invalid_id_value);
+    BOOST_CHECK (f2.getHandle() != helics::invalid_id_value);
 
     bool res = two_stage_filter_test (mFed, fFed, fFed2, p1, p2, f1, f2);
     BOOST_CHECK (res);
@@ -672,8 +672,8 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
     auto &f1 = helics::make_filter (helics::defined_filter_types::delay, fFed.get (), "filter1");
-    f1->addSourceTarget ("port1");
-    f1->set ("delay", 1.25);
+    f1.addSourceTarget ("port1");
+    f1.set ("delay", 1.25);
 
     auto &f2 = helics::make_filter (helics::defined_filter_types::delay, fFed.get (), "filter2");
     f2.addSourceTarget ("port1");

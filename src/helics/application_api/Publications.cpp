@@ -19,19 +19,46 @@ Publication::Publication (ValueFederate *valueFed,
     pubType = getTypeFromString (type);
 }
 
+Publication::Publication (ValueFederate *valueFed,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units)
+{
+    auto &pub = valueFed->getPublication (key);
+    if (pub.isValid ())
+    {
+        operator= (pub);
+    }
+    else
+    {
+        operator= (valueFed->registerPublication (key, type, units));
+    }
+}
+
 Publication::Publication (interface_visibility locality,
                           ValueFederate *valueFed,
                           const std::string &key,
                           const std::string &type,
                           const std::string &units)
 {
-    if (locality == interface_visibility::global)
+    try
     {
-        operator= (valueFed->registerGlobalPublication (key, type, units));
+        if (locality == interface_visibility::global)
+        {
+            operator= (valueFed->registerGlobalPublication (key, type, units));
+        }
+        else
+        {
+            operator= (valueFed->registerPublication (key, type, units));
+        }
     }
-    else
+    catch (const RegistrationFailure &e)
     {
-        operator= (valueFed->registerPublication (key, type, units));
+        operator= (valueFed->getPublication (key));
+        if (!isValid ())
+        {
+            throw (e);
+        }
     }
 }
 

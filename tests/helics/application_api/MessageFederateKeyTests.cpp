@@ -224,7 +224,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     auto mFed1 = GetFederateAs<MessageFederate> (0);
     auto mFed2 = GetFederateAs<MessageFederate> (1);
 
-    Endpoint epid (mFed1.get (), "ep1");
+    Endpoint epid (mFed1, "ep1");
 
     Endpoint epid2 (GLOBAL, mFed2.get (), "ep2", "random");
 

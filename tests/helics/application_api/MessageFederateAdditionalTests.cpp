@@ -99,13 +99,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = mFed1->registerEndpoint ("ep1");
+    auto &epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
-    helics::endpoint_id_t rxend;
+    helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&](helics::endpoint_id_t ept, helics::Time rtime) {
-        rxend = ept;
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+        rxend = ept.getHandle();
         timeRx = rtime;
     };
 
@@ -151,10 +151,10 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     helics::Endpoint ep1 (mFed1, "ep1");
     helics::Endpoint ep2 (helics::GLOBAL, mFed1, "ep2", "random");
 
-    helics::endpoint_id_t rxend;
+    helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&](helics::endpoint_id_t ept, helics::Time rtime) {
-        rxend = ept;
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+        rxend = ept.getHandle();
         timeRx = rtime;
     };
 
@@ -177,7 +177,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     res = ep1.hasMessage ();
     BOOST_CHECK (!res);
 
-    BOOST_CHECK (rxend == ep2.getID ());
+    BOOST_CHECK (rxend == ep2.getHandle ());
     BOOST_CHECK_EQUAL (timeRx, helics::Time (1.0));
     auto M = ep2.getMessage ();
     BOOST_REQUIRE (M);
@@ -200,8 +200,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     helics::endpoint_id_t rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint *ept, helics::Time rtime) {
-        rxend = ept->getID ();
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+        rxend = ept->getHandle ();
         timeRx = rtime;
     }; 
 
@@ -244,12 +244,12 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = mFed1->registerEndpoint ("ep1");
+    auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    mFed1->registerEndpointCallback (epid, [&](helics::endpoint_id_t, helics::Time) { ++e1cnt; });
-    mFed2->registerEndpointCallback (epid2, [&](helics::endpoint_id_t, helics::Time) { ++e2cnt; });
+    mFed1->registerEndpointCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
+    mFed2->registerEndpointCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);

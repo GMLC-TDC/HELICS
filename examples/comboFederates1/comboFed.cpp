@@ -69,11 +69,11 @@ int main (int argc, char *argv[])
     std::cout << " registering endpoint '" << myendpoint << "' for " << name << '\n';
 
     // this line actually creates an endpoint
-    auto id = cFed->registerEndpoint (myendpoint);
+    auto &id = cFed->registerEndpoint (myendpoint);
 
-    auto pubid = cFed->registerPublication ("pub", "double");
+    auto &pubid = cFed->registerPublication ("pub", "double");
 
-    auto subid = cFed->registerSubscription (vtarget + "/pub", "double");
+    auto &subid = cFed->registerSubscription (vtarget + "/pub", "double");
     std::cout << "entering init State\n";
     cFed->enterInitializingMode ();
     std::cout << "entered init State\n";

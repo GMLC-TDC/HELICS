@@ -27,16 +27,32 @@ Endpoint &MessageFederateManager::registerEndpoint (const std::string &name, con
     auto handle = coreObject->registerEndpoint (fedID, name, type);
 	if (handle.isValid())
 	{
+        auto edat = std::make_unique<EndpointData> ();
+
         auto eptHandle = local_endpoints.lock ();
-        if (eptHandle->insert (name, handle, mFed, handle, name))
+        auto loc = eptHandle->insert (name, handle, mFed, name, handle, edat.get ());
+        if (loc)
         {
             auto &ref = eptHandle->back ();
-            auto edat = std::make_unique<EndpointData> ();
-			//non-owning pointer
-            ref.dataReference = edat.get ();
+            ref.referenceIndex = static_cast<int> (*loc);
+            eptHandle.unlock ();
+			
+			//** now insert the data into the appropriate location in the data array
 			auto datHandle = eptData.lock ();
-            datHandle->push_back (std::move(edat));
-            ref.referenceIndex = static_cast<int> (datHandle->size () - 1);
+			if (datHandle->size() == loc)
+			{
+                datHandle->push_back (std::move (edat));
+			}
+			else if (datHandle->size() < loc)
+			{
+                datHandle->resize (*loc + 1);
+                (*datHandle)[*loc] = std::move (edat);
+			}
+			else
+			{
+                (*datHandle)[*loc] = std::move (edat);
+			}
+            
             return ref;
         }
 	}

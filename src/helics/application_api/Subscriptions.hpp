@@ -226,7 +226,7 @@ class VectorSubscription2d
     void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (Input &inp, Time time)
+    void handleCallback (const Input &inp, Time time)
     {
         auto res = std::lower_bound (ids.begin (), ids.end (), inp);
         int index = static_cast<int> (res - ids.begin ());

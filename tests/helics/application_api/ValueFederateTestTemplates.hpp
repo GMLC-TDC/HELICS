@@ -380,7 +380,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
     BOOST_CHECK_EQUAL (f1time.get (), 2.0);
 
     // make sure the value was updated
-    fedB->getValue (subid.getID (), val);
+    fedB->getValue (subid, val);
     BOOST_CHECK_EQUAL (val, testValue2);
     fedA->finalize ();
     fedB->finalize ();

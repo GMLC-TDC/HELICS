@@ -46,8 +46,8 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
     auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
-    Filt->setString ("newdestination", "port3");
+    Filt.addSourceTarget ("port1");
+    Filt.setString ("newdestination", "port3");
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -220,9 +220,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
     auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
+    Filt.addSourceTarget ("port1");
     double drop_prob = 0.75;
-    Filt->set ("dropprob", drop_prob);
+    Filt.set ("dropprob", drop_prob);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -339,9 +339,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
     auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
-    Filt->addDestinationTarget ("port2");
+    Filt.addDestinationTarget ("port2");
     double drop_prob = 0.25;
-    Filt->set ("dropprob", drop_prob);
+    Filt.set ("dropprob", drop_prob);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -457,11 +457,11 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
     auto &Filt = helics::make_filter (helics::defined_filter_types::randomDelay, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
-    Filt->setString ("distribution", "binomial");
+    Filt.addSourceTarget ("port1");
+    Filt.setString ("distribution", "binomial");
 
-    Filt->set ("param1", 4);  // max_delay=4
-    Filt->set ("param2", 0.5);  // prob
+    Filt.set ("param1", 4);  // max_delay=4
+    Filt.set ("param2", 0.5);  // prob
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();

@@ -26,7 +26,7 @@ class Publication
     std::string units_;  //!< the defined units of the publication
   public:
     Publication () = default;
-    /** base constructor for a publication
+    /** constructor for a publication used by the valueFederateManager
     @param a valueFed a pointer the link valueFederate
     @param id the interface_handle from the core
     @param key the identifier for the publication
@@ -37,6 +37,16 @@ class Publication
         const std::string &type,
         const std::string &units);
 
+	 /** constructor for a publication 
+   @param a valueFed a pointer the link valueFederate
+   @param key the identifier for the publication
+   @param type the type of the publication
+   @param units, an optional string defining the units*/
+    Publication (ValueFederate *valueFed,
+                 const std::string &key,
+                 const std::string &type,
+                 const std::string &units = std::string ());
+
     /** base constructor for a publication
     @tparam a valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
     that results in a valueFederate object
@@ -46,9 +56,9 @@ class Publication
     template <class FedPtr>
     Publication (FedPtr valueFed,
                      const std::string &key,
-                     const std::string &type,
+                 const std::string &type = std::string (),
                      const std::string &units = std::string ())
-        :Publication(valueFed->registerPublication(key,type,units))
+        : Publication (std::addressof (*valueFed),key,type,units )
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");

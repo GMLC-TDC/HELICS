@@ -25,13 +25,20 @@ class Endpoint
     /** default constructor*/
     Endpoint () = default;
     /**/
-    Endpoint (MessageFederate *mfed, interface_handle id, const std::string &actName)
-        : fed (mfed), handle (id), actualName (actName)
+    // constructor used by messageFederateManager
+    Endpoint (MessageFederate *mfed, const std::string &name, interface_handle id, void *data)
+        : fed (mfed), handle (id), dataReference(data), actualName (name)
     {
     }
-template <class FedPtr>
-    Endpoint (FedPtr &mFed, const std::string &name, const std::string &type = std::string ())
-        : Endpoint (mFed->registerEndpoint(name,type))
+
+    Endpoint (MessageFederate *mFed, const std::string &name, const std::string &type = std::string ())
+        : Endpoint (mFed->registerEndpoint (name, type))
+    {
+    }
+
+    template <class FedPtr>
+    Endpoint (FedPtr &mFed, const std::string &aactname, const std::string &type = std::string ())
+        : Endpoint (mFed->registerEndpoint (name, type))
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
                        "first argument must be a pointer to a MessageFederate");

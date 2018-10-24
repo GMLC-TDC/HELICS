@@ -237,15 +237,14 @@ class Input
 /** class to handle a subscription
 @tparam X the class of the value associated with a subscription*/
 template <class X>
-class InputT : public InputBase
+class InputT : public Input
 {
   public:
   private:
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
     std::function<double(const X &v1, const X &v2)>
-      changeDetectionCallback;  //!< callback function for change detection
-    double delta = 0.0;  // 1< the minimum difference to trigger an update
-    bool changeDetectionEnabled = false;  //!< flag indicating if change detection is enabled or not
+      changeDetectionOperator;  //!< callback function for change detection
+
   public:
     InputT () = default;
     /**constructor to build a subscription object
@@ -290,20 +289,6 @@ class InputT : public InputBase
     @param val the value to set as the default
     */
     void setDefault (const X &val) { fed->setDefaultValue (id, val); }
-    /** set a minimum change value*/
-    void setMinimumChange (double deltaV)
-    {
-        if (delta < 0.0)
-        {
-            changeDetectionEnabled = true;
-        }
-        delta = deltaV;
-        if (delta < 0.0)
-        {
-            changeDetectionEnabled = false;
-        }
-    }
-    void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
     /** store the value in the given variable
     @param[out] out the location to store the value
