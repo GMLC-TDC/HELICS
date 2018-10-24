@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(tcpComms_broker_test_transmit)
 
     auto srv = AsioServiceManager::getServicePointer();
     auto server = helics::tcp::TcpServer::create(srv->getBaseService(), host, TCP_BROKER_PORT);
-    srv->runServiceLoop();
+    auto serviceLoop = srv->runServiceLoop();
     std::vector<char> data(1024);
     server->setDataCall(
         [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(tcpComms_rx_test)
     auto srv = AsioServiceManager::getServicePointer();
 
     auto server = helics::tcp::TcpServer::create(srv->getBaseService(), host, TCP_BROKER_PORT_STRING);
-    srv->runServiceLoop();
+    auto serviceLoop = srv->runServiceLoop();
     std::vector<char> data(1024);
     server->setDataCall([&data, &ServerCounter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec,
         size_t data_Size) {
@@ -345,6 +345,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string());
     comm3.loadTargetInfo (host, host);
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
 
     comm.setBrokerPort (TCP_BROKER_PORT+2);
     comm.setName ("tests");
@@ -432,7 +434,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     auto srv = AsioServiceManager::getServicePointer ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (),"localhost", TCP_BROKER_PORT);
-    srv->runServiceLoop ();
+    auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (

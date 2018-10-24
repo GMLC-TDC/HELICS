@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
 
     auto srv = AsioServiceManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
-    srv->runServiceLoop ();
+    auto serviceLoop = srv->runServiceLoop ();
     std::vector<char> data (1024);
     server->setDataCall (
       [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     comm.loadTargetInfo (host, "");
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
-
+    auto serviceLoop = srv->runServiceLoop();
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock (actguard);
@@ -182,6 +182,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm;
@@ -242,7 +244,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm, comm2, comm3;
-
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string ());
     comm3.loadTargetInfo (host, host);
@@ -332,10 +335,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), "localhost", TCP_BROKER_PORT);
-    srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (
