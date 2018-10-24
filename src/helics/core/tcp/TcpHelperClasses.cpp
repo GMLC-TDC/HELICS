@@ -48,6 +48,7 @@ void TcpConnection::startReceive ()
             {
                 //cancel previous operation if triggerhalt is now active
                 socket_.cancel();
+                receivingHalt.trigger();
             }
         }
         else
@@ -101,7 +102,7 @@ void TcpConnection::handle_read (const boost::system::error_code &error, size_t 
 {
     if (triggerhalt)
     {
-        state = connection_state_t::halted;
+        state = connection_state_t::closed;
         receivingHalt.trigger ();
         return;
     }
@@ -190,23 +191,19 @@ void TcpConnection::close ()
 void TcpConnection::closeNoWait ()
 {
     triggerhalt.store(true);
-    if (state == connection_state_t::prestart)
+    switch (state.load())
     {
-        state = connection_state_t::closed;
+    case connection_state_t::prestart:
         if (receivingHalt.isActive())
         {
             receivingHalt.trigger();
         }
-        connected.activate();
-    }
-    else if (state == connection_state_t::halted)
-    {
-        state = connection_state_t::closed;
+        break;
+    case connection_state_t::closed:
         receivingHalt.trigger();
-    }
-    else
-    {
-        state = connection_state_t::closed;
+        break;
+    default:
+        break;
     }
 
     boost::system::error_code ec;
@@ -242,7 +239,7 @@ void TcpConnection::waitOnClose ()
         std::cout << "wait on receiving halt" << std::endl;
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200)))
         {
-            std::cout << "wait timeout " << static_cast<int>(state.load())<< std::endl;
+            std::cout << "wait timeout " << static_cast<int>(state.load())<<" "<<receivingHalt.isActive()<<" "<<receivingHalt.isTriggered()<< std::endl;
         }
     }
     else
