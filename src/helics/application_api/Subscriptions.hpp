@@ -135,7 +135,7 @@ class VectorSubscription2d
     ValueFederate *fed = nullptr;  //!< reference to the value federate
     std::string m_key;  //!< the name of the subscription
     std::string m_units;  //!< the defined units of the federate
-    std::vector<input_id_t> ids;  //!< the id of the federate
+    std::vector<Input> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
     std::array<int, 4> indices;  //!< storage for the indices and start values
@@ -182,8 +182,8 @@ class VectorSubscription2d
         indices[1] = count_x;
         indices[2] = startIndex_y;
         indices[3] = count_y;
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
+        fed->registerInputNotificationCallback (ids, [this](const Input &inp, Time tm) {
+            handleCallback (inp, tm);
         });
     }
 
@@ -197,8 +197,8 @@ class VectorSubscription2d
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
+        fed->registerInputNotificationCallback (ids, [this](const Input &inp, Time tm) {
+            handleCallback (inp, tm);
         });
         indices = vs.indices;
         return *this;
@@ -226,9 +226,9 @@ class VectorSubscription2d
     void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (input_id_t id, Time time)
+    void handleCallback (Input &inp, Time time)
     {
-        auto res = std::lower_bound (ids.begin (), ids.end (), id);
+        auto res = std::lower_bound (ids.begin (), ids.end (), inp);
         int index = static_cast<int> (res - ids.begin ());
         fed->getValue (ids[index], vals[index]);
         if (update_callback)

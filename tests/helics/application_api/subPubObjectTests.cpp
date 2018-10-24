@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_tests, *utf::label("ci"))
     // register the publications
     auto pubObj = helics::make_publication<std::string> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj = vFed->registerSubscription( "pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -329,8 +329,8 @@ BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
     // register the publications
     auto pubObj = helics::make_publication<double> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj1 = helics::Subscription (vFed.get (), "pub1");
-    auto subObj2 = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj1 = vFed->registerSubscription("pub1");
+    auto &subObj2 = vFed->registerSubscription ("pub1");
     subObj2.setMinimumChange (0.1);
     vFed->setTimeProperty (TIME_DELTA_PROPERTY,1.0);
     vFed->enterExecutingMode ();
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label("ci"))
     // register the publications
     auto pubObj = helics::make_publication<std::string> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj = vFed->registerSubscription ("pub1");
 
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label("ci"))
     auto pubObj =
       helics::make_publication<std::vector<double>> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj = vFed->registerSubscription ("pub1");
 
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
@@ -430,8 +430,8 @@ BOOST_AUTO_TEST_CASE(subscriptionDefaults_test, *utf::label("ci"))
 
     auto vFed = std::make_shared<helics::ValueFederate> ("test1", fi);
     // register the publications
-    helics::Subscription subObj1(vFed, "pub1");
-    helics::Subscription subObj2(vFed, "pub2");
+    auto &subObj1=vFed->registerSubscription ("pub1");
+    auto &subObj2 = vFed->registerSubscription ("pub2");
     subObj1.setDefault(45.3);
     subObj2.setDefault(67.4);
     vFed->enterExecutingMode();

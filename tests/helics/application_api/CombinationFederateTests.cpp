@@ -42,19 +42,19 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     SetupTest<helics::CombinationFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
-    auto pubid = vFed1->registerPublication<std::string> ("pub1");
-    auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
+    auto &pubid = vFed1->registerPublication<std::string> ("pub1");
+    auto &pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
 
-    auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
+    auto &pubid3 = vFed1->registerPublication ("pub3", "double", "V");
     vFed1->enterExecutingMode ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = vFed1->getPublicationKey (pubid);
-    auto sv2 = vFed1->getPublicationKey (pubid2);
+    auto &sv = vFed1->getPublicationKey (pubid);
+    auto &sv2 = vFed1->getPublicationKey (pubid2);
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
-    auto pub3name = vFed1->getPublicationKey (pubid3);
+    auto &pub3name = vFed1->getPublicationKey (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
@@ -74,9 +74,9 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = vFed1->registerSubscription("pub1");
+    auto &subid = vFed1->registerSubscription("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -109,15 +109,15 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     SetupTest<helics::CombinationFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = mFed1->registerEndpoint ("ep1");
+    auto &epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
     mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = mFed1->getEndpointName (epid);
-    auto sv2 = mFed1->getEndpointName (epid2);
+    auto &sv = mFed1->getEndpointName (epid);
+    auto &sv2 = mFed1->getEndpointName (epid2);
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
@@ -138,8 +138,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     auto mFed1 = GetFederateAs<helics::CombinationFederate> (0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate> (1);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = mFed1->registerEndpoint ("ep1");
+    auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
@@ -192,13 +192,13 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     auto cFed1 = GetFederateAs<helics::CombinationFederate> (0);
     auto cFed2 = GetFederateAs<helics::CombinationFederate> (1);
 
-    auto epid = cFed1->registerEndpoint ("ep1");
-    auto epid2 = cFed2->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = cFed1->registerEndpoint ("ep1");
+    auto &epid2 = cFed2->registerGlobalEndpoint ("ep2", "random");
 
     // register the publications
-    auto pubid = cFed1->registerGlobalPublication<std::string> ("pub1");
+    auto &pubid = cFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto subid = cFed2->registerSubscription("pub1");
+    auto &subid = cFed2->registerSubscription("pub1");
 
     cFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     cFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 
     BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
-    auto id = cFed.getEndpointId ("ept1");
+    auto &id = cFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 
     BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
-    auto id = cFed.getEndpointId ("ept1");
+    auto &id = cFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);

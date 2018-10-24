@@ -45,7 +45,7 @@ class MappedVector
     @return the index of the value placed
     */
     template <typename... Us>
-    size_t insert (std::nullptr_t /*searchValue*/, Us &&... data)
+    stx::optional<size_t> insert (std::nullptr_t /*searchValue*/, Us &&... data)
     {
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);

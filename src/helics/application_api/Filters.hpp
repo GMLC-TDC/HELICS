@@ -58,6 +58,9 @@ class Filter
     /** virtual destructor*/
     virtual ~Filter () = default;
 
+	bool isValid () const { return id.isValid (); }
+
+	bool isCloningFilter () const { return cloning; }
     /** set a message operator to process the message*/
     void setOperator (std::shared_ptr<FilterOperator> mo);
 

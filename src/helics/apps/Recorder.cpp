@@ -100,7 +100,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     for (int ii = 0; ii < subCount; ++ii)
     {
         subscriptions.emplace_back (fed.get (), ii);
-        subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
+        subids.emplace (subscriptions.back ().getHandle (), static_cast<int> (subscriptions.size ()) - 1);
         subkeys.emplace (subscriptions.back ().getTarget (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
@@ -438,7 +438,7 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
         if (sub.isUpdated ())
         {
             auto val = sub.getValue<std::string> ();
-            int ii = subids[sub.getID ()];
+            int ii = subids[sub.getHandle()];
             points.emplace_back (currentTime, ii, val);
             if (iteration > 0)
             {
@@ -595,7 +595,7 @@ void Recorder::addSubscription (const std::string &key)
     {
         subscriptions.emplace_back (fed, key);
         auto index = static_cast<int> (subscriptions.size ()) - 1;
-        auto id = subscriptions.back ().getID ();
+        auto id = subscriptions.back ().getHandle();
         subids[id] = index;  // this is a new element
         subkeys[key] = index;  // this is a potential replacement
     }

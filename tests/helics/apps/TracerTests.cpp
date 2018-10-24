@@ -477,8 +477,8 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
 
 
     helics::MessageFederate mfed2 ("block2", fi);
-    helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint &e1=mfed.registerGlobalEndpoint ("d1");
+    helics::Endpoint &e2 = mfed2.registerGlobalEndpoint ("d2");
 
     trace1.addDestEndpointClone ("d1");
     trace1.addSourceEndpointClone ("d1");
@@ -552,8 +552,8 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 
 
     helics::MessageFederate mfed2 ("block2", fi);
-    helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint &e1 = mfed.registerGlobalEndpoint ("d1");
+    helics::Endpoint &e2 = mfed2.registerGlobalEndpoint ("d2");
 
     trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
@@ -630,7 +630,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
-    helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
+    helics::Endpoint &e1 = mfed.registerGlobalEndpoint ("d1");
 
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);

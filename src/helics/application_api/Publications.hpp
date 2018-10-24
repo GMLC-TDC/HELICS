@@ -37,6 +37,112 @@ class Publication
         const std::string &type,
         const std::string &units);
 
+    /** base constructor for a publication
+    @tparam a valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    that results in a valueFederate object
+    @param key the identifier for the publication
+    @param type the type of the publication
+    @param units, an optional string defining the units*/
+    template <class FedPtr>
+    Publication (FedPtr valueFed,
+                     const std::string &key,
+                     const std::string &type,
+                     const std::string &units = std::string ())
+        :Publication(valueFed->registerPublication(key,type,units))
+    {
+        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
+                       "first argument must be a pointer to a ValueFederate");
+    }
+    /** base constructor for a publication
+    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
+    @param valueFed a pointer to a value federate
+    @param key the identifier for the publication
+    @param type the type of the publication
+    @param units, an optional string defining the units*/
+    Publication(interface_visibility locality,
+        ValueFederate *valueFed,
+        const std::string &key,
+        const std::string &type,
+        const std::string &units = std::string());
+    /** base constructor for a publication
+    @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
+    @tparam valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
+    that results in a valueFederate object
+    @param key the identifier for the publication
+    @param type the type of the publication
+    @param units, an optional string defining the units*/
+    template <class FedPtr>
+    Publication (interface_visibility locality,
+            FedPtr & valueFed,
+                     const std::string &key,
+                     const std::string &type,
+                     const std::string &units = std::string ())
+        : Publication(locality, std::addressof (*valueFed), key, type, units)
+    {
+        static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
+            "first argument must be a pointer to a ValueFederate");
+    }
+ 
+	 /**constructor to build a publication object
+   @param[in] valueFed  the ValueFederate to use
+   @param[in] key the identifier for the publication
+   @param type_ the defined type of the publication
+   @param[in] units the units associated with a Federate
+   */
+    Publication (ValueFederate *valueFed,
+                 const std::string &key,
+                 helics_type_t type,
+                 const std::string &units = std::string ())
+        : Publication(valueFed, key, typeNameStringRef (type), units)
+    {
+    }
+    /**constructor to build a publication object
+    @param[in] valueFed  the ValueFederate to use
+    @param[in] key the identifier for the publication
+    @param type_ the defined type of the publication
+    @param[in] units the units associated with a Federate
+    */
+    template <class FedPtr>
+    Publication (FedPtr &valueFed,
+                 const std::string &key,
+                 helics_type_t type,
+                 const std::string &units = std::string ())
+        : Publication (valueFed, key, typeNameStringRef (type), units)
+    {
+    }
+    /**constructor to build a publication object
+    @param locality  set to global for a global publication or local for a local one
+    @param[in] valueFed  the ValueFederate to use
+    @param[in] key the identifier for the publication
+    @param type_ the defined type of the publication
+    @param[in] units the units associated with a Federate
+    */
+    Publication (interface_visibility locality,
+                 ValueFederate *valueFed,
+                 const std::string &key,
+                 helics_type_t type,
+                 const std::string &units = std::string ())
+        : Publication (locality, valueFed, key, typeNameStringRef (type), units)
+    {
+    }
+
+    /**constructor to build a publication object
+    @param locality  set to global for a global publication or local for a local one
+    @param[in] valueFed  the ValueFederate to use
+    @param[in] key the identifier for the publication
+    @param type_ the defined type of the publication
+    @param[in] units the units associated with a Federate
+    */
+    template <class FedPtr>
+    Publication (interface_visibility locality,
+                 FedPtr &valueFed,
+                 const std::string &key,
+                 helics_type_t type,
+                 const std::string &units = std::string ())
+        : Publication(locality, valueFed, key, typeNameStringRef (type), units)
+    {
+    }
+
     /** get the publication id that can be used to make the function calls from a Value Federate
      */
     interface_handle getHandle () const { return handle; }
@@ -174,7 +280,7 @@ make_publication (interface_visibility locality,
 
 /** class to handle a publication of an arbitrary type*/
 template <class X>
-class PublicationT : public PublicationBase
+class PublicationT : public Publication
 {
   public:
     PublicationT () = default;
@@ -184,7 +290,7 @@ class PublicationT : public PublicationBase
     @param[in] units the units associated with a Federate
     */
     PublicationT(ValueFederate *valueFed, const std::string &key, const std::string &units = std::string())
-        : PublicationBase(valueFed, key, typeNameString<X>(), units)
+        : Publication(valueFed, key, typeNameString<X>(), units)
     {
     }
     /**constructor to build a publication object
@@ -194,7 +300,7 @@ class PublicationT : public PublicationBase
     */
     template <class FedPtr>
     PublicationT (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
-        : PublicationBase (valueFed, key, typeNameString<X> (), units)
+        : Publication (valueFed, key, typeNameString<X> (), units)
     {
     }
     /**constructor to build a publication object
@@ -206,7 +312,7 @@ class PublicationT : public PublicationBase
         ValueFederate *valueFed,
         const std::string &key,
         const std::string &units = std::string())
-        : PublicationBase(locality, valueFed, key, typeNameString<X>(), units)
+        : Publication(locality, valueFed, key, typeNameString<X>(), units)
     {
     }
     /**constructor to build a publication object
@@ -219,17 +325,17 @@ class PublicationT : public PublicationBase
                   FedPtr &valueFed,
                   const std::string &key,
                   const std::string &units = std::string ())
-        : PublicationBase (locality, valueFed, key, typeNameString<X> (), units)
+        : Publication (locality, valueFed, key, typeNameString<X> (), units)
     {
     }
     /** send a value for publication
     @param[in] val the value to publish*/
-    virtual void publish (const X &val) const { fed->publish (id, val); }
+    void publish (const X &val) const { fed->publish (id, val); }
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication
     */
-    virtual void publish (const X &val, const std::string & /*units*/) const
+    void publish (const X &val, const std::string & /*units*/) const
     {
         // TODO:: figure out units
         publish (val);

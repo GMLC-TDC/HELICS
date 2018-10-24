@@ -117,7 +117,7 @@ void Source::loadJsonFile (const std::string &jsonFile)
     {
         SourceObject newObj;
 
-        newObj.pub = Publication (fed, ii);
+        newObj.pub = fed->getPublication (ii);
         newObj.period = defaultPeriod;
         sources.push_back (newObj);
         pubids[newObj.pub.getKey ()] = static_cast<int> (sources.size ()) - 1;
@@ -313,7 +313,14 @@ void Source::addPublication (const std::string &key,
     }
     SourceObject newObj;
 
-    newObj.pub = Publication (useLocal ? LOCAL : GLOBAL, fed, key, type, units);
+	if (useLocal)
+	{
+        newObj.pub = fed->registerPublication (key, typeNameStringRef (type), units);
+	}
+	else
+	{
+        newObj.pub = fed->registerGlobalPublication (key, typeNameStringRef (type), units);
+	}
     newObj.period = period;
     if (!generator.empty ())
     {

@@ -49,16 +49,13 @@ class Input
     @return the time of the last update
     */
     Time getLastUpdate () const { return fed->getLastUpdateTime (*this); }
-    /** get the underlying handle that can be used to make direct calls to the Core api
+    /** get the underlying handle that can be used to make direct calls to the Core API
      */
     interface_handle getHandle () const { return handle; }
 
     /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
-    bool operator== (const Input &inp) const { return (handle == inp.handle); }
-    bool operator!= (const Input &inp) const { return (handle != inp.handle); }
     bool operator< (const Input &inp) const { return (handle < inp.handle); }
-
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void( Time time)
@@ -78,8 +75,10 @@ class Input
     const std::string &getName () const { return actualName; }
     /** get the type of the input*/
     const std::string &getType () const { return fed->getInputType (*this); }
-    /** get the units associated with a subscription*/
+    /** get the units associated with a input*/
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
+    /** get an associated target*/
+    const std::string &getTarget () const { return fed->getTarget (*this); }
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
 
     /** check if the value has been updated*/

@@ -4,19 +4,35 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "Publications.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Publications.hpp"
 
 namespace helics
 {
-Publication::Publication(ValueFederate *valueFed,
-                                  interface_handle id,
-                                  const std::string &key,
-                                  const std::string &type,
-                                  const std::string &units)
-    : fed(valueFed), handle(id), key_(key), units_(units)
+Publication::Publication (ValueFederate *valueFed,
+                          interface_handle id,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units)
+    : fed (valueFed), handle (id), key_ (key), units_ (units)
 {
     pubType = getTypeFromString (type);
+}
+
+Publication::Publication (interface_visibility locality,
+                          ValueFederate *valueFed,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units)
+{
+    if (locality == interface_visibility::global)
+    {
+        operator= (valueFed->registerGlobalPublication (key, type, units));
+    }
+    else
+    {
+        operator= (valueFed->registerPublication (key, type, units));
+    }
 }
 
 void Publication::publish (double val) const
@@ -205,12 +221,12 @@ void Publication::publish (std::complex<double> val) const
     }
 }
 
-void Publication::publish(const named_point &np) const
+void Publication::publish (const named_point &np) const
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected(prevValue, np, delta))
+        if (changeDetected (prevValue, np, delta))
         {
             prevValue = np;
         }
@@ -221,20 +237,20 @@ void Publication::publish(const named_point &np) const
     }
     if (doPublish)
     {
-        auto db = typeConvert(pubType,np);
-        fed->publish(*this, db);
+        auto db = typeConvert (pubType, np);
+        fed->publish (*this, db);
     }
 }
 
-void Publication::publish(const std::string &name,double val) const
+void Publication::publish (const std::string &name, double val) const
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np(name, val);
-        if (changeDetected(prevValue, np, delta))
+        named_point np (name, val);
+        if (changeDetected (prevValue, np, delta))
         {
-            prevValue = std::move(np);
+            prevValue = std::move (np);
         }
         else
         {
@@ -243,20 +259,20 @@ void Publication::publish(const std::string &name,double val) const
     }
     if (doPublish)
     {
-        auto db = typeConvert(pubType, name,val);
-        fed->publish(*this, db);
+        auto db = typeConvert (pubType, name, val);
+        fed->publish (*this, db);
     }
 }
 
-void Publication::publish(const char *name, double val) const
+void Publication::publish (const char *name, double val) const
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np(name, val);
-        if (changeDetected(prevValue, np, delta))
+        named_point np (name, val);
+        if (changeDetected (prevValue, np, delta))
         {
-            prevValue = std::move(np);
+            prevValue = std::move (np);
         }
         else
         {
@@ -265,8 +281,8 @@ void Publication::publish(const char *name, double val) const
     }
     if (doPublish)
     {
-        auto db = typeConvert(pubType, name,val);
-        fed->publish(*this, db);
+        auto db = typeConvert (pubType, name, val);
+        fed->publish (*this, db);
     }
 }
 
@@ -288,7 +304,7 @@ data_block typeConvert (helics_type_t type, const defV &val)
     case complexVectorLoc:  // complex
         return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
     case namedPointLoc:
-        return typeConvert(type, mpark::get<named_point>(val));
+        return typeConvert (type, mpark::get<named_point> (val));
     }
 }
 

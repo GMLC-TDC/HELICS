@@ -264,7 +264,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     template <typename X>
     void setDefaultValue (const Input &inp, const X &val)
     {
-        setDefaultValue (Inp, data_view (ValueConverter<X>::convert (val)));
+        setDefaultValue (inp, data_view (ValueConverter<X>::convert (val)));
     }
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode to add an toml files must have extension .toml or .TOML

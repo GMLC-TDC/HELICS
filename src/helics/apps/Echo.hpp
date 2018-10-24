@@ -75,7 +75,7 @@ class Echo:public App
     /** load information from a JSON file*/
       virtual void loadJsonFile(const std::string &filename) override;
     /** echo an actual message from an endpoint*/
-    void echoMessage(const Endpoint *ept, Time currentTime);
+    void echoMessage(const Endpoint &ept, Time currentTime);
   private:
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     Time delayTime = timeZero;  //!< respond to each message with the specified delay

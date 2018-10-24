@@ -11,6 +11,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/application_api/Publications.hpp"
+
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include <chrono>
@@ -28,8 +30,8 @@ public:
     helics::Time finalTime = helics::Time(100000, timeUnits::ns);  // final time
 private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::publication_id_t pub;
-    helics::input_id_t sub;
+    helics::Publication *pub;
+    helics::Input *sub;
 
     int index_ = 0;
     int maxIndex_ = 0;
@@ -56,14 +58,14 @@ public:
         helics::FederateInfo fi;
         fi.coreName = coreName;
         vFed = std::make_unique<helics::ValueFederate>(name,fi);
-        pub = vFed->registerPublicationIndexed<std::string>("pub", index_);
+        pub = &vFed->registerPublicationIndexed<std::string>("pub", index_);
         if (index_ == 0)
         {
-            sub = vFed->registerSubscriptionIndexed("pub", maxIndex_-1);
+            sub = &vFed->registerSubscriptionIndexed("pub", maxIndex_-1);
         }
         else
         {
-            sub = vFed->registerSubscriptionIndexed("pub", index_-1);
+            sub = &vFed->registerSubscriptionIndexed("pub", index_-1);
         }
         initialized = true;
     }
@@ -73,7 +75,7 @@ public:
         if (index_ == 0)
         {
             std::string txstring(100, '1');
-            vFed->publish(pub, txstring);
+            pub->publish(txstring);
         }
         auto nextTime = deltaTime;
         
@@ -81,10 +83,10 @@ public:
         {
 
             nextTime = vFed->requestTime(finalTime);
-            if (vFed->isUpdated(sub))
+            if (vFed->isUpdated(*sub))
             {
-                auto nstring = vFed->getValue<std::string>(sub);
-                vFed->publish(pub,nstring);
+                auto nstring = vFed->getValue<std::string>(*sub);
+                vFed->publish(*pub,nstring);
             }
 
         }

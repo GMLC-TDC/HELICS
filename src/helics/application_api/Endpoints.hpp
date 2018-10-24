@@ -29,6 +29,37 @@ class Endpoint
         : fed (mfed), handle (id), actualName (actName)
     {
     }
+template <class FedPtr>
+    Endpoint (FedPtr &mFed, const std::string &name, const std::string &type = std::string ())
+        : Endpoint (mFed->registerEndpoint(name,type))
+    {
+        static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
+                       "first argument must be a pointer to a MessageFederate");
+    }
+    /**constructor to build an endpoint object
+    @param[in] mFed  the MessageFederate to use
+    @param[in] name the name of the endpoint
+    @param[in] type a named type associated with the endpoint
+    */
+    Endpoint (interface_visibility locality,
+              MessageFederate *mFed,
+              const std::string &name,
+              const std::string &type = std::string ());
+    /**constructor to build an endpoint object
+    @param[in] mFed  the MessageFederate to use
+    @param[in] name the name of the endpoint
+    @param[in] type a named type associated with the endpoint
+    */
+    template <class FedPtr>
+    Endpoint (interface_visibility locality,
+              FedPtr &mFed,
+              const std::string &name,
+              const std::string &type = std::string ())
+        : Endpoint (locality, std::addressof (*mFed), name, type)
+    {
+        static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
+                       "second argument must be a pointer to a MessageFederate");
+    }
     /** check if the Endpoint links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
     bool operator== (const Endpoint &ept) const { return (handle == ept.handle); }

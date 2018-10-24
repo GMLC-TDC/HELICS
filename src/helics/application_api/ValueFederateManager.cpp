@@ -42,7 +42,7 @@ Publication &ValueFederateManager::registerPublication (const std::string &key,
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
     auto pubHandle = publications.lock ();
-    bool active;
+    stx::optional<size_t> active;
     if (!key.empty ())
     {
         active = pubHandle->insert (key, coreID, fed, coreID, key, type, units);
@@ -67,7 +67,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock ();
-    bool active = false;
+    stx::optional<size_t> active;
     if (!key.empty ())
     {
         active = inpHandle->insert (key, coreID, fed, coreID, key);

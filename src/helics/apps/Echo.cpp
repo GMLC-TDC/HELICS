@@ -76,22 +76,22 @@ void Echo::setEchoDelay (Time delay)
     delayTime = delay;
 }
 
-void Echo::echoMessage (const Endpoint *ept, Time currentTime)
+void Echo::echoMessage (const Endpoint &ept, Time currentTime)
 {
-    auto m = ept->getMessage ();
+    auto m = ept.getMessage ();
     std::lock_guard<std::mutex> lock (delayTimeLock);
     while (m)
     {
-        ept->send (m->original_source, m->data, currentTime + delayTime);
-        m = ept->getMessage ();
+        ept.send (m->original_source, m->data, currentTime + delayTime);
+        m = ept.getMessage ();
     }
 }
 
 void Echo::addEndpoint (const std::string &endpointName, const std::string &endpointType)
 {
-    endpoints.emplace_back (GLOBAL, fed.get (), endpointName, endpointType);
+    endpoints.emplace_back (fed->registerGlobalEndpoint(endpointName, endpointType));
     endpoints.back ().setCallback (
-      [this](const Endpoint *ept, Time messageTime) { echoMessage (ept, messageTime); });
+      [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
 }
 
 int Echo::loadArguments (boost::program_options::variables_map &vm_map)
@@ -110,9 +110,9 @@ void Echo::loadJsonFile (const std::string &jsonFile)
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint(ii));
         endpoints.back ().setCallback (
-          [this](const Endpoint *ept, Time messageTime) { echoMessage (ept, messageTime); });
+          [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
     }
 
     auto doc = loadJson (jsonFile);

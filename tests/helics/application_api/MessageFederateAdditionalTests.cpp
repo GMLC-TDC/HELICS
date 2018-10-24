@@ -327,7 +327,7 @@ class PingPongFed
     std::string name;  //!< the name of the federate
     helics::core_type coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
-    helics::endpoint_id_t ep;
+    helics::Endpoint *ep;
     int index = 0;
 
   public:
@@ -357,15 +357,15 @@ class PingPongFed
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("registering federate ") + name + "\n";
 #endif
-        ep = mFed->registerEndpoint ("port");
+        ep = &mFed->registerEndpoint ("port");
     }
 
   private:
     void processMessages (helics::Time currentTime)
     {
-        while (mFed->hasMessage (ep))
+        while (mFed->hasMessage (*ep))
         {
-            auto mess = mFed->getMessage (ep);
+            auto mess = mFed->getMessage (*ep);
             auto messString = mess->data.to_string ();
             if (messString == "ping")
             {
@@ -378,7 +378,7 @@ class PingPongFed
                 mess->source = name;
                 mess->original_source = mess->source;
                 mess->time = currentTime;
-                mFed->sendMessage (ep, std::move (mess));
+                mFed->sendMessage (*ep, std::move (mess));
                 pings++;
             }
             else if (messString == "pong")
@@ -405,7 +405,7 @@ class PingPongFed
                     std::cout << name << ": send ping to " << triggers[index].second << " at time "
                               << static_cast<double> (nextTime) << '\n';
 #endif
-                    mFed->sendMessage (ep, triggers[index].second, "ping");
+                    mFed->sendMessage (*ep, triggers[index].second, "ping");
                     ++index;
                     if (index >= static_cast<int> (triggers.size ()))
                     {
@@ -477,7 +477,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
-    auto id = mFed.getEndpointId ("ept1");
+    auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
     mFed.disconnect ();
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
-    auto id = mFed.getEndpointId ("ept1");
+    auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
     mFed.disconnect ();
@@ -503,15 +503,15 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
-    auto id = mFed.getEndpointId ("ept1");
+    auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
-    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
+    BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
 
-    auto filt = mFed.getFilterObject (2);
+    auto filt = &mFed.getFilter (2);
 
-    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
-    BOOST_CHECK (cloneFilt);
+    auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
+    BOOST_CHECK (cloneFilt!=nullptr);
     mFed.disconnect ();
 }
 
@@ -522,14 +522,14 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
-    auto id = mFed.getEndpointId ("ept1");
+    auto &id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
-    BOOST_CHECK_EQUAL (mFed.filterObjectCount (), 3);
+    BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
 
-    auto filt = mFed.getFilterObject (2);
+    auto filt = &mFed.getFilter (2);
 
-    auto cloneFilt = std::dynamic_pointer_cast<helics::CloningFilter> (filt);
+    auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
     BOOST_CHECK (cloneFilt);
     mFed.disconnect ();
 }

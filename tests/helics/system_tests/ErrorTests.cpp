@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
     helics::Publication pub (fed1, "testkey", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (fed1, pubid);
 
-    helics::Subscription sub (fed1, fed1->getPublicationKey (pubid));
+    auto &sub=fed1->registerSubscription(fed1->getPublicationKey (pubid));
     fed1->enterExecutingMode ();
     fed1->publish (pubid, 45.7);
     fed1->requestTime (1.0);

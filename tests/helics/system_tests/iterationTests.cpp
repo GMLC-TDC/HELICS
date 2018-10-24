@@ -63,8 +63,8 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     std::string high_target = "fed";
     high_target += std::to_string ((index == total - 1) ? (0) : index + 1);
     high_target += "/pub";
-    Subscription sub_low (vfed, low_target);
-    Subscription sub_high (vfed, high_target);
+    auto &sub_low =vfed->registerSubscription(low_target);
+    auto &sub_high=vfed->registerSubscription (high_target);
     sub_low.setDefault (static_cast<double> (2 * index));
     sub_high.setDefault (static_cast<double> (2 * index + 1));
     vfed->enterInitializingMode ();
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
-    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
+    auto &sub1 = vFed2->registerSubscription ("pub1");
     vFed1->setTimeProperty (TIME_DELTA_PROPERTY,1.0);
     vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -292,11 +292,11 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
 
-    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
+    auto &sub1 = vFed2->registerSubscription ("pub1");
 
     auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
 
-    auto sub2 = helics::Subscription (vFed1.get (), "pub2");
+	auto &sub2 = vFed1->registerSubscription ("pub2");
     vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
     vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
     // vFed1->setLoggingLevel(5);
