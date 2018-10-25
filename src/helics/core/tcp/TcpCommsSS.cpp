@@ -241,8 +241,8 @@ void TcpCommsSS::queue_tx_function ()
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");
-                    setTxStatus (connection_status::terminated);
-                    setRxStatus (connection_status::terminated);
+                    setTxStatus (connection_status::error);
+                    setRxStatus (connection_status::error);
                     return;
                 }
 
@@ -255,6 +255,9 @@ void TcpCommsSS::queue_tx_function ()
             catch (std::exception &e)
             {
                 logError (e.what ());
+                setTxStatus(connection_status::error);
+                setRxStatus(connection_status::error);
+                return;
             }
             established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
         }
