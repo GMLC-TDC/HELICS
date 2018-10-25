@@ -700,6 +700,7 @@ bool TcpServer::start ()
 {
     if (halted.load(std::memory_order_acquire))
     {
+        std::cout << "previously halted server" << std::endl;
         return false;
     }
     else
@@ -722,6 +723,7 @@ bool TcpServer::start ()
         {
             if (!acc->start(TcpConnection::create(ioserv, bufferSize)))
             {
+                std::cout << "acceptor has failed to start" << std::endl;
                 success = false;
             }
         }
