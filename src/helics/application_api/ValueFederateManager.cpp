@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ValueFederateManager.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+#include "ValueFederateManager.hpp"
 
 namespace helics
 {
@@ -239,7 +239,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     // get the actual publication types
     auto inpHandle = inputs.lock ();
-    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString(coreObject->getType (inp.handle)); });
+    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString (coreObject->getType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -295,8 +295,8 @@ const std::string &ValueFederateManager::getTarget (const Input &inp) const
 
 const std::string &ValueFederateManager::getInputKey (const Input &inp) const { return inp.getName (); }
 
-static const Input invalidIpt;
-static Input invalidIptNC;
+static const Input invalidIpt{};
+static Input invalidIptNC{};
 
 const Input &ValueFederateManager::getInput (const std::string &key) const
 {
@@ -328,19 +328,17 @@ const Input &ValueFederateManager::getInput (int index) const
         return (*inpHandle)[index];
     }
     return invalidIpt;
-   
 }
 
 Input &ValueFederateManager::getInput (int index)
 {
-    auto inpHandle = inputs.lock();
+    auto inpHandle = inputs.lock ();
     if (isValidIndex (index, *inpHandle))
     {
         return (*inpHandle)[index];
     }
     return invalidIptNC;
 }
-
 
 const Input &ValueFederateManager::getSubscription (const std::string &key) const
 {
@@ -404,16 +402,16 @@ Publication &ValueFederateManager::getPublication (const std::string &key)
 const Publication &ValueFederateManager::getPublication (int index) const
 {
     auto pubHandle = publications.lock_shared ();
-	if (isValidIndex(index, *pubHandle))
-	{
+    if (isValidIndex (index, *pubHandle))
+    {
         return (*pubHandle)[index];
-	}
+    }
     return invalidPub;
 }
 
 Publication &ValueFederateManager::getPublication (int index)
 {
-    auto pubHandle = publications.lock();
+    auto pubHandle = publications.lock ();
     if (isValidIndex (index, *pubHandle))
     {
         return (*pubHandle)[index];
@@ -479,7 +477,8 @@ void ValueFederateManager::setInputNotificationCallback (std::function<void(Inpu
     allCallback.store (std::move (callback));
 }
 
-void ValueFederateManager::setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (const Input &inp,
+                                                         std::function<void(Input &, Time)> callback)
 {
     auto data = reinterpret_cast<input_info *> (inp.dataReference);
     if (data != nullptr)

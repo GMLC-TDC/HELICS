@@ -3,15 +3,16 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
 #include "../core/queryHelpers.hpp"
+#include "MessageFederateManager.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include <cassert>
 
 namespace helics
 {
-MessageFederateManager::MessageFederateManager (Core *coreOb, MessageFederate *fed, federate_id_t id) : coreObject (coreOb),mFed(fed), fedID (id)
+MessageFederateManager::MessageFederateManager (Core *coreOb, MessageFederate *fed, federate_id_t id)
+    : coreObject (coreOb), mFed (fed), fedID (id)
 {
 }
 MessageFederateManager::~MessageFederateManager () = default;
@@ -25,8 +26,8 @@ void MessageFederateManager::disconnect ()
 Endpoint &MessageFederateManager::registerEndpoint (const std::string &name, const std::string &type)
 {
     auto handle = coreObject->registerEndpoint (fedID, name, type);
-	if (handle.isValid())
-	{
+    if (handle.isValid ())
+    {
         auto edat = std::make_unique<EndpointData> ();
 
         auto eptHandle = local_endpoints.lock ();
@@ -36,26 +37,26 @@ Endpoint &MessageFederateManager::registerEndpoint (const std::string &name, con
             auto &ref = eptHandle->back ();
             ref.referenceIndex = static_cast<int> (*loc);
             eptHandle.unlock ();
-			
-			//** now insert the data into the appropriate location in the data array
-			auto datHandle = eptData.lock ();
-			if (datHandle->size() == loc)
-			{
+
+            //** now insert the data into the appropriate location in the data array
+            auto datHandle = eptData.lock ();
+            if (datHandle->size () == loc)
+            {
                 datHandle->push_back (std::move (edat));
-			}
-			else if (datHandle->size() < loc)
-			{
+            }
+            else if (datHandle->size () < loc)
+            {
                 datHandle->resize (*loc + 1);
                 (*datHandle)[*loc] = std::move (edat);
-			}
-			else
-			{
+            }
+            else
+            {
                 (*datHandle)[*loc] = std::move (edat);
-			}
-            
+            }
+
             return ref;
         }
-	}
+    }
     throw (RegistrationFailure ("Unable to register Endpoint"));
 }
 
@@ -75,7 +76,7 @@ bool MessageFederateManager::hasMessage () const
     auto eptDat = eptData.lock_shared ();
     for (auto &mq : eptDat)
     {
-        if (!mq->messages.empty())
+        if (!mq->messages.empty ())
         {
             return true;
         }
@@ -85,15 +86,15 @@ bool MessageFederateManager::hasMessage () const
 
 bool MessageFederateManager::hasMessage (const Endpoint &ept) const
 {
-	if (ept.dataReference != nullptr)
-	{
+    if (ept.dataReference != nullptr)
+    {
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
         return (!eptDat->messages.empty ());
-	}
-	else
-	{
+    }
+    else
+    {
         return false;
-	}
+    }
 }
 
 /**
@@ -104,7 +105,7 @@ uint64_t MessageFederateManager::pendingMessages (const Endpoint &ept) const
     if (ept.dataReference != nullptr)
     {
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
-        return eptDat->messages.size();
+        return eptDat->messages.size ();
     }
     else
     {
@@ -129,7 +130,6 @@ uint64_t MessageFederateManager::pendingMessages () const
 
 std::unique_ptr<Message> MessageFederateManager::getMessage (const Endpoint &ept)
 {
-  
     if (ept.dataReference != nullptr)
     {
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
@@ -162,8 +162,7 @@ std::unique_ptr<Message> MessageFederateManager::getMessage ()
 
 void MessageFederateManager::sendMessage (const Endpoint &source, const std::string &dest, data_view message)
 {
-        coreObject->send (source.handle, dest, message.data (),
-                          message.size ());
+    coreObject->send (source.handle, dest, message.data (), message.size ());
 }
 
 void MessageFederateManager::sendMessage (const Endpoint &source,
@@ -171,14 +170,12 @@ void MessageFederateManager::sendMessage (const Endpoint &source,
                                           data_view message,
                                           Time sendTime)
 {
-
-        coreObject->sendEvent (sendTime, source.handle, dest,
-                               message.data (), message.size ());
+    coreObject->sendEvent (sendTime, source.handle, dest, message.data (), message.size ());
 }
 
 void MessageFederateManager::sendMessage (const Endpoint &source, std::unique_ptr<Message> message)
 {
-     coreObject->sendMessage (source.handle, std::move (message));
+    coreObject->sendMessage (source.handle, std::move (message));
 }
 
 void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
@@ -200,15 +197,15 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         }
 
         /** find the id*/
-        
+
         auto fid = epts->find (endpoint_id);
         if (fid != epts->end ())
         {  // assign the data
 
-			Endpoint &currentEpt = *fid;
+            Endpoint &currentEpt = *fid;
             auto localEndpointIndex = fid->referenceIndex;
             (*eptDat)[localEndpointIndex]->messages.emplace (std::move (message));
-           
+
             if ((*eptDat)[localEndpointIndex]->callback)
             {
                 // need to be copied otherwise there is a potential race condition on lock removal
@@ -231,7 +228,7 @@ void MessageFederateManager::updateTime (Time newTime, Time /*oldTime*/)
     }
 }
 
-void MessageFederateManager::startupToInitializeStateTransition () { }
+void MessageFederateManager::startupToInitializeStateTransition () {}
 
 void MessageFederateManager::initializeToExecuteStateTransition () {}
 
@@ -251,12 +248,12 @@ static const std::string nullStr;
 
 const std::string &MessageFederateManager::getEndpointName (const Endpoint &ept) const { return ept.actualName; }
 
-static const Endpoint invalidEpt;
-static Endpoint invalidEptNC;
+static const Endpoint invalidEpt{};
+static Endpoint invalidEptNC{};
 
 Endpoint &MessageFederateManager::getEndpoint (const std::string &name)
 {
-    auto sharedEpt = local_endpoints.lock();
+    auto sharedEpt = local_endpoints.lock ();
     auto ept = sharedEpt->find (name);
     return (ept != sharedEpt.end ()) ? (*ept) : invalidEptNC;
 }
@@ -269,13 +266,12 @@ const Endpoint &MessageFederateManager::getEndpoint (const std::string &name) co
 
 Endpoint &MessageFederateManager::getEndpoint (int index)
 {
-
     auto sharedEpt = local_endpoints.lock ();
-	if (isValidIndex(index, *sharedEpt))
-	{
+    if (isValidIndex (index, *sharedEpt))
+    {
         return (*sharedEpt)[index];
-	}
-   return invalidEptNC;
+    }
+    return invalidEptNC;
 }
 const Endpoint &MessageFederateManager::getEndpoint (int index) const
 {
@@ -313,20 +309,21 @@ void MessageFederateManager::addDestinationFilter (const Endpoint &ept, const st
     coreObject->addDestinationTarget (ept.handle, filterName);
 }
 
-void MessageFederateManager::setEndpointNotificationCallback (const std::function<void(Endpoint &, Time)> &callback)
+void MessageFederateManager::setEndpointNotificationCallback (
+  const std::function<void(Endpoint &, Time)> &callback)
 {
     allCallback.store (callback);
 }
 
-void MessageFederateManager::setEndpointNotificationCallback (const Endpoint &ept,
-                                               const std::function<void(Endpoint &, Time)> &callback)
+void MessageFederateManager::setEndpointNotificationCallback (
+  const Endpoint &ept,
+  const std::function<void(Endpoint &, Time)> &callback)
 {
     if (ept.dataReference != nullptr)
     {
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
-		eptDat->callback = callback;
-	}
-    
+        eptDat->callback = callback;
+    }
 }
 
 void MessageFederateManager::removeOrderedMessage (unsigned int index)
