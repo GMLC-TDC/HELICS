@@ -373,6 +373,7 @@ bool TcpAcceptor::connect ()
         if (ec)
         {
             state = accepting_state_t::opened;
+            std::cout << "acceptor error" << ec << std::endl;
             return false;
         }
         state = accepting_state_t::connected;
@@ -616,8 +617,9 @@ TcpServer::~TcpServer () { close (); }
 
 void TcpServer::initialConnect ()
 {
-    if (halted == true)
+    if (halted.load(std::memory_order_acquire))
     {
+        std::cout << "previously halted server" << std::endl;
         return;
     }
     for (auto &ep : endpoints)
@@ -639,6 +641,7 @@ void TcpServer::initialConnect ()
     {
         if (!acc->connect ())
         {
+            std::cout << "unable to connect acceptor" << std::endl;
             halted = true;
             break;
         }
