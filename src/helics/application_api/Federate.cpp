@@ -78,6 +78,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
@@ -122,6 +123,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
 Federate::Federate (const std::string &configString) : Federate (std::string (), loadFederateInfo (configString))

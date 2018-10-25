@@ -379,7 +379,7 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types_all), cor
 
     BOOST_REQUIRE_EQUAL (gtime, 0.5);
 
-    BOOST_REQUIRE (mFed2->hasMessage (epid));
+    BOOST_REQUIRE (mFed2->hasMessage (epid2));
 
     auto M2 = mFed2->getMessage (epid2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data.size ());

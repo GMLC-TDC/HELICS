@@ -58,9 +58,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     const auto &sub3name = subid3.getTarget ();
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
-    BOOST_CHECK_EQUAL (subid1.getType (), "def");  // def is the default type
+    BOOST_CHECK (subid1.getType ().empty());  // def is the default type
     BOOST_CHECK_EQUAL (subid2.getType (), "int32");
-    BOOST_CHECK_EQUAL (subid3.getType (), "def");
+    BOOST_CHECK (subid3.getType ().empty());
     BOOST_CHECK_EQUAL (subid3.getUnits (), "V");
 
     // check publications

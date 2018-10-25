@@ -104,11 +104,11 @@ uint64_t MessageFederateManager::pendingMessages (const Endpoint &ept) const
     if (ept.dataReference != nullptr)
     {
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
-        return (!eptDat->messages.size());
+        return eptDat->messages.size();
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 /**
