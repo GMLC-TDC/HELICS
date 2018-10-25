@@ -197,12 +197,12 @@ class ValueFederateManager
     @details there can only be one generic callback
     @param[in] callback the function to call
     */
-    void registerCallback (std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (const Input &inp, std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect ();

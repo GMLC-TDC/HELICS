@@ -474,12 +474,12 @@ int ValueFederateManager::getPublicationCount () const
 /** get a count of the number inputs registered*/
 int ValueFederateManager::getInputCount () const { return static_cast<int> (inputs.lock_shared ()->size ()); }
 
-void ValueFederateManager::registerCallback (std::function<void(Input &, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
     allCallback.store (std::move (callback));
 }
 
-void ValueFederateManager::registerCallback (const Input &inp, std::function<void(Input &, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback)
 {
     auto data = reinterpret_cast<input_info *> (inp.dataReference);
     if (data != nullptr)

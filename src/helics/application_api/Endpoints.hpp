@@ -159,7 +159,7 @@ class Endpoint
     */
     void setCallback (const std::function<void(const Endpoint &, Time)> &callback)
     {
-        fed->registerEndpointCallback (*this, callback);
+        fed->setMessageNotificationCallback (*this, callback);
     }
 
     /** add a named filter to an endpoint for all message coming from the endpoint*/

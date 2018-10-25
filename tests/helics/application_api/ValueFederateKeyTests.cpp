@@ -483,7 +483,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     helics::data_block db (547, ';');
     helics::interface_handle lastId;
     helics::Time lastTime;
-    vFed1->registerInputNotificationCallback ([&](const helics::Input & subid, helics::Time callTime) {
+    vFed1->setInputNotificationCallback ([&](const helics::Input & subid, helics::Time callTime) {
         lastTime = callTime;
         lastId = subid.getHandle();
     });
@@ -514,7 +514,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     BOOST_CHECK_EQUAL (lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->registerInputNotificationCallback ([&](const helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback ([&](const helics::Input &, helics::Time) { ++ccnt; });
 
     vFed1->publish (pubid3, db);
     vFed1->publish (pubid2, 4);

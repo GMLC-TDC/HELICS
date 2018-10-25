@@ -115,7 +115,7 @@ void Input::handleCallback (Time time)
     }
 }
 
-bool Input::isUpdated () const
+bool Input::isUpdated ()
 {
     if (hasUpdate)
     {
@@ -123,38 +123,7 @@ bool Input::isUpdated () const
     }
     if (changeDetectionEnabled)
     {
-        if (isUpdated ())
-        {
-            if (type == helics_type_t::helicsInvalid)
-            {
-                return true;
-            }
-            auto dv = fed->getValueRaw (*this);
-            auto visitor = [&](auto &&arg) -> bool {
-                std::remove_const_t<std::remove_reference_t<decltype (arg)>> newVal;
-                (void)arg;  // suppress VS2015 warning
-                valueExtract (dv, type, newVal);
-                return (changeDetected (lastValue, newVal, delta));
-            };
-            return mpark::visit (visitor, lastValue);
-        }
-        return false;
-    }
-    else
-    {
-        return isUpdated ();
-    }
-}
-
-bool Input::getAndCheckForUpdate ()
-{
-    if (hasUpdate)
-    {
-        return true;
-    }
-    if (changeDetectionEnabled)
-    {
-        if (isUpdated ())
+        if (fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
             if (type == helics_type_t::helicsInvalid)
@@ -163,7 +132,8 @@ bool Input::getAndCheckForUpdate ()
             }
             if (type != helics_type_t::helicsInvalid)
             {
-                auto visitor = [&](auto &&arg) {
+                auto visitor = [&,this](auto &&arg)
+                {
                     std::remove_reference_t<decltype (arg)> newVal;
                     (void)arg;  // suppress VS2015 warning
                     valueExtract (dv, type, newVal);
@@ -179,15 +149,14 @@ bool Input::getAndCheckForUpdate ()
     }
     else
     {
-        hasUpdate = isUpdated ();
+        hasUpdate=fed->isUpdated (*this);
     }
-
     return hasUpdate;
 }
 
 size_t Input::getRawSize ()
 {
-    getAndCheckForUpdate ();
+    isUpdated ();
     auto dv = fed->getValueRaw (*this);
     if (dv.empty ())
     {
@@ -199,7 +168,7 @@ size_t Input::getRawSize ()
 
 size_t Input::getStringSize ()
 {
-    getAndCheckForUpdate ();
+    isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
         if (lastValue.index () == namedPointLoc)
@@ -233,7 +202,7 @@ size_t Input::getStringSize ()
 
         if (np.name.empty ())
         {
-            return 30;  //"#invalid" string +20
+            return 30;  //"~length of #invalid" string +20
         }
         else
         {
@@ -248,7 +217,7 @@ size_t Input::getStringSize ()
 
 size_t Input::getVectorSize ()
 {
-    getAndCheckForUpdate ();
+    isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
         auto out = getValue<std::vector<double>> ();

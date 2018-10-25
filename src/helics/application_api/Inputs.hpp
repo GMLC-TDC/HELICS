@@ -22,7 +22,7 @@ class Input
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
 
-    mutable helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
+    helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
@@ -151,7 +151,7 @@ class Input
     */
     void registerNotificationCallback (std::function<void(Time)> callback)
     {
-        fed->registerInputNotificationCallback (*this, [this, callback](const Input &, Time time) {
+        fed->setInputNotificationCallback (*this, [this, callback](const Input &, Time time) {
             if (isUpdated ())
             {
                 callback (time);
@@ -169,10 +169,9 @@ class Input
     const std::string &getTarget () const { return fed->getTarget (*this); }
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
 
-    /** check if the value has been updated*/
-    bool isUpdated () const;
-    /** check if the value has been updated and load the value into buffer*/
-    bool getAndCheckForUpdate ();
+    /** check if the value has been updated
+	@details if changeDetection is Enabled this function also loads the value into the buffer*/
+    bool isUpdated ();
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -180,13 +179,13 @@ class Input
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    void registerCallback (std::function<void(const X &, Time)> callback)
+    void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
         static_assert (helicsType<X> () != helics_type_t::helicsInvalid,
                        "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
                        "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = callback;
-        fed->registerInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
     }
 
     /** set the default value to use before any update has been published
@@ -265,7 +264,7 @@ class Input
     template <class X>
     void getValue_impl (std::false_type /*V*/, X &out)
     {
-        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
         getValue_impl (std::true_type (), gval);
         out = static_cast<X> (gval);
     }
@@ -279,7 +278,7 @@ class Input
     template <class X>
     X getValue_impl (std::false_type /*V*/)
     {
-        std::conditional<std::is_integral<X>::value, int64_t, double> gval;
+        std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
         getValue_impl (std::true_type (), gval);
         return static_cast<X> (gval);
     }
@@ -322,7 +321,7 @@ class Input
     friend class ValueFederateManager;
 };
 
-/** class to handle a subscription
+/** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a subscription*/
 template <class X>
 class InputT : public Input
@@ -332,7 +331,11 @@ class InputT : public Input
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
     std::function<double(const X &v1, const X &v2)>
       changeDetectionOperator;  //!< callback function for change detection
-
+	//determine if we can convert to a primary type
+    using is_convertible_to_primary_type =
+      std::conditional_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+                         std::true_type,
+                         std::false_type>;
   public:
     InputT () = default;
     /**constructor to build a subscription object
@@ -355,23 +358,36 @@ class InputT : public Input
     {
     }
 
+  private:
+    void getValueX_impl (std::true_type /*V*/, X &out) { Input::getValue (out); }
+    void getValueX_impl (std::false_type /*V*/, X &out) { fed->getValue (*this, out); }
+    X getValueX_impl (std::true_type /*V*/) { return Input::getValue<X> (); }
+    X getValueX_impl (std::false_type /*V*/) { return fed->getValue<X> (*this); }
+
+  public:
     /** get the most recent value
     @return the value*/
-    X getValue () const { return fed->getValue<X> (*this); }
+    X getValue ()
+    {
+        return getValueX_impl (is_convertible_to_primary_type());
+    }
     /** store the value in the given variable
     @param[out] out the location to store the value
     */
-    void getValue (X &out) const { fed->getValue (*this, out); }
+    void getValue (X &out)
+    {
+        getValueX_impl(is_convertible_to_primary_type (),out);
+    }
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void registerCallback (std::function<void(X, Time)> callback)
+    void setInputNotificationCallback (std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->registerInputNotificationCallback (*this, [=](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [=](Input &, Time time) { handleCallback (time); });
     }
     /** set a default value
     @param val the value to set as the default

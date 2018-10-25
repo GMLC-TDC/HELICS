@@ -202,12 +202,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
     */
-    void registerEndpointCallback (const std::function<void(Endpoint &, Time)> &callback);
+    void setMessageNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
     /** register a callback for a specific endpoint
     @param[in] ep the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
-    void registerEndpointCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void setMessageNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
 	/** set an endpoint option */
 	void setEndpointOption(const Endpoint &ept, int32_t option, bool option_value = true);

@@ -109,7 +109,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
         timeRx = rtime;
     };
 
-    mFed1->registerEndpointCallback (mend);
+    mFed1->setMessageNotificationCallback (mend);
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
 
@@ -248,8 +248,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bda
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    mFed1->registerEndpointCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
-    mFed2->registerEndpointCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
+    mFed1->setMessageNotificationCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
+    mFed2->setMessageNotificationCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);

@@ -336,14 +336,14 @@ const std::string &MessageFederate::getEndpointName (const Endpoint &ept) const 
 
 const std::string &MessageFederate::getEndpointType (const Endpoint &ept) const { return mfManager->getEndpointType (ept); }
 
-void MessageFederate::registerEndpointCallback (const std::function<void(Endpoint &ept, Time)> &func)
+void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &func)
 {
-    mfManager->registerCallback (func);
+    mfManager->setEndpointNotificationCallback (func);
 }
-void MessageFederate::registerEndpointCallback (const Endpoint &ept,
+void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
                                                 const std::function<void(Endpoint &ept, Time)> &func)
 {
-    mfManager->registerCallback (ept, func);
+    mfManager->setEndpointNotificationCallback (ept, func);
 }
 
 /** get a count of the number endpoints registered*/

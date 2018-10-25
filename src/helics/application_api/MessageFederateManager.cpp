@@ -313,12 +313,12 @@ void MessageFederateManager::addDestinationFilter (const Endpoint &ept, const st
     coreObject->addDestinationTarget (ept.handle, filterName);
 }
 
-void MessageFederateManager::registerCallback (const std::function<void(Endpoint &, Time)> &callback)
+void MessageFederateManager::setEndpointNotificationCallback (const std::function<void(Endpoint &, Time)> &callback)
 {
     allCallback.store (callback);
 }
 
-void MessageFederateManager::registerCallback (const Endpoint &ept,
+void MessageFederateManager::setEndpointNotificationCallback (const Endpoint &ept,
                                                const std::function<void(Endpoint &, Time)> &callback)
 {
     if (ept.dataReference != nullptr)

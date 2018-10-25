@@ -111,12 +111,12 @@ class MessageFederateManager
     @details there can only be one generic callback
     @param[in] callback the function to call
     */
-    void registerCallback (const std::function<void(Endpoint &, Time)> &callback);
+    void setEndpointNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
     /** register a callback function to call when the specified endpoint receives a message
     @param[in] id  the endpoint id to register the callback for
     @param[in] callback the function to call
     */
-    void registerCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void setEndpointNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
     /**disconnect from the coreObject*/
     void disconnect ();

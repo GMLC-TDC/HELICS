@@ -108,6 +108,7 @@ static const std::map<std::string, helics_type_t> typeMap{{"double", helics_type
                                                           {"default", helics_type_t::helicsAny},
                                                           {"def", helics_type_t::helicsAny},
                                                           {"any", helics_type_t::helicsAny},
+                                                          {"", helics_type_t::helicsAny},
                                                           {"all", helics_type_t::helicsAny}};
 
 helics_type_t getTypeFromString (const std::string &typeName)

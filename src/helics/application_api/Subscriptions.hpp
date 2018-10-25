@@ -81,7 +81,7 @@ class VectorSubscription
             ids.push_back (id);
         }
 
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
     }
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
@@ -110,7 +110,7 @@ class VectorSubscription
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
     };
     /** move assignment*/
     VectorSubscription &operator= (VectorSubscription &&vs) noexcept
@@ -122,7 +122,7 @@ class VectorSubscription
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
         return *this;
     }
     /** get the most recent value
@@ -137,7 +137,7 @@ class VectorSubscription
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
+    void setInputNotificationCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
     void handleCallback (input_id_t id, Time time)
@@ -210,7 +210,7 @@ class VectorSubscription2d
         indices[3] = count_y;
         for (auto &id : ids)
         {
-            fed->registerInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
         }
     }
 
@@ -226,7 +226,7 @@ class VectorSubscription2d
         // need to transfer the callback to the new object
         for (auto &id : ids)
         {
-            fed->registerInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
         }
         indices = vs.indices;
         return *this;
@@ -251,7 +251,7 @@ class VectorSubscription2d
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void registerCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
+    void setInputNotificationCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
     void handleCallback (const Input &inp, Time time)

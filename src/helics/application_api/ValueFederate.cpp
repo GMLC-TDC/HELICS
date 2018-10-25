@@ -473,17 +473,17 @@ bool ValueFederate::getPublicationOption (const Publication &pub, int32_t option
     return vfManager->getPublicationOption(pub, option);
 }
 
-void ValueFederate::registerInputNotificationCallback (
+void ValueFederate::setInputNotificationCallback (
   std::function<void(Input &, Time)> callback)
 {
-    vfManager->registerCallback (callback);
+    vfManager->setInputNotificationCallback (callback);
 }
 
-void ValueFederate::registerInputNotificationCallback (
+void ValueFederate::setInputNotificationCallback (
   Input &inp,
   std::function<void(Input &, Time)> callback)
 {
-    vfManager->registerCallback (inp, callback);
+    vfManager->setInputNotificationCallback (inp, callback);
 }
 
 /** get a count of the number publications registered*/

@@ -393,7 +393,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] units the optional units on the subscription
     */
     template <class iType>
-    input_id_t addTargetIndexed (const iType &id,
+    void addTargetIndexed (const iType &id,
                                  const std::string &target,
                                  int index1,
                                  int index2,
@@ -526,12 +526,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @details there can only be one generic callback
     @param[in] callback the function to call signature void(input_id_t, Time)
     */
-    void registerInputNotificationCallback (std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
     @param[in] callback the function to call
     */
-    void registerInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;

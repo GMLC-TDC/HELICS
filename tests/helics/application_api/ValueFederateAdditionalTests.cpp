@@ -305,8 +305,8 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     helics::data_block db (547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->registerInputNotificationCallback (sub1, [&](helics::Input &, helics::Time) { ++ccnt; });
-    vFed1->registerInputNotificationCallback (sub2, [&](helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub1, [&](helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub2, [&](helics::Input &, helics::Time) { ++ccnt; });
     vFed1->enterExecutingMode ();
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);

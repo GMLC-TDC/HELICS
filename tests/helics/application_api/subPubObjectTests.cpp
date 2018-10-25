@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(subscriptionObject_complex_vector_tests_ext)
      runPubSubTypeTests<int64_t, vc>(56, vc{ c{ 56 } });
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionChangedDetection_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (subscriptionChangeDetection_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "1";
