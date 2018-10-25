@@ -426,6 +426,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         {
             accepting.trigger ();
         }
+        std::cout << "tcpconnection is not valid" << std::endl;
         return false;
     }
     if (state != accepting_state_t::connected)
@@ -435,6 +436,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         {
             accepting.trigger ();
         }
+        std::cout << "acceptor is not in a connected state" << std::endl;
         return false;
     }
     if (accepting.activate ())
@@ -450,6 +452,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
     }
     else
     {
+        std::cout << "acceptor is already active" << std::endl;
         conn->close ();
         return false;
     }
