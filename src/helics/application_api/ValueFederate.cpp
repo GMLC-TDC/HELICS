@@ -360,6 +360,11 @@ const Input &ValueFederate::getInput (const std::string &key) const
 
 Input &ValueFederate::getInput (const std::string &key) { return vfManager->getInput (key); }
 
+
+const Input &ValueFederate::getInput (int index) const { return vfManager->getInput (index); }
+
+Input &ValueFederate::getInput (int index) { return vfManager->getInput (index); }
+
 const Input &ValueFederate::getInput (const std::string &key, int index1) const
 {
     return vfManager->getInput (key + '_' + std::to_string (index1));

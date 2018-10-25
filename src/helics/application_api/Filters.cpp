@@ -226,6 +226,12 @@ CloningFilter::CloningFilter (Federate *fed, const std::string &name) : Filter (
 		}
 }
 
+CloningFilter::CloningFilter(Federate *fed, const std::string &name, interface_handle handle)
+	: Filter(fed, name, handle)
+{
+
+}
+
 CloningFilter::CloningFilter(interface_visibility locality, Federate *fed, const std::string &name)
 {
     if (fed != nullptr)

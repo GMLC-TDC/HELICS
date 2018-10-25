@@ -9,9 +9,41 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+inline Input &
+make_subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
+{
+    return valueFed->registerSubscription (key, units);
+}
+
+inline Input &
+make_subscription (ValueFederate &valueFed, const std::string &key, const std::string &units = std::string ())
+{
+    return valueFed.registerSubscription (key, units);
+}
+
+template <class X>
+inline InputT<X>
+make_subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
+{
+    InputT<X> ipt (valueFed, typeNameString<X> (), units);
+    ipt.addTarget (key);
+    return ipt;
+}
+
+template <class X>
+inline InputT<X>
+make_subscription (ValueFederate &valueFed,
+                          const std::string &key,
+                          const std::string &units = std::string ())
+{
+    InputT<X> ipt (&valueFed, typeNameString<X> (), units);
+    ipt.addTarget (key);
+    return ipt;
+}
 
 /** class to handle a Vector Subscription
-@tparam X the class of the value associated with the vector subscription*/
+@tparam X the class of the value associated with the vector subscription
+*/
 template <class X>
 class VectorSubscription
 {
@@ -19,7 +51,7 @@ class VectorSubscription
     ValueFederate *fed = nullptr;  //!< reference to the value federate
     std::string m_key;  //!< the key for the subscription
     std::string m_units;  //!< the defined units of the federate
-    std::vector<input_id_t> ids;  //!< the id of the federate
+    std::vector<Input> ids;  //!< the id of the federate
     std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
   public:
@@ -42,16 +74,14 @@ class VectorSubscription
     {
         ids.reserve (count);
         vals.resize (count, defValue);
-       
+
         for (auto ind = startIndex; ind < startIndex + count; ++ind)
         {
-                auto id = fed->registerSubscriptionIndexed (m_key, ind, m_units);
+            auto id = fed->registerSubscriptionIndexed (m_key, ind, m_units);
             ids.push_back (id);
         }
-       
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
-        });
+
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
     }
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
@@ -80,9 +110,7 @@ class VectorSubscription
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
-        });
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
     };
     /** move assignment*/
     VectorSubscription &operator= (VectorSubscription &&vs) noexcept
@@ -94,9 +122,7 @@ class VectorSubscription
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) {
-            handleCallback (id, tm);
-        });
+        fed->registerInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
         return *this;
     }
     /** get the most recent value
@@ -118,7 +144,7 @@ class VectorSubscription
     {
         auto res = std::lower_bound (ids.begin (), ids.end (), id);
         int index = static_cast<int> (res - ids.begin ());
-		vals[index]=fed->getValue<X> (ids[index]);
+        vals[index] = fed->getValue<X> (ids[index]);
         if (update_callback)
         {
             update_callback (index, time);
@@ -168,23 +194,24 @@ class VectorSubscription2d
                        "Second argument must be a pointer to a ValueFederate");
         ids.reserve (count_x * count_y);
         vals.resize (count_x * count_y, defValue);
-        
+
         for (auto ind_x = startIndex_x; ind_x < startIndex_x + count_x; ++ind_x)
         {
             for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
             {
-                    auto id = fed->registerSubscriptionIndexed (m_key, ind_x, ind_y, m_units);
-                    ids.push_back (id);
+                auto id = fed->registerSubscriptionIndexed (m_key, ind_x, ind_y, m_units);
+                ids.push_back (id);
             }
         }
-        
+
         indices[0] = startIndex_x;
         indices[1] = count_x;
         indices[2] = startIndex_y;
         indices[3] = count_y;
-        fed->registerInputNotificationCallback (ids, [this](const Input &inp, Time tm) {
-            handleCallback (inp, tm);
-        });
+        for (auto &id : ids)
+        {
+            fed->registerInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+        }
     }
 
     /** move assignment*/
@@ -197,9 +224,10 @@ class VectorSubscription2d
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->registerInputNotificationCallback (ids, [this](const Input &inp, Time tm) {
-            handleCallback (inp, tm);
-        });
+        for (auto &id : ids)
+        {
+            fed->registerInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+        }
         indices = vs.indices;
         return *this;
     }
@@ -234,7 +262,7 @@ class VectorSubscription2d
         if (update_callback)
         {
             update_callback (index, time);
-    }
+        }
     }
 };
 

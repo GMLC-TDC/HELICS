@@ -43,24 +43,24 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     SetupTest<helics::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
+    auto &epid = mFed1->registerEndpoint ("ep1");
+    auto &epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
     mFed1->enterExecutingMode ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
-    auto sv = mFed1->getEndpointName (epid);
-    auto sv2 = mFed1->getEndpointName (epid2);
+    auto &sv = mFed1->getEndpointName (epid);
+    auto &sv2 = mFed1->getEndpointName (epid2);
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
     BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid), "");
     BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
 
-    BOOST_CHECK (mFed1->getEndpointId ("ep1") == epid);
-    BOOST_CHECK (mFed1->getEndpointId ("fed0/ep1") == epid);
-    BOOST_CHECK (mFed1->getEndpointId ("ep2") == epid2);
+    BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("fed0/ep1").getHandle () == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
@@ -86,8 +86,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK_EQUAL (epid.getType (), "");
     BOOST_CHECK_EQUAL (epid2.getType (), "random");
 
-    BOOST_CHECK (mFed1->getEndpointId ("ep1") == epid.getID ());
-    BOOST_CHECK (mFed1->getEndpointId ("ep2") == epid2.getID ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle() == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle() == epid2.getHandle ());
     mFed1->finalize ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
@@ -130,7 +130,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     res = mFed1->hasMessage (epid2);
     BOOST_CHECK (res);
 
-    BOOST_CHECK (rxend == epid2);
+    BOOST_CHECK (rxend == epid2.getHandle());
     BOOST_CHECK_EQUAL (timeRx, helics::Time (1.0));
     auto M = mFed1->getMessage (epid2);
     BOOST_REQUIRE (M);
@@ -198,10 +198,10 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     helics::Endpoint ep1 (mFed1, "ep1");
     helics::Endpoint ep2 (helics::GLOBAL, mFed1, "ep2", "random");
 
-    helics::endpoint_id_t rxend;
+    helics::interface_handle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
-        rxend = ept->getHandle ();
+        rxend = ept.getHandle ();
         timeRx = rtime;
     }; 
 
@@ -225,7 +225,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     res = ep1.hasMessage ();
     BOOST_CHECK (!res);
 
-    BOOST_CHECK (rxend == ep2.getID ());
+    BOOST_CHECK (rxend == ep2.getHandle ());
     BOOST_CHECK_EQUAL (timeRx, helics::Time (1.0));
     auto M = ep2.getMessage ();
     BOOST_REQUIRE (M);

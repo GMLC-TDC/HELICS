@@ -91,7 +91,6 @@ class DualMappedVector
     {
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
-        lookup1.emplace (searchValue1, index);
         return index;
     }
 

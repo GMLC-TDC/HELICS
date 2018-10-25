@@ -34,6 +34,32 @@ Filter &FilterFederateManager::registerFilter (const std::string &name,
     throw (RegistrationFailure ("Unable to register Filter"));
 }
 
+CloningFilter &FilterFederateManager::registerCloningFilter (const std::string &name,
+                                                             const std::string &type_in,
+                                                             const std::string &type_out)
+{
+    auto handle = coreObject->registerCloningFilter (name, type_in, type_out);
+    if (handle.isValid ())
+    {
+        auto filt = std::make_unique<CloningFilter> (fed, name, handle);
+        CloningFilter &f = *filt;
+        auto filts = filters.lock ();
+        filts->insert (name, std::move (filt));
+        return f;
+    }
+    throw (RegistrationFailure ("Unable to register Filter"));
+}
+
+Filter &FilterFederateManager::registerFilter (defined_filter_types type, const std::string &name) 
+{
+    return make_filter (type, fed, name);
+}
+
+CloningFilter &FilterFederateManager::registerCloningFilter (defined_filter_types type, const std::string &name) 
+{
+    return make_cloning_filter (type, fed,std::string(), name);
+}
+
 static const Filter invalidFilt;
 static Filter invalidFiltNC;
 

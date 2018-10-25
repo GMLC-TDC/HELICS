@@ -10,6 +10,50 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 
+
+	Input::Input (ValueFederate *valueFed,
+                          const std::string &key,
+                          const std::string &defType,
+                          const std::string &units)
+{
+    auto &inp = valueFed->getInput (key);
+    if (inp.isValid ())
+    {
+        operator= (inp);
+    }
+    else
+    {
+        operator= (valueFed->registerInput (key, defType, units));
+    }
+}
+
+Input::Input (interface_visibility locality,
+                          ValueFederate *valueFed,
+                          const std::string &key,
+                          const std::string &defType,
+                          const std::string &units)
+{
+    try
+    {
+        if (locality == interface_visibility::global)
+        {
+            operator= (valueFed->registerGlobalInput (key, defType, units));
+        }
+        else
+        {
+            operator= (valueFed->registerInput (key, defType, units));
+        }
+    }
+    catch (const RegistrationFailure &e)
+    {
+        operator= (valueFed->getInput (key));
+        if (!isValid ())
+        {
+            throw (e);
+        }
+    }
+}
+
 void Input::handleCallback (Time time)
 {
     if (!isUpdated ())

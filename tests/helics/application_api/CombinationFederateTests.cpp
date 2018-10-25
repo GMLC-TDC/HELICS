@@ -7,7 +7,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -60,9 +61,9 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
 
-    BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid);
-    BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2);
-    BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid);
+    BOOST_CHECK (vFed1->getPublication ("pub1").getHandle () == pubid.getHandle ());
+    BOOST_CHECK (vFed1->getPublication ("pub2").getHandle () == pubid2.getHandle ());
+    BOOST_CHECK (vFed1->getPublication ("fed0/pub1").getHandle () == pubid.getHandle ());
     vFed1->finalize ();
 
     BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
@@ -124,9 +125,9 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid), "");
     BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
 
-    BOOST_CHECK (mFed1->getEndpointId ("ep1") == epid);
-    BOOST_CHECK (mFed1->getEndpointId ("fed0/ep1") == epid);
-    BOOST_CHECK (mFed1->getEndpointId ("ep2") == epid2);
+    BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("fed0/ep1").getHandle () == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);

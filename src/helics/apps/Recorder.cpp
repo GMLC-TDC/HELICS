@@ -99,16 +99,16 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back (fed.get (), ii);
+        subscriptions.emplace_back (fed->getInput(ii));
         subids.emplace (subscriptions.back ().getHandle (), static_cast<int> (subscriptions.size ()) - 1);
         subkeys.emplace (subscriptions.back ().getTarget (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint(ii));
         eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
-        eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
+        eptids.emplace (endpoints.back ().getHandle (), static_cast<int> (endpoints.size () - 1));
     }
 
     auto doc = loadJson (jsonString);
@@ -608,7 +608,7 @@ void Recorder::addEndpoint (const std::string &endpoint)
     {
         endpoints.emplace_back (GLOBAL, fed.get (), endpoint);
         auto index = static_cast<int> (endpoints.size ()) - 1;
-        auto id = endpoints.back ().getID ();
+        auto id = endpoints.back ().getHandle ();
         eptids.emplace (id, index);  // this is a new element
         eptNames[endpoint] = index;  // this is a potential replacement
     }

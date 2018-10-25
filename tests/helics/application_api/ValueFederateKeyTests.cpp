@@ -41,11 +41,11 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     Publication pubid3 (vFed1, "pub3", helicsType<double> (), "V");
 
     // these aren't meant to match the publications
-    Subscription subid1 (vFed1, "sub1");
+    auto &subid1=make_subscription(*vFed1, "sub1");
 
-    SubscriptionT<int> subid2 (vFed1, "sub2");
+    auto subid2=make_subscription<int>(*vFed1, "sub2");
 
-    Subscription subid3 (vFed1, "sub3", "V");
+    auto &subid3=make_subscription(*vFed1, "sub3", "V");  
     // enter execution
     vFed1->enterExecutingMode ();
 
@@ -491,8 +491,8 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     vFed1->publish (pubid3, db);
     vFed1->requestTime (1.0);
     // the callback should have occurred here
-    BOOST_CHECK (lastId == sub3);
-    if (lastId == sub3)
+    BOOST_CHECK (lastId == sub3.getHandle());
+    if (lastId == sub3.getHandle())
     {
         BOOST_CHECK_EQUAL (lastTime, 1.0);
         BOOST_CHECK_EQUAL (vFed1->getLastUpdateTime (sub3), lastTime);
@@ -505,12 +505,12 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     vFed1->publish (pubid2, 4);
     vFed1->requestTime (2.0);
     // the callback should have occurred here
-    BOOST_CHECK (lastId == sub2);
+    BOOST_CHECK (lastId == sub2.getHandle());
     BOOST_CHECK_EQUAL (lastTime, 2.0);
     vFed1->publish (pubid1, "this is a test");
     vFed1->requestTime (3.0);
     // the callback should have occurred here
-    BOOST_CHECK (lastId == sub1);
+    BOOST_CHECK (lastId == sub1.getHandle());
     BOOST_CHECK_EQUAL (lastTime, 3.0);
 
     int ccnt = 0;

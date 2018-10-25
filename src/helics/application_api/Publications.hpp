@@ -13,14 +13,17 @@ namespace helics
 {
 class Publication
 {
-  private:
+  protected:
     ValueFederate *fed = nullptr;  //!< the federate construct to interact with
     interface_handle handle;  //!< the internal id of the publication
+  private:
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     double delta = -1.0;  //!< the minimum change to publish
-    helics_type_t pubType;  //!< the type of publication
+  protected:
+    helics_type_t pubType=helics_type_t::helicsAny;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
+  private:
     mutable defV prevValue;  //!< the previous value of the publication
     std::string key_;  //!< the name of the publication
     std::string units_;  //!< the defined units of the publication
@@ -340,7 +343,7 @@ class PublicationT : public Publication
     }
     /** send a value for publication
     @param[in] val the value to publish*/
-    void publish (const X &val) const { fed->publish (id, val); }
+    void publish (const X &val) const { fed->publish (*this, val); }
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

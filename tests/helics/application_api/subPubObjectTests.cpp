@@ -14,7 +14,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
-
 #include <future>
 
 namespace utf = boost::unit_test;
@@ -32,7 +31,7 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label("ci"))
     // register the publications
     auto pubObj = helics::PublicationT<std::string> (helics::GLOBAL, vFed.get (), "pub1");
 
-    auto subObj = helics::SubscriptionT<std::string> (vFed.get (), "pub1");
+    auto subObj = helics::make_subscription<std::string> (*vFed, "pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -40,7 +39,7 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label("ci"))
     auto gtime = vFed->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    std::string s = subObj.getValue ();
+    std::string s = subObj.getValue();
 
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
@@ -108,7 +107,7 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     // register the publications
     auto pubObj = helics::make_publication<TX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj = vFed->registerSubscription( "pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
@@ -133,7 +132,7 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
     // register the publications
     auto pubObj = helics::make_publication<IX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
-    auto subObj = helics::Subscription (vFed.get (), "pub1");
+    auto &subObj = vFed->registerSubscription("pub1");
     vFed->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;

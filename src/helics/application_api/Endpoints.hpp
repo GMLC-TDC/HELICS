@@ -37,7 +37,7 @@ class Endpoint
     }
 
     template <class FedPtr>
-    Endpoint (FedPtr &mFed, const std::string &aactname, const std::string &type = std::string ())
+    Endpoint (FedPtr &mFed, const std::string &name, const std::string &type = std::string ())
         : Endpoint (mFed->registerEndpoint (name, type))
     {
         static_assert (std::is_base_of<MessageFederate, std::remove_reference_t<decltype (*mFed)>>::value,
@@ -173,7 +173,7 @@ class Endpoint
     /** get the specified type of the endpoint*/
     const std::string &getType () const { return fed->getEndpointType (*this); }
     /** get the actual endpoint id for the fed*/
-    interface_handle getID () const { return handle; }
+    interface_handle getHandle () const { return handle; }
 
     friend class MessageFederateManager;
 };

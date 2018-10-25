@@ -110,8 +110,10 @@ class CloningFilter : public Filter
     explicit CloningFilter (Federate *fed, const std::string &name = EMPTY_STRING);
     /** construct from a Federate
     */
-    explicit CloningFilter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
+    CloningFilter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
     
+	/** constructor used by FilterFederateManager*/
+	CloningFilter (Federate *fed, const std::string &name, interface_handle handle);
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
