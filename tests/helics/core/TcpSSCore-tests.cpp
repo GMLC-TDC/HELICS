@@ -35,7 +35,7 @@ using helics::Core;
 #define TCP_BROKER_PORT_ALT 33134
 #define TCP_BROKER_PORT_ALT_STRING "33134"
 
-BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
+BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
+BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -113,6 +113,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     int cnt = 0;
     while (counter < 2)
     {
+        if (len > 130)
+        {
+            break;
+        }
         std::this_thread::sleep_for (100ms);
         ++cnt;
         if (cnt > 30)
@@ -120,17 +124,22 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
             break;
         }
     }
-    BOOST_CHECK_EQUAL (counter, 2);
+    BOOST_CHECK_GE (counter, 1);
 
-    BOOST_CHECK_GT (len, 32);
-    helics::ActionMessage rM (data.data (), len);
+    BOOST_CHECK_GT (len, 50);
+    helics::ActionMessage rM;
+    auto loc=rM.depacketize(data.data(), len);
+    if ((counter == 1) && (loc < len))
+    {
+        rM.depacketize(data.data() + loc, len - loc);
+    }
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     server->close ();
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
+BOOST_AUTO_TEST_CASE (tcpSSComms_rx_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> ServerCounter{0};
@@ -175,7 +184,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
+BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_through)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -235,7 +244,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
+BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
 {
     std::this_thread::sleep_for (500ms);
     std::atomic<int> counter{0};
@@ -326,7 +335,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -418,7 +427,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_core_broker_default_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (400));
     std::string initializationString = "1";
