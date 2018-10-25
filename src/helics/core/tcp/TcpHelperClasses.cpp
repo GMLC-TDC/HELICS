@@ -667,10 +667,14 @@ bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
                 }
 
                 halted = true;
-                break;
+                continue;
             }
         }
         partialConnect = true;
+    }
+    if ((halted.load()) && (partialConnect))
+    {
+        std::cerr << "partial connection on acceptor\n";
     }
     return !halted;
 }
@@ -707,12 +711,13 @@ bool TcpServer::start ()
             std::cout << "reconnect failed" << std::endl;
             acceptors.clear ();
             std::this_thread::sleep_for (std::chrono::milliseconds (200));
+            halted.store(false);
             initialConnect ();
             if (halted)
             {
                 if (!reConnect (std::chrono::milliseconds (1000)))
                 {
-                    std::cout << "reconnect part 2failed" << std::endl;
+                    std::cout << "reconnect part 2 failed" << std::endl;
                     return false;
                 }
             }
