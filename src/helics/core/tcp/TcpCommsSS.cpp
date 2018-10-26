@@ -450,6 +450,11 @@ void TcpCommsSS::queue_tx_function ()
         }
     }
 CLOSE_TX_LOOP:
+    for (auto &rt : made_connections)
+    {
+        rt.second->close();
+    }
+    made_connections.clear();
     for (auto &rt : routes)
     {
         rt.second->close ();
@@ -463,6 +468,7 @@ CLOSE_TX_LOOP:
     if (server)
     {
         server->close();
+        server = nullptr;
     }
     if (getRxStatus () == connection_status::connected)
     {
