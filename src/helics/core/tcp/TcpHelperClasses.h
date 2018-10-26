@@ -298,7 +298,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
 
     void initialConnect ();
     boost::asio::io_service &ioserv;
-    std::mutex accepting;
+    mutable std::mutex accepting;
     std::vector<TcpAcceptor::pointer> acceptors;
     std::vector<boost::asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;

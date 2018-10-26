@@ -785,6 +785,7 @@ void TcpServer::handle_accept (TcpAcceptor::pointer acc, TcpConnection::pointer 
 
 TcpConnection::pointer TcpServer::findSocket (int connectorID) const
 {
+    std::unique_lock<std::mutex> lock(accepting);
     auto ptr = std::find_if (connections.begin (), connections.end (),
                              [connectorID](const auto &conn) { return (conn->getIdentifier () == connectorID); });
     if (ptr != connections.end ())

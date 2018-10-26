@@ -36,8 +36,7 @@ private:
   public:
     /** default constructor*/
 	  explicit NetworkCommsInterface(interface_type type) noexcept;
-    /** destructor*/
-    ~NetworkCommsInterface();
+
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
