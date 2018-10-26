@@ -267,7 +267,7 @@ enum class helics_type_t : int
     helicsComplexVector = 5,
     helicsNamedPoint = 6,
     helicsBool = 7,
-    helicsInvalid = 23425,
+    helicsCustom = 23425,
     helicsAny = 247652,
 };
 
@@ -336,7 +336,7 @@ data_block typeConvert (helics_type_t type, bool val);
 template <class X>
 constexpr helics_type_t helicsType ()
 {
-    return helics_type_t::helicsInvalid;
+    return helics_type_t::helicsCustom;
 }
 
 template <>

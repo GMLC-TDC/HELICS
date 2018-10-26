@@ -247,7 +247,7 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, 
 /** create a message federate from a JSON file or JSON string or TOML file
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
 argument
-@param configFile  a Config(json,toml) file or a JSON string that contains setup and configuration information
+@param configFile  a Config(json,TOML) file or a JSON string that contains setup and configuration information
 @return an opaque message federate object
 */
 HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, helics_error *err);

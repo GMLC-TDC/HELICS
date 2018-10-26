@@ -22,7 +22,7 @@ class Input
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
 
-    helics_type_t type = helics_type_t::helicsInvalid;  //!< the underlying type the publication is using
+    helics_type_t type = helics_type_t::helicsCustom;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
     defV lastValue;  //!< the last value updated
@@ -181,7 +181,7 @@ class Input
     template <class X>
     void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
-        static_assert (helicsType<X> () != helics_type_t::helicsInvalid,
+        static_assert (helicsType<X> () != helics_type_t::helicsCustom,
                        "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
                        "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = callback;
@@ -227,11 +227,11 @@ class Input
         if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
         {
             auto dv = fed->getValueRaw (*this);
-            if (type == helics_type_t::helicsInvalid)
+            if (type == helics_type_t::helicsCustom)
             {
                 type = getTypeFromString (fed->getPublicationType (*this));
             }
-            if (type != helics_type_t::helicsInvalid)
+            if (type != helics_type_t::helicsCustom)
             {
                 valueExtract (dv, type, out);
                 if (changeDetectionEnabled)
@@ -292,9 +292,9 @@ class Input
     template <class X>
     void getValue (X &out)
     {
-        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+        static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                        "requested types must be one of the primary helics types or convertible to one");
-        getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid), std::true_type,
+        getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsCustom), std::true_type,
                                              std::false_type> (),
                           out);
     }
@@ -303,9 +303,9 @@ class Input
     template <class X>
     X getValue ()
     {
-        static_assert (((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+        static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                        "requested types must be one of the primary helics types or convertible to one");
-        return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsInvalid),
+        return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsCustom),
                                                     std::true_type, std::false_type> ());
     }
 
@@ -333,7 +333,7 @@ class InputT : public Input
       changeDetectionOperator;  //!< callback function for change detection
 	//determine if we can convert to a primary type
     using is_convertible_to_primary_type =
-      std::conditional_t<((helicsType<X> () != helics_type_t::helicsInvalid) || (isConvertableType<X> ())),
+      std::conditional_t<((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                          std::true_type,
                          std::false_type>;
   public:

@@ -116,7 +116,7 @@ helics_type_t getTypeFromString (const std::string &typeName)
     auto res = typeMap.find (typeName);
     if (res == typeMap.end ())
     {
-        return helics_type_t::helicsInvalid;
+        return helics_type_t::helicsCustom;
     }
     return res->second;
 }

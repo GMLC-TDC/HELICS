@@ -62,7 +62,7 @@ class FederateInfo : public CoreFederateInfo
     void loadInfoFromArgs (int argc, const char *const *argv);
 };
 
-/** generate a FederateInfo object from a config file (JSON, toml)
+/** generate a FederateInfo object from a config file (JSON, TOML)
  */
 FederateInfo loadFederateInfo (const std::string &configString);
 
@@ -115,8 +115,8 @@ class Federate
     explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with
-    extension (.TOML, .toml)
+    @param[in] configString can be either a JSON file or a string containing JSON code or a TOML file with
+    extension (.TOML, .TOML)
     */
     Federate (const std::string &fedname, const std::string &configString);
     /**default constructor*/

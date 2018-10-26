@@ -27,12 +27,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     MessageFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
-    @param[in] configString can be either a JSON file, toml file or a string containing JSON code
+    @param[in] configString can be either a JSON file, TOML file or a string containing JSON code
     */
     explicit MessageFederate (const std::string &configString);
     /**constructor taking a string with the required information
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file, toml file or a string containing JSON code
+    @param[in] configString can be either a JSON file, TOML file or a string containing JSON code
     */
     MessageFederate (const std::string &name, const std::string &configString);
     /** move constructor*/
@@ -84,7 +84,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 
 	 /** register a set Message interfaces
    @details call is only valid in startup mode it is a protected call to add an
-   @param[in] configString  the location of the toml to load to generate the interfaces
+   @param[in] configString  the location of the TOML to load to generate the interfaces
    */
     void registerMessageInterfacesToml (const std::string &tomlString);
 

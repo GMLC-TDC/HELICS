@@ -501,7 +501,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<doub
         }
         break;
     }
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
     default:
         break;
     }
@@ -560,7 +560,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
         val.push_back (cval);
         break;
     }
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
     default:
         break;
     }
@@ -616,7 +616,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
         val = ValueConverter<std::complex<double>>::interpret (dv);
         break;
     }
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
     default:
         break;
     }
@@ -696,7 +696,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val
     case helics_type_t::helicsNamedPoint:
         val = ValueConverter<named_point>::interpret (dv);
         break;
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
     default:
         break;
     }

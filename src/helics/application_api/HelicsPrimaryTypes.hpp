@@ -244,7 +244,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         val = static_cast<X>(vectorNorm(V));
         break;
     }
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
         throw (std::invalid_argument ("unrecognized helics type"));
     }
 }

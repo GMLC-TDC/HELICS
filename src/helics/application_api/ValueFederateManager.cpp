@@ -375,8 +375,9 @@ const std::string &ValueFederateManager::getPublicationKey (const Publication &p
     return pub.getName ();
 }
 
-static const Publication invalidPub;
-static Publication invalidPubNC;
+static const Publication invalidPub{};
+static Publication invalidPubNC{};
+
 const Publication &ValueFederateManager::getPublication (const std::string &key) const
 {
     auto pubHandle = publications.lock_shared ();

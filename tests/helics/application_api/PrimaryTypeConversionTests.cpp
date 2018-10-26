@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (string_converstion_tests)
 BOOST_AUTO_TEST_CASE (double_type_tests)
 {
     BOOST_CHECK (helicsType<double> () == helics_type_t::helicsDouble);
-    BOOST_CHECK (helicsType<float> () == helics_type_t::helicsInvalid);
+    BOOST_CHECK (helicsType<float> () == helics_type_t::helicsCustom);
     BOOST_CHECK (isConvertableType<float> () == true);
     BOOST_CHECK (isConvertableType<double> () == false);
 }
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE (double_conversion_tests)
 BOOST_AUTO_TEST_CASE (integer_type_tests)
 {
     BOOST_CHECK (helicsType<int64_t> () == helics_type_t::helicsInt);
-    BOOST_CHECK (helicsType<int> () == helics_type_t::helicsInvalid);
+    BOOST_CHECK (helicsType<int> () == helics_type_t::helicsCustom);
     BOOST_CHECK (isConvertableType<int> () == true);
     BOOST_CHECK (isConvertableType<int64_t> () == false);
 

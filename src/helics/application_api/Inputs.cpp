@@ -126,11 +126,11 @@ bool Input::isUpdated ()
         if (fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
-            if (type == helics_type_t::helicsInvalid)
+            if (type == helics_type_t::helicsCustom)
             {
                 type = getTypeFromString (fed->getPublicationType (*this));
             }
-            if (type != helics_type_t::helicsInvalid)
+            if (type != helics_type_t::helicsCustom)
             {
                 auto visitor = [&,this](auto &&arg)
                 {

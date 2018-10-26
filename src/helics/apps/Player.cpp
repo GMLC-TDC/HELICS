@@ -882,7 +882,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::helics_type_t::helicsInvalid)
+        if (defType == helics::helics_type_t::helicsCustom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;

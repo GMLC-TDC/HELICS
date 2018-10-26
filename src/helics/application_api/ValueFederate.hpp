@@ -31,12 +31,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     ValueFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
-    @param[in] configString can be either a JSON file a toml file (with extension toml) or a string containing JSON
+    @param[in] configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     explicit ValueFederate (const std::string &configString);
     /**constructor taking a string with the required information
-    @param[in] configString can be either a JSON file a toml file (with extension toml) or a string containing JSON
+    @param[in] configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     ValueFederate (const std::string &fedName, const std::string &configString);
@@ -267,16 +267,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
         setDefaultValue (inp, data_view (ValueConverter<X>::convert (val)));
     }
     /** register a set of interfaces defined in a file
-    @details call is only valid in startup mode to add an toml files must have extension .toml or .TOML
-    @param[in] configString  the location of the file(JSON or toml) or JSON String to load to generate the
+    @details call is only valid in startup mode to add an TOML files must have extension .TOML or .TOML
+    @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */
     virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set of value interfaces (publications and subscriptions)
-    @details call is only valid in startup mode it is a protected call to add an toml files must have extension
-    .toml or .TOML
-    @param[in] configString  the location of the file(JSON or toml) or JSON String to load to generate the
+    @details call is only valid in startup mode it is a protected call to add an TOML files must have extension
+    .TOML or .TOML
+    @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */
     void registerValueInterfaces (const std::string &configString);

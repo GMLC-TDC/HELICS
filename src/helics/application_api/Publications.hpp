@@ -24,6 +24,7 @@ class Publication
     helics_type_t pubType=helics_type_t::helicsAny;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
   private:
+    size_t typeHash = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
     std::string key_;  //!< the name of the publication
     std::string units_;  //!< the defined units of the publication
@@ -235,7 +236,7 @@ class Publication
 @param units optional units for the publication
 */
 template <class X>
-typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
 make_publication(ValueFederate *valueFed, const std::string &key, const std::string &units = std::string())
 {
     return std::make_unique<Publication>(valueFed, helicsType<X>(), key, units);
@@ -249,7 +250,7 @@ make_publication(ValueFederate *valueFed, const std::string &key, const std::str
 @param units optional units for the publication
 */
 template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
 make_publication (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
 {
     return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
@@ -264,7 +265,7 @@ make_publication (FedPtr &valueFed, const std::string &key, const std::string &u
 @param units optional units for the publication
 */
 template <class X>
-typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
 make_publication(interface_visibility locality,
     ValueFederate *valueFed,
     const std::string &key,
@@ -282,7 +283,7 @@ make_publication(interface_visibility locality,
 @param units optional units for the publication
 */
 template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsInvalid, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
 make_publication (interface_visibility locality,
                   FedPtr &valueFed,
                   const std::string &key,
