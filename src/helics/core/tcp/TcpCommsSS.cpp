@@ -241,8 +241,13 @@ void TcpCommsSS::queue_tx_function ()
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");
-                    setTxStatus (connection_status::error);
-                    setRxStatus (connection_status::error);
+                   
+                    if (server)
+                    {
+                        server->close();
+                    }
+                    setTxStatus(connection_status::error);
+                    setRxStatus(connection_status::error);
                     return;
                 }
 
@@ -455,6 +460,10 @@ CLOSE_TX_LOOP:
     }
     routes.clear ();
     brokerConnection = nullptr;
+    if (server)
+    {
+        server->close();
+    }
     if (getRxStatus () == connection_status::connected)
     {
         setRxStatus (connection_status::terminated);
