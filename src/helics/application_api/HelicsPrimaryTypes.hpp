@@ -55,6 +55,19 @@ bool changeDetected (const defV &prevValue, bool val, double deltaV);
 /** directly convert the boolean to integer*/
 inline int64_t make_valid (bool obj) { return (obj) ? 1ll : 0ll; }
 
+/** directly convert the boolean to integer*/
+inline int64_t make_valid (uint64_t val) { return static_cast<int64_t>(val); }
+inline int64_t make_valid (int16_t val) { return static_cast<int64_t> (val); }
+inline int64_t make_valid (uint16_t val) { return static_cast<int64_t> (val); }
+inline int64_t make_valid (char val) { return static_cast<int64_t> (val); }
+inline int64_t make_valid (unsigned char val) { return static_cast<int64_t> (val); }
+inline int64_t make_valid (int32_t val) { return static_cast<int64_t> (val); }
+inline int64_t make_valid (uint32_t val) { return static_cast<int64_t> (val); }
+
+inline double make_valid (float val) { return static_cast<double> (val); }
+
+inline std::complex<double> make_valid (const std::complex<float> &val) { return std::complex<double>(val.real(),val.imag()); }
+
 /** this template should do nothing for most classes the specific overloads are the important ones*/
 template <class X>
 decltype (auto) make_valid (X &&obj)

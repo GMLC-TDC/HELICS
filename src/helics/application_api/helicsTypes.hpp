@@ -50,7 +50,7 @@ template <typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t
 {
   private:
-    BaseType ivalue=invalidValue;  //!< the underlying index value
+    BaseType ivalue = invalidValue;  //!< the underlying index value
 
   public:
     static const identifiers identity{ID};  //!< the type of the identifier
@@ -82,7 +82,7 @@ class identifier_id_t
     bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
     /** less than operator for sorting*/
     bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
-	//check if the current value is not the invalidValue
+    // check if the current value is not the invalidValue
     bool isValid () const noexcept { return (ivalue != invalidValue); };
 };
 }  // namespace helics
@@ -95,9 +95,12 @@ struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
     using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;
     using result_type = std::size_t;
-    result_type operator() (argument_type const &key) const noexcept { return std::hash<BaseType>{}(key.value ());}
+    result_type operator() (argument_type const &key) const noexcept
+    {
+        return std::hash<BaseType>{}(key.value ());
+    }
 };
-} //namespace std
+}  // namespace std
 
 namespace helics
 {
@@ -424,13 +427,13 @@ constexpr bool isConvertableType<uint16_t> ()
 }
 
 template <>
-constexpr bool isConvertableType<int8_t> ()
+constexpr bool isConvertableType<char> ()
 {
     return true;
 }
 
 template <>
-constexpr bool isConvertableType<uint8_t> ()
+constexpr bool isConvertableType<unsigned char> ()
 {
     return true;
 }
@@ -478,4 +481,17 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
     return {invalidValue<double> (), 0.0};
 }
 
+template <typename T>
+using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
+
+/** template dividing types into 3 categories
+0 is primary types
+1 types convertible to primary types
+2 type not convertible to primary types */
+template <typename X>
+using typeCategory = std::conditional_t < helicsType<remove_cv_ref<X>> () != helics_type_t::helicsCustom,
+                                                  std::integral_constant<int, 0>,
+                                                  std::conditional_t<isConvertableType<remove_cv_ref<X>>(),
+                                                                     std::integral_constant<int, 1>,
+                                                                     std::integral_constant<int, 2>>>;
 }  // namespace helics

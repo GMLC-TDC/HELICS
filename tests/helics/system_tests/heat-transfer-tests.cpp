@@ -64,13 +64,14 @@ class HeatUnitBlock
         {
             sub[0] = &vFed->registerSubscriptionIndexed ("temp", x - 1, y);
         }
-        vFed->setDefaultValue (*sub[0], T);
+        sub[0]->setDefault (T);
         sub[1] = &vFed->registerSubscriptionIndexed ("temp", x + 1, y);
-        vFed->setDefaultValue (*sub[1], -512.0);
+        sub[1]->setDefault (-512.0);
+
         sub[2] = &vFed->registerSubscriptionIndexed ("temp", x, y - 1);
-        vFed->setDefaultValue (*sub[2], -512.0);
+        sub[2]->setDefault (-512.0);
         sub[3] = &vFed->registerSubscriptionIndexed ("temp", x, y + 1);
-        vFed->setDefaultValue (*sub[3], -512.0);
+        sub[3]->setDefault (-512.0);
         initialized = true;
     }
 
@@ -131,7 +132,7 @@ class Wall
         std::string name = "Wall";
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate> (name,fi);
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
         pub = &vFed->registerGlobalPublication<double> ("temp_wall");
         initialized = true;
     }
@@ -194,9 +195,9 @@ class observer
         std::string name = "observer";
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.setFlagOption(HELICS_OBSERVER_FLAG);
+        fi.setFlagOption (HELICS_OBSERVER_FLAG);
         fi.setTimeProperty (TIME_DELTA_PROPERTY, 10.0);
-        vFed = std::make_unique<helics::ValueFederate> (name,fi);
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
         vSub = helics::VectorSubscription2d<double> (vFed.get (), subName, 0, m_count, 0, 1, 0.0);
         initialized = true;
     }

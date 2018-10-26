@@ -236,7 +236,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] subid the subscription identifier
+    @param[in] inp the input object
     @param[in] shortcutName the name of the shortcut
     */
     void addShortcut (const Input &inp, const std::string &shortcutName);
@@ -248,24 +248,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @throw std::invalid_argument if id is invalid
     */
     void setDefaultValue (const Input &inp, data_view block);
-    /** set the default value for a subscription
-    @details this is the value returned prior to any publications
-    @param[in] id the input identifier
-    @param[in] block the data block representing the default value
-    @throw std::invalid_argument if id is invalid
-    */
-    void setDefaultValue (const Input &inp, const data_block &block) { setDefaultValue (inp, data_view (block)); }
 
-    /** set a default value for a subscription
-    @param[in] id  the identifier for the subscription
-    @param[in] val the default value
-    @throw std::invalid_argument if id is invalid
-    */
-    template <typename X>
-    void setDefaultValue (const Input &inp, const X &val)
-    {
-        setDefaultValue (inp, data_view (ValueConverter<X>::convert (val)));
-    }
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode to add an TOML files must have extension .TOML or .TOML
     @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the

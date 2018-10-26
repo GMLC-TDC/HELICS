@@ -593,7 +593,7 @@ void Recorder::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.emplace_back (fed, key);
+        subscriptions.emplace_back (fed->registerSubscription(key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
         auto id = subscriptions.back ().getHandle();
         subids[id] = index;  // this is a new element

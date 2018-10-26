@@ -25,6 +25,7 @@ class Input
     helics_type_t type = helics_type_t::helicsCustom;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
+    size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
     std::string actualName;  //!< the name of the federate
@@ -170,7 +171,7 @@ class Input
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
 
     /** check if the value has been updated
-	@details if changeDetection is Enabled this function also loads the value into the buffer*/
+    @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
 
     /** register a callback for the update
@@ -188,12 +189,33 @@ class Input
         fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
     }
 
+  private:
+    template <class X>
+    void setDefault_impl (std::integral_constant<int, 0> /**/, X &&val)
+    {
+        /** still need to make_valid for bool*/
+        lastValue = make_valid(std::forward<X> (val));
+    }
+
+	template <class X>
+    void setDefault_impl (std::integral_constant<int, 1> /**/, X &&val)
+    {
+        lastValue = make_valid(std::forward<X> (val));
+    }
+
+	template <class X>
+    void setDefault_impl (std::integral_constant<int, 2> /**/, X &&val)
+    {
+       fed->setDefaultValue(*this,ValueConverter<remove_cv_ref<X>>::convert(std::forward<X>(val)));
+    }
+
+  public:
     /** set the default value to use before any update has been published
      */
     template <class X>
     void setDefault (X &&val)
     {
-        lastValue = make_valid (std::forward<X> (val));
+        setDefault_impl<X>(typeCategory<X>(),std::forward<X>(val));
     }
 
     /** set the minimum delta for change detection
@@ -222,7 +244,7 @@ class Input
     /** deal with the callback from the application API*/
     void handleCallback (Time time);
     template <class X>
-    void getValue_impl (std::true_type /*V*/, X &out)
+    void getValue_impl (std::integral_constant<int, 0> /*V*/, X &out)
     {
         if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
         {
@@ -262,24 +284,24 @@ class Input
         hasUpdate = false;
     }
     template <class X>
-    void getValue_impl (std::false_type /*V*/, X &out)
+    void getValue_impl (std::integral_constant<int, 1> /*V*/, X &out)
     {
         std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
-        getValue_impl (std::true_type (), gval);
+        getValue_impl (std::integral_constant<int, 0>(), gval);
         out = static_cast<X> (gval);
     }
     template <class X>
-    X getValue_impl (std::true_type /*V*/)
+    X getValue_impl (std::integral_constant<int, 0> /*V*/)
     {
         X val;
-        getValue_impl (std::true_type (), val);
+        getValue_impl (std::integral_constant<int, 0>(), val);
         return val;
     }
     template <class X>
-    X getValue_impl (std::false_type /*V*/)
+    X getValue_impl (std::integral_constant<int, 1> /*V*/)
     {
         std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
-        getValue_impl (std::true_type (), gval);
+        getValue_impl (std::integral_constant<int, 0>(), gval);
         return static_cast<X> (gval);
     }
 
@@ -294,9 +316,7 @@ class Input
     {
         static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                        "requested types must be one of the primary helics types or convertible to one");
-        getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsCustom), std::true_type,
-                                             std::false_type> (),
-                          out);
+        getValue_impl<X> (typeCategory<X>(),out);
     }
     /** get the most recent value
     @return the value*/
@@ -305,8 +325,7 @@ class Input
     {
         static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                        "requested types must be one of the primary helics types or convertible to one");
-        return getValue_impl<X> (std::conditional_t<(helicsType<X> () != helics_type_t::helicsCustom),
-                                                    std::true_type, std::false_type> ());
+        return getValue_impl<X> (typeCategory<X>());
     }
 
     /** get the size of the raw data*/
@@ -331,11 +350,12 @@ class InputT : public Input
     std::function<void(X, Time)> value_callback;  //!< callback function for the federate
     std::function<double(const X &v1, const X &v2)>
       changeDetectionOperator;  //!< callback function for change detection
-	//determine if we can convert to a primary type
+    // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
       std::conditional_t<((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
                          std::true_type,
                          std::false_type>;
+
   public:
     InputT () = default;
     /**constructor to build a subscription object
@@ -367,17 +387,11 @@ class InputT : public Input
   public:
     /** get the most recent value
     @return the value*/
-    X getValue ()
-    {
-        return getValueX_impl (is_convertible_to_primary_type());
-    }
+    X getValue () { return getValueX_impl (is_convertible_to_primary_type ()); }
     /** store the value in the given variable
     @param[out] out the location to store the value
     */
-    void getValue (X &out)
-    {
-        getValueX_impl(is_convertible_to_primary_type (),out);
-    }
+    void getValue (X &out) { getValueX_impl (is_convertible_to_primary_type (), out); }
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -392,12 +406,7 @@ class InputT : public Input
     /** set a default value
     @param val the value to set as the default
     */
-    void setDefault (const X &val) { fed->setDefaultValue (*this, val); }
-
-    /** store the value in the given variable
-    @param[out] out the location to store the value
-    */
-    const X &operator[] (int index) const { return fed->getValue<X> (*this, index); }
+    void setDefault (const X &val) { fed->setDefaultValue (*this, ValueConverter<X>::convert (val)); }
 
   private:
     void handleCallback (Time time)

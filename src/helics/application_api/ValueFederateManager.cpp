@@ -199,6 +199,10 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
+	if (handles.empty())
+	{
+        return;
+	}
     // lock the data updates
     auto inpHandle = inputs.lock ();
     auto allCall = allCallback.load ();
