@@ -170,7 +170,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 
     // register the publications
     auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_DATA_TYPE_STRING, "");
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_DATA_TYPE_INT, "volts");
 
     auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
 
@@ -201,6 +201,14 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     CE (helicsSubscriptionGetUnits (subid3, tmp, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (tmp, "V");
 
+	//check the getSubscription function
+	auto subid_b = helicsFederateGetSubscription (vFed1, "sub1");
+    CE (helicsSubscriptionGetType (subid_b, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "double");
+	//check the getSubscriptionByIndex function
+    auto subid_c = helicsFederateGetSubscriptionByIndex (vFed1, 2);
+    CE (helicsSubscriptionGetKey (subid_c, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "sub3");
     // check publications
 
     CE (helicsPublicationGetKey (pubid, sv, HELICS_SIZE_MAX));
@@ -215,6 +223,16 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK_EQUAL (tmp, "double");
     CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
     BOOST_CHECK_EQUAL (tmp, "V");
+
+	// check the getSubscription function
+    auto pubid_b = helicsFederateGetPublication (vFed1, "fed0/pub1");
+    CE (helicsPublicationGetType (pubid_b, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "string");
+    // check the getSubscriptionByIndex function
+    auto pubid_c = helicsFederateGetPublicationByIndex (vFed1, 1);
+    CE (helicsPublicationGetUnits (pubid_c, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL (tmp, "volts");
+
     CE (helicsFederateFinalize (vFed1));
 
     CE (helicsFederateGetState (vFed1, &state));

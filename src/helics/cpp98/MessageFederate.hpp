@@ -22,9 +22,9 @@ class MessageFederate : public virtual Federate
         fed = helicsCreateMessageFederate (fi.getInfo ());
     }
 
-    explicit MessageFederate (const std::string &jsonString)
+    explicit MessageFederate (const std::string &configString)
     {
-        fed = helicsCreateMessageFederateFromJson (jsonString.c_str());
+        fed = helicsCreateMessageFederateFromJson (configString.c_str());
     }
 
     // Default constructor, not meant to be used
@@ -43,6 +43,15 @@ class MessageFederate : public virtual Federate
         helics_endpoint ep = helicsFederateRegisterGlobalEndpoint (fed, name.c_str(), type.c_str());
         local_endpoints.push_back(ep);
         return Endpoint(ep);
+    }
+
+	Endpoint getEndpoint (const std::string &name)
+    {
+        return Endpoint (helicsFederateGetEndpoint (fed, name.c_str ()));
+    }
+    Endpoint getEndpoint (int index)
+    {
+        return Endpoint (helicsFederateGetEndpointByIndex (fed, index));
     }
 
     /** Checks if federate has any messages **/

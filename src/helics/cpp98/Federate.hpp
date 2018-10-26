@@ -168,6 +168,14 @@ class Federate
         return fedState;
     }
 
+	void registerInterfaces (const std::string &configFile)
+    {
+        if (helics_ok != helicsFederateRegisterInterfaces (fed,configFile.c_str()))
+        {
+            throw (std::runtime_error ("error in processing config file"));
+        }
+    }
+
     void enterInitializationMode ()
     {
         if (helics_ok != helicsFederateEnterInitializationMode (fed))
@@ -246,6 +254,13 @@ class Federate
     {
         helics_time_t grantedTime;
         helicsFederateRequestTime (fed, time, &grantedTime);
+        return grantedTime;
+    }
+
+	 helics_time_t requestNextStep ()
+    {
+        helics_time_t grantedTime;
+        helicsFederateRequestNextStep (fed, &grantedTime);
         return grantedTime;
     }
 
@@ -344,6 +359,14 @@ class Federate
         return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str ()));
     }
 
+	Filter getFilter (const std::string &name)
+    {
+        return Filter (helicsFederateGetFilter (fed, name.c_str ()));
+    }
+    Filter getSubscription (int index)
+    {
+        return Filter (helicsFederateGetFilterByIndex (fed, index));
+    }
   protected:
     helics_federate fed;
     bool exec_async_iterate;

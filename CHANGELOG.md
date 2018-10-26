@@ -3,9 +3,21 @@ All notable changes to this project after the 1.0.0 release will be documented i
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).  
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.3.2] - 2018-10-20
+- The 1.3.X branch is now in maintenance mode, this is the last expected update for the 1.X series of HELICS.  Development is expected on the 2.0 branch and only bug fixes until the 2.0 branch is fully released are expected.  
+
+### Fixed
+ - Log level defines were interfering with other applications a HELICS_* was prepending to the definitions
+ - ZMQ comms were not shutting down properly for some combinations of ZMQ version and compiler, a termination flag and timeout was added to fix the situation
+ - The initial broker connection procedure for TCP cores was modified to repeat tries to connect and fix some connection issues showing up in the tests.  
+
+### Added
+ - helicsFederateGetXXXX for all interfaces was added to the C-api to retrieve the interface ID's after creation by a file
+ - helicsFederateGetXXXXByIndex for all interfaces was added to retrieve the interfaces by index
+ - helicsFederateRegisterInterfaces was added to the C-api to load the interfaces from a file
+ - a requestNextStep was added to the C and C++ api's to to request the next allowed time step in simulation.  
+
 ## [1.3.1] - 2018-09-23
-### Changed
- - wait for Broker now uses a condition variable instead of sleep and checking repeatedly
 
 ### Fixed
  - some race conditions in a few test cases and in user disconnection calls for brokers
@@ -16,6 +28,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
  - tcp cores have a --reuse-address flag to allow multiple brokers on the same port,  mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.  
 
 ### Changed
+ - wait for Broker now uses a condition variable instead of sleep and checking repeatedly
  - changed the logging levels to be error, warning, summary, connections, interfaces, timing, data, and trace to better match debugging levels used in development and make the purpose of each level clearer
  - comm objects now can use the same logging system as the rest of HELICS
 

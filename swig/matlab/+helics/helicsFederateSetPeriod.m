@@ -10,5 +10,5 @@ function varargout = helicsFederateSetPeriod(varargin)
     %* `offset` :
     %    the shift of the period from 0 offset must be < period
     %
-  [varargout{1:nargout}] = helicsMEX(103, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(105, varargin{:});
 end

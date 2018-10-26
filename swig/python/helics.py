@@ -881,6 +881,10 @@ def helicsFederateInfoSetLoggingLevel(fi: 'helics_federate_info_t', logLevel: 'i
     """
     return _helics.helicsFederateInfoSetLoggingLevel(fi, logLevel)
 
+def helicsFederateRegisterInterfaces(fed: 'helics_federate', file: 'char const *') -> "helics_status":
+    return _helics.helicsFederateRegisterInterfaces(fed, file)
+helicsFederateRegisterInterfaces = _helics.helicsFederateRegisterInterfaces
+
 def helicsFederateFinalize(fed: 'helics_federate') -> "helics_status":
     """
 
@@ -1086,6 +1090,10 @@ def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time_
 
     """
     return _helics.helicsFederateRequestTime(fed, requestTime)
+
+def helicsFederateRequestNextStep(fed: 'helics_federate') -> "helics_time_t *":
+    return _helics.helicsFederateRequestNextStep(fed)
+helicsFederateRequestNextStep = _helics.helicsFederateRequestNextStep
 
 def helicsFederateRequestTimeIterative(fed: 'helics_federate', requestTime: 'helics_time_t', iterate: 'helics_iteration_request') -> "helics_time_t *, helics_iteration_status *":
     """
@@ -1535,6 +1543,14 @@ def helicsFederateRegisterOptionalTypeSubscription(fed: 'helics_federate', key: 
     """
     return _helics.helicsFederateRegisterOptionalTypeSubscription(fed, key, type, units)
 
+def helicsFederateGetSubscription(fed: 'helics_federate', key: 'char const *') -> "helics_subscription":
+    return _helics.helicsFederateGetSubscription(fed, key)
+helicsFederateGetSubscription = _helics.helicsFederateGetSubscription
+
+def helicsFederateGetSubscriptionByIndex(fed: 'helics_federate', index: 'int') -> "helics_subscription":
+    return _helics.helicsFederateGetSubscriptionByIndex(fed, index)
+helicsFederateGetSubscriptionByIndex = _helics.helicsFederateGetSubscriptionByIndex
+
 def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
     """
 
@@ -1562,6 +1578,14 @@ def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'ch
 
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
+
+def helicsFederateGetPublication(fed: 'helics_federate', key: 'char const *') -> "helics_publication":
+    return _helics.helicsFederateGetPublication(fed, key)
+helicsFederateGetPublication = _helics.helicsFederateGetPublication
+
+def helicsFederateGetPublicationByIndex(fed: 'helics_federate', index: 'int') -> "helics_publication":
+    return _helics.helicsFederateGetPublicationByIndex(fed, index)
+helicsFederateGetPublicationByIndex = _helics.helicsFederateGetPublicationByIndex
 
 def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *') -> "int":
     return _helics.helicsPublicationPublishRaw(pub, data)
@@ -1813,6 +1837,14 @@ def helicsFederateRegisterGlobalEndpoint(fed: 'helics_federate', name: 'char con
     """
     return _helics.helicsFederateRegisterGlobalEndpoint(fed, name, type)
 
+def helicsFederateGetEndpoint(fed: 'helics_federate', name: 'char const *') -> "helics_endpoint":
+    return _helics.helicsFederateGetEndpoint(fed, name)
+helicsFederateGetEndpoint = _helics.helicsFederateGetEndpoint
+
+def helicsFederateGetEndpointByIndex(fed: 'helics_federate', index: 'int') -> "helics_endpoint":
+    return _helics.helicsFederateGetEndpointByIndex(fed, index)
+helicsFederateGetEndpointByIndex = _helics.helicsFederateGetEndpointByIndex
+
 def helicsEndpointSetDefaultDestination(endpoint: 'helics_endpoint', dest: 'char const *') -> "helics_status":
     """
 
@@ -2038,6 +2070,14 @@ def helicsCoreRegisterCloningFilter(core: 'helics_core', deliveryEndpoint: 'char
 
     """
     return _helics.helicsCoreRegisterCloningFilter(core, deliveryEndpoint)
+
+def helicsFederateGetFilter(fed: 'helics_federate', name: 'char const *') -> "helics_filter":
+    return _helics.helicsFederateGetFilter(fed, name)
+helicsFederateGetFilter = _helics.helicsFederateGetFilter
+
+def helicsFederateGetFilterByIndex(fed: 'helics_federate', index: 'int') -> "helics_filter":
+    return _helics.helicsFederateGetFilterByIndex(fed, index)
+helicsFederateGetFilterByIndex = _helics.helicsFederateGetFilterByIndex
 
 def helicsFilterGetTarget(filt: 'helics_filter') -> "int":
     """

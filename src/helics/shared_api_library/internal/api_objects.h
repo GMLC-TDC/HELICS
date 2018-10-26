@@ -134,7 +134,7 @@ class FilterObject
   public:
     ftype type;
     int valid = 0;
-    std::unique_ptr<Filter> filtptr;
+    std::shared_ptr<Filter> filtptr;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };

@@ -141,6 +141,13 @@ private:
         return registerGlobalTypePublication (indexed_name, type, units);
     }
 
+	Publication getPublication (const std::string &name){
+        return Publication (helicsFederateGetPublication (fed, name.c_str ()));
+	}
+    Publication getPublication (int index)
+    {
+        return Publication (helicsFederateGetPublicationByIndex (fed, index));
+    }
     /** Methods to register subscriptions **/
     Subscription
     registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
@@ -183,6 +190,15 @@ private:
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
         return registerTypeSubscription (indexed_name, type, units);
+    }
+
+	Subscription getSubscription (const std::string &name)
+    {
+        return Subscription (helicsFederateGetSubscription (fed, name.c_str ()));
+    }
+    Subscription getSubscription (int index)
+    {
+        return Subscription (helicsFederateGetSubscriptionByIndex (fed, index));
     }
 
     int getSubscriptionCount() const

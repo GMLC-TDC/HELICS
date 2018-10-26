@@ -1,4 +1,4 @@
 function varargout = helicsFilterAddDeliveryEndpoint(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(191, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(201, varargin{:});
 end
