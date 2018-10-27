@@ -76,7 +76,7 @@ class EchoHub
             {
                 if (vFed->isUpdated (subs[ii]))
                 {
-                    auto val = vFed->getValue<std::string> (subs[ii]);
+                    auto &val = vFed->getString (subs[ii]);
                     pubs[ii].publish(val);
                 }
             }
@@ -134,7 +134,7 @@ class EchoLeaf
             vFed->publish (pub, txstring);
             if (vFed->isUpdated (sub))
             {
-                auto nstring = vFed->getValue<std::string> (sub);
+                auto &nstring = vFed->getString (sub);
                 if (nstring != txstring)
                 {
                     std::cout << "incorrect string\n";

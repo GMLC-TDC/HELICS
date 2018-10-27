@@ -203,22 +203,21 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     auto gtime = vFed1->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    std::string s;
+    std::string s = vFed1->getString (subid);
     // get the value
-    vFed1->getValue (subid, s);
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    vFed1->getValue (subid, s);
+    s=vFed1->getString(subid);
 
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     gtime = vFed1->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    vFed1->getValue (subid, s);
+    s=vFed1->getString(subid);
 
     BOOST_CHECK_EQUAL (s, "string2");
 }
@@ -308,7 +307,7 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     vFed1->setInputNotificationCallback (sub1, [&](helics::Input &, helics::Time) { ++ccnt; });
     vFed1->setInputNotificationCallback (sub2, [&](helics::Input &, helics::Time) { ++ccnt; });
     vFed1->enterExecutingMode ();
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->requestTime (1.0);
     // callbacks here
     BOOST_CHECK_EQUAL (ccnt, 0);
@@ -318,7 +317,7 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     BOOST_CHECK_EQUAL (ccnt, 1);
 
     ccnt = 0;  // reset the counter
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->publish (pubid2, 4);
     vFed1->publish (pubid1, "test string2");
     vFed1->requestTime (5.0);
@@ -349,9 +348,9 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
     vFed1->publish (pubid2, 20.0);
     vFed1->publish (pubid3, 30.0);
     vFed1->requestTime (2.0);
-    auto v1 = vFed1->getValue<double> (sub1);
-    auto v2 = vFed1->getValue<double> (sub2);
-    auto v3 = vFed1->getValue<double> (sub3);
+    auto v1 = vFed1->getDouble(sub1);
+    auto v2 = vFed1->getDouble (sub2);
+    auto v3 = vFed1->getDouble (sub3);
 
     BOOST_CHECK_CLOSE (10.0, v1, 0.00000001);
     BOOST_CHECK_CLOSE (20.0, v2, 0.00000001);
@@ -388,16 +387,15 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (f1time, 1.0);
-    std::string s;
     // get the value
-    vFed2->getValue (subid, s);
+    std::string s = vFed2->getString (subid);
+    
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    vFed2->getValue (subid, s);
-
+    subid.getValue (s);
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     vFed1->requestTimeAsync (2.0);
@@ -410,8 +408,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 
     // make sure the value was updated
 
-    vFed2->getValue (subid, s);
-
+    s = subid.getValue<std::string> ();
     BOOST_CHECK_EQUAL (s, "string2");
     vFed1->finalize ();
     vFed2->finalize ();

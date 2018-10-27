@@ -48,13 +48,13 @@ class Filter
     /** default constructor*/
     Filter () = default;
     /** construct through a federate*/
-    explicit Filter (Federate *fed, const std::string &name = EMPTY_STRING);
+    explicit Filter (Federate *ffed, const std::string &filtName = EMPTY_STRING);
     /** construct from handle*/
-    Filter (Federate *fed, const std::string &name, interface_handle handle);
+    Filter (Federate *ffed, const std::string &filtName, interface_handle handle);
     /** construct through a federate*/
-    Filter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
+    Filter(interface_visibility locality, Federate *ffed, const std::string &filtName = EMPTY_STRING);
     /** construct through a core object*/
-    explicit Filter (Core *cr, const std::string &name = EMPTY_STRING);
+    explicit Filter (Core *cr, const std::string &filtName = EMPTY_STRING);
     /** virtual destructor*/
     virtual ~Filter () = default;
 
@@ -107,13 +107,13 @@ class CloningFilter : public Filter
     explicit CloningFilter (Core *cr, const std::string &name = EMPTY_STRING);
     /** construct from a Federate
      */
-    explicit CloningFilter (Federate *fed, const std::string &name = EMPTY_STRING);
+    explicit CloningFilter (Federate *ffed, const std::string &name = EMPTY_STRING);
     /** construct from a Federate
     */
-    CloningFilter(interface_visibility locality, Federate *fed, const std::string &name = EMPTY_STRING);
+    CloningFilter(interface_visibility locality, Federate *ffed, const std::string &name = EMPTY_STRING);
     
 	/** constructor used by FilterFederateManager*/
-	CloningFilter (Federate *fed, const std::string &name, interface_handle handle);
+	CloningFilter (Federate *ffed, const std::string &name, interface_handle handle);
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);

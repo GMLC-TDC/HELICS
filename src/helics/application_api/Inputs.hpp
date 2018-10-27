@@ -22,7 +22,7 @@ class Input
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
 
-    helics_type_t type = helics_type_t::helicsCustom;  //!< the underlying type the publication is using
+    helics_type_t type = helics_type_t::helicsUnknown;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
     size_t customTypeHash = 0;  //!< a hash code for the custom type
@@ -194,19 +194,19 @@ class Input
     void setDefault_impl (std::integral_constant<int, 0> /**/, X &&val)
     {
         /** still need to make_valid for bool*/
-        lastValue = make_valid(std::forward<X> (val));
+        lastValue = make_valid (std::forward<X> (val));
     }
 
-	template <class X>
+    template <class X>
     void setDefault_impl (std::integral_constant<int, 1> /**/, X &&val)
     {
-        lastValue = make_valid(std::forward<X> (val));
+        lastValue = make_valid (std::forward<X> (val));
     }
 
-	template <class X>
+    template <class X>
     void setDefault_impl (std::integral_constant<int, 2> /**/, X &&val)
     {
-       fed->setDefaultValue(*this,ValueConverter<remove_cv_ref<X>>::convert(std::forward<X>(val)));
+        fed->setDefaultValue (*this, ValueConverter<remove_cv_ref<X>>::convert (std::forward<X> (val)));
     }
 
   public:
@@ -215,7 +215,7 @@ class Input
     template <class X>
     void setDefault (X &&val)
     {
-        setDefault_impl<X>(typeCategory<X>(),std::forward<X>(val));
+        setDefault_impl<X> (typeCategory<X> (), std::forward<X> (val));
     }
 
     /** set the minimum delta for change detection
@@ -244,69 +244,48 @@ class Input
     /** deal with the callback from the application API*/
     void handleCallback (Time time);
     template <class X>
-    void getValue_impl (std::integral_constant<int, 0> /*V*/, X &out)
-    {
-        if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
-        {
-            auto dv = fed->getValueRaw (*this);
-            if (type == helics_type_t::helicsCustom)
-            {
-                type = getTypeFromString (fed->getPublicationType (*this));
-            }
-            if (type != helics_type_t::helicsCustom)
-            {
-                valueExtract (dv, type, out);
-                if (changeDetectionEnabled)
-                {
-                    if (changeDetected (lastValue, out, delta))
-                    {
-                        lastValue = make_valid (out);
-                    }
-                    else
-                    {
-                        valueExtract (lastValue, out);
-                    }
-                }
-                else
-                {
-                    lastValue = make_valid (out);
-                }
-            }
-            else
-            {
-                out = invalidValue<X> ();
-            }
-        }
-        else
-        {
-            valueExtract (lastValue, out);
-        }
-        hasUpdate = false;
-    }
+    void getValue_impl (std::integral_constant<int, 0> /*V*/, X &out);
+
     template <class X>
     void getValue_impl (std::integral_constant<int, 1> /*V*/, X &out)
     {
         std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
-        getValue_impl (std::integral_constant<int, 0>(), gval);
+        getValue_impl (std::integral_constant<int, 0> (), gval);
         out = static_cast<X> (gval);
     }
+
+    template <class X>
+    void getValue_impl (std::integral_constant<int, 2> /*V*/, X &out)
+    {
+        ValueConverter<X>::interpret (fed->getValueRaw (*this), out);
+    }
+
     template <class X>
     X getValue_impl (std::integral_constant<int, 0> /*V*/)
     {
         X val;
-        getValue_impl (std::integral_constant<int, 0>(), val);
+        getValue_impl (std::integral_constant<int, 0> (), val);
         return val;
     }
+
     template <class X>
     X getValue_impl (std::integral_constant<int, 1> /*V*/)
     {
         std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
-        getValue_impl (std::integral_constant<int, 0>(), gval);
+        getValue_impl (std::integral_constant<int, 0> (), gval);
         return static_cast<X> (gval);
     }
 
+    template <class X>
+    X getValue_impl (std::integral_constant<int, 2> /*V*/)
+    {
+        return ValueConverter<X>::interpret (fed->getValueRaw (*this));
+    }
+
   public:
+    /** get double vector value functions to retrieve data by a C array of doubles*/
     int getValue (double *data, int maxsize);
+    /** get string value functions to retrieve data by a C string*/
     int getValue (char *str, int maxsize);
     /** get the latest value for the subscription
     @param[out] out the location to store the value
@@ -314,19 +293,18 @@ class Input
     template <class X>
     void getValue (X &out)
     {
-        static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
-                       "requested types must be one of the primary helics types or convertible to one");
-        getValue_impl<X> (typeCategory<X>(),out);
+        getValue_impl<X> (typeCategory<X> (), out);
     }
     /** get the most recent value
     @return the value*/
     template <class X>
-    X getValue ()
+    auto getValue ()
     {
-        static_assert (((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
-                       "requested types must be one of the primary helics types or convertible to one");
-        return getValue_impl<X> (typeCategory<X>());
+        return getValue_impl<remove_cv_ref<X>> (typeCategory<X> ());
     }
+
+    template <class X>
+    const X &getValueRef ();
 
     /** get the size of the raw data*/
     size_t getRawSize ();
@@ -335,8 +313,7 @@ class Input
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize ();
 
-    // TODO:: add a getValueByReference function that gets the data by reference but may force a copy and will only
-    // work on the primary types
+  private:
     friend class ValueFederateManager;
 };
 
@@ -417,4 +394,96 @@ class InputT : public Input
     }
 };
 
+template <class X>
+void Input::getValue_impl (std::integral_constant<int, 0> /*V*/, X &out)
+{
+    if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
+    {
+        auto dv = fed->getValueRaw (*this);
+        if (type == helics_type_t::helicsUnknown)
+        {
+            type = getTypeFromString (fed->getPublicationType (*this));
+        }
+        if (type != helics_type_t::helicsCustom)
+        {
+            valueExtract (dv, type, out);
+            if (changeDetectionEnabled)
+            {
+                if (changeDetected (lastValue, out, delta))
+                {
+                    lastValue = make_valid (out);
+                }
+                else
+                {
+                    valueExtract (lastValue, out);
+                }
+            }
+            else
+            {
+                lastValue = make_valid (out);
+            }
+        }
+        else
+        {
+            out = invalidValue<X> ();
+        }
+    }
+    else
+    {
+        valueExtract (lastValue, out);
+    }
+    hasUpdate = false;
+}
+
+template <class X>
+inline const X &getValueRefImpl (defV &val)
+{
+    valueConvert (val, helicsType<X> ());
+    return mpark::get<X> (val);
+}
+
+template <>
+inline const std::string &getValueRefImpl (defV &val)
+{
+    // don't convert a named point to a string
+    if ((val.index () == namedPointLoc))
+    {
+        return mpark::get<named_point> (val).name;
+    }
+    else
+    {
+        valueConvert (val, helics_type_t::helicsString);
+        return mpark::get <std::string> (val);
+    }
+}
+
+template <class X>
+const X &Input::getValueRef ()
+{
+    static_assert (std::is_same<typeCategory<X>, std::integral_constant<int, 0>>::value,
+                   "calling getValue By ref must be with a primary type");
+    if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
+    {
+        auto dv = fed->getValueRaw (*this);
+        if (type == helics_type_t::helicsUnknown)
+        {
+            type = getTypeFromString (fed->getPublicationType (*this));
+        }
+
+        if (changeDetectionEnabled)
+        {
+            X out;
+            valueExtract (dv, type, out);
+            if (changeDetected (lastValue, out, delta))
+            {
+                lastValue = make_valid (out);
+            }
+        }
+        else
+        {
+            valueExtract (dv, type, lastValue);
+        }
+    }
+    return getValueRefImpl<remove_cv_ref<X>> (lastValue);
+}
 }  // namespace helics

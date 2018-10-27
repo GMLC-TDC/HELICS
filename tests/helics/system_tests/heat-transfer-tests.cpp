@@ -80,13 +80,13 @@ class HeatUnitBlock
         auto cTime = 0.0_t;
         while (cTime < tend)
         {
-            auto T0 = vFed->getValue<double> (*sub[0]);
+            auto T0 = sub[0]->getValue<double> ();
 
             double Etransfer = (T0 - T) * tRate * deltaTime;
 
             for (int ii = 1; ii < 3; ++ii)
             {
-                auto TT = vFed->getValue<double> (*sub[ii]);
+                auto TT = sub[ii]->getValue<double> ();
                 if (TT > -500)
                 {
                     Etransfer += (TT - T) * tRate * deltaTime;

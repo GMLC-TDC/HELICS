@@ -99,6 +99,8 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
 
 void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val);
 
+void valueExtract (const data_view &dv, helics_type_t baseType, defV &val);
+
 /** extract the value from a variant to a numerical type*/
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const defV &dv, X &val)
@@ -261,4 +263,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         throw (std::invalid_argument ("unrecognized helics type"));
     }
 }
+
+void valueConvert (defV &val, helics_type_t newType);
+
 }  // namespace helics

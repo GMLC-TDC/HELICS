@@ -553,7 +553,7 @@ void helicsPublicationPublishRaw (helics_publication pub, const void *data, int 
     }
     try
     {
-            pubObj->fedptr->publish (*pubObj->pubPtr, reinterpret_cast<const char *> (data), datalen);
+            pubObj->fedptr->publishRaw (*pubObj->pubPtr, reinterpret_cast<const char *> (data), datalen);
     }
     catch (...)
     {

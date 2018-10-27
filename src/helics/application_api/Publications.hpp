@@ -5,9 +5,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include "../core/core-exceptions.hpp"
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
-#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
@@ -21,10 +21,10 @@ class Publication
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     double delta = -1.0;  //!< the minimum change to publish
   protected:
-    helics_type_t pubType=helics_type_t::helicsAny;  //!< the type of publication
+    helics_type_t pubType = helics_type_t::helicsAny;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
   private:
-    size_t customTypeHash =0;  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
+    size_t customTypeHash = 0;  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
     std::string key_;  //!< the name of the publication
     std::string units_;  //!< the defined units of the publication
@@ -36,16 +36,17 @@ class Publication
     @param key the identifier for the publication
     @param type the type of the publication
     @param units, an optional string defining the units*/
-    Publication(ValueFederate *valueFed,interface_handle id,
-        const std::string &key,
-        const std::string &type,
-        const std::string &units);
+    Publication (ValueFederate *valueFed,
+                 interface_handle id,
+                 const std::string &key,
+                 const std::string &type,
+                 const std::string &units);
 
-	 /** constructor for a publication 
-   @param a valueFed a pointer the link valueFederate
-   @param key the identifier for the publication
-   @param type the type of the publication
-   @param units, an optional string defining the units*/
+    /** constructor for a publication
+  @param a valueFed a pointer the link valueFederate
+  @param key the identifier for the publication
+  @param type the type of the publication
+  @param units, an optional string defining the units*/
     Publication (ValueFederate *valueFed,
                  const std::string &key,
                  const std::string &type,
@@ -59,10 +60,10 @@ class Publication
     @param units, an optional string defining the units*/
     template <class FedPtr>
     Publication (FedPtr valueFed,
-                     const std::string &key,
+                 const std::string &key,
                  const std::string &type = std::string (),
-                     const std::string &units = std::string ())
-        : Publication (std::addressof (*valueFed),key,type,units )
+                 const std::string &units = std::string ())
+        : Publication (std::addressof (*valueFed), key, type, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
@@ -73,11 +74,11 @@ class Publication
     @param key the identifier for the publication
     @param type the type of the publication
     @param units, an optional string defining the units*/
-    Publication(interface_visibility locality,
-        ValueFederate *valueFed,
-        const std::string &key,
-        const std::string &type,
-        const std::string &units = std::string());
+    Publication (interface_visibility locality,
+                 ValueFederate *valueFed,
+                 const std::string &key,
+                 const std::string &type,
+                 const std::string &units = std::string ());
     /** base constructor for a publication
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global identifier
     @tparam valueFed a pointer of some kind to a value federate (any dereferencable type with * and -> operator
@@ -87,27 +88,27 @@ class Publication
     @param units, an optional string defining the units*/
     template <class FedPtr>
     Publication (interface_visibility locality,
-            FedPtr & valueFed,
-                     const std::string &key,
-                     const std::string &type,
-                     const std::string &units = std::string ())
-        : Publication(locality, std::addressof (*valueFed), key, type, units)
+                 FedPtr &valueFed,
+                 const std::string &key,
+                 const std::string &type,
+                 const std::string &units = std::string ())
+        : Publication (locality, std::addressof (*valueFed), key, type, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
-            "first argument must be a pointer to a ValueFederate");
+                       "first argument must be a pointer to a ValueFederate");
     }
- 
-	 /**constructor to build a publication object
-   @param[in] valueFed  the ValueFederate to use
-   @param[in] key the identifier for the publication
-   @param type_ the defined type of the publication
-   @param[in] units the units associated with a Federate
-   */
+
+    /**constructor to build a publication object
+  @param[in] valueFed  the ValueFederate to use
+  @param[in] key the identifier for the publication
+  @param type_ the defined type of the publication
+  @param[in] units the units associated with a Federate
+  */
     Publication (ValueFederate *valueFed,
                  const std::string &key,
                  helics_type_t type,
                  const std::string &units = std::string ())
-        : Publication(valueFed, key, typeNameStringRef (type), units)
+        : Publication (valueFed, key, typeNameStringRef (type), units)
     {
     }
     /**constructor to build a publication object
@@ -153,7 +154,7 @@ class Publication
                  const std::string &key,
                  helics_type_t type,
                  const std::string &units = std::string ())
-        : Publication(locality, valueFed, key, typeNameStringRef (type), units)
+        : Publication (locality, valueFed, key, typeNameStringRef (type), units)
     {
     }
 
@@ -161,7 +162,7 @@ class Publication
      */
     interface_handle getHandle () const { return handle; }
 
-	 /** check if the Publication links to a valid operation*/
+    /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
     bool operator== (const Publication &pub) const { return (handle == pub.handle); }
     bool operator!= (const Publication &pub) const { return (handle != pub.handle); }
@@ -180,30 +181,47 @@ class Publication
 
     /** send a value for publication
     @param[in] val the value to publish*/
-    void publish (double val) const;
-    void publish (int64_t val) const;
-    void publish (const char *val) const;
-    void publish (const std::string &val) const;
-    void publish (const std::vector<double> &val) const;
-    void publish (const std::vector<std::complex<double>> &val) const;
-    void publish (const double *vals, int size) const;
-    void publish (std::complex<double> val) const;
-    void publish (const defV &val) const;
-    void publish (bool val) const;
-    void publish (const named_point &np) const;
-    void publish (const std::string &name, double val) const;
-    void publish (const char *str, double val) const;
+    void publish (double val);
+    void publish (const char *val);
+    void publish (const std::string &val);
+    void publish (const std::vector<double> &val);
+    void publish (const std::vector<std::complex<double>> &val);
+    void publish (const double *vals, int size);
+    void publish (std::complex<double> val);
+    void publish (const defV &val);
+    void publish (bool val);
+    void publish (const named_point &np);
+    void publish (const std::string &name, double val);
+    void publish (const char *str, double val);
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication
     */
     template <class X>
-    void publish (const X &val, const std::string & /*units*/) const
+    void publish (const X &val, const std::string & /*units*/)
     {
         // TODO:: figure out units
         publish (val);
     }
-
+    /** publish integral values */
+    template <class X>
+    std::enable_if_t<(std::is_integral<X>::value), void>
+    publish (X val)
+    {
+        publishInt (static_cast<int64_t> (val));
+    }
+    /** publish anything not previously covered*/
+    template <class X>
+    std::enable_if_t<((typeCategory<X>::value == 2) && (!std::is_convertible<X, std::string>::value) &&
+                      (!std::is_same<X, defV>::value)),
+                     void>
+    publish (const X &val)
+    {
+        if (pubType == helics_type_t::helicsCustom)
+        {
+            fed->publishRaw (*this, ValueConverter<X>::convert (val));
+        }
+    }
     /** set the level by which a value must have changed to actually publish the value
      */
     void setMinimumChange (double deltaV)
@@ -225,7 +243,10 @@ class Publication
     void enableChangeDetection (bool enabled = true) { changeDetectionEnabled = enabled; }
 
   private:
-    friend class ValueFederateManager;
+    /** implementation of the integer publications*/
+  void publishInt (int64_t val);
+
+  friend class ValueFederateManager;
 };
 
 /** create a pointer to a publication
@@ -235,174 +256,174 @@ class Publication
 @param key the identifier for the publication
 @param units optional units for the publication
 */
-template <class X>
-typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
-make_publication(ValueFederate *valueFed, const std::string &key, const std::string &units = std::string())
-{
-    return std::make_unique<Publication>(valueFed, helicsType<X>(), key, units);
-}
+    template <class X>
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
+    make_publication (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
+    {
+        return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
+    }
 
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
-make_publication (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
-{
-    return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
-}
+    /** create a pointer to a publication
+    @tparam X is the type of the publication
+    @tparam FedPtr a pointer a value Federate
+    @param valueFed pointer to a valid federate
+    @param key the identifier for the publication
+    @param units optional units for the publication
+    */
+    template <class X, class FedPtr>
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
+    make_publication (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
+    {
+        return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
+    }
 
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
-@param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template <class X>
-typename std::enable_if_t<helicsType<X>() != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
-make_publication(interface_visibility locality,
-    ValueFederate *valueFed,
-    const std::string &key,
-    const std::string &units = std::string())
-{
-    return std::make_unique<Publication>(locality, valueFed, key, helicsType<X>(), units);
-}
+    /** create a pointer to a publication
+    @tparam X is the type of the publication
+    @tparam FedPtr a pointer a value Federate
+    @param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
+    @param valueFed pointer to a valid federate
+    @param key the identifier for the publication
+    @param units optional units for the publication
+    */
+    template <class X>
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
+    make_publication (interface_visibility locality,
+                      ValueFederate *valueFed,
+                      const std::string &key,
+                      const std::string &units = std::string ())
+    {
+        return std::make_unique<Publication> (locality, valueFed, key, helicsType<X> (), units);
+    }
 
-/** create a pointer to a publication
-@tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
-@param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
-@param valueFed pointer to a valid federate
-@param key the identifier for the publication
-@param units optional units for the publication
-*/
-template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
-make_publication (interface_visibility locality,
-                  FedPtr &valueFed,
-                  const std::string &key,
-                  const std::string &units = std::string ())
-{
-    return std::make_unique<Publication> (locality, valueFed, key, helicsType<X> (), units);
-}
+    /** create a pointer to a publication
+    @tparam X is the type of the publication
+    @tparam FedPtr a pointer a value Federate
+    @param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
+    @param valueFed pointer to a valid federate
+    @param key the identifier for the publication
+    @param units optional units for the publication
+    */
+    template <class X, class FedPtr>
+    typename std::enable_if_t<helicsType<X> () != helics_type_t::helicsCustom, std::unique_ptr<Publication>>
+    make_publication (interface_visibility locality,
+                      FedPtr &valueFed,
+                      const std::string &key,
+                      const std::string &units = std::string ())
+    {
+        return std::make_unique<Publication> (locality, valueFed, key, helicsType<X> (), units);
+    }
 
-/** class to handle a publication of an arbitrary type*/
-template <class X>
-class PublicationT : public Publication
-{
-  public:
-    PublicationT () = default;
-    /**constructor to build a publication object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] units the units associated with a Federate
-    */
-    PublicationT(ValueFederate *valueFed, const std::string &key, const std::string &units = std::string())
-        : Publication(valueFed, key, typeNameString<X>(), units)
+    /** class to handle a publication of an arbitrary type*/
+    template <class X>
+    class PublicationT : public Publication
     {
-    }
-    /**constructor to build a publication object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] units the units associated with a Federate
-    */
-    template <class FedPtr>
-    PublicationT (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
-        : Publication (valueFed, key, typeNameString<X> (), units)
-    {
-    }
-    /**constructor to build a publication object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] units the units associated with a Federate
-    */
-    PublicationT(interface_visibility locality,
-        ValueFederate *valueFed,
-        const std::string &key,
-        const std::string &units = std::string())
-        : Publication(locality, valueFed, key, typeNameString<X>(), units)
-    {
-    }
-    /**constructor to build a publication object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] units the units associated with a Federate
-    */
-    template <class FedPtr>
-    PublicationT (interface_visibility locality,
-                  FedPtr &valueFed,
-                  const std::string &key,
-                  const std::string &units = std::string ())
-        : Publication (locality, valueFed, key, typeNameString<X> (), units)
-    {
-    }
-    /** send a value for publication
-    @param[in] val the value to publish*/
-    void publish (const X &val) const { fed->publish (*this, val); }
-    /** secondary publish function to allow unit conversion before publication
-    @param[in] val the value to publish
-    @param[in] units  the units association with the publication
-    */
-    void publish (const X &val, const std::string & /*units*/) const
-    {
-        // TODO:: figure out units
-        publish (val);
-    }
-};
-
-/** class to handle a publication on change for an arbitrary type
-but the value is only published in the change is greater than a certain level*/
-template <class X>
-class PublicationOnChange : public PublicationT<X>
-{
-  private:
-    X publishDelta;  //!< the delta on which to publish a value
-    mutable X prev;  //!< the previous value
-  public:
-    PublicationOnChange () = default;
-    /**constructor to build a publishOnChange object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] minChange  the minimum change required to actually publish the value
-    @param[in] units the units associated with a Federate
-    */
-    PublicationOnChange(ValueFederate *valueFed,
-        const std::string &key,
-        const X &minChange,
-        const std::string &units = std::string())
-        : PublicationT<X>(valueFed, key, units), publishDelta(minChange), prev(X())
-    {
-    }
-    /**constructor to build a publishOnChange object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication
-    @param[in] minChange  the minimum change required to actually publish the value
-    @param[in] units the units associated with a Federate
-    */
-    template <class FedPtr>
-    PublicationOnChange (FedPtr &valueFed,
-                         const std::string &key,
-                         const X &minChange,
-                         const std::string &units = std::string ())
-        : PublicationT<X> (valueFed, key, units), publishDelta (minChange), prev (X ())
-    {
-    }
-    /** send a value for publication
-    @details the value is only published if it exceeds the specified level
-    @param[in] val the value to publish*/
-    virtual void publish (const X &val) const override
-    {
-        if (std::abs (val - prev) >= publishDelta)
+      public:
+        PublicationT () = default;
+        /**constructor to build a publication object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] units the units associated with a Federate
+        */
+        PublicationT (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
+            : Publication (valueFed, key, typeNameString<X> (), units)
         {
-            prev = val;
-            PublicationT<X>::publish (val);
         }
-    }
-};
+        /**constructor to build a publication object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] units the units associated with a Federate
+        */
+        template <class FedPtr>
+        PublicationT (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
+            : Publication (valueFed, key, typeNameString<X> (), units)
+        {
+        }
+        /**constructor to build a publication object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] units the units associated with a Federate
+        */
+        PublicationT (interface_visibility locality,
+                      ValueFederate *valueFed,
+                      const std::string &key,
+                      const std::string &units = std::string ())
+            : Publication (locality, valueFed, key, typeNameString<X> (), units)
+        {
+        }
+        /**constructor to build a publication object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] units the units associated with a Federate
+        */
+        template <class FedPtr>
+        PublicationT (interface_visibility locality,
+                      FedPtr &valueFed,
+                      const std::string &key,
+                      const std::string &units = std::string ())
+            : Publication (locality, valueFed, key, typeNameString<X> (), units)
+        {
+        }
+        /** send a value for publication
+        @param[in] val the value to publish*/
+        void publish (const X &val){ Publication::publish (val); }
+        /** secondary publish function to allow unit conversion before publication
+        @param[in] val the value to publish
+        @param[in] units  the units association with the publication
+        */
+        void publish (const X &val, const std::string & /*units*/)
+        {
+            // TODO:: figure out units
+            Publication::publish (val);
+        }
+    };
+
+    /** class to handle a publication on change for an arbitrary type
+    but the value is only published in the change is greater than a certain level*/
+    template <class X>
+    class PublicationOnChange : public PublicationT<X>
+    {
+      private:
+        X publishDelta;  //!< the delta on which to publish a value
+        mutable X prev;  //!< the previous value
+      public:
+        PublicationOnChange () = default;
+        /**constructor to build a publishOnChange object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] minChange  the minimum change required to actually publish the value
+        @param[in] units the units associated with a Federate
+        */
+        PublicationOnChange (ValueFederate *valueFed,
+                             const std::string &key,
+                             const X &minChange,
+                             const std::string &units = std::string ())
+            : PublicationT<X> (valueFed, key, units), publishDelta (minChange), prev (X ())
+        {
+        }
+        /**constructor to build a publishOnChange object
+        @param[in] valueFed  the ValueFederate to use
+        @param[in] key the identifier for the publication
+        @param[in] minChange  the minimum change required to actually publish the value
+        @param[in] units the units associated with a Federate
+        */
+        template <class FedPtr>
+        PublicationOnChange (FedPtr &valueFed,
+                             const std::string &key,
+                             const X &minChange,
+                             const std::string &units = std::string ())
+            : PublicationT<X> (valueFed, key, units), publishDelta (minChange), prev (X ())
+        {
+        }
+        /** send a value for publication
+        @details the value is only published if it exceeds the specified level
+        @param[in] val the value to publish*/
+        virtual void publish (const X &val) const override
+        {
+            if (std::abs (val - prev) >= publishDelta)
+            {
+                prev = val;
+                PublicationT<X>::publish (val);
+            }
+        }
+    };
 }  // namespace helics

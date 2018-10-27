@@ -96,7 +96,7 @@ int main (int argc, char *argv[])
 
         if (cFed->isUpdated (subid))
         {
-            auto val = cFed->getValue<double> (subid);
+            auto val = cFed->getDouble (subid);
             std::cout << "received updated value of " << val << " at " << newTime << " from "
                       << cFed->getTarget (subid) << '\n';
         }

@@ -258,7 +258,7 @@ class VectorSubscription2d
     {
         auto res = std::lower_bound (ids.begin (), ids.end (), inp);
         int index = static_cast<int> (res - ids.begin ());
-        fed->getValue (ids[index], vals[index]);
+        ids[index].getValue (vals[index]);
         if (update_callback)
         {
             update_callback (index, time);

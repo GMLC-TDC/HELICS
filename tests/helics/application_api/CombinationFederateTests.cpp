@@ -85,22 +85,21 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     auto gtime = vFed1->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    std::string s;
     // get the value
-    vFed1->getValue (subid, s);
+    std::string s = vFed1->getString (subid);
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    vFed1->getValue (subid, s);
-
+    s=vFed1->getString (subid);
+	
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     gtime = vFed1->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    vFed1->getValue (subid, s);
+    s=vFed1->getString (subid);
 
     BOOST_CHECK_EQUAL (s, "string2");
 }
@@ -225,15 +224,14 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK_EQUAL (f1time.get (), 1.0);
 
-    std::string s;
+    std::string s = cFed2->getString (subid);
     // get the value
-    cFed2->getValue (subid, s);
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     // publish a second string
     cFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    cFed2->getValue (subid, s);
+    s=cFed2->getString(subid);
 
     BOOST_CHECK_EQUAL (s, "string1");
 
@@ -262,9 +260,9 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     BOOST_CHECK_EQUAL (f1time.get (), 2.0);
     // make sure the value was updated
 
-    cFed2->getValue (subid, s);
+    auto &ns=cFed2->getString (subid);
 
-    BOOST_CHECK_EQUAL (s, "string2");
+    BOOST_CHECK_EQUAL (ns, "string2");
 
     cFed1->finalize ();
     cFed2->finalize ();

@@ -145,9 +145,9 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
     {
         correct = false;
     }
-    std::string s;
     // get the value
-    vFed2->getValue (subid, s);
+    std::string s = vFed2->getString (subid);
+    
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     if (s != "string1")
@@ -157,8 +157,7 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    vFed2->getValue (subid, s);
-
+    subid.getValue (s);
     BOOST_CHECK_EQUAL (s, "string1");
     if (s != "string1")
     {
@@ -181,7 +180,7 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
     }
     // make sure the value was updated
 
-    vFed2->getValue (subid, s);
+    subid.getValue (s);
 
     BOOST_CHECK_EQUAL (s, "string2");
     if (s != "string2")
@@ -412,8 +411,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
 
     vFed1->enterExecutingMode ();
     // get the value set at initialization
-    double val;
-    vFed1->getValue (subid, val);
+    double val = vFed1->getDouble (subid);
+
     BOOST_CHECK_EQUAL (val, 1.0);
     // publish string1 at time=0.0;
     vFed1->publish (pubid, 2.0);
@@ -422,21 +421,20 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     BOOST_CHECK_EQUAL (gtime, 1.0);
 
     // get the value
-    vFed1->getValue (subid, val);
+    subid.getValue (val);
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (val, 2.0);
     // publish a second string
     vFed1->publish (pubid, 3.0);
     // make sure the value is still what we expect
-    vFed1->getValue (subid, val);
+    val=vFed1->getDouble(subid);
 
     BOOST_CHECK_EQUAL (val, 2.0);
     // advance time
     gtime = vFed1->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    vFed1->getValue (subid, val);
-
+    subid.getValue (val);
     BOOST_CHECK_EQUAL (val, 3.0);
     vFed1->finalize ();
 }
@@ -456,7 +454,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types_single), 
     helics::data_block db (547, ';');
 
     vFed1->enterExecutingMode ();
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->requestTime (1.0);
     BOOST_CHECK (vFed1->isUpdated (sub1));
     auto res = vFed1->getValueRaw (sub1);
@@ -488,7 +486,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
         lastId = subid.getHandle();
     });
     vFed1->enterExecutingMode ();
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->requestTime (1.0);
     // the callback should have occurred here
     BOOST_CHECK (lastId == sub3.getHandle());
@@ -516,13 +514,13 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     int ccnt = 0;
     vFed1->setInputNotificationCallback ([&](const helics::Input &, helics::Time) { ++ccnt; });
 
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->publish (pubid2, 4);
     vFed1->requestTime (4.0);
     // the callback should have occurred here
     BOOST_CHECK_EQUAL (ccnt, 2);
     ccnt = 0;  // reset the counter
-    vFed1->publish (pubid3, db);
+    vFed1->publishRaw (pubid3, db);
     vFed1->publish (pubid2, 4);
     vFed1->publish (pubid1, "test string2");
     vFed1->requestTime (5.0);

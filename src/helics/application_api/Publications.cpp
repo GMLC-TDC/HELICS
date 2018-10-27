@@ -62,7 +62,7 @@ Publication::Publication (interface_visibility locality,
     }
 }
 
-void Publication::publish (double val) const
+void Publication::publish (double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -79,10 +79,10 @@ void Publication::publish (double val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
-void Publication::publish (int64_t val) const
+void Publication::publishInt (int64_t val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -99,10 +99,10 @@ void Publication::publish (int64_t val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
-void Publication::publish (bool val) const
+void Publication::publish (bool val)
 {
     bool doPublish = true;
     std::string bstring = val ? "1" : "0";
@@ -120,11 +120,11 @@ void Publication::publish (bool val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, bstring);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (const char *val) const
+void Publication::publish (const char *val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -141,10 +141,10 @@ void Publication::publish (const char *val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
-void Publication::publish (const std::string &val) const
+void Publication::publish (const std::string &val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -161,10 +161,10 @@ void Publication::publish (const std::string &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
-void Publication::publish (const std::vector<double> &val) const
+void Publication::publish (const std::vector<double> &val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -181,32 +181,32 @@ void Publication::publish (const std::vector<double> &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
-    }
-}
-
-void Publication::publish (const std::vector<std::complex<double>> &val) const
-{
-    bool doPublish = true;
-    if (changeDetectionEnabled)
-    {
-        if (changeDetected (prevValue, val, delta))
-        {
-            prevValue = val;
-        }
-        else
-        {
-            doPublish = false;
-        }
-    }
-    if (doPublish)
-    {
-        auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (const double *vals, int size) const
+void Publication::publish (const std::vector<std::complex<double>> &val)
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        if (changeDetected (prevValue, val, delta))
+        {
+            prevValue = val;
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert (pubType, val);
+        fed->publishRaw (*this, db);
+    }
+}
+
+void Publication::publish (const double *vals, int size)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -223,11 +223,11 @@ void Publication::publish (const double *vals, int size) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, vals, size);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (std::complex<double> val) const
+void Publication::publish (std::complex<double> val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -244,11 +244,11 @@ void Publication::publish (std::complex<double> val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (const named_point &np) const
+void Publication::publish (const named_point &np)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -265,11 +265,11 @@ void Publication::publish (const named_point &np) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, np);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (const std::string &name, double val) const
+void Publication::publish (const std::string &name, double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -287,11 +287,11 @@ void Publication::publish (const std::string &name, double val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, name, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
-void Publication::publish (const char *name, double val) const
+void Publication::publish (const char *name, double val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -309,7 +309,7 @@ void Publication::publish (const char *name, double val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, name, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 
@@ -335,7 +335,7 @@ data_block typeConvert (helics_type_t type, const defV &val)
     }
 }
 
-void Publication::publish (const defV &val) const
+void Publication::publish (const defV &val)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -352,7 +352,7 @@ void Publication::publish (const defV &val) const
     if (doPublish)
     {
         auto db = typeConvert (pubType, val);
-        fed->publish (*this, db);
+        fed->publishRaw (*this, db);
     }
 }
 }  // namespace helics

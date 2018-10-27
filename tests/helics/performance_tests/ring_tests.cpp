@@ -85,7 +85,7 @@ public:
             nextTime = vFed->requestTime(finalTime);
             if (vFed->isUpdated(*sub))
             {
-                auto nstring = vFed->getValue<std::string>(*sub);
+                auto &nstring = vFed->getString(*sub);
                 vFed->publish(*pub,nstring);
             }
 

@@ -15,8 +15,8 @@ namespace helics
 {
 class Publication;
 class Input;
-  /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
-  class ValueFederateManager;
+/** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
+class ValueFederateManager;
 /** class defining the value based interface */
 class ValueFederate : public virtual Federate  // using virtual inheritance to allow combination federate
 {
@@ -276,73 +276,42 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     data_view getValueRaw (const Input &inp);
 
-    /** get a value as raw data block from the system
-    @param[in] id the identifier for the subscription
-    @param[out] the value translated to a specific object
-    @return a constant data block
-    @throw std::invalid_argument if id is invalid
-    */
-    template <typename X>
-    void getValue (const Input &inp, X &obj)
-    {
-        ValueConverter<X>::interpret (getValueRaw (inp), obj);
-    }
-    /** get a value as raw data block from the system
-    @param[in] id the identifier for the subscription
-    @param[out] the value translated to a specific object
-    @return a constant data block
-    @throw std::invalid_argument if id is invalid
-    */
-    template <typename X>
-    X getValue (const Input &inp)
-    {
-        return ValueConverter<X>::interpret (getValueRaw (inp));
-    }
-
+    /** get a double value*/
+    double getDouble (Input &inp);
+    /** get a string value*/
+    const std::string &getString (Input &inp);
     /** publish a value
     @param[in] id the publication identifier
     @param[in] a data block containing the data
     @throw invalid_argument if the publication id is invalid
     */
-    void publish (const Publication &pub, data_view block);
-
-    /** publish a data block
-    @details this function is primarily to prevent data blocks from falling through to the template
-    @param[in] id the publication identifier
-    @param[in] a data block containing the data
-    @throw invalid_argument if the publication id is invalid
-    */
-    void publish (const Publication &pub, const data_block &block) { publish (pub, data_view (block)); }
-
-    /** publish a string
-    @param[in] id the publication identifier
-    @param[in] data a const char pointer to a string
-    @throw invalid_argument if the publication id is invalid
-    */
-    void publish (const Publication &pub, const char *data) { publish (pub, data_view{data, strlen (data)}); }
+    void publishRaw (const Publication &pub, data_view block);
 
     /** publish data
-    @param[in] id the publication identifier
-    @param[in] data a const char pointer to raw data
-    @param[in] data_size the length of the data
-    @throw invalid_argument if the publication id is invalid
-    */
-    void publish (const Publication &pub, const char *data, size_t data_size)
+  @param[in] id the publication identifier
+  @param[in] data a const char pointer to raw data
+  @param[in] data_size the length of the data
+  @throw invalid_argument if the publication id is invalid
+  */
+    void publishRaw (const Publication &pub, const char *data, size_t data_size)
     {
-        publish (pub, data_view{data, data_size});
+        publishRaw (pub, data_view{data, data_size});
     }
 
-    /** publish a value
-    @tparam X the type of the value to publish
-    @param[in] id the publication identifier
-    @param[in] value a reference to a value holding the data
-    @throw invalid_argument if the publication id is invalid
-    */
-    template <typename X>
-    void publish (const Publication &pub, const X &value)
-    {
-        publish (pub, data_view (ValueConverter<X>::convert (value)));
-    }
+    /** publish a string
+@param[in] id the publication identifier
+@param[in] data a const char pointer to a string
+@throw invalid_argument if the publication id is invalid
+*/
+    void publish (Publication &pub, const std::string &str);
+
+    /** publish a double
+ @param[in] id the publication identifier
+ @param[in] val the value to publish
+ @throw invalid_argument if the publication id is invalid
+ */
+    void publish (Publication &pub, double val);
+
     /** add a destination target to a publication
     @param id the identifier of the input
     target the name of the input to send the data to
@@ -377,10 +346,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     template <class iType>
     void addTargetIndexed (const iType &id,
-                                 const std::string &target,
-                                 int index1,
-                                 int index2,
-                                 const std::string &units = std::string ())
+                           const std::string &target,
+                           int index1,
+                           int index2,
+                           const std::string &units = std::string ())
     {
         return addTarget (id, target + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
     }

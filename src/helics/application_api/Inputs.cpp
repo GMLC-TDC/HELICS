@@ -160,7 +160,7 @@ size_t Input::getRawSize ()
     auto dv = fed->getValueRaw (*this);
     if (dv.empty ())
     {
-        auto out = getValue<std::string> ();
+        auto &out = getValueRef<std::string> ();
         return out.size ();
     }
     return dv.size ();
@@ -173,7 +173,7 @@ size_t Input::getStringSize ()
     {
         if (lastValue.index () == namedPointLoc)
         {
-            auto np = getValue<named_point> ();
+            auto &np = mpark::get<named_point>(lastValue);
             if (np.name.empty ())
             {
                 return 30;  //"#invalid" string +20
@@ -187,7 +187,7 @@ size_t Input::getStringSize ()
         }
         else
         {
-            auto out = getValue<std::string> ();
+            auto &out = getValueRef<std::string> ();
             return out.size ();
         }
     }
@@ -211,7 +211,7 @@ size_t Input::getStringSize ()
             return np.name.size () + 20;
         }
     }
-    auto out = getValue<std::string> ();
+    auto &out = getValueRef<std::string> ();
     return out.size ();
 }
 
@@ -220,7 +220,7 @@ size_t Input::getVectorSize ()
     isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
-        auto out = getValue<std::vector<double>> ();
+        auto &out = getValueRef<std::vector<double>> ();
         return out.size ();
     }
     switch (lastValue.index ())
@@ -237,14 +237,13 @@ size_t Input::getVectorSize ()
     default:
         break;
     }
-    auto out = getValue<std::vector<double>> ();
+    auto &out = getValueRef<std::vector<double>> ();
     return out.size ();
 }
 
 int Input::getValue (double *data, int maxsize)
 {
-    // TODO:: need to figure out some way to get rid of the copy if the stored value is actually a vector
-    auto V = getValue<std::vector<double>> ();
+    auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
     std::copy (V.data (), V.data () + length, data);
     return length;
@@ -252,9 +251,7 @@ int Input::getValue (double *data, int maxsize)
 
 int Input::getValue (char *str, int maxsize)
 {
-    // TODO:: need to figure out some way to get rid of the copy if the stored value is actually a string or named
-    // point probably need a getValueRef function for primaryTypes
-    auto S = getValue<std::string> ();
+    auto &S = getValueRef<std::string> ();
     int length = std::min (static_cast<int> (S.size ()), maxsize);
     memcpy (str, S.data (), length);
     if (length == maxsize)

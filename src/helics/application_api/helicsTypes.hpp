@@ -270,9 +270,17 @@ enum class helics_type_t : int
     helicsComplexVector = 5,
     helicsNamedPoint = 6,
     helicsBool = 7,
+	helicsTime = 8,
     helicsCustom = 23425,
     helicsAny = 247652,
+	helicsUnknown=262355,
 };
+
+
+inline constexpr bool isRawType (helics_type_t type)
+{
+    return (type == helics_type_t::helicsAny) || (type == helics_type_t::helicsCustom);
+}
 
 /** sometimes we just need a ref to a string for the basic types*/
 const std::string &typeNameStringRef (helics_type_t type);
