@@ -37,7 +37,8 @@ class Input
                    std::function<void(const std::vector<double> &, Time)>,
                    std::function<void(const std::vector<std::complex<double>> &, Time)>,
                    std::function<void(const named_point &, Time)>,
-                   std::function<void(const bool &, Time)>>
+                   std::function<void(const bool &, Time)>,
+                   std::function<void(const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
     Input () = default;
@@ -182,29 +183,30 @@ class Input
     template <class X>
     void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
-        static_assert (helicsType<X> () != helics_type_t::helicsCustom,
-                       "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, "
-                       "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
-        value_callback = callback;
+        static_assert (
+          helicsType<X> () != helics_type_t::helicsCustom,
+          "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
+          "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
+        value_callback = std::move (callback);
         fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
     }
 
   private:
     template <class X>
-    void setDefault_impl (std::integral_constant<int, 0> /**/, X &&val)
+    void setDefault_impl (std::integral_constant<int, 0> /*V*/, X &&val)
     {
-        /** still need to make_valid for bool*/
+        /** still need to make_valid for bool and Time*/
         lastValue = make_valid (std::forward<X> (val));
     }
 
     template <class X>
-    void setDefault_impl (std::integral_constant<int, 1> /**/, X &&val)
+    void setDefault_impl (std::integral_constant<int, 1> /*V*/, X &&val)
     {
         lastValue = make_valid (std::forward<X> (val));
     }
 
     template <class X>
-    void setDefault_impl (std::integral_constant<int, 2> /**/, X &&val)
+    void setDefault_impl (std::integral_constant<int, 2> /*V*/, X &&val)
     {
         fed->setDefaultValue (*this, ValueConverter<remove_cv_ref<X>>::convert (std::forward<X> (val)));
     }
@@ -253,6 +255,11 @@ class Input
         getValue_impl (std::integral_constant<int, 0> (), gval);
         out = static_cast<X> (gval);
     }
+    template <>
+    void getValue_impl (std::integral_constant<int, 1> /*V*/, char &out)
+    {
+        out = getValueChar ();
+    }
 
     template <class X>
     void getValue_impl (std::integral_constant<int, 2> /*V*/, X &out)
@@ -274,6 +281,12 @@ class Input
         std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
         getValue_impl (std::integral_constant<int, 0> (), gval);
         return static_cast<X> (gval);
+    }
+    //** template specialization for character data (which can be a string or int)
+    template <>
+    char getValue_impl (std::integral_constant<int, 1> /*V*/)
+    {
+        return getValueChar ();
     }
 
     template <class X>
@@ -314,6 +327,8 @@ class Input
     size_t getVectorSize ();
 
   private:
+    /** helper class for getting a character since that is a bit odd*/
+    char getValueChar ();
     friend class ValueFederateManager;
 };
 
@@ -355,20 +370,14 @@ class InputT : public Input
     {
     }
 
-  private:
-    void getValueX_impl (std::true_type /*V*/, X &out) { Input::getValue (out); }
-    void getValueX_impl (std::false_type /*V*/, X &out) { fed->getValue (*this, out); }
-    X getValueX_impl (std::true_type /*V*/) { return Input::getValue<X> (); }
-    X getValueX_impl (std::false_type /*V*/) { return fed->getValue<X> (*this); }
-
   public:
     /** get the most recent value
     @return the value*/
-    X getValue () { return getValueX_impl (is_convertible_to_primary_type ()); }
+    X getValue () { return Input::getValue<X> (); }
     /** store the value in the given variable
     @param[out] out the location to store the value
     */
-    void getValue (X &out) { getValueX_impl (is_convertible_to_primary_type (), out); }
+    void getValue (X &out) { Input::getValue<X> (out); }
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -383,13 +392,13 @@ class InputT : public Input
     /** set a default value
     @param val the value to set as the default
     */
-    void setDefault (const X &val) { fed->setDefaultValue (*this, ValueConverter<X>::convert (val)); }
+    void setDefault (const X &val) { Input::setDefault (val); }
 
   private:
     void handleCallback (Time time)
     {
         X out;
-        fed->getValue (*this, out);
+        Input::getValue (out);
         value_callback (out, time);
     }
 };
@@ -404,28 +413,22 @@ void Input::getValue_impl (std::integral_constant<int, 0> /*V*/, X &out)
         {
             type = getTypeFromString (fed->getPublicationType (*this));
         }
-        if (type != helics_type_t::helicsCustom)
+
+        valueExtract (dv, type, out);
+        if (changeDetectionEnabled)
         {
-            valueExtract (dv, type, out);
-            if (changeDetectionEnabled)
+            if (changeDetected (lastValue, out, delta))
             {
-                if (changeDetected (lastValue, out, delta))
-                {
-                    lastValue = make_valid (out);
-                }
-                else
-                {
-                    valueExtract (lastValue, out);
-                }
+                lastValue = make_valid (out);
             }
             else
             {
-                lastValue = make_valid (out);
+                valueExtract (lastValue, out);
             }
         }
         else
         {
-            out = invalidValue<X> ();
+            lastValue = make_valid (out);
         }
     }
     else
@@ -453,7 +456,7 @@ inline const std::string &getValueRefImpl (defV &val)
     else
     {
         valueConvert (val, helics_type_t::helicsString);
-        return mpark::get <std::string> (val);
+        return mpark::get<std::string> (val);
     }
 }
 
@@ -486,4 +489,5 @@ const X &Input::getValueRef ()
     }
     return getValueRefImpl<remove_cv_ref<X>> (lastValue);
 }
+
 }  // namespace helics

@@ -380,6 +380,12 @@ constexpr helics_type_t helicsType<double> ()
 }
 
 template <>
+constexpr helics_type_t helicsType<Time> ()
+{
+    return helics_type_t::helicsTime;
+}
+
+template <>
 constexpr helics_type_t helicsType<std::complex<double>> ()
 {
     return helics_type_t::helicsComplex;
@@ -475,6 +481,12 @@ template <>
 constexpr uint64_t invalidValue<uint64_t> ()
 {
     return std::numeric_limits<uint64_t>::max ();
+}
+
+template <>
+constexpr Time invalidValue<Time> ()
+{
+    return Time::minVal();
 }
 
 template <>

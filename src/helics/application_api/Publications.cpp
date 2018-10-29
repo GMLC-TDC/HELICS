@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../core/core-exceptions.hpp"
 #include "Publications.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
@@ -102,6 +102,44 @@ void Publication::publishInt (int64_t val)
         fed->publishRaw (*this, db);
     }
 }
+
+void Publication::publishChar (char val)
+{
+    switch (pubType)
+    {
+    case helics_type_t::helicsBool:
+        publish (!((val == '0') || (val == 'f') || (val == 0) || (val == 'F') || (val == '-')));
+        break;
+    case helics_type_t::helicsString:
+    case helics_type_t::helicsNamedPoint:
+        publish (std::string (1,val));
+        break;
+    default:
+        publishInt (static_cast<int64_t> (val));
+    }
+}
+
+void Publication::publish (Time val)
+{
+    bool doPublish = true;
+    if (changeDetectionEnabled)
+    {
+        if (changeDetected (prevValue, val, delta))
+        {
+            prevValue = val.getBaseTimeCode ();
+        }
+        else
+        {
+            doPublish = false;
+        }
+    }
+    if (doPublish)
+    {
+        auto db = typeConvert (pubType, val.getBaseTimeCode ());
+        fed->publishRaw (*this, db);
+    }
+}
+
 void Publication::publish (bool val)
 {
     bool doPublish = true;

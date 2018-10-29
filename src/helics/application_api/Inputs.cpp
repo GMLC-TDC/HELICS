@@ -4,17 +4,15 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../core/core-exceptions.hpp"
 #include "Inputs.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
-
-
-	Input::Input (ValueFederate *valueFed,
-                          const std::string &key,
-                          const std::string &defType,
-                          const std::string &units)
+Input::Input (ValueFederate *valueFed,
+              const std::string &key,
+              const std::string &defType,
+              const std::string &units)
 {
     auto &inp = valueFed->getInput (key);
     if (inp.isValid ())
@@ -28,10 +26,10 @@ namespace helics
 }
 
 Input::Input (interface_visibility locality,
-                          ValueFederate *valueFed,
-                          const std::string &key,
-                          const std::string &defType,
-                          const std::string &units)
+              ValueFederate *valueFed,
+              const std::string &key,
+              const std::string &defType,
+              const std::string &units)
 {
     try
     {
@@ -111,6 +109,11 @@ void Input::handleCallback (Time time)
         auto val = getValue<bool> ();
         mpark::get<std::function<void(const bool &, Time)>> (value_callback) (val, time);
     }
+    case 8:  // Time loc
+    {
+        auto val = getValue<Time> ();
+        mpark::get<std::function<void(const Time &, Time)>> (value_callback) (val, time);
+    }
     break;
     }
 }
@@ -126,30 +129,26 @@ bool Input::isUpdated ()
         if (fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
-            if (type == helics_type_t::helicsCustom)
+            if (type == helics_type_t::helicsUnknown)
             {
                 type = getTypeFromString (fed->getPublicationType (*this));
             }
-            if (type != helics_type_t::helicsCustom)
-            {
-                auto visitor = [&,this](auto &&arg)
+            auto visitor = [&, this](auto &&arg) {
+                std::remove_reference_t<decltype (arg)> newVal;
+                (void)arg;  // suppress VS2015 warning
+                valueExtract (dv, type, newVal);
+                if (changeDetected (lastValue, newVal, delta))
                 {
-                    std::remove_reference_t<decltype (arg)> newVal;
-                    (void)arg;  // suppress VS2015 warning
-                    valueExtract (dv, type, newVal);
-                    if (changeDetected (lastValue, newVal, delta))
-                    {
-                        lastValue = newVal;
-                        hasUpdate = true;
-                    }
-                };
-                mpark::visit (visitor, lastValue);
-            }
+                    lastValue = newVal;
+                    hasUpdate = true;
+                }
+            };
+            mpark::visit (visitor, lastValue);
         }
     }
     else
     {
-        hasUpdate=fed->isUpdated (*this);
+        hasUpdate = fed->isUpdated (*this);
     }
     return hasUpdate;
 }
@@ -173,7 +172,7 @@ size_t Input::getStringSize ()
     {
         if (lastValue.index () == namedPointLoc)
         {
-            auto &np = mpark::get<named_point>(lastValue);
+            auto &np = getValueRef<named_point> ();
             if (np.name.empty ())
             {
                 return 30;  //"#invalid" string +20
@@ -239,6 +238,55 @@ size_t Input::getVectorSize ()
     }
     auto &out = getValueRef<std::vector<double>> ();
     return out.size ();
+}
+
+char Input::getValueChar ()
+{
+    if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
+    {
+        auto dv = fed->getValueRaw (*this);
+        if (type == helics_type_t::helicsUnknown)
+        {
+            type = getTypeFromString (fed->getPublicationType (*this));
+        }
+
+        if ((type == helics_type_t::helicsString)||(type==helics_type_t::helicsAny)||(type==helics_type_t::helicsCustom))
+        {
+            std::string out;
+            valueExtract (dv, type, out);
+            if (changeDetectionEnabled)
+            {
+                if (changeDetected (lastValue, out, delta))
+                {
+                    lastValue = out;
+                }
+            }
+            else
+            {
+                lastValue = out;
+            }
+        }
+        else
+        {
+            int64_t out;
+            valueExtract (dv, type, out);
+            if (changeDetectionEnabled)
+            {
+                if (changeDetected (lastValue, out, delta))
+                {
+                    lastValue = out;
+                }
+            }
+            else
+            {
+                lastValue = out;
+            }
+        }
+    }
+    char V;
+    valueExtract (lastValue, V);
+    hasUpdate = false;
+    return V;
 }
 
 int Input::getValue (double *data, int maxsize)

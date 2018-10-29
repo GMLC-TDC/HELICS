@@ -104,16 +104,16 @@ class CloningFilter : public Filter
     CloningFilter () = default;
     /** construct from a core object
      */
-    explicit CloningFilter (Core *cr, const std::string &name = EMPTY_STRING);
+    explicit CloningFilter (Core *cr, const std::string &filtName = EMPTY_STRING);
     /** construct from a Federate
      */
-    explicit CloningFilter (Federate *ffed, const std::string &name = EMPTY_STRING);
+    explicit CloningFilter (Federate *ffed, const std::string &filtName = EMPTY_STRING);
     /** construct from a Federate
     */
-    CloningFilter(interface_visibility locality, Federate *ffed, const std::string &name = EMPTY_STRING);
+    CloningFilter(interface_visibility locality, Federate *ffed, const std::string &filtName = EMPTY_STRING);
     
 	/** constructor used by FilterFederateManager*/
-	CloningFilter (Federate *ffed, const std::string &name, interface_handle handle);
+	CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle);
 
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);

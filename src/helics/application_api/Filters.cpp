@@ -218,7 +218,7 @@ CloningFilter::CloningFilter (Core *cr, const std::string &filtName)
     setFilterOperations(std::make_shared<CloneFilterOperation> (cr));
 }
 
-CloningFilter::CloningFilter (Federate *ffed, const std::string &name) : Filter (ffed->registerCloningFilter (name))
+CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName) : Filter (ffed->registerCloningFilter (filtName))
 {
 		if (corePtr != nullptr)
 		{
@@ -226,24 +226,24 @@ CloningFilter::CloningFilter (Federate *ffed, const std::string &name) : Filter 
 		}
 }
 
-CloningFilter::CloningFilter(Federate *ffed, const std::string &name, interface_handle handle)
-	: Filter(ffed, name, handle)
+CloningFilter::CloningFilter(Federate *ffed, const std::string &filtName, interface_handle handle)
+	: Filter(ffed, filtName, handle)
 {
 
 }
 
-CloningFilter::CloningFilter(interface_visibility locality, Federate *ffed, const std::string &name)
+CloningFilter::CloningFilter(interface_visibility locality, Federate *ffed, const std::string &filtName)
 {
     if (ffed != nullptr)
     {
         corePtr = ffed->getCorePointer().get();
         if (locality == interface_visibility::global)
         {
-            operator=(ffed->registerGlobalCloningFilter(name));
+            operator=(ffed->registerGlobalCloningFilter(filtName));
         }
         else
         {
-            operator=(ffed->registerCloningFilter(name));
+            operator=(ffed->registerCloningFilter(filtName));
         }
        
         setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));

@@ -41,6 +41,33 @@ make_subscription (ValueFederate &valueFed,
     return ipt;
 }
 
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a reference to a valueFederate
+@param key  the name of the publication
+*/
+template <class X>
+X getValue (ValueFederate &fed, const std::string &Key)
+{
+    return fed.getInput (Key).getValue<X> ();
+}
+
+/** get a value directly from the subscription key name
+@details this is a convenience function to get a value directly from the subscription key name
+this function should not be used as the primary means of retrieving value as it does involve an additional map find
+operation vs the member getValue calls
+@param fed a reference to a valueFederate
+@param key  the name of the publication
+@param obj the obj to store the retrieved value
+*/
+template <class X>
+void getValue (ValueFederate &fed, const std::string &Key, X &obj)
+{
+    fed.getSubscription (Key).getValue<X> (obj);
+}
+
 /** class to handle a Vector Subscription
 @tparam X the class of the value associated with the vector subscription
 */
