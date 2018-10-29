@@ -24,7 +24,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label ("ci"))
+BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label ("cic"))
 
 using boost::asio::ip::tcp;
 using helics::Core;
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
+    auto ccore = static_cast<helics::tcp::TcpCoreSS *> (core.get ());
     // this will test the automatic port allocation
     BOOST_CHECK_EQUAL (ccore->getAddress (), ccore->getIdentifier ());
     core->disconnect ();
