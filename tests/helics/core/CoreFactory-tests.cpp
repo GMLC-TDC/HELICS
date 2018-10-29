@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
 }
 #endif  // HELICS_HAVE_ZEROMQ
 
-/*
+
 #if HELICS_HAVE_MPI
 
 BOOST_AUTO_TEST_CASE (MpiCore_test)
@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_CASE (MpiCore_test)
 }
 #endif  // HELICS_HAVE_MPI
 
+/*
 BOOST_AUTO_TEST_CASE (TestCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TEST), true);
