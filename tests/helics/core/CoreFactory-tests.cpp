@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("cic"))
+BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("ci"))
 
 #if HELICS_HAVE_ZEROMQ
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
@@ -30,6 +30,7 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
 }
 #endif  // HELICS_HAVE_ZEROMQ
 
+/*
 #if HELICS_HAVE_MPI
 
 BOOST_AUTO_TEST_CASE (MpiCore_test)
@@ -111,4 +112,5 @@ BOOST_AUTO_TEST_CASE (udpCore_test)
     core2 = nullptr;
 }
 
+*/
 BOOST_AUTO_TEST_SUITE_END ()
