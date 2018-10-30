@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 {
-    const char *initializationString = "1";
+    const char *initializationString = "1 --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
