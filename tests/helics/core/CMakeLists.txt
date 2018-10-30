@@ -60,7 +60,7 @@ add_test(
     --report_level=short
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
-set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
+#set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
   add_custom_command(
     TARGET
