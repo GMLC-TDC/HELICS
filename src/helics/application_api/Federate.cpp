@@ -1123,10 +1123,25 @@ const std::string &Federate::getFilterOutputType (const Filter &filt) const
 
 const Filter &Federate::getFilter (const std::string &filterName) const
 {
-    return fManager->getFilter (filterName);
+    auto &filt = fManager->getFilter (filterName);
+    if (!filt.isValid ())
+    {
+        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        return filt2;
+    }
+    return filt;
 }
 
-Filter &Federate::getFilter (const std::string &filterName) { return fManager->getFilter (filterName); }
+Filter &Federate::getFilter (const std::string &filterName)
+{
+    auto &filt = fManager->getFilter (filterName);
+    if (!filt.isValid ())
+    {
+        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        return filt2;
+    }
+    return filt;
+}
 
 void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
 {

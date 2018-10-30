@@ -118,13 +118,11 @@ class EndpointObject
     int valid = 0;
 };
 
-
-
 /** object wrapping a source filter*/
 class FilterObject
 {
   public:
-    bool cloning=false;  //indicator that the filter is a cloning filter
+    bool cloning = false;  // indicator that the filter is a cloning filter
     int valid = 0;
     Filter *filtPtr;
     std::unique_ptr<Filter> uFilter;
@@ -153,6 +151,24 @@ class QueryObject
     {                                                                                                                                      \
         if ((err != nullptr) && (err->error_code != 0))                                                                                    \
         {                                                                                                                                  \
+            return retval;                                                                                                                 \
+        }                                                                                                                                  \
+    } while (0)
+
+extern const std::string nullStr;
+extern const std::string nullStringArgument;
+#define AS_STRING(str) (str != nullptr) ? std::string (str) : nullStr
+
+#define CHECK_NULL_STRING(str, retval)                                                                                                     \
+    do                                                                                                                                     \
+    {                                                                                                                                      \
+        if (str == nullptr)                                                                                                                \
+        {                                                                                                                                  \
+            if (err != nullptr)                                                                                                            \
+            {                                                                                                                              \
+                err->error_code = helics_error_invalid_argument;                                                                           \
+                err->message = nullStringArgument.c_str ();                                                                                \
+            }                                                                                                                              \
             return retval;                                                                                                                 \
         }                                                                                                                                  \
     } while (0)

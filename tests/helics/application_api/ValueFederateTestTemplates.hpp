@@ -175,7 +175,7 @@ void runFederateTestObjv2 (const std::string &core_type_str,
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
-    auto val = sub.getValue<X> ();
+    auto val = sub.getValue();
     BOOST_CHECK (val == defaultValue);
 
     auto gtime = vFed->requestTime (1.0);

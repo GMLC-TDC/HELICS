@@ -248,17 +248,20 @@ class Input
     template <class X>
     void getValue_impl (std::integral_constant<int, 0> /*V*/, X &out);
 
+    /** handle special case for character return data*/
+    void getValue_impl (std::integral_constant<int, 0> /*V*/, char &out) { out = getValueChar (); }
+
+    /** handle special case for character return data*/
+    void getValue_impl (std::integral_constant<int, 1> /*V*/, char &out) { out = getValueChar (); }
+
     template <class X>
     void getValue_impl (std::integral_constant<int, 1> /*V*/, X &out)
     {
-        std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
+        std::conditional_t<std::is_integral<X>::value,
+                           std::conditional_t<std::is_same<X, char>::value, char, int64_t>, double>
+          gval;
         getValue_impl (std::integral_constant<int, 0> (), gval);
         out = static_cast<X> (gval);
-    }
-    template <>
-    void getValue_impl (std::integral_constant<int, 1> /*V*/, char &out)
-    {
-        out = getValueChar ();
     }
 
     template <class X>
@@ -278,15 +281,11 @@ class Input
     template <class X>
     X getValue_impl (std::integral_constant<int, 1> /*V*/)
     {
-        std::conditional_t<std::is_integral<X>::value, int64_t, double> gval;
+        std::conditional_t<std::is_integral<X>::value,
+                           std::conditional_t<std::is_same<X, char>::value, char, int64_t>, double>
+          gval;
         getValue_impl (std::integral_constant<int, 0> (), gval);
         return static_cast<X> (gval);
-    }
-    //** template specialization for character data (which can be a string or int)
-    template <>
-    char getValue_impl (std::integral_constant<int, 1> /*V*/)
-    {
-        return getValueChar ();
     }
 
     template <class X>
@@ -319,6 +318,8 @@ class Input
     template <class X>
     const X &getValueRef ();
 
+    /** get the raw binary data*/
+    data_view getRawValue ();
     /** get the size of the raw data*/
     size_t getRawSize ();
     /** get the size of the data if it were a string*/
@@ -479,7 +480,7 @@ const X &Input::getValueRef ()
             valueExtract (dv, type, out);
             if (changeDetected (lastValue, out, delta))
             {
-                lastValue = make_valid (out);
+                lastValue = make_valid (std::move(out));
             }
         }
         else
@@ -487,6 +488,11 @@ const X &Input::getValueRef ()
             valueExtract (dv, type, lastValue);
         }
     }
+    else
+    {
+		//TODO:: PT make some logic that it can get the raw data from the core again if it was converted already
+    }
+
     return getValueRefImpl<remove_cv_ref<X>> (lastValue);
 }
 

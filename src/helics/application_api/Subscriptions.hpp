@@ -108,7 +108,10 @@ class VectorSubscription
             ids.push_back (id);
         }
 
-        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+		for (auto &id : ids)
+        {
+            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+        }
     }
     /**constructor to build a subscription object
     @param[in] valueFed  the ValueFederate to use
@@ -137,7 +140,10 @@ class VectorSubscription
           update_callback (std::move (vs.update_callback)), vals (std::move (vs.vals))
     {
         // need to transfer the callback to the new object
-        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+        for (auto &id : ids)
+        {
+            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+        }
     };
     /** move assignment*/
     VectorSubscription &operator= (VectorSubscription &&vs) noexcept
@@ -149,7 +155,10 @@ class VectorSubscription
         update_callback = std::move (vs.update_callback);
         vals = std::move (vs.vals);
         // need to transfer the callback to the new object
-        fed->setInputNotificationCallback (ids, [this](input_id_t id, Time tm) { handleCallback (id, tm); });
+        for (auto &id : ids)
+        {
+            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+        }
         return *this;
     }
     /** get the most recent value
@@ -167,11 +176,11 @@ class VectorSubscription
     void setInputNotificationCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
 
   private:
-    void handleCallback (input_id_t id, Time time)
+    void handleCallback (Input &inp, Time time)
     {
-        auto res = std::lower_bound (ids.begin (), ids.end (), id);
+        auto res = std::lower_bound (ids.begin (), ids.end (), inp);
         int index = static_cast<int> (res - ids.begin ());
-        vals[index] = fed->getValue<X> (ids[index]);
+        vals[index] = inp.getValue<X> ();
         if (update_callback)
         {
             update_callback (index, time);

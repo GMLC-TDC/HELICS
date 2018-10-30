@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "Inputs.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Inputs.hpp"
 
 namespace helics
 {
@@ -109,6 +109,7 @@ void Input::handleCallback (Time time)
         auto val = getValue<bool> ();
         mpark::get<std::function<void(const bool &, Time)>> (value_callback) (val, time);
     }
+    break;
     case 8:  // Time loc
     {
         auto val = getValue<Time> ();
@@ -163,6 +164,12 @@ size_t Input::getRawSize ()
         return out.size ();
     }
     return dv.size ();
+}
+
+data_view Input::getRawValue ()
+{
+    hasUpdate = false;
+    return fed->getValueRaw (*this);
 }
 
 size_t Input::getStringSize ()
@@ -250,7 +257,8 @@ char Input::getValueChar ()
             type = getTypeFromString (fed->getPublicationType (*this));
         }
 
-        if ((type == helics_type_t::helicsString)||(type==helics_type_t::helicsAny)||(type==helics_type_t::helicsCustom))
+        if ((type == helics_type_t::helicsString) || (type == helics_type_t::helicsAny) ||
+            (type == helics_type_t::helicsCustom))
         {
             std::string out;
             valueExtract (dv, type, out);

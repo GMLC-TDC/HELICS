@@ -119,7 +119,9 @@ class BrokerBase
   private:
     /** start main broker loop*/
     void queueProcessingLoop ();
-
+    /** helper function for doing some preprocessing on a command
+	@return (-1) if the command is a termination command*/
+    action_message_def::action_t commandProcessor (ActionMessage &command);
   protected:
     /** process a disconnect signal*/
     virtual void processDisconnect (bool skipUnregister = false) = 0;

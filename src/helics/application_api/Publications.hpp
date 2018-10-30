@@ -191,6 +191,7 @@ class Publication
     void publish (const defV &val);
     void publish (bool val);
     void publish (Time val);
+    void publish (char val);
     void publish (const named_point &np);
     void publish (const std::string &name, double val);
     void publish (const char *str, double val);
@@ -206,16 +207,11 @@ class Publication
     }
     /** publish integral values */
     template <class X>
-    std::enable_if_t<(std::is_integral<X>::value), void> publish (X val)
+    std::enable_if_t<(std::is_integral<X>::value && !std::is_same<remove_cv_ref<X>,char>::value), void> publish (X val)
     {
         publishInt (static_cast<int64_t> (val));
     }
-    template <>
-    void publish (char val)
-    { //char is a little special in that it should be interpreted directly as a string if appropriate
-        publishChar (val);
-    }
-   
+
     /** publish anything not previously covered*/
     template <class X>
     std::enable_if_t<((typeCategory<X>::value == 2) && (!std::is_convertible<X, std::string>::value) &&
@@ -255,9 +251,6 @@ class Publication
     it would be recursive
     */
     void publishInt (int64_t val);
-    /** implementation of single character publications which could be an int or string depending on the pubType
-    */
-	void publishChar (char val);
     friend class ValueFederateManager;
 };
 

@@ -23,13 +23,12 @@ static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::End
     fedObj->epts.push_back (std::move(ept));
 }
 
-static const std::string nullStr;
 static constexpr char nullcstr[] = "";
+const std::string nullStringArgument ("the supplied string argument is null and therefor invalid");
 
 static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
 
-#define AS_STRING(str) (str != nullptr) ? nullStr : std::string (str)
 
 static helics::EndpointObject *verifyEndpoint (helics_endpoint ept, helics_error *err)
 { 
@@ -117,6 +116,7 @@ helics_endpoint helicsFederateGetEndpoint (helics_federate fed, const char *name
     {
         return nullptr;
     }
+    CHECK_NULL_STRING (name, nullptr);
     try
     {
         auto &id = fedObj->getEndpoint (name);
@@ -183,6 +183,7 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
 	{
         return;
 	}
+    CHECK_NULL_STRING(dest, void());
     try
     {
         endObj->endPtr->setTargetDestination (dest);
@@ -331,6 +332,7 @@ void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_
     {
         return;
     }
+    CHECK_NULL_STRING (key, void());
     try
     {
         endObj->endPtr->subscribe (key);

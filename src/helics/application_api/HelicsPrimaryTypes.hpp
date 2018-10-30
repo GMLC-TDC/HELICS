@@ -64,7 +64,7 @@ inline int64_t make_valid (char val) { return static_cast<int64_t> (val); }
 inline int64_t make_valid (unsigned char val) { return static_cast<int64_t> (val); }
 inline int64_t make_valid (int32_t val) { return static_cast<int64_t> (val); }
 inline int64_t make_valid (uint32_t val) { return static_cast<int64_t> (val); }
-inline int64_t make_valid (Time val) { return val.getBaseTimeCode(); }
+inline int64_t make_valid (Time val) { return val.getBaseTimeCode (); }
 
 inline double make_valid (float val) { return static_cast<double> (val); }
 
@@ -197,6 +197,19 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
             auto V = ValueConverter<std::complex<double>>::interpret (dv);
             val = static_cast<X> (std::abs (V));
         }
+        else if (dv.size () == 5)
+        {
+            auto V = ValueConverter<float>::interpret (dv);
+            if (std::isnormal (V))
+            {
+                val = static_cast<X> (V);
+            }
+            else
+            {
+                auto Vint = ValueConverter<int32_t>::interpret (dv);
+                val = static_cast<X> (Vint);
+            }
+        }
         else if (dv.size () == 1)
         {
             val = static_cast<X> ((dv[0] == '0') ? 0 : 1);
@@ -216,6 +229,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         break;
     }
     case helics_type_t::helicsString:
+    default:
         val = static_cast<X> (getDoubleFromString (dv.string ()));
         break;
     case helics_type_t::helicsBool:
@@ -252,8 +266,9 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     case helics_type_t::helicsInt:
     case helics_type_t::helicsTime:
     {
-        auto V = ValueConverter<int64_t>::interpret (dv); val = static_cast<X> (V); 
-		break;
+        auto V = ValueConverter<int64_t>::interpret (dv);
+        val = static_cast<X> (V);
+        break;
     }
 
     case helics_type_t::helicsVector:

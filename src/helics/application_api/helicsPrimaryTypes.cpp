@@ -53,6 +53,7 @@ bool changeDetected (const defV &prevValue, bool val, double /*deltaV*/)
     {
         return ((mpark::get<int64_t> (prevValue) != 0) != val);
     }
+    return true;
 }
 
 bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV)
@@ -508,9 +509,8 @@ void valueExtract (const defV &dv, char &val)
         break;
     case stringLoc:  // string
     {
-        size_t index;
         auto &str = mpark::get<std::string> (dv);
-        val = (str.empty ()) ? '/0' : str[0];
+        val = (str.empty ()) ? '\0' : str[0];
         break;
     }
     case complexLoc:  // complex
@@ -608,6 +608,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<doub
         Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
         val.push_back (static_cast<double> (tm));
     }
+    break;
     case helics_type_t::helicsString:
     default:
     {
@@ -673,6 +674,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std:
         Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
         val.emplace_back (static_cast<double> (tm), 0.0);
     }
+    break;
     case helics_type_t::helicsString:
     default:
     {
@@ -734,6 +736,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<dou
         Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
         val = std::complex<double> (static_cast<double> (tm), 0.0);
     }
+    break;
     case helics_type_t::helicsString:
     default:
     {
@@ -798,6 +801,7 @@ void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val
         val.name = "time";
         val.value = static_cast<double> (tm);
     }
+    break;
     case helics_type_t::helicsString:
     default:
     {

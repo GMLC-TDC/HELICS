@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 bool hasTomlExtension (const std::string &tomlString)
 {
     auto ext = tomlString.substr (tomlString.length () - 4);
-    return ((ext == "TOML") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
+    return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
 toml::Value loadToml (const std::string &tomlString)

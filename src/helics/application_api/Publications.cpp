@@ -103,7 +103,7 @@ void Publication::publishInt (int64_t val)
     }
 }
 
-void Publication::publishChar (char val)
+void Publication::publish (char val)
 {
     switch (pubType)
     {

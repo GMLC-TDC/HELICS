@@ -29,6 +29,8 @@ const char *helicsGetVersion (void) { return helics::versionString; }
 
 static const char *nullstrPtr = "";
 
+const std::string nullStr;
+
 helics_error helicsErrorInitialize ()
 {
     helics_error err;

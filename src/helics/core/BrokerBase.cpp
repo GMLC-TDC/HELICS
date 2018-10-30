@@ -10,37 +10,36 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/argParser.h"
 #include "../common/logger.h"
 
+#include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
+#include "flagOperations.hpp"
 #include "helics/helics-config.h"
 #include "helicsVersion.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
+#include <random>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
-#include "../common/fmt_format.h"
-#include <random>
 #include <boost/program_options.hpp>
-#include "flagOperations.hpp"
 
-
-
-static constexpr auto chars= "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 static inline std::string genId ()
 {
-    std::string nm = std::string(23, ' ');
-    std::random_device rd;     // only used once to initialize (seed) engine
-    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-    std::uniform_int_distribution<int> uni(0, 61); // guaranteed unbiased
+    std::string nm = std::string (23, ' ');
+    std::random_device rd;  // only used once to initialize (seed) engine
+    std::mt19937 rng (rd ());  // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
     nm[5] = '-';
     nm[11] = '-';
     nm[17] = '-';
 
-    for (int ii = 0; ii<23; ii++) {
-        if ((ii != 5)&&(ii!=11)&& (ii != 17))
+    for (int ii = 0; ii < 23; ii++)
+    {
+        if ((ii != 5) && (ii != 11) && (ii != 17))
         {
-            nm[ii] = chars[uni(rng)];
+            nm[ii] = chars[uni (rng)];
         }
     }
 #ifdef _WIN32
@@ -53,21 +52,24 @@ static inline std::string genId ()
 
 namespace helics
 {
-BrokerBase::BrokerBase (bool DisableQueue) noexcept:queueDisabled(DisableQueue){}
+BrokerBase::BrokerBase (bool DisableQueue) noexcept : queueDisabled (DisableQueue) {}
 
-BrokerBase::BrokerBase (const std::string &broker_name, bool DisableQueue) : identifier (broker_name), queueDisabled(DisableQueue) {}
+BrokerBase::BrokerBase (const std::string &broker_name, bool DisableQueue)
+    : identifier (broker_name), queueDisabled (DisableQueue)
+{
+}
 
-BrokerBase::~BrokerBase() 
+BrokerBase::~BrokerBase ()
 {
     if (!queueDisabled)
     {
-        joinAllThreads();
+        joinAllThreads ();
     }
 }
 
 void BrokerBase::joinAllThreads ()
 {
-    if ((!queueDisabled) &&(queueProcessingThread.joinable ()))
+    if ((!queueDisabled) && (queueProcessingThread.joinable ()))
     {
         actionQueue.push (CMD_TERMINATE_IMMEDIATELY);
         queueProcessingThread.join ();
@@ -97,7 +99,6 @@ static const ArgDescriptors extraArgs{
    "milliseconds to wait to establish a network (can also be entered as a time like '500ms' or '2s') "},
   {"timeout",
    "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}};
-
 
 void BrokerBase::displayHelp ()
 {
@@ -173,15 +174,15 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
         timeout = time_out.toCount (timeUnits::ms);
-		if (networkTimeout < 0)
-		{
+        if (networkTimeout < 0)
+        {
             networkTimeout = timeout;
-		}
+        }
     }
-	if (networkTimeout < 0)
-	{
+    if (networkTimeout < 0)
+    {
         networkTimeout = 4000;
-	}
+    }
     if (vm.count ("tick") > 0)
     {
         auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);
@@ -212,7 +213,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
                                const std::string &name,
                                const std::string &message) const
 {
-    if ((federateID == parent_broker_id) || (federateID == global_broker_id.load()))
+    if ((federateID == parent_broker_id) || (federateID == global_broker_id.load ()))
     {
         if (logLevel > maxLogLevel)
         {
@@ -225,7 +226,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
         }
         else if (loggingObj)
         {
-            loggingObj->log (logLevel, fmt::format ("{} ({})::{}", name, federateID.baseValue (),message));
+            loggingObj->log (logLevel, fmt::format ("{} ({})::{}", name, federateID.baseValue (), message));
         }
         return true;
     }
@@ -233,7 +234,6 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
 }
 
 void BrokerBase::generateNewIdentifier () { identifier = genId (); }
-
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
@@ -297,18 +297,17 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
+using activeProtector = libguarded::guarded<std::pair<bool, bool>>;
 
-using activeProtector = libguarded::guarded<std::pair<bool,bool>>;
-
-static void haltTimer(activeProtector &active, boost::asio::steady_timer &tickTimer)
+static void haltTimer (activeProtector &active, boost::asio::steady_timer &tickTimer)
 {
     bool TimerRunning = true;
     {
-        auto p = active.lock();
+        auto p = active.lock ();
         if (p->second)
         {
             p->first = false;
-            tickTimer.cancel();
+            tickTimer.cancel ();
         }
         else
         {
@@ -317,8 +316,8 @@ static void haltTimer(activeProtector &active, boost::asio::steady_timer &tickTi
     }
     while (TimerRunning)
     {
-        std::this_thread::yield();
-        auto res = active.load();
+        std::this_thread::yield ();
+        auto res = active.load ();
         TimerRunning = res.second;
     }
 }
@@ -337,7 +336,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
             catch (std::exception &e)
             {
                 std::cout << "exception caught from addActionMessage" << std::endl;
-            } 
+            }
         }
         else
         {
@@ -351,7 +350,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
 
 bool BrokerBase::tryReconnect () { return false; }
 
-//#define DISABLE_TICK 
+//#define DISABLE_TICK
 void BrokerBase::queueProcessingLoop ()
 {
     std::vector<ActionMessage> dumpMessages;
@@ -359,15 +358,15 @@ void BrokerBase::queueProcessingLoop ()
     auto serv = AsioServiceManager::getServicePointer ();
     auto serviceLoop = AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
-    activeProtector active(true,false);
+    activeProtector active (true, false);
 
     auto timerCallback = [this, &active](const boost::system::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
     ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
-    active = std::make_pair(true, true);
+    active = std::make_pair (true, true);
     ticktimer.async_wait (timerCallback);
-    global_broker_id_local = global_broker_id.load();
+    global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
         if (dumplog)
@@ -376,11 +375,11 @@ void BrokerBase::queueProcessingLoop ()
             {
                 sendToLogger (parent_broker_id, -10, identifier,
                               fmt::format ("|| dl cmd:{} from {} to {}", prettyPrintString (act),
-                               act.source_id.baseValue(), act.dest_id.baseValue()));
+                                           act.source_id.baseValue (), act.dest_id.baseValue ()));
             }
         }
     };
-   
+
     while (true)
     {
         auto command = actionQueue.pop ();
@@ -388,13 +387,18 @@ void BrokerBase::queueProcessingLoop ()
         {
             dumpMessages.push_back (command);
         }
-        switch (command.action ())
+        auto ret = commandProcessor (command);
+		if (ret == CMD_IGNORE)
+		{
+            continue;
+		}
+        switch (ret)
         {
         case CMD_TICK:
-            if (checkActionFlag(command, error_flag))
+            if (checkActionFlag (command, error_flag))
             {
                 serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop();
+                serviceLoop = AsioServiceManager::runServiceLoop ();
             }
             if (messagesSinceLastTick == 0)
             {
@@ -406,19 +410,20 @@ void BrokerBase::queueProcessingLoop ()
             messagesSinceLastTick = 0;
             // reschedule the timer
             ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
-            active = std::make_pair(true, true);
+            active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
             break;
         case CMD_IGNORE:
+        default:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
-            haltTimer(active, ticktimer);
+            haltTimer (active, ticktimer);
             serviceLoop = nullptr;
-            mainLoopIsRunning.store(false);
-            logDump();
+            mainLoopIsRunning.store (false);
+            logDump ();
             return;  // immediate return
         case CMD_STOP:
-            haltTimer(active, ticktimer);
+            haltTimer (active, ticktimer);
             serviceLoop = nullptr;
             if (!haltOperations)
             {
@@ -428,20 +433,52 @@ void BrokerBase::queueProcessingLoop ()
                 processDisconnect ();
             }
             return;
-        default:
-            if (!haltOperations)
-            {
-                ++messagesSinceLastTick;
-                if (isPriorityCommand (command))
-                {
-                    processPriorityCommand (std::move (command));
-                }
-                else
-                {
-                    processCommand (std::move (command));
-                }
-            }
+        
         }
     }
 }
+
+action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &command)
+{
+    switch (command.action ())
+    {
+    case CMD_IGNORE:
+        break;
+    case CMD_TERMINATE_IMMEDIATELY:
+    case CMD_STOP:
+    case CMD_TICK:
+        return command.action ();
+    case CMD_MULTI_MESSAGE:
+        for (int ii = 0; ii < command.counter; ++ii)
+        {
+            ActionMessage NMess;
+            NMess.from_string (command.getString (ii));
+            auto V = commandProcessor (NMess);
+			if (V != CMD_IGNORE)
+			{
+				//overwrite the abort command but ignore ticks in a multimessage context they shouldn't be there
+				if (V != CMD_TICK)
+				{
+                    command = NMess;
+                    return V;
+				}
+			}
+        }
+        break;
+    default:
+        if (!haltOperations)
+        {
+            if (isPriorityCommand (command))
+            {
+                processPriorityCommand (std::move (command));
+            }
+            else
+            {
+                processCommand (std::move (command));
+            }
+        }
+    }
+    return CMD_IGNORE;
+}
+
 }  // namespace helics
