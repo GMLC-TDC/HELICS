@@ -141,14 +141,18 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
         auto ptr = fnd->second;
         servelock.unlock();
         ++ptr->runCounter;
-       
+        
         bool exp = false;
         if (ptr->running.compare_exchange_strong(exp,true))
         {
-            std::lock_guard<std::mutex> nullLock(ptr->runningLoopLock);
+            std::packaged_task<void()> serviceTask([ptr]() { serviceProcessingLoop(ptr); });
+            std::unique_lock<std::mutex> nullLock(ptr->runningLoopLock);
             // std::cout << "run Service loop " << ptr->runCounter << "\n";
             ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
-            ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+            ptr->loopRet = serviceTask.get_future();
+            nullLock.unlock();
+            std::thread serviceThread(std::move(serviceTask));
+            serviceThread.detach();
         }
         else
         {
@@ -164,9 +168,13 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
                 exp = false;
                 if (ptr->running.compare_exchange_strong(exp, true))
                 {
+                    std::packaged_task<void()> serviceTask([ptr]() { serviceProcessingLoop(ptr); });
                     nullLock.lock();
                     ptr->nullwork = std::make_unique<boost::asio::io_service::work>(ptr->getBaseService());
-                    ptr->loopRet = std::async(std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+                    ptr->loopRet = serviceTask.get_future();
+                    nullLock.unlock();
+                    std::thread serviceThread(std::move(serviceTask));
+                    serviceThread.detach();
                 }
             }
         }
@@ -180,26 +188,25 @@ void AsioServiceManager::haltServiceLoop ()
     if (running)
     {
         // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
-        if (runCounter > 0)
-        {
-            --runCounter;
-        }
-        if (runCounter <= 0)
+        if (--runCounter <= 0)
         {
             std::lock_guard<std::mutex> nullLock(runningLoopLock);
             //    std::cout << "calling halt on service loop \n";
-            if (nullwork)
+            if (runCounter <= 0)
             {
-                nullwork.reset ();
-                iserv->stop ();
-                loopRet.get ();
-                iserv->reset ();  // prepare for future runs
+                if (nullwork)
+                {
+                    nullwork.reset();
+                    iserv->stop();
+                    loopRet.get();
+                    iserv->reset();  // prepare for future runs
+                }
             }
         }
     }
     else
     {
-        runCounter = 0;
+        runCounter.store(0);
     }
 }
 
