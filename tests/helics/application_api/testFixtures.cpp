@@ -11,6 +11,47 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cctype>
 #include <iostream>
 
+
+#ifdef HELICS_HAVE_ZEROMQ
+#define ZMQTEST "zmq",
+#define ZMQTEST2 "zmq_2",
+#define ZMQTEST3 "zmq_3",
+#define ZMQTEST4 "zmq_4",
+#else
+#define ZMQTEST
+#define ZMQTEST2
+#define ZMQTEST3
+#define ZMQTEST4
+#endif
+
+#ifndef DISABLE_TCP_CORE
+#define TCPTEST "tcp",
+#define TCPTEST2 "tcp_2",
+#define TCPTEST3 "tcp_3",
+#define TCPTEST4 "tcp_4",
+#else
+#define TCPTEST
+#define TCPTEST2
+#define TCPTEST3
+#define TCPTEST4
+#endif
+
+const std::vector<std::string> ztypes = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
+const std::vector<std::string> core_types = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
+
+const std::vector<std::string> core_types_2 = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};
+
+const std::vector<std::string> core_types_simple = {"test", "ipc", TCPTEST ZMQTEST "udp"};
+const std::vector<std::string> core_types_single = {"test", "ipc", TCPTEST ZMQTEST "udp", "test_3",
+                                                    ZMQTEST3 TCPTEST3 "udp_3"};
+const std::vector<std::string> core_types_all = {
+  "test",         "ipc_2",          TCPTEST "test_2", ZMQTEST "udp",     "test_3",
+  ZMQTEST3 "ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
+const std::vector<std::string> core_types_extended = {"ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4",
+                                                      ZMQTEST4 TCPTEST4 "udp_4"};
+
+const std::string defaultNamePrefix = "fed";
+
 bool hasIndexCode (const std::string &type_name)
 {
     if (std::isdigit (type_name.back ()) != 0)
