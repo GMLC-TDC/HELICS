@@ -1,3 +1,74 @@
+%{
+#include "api-data.h"
+/* throw a helics error */
+static void throwHelicsPythonException(helics_error *err) {
+  switch (err->error_code)
+  {
+  case helics_ok:
+    return;
+  case helics_error_registration_failure:
+    raisePythonException( "helics:registration_failure", err->message);
+    break;
+  case   helics_error_connection_failure:
+  raisePythonException( "helics:connection_failure", err->message);
+    break;
+  case   helics_error_invalid_object:
+  raisePythonException( "helics:invalid_object", err->message);
+    break;
+  case   helics_error_invalid_argument:
+  raisePythonException( "helics:invalid_argument", err->message);
+    break;
+  case   helics_error_discard:
+  raisePythonException( "helics:discard", err->message);
+    break;
+  case helics_error_system_failure:
+    raisePythonException( "helics:system_failure", err->message);
+    break;
+  case   helics_error_invalid_state_transition:
+  raisePythonException( "helics:invalid_state_transition", err->message);
+    break;
+  raisePythonException( "helics:invalid_argument", err->message);
+    break;
+  case   helics_error_discard:
+  raisePythonException( "helics:discard", err->message);
+    break;
+  case helics_error_system_failure:
+    raisePythonException( "helics:system_failure", err->message);
+    break;
+  case   helics_error_invalid_state_transition:
+  raisePythonException( "helics:invalid_state_transition", err->message);
+    break;
+  case   helics_error_invalid_function_call:
+  raisePythonException( "helics:invalid_function_call", err->message);
+    break;
+  case   helics_error_execution_failure:
+  raisePythonException( "helics:execution_failure", err->message);
+    break;
+  case   helics_error_other:
+  case   other_error_type:
+  default:
+  raisePythonException( "helics:error", err->message);
+    break;
+  }
+}
+
+%}
+
+
+%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+    etemp=helicsErrorInitialize();
+    $1=&etemp;
+}
+
+%typemap(freearg) helics_error *
+{
+    if ($1->error_code!=helics_ok)
+    {
+        throwHelicsPythonException($1);
+    }
+}
+
+
 
 //typemap for short maxlen strings
 %typemap(in, numinputs=0) (char *outputString, int maxlen) {
