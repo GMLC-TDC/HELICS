@@ -116,6 +116,8 @@ void TestCore::brokerDisconnect ()
     brokerState = broker_state_t::terminating;
     std::lock_guard<std::mutex> lock (routeMutex);
     tbroker = nullptr;
+    brokerRoutes.clear ();
+    coreRoutes.clear ();
 }
 
 TestCore::~TestCore ()
