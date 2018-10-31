@@ -372,7 +372,7 @@ HELICS_EXPORT void helicsInputGetVector (helics_input ipt, double data[], int ma
 @param[out] val the double value for the named point
 */
 HELICS_EXPORT void
-helicsInputGetNamedPoint (helics_input ipt, char *outputString, int maxlen, int *actualLength, double *val, helics_error *err);
+helicsInputGetNamedPoint (helics_input ipt, char *outputString, int maxStringlen, int *actualLength, double *val, helics_error *err);
 
 /**@}*/
 

@@ -40,19 +40,6 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %}
 
-//typemap for short maxlen strings
-%typemap(in, numinputs=0) (char *outputString, int maxlen) {
-  $2=256;
-  $1=(char *)malloc(256);
-}
-
-%typemap(argout) (char *outputString, int maxlen) {
-  if (--resc>=0) *resv++ = SWIG_FromCharPtr($1);
-}
-
-%typemap(freearg) (char *outputString, int maxlen) {
-   if ($1) free($1);
-}
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
 	etemp=helicsErrorInitialize();
@@ -94,9 +81,9 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %typemap(argout)(double *real, double *imag)
 {
-	ComplexMatrix mat(1,1);
-	mat(1,1)=std::complex<double>($1,$2);
-	if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+	Complex c($1,$2);
+	octave_complex cv(c);
+	_outp = SWIG_Octave_AppendOutput(_outp, cv);
 }
 
 
@@ -150,6 +137,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
   else
   {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
+    return octave_value_list();
   }
 }
 
@@ -159,12 +147,13 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 // typemap for vector input functions
 %typemap(in) (const double *vectorInput, int vectorlength) {
-  if (!mxIsDouble($input)) {
+  if ($input.is_real_matrix()) {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
-    return NULL;
+    return octave_value_list();
   }
-  $2=static_cast<int>(mxGetNumberOfElements($input));
-  $1=mxGetPr($input);
+  $2=static_cast<int>($input.numel());
+  Matrix M=$input.matrix_value();
+  $1=M.fortran_vec();
 }
 
 %typemap(argout) (const double *vectorInput, int vectorlength)
@@ -188,14 +177,19 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 // Set argument to NULL before any conversion occurs
 %typemap(check)(double data[], int maxlen, int *actualSize) {
     $2=helicsInputGetVectorSize(arg1);
-    $1 = (double *) mxCalloc($2,sizeof(double));
+    OCTAVE_LOCAL_BUFFER(double,tmp,$2);
+    $1=tmp;
 }
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
 
-	mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
-	mxSetPr(mat,$1);
-  if (--resc>=0) *resv++ = mat;
+	Matrix a(*$3,1);
+	double *dat=a.fortran_vec();
+	for (int ii=0;ii<*$3;++ii)
+	{
+        dat[ii]=$1[ii];
+	}
+  _outp = SWIG_Octave_AppendOutput(_outp, a);
 }
 
 %apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
