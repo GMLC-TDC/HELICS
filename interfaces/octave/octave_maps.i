@@ -6,33 +6,33 @@
 static octave_value Helics_ErrorType(helics_error *err) {
 switch (err->error_code)
   {
-  case helics_registration_failure:
+  case helics_error_registration_failure:
 	return "helics:registration_failure";
-  case   helics_connection_failure:
+  case   helics_error_connection_failure:
     return "helics:connection_failure";
   case   helics_error_invalid_object:
     return "helics:invalid_object";
   case   helics_error_invalid_argument:
     return "helics:invalid_argument";
-  case   helics_discard:
+  case   helics_error_discard:
     return "helics:discard";
-  case helics_system_failure:
+  case helics_error_system_failure:
 	return "helics:system_failure";
-  case   helics_invalid_state_transition:
+  case   helics_error_invalid_state_transition:
     return "helics:invalid_state_transition";
-  case   helics_invalid_function_call:
+  case   helics_error_invalid_function_call:
     return "helics:invalid_function_call";
-  case   helics_execution_failure:
+  case   helics_error_execution_failure:
 	return "helics:execution_failure";
-  case   helics_other_error:
+  case   helics_error_other:
   case   other_error_type:
   default:
     return "helics:error";
   }
 }
 static octave_value throwHelicsOctaveError(helics_error *err) {
- octave_value type(Helics_ErrorType(code));
-  std::string r = msg;
+ octave_value type(Helics_ErrorType(err));
+  std::string r(err->message);
   r += " (" + type.string_value() + ")";
   error(r.c_str());
   return octave_value(r);
@@ -102,16 +102,16 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %typemap(in) (double real, double imag)
 {
-	if(mxIsComplex($input))
+	if($input.is_complex_scalar())
 	{
-		
-		$1=mxGetPr($input)[0];
-		$2=mxGetPi($input)[0];
+		Complex arg=$input.complex_value();
+		$1=arg.real();
+		$2=arg.imag();
 	}  
-    else if (mxIsDouble($input))
+    else if ($input.is_float_type())
 	{
 		$2=0.0;
-		$1=mxGetPr($input)[0];
+		$1=$input.double_value();
 	}
 	else
 	{
@@ -122,24 +122,18 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
-  if (mxIsCell($input)) {
-    int ii;
-	int allocation2=0;
-	char *buffer_cell=NULL;
-	int cellSize=static_cast<int>(mxGetNumberOfElements($input));
-	$2 = (char **) malloc((cellSize+1)*sizeof(char *));
-	for (ii=0;ii<cellSize;++ii)
+  if ($input.is_cellstr()) {
+	Cell cellargs=octave_value_extract<Cell>($input);
+	$2 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
+	for (int ii=0;ii<cellargs.numel();++ii)
 	{
-		mxArray *cellElement=mxGetCell($input, ii);
-		int resCode = SWIG_AsCharPtrAndSize(cellElement, &buffer_cell, NULL, &allocation2);
-		if (!SWIG_IsOK(resCode)) {
-			SWIG_exception_fail(SWIG_ArgError(resCode), "cell elements must be a string");
-		}
-		$2[ii+1]=buffer_cell;
+        octave_value arg=cellargs(ii);
+        int alloc;
+		SWIG_AsCharPtrAndSize(arg, &$2[ii+1], NULL, &alloc);
 	}
     
   } 
-  else if (mxIsChar($input))
+  else if ($input.is_string())
   {
   int retval=0;
   char *buffer=NULL;
@@ -156,7 +150,6 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
   else
   {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
-    return NULL;
   }
 }
 
