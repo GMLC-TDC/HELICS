@@ -151,7 +151,7 @@ def test_value_federate_runFederateTestBool(vFed):
     h.helicsFederateEnterExecutionMode(vFed)
 
     # publish string1 at time=0.0;
-    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
+    h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
     val = h.helicsSubscriptionGetBoolean(subid)
 
     assert val == h.helics_true if defaultValue else h.helics_false
