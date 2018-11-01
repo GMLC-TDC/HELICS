@@ -859,6 +859,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 			}
 		}
 	}
+    break;
     case CMD_STOP:
         if (!allDisconnected ())
         {  // only send a disconnect message if we haven't done so already
