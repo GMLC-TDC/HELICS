@@ -67,9 +67,9 @@ def test_value_federate_initialize(vFed):
     assert state == 2
 
 def test_value_federate_publication_registration(vFed):
-    pubid1 = h.helicsFederateRegisterPublication(vFed, "pub1", "string", "")
-    pubid2 = h.helicsFederateRegisterGlobalPublication(vFed, "pub2", "int", "")
-    pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
+    pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", "string", "")
+    pubid2 = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "int", "")
+    pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", "double", "V")
     h.helicsFederateEnterExecutingMode(vFed)
 
     publication_key = h.helicsPublicationGetKey(pubid1)
@@ -92,8 +92,8 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     testValue2 = "I am a string"
     testVal2 = 0.0
 
-    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
-    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "named_point", "")
+    pubid = h.helicsFederateRegisterGlobalPublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "")
 
     h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
 
@@ -143,8 +143,8 @@ def test_value_federate_runFederateTestBool(vFed):
     testValue2 = False
 
     # register the publications
-    pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
-    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "bool", "")
+    pubid = h.helicsFederateRegisterGlobalPublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
+    subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "")
 
     h.helicsSubscriptionSetDefaultBoolean(subid, h.helics_true if defaultValue else h.helics_false)
 
@@ -182,7 +182,7 @@ def test_value_federate_runFederateTestBool(vFed):
 
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
-    pubid2 = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub2", h.HELICS_DATA_TYPE_INT, "")
+    pubid2 = h.helicsFederateRegisterGlobalPublication(vFed, "pub2", h.HELICS_DATA_TYPE_INT, "")
     pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", h.HELICS_DATA_TYPE_DOUBLE, "V")
     h.helicsFederateEnterExecutingMode(vFed)
 
@@ -203,7 +203,7 @@ def test_value_federate_publisher_registration(vFed):
 
 
 def test_value_federate_subscription_and_publication_registration(vFed):
-    pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
+    pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", "double", "V")
 
     subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "int64", "V")
     subid2 = h.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
@@ -231,8 +231,8 @@ def test_value_federate_subscription_and_publication_registration(vFed):
 
 def test_value_federate_single_transfer(vFed):
 
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "");
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "string", "");
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "");
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "");
 
     h.helicsFederateEnterExecutingMode(vFed)
 
@@ -247,8 +247,8 @@ def test_value_federate_single_transfer(vFed):
 def test_value_federate_runFederateTestDouble(vFed):
     defaultValue = 1.0
     testValue = 2.0
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_DOUBLE, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "double", "")
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_DOUBLE, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
     h.helicsSubscriptionSetDefaultDouble(subid, defaultValue)
 
     h.helicsFederateEnterExecutingMode (vFed)
@@ -279,8 +279,8 @@ def test_value_federate_runFederateTestComplex(vFed):
     iDefaultValue = 1.0
     rTestValue = 2.0
     iTestValue = 2.0
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_COMPLEX, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "complex", "")
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_COMPLEX, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
     h.helicsSubscriptionSetDefaultComplex(subid, rDefaultValue, iDefaultValue)
 
     h.helicsFederateEnterExecutingMode (vFed)
@@ -303,8 +303,8 @@ def test_value_federate_runFederateTestComplex(vFed):
 def test_value_federate_runFederateTestInteger(vFed):
     defaultValue = 1
     testValue = 2
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_INT, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "int", "")
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_INT, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
     h.helicsSubscriptionSetDefaultInteger(subid, defaultValue)
 
     h.helicsFederateEnterExecutingMode (vFed)
@@ -332,8 +332,8 @@ def test_value_federate_runFederateTestInteger(vFed):
 def test_value_federate_runFederateTestString(vFed):
     defaultValue = "String1"
     testValue = "String2"
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "string", "")
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_STRING, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
     h.helicsSubscriptionSetDefaultString(subid, defaultValue)
 
     h.helicsFederateEnterExecutingMode(vFed)
@@ -352,8 +352,8 @@ def test_value_federate_runFederateTestString(vFed):
 def test_value_federate_runFederateTestVectorD(vFed):
     defaultValue = [0, 1, 2]
     testValue = [3, 4, 5]
-    pubid = h.helicsFederateRegisterGlobalTypePublication (vFed, "pub1", h.HELICS_DATA_TYPE_VECTOR, "")
-    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "vector", "")
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.HELICS_DATA_TYPE_VECTOR, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
     h.helicsSubscriptionSetDefaultVector(subid, defaultValue)
 
     h.helicsFederateEnterExecutingMode(vFed)
