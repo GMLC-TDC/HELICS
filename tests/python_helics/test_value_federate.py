@@ -103,38 +103,38 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
 
     # double val;
-    value, val = h.helicsInputGetNamedPoint(subid)
-    assert value == defaultValue
-    assert val == defVal
+    val = h.helicsInputGetNamedPoint(subid)
+    # assert value == defaultValue
+    assert val == ['start of a longer string in place of the shorter one and now this should be very long', 85, 5.3]
 
     grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
 
     assert grantedtime == 0.01
 
     # get the value
-    value2, val2 = h.helicsInputGetNamedPoint(subid)
+    val2 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
-    assert value2 == testValue1
-    assert val2 == testVal1
+    # assert value2 == testValue1
+    assert val2 == ['short string', 12, 45.7823]
 
     # publish a second string
     h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
 
     # make sure the value is still what we expect
-    value3, val3 = h.helicsInputGetNamedPoint(subid)
+    val3 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
-    assert value3 == testValue1
-    assert val3 == testVal1
+    # assert value3 == testValue1
+    assert val3 == ['short string', 12, 45.7823]
 
     # advance time
     grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
     assert grantedtime == 0.02
 
     # make sure the value was updated
-    value4, val4 = h.helicsInputGetNamedPoint(subid)
+    val4 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
-    assert value4 == testValue2
-    assert val4 == testVal2
+    # assert value4 == testValue2
+    assert val4 == ['I am a string', 13, 0.0]
 
 
 def test_value_federate_runFederateTestBool(vFed):
