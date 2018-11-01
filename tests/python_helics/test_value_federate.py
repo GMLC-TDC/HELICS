@@ -205,11 +205,12 @@ def test_value_federate_publisher_registration(vFed):
 def test_value_federate_subscription_and_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", "double", "V")
 
-    subid1 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub1", "int64", "V")
-    subid2 = h.helicsFederateRegisterOptionalTypeSubscription(vFed, "sub2", h.HELICS_DATA_TYPE_INT, "")
+    subid1 = h.helicsFederateRegisterSubscription(vFed, "sub1", "V")
+    subid2 = h.helicsFederateRegisterSubscription(vFed, "sub2", "")
+    subid3 = h.helicsFederateRegisterSubscription(vFed, "sub3", "V")
 
-    subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "vector", "V")
     h.helicsFederateEnterExecutingMode(vFed)
+
     publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
 
