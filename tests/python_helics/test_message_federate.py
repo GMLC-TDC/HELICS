@@ -19,10 +19,10 @@ def mFed():
         pass
 
     # Create Federate Info object that describes the federate properties #
-    fedinfo = h.helicsFederateInfoCreate()
+    fedinfo = h.helicsCreateFederateInfo()
 
     # Set Federate name #
-    h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    h.helicsFederateInfoSetCoreName(fedinfo, "TestA Federate")
 
     # Set core type from string #
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -36,19 +36,17 @@ def mFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_time_property_time_delta, deltat)
 
-    h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    # h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
-    mFed = h.helicsCreateMessageFederate(fedinfo)
+    mFed = h.helicsCreateMessageFederate("Federate 1", fedinfo)
 
     yield mFed
 
-    status = h.helicsFederateFinalize(mFed)
-    assert status == h.helics_ok
-    status, state = h.helicsFederateGetState(mFed)
+    h.helicsFederateFinalize(mFed)
+    state = h.helicsFederateGetState(mFed)
     assert state == 3
-    assert status == h.helics_ok
     while (h.helicsBrokerIsConnected(broker)):
         time.sleep(1)
 
@@ -57,12 +55,11 @@ def mFed():
 
 
 def test_message_federate_initialize(mFed):
-    status, state = h.helicsFederateGetState(mFed)
+    state = h.helicsFederateGetState(mFed)
     assert state == 0
-    assert status == 0
-    h.helicsFederateEnterExecutionMode(mFed)
+    h.helicsFederateEnterExecutingMode(mFed)
 
-    status, state = h.helicsFederateGetState(mFed)
+    state = h.helicsFederateGetState(mFed)
     assert state == 2
 
 def test_message_federate_endpoint_registration(mFed):
