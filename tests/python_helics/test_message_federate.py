@@ -22,7 +22,7 @@ def mFed():
     fedinfo = h.helicsCreateFederateInfo()
 
     # Set Federate name #
-    h.helicsFederateInfoSetCoreName(fedinfo, "TestA Federate")
+    h.helicsFederateInfoSetCoreName(fedinfo, "CoreA Federate")
 
     # Set core type from string #
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -40,7 +40,7 @@ def mFed():
 
     # h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
-    mFed = h.helicsCreateMessageFederate("Federate 1", fedinfo)
+    mFed = h.helicsCreateMessageFederate("TestA Federate", fedinfo)
 
     yield mFed
 
@@ -66,22 +66,18 @@ def test_message_federate_endpoint_registration(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
     epid2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "ep2", "random")
 
-    h.helicsFederateEnterExecutionMode(mFed)
+    h.helicsFederateEnterExecutingMode(mFed)
 
-    status, endpoint_name = h.helicsEndpointGetName(epid1)
-    assert status == 0
+    endpoint_name = h.helicsEndpointGetName(epid1)
     assert endpoint_name == "TestA Federate/ep1"
 
-    status, endpoint_name = h.helicsEndpointGetName(epid2)
-    assert status == 0
+    endpoint_name = h.helicsEndpointGetName(epid2)
     assert endpoint_name == "ep2"
 
-    status, endpoint_name = h.helicsEndpointGetType(epid1)
-    assert status == 0
+    endpoint_name = h.helicsEndpointGetType(epid1)
     assert endpoint_name == ""
 
-    status, endpoint_name = h.helicsEndpointGetType(epid2)
-    assert status == 0
+    endpoint_name = h.helicsEndpointGetType(epid2)
     assert endpoint_name == "random"
 
 
@@ -89,15 +85,14 @@ def test_message_federate_send(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
     epid2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "ep2", "random")
 
-    h.helicsFederateSetTimeDelta(mFed, 1.0)
-    h.helicsFederateEnterExecutionMode(mFed)
+    h.helicsFederateSetTimeProperty(mFed, h.helics_time_property_time_delta, 1.0)
+    h.helicsFederateEnterExecutingMode(mFed)
 
     data = "random-data"
 
     status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1.0)
 
-    status, granted_time = h.helicsFederateRequestTime(mFed, 2.0)
-    assert status == 0
+    granted_time = h.helicsFederateRequestTime(mFed, 2.0)
     assert granted_time == 1.0
 
     res = h.helicsFederateHasMessage(mFed)
