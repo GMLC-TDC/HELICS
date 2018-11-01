@@ -57,9 +57,9 @@ static void throwHelicsPythonException(helics_error *err) {
 %}
 
 %init %{
-    pMyException = PyErr_NewException("_mylibrary.MyException", NULL, NULL);
-    Py_INCREF(pMyException);
-    PyModule_AddObject(m, "MyException", pMyException);
+    pHelicsException = PyErr_NewException("_helics.pHelicsException", NULL, NULL);
+    Py_INCREF(pHelicsException);
+    PyModule_AddObject(m, "HelicsException", pHelicsException);
 %}
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
