@@ -106,32 +106,45 @@ def test_message_filter_registration(broker):
     FreeFederate(mFed)
     time.sleep(1.0)
 
-@pt.mark.skip("Test hangs indefinitely") # TODO: why does this hang?
 def test_message_filter_function(broker):
 
     fFed = AddFederate(broker, "zmq", 1, 1, "filter")
     mFed = AddFederate(broker, "zmq", 1, 1, "message")
 
     p1 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
-    p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "")
+    p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random")
 
-    f1 = h.helicsFederateRegisterFilter (fFed, h.helics_filtertype_delay, "filter1")
-    h.helicsFilterSet(f1, "delay", 2.5)
+    f1 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_custom, "filter1")
+    h.helicsFilterAddSourceTarget(f1, "port1")
+    f2 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_delay, "filter2")
+    h.helicsFilterAddSourceTarget(f1, "port2")
+    h.helicsFederateRegisterEndpoint(fFed,'fout','');
+    f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filtertype_random_delay, 'filter3');
+    h.helicsFilterAddSourceTarget(f3,'fed2/fout');
+
+    # h.helicsFilterSet(f1, "delay", 2.5)
     h.helicsFederateEnterExecutingModeAsync(fFed)
     h.helicsFederateEnterExecutingMode(mFed)
     h.helicsFederateEnterExecutingModeComplete(fFed)
     state = h.helicsFederateGetState(fFed)
     assert state == 2
     data = "hello world"
+
+    filt_key = h.helicsFilterGetName(f1);
+    assert filt_key == 'filter1';
+
+    filt_key = h.helicsFilterGetName(f2);
+    assert filt_key == 'filter2';
+
     h.helicsEndpointSendMessageRaw(p1, "port2", data)
-    h.helicsFederateRequestTimeAsync (mFed, 1.0)
+    h.helicsFederateRequestTimeAsync(mFed, 1.0)
     grantedtime = h.helicsFederateRequestTime(fFed, 1.0)
     assert grantedtime == 1.0
-    grantedtime = h.helicsFederateRequestTimeComplete (mFed)
+    grantedtime = h.helicsFederateRequestTimeComplete(mFed)
     assert grantedtime == 1.0
-    res=h.helicsFederateHasMessage(mFed)
+    res = h.helicsFederateHasMessage(mFed)
     assert res==0
-    res=h.helicsEndpointHasMessage(p2)
+    res = h.helicsEndpointHasMessage(p2)
     assert res==0
     #grantedtime = h.helicsFederateRequestTime(fFed, 3.0)
     #assert res==h.helics_true
