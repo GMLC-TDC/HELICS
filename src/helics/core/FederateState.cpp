@@ -261,8 +261,14 @@ void FederateState::addAction (const ActionMessage &action)
     }
 }
 
-void FederateState::addAction (ActionMessage &&action)
+
+stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/) 
 {
+    return stx::nullopt;
+}
+
+    void FederateState::addAction (ActionMessage && action)
+    {
     if (action.action () != CMD_IGNORE)
     {
         queue.push (std::move (action));

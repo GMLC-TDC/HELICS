@@ -11,7 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cctype>
 #include <iostream>
 
-
 #ifdef HELICS_HAVE_ZEROMQ
 #define ZMQTEST "zmq",
 #define ZMQTEST2 "zmq_2",
@@ -76,11 +75,11 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     }
     else
     {
-        type = helics::coreTypeFromString(core_type_name);
+        type = helics::coreTypeFromString (core_type_name);
     }
     std::shared_ptr<helics::Broker> broker;
-	switch (type)
-	{
+    switch (type)
+    {
     case helics::core_type::TCP:
         broker = helics::BrokerFactory::create (type, initialization_string + " --reuse_address");
         break;
@@ -89,10 +88,9 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
         broker = helics::BrokerFactory::create (type, initialization_string + " --client");
         break;
     default:
-        broker=helics::BrokerFactory::create (type, initialization_string);
-	}
+        broker = helics::BrokerFactory::create (type, initialization_string);
+    }
     return broker;
-    
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -123,21 +121,21 @@ FederateTestFixture::~FederateTestFixture ()
     }
     federates.clear ();
     for (auto &broker : brokers)
-    { 
-        if (ctype.compare(0, 3, "tcp") == 0)
+    {
+        if (ctype.compare (0, 3, "tcp") == 0)
         {
-            broker->waitForDisconnect(2000);
+            broker->waitForDisconnect (2000);
         }
         else
         {
-            broker->waitForDisconnect(200);
+            broker->waitForDisconnect (2000);
         }
-        
-		if (broker->isConnected())
-		{
+
+        if (broker->isConnected ())
+        {
             std::cout << "forcing disconnect\n";
             broker->disconnect ();
-		}
+        }
     }
     brokers.clear ();
     helics::cleanupHelicsLibrary ();

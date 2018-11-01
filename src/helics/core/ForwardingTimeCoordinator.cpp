@@ -383,7 +383,7 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-    if (cmd.action () == CMD_DISCONNECT)
+    if ((cmd.action () == CMD_DISCONNECT)||(cmd.action()==CMD_BROADCAST_DISCONNECT))
     {
         removeDependent (cmd.source_id);
     }

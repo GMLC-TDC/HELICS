@@ -38,6 +38,8 @@ class BasicFedInfo
     const std::string name;  //!< name of the federate
     global_federate_id_t global_id;  //!< the identification code for the federate
     route_id_t route_id;  //!< the routing information for data to be sent to the federate
+    global_broker_id_t parent; //!< the id of the parent broker/core
+    bool _disconnected = false;
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -49,12 +51,12 @@ class BasicBrokerInfo
 
     global_broker_id_t global_id;  //!< the global identifier for the broker
     route_id_t route_id;  //!< the identifier for the route to take to the broker
-
+    global_broker_id_t parent;  //!< the id of the parent broker/core
     bool _initRequested = false;  //!< flag indicating the broker has requesting initialization
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
-    bool _nonLocal = false;  //!< flag indicating that a broker is a direct subbroker of the managing object
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
+    bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
     std::string routeInfo;  //!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
@@ -83,8 +85,8 @@ class CoreBroker : public Broker, public BrokerBase
     UnknownHandleManager unknownHandles; //!< structure containing unknown targeted handles
     std::vector<std::pair<std::string, global_federate_id_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
-    std::map<global_federate_id_t, route_id_t>
+    std::unordered_map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
+    std::unordered_map<global_federate_id_t, route_id_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
@@ -276,6 +278,8 @@ class CoreBroker : public Broker, public BrokerBase
 	void sendDisconnect ();
     /** generate a string about the federation summarizing connections*/
     std::string generateFederationSummary () const;
+    /** label the broker and all children as disconnected*/
+	void labelAsDisconnected (global_broker_id_t broker);
 };
 
 }  // namespace helics

@@ -321,7 +321,7 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
     TriggerVariable disconnection;  //!< controller for the disconnection process
-  protected:
+  private:
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
@@ -372,7 +372,7 @@ class CommonCore : public Core, public BrokerBase
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);
     /** check for a disconnect and take actions if the object can disconnect*/
-    void checkDisconnect ();
+    bool checkAndProcessDisconnect ();
     /** send a disconnect message to time dependencies and child federates*/
     void sendDisconnect ();
 };
