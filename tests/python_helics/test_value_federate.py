@@ -20,10 +20,10 @@ def vFed():
         pass
 
     # Create Federate Info object that describes the federate properties #
-    fedinfo = h.helicsFederateInfoCreate()
+    fedinfo = h.helicsCreateFederateInfo()
 
     # Set Federate name #
-    h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
+    h.helicsFederateInfoSetCoreName(fedinfo, "TestA Core")
 
     # Set core type from string #
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -37,11 +37,11 @@ def vFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
+    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_time_property_time_delta, deltat)
 
-    h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    # h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
-    vFed = h.helicsCreateValueFederate(fedinfo)
+    vFed = h.helicsCreateValueFederate("TestA Federate", fedinfo)
 
     yield vFed
 
