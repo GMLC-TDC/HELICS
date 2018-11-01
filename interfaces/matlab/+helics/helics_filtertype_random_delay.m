@@ -1,7 +1,7 @@
 function v = helics_filtertype_random_delay()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1936535385);
+    vInitialized = helicsMEX(0, 1128095519);
   end
   v = vInitialized;
 end

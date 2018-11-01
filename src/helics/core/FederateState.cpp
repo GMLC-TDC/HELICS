@@ -1012,6 +1012,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (cmd.payload.empty ())
         {
             errorString = commandErrorString (cmd.messageID);
+			if(errorString == "unknown")
+			{
+                errorString += " code:" + std::to_string (cmd.messageID);
+			}
         }
         else
         {

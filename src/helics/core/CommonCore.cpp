@@ -504,7 +504,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         return local_id;
     }
-    throw (RegistrationFailure (fed->lastErrorString ()));
+    throw (RegistrationFailure (std::string("fed received Failure ")+fed->lastErrorString ()));
 }
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
