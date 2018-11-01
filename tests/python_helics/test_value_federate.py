@@ -103,7 +103,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
 
     # double val;
-    value, val = h.helicsSubscriptionGetNamedPoint(subid)
+    value, val = h.helicsInputGetNamedPoint(subid)
     assert value == defaultValue
     assert val == defVal
 
@@ -112,7 +112,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert grantedtime == 0.01
 
     # get the value
-    value2, val2 = h.helicsSubscriptionGetNamedPoint(subid)
+    value2, val2 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value2 == testValue1
     assert val2 == testVal1
@@ -121,7 +121,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
 
     # make sure the value is still what we expect
-    value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
+    value3, val3 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value3 == testValue1
     assert val3 == testVal1
@@ -131,7 +131,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert grantedtime == 0.02
 
     # make sure the value was updated
-    value4, val4 = h.helicsSubscriptionGetNamedPoint(subid)
+    value4, val4 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value4 == testValue2
     assert val4 == testVal2
@@ -152,7 +152,7 @@ def test_value_federate_runFederateTestBool(vFed):
 
     # publish string1 at time=0.0;
     h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
-    val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsInputGetBoolean(subid)
 
     assert val == h.helics_true if defaultValue else h.helics_false
 
@@ -160,7 +160,7 @@ def test_value_federate_runFederateTestBool(vFed):
     assert grantedtime == 0.01
 
     # get the value
-    val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsInputGetBoolean(subid)
 
     # make sure the string is what we expect
     assert val == h.helics_true if testValue1 else h.helics_false
@@ -169,14 +169,14 @@ def test_value_federate_runFederateTestBool(vFed):
     h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue2 else h.helics_false)
 
     # make sure the value is still what we expect
-    val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsInputGetBoolean(subid)
     assert val == h.helics_true if testValue1 else h.helics_false
     # advance time
     grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     # make sure the value was updated
     assert grantedtime == 0.02
 
-    val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsInputGetBoolean(subid)
     assert val == h.helics_false if testValue2 else h.helics_true
 
 
@@ -213,19 +213,19 @@ def test_value_federate_subscription_and_publication_registration(vFed):
     publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
 
-    sub_key = h.helicsSubscriptionGetKey(subid1)
+    sub_key = h.helicsInputGetKey(subid1)
     assert sub_key == 'sub1'
-    sub_type = h.helicsSubscriptionGetType(subid1)
+    sub_type = h.helicsInputGetType(subid1)
     assert sub_type == 'int64'
-    sub_key = h.helicsSubscriptionGetKey(subid2)
+    sub_key = h.helicsInputGetKey(subid2)
     assert sub_key == 'sub2'
-    sub_key = h.helicsSubscriptionGetKey(subid3)
+    sub_key = h.helicsInputGetKey(subid3)
     assert sub_key == 'sub3'
-    sub_type = h.helicsSubscriptionGetType(subid3)
+    sub_type = h.helicsInputGetType(subid3)
     assert sub_type == 'double_vector'
-    sub_units = h.helicsSubscriptionGetUnits(subid3)
+    sub_units = h.helicsInputGetUnits(subid3)
     assert sub_units == 'V'
-    sub_type = h.helicsSubscriptionGetType(subid2)
+    sub_type = h.helicsInputGetType(subid2)
     assert sub_type == 'int64'
 
 
@@ -241,7 +241,7 @@ def test_value_federate_single_transfer(vFed):
     grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    s = h.helicsSubscriptionGetString(subid)
+    s = h.helicsInputGetString(subid)
     assert s == "string1"
 
 def test_value_federate_runFederateTestDouble(vFed):
@@ -256,13 +256,13 @@ def test_value_federate_runFederateTestDouble(vFed):
     # publish string1 at time=0.0;
     h.helicsPublicationPublishDouble(pubid, testValue)
 
-    value = h.helicsSubscriptionGetDouble(subid)
+    value = h.helicsInputGetDouble(subid)
     assert value == defaultValue
 
     grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    value = h.helicsSubscriptionGetDouble(subid)
+    value = h.helicsInputGetDouble(subid)
     assert value == testValue
 
     # publish string1 at time=0.0;
@@ -271,7 +271,7 @@ def test_value_federate_runFederateTestDouble(vFed):
     grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     assert grantedtime == 0.02
 
-    value = h.helicsSubscriptionGetDouble(subid)
+    value = h.helicsInputGetDouble(subid)
     assert value == testValue + 1
 
 def test_value_federate_runFederateTestComplex(vFed):
@@ -288,14 +288,14 @@ def test_value_federate_runFederateTestComplex(vFed):
     # publish string1 at time=0.0;
     h.helicsPublicationPublishComplex(pubid, rTestValue, iTestValue)
 
-    value1, value2 = h.helicsSubscriptionGetComplex(subid)
+    value1, value2 = h.helicsInputGetComplex(subid)
     assert value1 == rDefaultValue
     assert value2 == iDefaultValue
 
     grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    value1, value2 = h.helicsSubscriptionGetComplex(subid)
+    value1, value2 = h.helicsInputGetComplex(subid)
     assert value1 == rTestValue
     assert value2 == iTestValue
 
@@ -311,13 +311,13 @@ def test_value_federate_runFederateTestInteger(vFed):
 
     h.helicsPublicationPublishInteger(pubid, testValue)
 
-    value = h.helicsSubscriptionGetInteger(subid)
+    value = h.helicsInputGetInteger(subid)
     assert value == defaultValue
 
     grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    value = h.helicsSubscriptionGetInteger(subid)
+    value = h.helicsInputGetInteger(subid)
     assert value == testValue
 
     h.helicsPublicationPublishInteger(pubid, testValue + 1)
@@ -325,7 +325,7 @@ def test_value_federate_runFederateTestInteger(vFed):
     grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     assert grantedtime == 0.02
 
-    value = h.helicsSubscriptionGetInteger(subid)
+    value = h.helicsInputGetInteger(subid)
     assert value == testValue + 1
 
 
@@ -340,13 +340,13 @@ def test_value_federate_runFederateTestString(vFed):
 
     h.helicsPublicationPublishString(pubid, testValue)
 
-    value = h.helicsSubscriptionGetString(subid)
+    value = h.helicsInputGetString(subid)
     assert value == defaultValue
 
     grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    value = h.helicsSubscriptionGetString(subid)
+    value = h.helicsInputGetString(subid)
     assert value == testValue
 
 def test_value_federate_runFederateTestVectorD(vFed):
@@ -360,11 +360,11 @@ def test_value_federate_runFederateTestVectorD(vFed):
 
     h.helicsPublicationPublishVector(pubid, testValue)
 
-    value = h.helicsSubscriptionGetVector(subid)
+    value = h.helicsInputGetVector(subid)
     assert value == [0, 1, 2]
 
     grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    value = h.helicsSubscriptionGetVector(subid)
+    value = h.helicsInputGetVector(subid)
     assert value == [3, 4, 5]
