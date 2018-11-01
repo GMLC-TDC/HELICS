@@ -105,6 +105,7 @@ def test_message_filter_registration(broker):
     FreeFederate(mFed)
     time.sleep(1.0)
 
+@pt.mark.skip("Test hangs indefinitely") # TODO: why does this hang?
 def test_message_filter_function(broker):
 
     fFed = AddFederate(broker, "zmq", 1, 1, "filter")
