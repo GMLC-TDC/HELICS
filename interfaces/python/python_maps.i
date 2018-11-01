@@ -93,7 +93,7 @@ static void throwHelicsPythonException(helics_error *err) {
 }
 
 %typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
-    $2=helicsSubscriptionGetStringSize(arg1)+2;
+    $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
