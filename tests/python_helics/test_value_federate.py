@@ -23,16 +23,13 @@ def vFed():
     fedinfo = h.helicsFederateInfoCreate()
 
     # Set Federate name #
-    status = h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
-    assert status == 0
+    h.helicsFederateInfoSetFederateName(fedinfo, "TestA Federate")
 
     # Set core type from string #
-    status = h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
-    assert status == 0
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 
     # Federate init string #
-    status = h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
-    assert status == 0
+    h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
 
     # Set the message interval (timedelta) for federate. Note th#
     # HELICS minimum message time interval is 1 ns and by default
@@ -40,18 +37,15 @@ def vFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    status = h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
-    assert status == 0
+    h.helicsFederateInfoSetTimeDelta(fedinfo, deltat)
 
-    status = h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
-    assert status == 0
+    h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
 
     vFed = h.helicsCreateValueFederate(fedinfo)
 
     yield vFed
 
-    status = h.helicsFederateFinalize(vFed)
-    assert status == 0
+    h.helicsFederateFinalize(vFed)
 
     state = h.helicsFederateGetState(vFed)
     assert state == 3
@@ -101,15 +95,12 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_NAMEDPOINT, "")
     subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "named_point", "")
 
-    status = h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
-    assert status == 0
+    h.helicsSubscriptionSetDefaultNamedPoint(subid, defaultValue, defVal)
 
-    status = h.helicsFederateEnterExecutionMode(vFed)
-    assert status == 0
+    h.helicsFederateEnterExecutionMode(vFed)
 
     # publish string1 at time=0.0;
-    status = h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
-    assert status == 0
+    h.helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1)
 
     # double val;
     value, val = h.helicsSubscriptionGetNamedPoint(subid)
@@ -127,8 +118,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert val2 == testVal1
 
     # publish a second string
-    status = h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
-    assert status == 0
+    h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
 
     # make sure the value is still what we expect
     value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
@@ -156,11 +146,9 @@ def test_value_federate_runFederateTestBool(vFed):
     pubid = h.helicsFederateRegisterGlobalTypePublication(vFed, "pub1", h.HELICS_DATA_TYPE_BOOLEAN, "")
     subid = h.helicsFederateRegisterSubscription(vFed, "pub1", "bool", "")
 
-    status = h.helicsSubscriptionSetDefaultBoolean(subid, h.helics_true if defaultValue else h.helics_false)
-    assert status == 0
+    h.helicsSubscriptionSetDefaultBoolean(subid, h.helics_true if defaultValue else h.helics_false)
 
-    status = h.helicsFederateEnterExecutionMode(vFed)
-    assert status == 0
+    h.helicsFederateEnterExecutionMode(vFed)
 
     # publish string1 at time=0.0;
     status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
@@ -178,8 +166,7 @@ def test_value_federate_runFederateTestBool(vFed):
     assert val == h.helics_true if testValue1 else h.helics_false
 
     # publish a second string
-    status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue2 else h.helics_false)
-    assert status == 0
+    h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue2 else h.helics_false)
 
     # make sure the value is still what we expect
     val = h.helicsSubscriptionGetBoolean(subid)
