@@ -43,7 +43,8 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
     # Set one second message interval #
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_time_property_time_delta, deltat)
 
-    # h.helicsFederateInfoSetLoggingLevel(fedinfo, 1)
+    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_int_property_log_level, 1)
+
 
     mFed = h.helicsCreateMessageFederate(name_prefix, fedinfo)
 
