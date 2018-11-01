@@ -116,7 +116,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert value == defaultValue
     assert val == defVal
 
-    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
+    grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
 
     assert grantedtime == 0.01
 
@@ -164,7 +164,7 @@ def test_value_federate_runFederateTestBool(vFed):
 
     # publish string1 at time=0.0;
     status = h.helicsPublicationPublishBoolean(pubid, h.helics_true if testValue1 else h.helics_false)
-    status, val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsSubscriptionGetBoolean(subid)
 
     assert val == h.helics_true if defaultValue else h.helics_false
 
@@ -172,7 +172,7 @@ def test_value_federate_runFederateTestBool(vFed):
     assert grantedtime == 0.01
 
     # get the value
-    status, val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsSubscriptionGetBoolean(subid)
 
     # make sure the string is what we expect
     assert val == h.helics_true if testValue1 else h.helics_false
@@ -182,10 +182,10 @@ def test_value_federate_runFederateTestBool(vFed):
     assert status == 0
 
     # make sure the value is still what we expect
-    status, val = h.helicsSubscriptionGetBoolean(subid)
+    val = h.helicsSubscriptionGetBoolean(subid)
     assert val == h.helics_true if testValue1 else h.helics_false
     # advance time
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
+    grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     # make sure the value was updated
     assert grantedtime == 0.02
 
