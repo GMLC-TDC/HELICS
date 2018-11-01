@@ -11,45 +11,35 @@ static void throwHelicsPythonException(helics_error *err) {
     return;
   case helics_error_registration_failure:
     PyErr_SetString(pHelicsException, strcat("helics:registration_failure", err->message));
-    SWIG_fail;
     break;
   case   helics_error_connection_failure:
     PyErr_SetString(pHelicsException, strcat("helics:connection_failure", err->message));
-    SWIG_fail;
     break;
   case   helics_error_invalid_object:
     PyErr_SetString(pHelicsException, strcat("helics:invalid_object", err->message));
-    SWIG_fail;
     break;
   case   helics_error_invalid_argument:
     PyErr_SetString(pHelicsException, strcat("helics:invalid_argument", err->message));
-    SWIG_fail;
     break;
   case   helics_error_discard:
     PyErr_SetString(pHelicsException, strcat("helics:discard", err->message));
-    SWIG_fail;
     break;
   case helics_error_system_failure:
     PyErr_SetString(pHelicsException, strcat("helics:system_failure", err->message));
-    SWIG_fail;
     break;
   case   helics_error_invalid_state_transition:
     PyErr_SetString(pHelicsException, strcat("helics:invalid_state_transition", err->message));
-    SWIG_fail;
     break;
   case   helics_error_invalid_function_call:
     PyErr_SetString(pHelicsException, strcat("helics:invalid_function_call", err->message));
-    SWIG_fail;
 	break;
   case   helics_error_execution_failure:
     PyErr_SetString(pHelicsException, strcat("helics:execution_failure", err->message));
-    SWIG_fail;
 	break;
   case   helics_error_other:
   case   other_error_type:
   default:
     PyErr_SetString(pHelicsException, strcat("helics:error", err->message));
-    SWIG_fail;
 	break;
   }
 }
