@@ -244,7 +244,7 @@ std::string MessageFederateManager::localQuery (const std::string &queryStr) con
     return ret;
 }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 
 const std::string &MessageFederateManager::getEndpointName (const Endpoint &ept) const { return ept.actualName; }
 

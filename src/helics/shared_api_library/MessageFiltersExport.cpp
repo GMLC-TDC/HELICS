@@ -316,7 +316,7 @@ const char *helicsFilterGetName (helics_filter filt)
     auto filter = getFilter (filt,nullptr);
     if (filter == nullptr)
     {
-        return nullStr.c_str ();
+        return emptyStr.c_str ();
     }
     try
     {
@@ -325,7 +325,7 @@ const char *helicsFilterGetName (helics_filter filt)
     }
     catch (...)
     {
-        return nullStr.c_str ();
+        return emptyStr.c_str ();
     }
 }
 

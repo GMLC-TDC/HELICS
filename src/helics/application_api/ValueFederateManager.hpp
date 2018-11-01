@@ -128,9 +128,6 @@ class ValueFederateManager
     /** get the target of a input*/
     const std::string &getTarget (const Input &inp) const;
 
-    /** get the key of a subscription from its id
-    @return empty string if an invalid id is passed*/
-    const std::string &getInputKey (const Input &inp) const;
     /** get an Input from Its Name
 	@param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
@@ -145,10 +142,6 @@ class ValueFederateManager
     const Input & getSubscription (const std::string &key) const;
     Input &getSubscription (const std::string &key);
 
-    /** get the key of a publication from its id
-    @return empty string if an invalid id is passed*/
-    const std::string &getPublicationKey (const Publication &pub) const;
-
     /** get a publication based on its key
     @param key the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
@@ -157,31 +150,6 @@ class ValueFederateManager
 
 	Publication &getPublication (int index);
     const Publication &getPublication (int index) const;
-
-    /** get the units of a subscriptions from its id
-    @param[in] id the subscription id to query
-    @return the name or empty string on unrecognized id*/
-    const std::string &getInputUnits (const Input &inp) const;
-
-    /** get the units of a publication from its id
-    @param[in] id the publication id to query
-    @return the units or empty string on unrecognized id*/
-    const std::string &getPublicationUnits (const Publication &pub) const;
-
-    /** get the declared type of a n input
-    @param[in] inp the input to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getInputType (const Input &inp) const;
-
-    /** get the type of a publication from its id
-    @param[in] id the publication id to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getPublicationType (const Publication &pub) const;
-
-    /** get the type of a publication from its subscription
-    @param[in] id the subscription id to query
-    @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (const Input &inp) const;
 
     /** set a publication option */
     void setPublicationOption (const Publication &pub, int32_t option, bool option_value);

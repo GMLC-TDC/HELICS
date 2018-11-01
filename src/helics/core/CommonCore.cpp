@@ -865,7 +865,7 @@ interface_handle CommonCore::getPublication (federate_id_t federateID, const std
     return pub->getInterfaceHandle ();
 }
 
-const std::string nullStr;
+const std::string emptyStr;
 
 const std::string &CommonCore::getHandleName (interface_handle handle) const
 {
@@ -874,7 +874,7 @@ const std::string &CommonCore::getHandleName (interface_handle handle) const
     {
         return handleInfo->key;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getUnits (interface_handle handle) const
@@ -884,7 +884,7 @@ const std::string &CommonCore::getUnits (interface_handle handle) const
     {
         return handleInfo->units;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getType (interface_handle handle) const
@@ -906,7 +906,7 @@ const std::string &CommonCore::getType (interface_handle handle) const
         }
         return handleInfo->type;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getOutputType (interface_handle handle) const
@@ -922,10 +922,10 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
         case handle_type_t::filter:
             return handleInfo->type_out;
         default:
-            return nullStr;
+            return emptyStr;
         }
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)

@@ -111,14 +111,14 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 
 void ActionMessage::setAction (action_message_def::action_t newAction) { messageAction = newAction; }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 const std::string &ActionMessage::getString (int index) const
 {
     if (isValidIndex (index, stringData))
     {
         return stringData[index];
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void ActionMessage::setString (int index, const std::string &str)

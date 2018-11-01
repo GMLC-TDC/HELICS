@@ -327,9 +327,9 @@ void runDualFederateTestObj (const std::string &core_type_str,
 {
     FederateTestFixture fixture;
     using namespace helics;
-    fixture.SetupTest<helics::ValueFederate> (core_type_str, 2);
-    auto fedA = fixture.GetFederateAs<helics::ValueFederate> (0);
-    auto fedB = fixture.GetFederateAs<helics::ValueFederate> (1);
+    fixture.SetupTest<ValueFederate> (core_type_str, 2);
+    auto fedA = fixture.GetFederateAs<ValueFederate> (0);
+    auto fedB = fixture.GetFederateAs<ValueFederate> (1);
 
     // register the publications
     PublicationT<X> pubid (GLOBAL, fedA, "pub1");

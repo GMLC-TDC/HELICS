@@ -21,7 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture, *utf::label("ci"))
+BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture, *utf::label ("ci"))
 
 BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
 {
@@ -33,7 +33,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
 
     mFed1->finalize ();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
@@ -86,13 +86,12 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK_EQUAL (epid.getType (), "");
     BOOST_CHECK_EQUAL (epid2.getType (), "random");
 
-    BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle() == epid.getHandle ());
-    BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle() == epid2.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
+    BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
-
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_types_single), core_type)
 {
@@ -105,7 +104,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     helics::interface_handle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
-        rxend = ept.getHandle();
+        rxend = ept.getHandle ();
         timeRx = rtime;
     };
 
@@ -130,7 +129,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     res = mFed1->hasMessage (epid2);
     BOOST_CHECK (res);
 
-    BOOST_CHECK (rxend == epid2.getHandle());
+    BOOST_CHECK (rxend == epid2.getHandle ());
     BOOST_CHECK_EQUAL (timeRx, helics::Time (1.0));
     auto M = mFed1->getMessage (epid2);
     BOOST_REQUIRE (M);
@@ -141,7 +140,6 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
-
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (core_types_single), core_type)
 {
@@ -154,7 +152,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     helics::interface_handle rxend;
     helics::Time timeRx;
     auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
-        rxend = ept.getHandle();
+        rxend = ept.getHandle ();
         timeRx = rtime;
     };
 
@@ -189,7 +187,6 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 1);
@@ -203,7 +200,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
-    }; 
+    };
 
     ep2.setCallback (mend);
 
@@ -218,7 +215,6 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     auto time = mFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (time, 1.0);
-
 
     auto res = ep2.hasMessage ();
     BOOST_CHECK (res);
@@ -237,8 +233,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
-
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback, bdata::make (core_types_all), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
+                      bdata::make (core_types_all),
+                      core_type)
 {
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -353,7 +350,7 @@ class PingPongFed
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";
 #endif
-        mFed = std::make_unique<helics::MessageFederate> (name,fi);
+        mFed = std::make_unique<helics::MessageFederate> (name, fi);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("registering federate ") + name + "\n";
 #endif
@@ -511,7 +508,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
     auto filt = &mFed.getFilter (2);
 
     auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
-    BOOST_CHECK (cloneFilt!=nullptr);
+    BOOST_CHECK (cloneFilt != nullptr);
     mFed.disconnect ();
 }
 

@@ -155,9 +155,9 @@ class QueryObject
         }                                                                                                                                  \
     } while (0)
 
-extern const std::string nullStr;
+extern const std::string emptyStr;
 extern const std::string nullStringArgument;
-#define AS_STRING(str) (str != nullptr) ? std::string (str) : nullStr
+#define AS_STRING(str) (str != nullptr) ? std::string (str) : emptyStr
 
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do                                                                                                                                     \

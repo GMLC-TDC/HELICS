@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "Publications.hpp"
+#include "ValueFederate.hpp"
 #include "ValueFederateManager.hpp"
 
 namespace helics
@@ -145,21 +145,26 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
         {
             auto key = getKey (pub);
 
-            auto &pubAct = vfManager->getPublication (key);
-            if (pubAct.isValid ())
+            Publication *pubAct = &vfManager->getPublication (key);
+            if (pubAct->isValid ())
             {
                 continue;
             }
-            auto type = (pub.isMember ("type")) ? pub["type"].asString () : std ::string ();
-            auto units = (pub.isMember ("units")) ? pub["units"].asString () : std::string ();
-            bool global = (pub.isMember ("global")) ? (pub["global"].asBool ()) : false;
+            auto type = jsonGetOrDefault (pub, "type", std::string ());
+            auto units = jsonGetOrDefault (pub, "units", std::string ());
+            bool global = jsonGetOrDefault (pub, "type", false);
             if (global)
             {
-                registerGlobalPublication (key, type, units);
+                pubAct=&registerGlobalPublication (key, type, units);
             }
             else
             {
-                registerPublication (key, type, units);
+                pubAct=&registerPublication (key, type, units);
+            }
+            auto tol = jsonGetOrDefault (pub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                pubAct->setMinimumChange (tol);
             }
         }
     }
@@ -174,7 +179,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 continue;
             }
-            auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
+            auto units = jsonGetOrDefault (sub, "units", std::string ());
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
@@ -189,6 +194,11 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 addShortcut (subNew, sub["shortcut"].asString ());
             }
+            auto tol = jsonGetOrDefault (sub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                subNew.setMinimumChange (tol);
+            }
         }
     }
     if (doc.isMember ("inputs"))
@@ -198,21 +208,26 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
         {
             auto key = getKey (ipt);
 
-            auto inp = vfManager->getInput (key);
-            if (inp.isValid ())
+            Input *inp = &vfManager->getInput (key);
+            if (inp->isValid ())
             {
                 continue;
             }
-            auto type = (ipt.isMember ("type")) ? ipt["type"].asString () : std ::string ();
-            auto units = (ipt.isMember ("units")) ? ipt["units"].asString () : std::string ();
-            bool global = (ipt.isMember ("global")) ? (ipt["global"].asBool ()) : false;
+            auto type = jsonGetOrDefault (ipt, "type", std::string ());
+            auto units = jsonGetOrDefault (ipt, "units", std::string ());
+            bool global = jsonGetOrDefault (ipt, "type", false);
             if (global)
             {
-                registerGlobalInput (key, type, units);
+                inp=&registerGlobalInput (key, type, units);
             }
             else
             {
-                registerInput (key, type, units);
+                inp=&registerInput (key, type, units);
+            }
+            auto tol = jsonGetOrDefault (ipt, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                inp->setMinimumChange (tol);
             }
         }
     }
@@ -246,13 +261,19 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             auto type = tomlGetOrDefault (pub, "type", std::string ());
             auto units = tomlGetOrDefault (pub, "units", std::string ());
             bool global = tomlGetOrDefault (pub, "global", false);
+            Publication *pubObj = nullptr;
             if (global)
             {
-                registerGlobalPublication (key, type, units);
+                pubObj=&registerGlobalPublication (key, type, units);
             }
             else
             {
-                registerPublication (key, type, units);
+                pubObj = &registerPublication (key, type, units);
+            }
+            auto tol = tomlGetOrDefault (pub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                pubObj->setMinimumChange (tol);
             }
         }
     }
@@ -263,15 +284,15 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
         for (const auto &sub : subArray)
         {
             auto key = getKey (sub);
-            auto id = vfManager->getSubscription (key);
-            if (id.isValid ())
+            Input *id = &vfManager->getSubscription (key);
+            if (id->isValid ())
             {
                 continue;
             }
             auto units = tomlGetOrDefault (sub, "units", std::string ());
             bool optional = tomlGetOrDefault (sub, "optional", false);
             bool required = tomlGetOrDefault (sub, "required", !optional);
-            id = registerSubscription (key, units);
+            id = &registerSubscription (key, units);
             if (required)
             {
                 // setInterfaceOption()
@@ -280,7 +301,12 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             auto shortcut = sub.find ("shortcut");
             if (shortcut != nullptr)
             {
-                addShortcut (id, shortcut->as<std::string> ());
+                addShortcut (*id, shortcut->as<std::string> ());
+            }
+            auto tol = tomlGetOrDefault (sub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                id->setMinimumChange (tol);
             }
         }
     }
@@ -292,8 +318,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
         {
             auto key = getKey (ipt);
 
-            auto id = vfManager->getPublication (key);
-            if (id.isValid ())
+            Input *id = &vfManager->getInput (key);
+            if (id->isValid ())
             {
                 continue;
             }
@@ -302,11 +328,16 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             bool global = tomlGetOrDefault (ipt, "global", false);
             if (global)
             {
-                registerGlobalInput (key, type, units);
+                id=&registerGlobalInput (key, type, units);
             }
             else
             {
-                registerInput (key, type, units);
+                id=&registerInput (key, type, units);
+            }
+            auto tol = tomlGetOrDefault (ipt, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                id->setMinimumChange (tol);
             }
         }
     }
@@ -314,10 +345,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
 
 data_view ValueFederate::getValueRaw (const Input &inp) { return vfManager->getValue (inp); }
 
-
-double ValueFederate::getDouble(Input &inp) { return inp.getValue<double> (); }
+double ValueFederate::getDouble (Input &inp) { return inp.getValue<double> (); }
 /** get a string value*/
-const std::string &ValueFederate::getString(Input &inp) { return inp.getValueRef<std::string> (); }
+const std::string &ValueFederate::getString (Input &inp) { return inp.getValueRef<std::string> (); }
 
 void ValueFederate::publishRaw (const Publication &pub, data_view block)
 {
@@ -351,13 +381,29 @@ std::string ValueFederate::localQuery (const std::string &queryStr) const
 
 std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
-const std::string &ValueFederate::getInputKey (const Input &inp) const { return vfManager->getInputKey (inp); }
+const std::string &ValueFederate::getInputKey (const Input &inp) const { return inp.getName (); }
 
 const std::string &ValueFederate::getTarget (const Input &inp) const { return vfManager->getTarget (inp); }
 
-const Input &ValueFederate::getInput (const std::string &key) const { return vfManager->getInput (key); }
+const Input &ValueFederate::getInput (const std::string &key) const
+{
+    auto &inp = vfManager->getInput (key);
+    if (!inp.isValid ())
+    {
+        return vfManager->getInput (getName () + separator_ + key);
+    }
+    return inp;
+}
 
-Input &ValueFederate::getInput (const std::string &key) { return vfManager->getInput (key); }
+Input &ValueFederate::getInput (const std::string &key)
+{
+    auto &inp = vfManager->getInput (key);
+    if (!inp.isValid ())
+    {
+        return vfManager->getInput (getName () + separator_ + key);
+    }
+    return inp;
+}
 
 const Input &ValueFederate::getInput (int index) const { return vfManager->getInput (index); }
 
@@ -416,22 +462,26 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
     return vfManager->getPublication (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-const std::string &ValueFederate::getInputUnits (const Input &inp) const { return vfManager->getInputUnits (inp); }
+const std::string &ValueFederate::getInputUnits (const Input &inp) const
+{
+    return coreObject->getUnits (inp.getHandle());
+}
 const std::string &ValueFederate::getPublicationUnits (const Publication &pub) const
 {
-    return vfManager->getPublicationUnits (pub);
+    return coreObject->getUnits (pub.getHandle());
 }
 
-const std::string &ValueFederate::getInputType (const Input &inp) const { return vfManager->getInputType (inp); }
+const std::string &ValueFederate::getInputType (const Input &inp) const
+{
+    return coreObject->getType (inp.getHandle());
+}
 const std::string &ValueFederate::getPublicationType (const Publication &pub) const
 {
-    return vfManager->getPublicationType (pub);
+    return coreObject->getType (pub.getHandle());
 }
 
 std::string ValueFederate::getPublicationType (const Input &inp) const
-{
-    return vfManager->getPublicationType (inp);
-}
+{ return coreObject->getType (inp.getHandle()); }
 
 void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
 {

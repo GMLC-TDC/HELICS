@@ -118,8 +118,8 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         for (const auto &ept : doc["endpoints"])
         {
             auto eptName = getKey (ept);
-            auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
-            bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
+            auto type = jsonGetOrDefault (ept, "type", std::string ());
+            bool global = jsonGetOrDefault (ept, "type", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
             
 
@@ -155,6 +155,11 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                     }
                 }
             }
+            auto defTarget = (ept.isMember ("destination")) ? ept["destination"].asString () : std::string ();
+            if (!defTarget.empty ())
+            {
+                epObj.setTargetDestination (defTarget);
+            }
         }
     }
 }
@@ -163,7 +168,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
 {
     
     toml::Value doc;
-    try
+    try  
     {
         doc = loadToml (tomlString);
     }
@@ -216,6 +221,11 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
                     }
                 }
             }
+            auto defTarget = tomlGetOrDefault (ept, "destination", std::string ());
+			if (!defTarget.empty())
+			{
+                epObj.setTargetDestination (defTarget);
+			}
         }
     }
    

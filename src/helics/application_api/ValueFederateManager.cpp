@@ -284,7 +284,7 @@ std::vector<input_id_t> ValueFederateManager::queryUpdates ()
     return updates;
 }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 
 const std::string &ValueFederateManager::getTarget (const Input &inp) const
 {
@@ -294,10 +294,8 @@ const std::string &ValueFederateManager::getTarget (const Input &inp) const
     {
         return fnd->second;
     }
-    return nullStr;
+    return emptyStr;
 }
-
-const std::string &ValueFederateManager::getInputKey (const Input &inp) const { return inp.getName (); }
 
 static const Input invalidIpt{};
 static Input invalidIptNC{};
@@ -374,11 +372,6 @@ Input &ValueFederateManager::getSubscription (const std::string &key)
     return invalidIptNC;
 }
 
-const std::string &ValueFederateManager::getPublicationKey (const Publication &pub) const
-{
-    return pub.getName ();
-}
-
 static const Publication invalidPub{};
 static Publication invalidPubNC{};
 
@@ -422,31 +415,6 @@ Publication &ValueFederateManager::getPublication (int index)
         return (*pubHandle)[index];
     }
     return invalidPubNC;
-}
-
-const std::string &ValueFederateManager::getInputUnits (const Input &inp) const
-{
-    return coreObject->getUnits (inp.handle);
-}
-
-const std::string &ValueFederateManager::getPublicationUnits (const Publication &pub) const
-{
-    return coreObject->getUnits (pub.handle);
-}
-
-const std::string &ValueFederateManager::getInputType (const Input &inp) const
-{
-    return coreObject->getType (inp.handle);
-}
-
-std::string ValueFederateManager::getPublicationType (const Input &inp) const
-{
-    return coreObject->getType (inp.handle);
-}
-
-const std::string &ValueFederateManager::getPublicationType (const Publication &pub) const
-{
-    return coreObject->getType (pub.handle);
 }
 
 void ValueFederateManager::setPublicationOption (const Publication &pub, int32_t option, bool option_value)

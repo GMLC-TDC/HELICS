@@ -159,7 +159,7 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
     }
 }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 
 
 const std::string &Filter::getName () const
@@ -168,7 +168,7 @@ const std::string &Filter::getName () const
     {
         return corePtr->getHandleName (id);
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &Filter::getInputType () const
@@ -177,7 +177,7 @@ const std::string &Filter::getInputType () const
     {
         return corePtr->getType (id);
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &Filter::getOutputType () const
@@ -186,7 +186,7 @@ const std::string &Filter::getOutputType () const
     {
         return corePtr->getOutputType (id);
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void Filter::set (const std::string &property, double val)

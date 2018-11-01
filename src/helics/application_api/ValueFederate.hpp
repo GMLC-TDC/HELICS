@@ -250,7 +250,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void setDefaultValue (const Input &inp, data_view block);
 
     /** register a set of interfaces defined in a file
-    @details call is only valid in startup mode to add an TOML files must have extension .TOML or .TOML
+    @details call is only valid in startup mode to add an TOML files must have extension .toml or .TOML
     @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */
@@ -258,7 +258,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register a set of value interfaces (publications and subscriptions)
     @details call is only valid in startup mode it is a protected call to add an TOML files must have extension
-    .TOML or .TOML
+    .toml or .TOML
     @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */

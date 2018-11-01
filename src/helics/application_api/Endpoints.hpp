@@ -175,6 +175,7 @@ class Endpoint
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
 
+  private:
     friend class MessageFederateManager;
 };
 }  // namespace helics

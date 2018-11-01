@@ -208,11 +208,11 @@ helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const 
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send (nullStr);
+                endObj->endPtr->send (emptyStr);
             }
             else
             {
-                endObj->endPtr->send (dest, nullStr);
+                endObj->endPtr->send (dest, emptyStr);
             }
         }
         else
@@ -251,11 +251,11 @@ void helicsEndpointSendEventRaw (helics_endpoint endpoint,
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send (nullStr, time);
+                endObj->endPtr->send (emptyStr, time);
             }
             else
             {
-                endObj->endPtr->send (dest, nullStr, time);
+                endObj->endPtr->send (dest, emptyStr, time);
             }
         }
         else
