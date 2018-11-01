@@ -205,7 +205,7 @@ def test_value_federate_publisher_registration(vFed):
 def test_value_federate_subscription_and_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", "double", "V")
 
-    subid1 = h.helicsFederateRegisterSubscription(vFed, "sub1", "V")
+    subid1 = h.helicsFederateRegisterSubscription(vFed, "sub1", "")
     subid2 = h.helicsFederateRegisterSubscription(vFed, "sub2", "")
     subid3 = h.helicsFederateRegisterSubscription(vFed, "sub3", "V")
 
@@ -214,20 +214,20 @@ def test_value_federate_subscription_and_publication_registration(vFed):
     publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
 
-    sub_key = h.helicsInputGetKey(subid1)
+    sub_key = h.helicsSubscriptionGetKey(subid1)
     assert sub_key == 'sub1'
     sub_type = h.helicsInputGetType(subid1)
-    assert sub_type == 'int64'
-    sub_key = h.helicsInputGetKey(subid2)
+    assert sub_type == 'def'
+    sub_key = h.helicsSubscriptionGetKey(subid2)
     assert sub_key == 'sub2'
-    sub_key = h.helicsInputGetKey(subid3)
+    sub_key = h.helicsSubscriptionGetKey(subid3)
     assert sub_key == 'sub3'
     sub_type = h.helicsInputGetType(subid3)
-    assert sub_type == 'double_vector'
+    assert sub_type == 'def'
     sub_units = h.helicsInputGetUnits(subid3)
     assert sub_units == 'V'
     sub_type = h.helicsInputGetType(subid2)
-    assert sub_type == 'int64'
+    assert sub_type == 'def'
 
 
 def test_value_federate_single_transfer(vFed):
