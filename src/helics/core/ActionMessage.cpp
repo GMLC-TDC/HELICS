@@ -371,12 +371,12 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     return msg;
 }
 
-constexpr char unknownStr[] = "unknown";
+static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
 // consts can cause seg faults
 
-constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
+static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
@@ -458,7 +458,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
+static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
 // can (in actuality) be used as the program is shutting down
 const char *actionMessageType (action_message_def::action_t action)
@@ -468,17 +468,18 @@ const char *actionMessageType (action_message_def::action_t action)
     if (res != pptr + actEnd)
     {
         return res->second;
-    }
+    }  
     return static_cast<const char *> (unknownStr);
 }
 
-constexpr std::pair<int, const char *> errorStrings[] = {
+static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
+  {-5, "lost connection with server"},
   {5, "already in initialization mode"},
   {6, "duplicate federate name detected"}};
 
 using errorPair = std::pair<int, const char *>;
-constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
+static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
 // can (in actuality) be used as the program is shutting down

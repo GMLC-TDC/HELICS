@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <map>
 #include <mutex>
 #include <stdexcept>
+#include <chrono>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -209,15 +210,23 @@ void AsioServiceManager::haltServiceLoop ()
     }
 }
 
-void serviceProcessingLoop (const std::shared_ptr<AsioServiceManager> &ptr)
+void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
 {
+    auto clk = std::chrono::steady_clock::now ();
     try
     {
         ptr->iserv->run ();
     }
+	catch (const boost::system::system_error &se)
+	{
+        auto nclk = std::chrono::steady_clock::now ();
+        std::cerr << "boost system error in service loop " << se.what()<<" ran for "<<(nclk-clk).count()/1000000<<"ms"<< std::endl;
+	}
     catch (const std::exception &e)
     {
-        std::cerr << "std::exception in service loop " << e.what () << std::endl;
+        auto nclk = std::chrono::steady_clock::now ();
+        std::cerr << "std::exception in service loop " << e.what () << " ran for "
+                  << (nclk - clk).count () / 1000000 << "ms" << std::endl;
     }
     catch (...)
     {

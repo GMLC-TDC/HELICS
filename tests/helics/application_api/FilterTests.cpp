@@ -49,6 +49,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
     fFed->finalize ();
     
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    FullDisconnect ();
 }
 
 /** test a filter operator

@@ -141,6 +141,27 @@ FederateTestFixture::~FederateTestFixture ()
     helics::cleanupHelicsLibrary ();
 }
 
+void FederateTestFixture::FullDisconnect () 
+{
+    for (auto &fed : federates)
+    {
+        if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)
+        {
+            fed->finalize ();
+        }
+    }
+    federates.clear ();
+    for (auto &broker : brokers)
+    {
+        if (broker->isConnected ())
+        {
+            broker->disconnect ();
+        }
+    }
+    brokers.clear ();
+    helics::cleanupHelicsLibrary ();
+}
+
 std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
     return AddBroker (core_type_name, std::to_string (count));

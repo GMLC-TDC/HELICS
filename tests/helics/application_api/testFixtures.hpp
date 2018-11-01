@@ -18,8 +18,7 @@ extern const std::vector<std::string> core_types;
 extern const std::vector<std::string> core_types_2;
 
 extern const std::vector<std::string> core_types_simple;
-extern const std::vector<
-  std::string> core_types_single;
+extern const std::vector<std::string> core_types_single;
 extern const std::vector<std::string> core_types_all;
 extern const std::vector<std::string> core_types_extended;
 
@@ -81,10 +80,10 @@ struct FederateTestFixture
         }
 
         helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
-		if (time_delta != helics::timeZero)
-		{
+        if (time_delta != helics::timeZero)
+        {
             fi.setTimeProperty (TIME_DELTA_PROPERTY, time_delta);
-		}
+        }
 
         std::vector<std::shared_ptr<FedType>> federates_added;
 
@@ -226,6 +225,8 @@ struct FederateTestFixture
     {
         return std::dynamic_pointer_cast<FedType> (federates[index]);
     }
+
+    void FullDisconnect ();
 
     std::vector<std::shared_ptr<helics::Broker>> brokers;
     std::vector<std::shared_ptr<helics::Federate>> federates;
