@@ -53,8 +53,7 @@ def vFed():
     status = h.helicsFederateFinalize(vFed)
     assert status == 0
 
-    status, state = h.helicsFederateGetState(vFed)
-    assert status == 0
+    state = h.helicsFederateGetState(vFed)
     assert state == 3
 
     while (h.helicsBrokerIsConnected(broker)):
@@ -64,17 +63,13 @@ def vFed():
     h.helicsCloseLibrary()
 
 
-
-
 def test_value_federate_initialize(vFed):
-    status, state = h.helicsFederateGetState(vFed)
-    assert status == 0
+    state = h.helicsFederateGetState(vFed)
     assert state == 0
 
     h.helicsFederateEnterExecutionMode(vFed)
 
-    status, state = h.helicsFederateGetState(vFed)
-    assert status == 0
+    state = h.helicsFederateGetState(vFed)
     assert state == 2
 
 def test_value_federate_publication_registration(vFed):
@@ -83,20 +78,15 @@ def test_value_federate_publication_registration(vFed):
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", "double", "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    status, publication_key = h.helicsPublicationGetKey(pubid1)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid1)
     assert publication_key == 'TestA Federate/pub1'
-    status, publication_key = h.helicsPublicationGetKey(pubid2)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid2)
     assert publication_key == 'pub2'
-    status, publication_key = h.helicsPublicationGetKey(pubid3)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid3)
     assert publication_key == 'TestA Federate/pub3'
-    status, publication_type = h.helicsPublicationGetType(pubid3)
-    assert status == 0
+    publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
-    status, publication_units = h.helicsPublicationGetUnits(pubid3)
-    assert status == 0
+    publication_units = h.helicsPublicationGetUnits(pubid3)
     assert publication_units == 'V'
 
 def test_value_federate_runFederateTestNamedPoint(vFed):
@@ -122,8 +112,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert status == 0
 
     # double val;
-    status, value, val = h.helicsSubscriptionGetNamedPoint(subid)
-    assert status == 0
+    value, val = h.helicsSubscriptionGetNamedPoint(subid)
     assert value == defaultValue
     assert val == defVal
 
@@ -132,8 +121,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert grantedtime == 0.01
 
     # get the value
-    status, value2, val2 = h.helicsSubscriptionGetNamedPoint(subid)
-    assert status == 0
+    value2, val2 = h.helicsSubscriptionGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value2 == testValue1
     assert val2 == testVal1
@@ -143,20 +131,17 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     assert status == 0
 
     # make sure the value is still what we expect
-    status, value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
-    assert status == 0
+    value3, val3 = h.helicsSubscriptionGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value3 == testValue1
     assert val3 == testVal1
 
     # advance time
-    status, grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
     assert grantedtime == 0.02
 
     # make sure the value was updated
-    status, value4, val4 = h.helicsSubscriptionGetNamedPoint(subid)
-    assert status == 0
+    value4, val4 = h.helicsSubscriptionGetNamedPoint(subid)
     # make sure the string is what we expect
     assert value4 == testValue2
     assert val4 == testVal2
@@ -183,8 +168,7 @@ def test_value_federate_runFederateTestBool(vFed):
 
     assert val == h.helics_true if defaultValue else h.helics_false
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
     # get the value
@@ -205,8 +189,7 @@ def test_value_federate_runFederateTestBool(vFed):
     # make sure the value was updated
     assert grantedtime == 0.02
 
-    status, val = h.helicsSubscriptionGetBoolean(subid)
-    assert status == 0
+    val = h.helicsSubscriptionGetBoolean(subid)
     assert val == h.helics_false if testValue2 else h.helics_true
 
 
@@ -216,26 +199,19 @@ def test_value_federate_publisher_registration(vFed):
     pubid3 = h.helicsFederateRegisterTypePublication(vFed, "pub3", h.HELICS_DATA_TYPE_DOUBLE, "V")
     h.helicsFederateEnterExecutionMode(vFed)
 
-    status, publication_key = h.helicsPublicationGetKey(pubid1)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid1)
     assert publication_key == 'TestA Federate/pub1'
-    status, publication_type = h.helicsPublicationGetType(pubid1)
-    assert status == 0
+    publication_type = h.helicsPublicationGetType(pubid1)
     assert publication_type == 'string'
-    status, publication_key = h.helicsPublicationGetKey(pubid2)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid2)
     assert publication_key == 'pub2'
-    status, publication_key = h.helicsPublicationGetKey(pubid3)
-    assert status == 0
+    publication_key = h.helicsPublicationGetKey(pubid3)
     assert publication_key == 'TestA Federate/pub3'
-    status, publication_type = h.helicsPublicationGetType(pubid3)
-    assert status == 0
+    publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
-    status, publication_units = h.helicsPublicationGetUnits(pubid3)
-    assert status == 0
+    publication_units = h.helicsPublicationGetUnits(pubid3)
     assert publication_units == 'V'
-    status, publication_type = h.helicsPublicationGetType(pubid2)
-    assert status == 0
+    publication_type = h.helicsPublicationGetType(pubid2)
     assert publication_type == 'int64'
 
 
@@ -247,30 +223,22 @@ def test_value_federate_subscription_and_publication_registration(vFed):
 
     subid3 = h.helicsFederateRegisterOptionalSubscription(vFed, "sub3", "vector", "V")
     h.helicsFederateEnterExecutionMode(vFed)
-    status, publication_type = h.helicsPublicationGetType(pubid3)
-    assert status == 0
+    publication_type = h.helicsPublicationGetType(pubid3)
     assert publication_type == 'double'
 
-    status, sub_key = h.helicsSubscriptionGetKey(subid1)
-    assert status == 0
+    sub_key = h.helicsSubscriptionGetKey(subid1)
     assert sub_key == 'sub1'
-    status, sub_type = h.helicsSubscriptionGetType(subid1)
-    assert status == 0
+    sub_type = h.helicsSubscriptionGetType(subid1)
     assert sub_type == 'int64'
-    status, sub_key = h.helicsSubscriptionGetKey(subid2)
-    assert status == 0
+    sub_key = h.helicsSubscriptionGetKey(subid2)
     assert sub_key == 'sub2'
-    status, sub_key = h.helicsSubscriptionGetKey(subid3)
-    assert status == 0
+    sub_key = h.helicsSubscriptionGetKey(subid3)
     assert sub_key == 'sub3'
-    status, sub_type = h.helicsSubscriptionGetType(subid3)
-    assert status == 0
+    sub_type = h.helicsSubscriptionGetType(subid3)
     assert sub_type == 'double_vector'
-    status, sub_units = h.helicsSubscriptionGetUnits(subid3)
-    assert status == 0
+    sub_units = h.helicsSubscriptionGetUnits(subid3)
     assert sub_units == 'V'
-    status, sub_type = h.helicsSubscriptionGetType(subid2)
-    assert status == 0
+    sub_type = h.helicsSubscriptionGetType(subid2)
     assert sub_type == 'int64'
 
 
@@ -283,12 +251,10 @@ def test_value_federate_single_transfer(vFed):
 
     h.helicsPublicationPublishString(pubid, "string1")
 
-    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, s = h.helicsSubscriptionGetString(subid)
-    assert status == 0
+    s = h.helicsSubscriptionGetString(subid)
     assert s == "string1"
 
 def test_value_federate_runFederateTestDouble(vFed):
@@ -303,27 +269,22 @@ def test_value_federate_runFederateTestDouble(vFed):
     # publish string1 at time=0.0;
     h.helicsPublicationPublishDouble(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetDouble(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetDouble(subid)
     assert value == defaultValue
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetDouble(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetDouble(subid)
     assert value == testValue
 
     # publish string1 at time=0.0;
     h.helicsPublicationPublishDouble(pubid, testValue + 1)
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     assert grantedtime == 0.02
 
-    status, value = h.helicsSubscriptionGetDouble(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetDouble(subid)
     assert value == testValue + 1
 
 def test_value_federate_runFederateTestComplex(vFed):
@@ -340,17 +301,14 @@ def test_value_federate_runFederateTestComplex(vFed):
     # publish string1 at time=0.0;
     h.helicsPublicationPublishComplex(pubid, rTestValue, iTestValue)
 
-    status, value1, value2 = h.helicsSubscriptionGetComplex(subid)
-    assert status == 0
+    value1, value2 = h.helicsSubscriptionGetComplex(subid)
     assert value1 == rDefaultValue
     assert value2 == iDefaultValue
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value1, value2 = h.helicsSubscriptionGetComplex(subid)
-    assert status == 0
+    value1, value2 = h.helicsSubscriptionGetComplex(subid)
     assert value1 == rTestValue
     assert value2 == iTestValue
 
@@ -366,26 +324,21 @@ def test_value_federate_runFederateTestInteger(vFed):
 
     h.helicsPublicationPublishInteger(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetInteger(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetInteger(subid)
     assert value == defaultValue
 
-    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetInteger(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetInteger(subid)
     assert value == testValue
 
     h.helicsPublicationPublishInteger(pubid, testValue + 1)
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 2.0)
     assert grantedtime == 0.02
 
-    status, value = h.helicsSubscriptionGetInteger(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetInteger(subid)
     assert value == testValue + 1
 
 
@@ -400,16 +353,13 @@ def test_value_federate_runFederateTestString(vFed):
 
     h.helicsPublicationPublishString(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetString(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetString(subid)
     assert value == defaultValue
 
-    status, grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime (vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetString(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetString(subid)
     assert value == testValue
 
 def test_value_federate_runFederateTestVectorD(vFed):
@@ -423,14 +373,11 @@ def test_value_federate_runFederateTestVectorD(vFed):
 
     h.helicsPublicationPublishVector(pubid, testValue)
 
-    status, value = h.helicsSubscriptionGetVector(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetVector(subid)
     assert value == [0, 1, 2]
 
-    status, grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
-    assert status == 0
+    grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
     assert grantedtime == 0.01
 
-    status, value = h.helicsSubscriptionGetVector(subid)
-    assert status == 0
+    value = h.helicsSubscriptionGetVector(subid)
     assert value == [3, 4, 5]
