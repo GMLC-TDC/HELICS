@@ -90,23 +90,6 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
 }
 
 
-
-//typemap for short maxlen strings
-%typemap(in, numinputs=0) (char *outputString, int maxlen) {
-  $2=256;
-  $1=(char *)malloc(256);
-}
-
-%typemap(argout) (char *outputString, int maxlen) {
-  PyObject *str=PyString_FromString($1);
-  $result = SWIG_Python_AppendOutput($result, str);
-}
-
-%typemap(freearg) (char *outputString, int maxlen) {
-   if ($1) free($1);
-}
-
-
 //typemap for large string output with a length return in C
 %typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
   $3=&($2);

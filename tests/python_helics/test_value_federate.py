@@ -105,7 +105,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     # double val;
     val = h.helicsInputGetNamedPoint(subid)
     # assert value == defaultValue
-    assert val == ['start of a longer string in place of the shorter one and now this should be very long', 85, 5.3]
+    assert val == ['start of a longer string in place of the shorter one and now this should be very long', 5.3]
 
     grantedtime = h.helicsFederateRequestTime(vFed, 1.0)
 
@@ -115,7 +115,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     val2 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     # assert value2 == testValue1
-    assert val2 == ['short string', 12, 45.7823]
+    assert val2 == ['short string', 45.7823]
 
     # publish a second string
     h.helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2)
@@ -124,7 +124,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     val3 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     # assert value3 == testValue1
-    assert val3 == ['short string', 12, 45.7823]
+    assert val3 == ['short string', 45.7823]
 
     # advance time
     grantedtime = h.helicsFederateRequestTime(vFed, 2.0)
@@ -134,7 +134,7 @@ def test_value_federate_runFederateTestNamedPoint(vFed):
     val4 = h.helicsInputGetNamedPoint(subid)
     # make sure the string is what we expect
     # assert value4 == testValue2
-    assert val4 == ['I am a string', 13, 0.0]
+    assert val4 == ['I am a string', 0.0]
 
 
 def test_value_federate_runFederateTestBool(vFed):
@@ -217,17 +217,17 @@ def test_value_federate_subscription_and_publication_registration(vFed):
     sub_key = h.helicsSubscriptionGetKey(subid1)
     assert sub_key == 'sub1'
     sub_type = h.helicsInputGetType(subid1)
-    assert sub_type == 'def'
+    assert sub_type == ''
     sub_key = h.helicsSubscriptionGetKey(subid2)
     assert sub_key == 'sub2'
     sub_key = h.helicsSubscriptionGetKey(subid3)
     assert sub_key == 'sub3'
     sub_type = h.helicsInputGetType(subid3)
-    assert sub_type == 'def'
+    assert sub_type == ''
     sub_units = h.helicsInputGetUnits(subid3)
     assert sub_units == 'V'
     sub_type = h.helicsInputGetType(subid2)
-    assert sub_type == 'def'
+    assert sub_type == ''
 
 
 def test_value_federate_single_transfer(vFed):
