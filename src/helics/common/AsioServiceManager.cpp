@@ -212,26 +212,31 @@ void AsioServiceManager::haltServiceLoop ()
 
 void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
 {
-    auto clk = std::chrono::steady_clock::now ();
-    try
-    {
-        ptr->iserv->run ();
-    }
-	catch (const boost::system::system_error &se)
+	while (ptr->runCounter > 0)
 	{
-        auto nclk = std::chrono::steady_clock::now ();
-        std::cerr << "boost system error in service loop " << se.what()<<" ran for "<<(nclk-clk).count()/1000000<<"ms"<< std::endl;
+        auto clk = std::chrono::steady_clock::now ();
+        try
+        {
+            ptr->iserv->run ();
+        }
+        catch (const boost::system::system_error &se)
+        {
+            auto nclk = std::chrono::steady_clock::now ();
+            std::cerr << "boost system error in service loop " << se.what () << " ran for "
+                      << (nclk - clk).count () / 1000000 << "ms" << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            auto nclk = std::chrono::steady_clock::now ();
+            std::cerr << "std::exception in service loop " << e.what () << " ran for "
+                      << (nclk - clk).count () / 1000000 << "ms" << std::endl;
+        }
+        catch (...)
+        {
+            std::cout << "caught other error in service loop" << std::endl;
+        }
 	}
-    catch (const std::exception &e)
-    {
-        auto nclk = std::chrono::steady_clock::now ();
-        std::cerr << "std::exception in service loop " << e.what () << " ran for "
-                  << (nclk - clk).count () / 1000000 << "ms" << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "caught other error in service loop" << std::endl;
-    }
+    
     // std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }

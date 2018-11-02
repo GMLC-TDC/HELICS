@@ -363,9 +363,17 @@ void BrokerBase::queueProcessingLoop ()
     auto timerCallback = [this, &active](const boost::system::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
-    ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
-    active = std::make_pair (true, true);
-    ticktimer.async_wait (timerCallback);
+    if (tickTimer > 0)
+    {
+        if (tickTimer < 500)
+        {
+            tickTimer = 500;
+        }
+        active = std::make_pair (true, true);
+        ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+        ticktimer.async_wait (timerCallback);
+    }
+  
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -388,10 +396,10 @@ void BrokerBase::queueProcessingLoop ()
             dumpMessages.push_back (command);
         }
         auto ret = commandProcessor (command);
-		if (ret == CMD_IGNORE)
-		{
+        if (ret == CMD_IGNORE)
+        {
             continue;
-		}
+        }
         switch (ret)
         {
         case CMD_TICK:
@@ -433,7 +441,6 @@ void BrokerBase::queueProcessingLoop ()
                 processDisconnect ();
             }
             return;
-        
         }
     }
 }
@@ -454,15 +461,15 @@ action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &comman
             ActionMessage NMess;
             NMess.from_string (command.getString (ii));
             auto V = commandProcessor (NMess);
-			if (V != CMD_IGNORE)
-			{
-				//overwrite the abort command but ignore ticks in a multimessage context they shouldn't be there
-				if (V != CMD_TICK)
-				{
+            if (V != CMD_IGNORE)
+            {
+                // overwrite the abort command but ignore ticks in a multimessage context they shouldn't be there
+                if (V != CMD_TICK)
+                {
                     command = NMess;
                     return V;
-				}
-			}
+                }
+            }
         }
         break;
     default:
