@@ -77,7 +77,7 @@ class BrokerBase
     bool noAutomaticID = false;
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
-    bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
+    bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
     
   public:

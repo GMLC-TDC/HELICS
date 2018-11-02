@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
+#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -2175,25 +2175,29 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
-        if (waitingForServerPingReply)
+        if (waitingForBrokerPingReply)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
-            LOG_ERROR (global_broker_id_local, getIdentifier (), "lost connection with server");
+            LOG_ERROR (global_broker_id_local, getIdentifier (), "core lost connection with broker");
             sendErrorToFederates (-5);
             processDisconnect ();
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
-        else if ((isConnected ())&&(global_broker_id_local.isValid()))
+        else if ((isConnected ()) && (global_broker_id_local.isValid ()) &&
+                 (global_broker_id_local != parent_broker_id))
         {
             // if (allFedWaiting())
             //{
-            ActionMessage png (CMD_PING);
-            png.source_id = global_broker_id_local;
-            png.dest_id = higher_broker_id;
-            transmit (parent_route_id, png);
-            waitingForServerPingReply = true;
+            if (higher_broker_id.isValid ())
+            {
+                ActionMessage png (CMD_PING);
+                png.source_id = global_broker_id_local;
+                png.dest_id = higher_broker_id;
+                transmit (parent_route_id, png);
+                waitingForBrokerPingReply = true;
+            }
             //}
         }
         break;
@@ -2209,7 +2213,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            waitingForServerPingReply = false;
+            waitingForBrokerPingReply = false;
         }
         break;
     case CMD_USER_DISCONNECT:
