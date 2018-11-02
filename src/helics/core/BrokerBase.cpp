@@ -27,8 +27,9 @@ static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 static inline std::string genId ()
 {
     std::string nm = std::string (23, ' ');
-    std::random_device rd;  // only used once to initialize (seed) engine
-    std::mt19937 rng (rd ());  // random-number engine used (Mersenne-Twister in this case)
+    auto seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
+    seed += std::hash<std::thread::id> {} (std::this_thread::get_id ());
+    std::mt19937 rng (seed);  // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
     nm[5] = '-';
