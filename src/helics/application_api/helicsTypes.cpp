@@ -81,7 +81,7 @@ std::string helicsComplexString (std::complex<double> val)
 {
     return helicsComplexString (val.real (), val.imag ());
 }
-
+/** map of an assortment of type string that can be converted to a known type*/
 static const std::unordered_map<std::string, helics_type_t> typeMap{
   {"double", helics_type_t::helicsDouble},
   {"string", helics_type_t::helicsString},
@@ -94,6 +94,7 @@ static const std::unordered_map<std::string, helics_type_t> typeMap{
   {"double_vector", helics_type_t::helicsVector},
   {"double vector", helics_type_t::helicsVector},
   {typeid (std::vector<double>).name (), helics_type_t::helicsVector},
+  {boost::core::demangle (typeid (std::vector<double>).name ()), helics_type_t::helicsVector},
   {typeid (double *).name (), helics_type_t::helicsVector},
   {"complex", helics_type_t::helicsComplex},
   {"pair", helics_type_t::helicsComplex},
@@ -119,6 +120,7 @@ static const std::unordered_map<std::string, helics_type_t> typeMap{
   {typeid (uint16_t).name (), helics_type_t::helicsInt},
   {typeid (int8_t).name (), helics_type_t::helicsInt},
   {typeid (uint8_t).name (), helics_type_t::helicsInt},
+  {typeid (bool).name (), helics_type_t::helicsBool},
   {"long long", helics_type_t::helicsInt},
   {"integer", helics_type_t::helicsInt},
   {"int32", helics_type_t::helicsInt},
@@ -139,12 +141,14 @@ static const std::unordered_map<std::string, helics_type_t> typeMap{
   {"complex_vector", helics_type_t::helicsComplexVector},
   {"complex vector", helics_type_t::helicsComplexVector},
   {typeid (std::vector<std::complex<double>>).name (), helics_type_t::helicsComplexVector},
+  {boost::core::demangle (typeid (std::vector<std::complex<double>>).name ()), helics_type_t::helicsComplexVector},
   {"d", helics_type_t::helicsDouble},
   {"s", helics_type_t::helicsString},
   {"f", helics_type_t::helicsDouble},
   {"v", helics_type_t::helicsVector},
   {"c", helics_type_t::helicsComplex},
   {typeid (std::complex<double>).name (), helics_type_t::helicsComplex},
+  {boost::core::demangle (typeid (std::complex<double>).name ()), helics_type_t::helicsComplex},
   {"t", helics_type_t::helicsTime},
   {"i", helics_type_t::helicsInt},
   {"i64", helics_type_t::helicsInt},

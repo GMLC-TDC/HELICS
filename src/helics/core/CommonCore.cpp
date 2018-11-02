@@ -2185,7 +2185,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
-        else if (isConnected ())
+        else if ((isConnected ())&&(global_broker_id_local.isValid()))
         {
             // if (allFedWaiting())
             //{
