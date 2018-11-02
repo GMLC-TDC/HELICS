@@ -184,9 +184,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK_EQUAL (units, "V");
 
 	//check the getSubscription function
-    const char *tmp;
 	auto subid_b = helicsFederateGetSubscription (vFed1, "sub1",&err);
-    tmp=helicsSubscriptionGetKey (subid_b);
+    const char *tmp = helicsSubscriptionGetKey (subid_b);
     BOOST_CHECK_EQUAL (tmp, "sub1");
 	//check the getSubscriptionByIndex function
     auto subid_c = helicsFederateGetInputByIndex (vFed1, 2,&err);
@@ -545,7 +544,7 @@ void runFederateTestVectorD (const char *core,
     auto vFed = fixture.GetFederateAt (0);
     // register the interfaces
     auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", HELICS_DATA_TYPE_VECTOR, "",&err);
-    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "",&err);
+    auto subid = helicsFederateRegisterSubscription (vFed, "pub1", nullptr,&err);
     CE(helicsInputSetDefaultVector (subid, defaultValue, len,&err));
     CE(helicsFederateEnterExecutingMode (vFed,&err));
 
@@ -596,7 +595,7 @@ void runFederateTestVectorD (const char *core,
     BOOST_CHECK_EQUAL (actualLen, len1);
     for (int i = 0; i < len1; i++)
     {
-        BOOST_CHECK_EQUAL (val[i], testValue1[i]);
+        BOOST_CHECK_CLOSE (val[i], testValue1[i],0.0001);
         //  std::cout << testValue1[i] << "\n";
     }
 

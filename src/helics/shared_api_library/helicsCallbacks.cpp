@@ -14,7 +14,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-void helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *),helics_error *err)
+void helicsBrokerAddLoggingCallback (helics_broker broker,
+                                     void (*logger) (int loglevel, const char *identifier, const char *message),
+                                     helics_error *err)
 {
     auto brk = getBroker (broker,err);
     if (brk == nullptr)
@@ -33,7 +35,9 @@ void helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, 
     }
 }
 
-void helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const char *, const char *), helics_error *err)
+void helicsCoreAddLoggingCallback (helics_core core,
+                                   void (*logger) (int loglevel, const char *identifier, const char *message),
+                                   helics_error *err)
 {
     auto cr = getCore (core,err);
     if (cr == nullptr)
@@ -52,7 +56,9 @@ void helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const 
     }
 }
 
-void helicsFederateAddLoggingCallback (helics_federate fed, void (*logger) (int, const char *, const char *), helics_error *err)
+void helicsFederateAddLoggingCallback (helics_federate fed,
+                                       void (*logger) (int loglevel, const char *identifier, const char *message),
+                                       helics_error *err)
 {
     auto fedptr = getFed (fed, err);
     if (fedptr == nullptr)

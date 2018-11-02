@@ -30,7 +30,7 @@ helics_type_t getType (const std::string &typeString)
     tstr.erase (0, tstr.find_first_not_of (" \t\n\0"));
     if (tstr.empty ())
     {
-        return helics_type_t::helicsInvalid;
+        return helics_type_t::helicsCustom;
     }
     if (tstr.size () == 1)
     {
@@ -57,7 +57,7 @@ helics_type_t getType (const std::string &typeString)
         case 'V':
             return helics_type_t::helicsVector;
         default:
-            return helics_type_t::helicsInvalid;
+            return helics_type_t::helicsCustom;
         }
     }
 
@@ -82,7 +82,7 @@ char typeCharacter (helics_type_t type)
         return 'v';
     case helics_type_t::helicsAny:
         return 'a';
-    case helics_type_t::helicsInvalid:
+    case helics_type_t::helicsCustom:
     default:
         return 'u';
     }

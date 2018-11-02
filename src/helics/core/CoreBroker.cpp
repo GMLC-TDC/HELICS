@@ -566,25 +566,30 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_TICK:
         if (!isRootc)
         {
-            if (waitingForServerPingReply)
+            if (waitingForBrokerPingReply)
             {
                 // try to reset the connection to the broker
                 // brokerReconnect()
-                LOG_ERROR (global_broker_id_local, getIdentifier (), "lost connection with server");
+                LOG_ERROR (global_broker_id_local, getIdentifier (), "broker lost connection with parent broker");
                 sendErrorToImmediateBrokers (-5);
                 disconnect ();
                 brokerState = broker_state_t::errored;
                 addActionMessage (CMD_STOP);
             }
-            else
+            else if ((isConnected ()) && (global_broker_id_local.isValid ()) &&
+                     (global_broker_id_local != parent_broker_id))
             {
                 // if (allFedWaiting())
                 //{
-                ActionMessage png (CMD_PING);
-                png.source_id = global_broker_id_local;
-                png.dest_id = higher_broker_id;
-                transmit (parent_route_id, png);
-                waitingForServerPingReply = true;
+				if (higher_broker_id.isValid())
+				{
+                    ActionMessage png (CMD_PING);
+                    png.source_id = global_broker_id_local;
+                    png.dest_id = higher_broker_id;
+                    transmit (parent_route_id, png);
+                    waitingForBrokerPingReply = true;
+				}
+                
                 //}
             }
         }
@@ -605,7 +610,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            waitingForServerPingReply = false;
+            waitingForBrokerPingReply = false;
         }
         else
         {
@@ -1506,7 +1511,11 @@ bool CoreBroker::connect ()
     return isConnected ();
 }
 
-bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
+bool CoreBroker::isConnected () const
+{
+    auto state = brokerState.load (std::memory_order_acquire);
+    return ((state == operating) || (state == connected));
+}
 
 void CoreBroker::waitForDisconnect (int msToWait) const
 {

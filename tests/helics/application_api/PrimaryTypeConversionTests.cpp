@@ -19,7 +19,7 @@ namespace utf = boost::unit_test;
 
 using namespace std::string_literals;
 using namespace helics;
-BOOST_AUTO_TEST_SUITE (type_conversion_tests,*utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (type_conversion_tests, *utf::label ("ci"))
 
 template <class T1, class T2>
 bool checkTypeConversion1 (const T1 &val1, const T2 &exp)
@@ -38,13 +38,13 @@ BOOST_AUTO_TEST_CASE (vectorNorm_tests)
 {
     using c = std::complex<double>;
     using cv = std::vector<c>;
-    BOOST_CHECK_EQUAL(vectorNorm(std::vector<double>()), 0.0);
+    BOOST_CHECK_EQUAL (vectorNorm (std::vector<double> ()), 0.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{4.0}), 4.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{3.0, 4.0}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{-3.0, -4.0}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (std::vector<double>{-3.0, -3.0, -3.0, -3.0, -3.0}), std::sqrt (9.0 * 5.0));
 
-    BOOST_CHECK_EQUAL(vectorNorm(cv()), 0.0);
+    BOOST_CHECK_EQUAL (vectorNorm (cv ()), 0.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (4.0, 0)}), 4.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (3.0, 4.0)}), 5.0);
     BOOST_CHECK_EQUAL (vectorNorm (cv{c (-3.0, -4.0)}), 5.0);
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (string_converstion_tests)
 BOOST_AUTO_TEST_CASE (double_type_tests)
 {
     BOOST_CHECK (helicsType<double> () == helics_type_t::helicsDouble);
-    BOOST_CHECK (helicsType<float> () == helics_type_t::helicsInvalid);
+    BOOST_CHECK (helicsType<float> () == helics_type_t::helicsCustom);
     BOOST_CHECK (isConvertableType<float> () == true);
     BOOST_CHECK (isConvertableType<double> () == false);
 }
@@ -101,12 +101,40 @@ BOOST_AUTO_TEST_CASE (double_conversion_tests)
 BOOST_AUTO_TEST_CASE (integer_type_tests)
 {
     BOOST_CHECK (helicsType<int64_t> () == helics_type_t::helicsInt);
-    BOOST_CHECK (helicsType<int> () == helics_type_t::helicsInvalid);
+    BOOST_CHECK (helicsType<int> () == helics_type_t::helicsCustom);
     BOOST_CHECK (isConvertableType<int> () == true);
     BOOST_CHECK (isConvertableType<int64_t> () == false);
 
     BOOST_CHECK (isConvertableType<short> () == true);
     BOOST_CHECK (isConvertableType<uint64_t> () == true);
+
+    BOOST_CHECK (isConvertableType<char> () == true);
+    BOOST_CHECK (isConvertableType<unsigned char> () == true);
+
+    BOOST_CHECK (isConvertableType<unsigned char> () == true);
+}
+
+BOOST_AUTO_TEST_CASE (namedType_tests)
+{
+    BOOST_CHECK (getTypeFromString ("int") == helics_type_t::helicsInt);
+    BOOST_CHECK (getTypeFromString ("INT") == helics_type_t::helicsInt);
+    BOOST_CHECK (getTypeFromString ("char") == helics_type_t::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid(int).name()) == helics_type_t::helicsInt);
+    BOOST_CHECK (getTypeFromString (typeid(float).name()) == helics_type_t::helicsDouble);
+    BOOST_CHECK (getTypeFromString (typeid(std::string).name()) == helics_type_t::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (char *).name ()) == helics_type_t::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (const char *).name ()) == helics_type_t::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (double).name ()) == helics_type_t::helicsDouble);
+    BOOST_CHECK (getTypeFromString (typeid (bool).name ()) == helics_type_t::helicsBool);
+    BOOST_CHECK (getTypeFromString (typeid (int64_t).name ()) == helics_type_t::helicsInt);
+    BOOST_CHECK (getTypeFromString (typeid (char).name ()) == helics_type_t::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (std::complex<double>).name ()) == helics_type_t::helicsComplex);
+    BOOST_CHECK (getTypeFromString ("COMPLEX") == helics_type_t::helicsComplex);
+    BOOST_CHECK (getTypeFromString ("map") == helics_type_t::helicsCustom);
+    BOOST_CHECK (getTypeFromString ("any") == helics_type_t::helicsAny);
+    BOOST_CHECK (getTypeFromString ("") == helics_type_t::helicsAny);
+    BOOST_CHECK (getTypeFromString (typeid (std::vector<std::complex<double>>).name ()) == helics_type_t::helicsComplexVector);
+    BOOST_CHECK (getTypeFromString (typeid (Time).name ()) == helics_type_t::helicsTime);
 }
 
 BOOST_AUTO_TEST_CASE (integer_conversion_tests)
@@ -158,10 +186,10 @@ BOOST_AUTO_TEST_CASE (namedpoint_conversion_tests)
     BOOST_CHECK (checkTypeConversion1 (vp2, true));
     BOOST_CHECK (checkTypeConversion1 (vp2, vp2.name));
 
-    named_point t1("this is a longer string for testing purposes", 234.252622334);
-    auto s = helicsNamedPointString(t1);
-    auto t2 = helicsGetNamedPoint(s);
-    BOOST_CHECK_EQUAL(t1.name, t2.name);
-    BOOST_CHECK_CLOSE(t1.value, t2.value,0.00001);
+    named_point t1 ("this is a longer string for testing purposes", 234.252622334);
+    auto s = helicsNamedPointString (t1);
+    auto t2 = helicsGetNamedPoint (s);
+    BOOST_CHECK_EQUAL (t1.name, t2.name);
+    BOOST_CHECK_CLOSE (t1.value, t2.value, 0.00001);
 }
 BOOST_AUTO_TEST_SUITE_END ()

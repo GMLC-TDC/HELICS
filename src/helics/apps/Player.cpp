@@ -402,13 +402,13 @@ void Player::loadJsonFile (const std::string &jsonFile)
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
-        publications.emplace_back (fed.get (), ii);
+        publications.emplace_back (fed->getPublication(ii));
         pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint(ii));
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
@@ -882,7 +882,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::helics_type_t::helicsInvalid)
+        if (defType == helics::helics_type_t::helicsCustom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;

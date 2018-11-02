@@ -97,7 +97,7 @@ class Player : public App
     @param units the units associated with the publication
     */
     template <class valType>
-    typename std::enable_if_t<helicsType<valType> () != helics_type_t::helicsInvalid>
+    typename std::enable_if_t<helicsType<valType> () != helics_type_t::helicsCustom>
     addPublication (const std::string &key, const std::string &pubUnits = std::string ())
     {
         if (!useLocal)

@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label ("ci"))
     vFed2->setTimeProperty (PERIOD_PROPERTY, 0.5);
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
-    auto sub = helics::Subscription (vFed2.get (), "pub1");
+    vFed2->registerSubscription( "pub1");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
     vFed2->setTimeProperty (PERIOD_PROPERTY, 0.5);
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
-    auto sub = helics::Subscription (vFed2.get (), "pub1");
+    vFed2->registerSubscription("pub1");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
     vFed1->setTimeProperty (PERIOD_PROPERTY, 0.6);
     vFed2->setTimeProperty (PERIOD_PROPERTY, 0.45);
 
-    auto ept1 = helics::Endpoint (helics::GLOBAL, vFed1.get (), "e1");
-    auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
+    auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
+     vFed2->registerGlobalEndpoint ("e2");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -120,8 +120,8 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label ("ci"))
     vFed2->setTimeProperty (PERIOD_PROPERTY, 0.1);
     vFed2->setTimeProperty (INPUT_DELAY_PROPERTY, 0.1);
 
-    auto ept1 = helics::Endpoint (helics::GLOBAL, vFed1.get (), "e1");
-    auto ept2 = helics::Endpoint (helics::GLOBAL, vFed2.get (), "e2");
+    auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
+    vFed2->registerGlobalEndpoint ("e2");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
-    helics::Subscription receiver (vFed2, "pub");
+   auto &receiver=vFed2->registerSubscription("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
-    helics::Subscription receiver (vFed2, "pub");
+    auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
                                 helics::helics_type_t::helicsDouble);
-    helics::Subscription receiver (vFed2, "pub");
+    auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -361,10 +361,10 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
     auto vFed3 = GetFederateAs<helics::ValueFederate> (2);
     helics::Publication sender1 (helics::interface_visibility::global, vFed1, "pub1",
                                  helics::helics_type_t::helicsDouble);
-    helics::Subscription receiver1 (vFed2, "pub1");
+    auto &receiver1 = vFed2->registerSubscription ("pub1");
     helics::Publication sender2 (helics::interface_visibility::global, vFed3, "pub2",
                                  helics::helics_type_t::helicsDouble);
-    helics::Subscription receiver2 (vFed2, "pub2");
+    auto &receiver2 = vFed2->registerSubscription ("pub2");
     vFed1->enterExecutingModeAsync ();
     vFed3->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();

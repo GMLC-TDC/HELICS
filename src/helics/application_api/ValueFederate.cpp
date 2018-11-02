@@ -3,37 +3,41 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "Publications.hpp"
+#include "ValueFederate.hpp"
 #include "ValueFederateManager.hpp"
 
 namespace helics
 {
 /**constructor taking a core engine and federate info structure
  */
-ValueFederate::ValueFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName,fi)
+ValueFederate::ValueFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName, fi)
 {
     // the core object get instantiated in the Federate constructor
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), this, getID ());
 }
-ValueFederate::ValueFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : Federate (fedName,core, fi)
+ValueFederate::ValueFederate (const std::string &fedName,
+                              const std::shared_ptr<Core> &core,
+                              const FederateInfo &fi)
+    : Federate (fedName, core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), this, getID ());
 }
-ValueFederate::ValueFederate (const std::string &configString) : Federate (std::string(),loadFederateInfo (configString))
+ValueFederate::ValueFederate (const std::string &configString)
+    : Federate (std::string (), loadFederateInfo (configString))
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), this, getID ());
     ValueFederate::registerInterfaces (configString);
 }
 
 ValueFederate::ValueFederate (const std::string &fedName, const std::string &configString)
-    : Federate (fedName,loadFederateInfo (configString))
+    : Federate (fedName, loadFederateInfo (configString))
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), this, getID ());
     ValueFederate::registerInterfaces (configString);
 }
 
@@ -41,7 +45,7 @@ ValueFederate::ValueFederate () = default;
 
 ValueFederate::ValueFederate (bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), getID ());
+    vfManager = std::make_unique<ValueFederateManager> (coreObject.get (), this, getID ());
 }
 
 ValueFederate::ValueFederate (ValueFederate &&) noexcept = default;
@@ -64,56 +68,52 @@ ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
     return *this;
 }
 
-publication_id_t
+Publication &
 ValueFederate::registerPublication (const std::string &key, const std::string &type, const std::string &units)
 {
-    return vfManager->registerPublication ((!key.empty())?(getName () + separator_ + key):key, type, units);
+    return vfManager->registerPublication ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
 }
 
-publication_id_t ValueFederate::registerGlobalPublication (const std::string &key,
-                                                           const std::string &type,
-                                                           const std::string &units)
+Publication &ValueFederate::registerGlobalPublication (const std::string &key,
+                                                       const std::string &type,
+                                                       const std::string &units)
 {
     return vfManager->registerPublication (key, type, units);
 }
 
-input_id_t
-ValueFederate::registerInput(const std::string &key, const std::string &type, const std::string &units)
+Input &ValueFederate::registerInput (const std::string &key, const std::string &type, const std::string &units)
 {
     return vfManager->registerInput ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
 }
 
-input_id_t ValueFederate::registerGlobalInput(const std::string &key, const std::string &type, const std::string &units)
+Input &
+ValueFederate::registerGlobalInput (const std::string &key, const std::string &type, const std::string &units)
 {
     return vfManager->registerInput (key, type, units);
 }
 
-input_id_t ValueFederate::registerSubscription (const std::string &key,
-                                                               const std::string &units)
+Input &ValueFederate::registerSubscription (const std::string &key, const std::string &units)
 {
-    auto id=vfManager->registerInput (std::string(), std::string(), units);
-    vfManager->addTarget (id, key);
-    return id;
+    auto &inp = vfManager->registerInput (std::string (), std::string (), units);
+    vfManager->addTarget (inp, key);
+    return inp;
 }
 
-
-void ValueFederate::addTarget(publication_id_t id, const std::string &target)
+void ValueFederate::addTarget (const Publication &pub, const std::string &target)
 {
-    vfManager->addTarget (id, target);
+    vfManager->addTarget (pub, target);
 }
 
-void ValueFederate::addTarget(input_id_t id, const std::string &target)
-{ vfManager->addTarget (id, target); }
+void ValueFederate::addTarget (const Input &inp, const std::string &target) { vfManager->addTarget (inp, target); }
 
-
-void ValueFederate::addShortcut (input_id_t subid, const std::string &shortcutName)
+void ValueFederate::addShortcut (const Input &inp, const std::string &shortcutName)
 {
-    vfManager->addShortcut (subid, shortcutName);
+    vfManager->addShortcut (inp, shortcutName);
 }
 
-void ValueFederate::setDefaultValue (input_id_t id, data_view block)
+void ValueFederate::setDefaultValue (const Input &inp, data_view block)
 {
-    vfManager->setDefaultValue (id, block);
+    vfManager->setDefaultValue (inp, block);
 }
 
 void ValueFederate::registerInterfaces (const std::string &configString)
@@ -125,16 +125,16 @@ void ValueFederate::registerInterfaces (const std::string &configString)
 void ValueFederate::registerValueInterfaces (const std::string &configString)
 {
     if (hasTomlExtension (configString))
-	{
+    {
         registerValueInterfacesToml (configString);
-	}
-	else
-	{
+    }
+    else
+    {
         registerValueInterfacesJson (configString);
-	}
+    }
 }
 
-void ValueFederate::registerValueInterfacesJson(const std::string &configString)
+void ValueFederate::registerValueInterfacesJson (const std::string &configString)
 {
     auto doc = loadJson (configString);
 
@@ -145,21 +145,26 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
         {
             auto key = getKey (pub);
 
-            auto id = vfManager->getPublicationId (key);
-            if (id.isValid())
+            Publication *pubAct = &vfManager->getPublication (key);
+            if (pubAct->isValid ())
             {
                 continue;
             }
-            auto type = (pub.isMember ("type")) ? pub["type"].asString () : std ::string ();
-            auto units = (pub.isMember ("units")) ? pub["units"].asString () : std::string ();
-            bool global = (pub.isMember ("global")) ? (pub["global"].asBool ()) : false;
+            auto type = jsonGetOrDefault (pub, "type", std::string ());
+            auto units = jsonGetOrDefault (pub, "units", std::string ());
+            bool global = jsonGetOrDefault (pub, "global", false);
             if (global)
             {
-                registerGlobalPublication (key, type, units);
+                pubAct=&registerGlobalPublication (key, type, units);
             }
             else
             {
-                registerPublication (key, type, units);
+                pubAct=&registerPublication (key, type, units);
+            }
+            auto tol = jsonGetOrDefault (pub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                pubAct->setMinimumChange (tol);
             }
         }
     }
@@ -169,26 +174,30 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
         for (const auto &sub : subs)
         {
             auto key = getKey (sub);
-            auto id = vfManager->getSubscriptionId (key);
-            if (id.isValid())
+            auto &subAct = vfManager->getSubscription (key);
+            if (subAct.isValid ())
             {
                 continue;
             }
-            auto units = (sub.isMember ("units")) ? sub["units"].asString () : "";
+            auto units = jsonGetOrDefault (sub, "units", std::string ());
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
                 required = sub["required"].asBool ();
             }
-            id = registerSubscription (key, units);
+            auto &subNew = registerSubscription (key, units);
             if (required)
             {
-
-                //TODO add setOPTION call
+                // TODO add setOPTION call
             }
             if (sub.isMember ("shortcut"))
             {
-                addShortcut (id, sub["shortcut"].asString ());
+                addShortcut (subNew, sub["shortcut"].asString ());
+            }
+            auto tol = jsonGetOrDefault (sub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                subNew.setMinimumChange (tol);
             }
         }
     }
@@ -199,27 +208,32 @@ void ValueFederate::registerValueInterfacesJson(const std::string &configString)
         {
             auto key = getKey (ipt);
 
-            auto id = vfManager->getInputId (key);
-            if (id.isValid())
+            Input *inp = &vfManager->getInput (key);
+            if (inp->isValid ())
             {
                 continue;
             }
-            auto type = (ipt.isMember ("type")) ? ipt["type"].asString () : std ::string ();
-            auto units = (ipt.isMember ("units")) ? ipt["units"].asString () : std::string ();
-            bool global = (ipt.isMember ("global")) ? (ipt["global"].asBool ()) : false;
+            auto type = jsonGetOrDefault (ipt, "type", std::string ());
+            auto units = jsonGetOrDefault (ipt, "units", std::string ());
+            bool global = jsonGetOrDefault (ipt, "global", false);
             if (global)
             {
-                registerGlobalInput (key, type, units);
+                inp=&registerGlobalInput (key, type, units);
             }
             else
             {
-                registerInput (key, type, units);
+                inp=&registerInput (key, type, units);
+            }
+            auto tol = jsonGetOrDefault (ipt, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                inp->setMinimumChange (tol);
             }
         }
     }
 }
 
-void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
+void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
 {
     toml::Value doc;
     try
@@ -231,29 +245,35 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-	auto pubs = doc.find ("publications");
-    if (pubs!=nullptr)
+    auto pubs = doc.find ("publications");
+    if (pubs != nullptr)
     {
         auto &pubArray = pubs->as<toml::Array> ();
         for (const auto &pub : pubArray)
         {
             auto key = getKey (pub);
 
-            auto id = vfManager->getPublicationId (key);
-            if (id.isValid())
+            auto id = vfManager->getPublication (key);
+            if (id.isValid ())
             {
                 continue;
             }
             auto type = tomlGetOrDefault (pub, "type", std::string ());
             auto units = tomlGetOrDefault (pub, "units", std::string ());
             bool global = tomlGetOrDefault (pub, "global", false);
+            Publication *pubObj = nullptr;
             if (global)
             {
-                registerGlobalPublication (key, type, units);
+                pubObj=&registerGlobalPublication (key, type, units);
             }
             else
             {
-                registerPublication (key, type, units);
+                pubObj = &registerPublication (key, type, units);
+            }
+            auto tol = tomlGetOrDefault (pub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                pubObj->setMinimumChange (tol);
             }
         }
     }
@@ -264,24 +284,29 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
         for (const auto &sub : subArray)
         {
             auto key = getKey (sub);
-            auto id = vfManager->getSubscriptionId (key);
-            if (id.isValid())
+            Input *id = &vfManager->getSubscription (key);
+            if (id->isValid ())
             {
                 continue;
             }
             auto units = tomlGetOrDefault (sub, "units", std::string ());
             bool optional = tomlGetOrDefault (sub, "optional", false);
             bool required = tomlGetOrDefault (sub, "required", !optional);
-            id = registerSubscription (key, units);
+            id = &registerSubscription (key, units);
             if (required)
             {
-               //setInterfaceOption()
+                // setInterfaceOption()
             }
-            
+
             auto shortcut = sub.find ("shortcut");
-            if (shortcut!=nullptr)
+            if (shortcut != nullptr)
             {
-                addShortcut (id, shortcut->as<std::string> ());
+                addShortcut (*id, shortcut->as<std::string> ());
+            }
+            auto tol = tomlGetOrDefault (sub, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                id->setMinimumChange (tol);
             }
         }
     }
@@ -293,8 +318,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
         {
             auto key = getKey (ipt);
 
-            auto id = vfManager->getPublicationId (key);
-            if (id.isValid())
+            Input *id = &vfManager->getInput (key);
+            if (id->isValid ())
             {
                 continue;
             }
@@ -303,23 +328,32 @@ void ValueFederate::registerValueInterfacesToml(const std::string &tomlString)
             bool global = tomlGetOrDefault (ipt, "global", false);
             if (global)
             {
-                registerGlobalInput(key, type, units);
+                id=&registerGlobalInput (key, type, units);
             }
             else
             {
-                registerInput (key, type, units);
+                id=&registerInput (key, type, units);
+            }
+            auto tol = tomlGetOrDefault (ipt, "tolerance", -1.0);
+            if (tol > 0.0)
+            {
+                id->setMinimumChange (tol);
             }
         }
     }
 }
 
-data_view ValueFederate::getValueRaw (input_id_t id) { return vfManager->getValue (id); }
+data_view ValueFederate::getValueRaw (const Input &inp) { return vfManager->getValue (inp); }
 
-void ValueFederate::publish (publication_id_t id, data_view block)
+double ValueFederate::getDouble (Input &inp) { return inp.getValue<double> (); }
+/** get a string value*/
+const std::string &ValueFederate::getString (Input &inp) { return inp.getValueRef<std::string> (); }
+
+void ValueFederate::publishRaw (const Publication &pub, data_view block)
 {
     if ((state == op_states::execution) || (state == op_states::initialization))
     {
-        vfManager->publish (id, block);
+        vfManager->publish (pub, block);
     }
     else
     {
@@ -327,144 +361,156 @@ void ValueFederate::publish (publication_id_t id, data_view block)
     }
 }
 
-bool ValueFederate::isUpdated (input_id_t sub_id) const { return vfManager->hasUpdate (sub_id); }
+void ValueFederate::publish (Publication &pub, const std::string &str) { pub.publish (str); }
 
-Time ValueFederate::getLastUpdateTime (input_id_t sub_id) const
-{
-    return vfManager->getLastUpdateTime (sub_id);
-}
+void ValueFederate::publish (Publication &pub, double val) { pub.publish (val); }
+
+bool ValueFederate::isUpdated (const Input &inp) const { return vfManager->hasUpdate (inp); }
+
+Time ValueFederate::getLastUpdateTime (const Input &inp) const { return vfManager->getLastUpdateTime (inp); }
 
 void ValueFederate::updateTime (Time newTime, Time oldTime) { vfManager->updateTime (newTime, oldTime); }
 
 void ValueFederate::startupToInitializeStateTransition () { vfManager->startupToInitializeStateTransition (); }
 void ValueFederate::initializeToExecuteStateTransition () { vfManager->initializeToExecuteStateTransition (); }
 
-
-std::string ValueFederate::localQuery(const std::string &queryStr) const
+std::string ValueFederate::localQuery (const std::string &queryStr) const
 {
-    return vfManager->localQuery(queryStr);
+    return vfManager->localQuery (queryStr);
 }
 
-std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
+std::vector<int> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
-const std::string &ValueFederate::getInputKey (input_id_t ipt_id) const
-{
-    return vfManager->getInputKey (ipt_id);
-}
+const std::string &ValueFederate::getInputKey (const Input &inp) const { return inp.getName (); }
 
-std::string ValueFederate::getTarget(input_id_t id) const
-{
-    return vfManager->getTarget(id);
-}
+const std::string &ValueFederate::getTarget (const Input &inp) const { return vfManager->getTarget (inp); }
 
-input_id_t ValueFederate::getInputId (const std::string &key) const
+const Input &ValueFederate::getInput (const std::string &key) const
 {
-    return vfManager->getInputId (key);
-}
-
-input_id_t ValueFederate::getInputId (const std::string &key, int index1) const
-{
-    return vfManager->getInputId (key + '_' + std::to_string (index1));
-}
-
-input_id_t ValueFederate::getInputId (const std::string &key, int index1, int index2) const
-{
-    return vfManager->getInputId (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
-}
-
-input_id_t ValueFederate::getSubscriptionId(const std::string &key) const
-{
-    return vfManager->getSubscriptionId (key);
-}
-
-const std::string &ValueFederate::getPublicationKey (publication_id_t pub_id) const
-{
-    return vfManager->getPublicationKey (pub_id);
-}
-
-publication_id_t ValueFederate::getPublicationId (const std::string &key) const
-{
-    auto id = vfManager->getPublicationId (key);
-    if (!id.isValid())
+    auto &inp = vfManager->getInput (key);
+    if (!inp.isValid ())
     {
-        id = vfManager->getPublicationId (getName () + separator_ + key);
+        return vfManager->getInput (getName () + separator_ + key);
     }
-    return id;
+    return inp;
 }
 
-publication_id_t ValueFederate::getPublicationId (const std::string &key, int index1) const
+Input &ValueFederate::getInput (const std::string &key)
 {
-    return vfManager->getPublicationId (key + '_' + std::to_string (index1));
+    auto &inp = vfManager->getInput (key);
+    if (!inp.isValid ())
+    {
+        return vfManager->getInput (getName () + separator_ + key);
+    }
+    return inp;
 }
 
-publication_id_t ValueFederate::getPublicationId (const std::string &key, int index1, int index2) const
+const Input &ValueFederate::getInput (int index) const { return vfManager->getInput (index); }
+
+Input &ValueFederate::getInput (int index) { return vfManager->getInput (index); }
+
+const Input &ValueFederate::getInput (const std::string &key, int index1) const
 {
-    return vfManager->getPublicationId (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
+    return vfManager->getInput (key + '_' + std::to_string (index1));
 }
 
-const std::string &ValueFederate::getInputUnits (input_id_t id) const
+const Input &ValueFederate::getInput (const std::string &key, int index1, int index2) const
 {
-    return vfManager->getInputUnits (id);
-}
-const std::string &ValueFederate::getPublicationUnits (publication_id_t id) const
-{
-    return vfManager->getPublicationUnits (id);
+    return vfManager->getInput (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-const std::string &ValueFederate::getInputType (input_id_t id) const
+const Input &ValueFederate::getSubscription (const std::string &key) const
 {
-    return vfManager->getInputType (id);
-}
-const std::string &ValueFederate::getPublicationType (publication_id_t id) const
-{
-    return vfManager->getPublicationType (id);
+    return vfManager->getSubscription (key);
 }
 
-std::string ValueFederate::getPublicationType (input_id_t id) const
+Input &ValueFederate::getSubscription (const std::string &key) { return vfManager->getSubscription (key); }
+
+const std::string &ValueFederate::getPublicationKey (const Publication &pub) const { return pub.getName (); }
+
+Publication &ValueFederate::getPublication (const std::string &key)
 {
-    return vfManager->getPublicationType (id);
+    auto &pub = vfManager->getPublication (key);
+    if (!pub.isValid ())
+    {
+        return vfManager->getPublication (getName () + separator_ + key);
+    }
+    return pub;
 }
 
-
-void ValueFederate::setPublicationOption(publication_id_t id, int32_t option, bool option_value)
+const Publication &ValueFederate::getPublication (const std::string &key) const
 {
-    vfManager->setPublicationOption(id, option, option_value);
+    auto &pub = vfManager->getPublication (key);
+    if (!pub.isValid ())
+    {
+        return vfManager->getPublication (getName () + separator_ + key);
+    }
+    return pub;
 }
 
-void ValueFederate::setInputOption(input_id_t id, int32_t option, bool option_value)
+Publication &ValueFederate::getPublication (int index) { return vfManager->getPublication (index); }
+
+const Publication &ValueFederate::getPublication (int index) const { return vfManager->getPublication (index); }
+
+const Publication &ValueFederate::getPublication (const std::string &key, int index1) const
 {
-    vfManager->setInputOption(id, option, option_value);
+    return vfManager->getPublication (key + '_' + std::to_string (index1));
 }
 
-bool ValueFederate::getInputOption(input_id_t id, int32_t option) const
+const Publication &ValueFederate::getPublication (const std::string &key, int index1, int index2) const
 {
-    return vfManager->getInputOption(id, option);
+    return vfManager->getPublication (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-bool ValueFederate::getPublicationOption(publication_id_t id, int32_t option) const
+const std::string &ValueFederate::getInputUnits (const Input &inp) const
 {
-    return vfManager->getPublicationOption(id, option);
+    return coreObject->getUnits (inp.getHandle());
+}
+const std::string &ValueFederate::getPublicationUnits (const Publication &pub) const
+{
+    return coreObject->getUnits (pub.getHandle());
 }
 
-
-void ValueFederate::registerInputNotificationCallback (
-  std::function<void(input_id_t, Time)> callback)
+const std::string &ValueFederate::getInputType (const Input &inp) const
 {
-    vfManager->registerCallback (callback);
+    return coreObject->getType (inp.getHandle());
+}
+const std::string &ValueFederate::getPublicationType (const Publication &pub) const
+{
+    return coreObject->getType (pub.getHandle());
 }
 
-void ValueFederate::registerInputNotificationCallback (
-  input_id_t id,
-  std::function<void(input_id_t, Time)> callback)
+std::string ValueFederate::getPublicationType (const Input &inp) const
+{ return coreObject->getType (inp.getHandle()); }
+
+void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
 {
-    vfManager->registerCallback (id, callback);
+    vfManager->setPublicationOption (pub, option, option_value);
 }
 
-void ValueFederate::registerInputNotificationCallback (
-  const std::vector<input_id_t> &ids,
-  std::function<void(input_id_t, Time)> callback)
+void ValueFederate::setInputOption (const Input &inp, int32_t option, bool option_value)
 {
-    vfManager->registerCallback (ids, callback);
+    vfManager->setInputOption (inp, option, option_value);
+}
+
+bool ValueFederate::getInputOption (const Input &inp, int32_t option) const
+{
+    return vfManager->getInputOption (inp, option);
+}
+
+bool ValueFederate::getPublicationOption (const Publication &pub, int32_t option) const
+{
+    return vfManager->getPublicationOption (pub, option);
+}
+
+void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
+{
+    vfManager->setInputNotificationCallback (callback);
+}
+
+void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback)
+{
+    vfManager->setInputNotificationCallback (inp, callback);
 }
 
 /** get a count of the number publications registered*/

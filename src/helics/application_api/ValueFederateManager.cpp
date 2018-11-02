@@ -3,12 +3,16 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "ValueFederateManager.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
+#include "Inputs.hpp"
+#include "Publications.hpp"
+#include "ValueFederateManager.hpp"
+
 namespace helics
 {
-ValueFederateManager::ValueFederateManager (Core *coreOb, federate_id_t id) : coreObject (coreOb), fedID (id)
+ValueFederateManager::ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id)
+    : coreObject (coreOb), fed (vfed), fedID (id)
 {
 }
 ValueFederateManager::~ValueFederateManager () = default;
@@ -31,100 +35,104 @@ int getTypeSize (const std::string &type)
     return (ret == typeSizes.end ()) ? (-1) : ret->second;
 }
 
-publication_id_t ValueFederateManager::registerPublication (const std::string &key,
-                                                            const std::string &type,
-                                                            const std::string &units)
+Publication &ValueFederateManager::registerPublication (const std::string &key,
+                                                        const std::string &type,
+                                                        const std::string &units)
 {
-    auto sz = getTypeSize (type);
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
-    auto pubHandle = publications.lock();
-    publication_id_t id(static_cast<publication_id_t::underlyingType> (pubHandle->size ()));
-    ++publicationCount;
-    pubHandle->insert (key,coreID, key, type, units);
-    pubHandle->back ().id = id;
-    pubHandle->back ().size = sz;
-    pubHandle->back ().coreID = coreID;
-    return id;
+    auto pubHandle = publications.lock ();
+    stx::optional<size_t> active;
+    if (!key.empty ())
+    {
+        active = pubHandle->insert (key, coreID, fed, coreID, key, type, units);
+    }
+    else
+    {
+        active = pubHandle->insert (nullptr, coreID, fed, coreID, key, type, units);
+    }
+
+    if (active)
+    {
+        return pubHandle->back ();
+    }
+    else
+    {
+        throw (RegistrationFailure ("Unable to register Publication"));
+    }
 }
 
-input_id_t ValueFederateManager::registerInput (const std::string &key,
-                                                                      const std::string &type,
-                                                                      const std::string &units)
+Input &
+ValueFederateManager::registerInput (const std::string &key, const std::string &type, const std::string &units)
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
-    auto inpHandle = inputs.lock();
-    input_id_t id(static_cast<input_id_t::underlyingType> (inpHandle->size ()));
-    ++inputCount;
-	if (!key.empty())
-	{
-        inpHandle->insert (key, coreID, key, type, units);
-	}
-	else
-	{
-        inpHandle->insert (nullptr, coreID, key, type, units);
-	}
-    
-    inpHandle->back ().id = id;
-    inpHandle->back ().coreID = coreID;
-    lastData.resize (id.value () + 1);
-    return id;
-}
-
-void ValueFederateManager::addShortcut (input_id_t subid, const std::string &shortcutName)
-{
-    if (subid.value () < inputCount)
+    auto inpHandle = inputs.lock ();
+    stx::optional<size_t> active;
+    if (!key.empty ())
     {
-        auto inpHandle = inputs.lock();
-        inpHandle->addSearchTermForIndex (shortcutName, subid.value ());
-        targetIDs.emplace (shortcutName, subid);
+        active = inpHandle->insert (key, coreID, fed, coreID, key);
     }
     else
     {
-        throw (InvalidIdentifier("input id is invalid"));
+        active = inpHandle->insert (nullptr, coreID, fed, coreID, key);
     }
-}
-
-void ValueFederateManager::addTarget(publication_id_t id, const std::string &target)
-{
-    if (id.value () < publicationCount)
+    if (active)
     {
-        auto pubHandle = publications.lock ();
-        coreObject->addDestinationTarget ((*pubHandle)[id.value ()].coreID, target);
+        auto &ref = inpHandle->back ();
+        auto edat = std::make_unique<input_info> (key, type, units);
+        // non-owning pointer
+        ref.dataReference = edat.get ();
+        auto datHandle = inputData.lock ();
+        datHandle->push_back (std::move (edat));
+        ref.referenceIndex = static_cast<int> (datHandle->size () - 1);
+        return ref;
     }
     else
     {
-        throw (InvalidIdentifier("publication id is invalid"));
+        throw (RegistrationFailure ("Unable to register Input"));
     }
- }
+}
 
-void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
+void ValueFederateManager::addShortcut (const Input &inp, const std::string &shortcutName)
 {
-    if (id.value () < inputCount)
+    if (inp.isValid ())
     {
         auto inpHandle = inputs.lock ();
-        coreObject->addSourceTarget ((*inpHandle)[id.value ()].coreID, target);
-        targetIDs.emplace (target, id);
-        inputTargets.emplace (id, target);
+        inpHandle->addSearchTerm (shortcutName, inp.handle);
+        targetIDs.emplace (shortcutName, inp.handle);
     }
     else
     {
-        throw (InvalidIdentifier("Input id is invalid"));
+        throw (InvalidIdentifier ("input id is invalid"));
     }
- }
+}
 
- void ValueFederateManager::setDefaultValue (input_id_t id, const data_view &block)
+void ValueFederateManager::addTarget (const Publication &pub, const std::string &target)
 {
-    if (id.value () < inputCount)
+    coreObject->addDestinationTarget (pub.handle, target);
+    targetIDs.emplace (target, pub.handle);
+}
+
+void ValueFederateManager::addTarget (const Input &inp, const std::string &target)
+{
+    coreObject->addSourceTarget (inp.handle, target);
+    targetIDs.emplace (target, inp.handle);
+    inputTargets.emplace (inp.handle, target);
+}
+
+void ValueFederateManager::setDefaultValue (const Input &inp, const data_view &block)
+{
+    if (inp.isValid ())
     {
-        auto inpHandle = inputs.lock();
+        input_info *info = reinterpret_cast<input_info *> (inp.dataReference);
+
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
-        lastData[id.value ()] = data_view (std::make_shared<data_block> (block.data (), block.size ()));
-        (*inpHandle)[id.value ()].lastUpdate = CurrentTime;
+        info->lastData = data_view (std::make_shared<data_block> (block.data (), block.size ()));
+        info->lastUpdate = CurrentTime;
     }
     else
     {
-        throw (InvalidIdentifier("Input id is invalid"));
+        throw (InvalidIdentifier ("Input id is invalid"));
     }
 }
 
@@ -132,30 +140,28 @@ void ValueFederateManager::addTarget(input_id_t id, const std::string &target)
 void ValueFederateManager::getUpdateFromCore (interface_handle updatedHandle)
 {
     auto data = coreObject->getValue (updatedHandle);
-    auto inpHandle = inputs.lock();
+    auto inpHandle = inputs.lock ();
     /** find the id*/
     auto fid = inpHandle->find (updatedHandle);
     if (fid != inpHandle->end ())
     {  // assign the data
-        
-        lastData[fid->id.value ()] = data_view (std::move (data));
-        fid->lastUpdate = CurrentTime;
+
+        input_info *info = reinterpret_cast<input_info *> (fid->dataReference);
+        info->lastData = data_view (std::move (data));
+        info->lastUpdate = CurrentTime;
     }
 }
 
-data_view ValueFederateManager::getValue (input_id_t id)
+data_view ValueFederateManager::getValue (const Input &inp)
 {
-    if (id.value () < inputCount)
+    auto iData = reinterpret_cast<input_info *> (inp.dataReference);
+    if (iData != nullptr)
     {
-        auto inpHandle = inputs.lock();
-        (*inpHandle)[id.value ()].lastQuery = CurrentTime;
-        (*inpHandle)[id.value ()].hasUpdate = false;
-        return lastData[id.value ()];
+        iData->lastQuery = CurrentTime;
+        iData->hasUpdate = false;
+        return iData->lastData;
     }
-    else
-    {
-        throw (InvalidIdentifier("Input id is invalid"));
-    }
+    return data_view ();
 }
 
 /** function to check if the size is valid for the given type*/
@@ -164,42 +170,27 @@ inline bool isBlockSizeValid (int size, const publication_info &pubI)
     return ((pubI.size < 0) || (pubI.size == size));
 }
 
-void ValueFederateManager::publish (publication_id_t id, const data_view &block)
+void ValueFederateManager::publish (const Publication &pub, const data_view &block)
 {
-    if (id.value () < publicationCount)
-    {  // send directly to the core
-        auto pubHandle = publications.lock();
-        if (isBlockSizeValid (static_cast<int> (block.size ()), (*pubHandle)[id.value ()]))
-        {
-            coreObject->setValue ((*pubHandle)[id.value ()].coreID, block.data (), block.size ());
-        }
-        else
-        {
-            throw (InvalidIdentifier("publication size is invalid"));
-        }
-    }
-    else
-    {
-        throw (InvalidIdentifier("publication id is invalid"));
-    }
+    coreObject->setValue (pub.handle, block.data (), block.size ());
 }
 
-bool ValueFederateManager::hasUpdate (input_id_t input_id) const
+bool ValueFederateManager::hasUpdate (const Input &inp) const
 {
-    if (input_id.value () < inputCount)
+    auto iData = reinterpret_cast<input_info *> (inp.dataReference);
+    if (iData != nullptr)
     {
-        auto inpHandle = inputs.lock_shared();
-        return (*inpHandle)[input_id.value ()].hasUpdate;
+        return iData->hasUpdate;
     }
     return false;
 }
 
-Time ValueFederateManager::getLastUpdateTime (input_id_t input_id) const
+Time ValueFederateManager::getLastUpdateTime (const Input &inp) const
 {
-    if (input_id.value () < inputCount)
+    auto iData = reinterpret_cast<input_info *> (inp.dataReference);
+    if (iData != nullptr)
     {
-        auto inpHandle = inputs.lock_shared();
-        return (*inpHandle)[input_id.value ()].lastUpdate;
+        return iData->lastUpdate;
     }
     return false;
 }
@@ -208,8 +199,13 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
+	if (handles.empty())
+	{
+        return;
+	}
     // lock the data updates
-    auto inpHandle = inputs.lock();
+    auto inpHandle = inputs.lock ();
+    auto allCall = allCallback.load ();
     for (auto handle : handles)
     {
         /** find the id*/
@@ -217,29 +213,27 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
         if (fid != inpHandle->end ())
         {  // assign the data
             auto data = coreObject->getValue (handle);
+            auto iData = reinterpret_cast<input_info *> (fid->dataReference);
+            iData->lastData = std::move (data);
+            iData->lastUpdate = CurrentTime;
+            iData->hasUpdate = true;
+            if (iData->callback)
+            {
+                Input &inp = *fid;
 
-            auto subIndex = fid->id.value ();
-            // move the data into the container
-            lastData[subIndex] = std::move (data);
-            fid->lastUpdate = CurrentTime;
-            fid->hasUpdate = true;
-            if (fid->callbackIndex >= 0)
-            {
-                // first copy the callback in case it gets changed via another operation
-                auto callbackFunction = callbacks[fid->callbackIndex];
-                inpHandle.unlock();  //need to free the lock
+                inpHandle.unlock ();  // need to free the lock
+
                 // callbacks can do all sorts of things, best not to have it locked during the callback
-                callbackFunction (fid->id, CurrentTime);
-                inpHandle = inputs.lock();
+                iData->callback (inp, CurrentTime);
+                inpHandle = inputs.lock ();
             }
-            else if (allCallbackIndex >= 0)
+            else if (allCall)
             {
-                // first copy the callback in case it gets changed via another operation
-                auto allCallBackFunction = callbacks[allCallbackIndex];
-                inpHandle.unlock();  //need to free the lock
+                Input &inp = *fid;
+                inpHandle.unlock ();  // need to free the lock
                 // callbacks can do all sorts of strange things, best not to have it locked during the callback
-                allCallBackFunction (fid->id, CurrentTime);
-                inpHandle = inputs.lock();
+                allCall (inp, CurrentTime);
+                inpHandle = inputs.lock ();
             }
         }
     }
@@ -247,246 +241,227 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 
 void ValueFederateManager::startupToInitializeStateTransition ()
 {
-    lastData.resize (inputCount);
     // get the actual publication types
-    auto inpHandle = inputs.lock();
-    inpHandle->apply ([this](auto &inp) { inp.pubtype = coreObject->getType (inp.coreID); });
+    auto inpHandle = inputs.lock ();
+    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString (coreObject->getType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
 
-
-std::string ValueFederateManager::localQuery(const std::string &queryStr) const
+std::string ValueFederateManager::localQuery (const std::string &queryStr) const
 {
     std::string ret;
     if (queryStr == "inputs")
     {
-        ret = generateStringVector_if(inputs.lock_shared(), [](const auto &info) { return info.name; },
-            [](const auto &info) {
-            return (!info.name.empty());
-        });
+        ret = generateStringVector_if (inputs.lock_shared (), [](const auto &info) { return info.actualName; },
+                                       [](const auto &info) { return (!info.actualName.empty ()); });
     }
     else if (queryStr == "publications")
     {
-        ret = generateStringVector_if(publications.lock_shared(), [](const auto &info) { return info.name; },
-            [](const auto &info) {
-            return (!info.name.empty());
-        });
+        ret = generateStringVector_if (publications.lock_shared (), [](const auto &info) { return info.key_; },
+                                       [](const auto &info) { return (!info.key_.empty ()); });
     }
     else if (queryStr == "subscriptions")
     {
-            ret = generateStringVector(targetIDs, [](const auto &target) { return target.first; });
+        ret = generateStringVector (targetIDs, [](const auto &target) { return target.first; });
     }
     return ret;
 }
 
-std::vector<input_id_t> ValueFederateManager::queryUpdates ()
+std::vector<int> ValueFederateManager::queryUpdates ()
 {
-    std::vector<input_id_t> updates;
-    auto inpHandle = inputs.lock_shared();
-    for (auto &sub : *inpHandle)
+    std::vector<int> updates;
+    auto inpHandle = inputs.lock_shared ();
+    int ii = 0;
+    for (auto &inp : *inpHandle)
     {
-        if (sub.hasUpdate)
+        if (inp.hasUpdate)
         {
-            updates.push_back (sub.id);
+            updates.push_back (ii);
         }
+        ++ii;
     }
     return updates;
 }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 
-std::string ValueFederateManager::getTarget(input_id_t id) const
+const std::string &ValueFederateManager::getTarget (const Input &inp) const
 {
-    auto inpHandle = inputs.lock_shared();
-    auto fnd = inputTargets.find (id);
+    auto inpHandle = inputs.lock_shared ();
+    auto fnd = inputTargets.find (inp.handle);
     if (fnd != inputTargets.end ())
     {
         return fnd->second;
-	}
-    return nullStr;
-}
-
-const std::string &ValueFederateManager::getInputKey (input_id_t input_id) const
-{
-    auto inpHandle = inputs.lock_shared();
-    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].name : nullStr;
-}
-
-input_id_t ValueFederateManager::getInputId (const std::string &key) const
-{
-    auto inpHandle = inputs.lock_shared();
-    auto sub = inpHandle->find (key);
-    if (sub != inpHandle->end ())
-    {
-        return sub->id;
     }
-    return input_id_t();
+    return emptyStr;
 }
 
-input_id_t ValueFederateManager::getSubscriptionId(const std::string &key) const
+static const Input invalidIpt{};
+static Input invalidIptNC{};
+
+const Input &ValueFederateManager::getInput (const std::string &key) const
+{
+    auto inpHandle = inputs.lock_shared ();
+    auto inpF = inpHandle->find (key);
+    if (inpF != inpHandle->end ())
+    {
+        return *inpF;
+    }
+    return invalidIpt;
+}
+
+Input &ValueFederateManager::getInput (const std::string &key)
+{
+    auto inpHandle = inputs.lock ();
+    auto inpF = inpHandle->find (key);
+    if (inpF != inpHandle->end ())
+    {
+        return *inpF;
+    }
+    return invalidIptNC;
+}
+
+const Input &ValueFederateManager::getInput (int index) const
+{
+    auto inpHandle = inputs.lock_shared ();
+    if (isValidIndex (index, *inpHandle))
+    {
+        return (*inpHandle)[index];
+    }
+    return invalidIpt;
+}
+
+Input &ValueFederateManager::getInput (int index)
+{
+    auto inpHandle = inputs.lock ();
+    if (isValidIndex (index, *inpHandle))
+    {
+        return (*inpHandle)[index];
+    }
+    return invalidIptNC;
+}
+
+const Input &ValueFederateManager::getSubscription (const std::string &key) const
 {
     auto res = targetIDs.equal_range (key);
-	if (res.first != res.second)
-	{
-        return res.first->second;
-	}
-    return input_id_t();
-}
-
-const std::string &ValueFederateManager::getPublicationKey (publication_id_t pub_id) const
-{
-    auto pubHandle = publications.lock_shared();
-    return (isValidIndex(pub_id.value(),*pubHandle)) ? (*pubHandle)[pub_id.value()].name : nullStr;
-}
-
-publication_id_t ValueFederateManager::getPublicationId (const std::string &key) const
-{
-    auto pubHandle = publications.lock_shared();
-    auto pub = pubHandle->find (key);
-    if (pub != pubHandle->end ())
+    if (res.first != res.second)
     {
-        return pub->id;
+        auto inps = inputs.lock_shared ();
+        auto ret = inps->find (res.first->second);
+        if (ret != inps->end ())
+        {
+            return *ret;
+        }
     }
-
-    return publication_id_t();
+    return invalidIpt;
 }
 
-const std::string &ValueFederateManager::getInputUnits (input_id_t input_id) const
+Input &ValueFederateManager::getSubscription (const std::string &key)
 {
-    auto inpHandle = inputs.lock_shared();
-    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].units : nullStr;
-}
-
-const std::string &ValueFederateManager::getPublicationUnits (publication_id_t pub_id) const
-{
-    auto pubHandle = publications.lock_shared();
-    return (isValidIndex(pub_id.value(), *pubHandle)) ? (*pubHandle)[pub_id.value ()].units : nullStr;
-}
-
-const std::string &ValueFederateManager::getInputType (input_id_t input_id) const
-{
-    auto inpHandle = inputs.lock_shared();
-    return (isValidIndex(input_id.value(), *inpHandle)) ? (*inpHandle)[input_id.value ()].type : nullStr;
-}
-
-std::string ValueFederateManager::getPublicationType (input_id_t input_id) const
-{
-    auto inpHandle = inputs.lock_shared();
-    if (isValidIndex(input_id.value(),*inpHandle))
+    auto res = targetIDs.equal_range (key);
+    if (res.first != res.second)
     {
-        if ((*inpHandle)[input_id.value ()].pubtype=="def")
-		{
-            return coreObject->getType ((*inpHandle)[input_id.value ()].coreID);
-		}
-		else
-		{
-            return (*inpHandle)[input_id.value ()].pubtype;
-		}
+        auto inps = inputs.lock ();
+        auto ret = inps->find (res.first->second);
+        if (ret != inps->end ())
+        {
+            return *ret;
+        }
     }
-    return nullStr;
+    return invalidIptNC;
 }
 
-const std::string &ValueFederateManager::getPublicationType (publication_id_t pub_id) const
+static const Publication invalidPub{};
+static Publication invalidPubNC{};
+
+const Publication &ValueFederateManager::getPublication (const std::string &key) const
 {
-    auto pubHandle = publications.lock_shared();
-    return (isValidIndex(pub_id.value(), *pubHandle)) ? (*pubHandle)[pub_id.value ()].type : nullStr;
+    auto pubHandle = publications.lock_shared ();
+    auto pubF = pubHandle->find (key);
+    if (pubF != pubHandle->end ())
+    {
+        return *pubF;
+    }
+    return invalidPub;
 }
 
-
-
-void ValueFederateManager::setPublicationOption(publication_id_t pub_id, int32_t option, bool option_value)
+Publication &ValueFederateManager::getPublication (const std::string &key)
 {
-    auto pubHandle = publications.lock_shared();
-    if (isValidIndex(pub_id.value(), *pubHandle))
+    auto pubHandle = publications.lock ();
+    auto pubF = pubHandle->find (key);
+    if (pubF != pubHandle->end ())
     {
-        coreObject->setHandleOption((*pubHandle)[pub_id.value()].coreID, option, option_value);
+        return *pubF;
     }
-    else
-    {
-        throw(InvalidIdentifier("Publication Id is invalid"));
-    }
+    return invalidPubNC;
 }
 
-void ValueFederateManager::setInputOption(input_id_t input_id, int32_t option, bool option_value)
+const Publication &ValueFederateManager::getPublication (int index) const
 {
-    auto inpHandle = inputs.lock_shared();
-    if (isValidIndex(input_id.value(), *inpHandle))
+    auto pubHandle = publications.lock_shared ();
+    if (isValidIndex (index, *pubHandle))
     {
-        coreObject->setHandleOption((*inpHandle)[input_id.value()].coreID, option, option_value);
+        return (*pubHandle)[index];
     }
-    else
-    {
-        throw(InvalidIdentifier("Input Id is invalid"));
-    }
+    return invalidPub;
 }
 
-bool ValueFederateManager::getInputOption(input_id_t input_id, int32_t option) const
+Publication &ValueFederateManager::getPublication (int index)
 {
-    auto inpHandle = inputs.lock_shared();
-    if (isValidIndex(input_id.value(), *inpHandle))
+    auto pubHandle = publications.lock ();
+    if (isValidIndex (index, *pubHandle))
     {
-        return coreObject->getHandleOption((*inpHandle)[input_id.value()].coreID, option);
+        return (*pubHandle)[index];
     }
-    throw(InvalidIdentifier("Input Id is invalid"));
+    return invalidPubNC;
 }
 
-bool ValueFederateManager::getPublicationOption(publication_id_t pub_id, int32_t option) const
+void ValueFederateManager::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
 {
-    auto pubHandle = publications.lock_shared();
-    if (isValidIndex(pub_id.value(), *pubHandle))
-    {
-        return coreObject->getHandleOption((*pubHandle)[pub_id.value()].coreID, option);
-    }
-    throw(InvalidIdentifier("Publication Id is invalid"));
+    coreObject->setHandleOption (pub.handle, option, option_value);
+}
+
+void ValueFederateManager::setInputOption (const Input &inp, int32_t option, bool option_value)
+{
+    coreObject->setHandleOption (inp.handle, option, option_value);
+}
+
+bool ValueFederateManager::getInputOption (const Input &inp, int32_t option) const
+{
+    return coreObject->getHandleOption (inp.handle, option);
+}
+
+bool ValueFederateManager::getPublicationOption (const Publication &pub, int32_t option) const
+{
+    return coreObject->getHandleOption (pub.handle, option);
 }
 
 /** get a count of the number publications registered*/
-int ValueFederateManager::getPublicationCount () const { return static_cast<int> (publicationCount); }
+int ValueFederateManager::getPublicationCount () const
+{
+    return static_cast<int> (publications.lock_shared ()->size ());
+}
 /** get a count of the number inputs registered*/
-int ValueFederateManager::getInputCount () const { return static_cast<int> (inputCount); }
+int ValueFederateManager::getInputCount () const { return static_cast<int> (inputs.lock_shared ()->size ()); }
 
-void ValueFederateManager::registerCallback (std::function<void(input_id_t, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
-    auto inpHandle = inputs.lock();
-    if (allCallbackIndex >= 0)
+    allCallback.store (std::move (callback));
+}
+
+void ValueFederateManager::setInputNotificationCallback (const Input &inp,
+                                                         std::function<void(Input &, Time)> callback)
+{
+    auto data = reinterpret_cast<input_info *> (inp.dataReference);
+    if (data != nullptr)
     {
-        callbacks[allCallbackIndex] = std::move (callback);
+        data->callback = std::move (callback);
     }
     else
     {
-        allCallbackIndex = static_cast<int> (callbacks.size ());
-        callbacks.emplace_back (std::move (callback));
+        throw (InvalidIdentifier ("Input is not valid"));
     }
 }
 
-void ValueFederateManager::registerCallback (input_id_t id,
-                                             std::function<void(input_id_t, Time)> callback)
-{
-    if (id.value () < inputCount)
-    {
-        auto inpHandle = inputs.lock();
-        (*inpHandle)[id.value ()].callbackIndex = static_cast<int> (callbacks.size ());
-        callbacks.emplace_back (std::move (callback));
-    }
-    else
-    {
-        throw(InvalidIdentifier("Input Id is invalid"));
-    }
-}
-
-void ValueFederateManager::registerCallback (const std::vector<input_id_t> &ids,
-                                             std::function<void(input_id_t, Time)> callback)
-{
-    auto inpHandle = inputs.lock();
-    int ind = static_cast<int> (callbacks.size ());
-    callbacks.emplace_back (std::move (callback));
-    for (auto id : ids)
-    {
-        if (isValidIndex(id.value (),*inpHandle))
-        {
-            (*inpHandle)[id.value ()].callbackIndex = ind;
-        }
-    }
-}
 }  // namespace helics

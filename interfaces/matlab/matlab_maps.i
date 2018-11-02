@@ -44,20 +44,6 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 %}
 
-//typemap for short maxlen strings
-%typemap(in, numinputs=0) (char *outputString, int maxlen) {
-  $2=256;
-  $1=(char *)malloc(256);
-}
-
-%typemap(argout) (char *outputString, int maxlen) {
-  if (--resc>=0) *resv++ = SWIG_FromCharPtr($1);
-}
-
-%typemap(freearg) (char *outputString, int maxlen) {
-   if ($1) free($1);
-}
-
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
 	etemp=helicsErrorInitialize();
 	$1=&etemp;
@@ -72,20 +58,20 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 //typemap for large string output with a length return in C
-%typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
   $3=&($2);
 }
 
-%typemap(freearg) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
    if ($1) free($1);
 }
 
-%typemap(check)(char *outputString, int maxStringlen, int *actualLength) {
+%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
     $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
-%typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
 	
   if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3-1);
 }

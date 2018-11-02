@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test )
     src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 1.0);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
@@ -89,8 +89,8 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
     src1.addPublication ("pub2", "ramp2", helics::helics_type_t::helicsDouble, 2.0);
     src1.setStartTime ("pub2", 3.0);
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
     src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 0.5);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test.json");
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
@@ -239,8 +239,8 @@ BOOST_AUTO_TEST_CASE (simple_source_test2_file)
 
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test2.json");
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE (sine_source_test_file)
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_sine_source.json");
 
     helics::ValueFederate vfed ("block1",fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();

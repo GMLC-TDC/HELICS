@@ -312,8 +312,6 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
 
-    //shared_guarded<DualMappedPointerVector<FilterInfo, std::string,
-     //                       fed_handle_pair>> filters;  //!< storage for all the filters
 
     DualMappedPointerVector<FilterInfo, std::string,
         global_handle> filters;  //!< storage for all the filters

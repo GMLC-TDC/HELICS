@@ -31,10 +31,10 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     auto pub2_b = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_b");
     
     
-    auto sub1_a = helics::Subscription( vFed2, "pub1_a");
-    auto sub1_b = helics::Subscription( vFed2, "pub1_b");
-    auto sub2_a = helics::Subscription( vFed1, "pub2_a");
-    auto sub2_b = helics::Subscription( vFed1, "pub2_b");
+    auto sub1_a = vFed2->registerSubscription("pub1_a");
+    auto sub1_b = vFed2->registerSubscription ("pub1_b");
+    auto sub2_a = vFed2->registerSubscription ("pub2_a");
+    auto sub2_b = vFed2->registerSubscription ("pub2_b");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
@@ -99,9 +99,9 @@ BOOST_AUTO_TEST_CASE(ring_test3)
     auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
     auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2");
     auto pub3 = helics::make_publication<double>(helics::GLOBAL, vFed3, "pub3");
-    auto sub1 = helics::Subscription(vFed1, "pub3");
-    auto sub2 = helics::Subscription(vFed2, "pub1");
-    auto sub3 = helics::Subscription(vFed3, "pub2");
+    auto sub1 = vFed1->registerSubscription ("pub3");
+    auto sub2 = vFed2->registerSubscription ("pub1");
+    auto sub3 = vFed3->registerSubscription ("pub2");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
     vFed3->enterExecutingMode();

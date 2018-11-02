@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     play1.addPoint (3.0, "pub1", 0.8);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1=vfed.registerSubscription( "pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
     play1.addPoint (3.0, "pub1", std::complex<double>(0.0,0.8));
     play1.addPoint (4.0, "pub1", "c[3.0+0j, 0.0-4.0j]");
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
     play1.addPoint (1.0, 2, "pub1", 0.8);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
@@ -158,8 +158,8 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     play1.addPoint (3.0, "pub2", 0.9);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
 
@@ -205,8 +205,8 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
     play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
@@ -252,8 +252,8 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 	
     BOOST_CHECK_EQUAL (play1.pointCount (), 7);
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
@@ -302,8 +302,8 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     fi.coreInitString = "1 --broker=ipc_broker";
 
     helics::ValueFederate vfed ("obj",fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
@@ -357,8 +357,8 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     fi.coreInitString = "1";
 
     helics::ValueFederate vfed ("fed",fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 0.3);
@@ -403,8 +403,8 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
     play1.loadFile (std::string (TEST_DIR) + "/test_files/example6.json");
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
 

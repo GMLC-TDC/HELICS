@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
 
     helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
 
-    helics::Subscription subid (fed, "pub1");
+    fed->registerSubscription("pub1");
     fed->enterExecutingMode ();
     // publish string1 at time=0.0;
     auto now = std::chrono::steady_clock::now ();
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
             ++warnCounter;
         }
     });
-    helics::Subscription subid (fed, "pub1");
+    fed->registerSubscription ("pub1");
     fed2->enterExecutingModeAsync ();
     fed->enterExecutingMode ();
     fed2->enterExecutingModeComplete ();
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
     helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
 
-    helics::Subscription subid (fed, "pub1");
+    fed->registerSubscription ("pub1");
     fed2->enterExecutingModeAsync ();
     fed->enterExecutingMode ();
     fed2->enterExecutingModeComplete ();

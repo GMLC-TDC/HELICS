@@ -95,42 +95,37 @@ FedObject *getFedObject (helics_federate fed, helics_error *err);
 class InputObject
 {
   public:
-    std::unique_ptr<Input> inputPtr;
-    input_id_t id;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Input *inputPtr;
 };
 
 /** object wrapping a publication*/
 class PublicationObject
 {
   public:
-    std::unique_ptr<Publication> pubptr;
-    publication_id_t id;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Publication *pubPtr;
 };
 /** object wrapping and endpoint*/
 class EndpointObject
 {
   public:
-    std::unique_ptr<Endpoint> endptr;
+    Endpoint *endPtr;
     std::shared_ptr<MessageFederate> fedptr;
     std::unique_ptr<Message> lastMessage;
     int valid = 0;
 };
 
-
-
 /** object wrapping a source filter*/
 class FilterObject
 {
   public:
-    bool cloning=false;  //indicator that the filter is a cloning filter
+    bool cloning = false;  // indicator that the filter is a cloning filter
     int valid = 0;
-    std::shared_ptr<Filter> filtptr;
+    Filter *filtPtr;
+    std::unique_ptr<Filter> uFilter;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };
@@ -156,6 +151,24 @@ class QueryObject
     {                                                                                                                                      \
         if ((err != nullptr) && (err->error_code != 0))                                                                                    \
         {                                                                                                                                  \
+            return retval;                                                                                                                 \
+        }                                                                                                                                  \
+    } while (0)
+
+extern const std::string emptyStr;
+extern const std::string nullStringArgument;
+#define AS_STRING(str) (str != nullptr) ? std::string (str) : emptyStr
+
+#define CHECK_NULL_STRING(str, retval)                                                                                                     \
+    do                                                                                                                                     \
+    {                                                                                                                                      \
+        if (str == nullptr)                                                                                                                \
+        {                                                                                                                                  \
+            if (err != nullptr)                                                                                                            \
+            {                                                                                                                              \
+                err->error_code = helics_error_invalid_argument;                                                                           \
+                err->message = nullStringArgument.c_str ();                                                                                \
+            }                                                                                                                              \
             return retval;                                                                                                                 \
         }                                                                                                                                  \
     } while (0)

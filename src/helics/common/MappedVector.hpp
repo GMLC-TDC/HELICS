@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 #include "MapTraits.hpp"
 #include "helics_includes/optional.hpp"
@@ -18,7 +17,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 the main use case is a bunch of inserts then searching with limited to no removal since removal is a rather
 expensive operation
 */
-template <class VType, class searchType = std::string>
+template <class VType,
+          class searchType = std::string,
+          reference_stability STABILITY = reference_stability::unstable>
 class MappedVector
 {
   public:
@@ -37,6 +38,17 @@ class MappedVector
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup.emplace (searchValue, index);
+        return index;
+    }
+    /** insert an element into the mapped vector
+    @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @return the index of the value placed
+    */
+    template <typename... Us>
+    stx::optional<size_t> insert (std::nullptr_t /*searchValue*/, Us &&... data)
+    {
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
         return index;
     }
 
@@ -149,9 +161,9 @@ class MappedVector
     {
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
     }
-    /*NOTE:: only constant iterators allowed since this would introduce the possibilty
+    /*NOTE:: only constant iterators allowed since this would introduce the possibility
     of using iterators for various algorithms which could cause the object to go to a indeterminate state
-    therefore constant iterators are allowed but not modifable iterators
+    therefore constant iterators are allowed but not modifiable iterators
     someone determined to screw it up could still easily do so*/
 
     /** get a const iterator to the beginning of the data vector*/
@@ -170,7 +182,8 @@ class MappedVector
     }
 
   private:
-    std::deque<VType> dataStorage;
+    std::conditional_t<STABILITY == reference_stability::unstable, std::vector<VType>, std::deque<VType>>
+      dataStorage;  //!< primary storage for data
     std::conditional_t<is_easily_hashable<searchType>::value,
                        std::unordered_map<searchType, size_t>,
                        std::map<searchType, size_t>>

@@ -98,7 +98,7 @@ bool CommonCore::connect ()
 
 bool CommonCore::isConnected () const
 {
-    auto getCurrentState = brokerState.load ();
+    auto getCurrentState = brokerState.load (std::memory_order_acquire);
     return ((getCurrentState == operating) || (getCurrentState == connected));
 }
 
@@ -504,7 +504,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         return local_id;
     }
-    throw (RegistrationFailure (std::string("fed received Failure ")+fed->lastErrorString ()));
+    throw (RegistrationFailure (std::string ("fed received Failure ") + fed->lastErrorString ()));
 }
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
@@ -865,7 +865,7 @@ interface_handle CommonCore::getPublication (federate_id_t federateID, const std
     return pub->getInterfaceHandle ();
 }
 
-const std::string nullStr;
+const std::string emptyStr;
 
 const std::string &CommonCore::getHandleName (interface_handle handle) const
 {
@@ -874,7 +874,7 @@ const std::string &CommonCore::getHandleName (interface_handle handle) const
     {
         return handleInfo->key;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getUnits (interface_handle handle) const
@@ -884,7 +884,7 @@ const std::string &CommonCore::getUnits (interface_handle handle) const
     {
         return handleInfo->units;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getType (interface_handle handle) const
@@ -906,7 +906,7 @@ const std::string &CommonCore::getType (interface_handle handle) const
         }
         return handleInfo->type;
     }
-    return nullStr;
+    return emptyStr;
 }
 
 const std::string &CommonCore::getOutputType (interface_handle handle) const
@@ -922,10 +922,10 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
         case handle_type_t::filter:
             return handleInfo->type_out;
         default:
-            return nullStr;
+            return emptyStr;
         }
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)
@@ -2175,25 +2175,29 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
-        if (waitingForServerPingReply)
+        if (waitingForBrokerPingReply)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
-            LOG_ERROR (global_broker_id_local, getIdentifier (), "lost connection with server");
+            LOG_ERROR (global_broker_id_local, getIdentifier (), "core lost connection with broker");
             sendErrorToFederates (-5);
             processDisconnect ();
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
-        else
+        else if ((isConnected ()) && (global_broker_id_local.isValid ()) &&
+                 (global_broker_id_local != parent_broker_id))
         {
             // if (allFedWaiting())
             //{
-            ActionMessage png (CMD_PING);
-            png.source_id = global_broker_id_local;
-            png.dest_id = higher_broker_id;
-            transmit (parent_route_id, png);
-            waitingForServerPingReply = true;
+            if (higher_broker_id.isValid ())
+            {
+                ActionMessage png (CMD_PING);
+                png.source_id = global_broker_id_local;
+                png.dest_id = higher_broker_id;
+                transmit (parent_route_id, png);
+                waitingForBrokerPingReply = true;
+            }
             //}
         }
         break;
@@ -2209,7 +2213,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            waitingForServerPingReply = false;
+            waitingForBrokerPingReply = false;
         }
         break;
     case CMD_USER_DISCONNECT:
@@ -2231,7 +2235,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_BROADCAST_DISCONNECT:
     {
         timeCoord->processTimeMessage (command);
-        for (auto &fed :loopFederates)
+        for (auto &fed : loopFederates)
         {
             fed->addAction (command);
         }
@@ -2312,11 +2316,11 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == parent_broker_id)
         {
-			if ((!checkAndProcessDisconnect())||(brokerState<broker_state_t::operating))
-			{
+            if ((!checkAndProcessDisconnect ()) || (brokerState < broker_state_t::operating))
+            {
                 command.setAction (CMD_DISCONNECT_FED);
                 transmit (parent_route_id, command);
-			}
+            }
         }
         else
         {
@@ -2427,6 +2431,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             command.name = command.getString (targetStringLoc);
             command.setAction (CMD_ADD_NAMED_INPUT);
             command.setSource (pub->handle);
+            command.clearStringData ();
             checkForNamedInterface (command);
         }
         else
@@ -2440,6 +2445,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             {
                 command.setAction (CMD_ADD_NAMED_PUBLICATION);
                 command.setSource (input->handle);
+                command.clearStringData ();
                 checkForNamedInterface (command);
             }
         }
@@ -2755,15 +2761,15 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         processFilterInfo (command);
         if (command.source_id != global_broker_id_local)
         {
-			if (!checkActionFlag(command, error_flag))
-			{
+            if (!checkActionFlag (command, error_flag))
+            {
                 auto fed = getFederateCore (command.dest_id);
                 if (fed != nullptr)
                 {
                     command.setAction (CMD_ADD_DEPENDENT);
                     fed->addAction (command);
                 }
-			}
+            }
         }
     }
     // just forward these to the appropriate federate
@@ -2782,11 +2788,10 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 {
                     filtI->sourceTargets.emplace_back (command.getSource ());
                 }
-				if (!checkActionFlag(command, error_flag))
-				{
+                if (!checkActionFlag (command, error_flag))
+                {
                     timeCoord->addDependency (command.source_id);
-				}
-                
+                }
             }
 
             auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue ());
@@ -2801,10 +2806,10 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
-			if (!checkActionFlag(command, error_flag))
-			{
+            if (!checkActionFlag (command, error_flag))
+            {
                 fed->addAction (command);
-			}
+            }
             auto handle = loopHandles.getHandleInfo (command.dest_handle.baseValue ());
             if (handle != nullptr)
             {
@@ -3425,7 +3430,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
             {
                 fed->processPostTerminationAction (cmd);
             }
-		}
+        }
     }
     else
     {
