@@ -119,7 +119,7 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         {
             auto eptName = getKey (ept);
             auto type = jsonGetOrDefault (ept, "type", std::string ());
-            bool global = jsonGetOrDefault (ept, "type", false);
+            bool global = jsonGetOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
             
 

@@ -106,8 +106,8 @@ namespace helics
 {
 using publication_id_t = identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
 using input_id_t = identifier_id_t<identifier_type, identifiers::input, invalid_id_value>;
-using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
-using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
+//using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
+//using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** data class for pair of a string and double*/

@@ -268,16 +268,16 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     return ret;
 }
 
-std::vector<input_id_t> ValueFederateManager::queryUpdates ()
+std::vector<int> ValueFederateManager::queryUpdates ()
 {
-    std::vector<input_id_t> updates;
+    std::vector<int> updates;
     auto inpHandle = inputs.lock_shared ();
     int ii = 0;
-    for (auto &sub : *inpHandle)
+    for (auto &inp : *inpHandle)
     {
-        if (sub.hasUpdate)
+        if (inp.hasUpdate)
         {
-            updates.push_back (input_id_t (ii));
+            updates.push_back (ii);
         }
         ++ii;
     }

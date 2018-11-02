@@ -123,7 +123,7 @@ class ValueFederateManager
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
     */
-    std::vector<input_id_t> queryUpdates ();
+    std::vector<int> queryUpdates ();
 
     /** get the target of a input*/
     const std::string &getTarget (const Input &inp) const;

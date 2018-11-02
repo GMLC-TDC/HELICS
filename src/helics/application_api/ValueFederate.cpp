@@ -152,7 +152,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             }
             auto type = jsonGetOrDefault (pub, "type", std::string ());
             auto units = jsonGetOrDefault (pub, "units", std::string ());
-            bool global = jsonGetOrDefault (pub, "type", false);
+            bool global = jsonGetOrDefault (pub, "global", false);
             if (global)
             {
                 pubAct=&registerGlobalPublication (key, type, units);
@@ -215,7 +215,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             }
             auto type = jsonGetOrDefault (ipt, "type", std::string ());
             auto units = jsonGetOrDefault (ipt, "units", std::string ());
-            bool global = jsonGetOrDefault (ipt, "type", false);
+            bool global = jsonGetOrDefault (ipt, "global", false);
             if (global)
             {
                 inp=&registerGlobalInput (key, type, units);
@@ -379,7 +379,7 @@ std::string ValueFederate::localQuery (const std::string &queryStr) const
     return vfManager->localQuery (queryStr);
 }
 
-std::vector<input_id_t> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
+std::vector<int> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
 const std::string &ValueFederate::getInputKey (const Input &inp) const { return inp.getName (); }
 

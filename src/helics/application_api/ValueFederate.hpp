@@ -372,7 +372,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
     */
-    std::vector<input_id_t> queryUpdates ();
+    std::vector<int> queryUpdates ();
 
     /** get the key or the string identifier of an from its id
     @return empty string if an invalid id is passed*/
