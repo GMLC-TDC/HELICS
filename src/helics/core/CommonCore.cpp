@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -98,7 +98,7 @@ bool CommonCore::connect ()
 
 bool CommonCore::isConnected () const
 {
-    auto getCurrentState = brokerState.load ();
+    auto getCurrentState = brokerState.load (std::memory_order_acquire);
     return ((getCurrentState == operating) || (getCurrentState == connected));
 }
 
@@ -2185,17 +2185,17 @@ void CommonCore::processCommand (ActionMessage &&command)
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
-        else if (!isConnected ())
-            {
-                // if (allFedWaiting())
-                //{
-                ActionMessage png (CMD_PING);
-                png.source_id = global_broker_id_local;
-                png.dest_id = higher_broker_id;
-                transmit (parent_route_id, png);
-                waitingForServerPingReply = true;
-                //}
-            }
+        else if (isConnected ())
+        {
+            // if (allFedWaiting())
+            //{
+            ActionMessage png (CMD_PING);
+            png.source_id = global_broker_id_local;
+            png.dest_id = higher_broker_id;
+            transmit (parent_route_id, png);
+            waitingForServerPingReply = true;
+            //}
+        }
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)

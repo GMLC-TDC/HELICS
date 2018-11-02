@@ -576,7 +576,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 brokerState = broker_state_t::errored;
                 addActionMessage (CMD_STOP);
             }
-            else
+            else if (isConnected ())
             {
                 // if (allFedWaiting())
                 //{
@@ -1506,7 +1506,11 @@ bool CoreBroker::connect ()
     return isConnected ();
 }
 
-bool CoreBroker::isConnected () const { return ((brokerState == operating) || (brokerState == connected)); }
+bool CoreBroker::isConnected () const
+{
+    auto state = brokerState.load (std::memory_order_acquire);
+    return ((state == operating) || (state == connected));
+}
 
 void CoreBroker::waitForDisconnect (int msToWait) const
 {
