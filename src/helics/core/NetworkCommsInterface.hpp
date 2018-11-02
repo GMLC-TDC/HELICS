@@ -36,8 +36,7 @@ private:
   public:
     /** default constructor*/
 	  explicit NetworkCommsInterface(interface_type type) noexcept;
-    /** destructor*/
-    ~NetworkCommsInterface();
+
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
@@ -49,6 +48,7 @@ private:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
     bool autoPortNumber = true;
+    bool useOsPortAllocation = false;
     const interface_type networkType;
 	interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};

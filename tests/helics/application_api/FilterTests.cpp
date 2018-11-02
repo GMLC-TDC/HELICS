@@ -26,9 +26,9 @@ BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
 BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all), core_type)
 {
     auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 2, broker, helics::timeZero, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 2, broker, helics::timeZero, "message");
-
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "filter");
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "message");
+    broker = nullptr;
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
@@ -48,7 +48,9 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
     BOOST_CHECK (f3.getHandle () != f2.getHandle ());
     mFed->finalize ();
     fFed->finalize ();
+    
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    FullDisconnect ();
 }
 
 /** test a filter operator
@@ -100,8 +102,8 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
         auto m3 = mFed->getMessage (p2);
     }
     fFed->requestTimeAsync (3.0);
-    /*auto retTime = */ mFed->requestTime (3.0);
-
+    auto retTime = mFed->requestTime (3.0);
+    BOOST_CHECK_EQUAL (retTime, 3.0);
     BOOST_REQUIRE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);

@@ -66,7 +66,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
     }
     CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (BrokerBase::networkTimeout);
+    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (std::chrono::milliseconds(BrokerBase::networkTimeout));
 
     auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)

@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
+#include <vector>
 
 #include "helics/chelics.h"
 #include "helics/helics-config.h"
@@ -18,24 +19,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #define HELICS_SIZE_MAX 512
 
-#ifndef DISABLE_TCP_CORE
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "ipc", "udp", "tcp", "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "udp"};
-#endif
-#else
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "ipc", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "udp"};
-#endif
-#endif
+extern const std::vector<std::string> core_types;
+extern const std::vector<std::string> core_types_single;
 
 typedef helics_federate (*FedCreator) (char const *, helics_federate_info_t, helics_error *err);
 

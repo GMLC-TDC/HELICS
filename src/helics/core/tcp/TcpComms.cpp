@@ -216,6 +216,10 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
             }
         }
     }
+    else
+    {
+        logError(errorMessage);
+    }
 }
 
 bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
@@ -274,28 +278,39 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                                                      }
                                                  }
                                              });
-            int cumsleep = 0;
+            std::chrono::milliseconds cumsleep{ 0 };
             while (PortNumber < 0)
             {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                auto mess = txQueue.try_pop ();
+                auto mess = txQueue.pop(std::chrono::milliseconds(100));
                 if (mess)
                 {
                     if (isProtocolCommand (mess->second))
                     {
                         if (mess->second.messageID == PORT_DEFINITIONS)
                         {
-                            rxMessageQueue.push (mess->second);
+                            rxMessageQueue.push(mess->second);
+                            break;
                         }
-                        else if (mess->second.messageID == DISCONNECT)
+                        
+                         else if (mess->second.messageID == DISCONNECT)
                         {
-                            return terminate (connection_status::terminated);
+                            return terminate(connection_status::terminated);
                         }
+                         else
+                         {
+                             rxMessageQueue.push(mess->second);
+                         }
+                        
+                    }
+                    else
+                    {
+                        logWarning("unexpected message received in transmit queue");
                     }
                 }
-                cumsleep += 100;
+                cumsleep += std::chrono::milliseconds(100);
                 if (cumsleep >= connectionTimeout)
                 {
+                    brokerConnection->cancel();
                     logError ("port number query to broker timed out");
                     return terminate (connection_status::error);
                 }

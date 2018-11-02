@@ -74,7 +74,7 @@ class CommsInterface
     /** set the timeout for the initial broker connection
     @param timeout the value is in milliseconds
     */
-	void setTimeout(int timeout);
+	void setTimeout(std::chrono::milliseconds timeOut);
 
 	/** enable or disable the server more for the comms*/
 	void setServerMode(bool serverActive);
@@ -111,8 +111,7 @@ class CommsInterface
     std::atomic<bool> operating;  //!< the comms interface is in startup mode
   protected:
 	 bool serverMode = true;  //!< some comms have a server mode and non-server mode
-    int connectionTimeout =
-      4000;  // timeout for the initial connection to a broker or to bind a broker port(in ms)
+     std::chrono::milliseconds connectionTimeout{ 4000 };  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
     std::atomic<bool> requestDisconnect{ false }; //!< flag gets set when disconnect is called

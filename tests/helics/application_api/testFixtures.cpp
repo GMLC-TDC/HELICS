@@ -11,6 +11,46 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cctype>
 #include <iostream>
 
+#ifdef HELICS_HAVE_ZEROMQ
+#define ZMQTEST "zmq",
+#define ZMQTEST2 "zmq_2",
+#define ZMQTEST3 "zmq_3",
+#define ZMQTEST4 "zmq_4",
+#else
+#define ZMQTEST
+#define ZMQTEST2
+#define ZMQTEST3
+#define ZMQTEST4
+#endif
+
+#ifndef DISABLE_TCP_CORE
+#define TCPTEST "tcp",
+#define TCPTEST2 "tcp_2",
+#define TCPTEST3 "tcp_3",
+#define TCPTEST4 "tcp_4",
+#else
+#define TCPTEST
+#define TCPTEST2
+#define TCPTEST3
+#define TCPTEST4
+#endif
+
+const std::vector<std::string> ztypes = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
+const std::vector<std::string> core_types = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
+
+const std::vector<std::string> core_types_2 = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};
+
+const std::vector<std::string> core_types_simple = {"test", "ipc", TCPTEST ZMQTEST "udp"};
+const std::vector<std::string> core_types_single = {"test", "ipc", TCPTEST ZMQTEST "udp", "test_3",
+                                                    ZMQTEST3 TCPTEST3 "udp_3"};
+const std::vector<std::string> core_types_all = {
+  "test",         "ipc_2",          TCPTEST "test_2", ZMQTEST "udp",     "test_3",
+  ZMQTEST3 "ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
+const std::vector<std::string> core_types_extended = {"ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4",
+                                                      ZMQTEST4 TCPTEST4 "udp_4"};
+
+const std::string defaultNamePrefix = "fed";
+
 bool hasIndexCode (const std::string &type_name)
 {
     if (std::isdigit (type_name.back ()) != 0)
@@ -35,11 +75,11 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     }
     else
     {
-        type = helics::coreTypeFromString(core_type_name);
+        type = helics::coreTypeFromString (core_type_name);
     }
     std::shared_ptr<helics::Broker> broker;
-	switch (type)
-	{
+    switch (type)
+    {
     case helics::core_type::TCP:
         broker = helics::BrokerFactory::create (type, initialization_string + " --reuse_address");
         break;
@@ -48,10 +88,9 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
         broker = helics::BrokerFactory::create (type, initialization_string + " --client");
         break;
     default:
-        broker=helics::BrokerFactory::create (type, initialization_string);
-	}
+        broker = helics::BrokerFactory::create (type, initialization_string);
+    }
     return broker;
-    
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -82,21 +121,42 @@ FederateTestFixture::~FederateTestFixture ()
     }
     federates.clear ();
     for (auto &broker : brokers)
-    { 
-        if (ctype.compare(0, 3, "tcp") == 0)
+    {
+        if (ctype.compare (0, 3, "tcp") == 0)
         {
-            broker->waitForDisconnect(2000);
+            broker->waitForDisconnect (2000);
         }
         else
         {
-            broker->waitForDisconnect(200);
+            broker->waitForDisconnect (2000);
         }
-        
-		if (broker->isConnected())
-		{
+
+        if (broker->isConnected ())
+        {
             std::cout << "forcing disconnect\n";
             broker->disconnect ();
-		}
+        }
+    }
+    brokers.clear ();
+    helics::cleanupHelicsLibrary ();
+}
+
+void FederateTestFixture::FullDisconnect () 
+{
+    for (auto &fed : federates)
+    {
+        if (fed && fed->getCurrentState () != helics::Federate::op_states::finalize)
+        {
+            fed->finalize ();
+        }
+    }
+    federates.clear ();
+    for (auto &broker : brokers)
+    {
+        if (broker->isConnected ())
+        {
+            broker->disconnect ();
+        }
     }
     brokers.clear ();
     helics::cleanupHelicsLibrary ();

@@ -24,7 +24,7 @@ bool TriggerVariable::trigger ()
     std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
-        triggered.store (true);
+        triggered.store (true,std::memory_order_release);
         cv_trigger.notify_all ();
         return true;
     }
@@ -35,18 +35,18 @@ bool TriggerVariable::trigger ()
 void TriggerVariable::wait () const
 {
     std::unique_lock<std::mutex> lk (stateLock);
-    if (activated && (!triggered.load ()))
+    if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        cv_trigger.wait (lk, [this] { return triggered.load (); });
+        cv_trigger.wait (lk, [this] { return triggered.load (std::memory_order_acquire); });
     }
 }
 
 bool TriggerVariable::wait_for (const std::chrono::milliseconds &duration) const
 {
     std::unique_lock<std::mutex> lk (stateLock);
-    if (activated && (!triggered.load ()))
+    if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        return cv_trigger.wait_for (lk, duration, [this] { return triggered.load (); });
+        return cv_trigger.wait_for(lk, duration, [this] { return triggered.load(std::memory_order_acquire); });
     }
     return true;
 }
@@ -75,7 +75,7 @@ void TriggerVariable::reset ()
     std::unique_lock<std::mutex> lk (stateLock);
     if (activated)
     {
-        while (!triggered.load ())
+        while (!triggered.load (std::memory_order_acquire))
         {
             lk.unlock ();
             trigger ();

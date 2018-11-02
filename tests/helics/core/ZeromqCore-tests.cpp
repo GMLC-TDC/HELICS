@@ -413,8 +413,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     {
         BOOST_CHECK(act2.lock()->action() == helics::action_message_def::action_t::cmd_ack);
     }
-   
-
+  
     comm.disconnect ();
     comm2.disconnect ();
     std::this_thread::sleep_for (200ms);

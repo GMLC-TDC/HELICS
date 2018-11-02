@@ -504,7 +504,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         return local_id;
     }
-    throw (RegistrationFailure (fed->lastErrorString ()));
+    throw (RegistrationFailure (std::string("fed received Failure ")+fed->lastErrorString ()));
 }
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
@@ -2032,7 +2032,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         addRoute (route_id_t (command.getExtraData ()), command.payload);
         break;
     case CMD_PRIORITY_DISCONNECT:
-        checkDisconnect ();
+        checkAndProcessDisconnect ();
         break;
     case CMD_BROKER_QUERY:
         if (command.dest_id == global_broker_id_local)
@@ -2228,6 +2228,16 @@ void CommonCore::processCommand (ActionMessage &&command)
         // we can't just fall through since this may have generated other messages that need to be forwarded or
         // processed
         break;
+    case CMD_BROADCAST_DISCONNECT:
+    {
+        timeCoord->processTimeMessage (command);
+        for (auto &fed :loopFederates)
+        {
+            fed->addAction (command);
+        }
+        checkAndProcessDisconnect ();
+    }
+    break;
     case CMD_STOP:
 
         if (isConnected ())
@@ -2302,7 +2312,11 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == parent_broker_id)
         {
-            checkDisconnect ();
+			if ((!checkAndProcessDisconnect())||(brokerState<broker_state_t::operating))
+			{
+                command.setAction (CMD_DISCONNECT_FED);
+                transmit (parent_route_id, command);
+        }
         }
         else
         {
@@ -2311,7 +2325,7 @@ void CommonCore::processCommand (ActionMessage &&command)
 
         break;
     case CMD_DISCONNECT_CHECK:
-        checkDisconnect ();
+        checkAndProcessDisconnect ();
         break;
     case CMD_SEARCH_DEPENDENCY:
     {
@@ -2743,6 +2757,8 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         processFilterInfo (command);
         if (command.source_id != global_broker_id_local)
         {
+			if (!checkActionFlag(command, error_flag))
+			{
             auto fed = getFederateCore (command.dest_id);
             if (fed != nullptr)
             {
@@ -2750,6 +2766,7 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 fed->addAction (command);
             }
         }
+    }
     }
     // just forward these to the appropriate federate
     else if (command.dest_id == global_broker_id_local)
@@ -2767,7 +2784,11 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 {
                     filtI->sourceTargets.emplace_back (command.getSource ());
                 }
+				if (!checkActionFlag(command, error_flag))
+				{
                 timeCoord->addDependency (command.source_id);
+            }
+                
             }
 
             auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue ());
@@ -2782,7 +2803,10 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
+			if (!checkActionFlag(command, error_flag))
+			{
             fed->addAction (command);
+			}
             auto handle = loopHandles.getHandleInfo (command.dest_handle.baseValue ());
             if (handle != nullptr)
             {
@@ -3201,7 +3225,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
             }
             else
             {
-                checkDisconnect ();
+                checkAndProcessDisconnect ();
             }
         }
     }
@@ -3215,7 +3239,7 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
     }
 }
 
-void CommonCore::checkDisconnect ()
+bool CommonCore::checkAndProcessDisconnect ()
 {
     if (allDisconnected ())
     {
@@ -3225,7 +3249,9 @@ void CommonCore::checkDisconnect ()
         dis.source_id = global_broker_id_local;
         transmit (parent_route_id, dis);
         addActionMessage (CMD_STOP);
+        return true;
     }
+    return false;
 }
 
 void CommonCore::sendDisconnect ()
@@ -3291,7 +3317,14 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
+            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            {
             fed->addAction (cmd);
+        }
+            else
+            {
+                fed->processPostTerminationAction (cmd);
+    }
         }
     }
     else
@@ -3316,7 +3349,14 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
         auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
+            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            {
             fed->addAction (cmd);
+        }
+            else
+            {
+                fed->processPostTerminationAction (cmd);
+    }
         }
     }
     else
@@ -3346,7 +3386,14 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
+            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            {
             fed->addAction (std::move (cmd));
+        }
+            else
+            {
+                fed->processPostTerminationAction (cmd);
+    }
         }
     }
     else
@@ -3372,8 +3419,15 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
+            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            {
             fed->addAction (std::move (cmd));
         }
+            else
+            {
+                fed->processPostTerminationAction (cmd);
+    }
+		}
     }
     else
     {

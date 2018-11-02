@@ -117,8 +117,7 @@ class FirewallOperator : public FilterOperator
         pass = 1,
         setFlag1 = 2,
         setFlag2 = 3,
-        setFlag3 = 4,
-        setFlag4 = 5
+        setFlag3 = 4
     };
     /** default constructor*/
     FirewallOperator () = default;

@@ -123,10 +123,9 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         autoPortNumber = false;
     }
+    useOsPortAllocation = netInfo.use_os_port;
     propertyUnLock ();
 }
-/** destructor*/
-NetworkCommsInterface::~NetworkCommsInterface () {}
 
 void NetworkCommsInterface::setBrokerPort (int brokerPortNumber)
 {

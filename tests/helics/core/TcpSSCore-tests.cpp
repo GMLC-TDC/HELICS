@@ -35,7 +35,7 @@ using helics::Core;
 #define TCP_BROKER_PORT_ALT 33134
 #define TCP_BROKER_PORT_ALT_STRING "33134"
 
-BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
+BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
-    comm.setTimeout (1000);
+    comm.setTimeout (1000ms);
     comm.setServerMode (false);
     auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
+BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -88,8 +88,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
+    auto serviceLoop = srv->runServiceLoop();
+
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
-    srv->runServiceLoop ();
+    
     std::vector<char> data (1024);
     server->setDataCall (
       [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -99,8 +101,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
           return data_Size;
       });
     BOOST_REQUIRE (server->isReady ());
-    server->start ();
-
+    auto res=server->start ();
+    BOOST_CHECK(res);
+    std::this_thread::sleep_for(100ms);
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
@@ -113,6 +116,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     int cnt = 0;
     while (counter < 2)
     {
+        if (len > 130)
+        {
+            break;
+        }
         std::this_thread::sleep_for (100ms);
         ++cnt;
         if (cnt > 30)
@@ -120,17 +127,22 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
             break;
         }
     }
-    BOOST_CHECK_EQUAL (counter, 2);
+    BOOST_CHECK_GE (counter, 1);
 
-    BOOST_CHECK_GT (len, 32);
-    helics::ActionMessage rM (data.data (), len);
+    BOOST_CHECK_GT (len, 50);
+    helics::ActionMessage rM;
+    auto loc=rM.depacketize(data.data(), len);
+    if ((counter == 1) && (loc < len))
+    {
+        rM.depacketize(data.data() + loc, len - loc);
+    }
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     server->close ();
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
+BOOST_AUTO_TEST_CASE (tcpSSComms_rx_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> ServerCounter{0};
@@ -142,7 +154,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     comm.loadTargetInfo (host, "");
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
-
+    auto serviceLoop = srv->runServiceLoop();
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock (actguard);
@@ -175,13 +187,15 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
+BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_through)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm;
@@ -233,7 +247,7 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_through)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
+BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
 {
     std::this_thread::sleep_for (500ms);
     std::atomic<int> counter{0};
@@ -242,7 +256,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm, comm2, comm3;
-
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string ());
     comm3.loadTargetInfo (host, host);
@@ -317,13 +332,14 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
+    
     comm.disconnect ();
-    comm2.disconnect ();
     comm3.disconnect ();
+    comm2.disconnect();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -332,10 +348,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioServiceManager::getServicePointer();
+    auto serviceLoop = srv->runServiceLoop();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), "localhost", TCP_BROKER_PORT);
-    srv->runServiceLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (
@@ -345,8 +361,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
           ++counter;
           return len.load ();
       });
-    server->start ();
-    BOOST_TEST_PASSPOINT ();
+    auto started=server->start ();
+
+    BOOST_CHECK(started);
+    std::this_thread::sleep_for(100ms);
     bool connected = core->connect ();
     BOOST_CHECK (connected);
 
@@ -414,7 +432,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_core_broker_default_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (400));
     std::string initializationString = "1";
@@ -428,7 +446,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_core_broker_default_test)
     connected = core->connect ();
     BOOST_CHECK (connected);
 
-    auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
+    auto ccore = static_cast<helics::tcp::TcpCoreSS *> (core.get ());
     // this will test the automatic port allocation
     BOOST_CHECK_EQUAL (ccore->getAddress (), ccore->getIdentifier ());
     core->disconnect ();

@@ -113,25 +113,28 @@ void MpiService::serviceLoop ()
 
 std::string MpiService::addMpiComms (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock(mpiDataLock);
     comms.push_back (comm);
-    comms_connected += 1;
-
+    comms_connected++;
+    auto tag = comms.size() - 1;
+    dataLock.unlock();
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service)
         ;
 
     // return the rank:tag for the MpiComms object
-    return std::to_string (commRank) + ":" + std::to_string (comms.size () - 1);
+    return std::to_string (commRank) + ":" + std::to_string (tag);
 }
 
 void MpiService::removeMpiComms (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock(mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
         {
             comms[i] = nullptr;
-            comms_connected -= 1;
+            --comms_connected;
             break;
         }
     }
@@ -139,6 +142,7 @@ void MpiService::removeMpiComms (MpiComms *comm)
 
 std::string MpiService::getAddress (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock(mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -166,6 +170,7 @@ int MpiService::getRank ()
 
 int MpiService::getTag (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock(mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -216,6 +221,8 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
+    std::lock_guard<std::mutex> mpilock(mpiDataLock);
+
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         // Skip any nullptr entries

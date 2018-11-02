@@ -224,17 +224,17 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act](helics::ActionMessage &&m) {
         ++counter;
-        act = m;
+        act = std::move(m);
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2](helics::ActionMessage &&m) {
         ++counter2;
-        act2 = m;
+        act2 = std::move(m);
     });
-    comm3.setCallback ([&counter3, &act3](helics::ActionMessage m) {
+    comm3.setCallback ([&counter3, &act3](helics::ActionMessage &&m) {
         ++counter3;
-        act3 = m;
+        act3 = std::move(m);
     });
 
     // need to launch the connection commands at the same time since they depend on eachother in this case

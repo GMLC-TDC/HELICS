@@ -98,7 +98,7 @@ class FederateState
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    std::atomic<bool> processing{false};  //!< the federate is processing
+    std::atomic_flag processing=ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** DISABLE_COPY_AND_ASSIGN */
     FederateState (const FederateState &) = delete;
@@ -252,7 +252,8 @@ class FederateState
     void addAction (const ActionMessage &action);
     /** move a message to the queue*/
     void addAction (ActionMessage &&action);
-
+    /** sometime a message comes in after a federate has terminated and may require a response*/
+	stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
     @param logMessageSource- the name of the object that sent the message

@@ -21,6 +21,7 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
                                        std::chrono::milliseconds timeOut)
 {
     using namespace std::chrono;
+    using namespace std::chrono_literals;
     auto tick = steady_clock::now ();
     milliseconds timeRemaining (timeOut);
     milliseconds timeRemPrev (timeOut);
@@ -30,20 +31,20 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
     {
         auto tock = steady_clock::now ();
         timeRemaining = milliseconds (timeOut) - duration_cast<milliseconds> (tock - tick);
-        if ((timeRemaining < milliseconds (0)) && (trycnt > 1))
+        if ((timeRemaining < 0ms) && (trycnt > 1))
         {
             connectionPtr = nullptr;
             break;
         }
         // make sure we slow down and sleep for a little bit
-        if (timeRemPrev - timeRemaining < milliseconds (100))
+        if (timeRemPrev - timeRemaining < 100ms)
         {
-            std::this_thread::sleep_for (milliseconds (200));
+            std::this_thread::sleep_for (200ms);
         }
         timeRemPrev = timeRemaining;
-        if (timeRemaining < milliseconds (0))
+        if (timeRemaining < 0ms)
         {
-            timeRemaining = milliseconds (400);
+            timeRemaining = 400ms;
         }
 
         // lets try to connect again

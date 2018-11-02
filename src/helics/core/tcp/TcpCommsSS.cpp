@@ -241,8 +241,13 @@ void TcpCommsSS::queue_tx_function ()
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");
-                    setTxStatus (connection_status::terminated);
-                    setRxStatus (connection_status::terminated);
+                   
+                    if (server)
+                    {
+                        server->close();
+                    }
+                    setTxStatus(connection_status::error);
+                    setRxStatus(connection_status::error);
                     return;
                 }
 
@@ -255,6 +260,9 @@ void TcpCommsSS::queue_tx_function ()
             catch (std::exception &e)
             {
                 logError (e.what ());
+                setTxStatus(connection_status::error);
+                setRxStatus(connection_status::error);
+                return;
             }
             established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
         }
@@ -442,9 +450,20 @@ void TcpCommsSS::queue_tx_function ()
         }
     }
 CLOSE_TX_LOOP:
+    for (auto &rt : made_connections)
+    {
+        if (rt.second)
+        {
+            rt.second->close();
+        } 
+    }
+    made_connections.clear();
     for (auto &rt : routes)
     {
-        rt.second->close ();
+        if (rt.second)
+        {
+            rt.second->close();
+        }
     }
     if (brokerConnection)
     {
@@ -452,6 +471,11 @@ CLOSE_TX_LOOP:
     }
     routes.clear ();
     brokerConnection = nullptr;
+    if (server)
+    {
+        server->close();
+        server = nullptr;
+    }
     if (getRxStatus () == connection_status::connected)
     {
         setRxStatus (connection_status::terminated);

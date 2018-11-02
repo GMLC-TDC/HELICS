@@ -22,7 +22,7 @@ class TriggerVariable
     @return true if the trigger was successful, false if the trigger has not been activated yet*/
     bool trigger ();
     /** check if the variable has been triggered*/
-    bool isTriggered () const { return triggered.load (); }
+    bool isTriggered () const { return triggered.load (std::memory_order_acquire); }
     /** wait for the variable to trigger*/
     void wait () const;
     /** wait for a period of time for the value to trigger*/

@@ -53,6 +53,7 @@ class NetworkBrokerData
 	int maxMessageCount = 256; //!< maximum message count
     interface_networks interfaceNetwork = interface_networks::local;
     bool reuse_address = false; //!< allow reuse of binding address
+    bool use_os_port = false;  //!< specify that any automatic port allocation should use operating system allocation
 	server_mode_options server_mode = server_mode_options::unspecified; //!< setup a server mode
   public:
     NetworkBrokerData () = default;
