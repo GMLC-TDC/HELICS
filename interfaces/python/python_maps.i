@@ -1,3 +1,4 @@
+
 %{
 #include "api-data.h"
 
@@ -5,41 +6,62 @@ static PyObject* pHelicsException;
 
 /* throw a helics error */
 static void throwHelicsPythonException(helics_error *err) {
+  char str[256];
   switch (err->error_code)
   {
   case helics_ok:
     return;
   case helics_error_registration_failure:
-    PyErr_SetString(pHelicsException, strcat("helics:registration_failure", err->message));
+    strcat(str, "helics:registration_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_connection_failure:
-    PyErr_SetString(pHelicsException, strcat("helics:connection_failure", err->message));
+    strcat(str, "helics:connection_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_invalid_object:
-    PyErr_SetString(pHelicsException, strcat("helics:invalid_object", err->message));
+    strcat(str, "helics:invalid_object - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_invalid_argument:
-    PyErr_SetString(pHelicsException, strcat("helics:invalid_argument", err->message));
+    strcat(str, "helics:invalid_argument - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_discard:
-    PyErr_SetString(pHelicsException, strcat("helics:discard", err->message));
+    strcat(str, "helics:discard - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case helics_error_system_failure:
-    PyErr_SetString(pHelicsException, strcat("helics:system_failure", err->message));
+    strcat(str, "helics:system_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_invalid_state_transition:
-    PyErr_SetString(pHelicsException, strcat("helics:invalid_state_transition", err->message));
+    strcat(str, "helics:invalid_state_transition - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
     break;
   case   helics_error_invalid_function_call:
-    PyErr_SetString(pHelicsException, strcat("helics:invalid_function_call", err->message));
+    strcat(str, "helics:invalid_function_call - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
 	break;
   case   helics_error_execution_failure:
-    PyErr_SetString(pHelicsException, strcat("helics:execution_failure", err->message));
+    strcat(str, "helics:execution_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
 	break;
   case   helics_error_other:
   case   other_error_type:
   default:
-    PyErr_SetString(pHelicsException, strcat("helics:error", err->message));
+    strcat(str, "helics:error - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
 	break;
   }
 }
@@ -47,10 +69,11 @@ static void throwHelicsPythonException(helics_error *err) {
 %}
 
 %init %{
-    pHelicsException = PyErr_NewException("_helics.pHelicsException", NULL, NULL);
-    Py_INCREF(pHelicsException);
-    PyModule_AddObject(m, "HelicsException", pHelicsException);
+pHelicsException = PyErr_NewException("_helics.HelicsException", NULL, NULL);
+Py_INCREF(pHelicsException);
+PyModule_AddObject(m, "HelicsException", pHelicsException);
 %}
+
 
 %typemap(in, numinputs=0) helics_error * (helics_error etemp) {
     etemp=helicsErrorInitialize();
@@ -62,6 +85,7 @@ static void throwHelicsPythonException(helics_error *err) {
     if ($1->error_code!=helics_ok)
     {
         throwHelicsPythonException($1);
+        return NULL;
     }
 }
 
