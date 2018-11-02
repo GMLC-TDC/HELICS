@@ -504,7 +504,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     {
         return local_id;
     }
-    throw (RegistrationFailure (std::string("fed received Failure ")+fed->lastErrorString ()));
+    throw (RegistrationFailure (std::string ("fed received Failure ") + fed->lastErrorString ()));
 }
 
 const std::string &CommonCore::getFederateName (federate_id_t federateID) const
@@ -2185,17 +2185,17 @@ void CommonCore::processCommand (ActionMessage &&command)
             brokerState = broker_state_t::errored;
             addActionMessage (CMD_STOP);
         }
-        else
-        {
-            // if (allFedWaiting())
-            //{
-            ActionMessage png (CMD_PING);
-            png.source_id = global_broker_id_local;
-            png.dest_id = higher_broker_id;
-            transmit (parent_route_id, png);
-            waitingForServerPingReply = true;
-            //}
-        }
+        else if (!isConnected ())
+            {
+                // if (allFedWaiting())
+                //{
+                ActionMessage png (CMD_PING);
+                png.source_id = global_broker_id_local;
+                png.dest_id = higher_broker_id;
+                transmit (parent_route_id, png);
+                waitingForServerPingReply = true;
+                //}
+            }
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -2231,7 +2231,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_BROADCAST_DISCONNECT:
     {
         timeCoord->processTimeMessage (command);
-        for (auto &fed :loopFederates)
+        for (auto &fed : loopFederates)
         {
             fed->addAction (command);
         }
@@ -2312,11 +2312,11 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT:
         if (command.dest_id == parent_broker_id)
         {
-			if ((!checkAndProcessDisconnect())||(brokerState<broker_state_t::operating))
-			{
+            if ((!checkAndProcessDisconnect ()) || (brokerState < broker_state_t::operating))
+            {
                 command.setAction (CMD_DISCONNECT_FED);
                 transmit (parent_route_id, command);
-        }
+            }
         }
         else
         {
@@ -2757,16 +2757,16 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         processFilterInfo (command);
         if (command.source_id != global_broker_id_local)
         {
-			if (!checkActionFlag(command, error_flag))
-			{
-            auto fed = getFederateCore (command.dest_id);
-            if (fed != nullptr)
+            if (!checkActionFlag (command, error_flag))
             {
-                command.setAction (CMD_ADD_DEPENDENT);
-                fed->addAction (command);
+                auto fed = getFederateCore (command.dest_id);
+                if (fed != nullptr)
+                {
+                    command.setAction (CMD_ADD_DEPENDENT);
+                    fed->addAction (command);
+                }
             }
         }
-    }
     }
     // just forward these to the appropriate federate
     else if (command.dest_id == global_broker_id_local)
@@ -2784,11 +2784,10 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 {
                     filtI->sourceTargets.emplace_back (command.getSource ());
                 }
-				if (!checkActionFlag(command, error_flag))
-				{
-                timeCoord->addDependency (command.source_id);
-            }
-                
+                if (!checkActionFlag (command, error_flag))
+                {
+                    timeCoord->addDependency (command.source_id);
+                }
             }
 
             auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue ());
@@ -2803,10 +2802,10 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
         auto fed = getFederateCore (command.dest_id);
         if (fed != nullptr)
         {
-			if (!checkActionFlag(command, error_flag))
-			{
-            fed->addAction (command);
-			}
+            if (!checkActionFlag (command, error_flag))
+            {
+                fed->addAction (command);
+            }
             auto handle = loopHandles.getHandleInfo (command.dest_handle.baseValue ());
             if (handle != nullptr)
             {
@@ -3319,12 +3318,12 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
         {
             if (fed->getState () != federate_state_t::HELICS_FINISHED)
             {
-            fed->addAction (cmd);
-        }
+                fed->addAction (cmd);
+            }
             else
             {
                 fed->processPostTerminationAction (cmd);
-    }
+            }
         }
     }
     else
@@ -3351,12 +3350,12 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
         {
             if (fed->getState () != federate_state_t::HELICS_FINISHED)
             {
-            fed->addAction (cmd);
-        }
+                fed->addAction (cmd);
+            }
             else
             {
                 fed->processPostTerminationAction (cmd);
-    }
+            }
         }
     }
     else
@@ -3388,12 +3387,12 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
         {
             if (fed->getState () != federate_state_t::HELICS_FINISHED)
             {
-            fed->addAction (std::move (cmd));
-        }
+                fed->addAction (std::move (cmd));
+            }
             else
             {
                 fed->processPostTerminationAction (cmd);
-    }
+            }
         }
     }
     else
@@ -3421,13 +3420,13 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
         {
             if (fed->getState () != federate_state_t::HELICS_FINISHED)
             {
-            fed->addAction (std::move (cmd));
-        }
+                fed->addAction (std::move (cmd));
+            }
             else
             {
                 fed->processPostTerminationAction (cmd);
-    }
-		}
+            }
+        }
     }
     else
     {
