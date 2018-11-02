@@ -146,6 +146,7 @@ class Input
     /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
     bool operator< (const Input &inp) const { return (handle < inp.handle); }
+    bool operator> (const Input &inp) const { return (handle > inp.handle); }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
     @param[in] callback a function with signature void( Time time)
@@ -480,7 +481,7 @@ const X &Input::getValueRef ()
             valueExtract (dv, type, out);
             if (changeDetected (lastValue, out, delta))
             {
-                lastValue = make_valid (std::move(out));
+                lastValue = make_valid (std::move (out));
             }
         }
         else
@@ -490,7 +491,7 @@ const X &Input::getValueRef ()
     }
     else
     {
-		//TODO:: PT make some logic that it can get the raw data from the core again if it was converted already
+        // TODO:: PT make some logic that it can get the raw data from the core again if it was converted already
     }
 
     return getValueRefImpl<remove_cv_ref<X>> (lastValue);

@@ -32,9 +32,7 @@ make_subscription (ValueFederate *valueFed, const std::string &key, const std::s
 
 template <class X>
 inline InputT<X>
-make_subscription (ValueFederate &valueFed,
-                          const std::string &key,
-                          const std::string &units = std::string ())
+make_subscription (ValueFederate &valueFed, const std::string &key, const std::string &units = std::string ())
 {
     InputT<X> ipt (&valueFed, typeNameString<X> (), units);
     ipt.addTarget (key);
@@ -108,7 +106,7 @@ class VectorSubscription
             ids.push_back (id);
         }
 
-		for (auto &id : ids)
+        for (auto &id : ids)
         {
             fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
         }
@@ -173,7 +171,10 @@ class VectorSubscription
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
+    void setInputNotificationCallback (std::function<void(int, Time)> callback)
+    {
+        update_callback = std::move (callback);
+    }
 
   private:
     void handleCallback (Input &inp, Time time)
@@ -287,7 +288,10 @@ class VectorSubscription2d
     @param[in] callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(int, Time)> callback) { update_callback = std::move (callback); }
+    void setInputNotificationCallback (std::function<void(int, Time)> callback)
+    {
+        update_callback = std::move (callback);
+    }
 
   private:
     void handleCallback (const Input &inp, Time time)

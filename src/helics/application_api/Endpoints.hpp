@@ -27,7 +27,7 @@ class Endpoint
     /**/
     // constructor used by messageFederateManager
     Endpoint (MessageFederate *mfed, const std::string &name, interface_handle id, void *data)
-        : fed (mfed), handle (id), dataReference(data), actualName (name)
+        : fed (mfed), handle (id), dataReference (data), actualName (name)
     {
     }
 

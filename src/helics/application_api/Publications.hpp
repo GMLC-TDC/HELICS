@@ -207,7 +207,8 @@ class Publication
     }
     /** publish integral values */
     template <class X>
-    std::enable_if_t<(std::is_integral<X>::value && !std::is_same<remove_cv_ref<X>,char>::value), void> publish (X val)
+    std::enable_if_t<(std::is_integral<X>::value && !std::is_same<remove_cv_ref<X>, char>::value), void>
+    publish (X val)
     {
         publishInt (static_cast<int64_t> (val));
     }
