@@ -56,6 +56,11 @@ def vFed():
     h.helicsFederateFree(vFed)
     h.helicsCloseLibrary()
 
+def test_error_value_federate_initialize():
+    initstring = "1 --name=mainbroker"
+    with pt.raises(h._helics.HelicsException):
+        h.helicsCreateBroker("mq", "", initstring)
+
 
 def test_value_federate_initialize(vFed):
     state = h.helicsFederateGetState(vFed)
