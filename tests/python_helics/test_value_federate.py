@@ -53,6 +53,7 @@ def vFed():
     while (h.helicsBrokerIsConnected(broker)):
         time.sleep(1)
 
+    h.helicsFederateInfoFree(fedinfo)
     h.helicsFederateFree(vFed)
     h.helicsCloseLibrary()
 

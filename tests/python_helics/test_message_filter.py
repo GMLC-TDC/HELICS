@@ -45,16 +45,16 @@ def AddFederate(broker, core_type="zmq", count=1, deltat=1.0, name_prefix="fed")
 
     h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_int_property_log_level, 1)
 
-
     mFed = h.helicsCreateMessageFederate(name_prefix, fedinfo)
 
-    return mFed
+    return mFed, fedinfo
 
-def FreeFederate(fed):
+def FreeFederate(fed, fedinfo):
     h.helicsFederateFinalize(fed)
     state = h.helicsFederateGetState(fed)
     assert state == 3 # TODO: should this be 3?
 
+    h.helicsFederateInfoFree(fedinfo)
     h.helicsFederateFree(fed)
 
 
@@ -76,8 +76,8 @@ def test_broker_functions(broker):
 
 def test_message_filter_registration(broker):
 
-    fFed = AddFederate(broker, "zmq", 1, 1, "filter")
-    mFed = AddFederate(broker, "zmq", 1, 1, "message")
+    fFed, ffedinfo = AddFederate(broker, "zmq", 1, 1, "filter")
+    mFed, mfedinfo = AddFederate(broker, "zmq", 1, 1, "message")
 
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", None)
@@ -102,8 +102,8 @@ def test_message_filter_registration(broker):
     h.helicsFederateFinalize(mFed)
     h.helicsFederateFinalize(fFed)
 
-    FreeFederate(fFed)
-    FreeFederate(mFed)
+    FreeFederate(fFed, ffedinfo)
+    FreeFederate(mFed, mfedinfo)
     time.sleep(1.0)
 
 def test_message_filter_function(broker):
