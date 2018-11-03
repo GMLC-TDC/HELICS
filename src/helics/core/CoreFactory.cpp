@@ -266,7 +266,7 @@ static tripwire::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
-bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
+static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
     if (ptr->isOpenToNewFederates ())
     {

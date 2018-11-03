@@ -36,6 +36,9 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 @return a shared_ptr to the Broker*/
 std::shared_ptr<Broker> findBroker (const std::string &brokerName);
 
+/** try to find a joinable broker of a specific type*/
+std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type);
+
 /** register a coreBroker so it can be found by others
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
 cleanUpBrokers earlier if desired

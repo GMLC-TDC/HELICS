@@ -79,8 +79,8 @@ void BrokerBase::joinAllThreads ()
 
 static const ArgDescriptors extraArgs{
   {"name,n", "name of the broker/core"},
-  {"federates", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-  {"minfed", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"federates,f", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"minfed,m", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
   {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
   {"logfile", "the file to log message to"},
   {"loglevel", ArgDescriptor::arg_type_t::int_type,
@@ -112,18 +112,8 @@ void BrokerBase::displayHelp ()
 void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     variable_map vm;
-    argumentParser (argc, argv, vm, extraArgs, "min");
-    if (vm.count ("min") > 0)
-    {
-        try
-        {
-            minFederateCount = std::stod (vm["min"].as<std::string> ());
-        }
-        catch (const std::invalid_argument &ia)
-        {
-            std::cerr << vm["min"].as<std::string> () << " is not a valid minimum federate count\n";
-        }
-    }
+    argumentParser (argc, argv, vm, extraArgs);
+   
     if (vm.count ("minfed") > 0)
     {
         minFederateCount = vm["minfed"].as<int> ();

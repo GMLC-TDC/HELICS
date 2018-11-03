@@ -420,7 +420,7 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     helics::ValueFederate vFed;
 
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     vFed = helics::ValueFederate ("test1", fi);
     BOOST_CHECK_EQUAL (vFed.getName (), "test1");
 

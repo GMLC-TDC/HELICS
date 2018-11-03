@@ -43,6 +43,7 @@ public:
     virtual bool tryReconnect() override;
 private:
     std::atomic<bool> initialized_{ false };  //!< atomic protecting local initialization
+	bool autoBroker = false;
     std::shared_ptr<CoreBroker> tbroker;  //!<the parent broker;
     std::string brokerInitString;  //!< the initialization string to use for the Broker
     std::string brokerName;  //!< the name of the broker to connect to

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 {
-    const char *initializationString = "1";
+    const char *initializationString = "1 --autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 {
-    const char *initializationString = "1 --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
+    const char *initializationString = "--autobroker --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         std::string filterName;
     };
 
-    std::string initializationString = "1";
+    std::string initializationString = "--autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);

@@ -43,6 +43,7 @@ class TestBroker : public CoreBroker
   private:
     std::string brokerName;  //!< the name of the higher level broker to connect to
     std::string brokerInitString;  //!< the initialization string for the higher level broker
+    bool autoBroker = false;
     std::shared_ptr<CoreBroker> tbroker;  // the parent broker;
                                           // void computeDependencies();
     std::map<route_id_t, std::shared_ptr<CoreBroker>> brokerRoutes;  //!< map of the routes to other brokers

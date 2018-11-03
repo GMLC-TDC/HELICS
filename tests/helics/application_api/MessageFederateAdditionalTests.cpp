@@ -345,7 +345,7 @@ class PingPongFed
     {
         helics::FederateInfo fi (coreType);
         fi.coreName = "pptest";
-        fi.coreInitString = "3";
+        fi.coreInitString = "-f 3";
         fi.setTimeProperty (TIME_DELTA_PROPERTY, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";

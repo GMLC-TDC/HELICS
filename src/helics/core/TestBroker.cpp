@@ -32,6 +32,8 @@ TestBroker::~TestBroker ()
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{{"brokername"s, "identifier for the broker-same as broker"s},
                                       {"broker,b"s, "identifier for the broker"s},
+                                      {"autobroker"s, ArgDescriptor::arg_type_t::flag_type,
+                                       "automatically generate a broker"},
                                       {"broker_address", "location of the broker i.e network address"},
                                       {"brokerinit"s, "the initialization string for the broker"s}};
 
@@ -70,6 +72,10 @@ void TestBroker::initializeFromArgs (int argc, const char *const *argv)
         {
             brokerInitString = vm["brokerinit"].as<std::string> ();
         }
+		if (vm.count("autobroker") > 0)
+		{
+            autoBroker = true;
+		}
         CoreBroker::initializeFromArgs (argc, argv);
     };
 }
@@ -77,7 +83,7 @@ void TestBroker::initializeFromArgs (int argc, const char *const *argv)
 bool TestBroker::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (routeMutex);
-    if (!tbroker)
+    while (!tbroker)
     {
         if (isRoot ())
         {
@@ -88,13 +94,26 @@ bool TestBroker::brokerConnect ()
             setAsRoot ();
             return true;
         }
-
+        std::chrono::milliseconds totalSleep (0);
         auto broker = BrokerFactory::findBroker (brokerName);
         tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
         if (!tbroker)
         {
-            tbroker = std::static_pointer_cast<CoreBroker> (
-              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+            if (autoBroker)
+            {
+                tbroker = std::static_pointer_cast<CoreBroker> (
+                  BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+                tbroker->connect ();
+            }
+            else
+            {
+                if (totalSleep > std::chrono::milliseconds (timeout))
+                {
+                    return false;
+                }
+                std::this_thread::sleep_for (std::chrono::milliseconds (200));
+                totalSleep += std::chrono::milliseconds (200);
+            }
         }
         else
         {
@@ -103,28 +122,8 @@ bool TestBroker::brokerConnect ()
                 tbroker = nullptr;
                 broker = nullptr;
                 BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(200));
-                broker = BrokerFactory::findBroker (brokerName);
-                tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-                if (!tbroker)
-                {
-                    tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
-                }
-                else
-                {
-                    if (!tbroker->isOpenToNewFederates ())
-                    {
-                        tbroker = nullptr;
-                        broker = nullptr;
-                    }
-                }
             }
         }
-        if (tbroker)
-        {
-            tbroker->connect ();
-        }
-        return static_cast<bool> (tbroker);
     }
 
     return static_cast<bool> (tbroker);

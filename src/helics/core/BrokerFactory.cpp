@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -223,6 +222,49 @@ static tripwire::TripWireTrigger tripTrigger;
 std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 {
     return searchableObjects.findObject (brokerName);
+}
+
+
+static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker> &ptr)
+{
+    if (ptr->isOpenToNewFederates ())
+    {
+        switch (type)
+        {
+        case core_type::ZMQ:
+#if HELICS_HAVE_ZEROMQ
+            return (dynamic_cast<zeromq::ZmqBroker *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
+        case core_type::MPI:
+#if HELICS_HAVE_MPI
+            return (dynamic_cast<mpi::MpiBroker *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
+        case core_type::TEST:
+            return (dynamic_cast<testcore::TestBroker *> (ptr.get ()) != nullptr);
+        case core_type::INTERPROCESS:
+        case core_type::IPC:
+            return (dynamic_cast<ipc::IpcBroker *> (ptr.get ()) != nullptr);
+        case core_type::UDP:
+            return (dynamic_cast<udp::UdpBroker *> (ptr.get ()) != nullptr);
+        case core_type::TCP:
+#ifndef DISABLE_TCP_CORE
+            return (dynamic_cast<tcp::TcpBroker *> (ptr.get ()) != nullptr);
+#endif
+        default:
+            return true;
+        }
+    }
+    return false;
+}
+
+
+std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
+{
+    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)

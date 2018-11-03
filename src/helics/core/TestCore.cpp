@@ -24,6 +24,8 @@ TestCore::TestCore (const std::string &core_name) : CommonCore (core_name) {}
 TestCore::TestCore (std::shared_ptr<CoreBroker> nbroker) : tbroker (std::move (nbroker)) {}
 using namespace std::string_literals;
 static const ArgDescriptors extraArgs{{"brokername"s, "identifier for the broker-same as broker"s},
+                                      {"autobroker"s, ArgDescriptor::arg_type_t::flag_type,
+                                       "automatically generate a broker"},
                                       {"broker,b"s, "identifier for the broker"s},
                                       {"broker_address", "location of the broker i.e network address"},
                                       {"brokerinit"s, "the initialization string for the broker"s}};
@@ -52,6 +54,10 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
         {
             brokerInitString = vm["brokerinit"].as<std::string> ();
         }
+        if (vm.count ("autobroker") > 0)
+        {
+            autoBroker = true;
+        }
     }
     if (brokerState == created)
     {
@@ -62,43 +68,45 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
 bool TestCore::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (routeMutex);
-    if (!tbroker)
+    std::chrono::milliseconds totalSleep (0);
+    while (!tbroker)
     {
-        auto broker = BrokerFactory::findBroker (brokerName);
-        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+		if (brokerName.empty())
+		{
+            tbroker =
+              std::dynamic_pointer_cast<CoreBroker> (BrokerFactory::findJoinableBrokerOfType (core_type::TEST));
+		}
+		else
+		{
+            tbroker = std::dynamic_pointer_cast<CoreBroker> (BrokerFactory::findBroker (brokerName));
+		}
+        
         if (!tbroker)
         {
-            tbroker = std::static_pointer_cast<CoreBroker> (
-              BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+            if (autoBroker)
+            {
+                tbroker = std::static_pointer_cast<CoreBroker> (
+                  BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
+                tbroker->connect ();
+            }
+            else
+            {
+                if (totalSleep > std::chrono::milliseconds (timeout))
+                {
+                    return false;
+                }
+                std::this_thread::sleep_for (std::chrono::milliseconds (200));
+                totalSleep += std::chrono::milliseconds (200);
+            }
         }
         else
         {
             if (!tbroker->isOpenToNewFederates ())
             {
                 tbroker = nullptr;
-                broker = nullptr;
-                BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(200));
-                broker = BrokerFactory::findBroker (brokerName);
-                tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-                if (!tbroker)
-                {
-                    tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
-                }
-                else
-                {
-                    if (!tbroker->isOpenToNewFederates ())
-                    {
-                        tbroker = nullptr;
-                        broker = nullptr;
-                    }
-                }
+                BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (200));
             }
         }
-    }
-    if (tbroker)
-    {
-        tbroker->connect ();
     }
     return static_cast<bool> (tbroker);
 }
@@ -106,7 +114,7 @@ bool TestCore::brokerConnect ()
 bool TestCore::tryReconnect ()
 {
     auto broker = BrokerFactory::findBroker (brokerName);
-    std::lock_guard<std::mutex> lock(routeMutex);
+    std::lock_guard<std::mutex> lock (routeMutex);
     tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     return static_cast<bool> (tbroker);
 }
@@ -166,7 +174,7 @@ void TestCore::transmit (route_id_t route_id, ActionMessage &&cmd)
     {
         if (tbroker)
         {
-            tbroker->addActionMessage (std::move(cmd));
+            tbroker->addActionMessage (std::move (cmd));
         }
 
         return;
@@ -175,18 +183,18 @@ void TestCore::transmit (route_id_t route_id, ActionMessage &&cmd)
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addActionMessage (std::move(cmd));
+        brkfnd->second->addActionMessage (std::move (cmd));
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
     if (crfnd != coreRoutes.end ())
     {
-        crfnd->second->addActionMessage (std::move(cmd));
+        crfnd->second->addActionMessage (std::move (cmd));
         return;
     }
     if (tbroker)
     {
-        tbroker->addActionMessage (std::move(cmd));
+        tbroker->addActionMessage (std::move (cmd));
     }
 }
 
@@ -217,7 +225,7 @@ void TestCore::addRoute (route_id_t route_id, const std::string &routeInfo)
     // the route will default to the central route
 }
 
-std::string TestCore::generateLocalAddressString () const  { return getIdentifier (); }
+std::string TestCore::generateLocalAddressString () const { return getIdentifier (); }
 
 }  // namespace testcore
 }  // namespace helics
