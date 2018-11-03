@@ -38,17 +38,17 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
         if (!coreObject)
         {
-            coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
+            coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString(fi));
         }
     }
     else
     {
-        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
         if (!coreObject->isOpenToNewFederates ())
         {
             coreObject = nullptr;
             CoreFactory::cleanUpCores (200ms);
-            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
             if (!coreObject->isOpenToNewFederates ())
             {
                 throw (
@@ -91,12 +91,12 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
             coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
             if (!coreObject)
             {
-                coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
+                coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
             }
         }
         else
         {
-            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
         }
     }
 
@@ -126,7 +126,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
-Federate::Federate (const std::string &configString) : Federate (std::string (), loadFederateInfo (configString))
+Federate::Federate (const std::string &configString) : Federate (std::string{}, loadFederateInfo (configString))
 {
     registerFilterInterfaces (configString);
 }

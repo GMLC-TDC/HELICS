@@ -488,5 +488,6 @@ std::string generateFullCoreInitString (const FederateInfo &fi)
         res.append (fi.localport);
 	}
     return res;
+}
 
 }  // namespace helics
