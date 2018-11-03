@@ -2197,7 +2197,13 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_CHECK_CONNECTIONS:
-        checkAndProcessDisconnect ();
+	{
+        auto res=checkAndProcessDisconnect ();
+        LOG_WARNING (global_broker_id_local, getIdentifier (),
+                     fmt::format ("CHECK CONNECTIONS {}, federates={}", res,
+                                  loopFederates.size ()));
+	}
+        
         break;
     case CMD_USER_DISCONNECT:
         if (isConnected ())

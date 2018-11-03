@@ -593,6 +593,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_CHECK_CONNECTIONS:
         sendDisconnect ();
         addActionMessage (CMD_STOP);
+        LOG_WARNING (global_broker_id_local, getIdentifier (), "disconnecting from check connections");
         break;
     case CMD_INIT:
     {
