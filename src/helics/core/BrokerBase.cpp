@@ -393,7 +393,6 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TICK:
             if (checkActionFlag(command, error_flag))
             {
-                serviceLoop = nullptr;
                 serviceLoop = AsioServiceManager::runServiceLoop();
             }
             if (messagesSinceLastTick == 0)
