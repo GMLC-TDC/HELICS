@@ -46,7 +46,7 @@ target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
 add_test(
   NAME application-api-tests
-  COMMAND application-api-tests --log_level=message --report_level=short
+  COMMAND application-api-tests --log_level=test_suite --report_level=short
 )
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
