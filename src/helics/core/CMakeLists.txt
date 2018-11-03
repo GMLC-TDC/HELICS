@@ -32,6 +32,7 @@ set(
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
 	federate_id.cpp
+	TimeoutMonitor.cpp
 
 )
 
@@ -100,6 +101,7 @@ set(
 	loggingHelper.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
+	TimeoutMonitor.h
 	CoreBroker.hpp
 	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp

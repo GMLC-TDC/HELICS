@@ -42,6 +42,7 @@ enum class action_t : int32_t
     cmd_disconnect_check = 5,  //!< check for a disconnect
     cmd_disconnect_fed = 6,  //!< disconnect a federate
 	cmd_broadcast_disconnect=7, //!< a broadcast disconnect message
+	cmd_check_connections=297, //!< command to check for any connections
     cmd_ping = 298,  //!< request for an Echo response
     cmd_ping_reply = 299,  //!< response to a ping request
 
@@ -145,6 +146,7 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
 #define CMD_DISCONNECT_FED action_message_def::action_t::cmd_disconnect_fed
 #define CMD_BROADCAST_DISCONNECT action_message_def::action_t::cmd_broadcast_disconnect
+#define CMD_CHECK_CONNECTIONS action_message_def::action_t::cmd_check_connections
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 #define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup

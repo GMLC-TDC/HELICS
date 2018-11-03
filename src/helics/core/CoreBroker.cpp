@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/fmt_format.h"
 #include <boost/filesystem.hpp>
 
+#include "TimeoutMonitor.h"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
@@ -564,35 +565,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
 
     case CMD_TICK:
-        if (!isRootc)
-        {
-            if (waitingForBrokerPingReply)
-            {
-                // try to reset the connection to the broker
-                // brokerReconnect()
-                LOG_ERROR (global_broker_id_local, getIdentifier (), "broker lost connection with parent broker");
-                sendErrorToImmediateBrokers (-5);
-                disconnect ();
-                brokerState = broker_state_t::errored;
-                addActionMessage (CMD_STOP);
-            }
-            else if ((isConnected ()) && (global_broker_id_local.isValid ()) &&
-                     (global_broker_id_local != parent_broker_id))
-            {
-                // if (allFedWaiting())
-                //{
-				if (higher_broker_id.isValid())
-				{
-                    ActionMessage png (CMD_PING);
-                    png.source_id = global_broker_id_local;
-                    png.dest_id = higher_broker_id;
-                    transmit (parent_route_id, png);
-                    waitingForBrokerPingReply = true;
-				}
-                
-                //}
-            }
-        }
+        timeoutMon->tick (this);
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -610,12 +583,16 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            waitingForBrokerPingReply = false;
+            timeoutMon->pingReply (command);
         }
         else
         {
             routeMessage (command);
         }
+        break;
+    case CMD_CHECK_CONNECTIONS:
+        sendDisconnect ();
+        addActionMessage (CMD_STOP);
         break;
     case CMD_INIT:
     {
@@ -1428,9 +1405,14 @@ void CoreBroker::addFilter (ActionMessage &m)
     }
 }
 
-CoreBroker::CoreBroker (bool setAsRootBroker) noexcept : _isRoot (setAsRootBroker),isRootc(setAsRootBroker) {}
+CoreBroker::CoreBroker (bool setAsRootBroker) noexcept
+    : _isRoot (setAsRootBroker), isRootc (setAsRootBroker), timeoutMon (new TimeoutMonitor)
+{
+}
 
-CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name) {}
+CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name), timeoutMon (new TimeoutMonitor)
+{
+}
 
 void CoreBroker::initialize (const std::string &initializationString)
 {
@@ -1475,6 +1457,7 @@ bool CoreBroker::connect ()
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
             LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "connecting");
+            timeoutMon->setTimeout (std::chrono::milliseconds (timeout));
             auto res = brokerConnect ();
             if (res)
             {

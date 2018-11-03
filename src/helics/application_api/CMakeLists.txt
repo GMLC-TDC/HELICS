@@ -20,6 +20,7 @@ set(
   ValueFederate.hpp
   HelicsPrimaryTypes.hpp
   queryFunctions.hpp
+  FederateInfo.hpp
 Inputs.hpp
 )
 

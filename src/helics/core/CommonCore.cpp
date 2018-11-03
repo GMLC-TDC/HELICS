@@ -22,7 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <boost/filesystem.hpp>
-
+#include "TimeoutMonitor.h"
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -35,11 +35,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-CommonCore::CommonCore () noexcept {}
+CommonCore::CommonCore () noexcept : timeoutMon (new TimeoutMonitor) {}
 
-CommonCore::CommonCore (bool /*arg*/) noexcept {}
+CommonCore::CommonCore (bool /*arg*/) noexcept : timeoutMon (new TimeoutMonitor) {}
 
-CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name) {}
+CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), timeoutMon (new TimeoutMonitor)
+{
+}
 
 void CommonCore::initialize (const std::string &initializationString)
 {
@@ -68,6 +70,7 @@ bool CommonCore::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
+            timeoutMon->setTimeout (std::chrono::milliseconds(timeout));
             bool res = brokerConnect ();
             if (res)
             {
@@ -2003,6 +2006,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             timeCoord->source_id = global_broker_id_local;
             higher_broker_id = global_broker_id_t (command.source_id);
             transmitDelayedMessages ();
+            timeoutMon->reset ();
         }
         break;
     case CMD_FED_ACK:
@@ -2175,31 +2179,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
-        if (waitingForBrokerPingReply)
-        {
-            // try to reset the connection to the broker
-            // brokerReconnect()
-            LOG_ERROR (global_broker_id_local, getIdentifier (), "core lost connection with broker");
-            sendErrorToFederates (-5);
-            processDisconnect ();
-            brokerState = broker_state_t::errored;
-            addActionMessage (CMD_STOP);
-        }
-        else if ((isConnected ()) && (global_broker_id_local.isValid ()) &&
-                 (global_broker_id_local != parent_broker_id))
-        {
-            // if (allFedWaiting())
-            //{
-            if (higher_broker_id.isValid ())
-            {
-                ActionMessage png (CMD_PING);
-                png.source_id = global_broker_id_local;
-                png.dest_id = higher_broker_id;
-                transmit (parent_route_id, png);
-                waitingForBrokerPingReply = true;
-            }
-            //}
-        }
+        timeoutMon->tick (this);
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -2213,8 +2193,11 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            waitingForBrokerPingReply = false;
+            timeoutMon->pingReply (command);
         }
+        break;
+    case CMD_CHECK_CONNECTIONS:
+        checkAndProcessDisconnect ();
         break;
     case CMD_USER_DISCONNECT:
         if (isConnected ())

@@ -63,7 +63,7 @@ class BasicBrokerInfo
 
 class TimeCoordinator;
 class Logger;
-
+class TimeoutMonitor;
 
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
@@ -101,6 +101,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
 	TriggerVariable disconnection; //!< controller for the disconnection process
+    std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
 	std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
 	std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
@@ -280,6 +281,8 @@ class CoreBroker : public Broker, public BrokerBase
     std::string generateFederationSummary () const;
     /** label the broker and all children as disconnected*/
 	void labelAsDisconnected (global_broker_id_t broker);
+
+	friend class TimeoutMonitor;
 };
 
 }  // namespace helics

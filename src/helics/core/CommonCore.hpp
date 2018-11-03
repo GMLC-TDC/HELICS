@@ -36,7 +36,7 @@ class BasicHandleInfo;
 class FilterCoordinator;
 class Logger;
 class FilterInfo;
-
+class TimeoutMonitor;
 enum class handle_type_t : char;
 
 /** base class implementing a standard interaction strategy between federates
@@ -239,6 +239,7 @@ class CommonCore : public Core, public BrokerBase
     std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
 
+	std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages ();
 
@@ -373,6 +374,8 @@ class CommonCore : public Core, public BrokerBase
     bool checkAndProcessDisconnect ();
     /** send a disconnect message to time dependencies and child federates*/
     void sendDisconnect ();
+
+	friend class TimeoutMonitor;
 };
 
 }  // namespace helics
