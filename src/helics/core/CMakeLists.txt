@@ -43,8 +43,8 @@ set(
 	ipc/IpcBroker.cpp
 	ipc/IpcComms.cpp
 	ipc/IpcQueueHelper.cpp
-	#ipc/IpcBlockingPriorityQueue.cpp
-	#ipc/IpcBlockingPriorityQueueImpl.cpp
+	ipc/IpcBlockingPriorityQueue.cpp
+	ipc/IpcBlockingPriorityQueueImpl.cpp
 )
 
 set(
@@ -130,8 +130,8 @@ set(
 set(TESTCORE_HEADER_FILES TestCore.h TestBroker.h)
 
 set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h 
-#ipc/IpcBlockingPriorityQueue.hpp 
-#ipc/IpcBlockingPriorityQueueImpl.hpp
+ipc/IpcBlockingPriorityQueue.hpp 
+ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
 set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqRequestSets.h)
