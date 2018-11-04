@@ -88,6 +88,10 @@ endpoint only if condition matches.
 BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), core_type)
 {
+	if (core_type == "test_3")
+	{
+        extraBrokerArgs = "--log_level=5";
+	}
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
