@@ -119,6 +119,7 @@ bool TestBroker::brokerConnect ()
         {
             if (!tbroker->isOpenToNewFederates ())
             {
+                std::cerr << "broker is not open to new federates " << brokerName << std::endl;
                 tbroker = nullptr;
                 broker = nullptr;
                 BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(200));
