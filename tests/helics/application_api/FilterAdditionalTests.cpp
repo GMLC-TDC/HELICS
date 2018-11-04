@@ -30,7 +30,7 @@ This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_TEST_DECORATOR (*utf::label ("ci_test"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), core_type)
 {
     if (core_type == "test_3")

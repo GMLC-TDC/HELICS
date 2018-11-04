@@ -55,7 +55,7 @@ add_test(
   NAME application-api-ci-tests
   COMMAND
     application-api-tests
-    --run_test=@ci_test
+    --run_test=@ci
     --log_level=test_suite
     --report_level=short
 )
