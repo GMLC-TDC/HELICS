@@ -123,6 +123,11 @@ bool TestBroker::brokerConnect ()
                 tbroker = nullptr;
                 broker = nullptr;
                 BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(200));
+                totalSleep += std::chrono::milliseconds (200);
+                if (totalSleep > std::chrono::milliseconds (timeout))
+                {
+                    return false;
+                }
             }
         }
     }
