@@ -22,6 +22,7 @@ set(
   TestCore-tests.cpp
   testFixtures.cpp
   IPCcore_tests.cpp
+  IpcQueueTests.cpp
   data-block-tests.cpp
   UdpCore-tests.cpp
   ForwardingTimeCoordinatorTests.cpp

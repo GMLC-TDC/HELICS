@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE (federate_tests)
 BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
-    fi.coreInitString = "1";
+    fi.coreInitString = "1 --autobroker";
 
     auto Fed = std::make_shared<helics::Federate> ("test1",fi);
 
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label("ci"))
 BOOST_AUTO_TEST_CASE (federate_time_step_tests, *utf::label("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
-    fi.coreInitString = "1";
+    fi.coreInitString = "1 --autobroker";
 
     auto Fed = std::make_shared<helics::Federate> ("test1",fi);
 
@@ -96,6 +96,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     BOOST_CHECK (Fed->getCurrentState () == helics::Federate::op_states::finalize);
 }
 
+//TODO PT:: make this work for all test types
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
@@ -116,7 +117,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "2 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate> ("fed1",fi);
 
@@ -166,7 +167,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label("ci")
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core_mc1";
-    fi.coreInitString = "1 --broker=brk1 --brokerinit=2";
+    fi.coreInitString = "1 --autobroker --broker=brk1 --brokerinit=2";
 
     auto Fed1 = std::make_shared<helics::Federate> ("fed1",fi);
     fi.coreName = "core_mc2";
@@ -214,7 +215,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label("ci")
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core_async";
-    fi.coreInitString = "2";
+    fi.coreInitString = "2 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate> ("fed1",fi);
 

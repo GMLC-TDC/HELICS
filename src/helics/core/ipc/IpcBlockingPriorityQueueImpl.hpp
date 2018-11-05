@@ -24,7 +24,7 @@ struct dataIndex
     int32_t dataSize;
 };
 /** class containing the raw data block implementation*/
-class dataBlock
+class StackQueueRaw
 {
   private:
     unsigned char *origin = nullptr;
@@ -34,42 +34,71 @@ class dataBlock
     int dataCount = 0;
 
   public:
-    dataBlock (unsigned char *newBlock, int blockSize);
+    StackQueueRaw (unsigned char *newBlock, int blockSize);
 
-    void swap (dataBlock &other) noexcept;
+    void swap (StackQueueRaw &other) noexcept;
 
     int getCurrentCount () const { return dataCount; }
-    bool isSpaceAvaialble (int sz) const;
+    bool isSpaceAvailable (int sz) const;
     bool empty () const { return (dataCount == 0); }
 
     bool push (const unsigned char *block, int blockSize);
 
     int next_data_size () const;
 
-    int pop(unsigned char *block,int maxSize);
+    int pop (unsigned char *block, int maxSize);
 
     /** reverse the order in which the data will be extracted*/
     void reverse ();
-    /** clear all data from the dataBlock*/
-	void clear ();
+    /** clear all data from the StackQueueRaw*/
+    void clear ();
 };
 
-class PriorityBlock
+/*
+class StackQueue
 {
   public:
-    PriorityBlock (char *dataBlock, int capacity);
+    StackQueue ();
+    StackQueue (int size);
+    int getCurrentCount () const { return stack.getCurrentCount(); }
+    bool isSpaceAvailable (int sz) const;
+    bool empty () const { return stack.empty(); }
 
-    int size () const { return size_; }
+    bool push (const unsigned char *block, int blockSize);
+
+    int next_data_size () const;
+
+    int pop (unsigned char *block, int maxSize);
+
+    void reverse ();
+    void clear ();
+	 private:
+    std::vector<unsigned char> data;
+    StackQueueRaw stack;
+};
+
+*/
+
+class CircularBufferRaw
+{
+  public:
+    CircularBufferRaw (unsigned char *dataBlock, int capacity);
+
     int capacity () const { return capacity_; }
+    bool isSpaceAvailable (int sz) const;
     // Return number of bytes written.
-    int push (const unsigned char *data, int bytes);
+    int push (const unsigned char *data, int blockSize);
     // Return number of bytes read.
-    int pop (const unsigned char *data, int bytes);
+    int pop (unsigned char *data, int maxSize);
     /** check if the block is Empty or not*/
-	bool empty () const;
+    bool empty () const;
+    void clear ();
+
   private:
-    int beg_index_, end_index_, size_, capacity_;
-    char *data_;
+    unsigned char *origin;
+    unsigned char *next_write;
+    unsigned char *next_read;
+    int capacity_ = 0;
 };
 /** class implementing a blocking queue with a priority channel
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal
@@ -78,11 +107,11 @@ operations require a swap, however in high usage the two locks will reduce conte
 class IpcBlockingPriorityQueueImpl
 {
   private:
+    boost::interprocess::interprocess_mutex m_pushLock;  //!< lock for operations on the pushElements vector
+    StackQueueRaw pushData;
     boost::interprocess::interprocess_mutex
-      m_pushLock;  //!< lock for operations on the pushElements vector
-    dataBlock pushData;
-    boost::interprocess::interprocess_mutex m_pullLock;  //!< lock for elements on the pullData and priority structure
-    dataBlock pullData;
+      m_pullLock;  //!< lock for elements on the pullData and priority structure
+    StackQueueRaw pullData;
     mutable boost::interprocess::interprocess_mutex m_conditionLock;  //!< lock for the empty and full Flag
     bool queueEmptyFlag{true};  //!< flag indicating the queue is empty
     bool queueFullFlag{false};
@@ -91,13 +120,13 @@ class IpcBlockingPriorityQueueImpl
       condition_empty;  //!< condition variable for notification of new data
     boost::interprocess::interprocess_condition
       condition_full;  //!< condition variable for notification of available space
-    unsigned char *dataBlock = nullptr;
-    size_t dataSize = 0;
-    PriorityBlock priorityData;
+    unsigned char *dataBlock_;
+    size_t dataSize;
+    CircularBufferRaw priorityData;
 
   public:
     /** default constructor*/
-    IpcBlockingPriorityQueueImpl (void *dataBlock, int blockSize);
+    IpcBlockingPriorityQueueImpl (unsigned char *dataBlock, int blockSize);
 
     /** clear the queue*/
     void clear ();
