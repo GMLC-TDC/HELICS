@@ -566,6 +566,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
     case CMD_TICK:
         timeoutMon->tick (this);
+        LOG_WARNING (global_broker_id_local, getIdentifier (), "tick");
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)

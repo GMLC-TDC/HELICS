@@ -306,13 +306,6 @@ HELICS_EXPORT void helicsFederateInfoSetCoreName (helics_federate_info_t fi, con
 */
 
 HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit, helics_error *err);
-/** set the core type from a string
-@param fi the federate info object to alter
-@param coretype a string naming a core type
-@return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference helics_discard if the string
-is not recognized
-*/
-HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype, helics_error *err);
 
 /** set the core type by integer code
 @details valid values available by definitions in api-data.h
@@ -322,6 +315,42 @@ HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString (helics_federate_info
 is not recognized
 */
 HELICS_EXPORT void helicsFederateInfoSetCoreType (helics_federate_info_t fi, int coretype, helics_error *err);
+
+/** set the core type from a string
+@param fi the federate info object to alter
+@param coretype a string naming a core type
+@return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference helics_discard if the string
+is not recognized
+*/
+HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString (helics_federate_info_t fi, const char *coretype, helics_error *err);
+
+/** set the name or connection information for a broker
+@details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
+@param fi the federate info object to alter
+@param coreInit a string with the core initialization strings
+@return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
+*/
+
+HELICS_EXPORT void helicsFederateInfoSetBroker (helics_federate_info_t fi, const char *broker, helics_error *err);
+/** set the port to use for the broker
+@details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
+this will only be useful for network broker connections
+@param fi the federate info object to alter
+@param brokerPort the integer port number to use for connection with a broker
+@return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
+*/
+
+HELICS_EXPORT void helicsFederateInfoSetBrokerPort (helics_federate_info_t fi, int brokerPort, helics_error *err);
+
+/** set the local port to use
+@details this is only used if the core is automatically created, the port information will be transferred to the core for connection
+@param fi the federate info object to alter
+@param localPort a string with the port information to use as the local server port can be a number or "auto" or "os_local"
+@return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
+*/
+
+HELICS_EXPORT void helicsFederateInfoSetLocalPort (helics_federate_info_t fi, const char *localPort, helics_error *err);
+
 /** set a flag in the info structure
 @details valid flags are available  flag-definitions.h
 @param fi the federate info object to alter

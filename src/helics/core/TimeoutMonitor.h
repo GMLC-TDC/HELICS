@@ -19,23 +19,21 @@ class TimeoutMonitor
     void tick (CoreBroker *brk);
     void pingReply (const ActionMessage &m);
 
-    void setTimeout (std::chrono::milliseconds to)
-    {
-        timeout = to;
-	}
+    void setTimeout (std::chrono::milliseconds to) { timeout = to; }
 
-	void reset ()
+    void reset ()
     {
         waitingForPingReply = false;
         waitingForConnection = false;
     }
-      private:
-        bool waitingForPingReply{false};
+
+  private:
+    bool waitingForPingReply{false};
     decltype (std::chrono::steady_clock::now ()) lastParentPing;
     decltype (std::chrono::steady_clock::now ()) startWaiting;
     std::chrono::milliseconds timeout{100000000};
     bool waitingForConnection{false};
-    int tickCounter;
+    // int tickCounter;
 };
 
 }  // namespace helics
