@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
     helics::MessageFederate mfed ("block1", fi);
@@ -128,7 +128,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
@@ -186,7 +186,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
@@ -250,7 +250,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
                       file)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (600));
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 
@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "core3";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 
@@ -463,7 +463,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core4";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 

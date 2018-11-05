@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE (echo_test1)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1 ("echo1",fi);
 
     echo1.addEndpoint ("test");
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE (echo_test_delay)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "core2";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1 ("echo1",fi);
 
     echo1.addEndpoint ("test");
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE (echo_test_delay_period)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "core3";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.1);
     helics::apps::Echo echo1 ("echo1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 0);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE (echo_test_multiendpoint)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "core4";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1 ("echo1",fi);
     echo1.addEndpoint ("test");
     echo1.addEndpoint ("test2");
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE (echo_test_multiendpoint)
 BOOST_AUTO_TEST_CASE (echo_test_fileload)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4";
-    fi.coreInitString = "2";
+    fi.coreName = "core4-file";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1 ("echo1",fi);
     echo1.loadFile (std::string (TEST_DIR) + "/test_files/echo_example.json");
 

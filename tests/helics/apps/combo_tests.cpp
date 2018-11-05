@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(save_load_file_binary)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "core3";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core4";
-    fi.coreInitString = "1";
+    fi.coreInitString = "-f 1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core5";
-    fi.coreInitString = "1";
+    fi.coreInitString = "-f 1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 ("play1",fi);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on(
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core6";
-    fi.coreInitString = "1";
+    fi.coreInitString = "-f 1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1("play1",fi);
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary2, *boost::unit_test::depends_on(
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "core7";
-    fi.coreInitString = "1";
+    fi.coreInitString = "-f 1";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1("play1",fi);

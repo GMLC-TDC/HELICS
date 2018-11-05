@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
         lastVal = std::stod (newval);
     };
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreName = "core-simple-tracer";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
 
     trace1.addSubscription ("pub1");
@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
+    fi.coreName = "core-tracer";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
 
 
@@ -148,7 +148,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1";
     fi.coreName.push_back (indx++);
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
 
     std::atomic<int> counter{0};
@@ -195,7 +195,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core1b";
     fi.coreName.push_back (indx++);
-    fi.coreInitString = "2";
+    fi.coreInitString = " - f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
 
     trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
@@ -248,7 +248,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
                       file)
 {
     std::this_thread::sleep_for(300ms);
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
@@ -261,7 +261,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
 
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::IPC;
-    fi.coreInitString = "1";
+    fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
@@ -303,8 +303,8 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreName = "core-dep";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
@@ -460,8 +460,8 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core3";
-    fi.coreInitString = "3";
+    fi.coreName = "core-ep";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
@@ -531,7 +531,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     }
 }
 
-const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "clone_example2.txt",
+static const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "clone_example2.txt",
                                                        "clone_example3.txt",  "clone_example4.txt",
                                                        "clone_example5.txt",  "clone_example6.txt",
                                                        "clone_example7.json", "clone_example8.JSON"};
@@ -544,7 +544,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core4";
     fi.coreName.push_back (indx++);
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1 ("trace1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -615,7 +615,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       file)
 {
     std::this_thread::sleep_for(300ms);
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
 
@@ -625,7 +625,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
 
     helics::FederateInfo fi (helics::core_type::IPC);
-    fi.coreInitString = "1";
+    fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj",fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
