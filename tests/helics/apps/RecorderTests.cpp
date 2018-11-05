@@ -511,7 +511,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core5";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core6";
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.addSubscription ("pub1");
@@ -608,7 +608,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "core7";
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
 
