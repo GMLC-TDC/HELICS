@@ -161,12 +161,12 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
 {
-    // extraBrokerArgs = "--loglevel=4";
+    extraBrokerArgs = "--loglevel=4";
     SetupTest<helics::MessageFederate>("test_7", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    // mFed1->setLoggingLevel(4);
-    // mFed2->setLoggingLevel(4);
+    mFed1->setIntegerProperty (LOG_LEVEL_PROPERTY, 4);
+    mFed2->setIntegerProperty (LOG_LEVEL_PROPERTY, 4);
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
