@@ -567,7 +567,7 @@ int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
 {
     if (m.action () == CMD_MULTI_MESSAGE)
     {
-        m.setString (++m.counter, newMessage.to_string ());
+        m.setString (m.counter++, newMessage.to_string ());
         return m.counter;
     }
     return (-1);
