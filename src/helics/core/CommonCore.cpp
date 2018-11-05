@@ -2200,9 +2200,14 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_CHECK_CONNECTIONS:
 	{
         auto res=checkAndProcessDisconnect ();
+        auto pred = [](const auto &fed) {
+            auto state = fed->getState();
+            return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
+        };
+        auto afed = std::all_of(loopFederates.begin(), loopFederates.end(), pred);
         LOG_WARNING (global_broker_id_local, getIdentifier (),
-                     fmt::format ("CHECK CONNECTIONS {}, federates={}", res,
-                                  loopFederates.size ()));
+                     fmt::format ("CHECK CONNECTIONS {}, federates={}, fed_disconnected={}", res,
+                                  loopFederates.size (),afed ));
 	}
         
         break;

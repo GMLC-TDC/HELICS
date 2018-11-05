@@ -55,9 +55,7 @@ void TimeCoordinator::disconnect ()
 {
     if (sendMessageFunction)
     {
-        ActionMessage bye (CMD_DISCONNECT);
-        
-        bye.source_id = source_id;
+       
         std::set<global_federate_id_t> connections (dependents.begin (), dependents.end ());
         for (auto dep : dependencies)
         {
@@ -70,9 +68,12 @@ void TimeCoordinator::disconnect ()
         {
             return;
         }
+        ActionMessage bye(CMD_DISCONNECT);
+
+        bye.source_id = source_id;
         if (connections.size() == 1)
         {
-            bye.dest_id == *connections.begin();
+            bye.dest_id = *connections.begin();
             if (bye.dest_id == source_id)
             {
                 processTimeMessage(bye);

@@ -389,6 +389,7 @@ void BrokerBase::queueProcessingLoop ()
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)
         {
+            ++messagesSinceLastTick;
             continue;
         }
         switch (ret)
