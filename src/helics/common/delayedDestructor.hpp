@@ -96,7 +96,7 @@ class DelayedDestructor
                 }
             }
             ecall.clear ();  //make sure the destructors get called before returning.
-            return sz;
+            lock.lock ();
         }
         return ElementsToBeDestroyed.size ();
     }
