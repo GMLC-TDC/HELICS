@@ -108,8 +108,8 @@ def test_message_filter_registration(broker):
 
 def test_message_filter_function(broker):
 
-    fFed = AddFederate(broker, "zmq", 1, 1, "filter")
-    mFed = AddFederate(broker, "zmq", 1, 1, "message")
+    fFed, ffedinfo = AddFederate(broker, "zmq", 1, 1, "filter")
+    mFed, mfedinfo = AddFederate(broker, "zmq", 1, 1, "message")
 
     p1 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random")
@@ -155,6 +155,6 @@ def test_message_filter_function(broker):
     #ep1 = h.helicsFederateRegisterEndpoint (fFed, "fout", "")
     #f3 = h.helicsFederateRegisterSourceFilter (fFed, h.helics_custom_filter, "", "filter0/fout")
 
-    FreeFederate(fFed)
-    FreeFederate(mFed)
+    FreeFederate(fFed, ffedinfo)
+    FreeFederate(mFed, mfedinfo)
     time.sleep(1.0)
