@@ -86,15 +86,16 @@ FederateTestFixture::~FederateTestFixture ()
         {
             federate_state state = helicsFederateGetState (fed, nullptr);
             helics_core core = helicsFederateGetCoreObject (fed,nullptr);
-            if (core != nullptr)
+            if (state != helics_state_finalize)
+            {
+                helicsFederateFinalize (fed, nullptr);
+            }
+            helicsFederateFree (fed);
+            if (helicsCoreIsValid(core))
             {
                 helicsCoreDisconnect (core,nullptr);
             }
-            if (state != helics_state_finalize)
-            {
-                helicsFederateFinalize (fed,nullptr);
-            }
-            helicsFederateFree (fed);
+            
         }
     }
     federates.clear ();
