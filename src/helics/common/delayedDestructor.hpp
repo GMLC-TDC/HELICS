@@ -84,7 +84,6 @@ class DelayedDestructor
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
-            auto sz = ElementsToBeDestroyed.size ();
             auto deleteFunc = callBeforeDeleteFunction;
             lock.unlock ();
 			//this needs to be done after the lock, so a destructor can never called while under the lock
@@ -96,7 +95,7 @@ class DelayedDestructor
                 }
             }
             ecall.clear ();  //make sure the destructors get called before returning.
-            lock.lock ();
+            lock.lock ();  //reengage the lock so the size is correct
         }
         return ElementsToBeDestroyed.size ();
     }

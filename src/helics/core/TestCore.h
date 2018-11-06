@@ -21,9 +21,9 @@ public:
     /** default constructor*/
     TestCore() = default;
     /**construct from a core name*/
-    TestCore(const std::string &core_name);
+    explicit TestCore(const std::string &core_name);
     /** construct with a pointer to a broker*/
-    TestCore(std::shared_ptr<CoreBroker> nbroker);
+    explicit TestCore(std::shared_ptr<CoreBroker> nbroker);
     /** destructor*/
     virtual ~TestCore();  // the destructor is defined so the definition of TestBroker does not need to be
                            // available in the header

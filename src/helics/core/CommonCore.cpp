@@ -18,16 +18,16 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ForwardingTimeCoordinator.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
+#include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
-#include <boost/filesystem.hpp>
-#include "TimeoutMonitor.h"
 #include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <boost/filesystem.hpp>
 
 #include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
@@ -39,9 +39,7 @@ CommonCore::CommonCore () noexcept : timeoutMon (new TimeoutMonitor) {}
 
 CommonCore::CommonCore (bool /*arg*/) noexcept : timeoutMon (new TimeoutMonitor) {}
 
-CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), timeoutMon (new TimeoutMonitor)
-{
-}
+CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), timeoutMon (new TimeoutMonitor) {}
 
 void CommonCore::initialize (const std::string &initializationString)
 {
@@ -70,7 +68,7 @@ bool CommonCore::connect ()
         broker_state_t exp = broker_state_t::initialized;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
-            timeoutMon->setTimeout (std::chrono::milliseconds(timeout));
+            timeoutMon->setTimeout (std::chrono::milliseconds (timeout));
             bool res = brokerConnect ();
             if (res)
             {
@@ -2198,19 +2196,19 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_CHECK_CONNECTIONS:
-	{
-        auto res=checkAndProcessDisconnect ();
+    {
+        auto res = checkAndProcessDisconnect ();
         auto pred = [](const auto &fed) {
-            auto state = fed->getState();
+            auto state = fed->getState ();
             return (HELICS_FINISHED == state) || (HELICS_ERROR == state);
         };
-        auto afed = std::all_of(loopFederates.begin(), loopFederates.end(), pred);
+        auto afed = std::all_of (loopFederates.begin (), loopFederates.end (), pred);
         LOG_WARNING (global_broker_id_local, getIdentifier (),
                      fmt::format ("CHECK CONNECTIONS {}, federates={}, fed_disconnected={}", res,
-                                  loopFederates.size (),afed ));
-	}
-        
-        break;
+                                  loopFederates.size (), afed));
+    }
+
+    break;
     case CMD_USER_DISCONNECT:
         if (isConnected ())
         {
@@ -3259,7 +3257,10 @@ void CommonCore::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto &fed : loopFederates)
     {
-        fed->addAction (bye);
+		if (fed->getState() != federate_state_t::HELICS_FINISHED)
+		{
+            fed->addAction (bye);
+		}   
         if (hasTimeDependency)
         {
             timeCoord->removeDependency (fed->global_id);
