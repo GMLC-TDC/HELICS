@@ -174,8 +174,6 @@ HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core);
 
 /** get the network address associated with a broker
 @param broker the broker to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
 HELICS_EXPORT const char* helicsBrokerGetAddress (helics_broker broker);
@@ -188,8 +186,6 @@ HELICS_EXPORT void helicsCoreSetReadyToInit (helics_core core, helics_error *err
 
 /** get an identifier for the core
 @param core the core to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
 HELICS_EXPORT void helicsCoreDisconnect (helics_core core, helics_error *err);
@@ -530,8 +526,6 @@ HELICS_EXPORT helics_time_t helicsFederateRequestTimeIterativeComplete (helics_f
 
 /** get the name of the federate
 @param fed the federate object to query
-@param[out] outputString memory buffer to store the result
-@param maxlen the maximum size of the buffer
 @return void object indicating success or error
 */
 HELICS_EXPORT const char *helicsFederateGetName (helics_federate fed);
