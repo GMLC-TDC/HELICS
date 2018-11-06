@@ -422,6 +422,15 @@ void BrokerBase::queueProcessingLoop ()
             serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             logDump ();
+            {
+
+                auto tcmd = actionQueue.try_pop();
+                while (tcmd)
+                {
+                    LOG_WARNING(global_broker_id_local, identifier, std::string("TI unprocessed command ") + prettyPrintString(*tcmd));
+                    tcmd = actionQueue.try_pop();
+                }
+            }
             return;  // immediate return
         case CMD_STOP:
             haltTimer (active, ticktimer);
@@ -436,7 +445,7 @@ void BrokerBase::queueProcessingLoop ()
             auto tcmd = actionQueue.try_pop();
             while (tcmd)
             {
-                LOG_WARNING(global_broker_id_local, identifier, std::string("unprocessed command")+prettyPrintString(*tcmd));
+                LOG_WARNING(global_broker_id_local, identifier, std::string("stop unprocessed command ")+prettyPrintString(*tcmd));
                 tcmd = actionQueue.try_pop();
             }
             return;

@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     fut.get ();
 }
 
-const std::vector<std::string> simple_files{"example1.player", "example2.player", "example3.player",
+static const std::vector<std::string> simple_files{"example1.player", "example2.player", "example3.player",
                                             "example4.player", "example5.json", "example5.player"};
 
 BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
     fut.get ();
 }
 
-const std::vector<std::string> simple_message_files{"example_message1.player", "example_message2.player",
+static const std::vector<std::string> simple_message_files{"example_message1.player", "example_message2.player",
                                                     "example_message3.json"};
 
 BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::make (simple_message_files), file)
