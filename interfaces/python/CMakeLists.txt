@@ -80,10 +80,39 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   ) # <--this is out- file path
 
 else()
-
   message("Building without swig")
 
-  add_custom_target("helicsPYTHON" ALL)
+  add_library(helicsPYTHON MODULE helics_wrap.c)
+  set_target_properties(helicsPYTHON
+      PROPERTIES PREFIX "_"
+                 OUTPUT_NAME "helics"
+  )
+  target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
+  target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
+
+  execute_process(
+      COMMAND
+          ${PYTHON_EXECUTABLE}
+          "-c"
+          "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
+      OUTPUT_VARIABLE
+          pymodule_libs
+  )
+  string(STRIP ${pymodule_libs} pymodule_libs)
+  target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs})
+
+  execute_process(
+      COMMAND
+          ${PYTHON_EXECUTABLE}
+          "-c"
+          "from distutils import sysconfig; print(sysconfig.get_config_vars('CFLAGS'))"
+      OUTPUT_VARIABLE
+          pymodule_includes
+  )
+  string(STRIP ${pymodule_includes} pymodule_includes)
+  #target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
+
+  #add_custom_target("helicsPYTHON" ALL)
 
   # Set directories to use as defaults in setup.py for the location of ZeroMQ
   set(ZMQ_INCLUDE_DIR ${ZeroMQ_INCLUDE_DIR})
@@ -104,21 +133,30 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY
   )
 
-  add_custom_target("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
+  #add_custom_target("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
 
-  add_custom_command(
-    TARGET "helicsPYTHONEXT" POST_BUILD
-    COMMAND
-      ${PYTHON_EXECUTABLE}
-      ARGS
-        "-m"
-        "pip"
-        "install"
-        "-e"
-        "."
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Building Python extension"
-  )
+  #add_custom_command(
+  #  TARGET "helicsPYTHONEXT" POST_BUILD
+  #  COMMAND
+  #    ${PYTHON_EXECUTABLE}
+  #    ARGS
+  #      "${CMAKE_CURRENT_BINARY_DIR}/setup.py"
+  #      "build"
+  #      "install"
+  #      "--install-lib=${CMAKE_CURRENT_BINARY_DIR}"
+  #  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+  #  COMMENT "Building Python extension"
+  #)
+
+  #add_custom_command(
+  #  TARGET "helicsPYTHONEXT" POST_BUILD
+  #  COMMAND
+  #    ${CMAKE_COMMAND}
+  #    -E
+  #    copy_if_different # which executes "cmake - E copy_if_different..."
+  #    "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+  #    "${CMAKE_CURRENT_BINARY_DIR}"
+  #) # <--this is out- file path
 
 endif()
 
