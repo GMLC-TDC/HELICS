@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include "loggingHelper.hpp"
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -431,6 +432,12 @@ void BrokerBase::queueProcessingLoop ()
                 mainLoopIsRunning.store (false);
                 logDump ();
                 processDisconnect ();
+            }
+            auto tcmd = actionQueue.try_pop();
+            while (tcmd)
+            {
+                LOG_WARNING(global_broker_id_local, identifier, std::string("unprocessed command")+prettyPrintString(*tcmd));
+                tcmd = actionQueue.try_pop();
             }
             return;
         }
