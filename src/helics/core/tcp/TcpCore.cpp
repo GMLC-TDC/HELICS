@@ -57,7 +57,7 @@ bool TcpCoreSS::brokerConnect ()
 	}
     if (no_outgoing_connections)
     {
-        comms->allowOutgoingConnections(false);
+        comms->setFlag("allow_outgoing",false);
     }
     lock.unlock();
     return NetworkCore::brokerConnect();

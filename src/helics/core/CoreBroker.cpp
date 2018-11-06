@@ -573,7 +573,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             ActionMessage pngrep (CMD_PING_REPLY);
             pngrep.dest_id = command.source_id;
-            pngrep.source_id = global_broker_id_local;
+            pngrep.source_id = global_broker_id_local;  
             routeMessage (pngrep);
         }
         else

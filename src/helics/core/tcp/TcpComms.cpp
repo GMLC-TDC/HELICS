@@ -35,6 +35,23 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
+
+void TcpComms::setFlag (const std::string &flag, bool val)
+{
+    if (flag == "reuse_address")
+    {
+        if (propertyLock ())
+        {
+            useOsPortAllocation = val;
+            propertyUnLock ();
+        }
+    }
+	else
+	{
+        NetworkCommsInterface::setFlag (flag, val);
+	}
+}
+
 /** destructor*/
 TcpComms::~TcpComms () { disconnect (); }
 

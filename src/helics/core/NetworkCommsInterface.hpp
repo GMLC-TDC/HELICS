@@ -43,7 +43,7 @@ private:
     void setBrokerPort (int brokerPortNumber);
     void setPortNumber (int localPortNumber);
     void setAutomaticPortStartPort (int startingPort);
-
+    virtual void setFlag (const std::string &flag, bool val) override;
   protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};

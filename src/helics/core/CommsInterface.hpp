@@ -75,8 +75,9 @@ class CommsInterface
     @param timeout the value is in milliseconds
     */
 	void setTimeout(std::chrono::milliseconds timeOut);
-
-	/** enable or disable the server more for the comms*/
+    /** set a flag for the comms system*/
+	virtual void setFlag (const std::string &flag, bool val);
+	/** enable or disable the server mode for the comms*/
 	void setServerMode(bool serverActive);
 
   protected:

@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "TcpCommsSS.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
+#include "TcpCommsSS.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -51,12 +51,27 @@ void TcpCommsSS::addConnections (const std::vector<std::string> &newConnections)
     }
 }
 
-void TcpCommsSS::allowOutgoingConnections (bool value)
+void TcpCommsSS::setFlag (const std::string &flag, bool val)
 {
-    if (propertyLock ())
+    if (flag == "reuse_address")
     {
-        outgoingConnectionsAllowed = value;
-        propertyUnLock ();
+        if (propertyLock ())
+        {
+            reuse_address = val;
+            propertyUnLock ();
+        }
+    }
+    else if (flag == "allow_outgoing")
+    {
+        if (propertyLock ())
+        {
+            outgoingConnectionsAllowed = val;
+            propertyUnLock ();
+        }
+    }
+    else
+    {
+        NetworkCommsInterface::setFlag (flag, val);
     }
 }
 
@@ -241,13 +256,13 @@ void TcpCommsSS::queue_tx_function ()
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");
-                   
+
                     if (server)
                     {
-                        server->close();
+                        server->close ();
                     }
-                    setTxStatus(connection_status::error);
-                    setRxStatus(connection_status::error);
+                    setTxStatus (connection_status::error);
+                    setRxStatus (connection_status::error);
                     return;
                 }
 
@@ -260,8 +275,8 @@ void TcpCommsSS::queue_tx_function ()
             catch (std::exception &e)
             {
                 logError (e.what ());
-                setTxStatus(connection_status::error);
-                setRxStatus(connection_status::error);
+                setTxStatus (connection_status::error);
+                setRxStatus (connection_status::error);
                 return;
             }
             established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
@@ -454,15 +469,15 @@ CLOSE_TX_LOOP:
     {
         if (rt.second)
         {
-            rt.second->close();
-        } 
+            rt.second->close ();
+        }
     }
-    made_connections.clear();
+    made_connections.clear ();
     for (auto &rt : routes)
     {
         if (rt.second)
         {
-            rt.second->close();
+            rt.second->close ();
         }
     }
     if (brokerConnection)
@@ -473,7 +488,7 @@ CLOSE_TX_LOOP:
     brokerConnection = nullptr;
     if (server)
     {
-        server->close();
+        server->close ();
         server = nullptr;
     }
     if (getRxStatus () == connection_status::connected)

@@ -29,6 +29,7 @@ class TcpComms final : public NetworkCommsInterface
     /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
    
+	virtual void setFlag (const std::string &flag, bool val) override;
   private:
     bool reuse_address = false;
     virtual int getDefaultBrokerPort () const override;
