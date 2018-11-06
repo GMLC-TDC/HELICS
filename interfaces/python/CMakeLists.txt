@@ -82,81 +82,57 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 else()
   message("Building without swig")
 
-  add_library(helicsPYTHON MODULE helics_wrap.c)
-  set_target_properties(helicsPYTHON
-      PROPERTIES PREFIX "_"
-                 OUTPUT_NAME "helics"
-  )
-  target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
-  target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
+  if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
+    # Use the Python_add_library function added in 3.12.0
+    find_package(Python COMPONENTS Development)
+    Python_add_library(helicsPYTHON MODULE helics_wrap.c)
+  else()
+    add_library(helicsPYTHON MODULE helics_wrap.c)
+    # Add path to Python include directory
+    target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
 
-  execute_process(
+    # Get list of libraries to link with for Python module
+    execute_process(
       COMMAND
           ${PYTHON_EXECUTABLE}
           "-c"
           "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
       OUTPUT_VARIABLE
           pymodule_libs
-  )
-  string(STRIP ${pymodule_libs} pymodule_libs)
-  target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs})
+    )
+    # Clean-up leading and trailing whitespace
+    string(STRIP ${pymodule_libs} pymodule_libs)
+    target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs})
 
-  execute_process(
+    # Get list of compiler flags for compiling Python module
+    execute_process(
       COMMAND
           ${PYTHON_EXECUTABLE}
           "-c"
-          "from distutils import sysconfig; print(sysconfig.get_config_vars('CFLAGS'))"
+          "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS').split(' ', 1)[1])"
       OUTPUT_VARIABLE
           pymodule_includes
-  )
-  string(STRIP ${pymodule_includes} pymodule_includes)
-  #target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
-
-  #add_custom_target("helicsPYTHON" ALL)
-
-  # Set directories to use as defaults in setup.py for the location of ZeroMQ
-  set(ZMQ_INCLUDE_DIR ${ZeroMQ_INCLUDE_DIR})
-  get_filename_component(ZMQ_LIB_DIR ${ZeroMQ_LIBRARY} DIRECTORY)
-  set(PYTHON_ZMQ_LINK_FLAG "-lzmq")
-  if(ZMQ_USE_STATIC_LIBRARY)
-      set(PYTHON_ZMQ_LINK_FLAG "")
+    )
+    # Clean-up leading and trailing whitespace, convert into a CMake ;-separated list
+    string(STRIP ${pymodule_includes} pymodule_includes)
+    string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
+    target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
   endif()
+
+  # Set the output library name to _helics
+  set_target_properties(helicsPYTHON
+      PROPERTIES PREFIX "_"
+                 OUTPUT_NAME "helics"
+  )
+  target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
   )
   configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/helics_wrap.c ${CMAKE_CURRENT_BINARY_DIR}/helics_wrap.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py
     COPYONLY
   )
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY
-  )
-
-  #add_custom_target("helicsPYTHONEXT" ALL DEPENDS helicsSharedLib helicsPYTHON)
-
-  #add_custom_command(
-  #  TARGET "helicsPYTHONEXT" POST_BUILD
-  #  COMMAND
-  #    ${PYTHON_EXECUTABLE}
-  #    ARGS
-  #      "${CMAKE_CURRENT_BINARY_DIR}/setup.py"
-  #      "build"
-  #      "install"
-  #      "--install-lib=${CMAKE_CURRENT_BINARY_DIR}"
-  #  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-  #  COMMENT "Building Python extension"
-  #)
-
-  #add_custom_command(
-  #  TARGET "helicsPYTHONEXT" POST_BUILD
-  #  COMMAND
-  #    ${CMAKE_COMMAND}
-  #    -E
-  #    copy_if_different # which executes "cmake - E copy_if_different..."
-  #    "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-  #    "${CMAKE_CURRENT_BINARY_DIR}"
-  #) # <--this is out- file path
 
 endif()
 
