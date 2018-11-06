@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 int main (int /*argc*/, char ** /*argv*/)
 {
-    std::string initstring = "2 --name=mainbroker";
+    std::string initstring = "-f 2 --name=mainbroker";
     std::string fedinitstring = "--broker=mainbroker --federates=1";
     double deltat = 0.01;
     helicscpp::Publication pub;
