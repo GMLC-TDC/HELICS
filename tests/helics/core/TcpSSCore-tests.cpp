@@ -343,7 +343,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
-    std::string initializationString = "1 --name=core1";
+    std::string initializationString = "-f 1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, initializationString);
 
     BOOST_REQUIRE (core);
@@ -435,7 +435,7 @@ also tests the automatic port determination for cores
 BOOST_AUTO_TEST_CASE (tcpSSCore_core_broker_default_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (400));
-    std::string initializationString = "1";
+    std::string initializationString = "-f 1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::TCP_SS, initializationString);
     BOOST_REQUIRE (broker);

@@ -69,16 +69,17 @@ class DelayedDestructor
     /** destroy objects that are now longer used*/
     size_t destroyObjects ()
     {
-        std::lock_guard<std::mutex> lock (destructionLock);
+        std::unique_lock<std::mutex> lock (destructionLock);
         if (!ElementsToBeDestroyed.empty ())
         {
+            std::vector<std::shared_ptr<X>> ecall;
             if (callBeforeDeleteFunction)
             {
                 for (auto &element : ElementsToBeDestroyed)
                 {
                     if (element.use_count () == 1)
                     {
-                        callBeforeDeleteFunction (element);
+                        ecall.push_back (element);
                     }
                 }
             }
@@ -87,6 +88,14 @@ class DelayedDestructor
             auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
                                        [](const auto &element) { return (element.use_count () <= 1); });
             ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+            if (callBeforeDeleteFunction)
+            {
+				lock.unlock ();
+				for (auto &element : ecall)
+				{
+                    callBeforeDeleteFunction (element);
+				}
+			}
         }
         return ElementsToBeDestroyed.size ();
     }
