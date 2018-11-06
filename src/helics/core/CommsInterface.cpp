@@ -216,7 +216,7 @@ bool CommsInterface::connect ()
         // this will lock all the properties and should not be unlocked;
         return isConnected ();
     }
-    std::lock_guard<std::mutex> syncLock (threadSyncLock);
+    std::unique_lock<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
         name = localTarget_;
