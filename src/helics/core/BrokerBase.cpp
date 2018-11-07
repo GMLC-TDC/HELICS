@@ -197,6 +197,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         loggingObj->openFile (logFile);
     }
     loggingObj->startLogging (maxLogLevel, maxLogLevel);
+    mainLoopIsRunning.store (true);
     queueProcessingThread = std::thread (&BrokerBase::queueProcessingLoop, this);
 }
 
@@ -345,8 +346,13 @@ bool BrokerBase::tryReconnect () { return false; }
 //#define DISABLE_TICK
 void BrokerBase::queueProcessingLoop ()
 {
+	if (haltOperations)
+	{
+        mainLoopIsRunning.store (false);
+        return;
+	}
     std::vector<ActionMessage> dumpMessages;
-    mainLoopIsRunning.store (true);
+    
     auto serv = AsioServiceManager::getServicePointer ();
     auto serviceLoop = AsioServiceManager::runServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
@@ -365,7 +371,7 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
         ticktimer.async_wait (timerCallback);
     }
-  
+    
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -379,7 +385,13 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     };
-
+	if (haltOperations)
+	{
+        haltTimer (active, ticktimer);
+        serviceLoop = nullptr;
+        mainLoopIsRunning.store (false);
+        return;
+	}
     while (true)
     {
         auto command = actionQueue.pop ();
