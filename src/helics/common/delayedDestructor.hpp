@@ -72,30 +72,39 @@ class DelayedDestructor
         if (!ElementsToBeDestroyed.empty ())
         {
             std::vector<std::shared_ptr<X>> ecall;
+            std::vector<std::string> ename;
             for (auto &element : ElementsToBeDestroyed)
             {
                 if (element.use_count () == 1)
                 {
                     ecall.push_back (element);
+                    ename.push_back (element->getIdentifier ());
                 }
             }
-            // so apparently remove_if can actually call the destructor for shared_ptrs so the call function needs
-            // to be before this call
-            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                       [](const auto &element) { return (element.use_count () <= 1); });
-            ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
-            auto deleteFunc = callBeforeDeleteFunction;
-            lock.unlock ();
-			//this needs to be done after the lock, so a destructor can never called while under the lock
-            if (deleteFunc)
+            if (!ename.empty ())
             {
-                for (auto &element : ecall)
+                // so apparently remove_if can actually call the destructor for shared_ptrs so the call function
+                // needs to be before this call
+                auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                           [&ename](const auto &element) {
+                                               return ((element.use_count () == 2) &&
+                                                       (std::find (ename.begin (), ename.end (),
+                                                                   element->getIdentifier ()) != ename.end ()));
+                                           });
+                ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                auto deleteFunc = callBeforeDeleteFunction;
+                lock.unlock ();
+                // this needs to be done after the lock, so a destructor can never called while under the lock
+                if (deleteFunc)
                 {
-                    deleteFunc (element);
+                    for (auto &element : ecall)
+                    {
+                        deleteFunc (element);
+                    }
                 }
+                ecall.clear ();  // make sure the destructors get called before returning.
+                lock.lock ();  // reengage the lock so the size is correct
             }
-            ecall.clear ();  //make sure the destructors get called before returning.
-            lock.lock ();  //reengage the lock so the size is correct
         }
         return ElementsToBeDestroyed.size ();
     }
@@ -110,7 +119,7 @@ class DelayedDestructor
         int cnt = 0;
         while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))
         {
-            if (cnt > 0) //don't sleep on the first loop
+            if (cnt > 0)  // don't sleep on the first loop
             {
                 lock.unlock ();
                 std::this_thread::sleep_for (delayTime);
