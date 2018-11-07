@@ -60,7 +60,7 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
             autoBroker = true;
         }
     }
-    if (brokerState == created)
+    if (brokerState.load() == created)
     {
         CommonCore::initializeFromArgs (argc, argv);
     }

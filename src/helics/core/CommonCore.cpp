@@ -43,7 +43,7 @@ CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), 
 
 void CommonCore::initialize (const std::string &initializationString)
 {
-    if ((brokerState ==
+    if ((brokerState.load() ==
          created))  // don't do the compare exchange here since we do that in the initialize fromArgs
     {  // and we can tolerate a spurious call
         StringToCmdLine cmdline (initializationString);

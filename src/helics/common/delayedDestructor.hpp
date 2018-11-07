@@ -141,14 +141,9 @@ class DelayedDestructor
         return ElementsToBeDestroyed.size ();
     }
 
-    void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
+    void addObjectsToBeDestroyed (std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock (destructionLock);
         ElementsToBeDestroyed.push_back (std::move (obj));
-    }
-    void addObjectsToBeDestroyed (std::shared_ptr<X> &obj)
-    {
-        std::lock_guard<std::mutex> lock (destructionLock);
-        ElementsToBeDestroyed.push_back (obj);
     }
 };
