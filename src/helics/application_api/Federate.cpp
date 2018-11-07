@@ -26,9 +26,7 @@ namespace helics
 using namespace std::literals::chrono_literals;
 void cleanupHelicsLibrary ()
 {
-    std::cerr << "cleaing brokers 1" << std::endl;
     auto sz=BrokerFactory::cleanUpBrokers (100ms);
-    std::cerr << sz<<" brokers remaining now cleaning cores" << std::endl;
     sz=CoreFactory::cleanUpCores (200ms);
     std::cerr << sz<<" core remain now cleaning brokers 2" << std::endl;
     sz=BrokerFactory::cleanUpBrokers (100ms);

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 
@@ -41,6 +42,10 @@ struct FederateTestFixture
     {
         ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
+        if (core_type_name == "test_7")
+        {
+            std::cout << "finished adding broker" << std::endl;
+        }
         if (!broker->isConnected ())
         {
             broker->disconnect ();

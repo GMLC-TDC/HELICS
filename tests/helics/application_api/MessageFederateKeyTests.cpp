@@ -160,19 +160,16 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
 {
     SetupTest<helics::MessageFederate>("test_7", 2);
-    std::cout << "finished setup" << std::endl;
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);  
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    std::cout << "registered endpoints" << std::endl;
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
-    std::cout << "entered execution" << std::endl;
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
     BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::execution);
 
@@ -206,10 +203,8 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
     BOOST_REQUIRE_EQUAL(M2->data.size(), data.size());
 
     BOOST_CHECK_EQUAL(M2->data[245], data[245]);
-    std::cout << "ran tests" << std::endl;
     mFed1->finalize();
     mFed2->finalize();
-    std::cout << "finalized" << std::endl;
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
     BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::finalize);
 }
