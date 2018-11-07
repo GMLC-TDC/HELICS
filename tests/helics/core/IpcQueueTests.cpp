@@ -207,4 +207,56 @@ BOOST_AUTO_TEST_CASE (test_circularbuffraw_simple)
     delete[] block;
 }
 
+BOOST_AUTO_TEST_CASE (test_circularbuffraw_loop_around)
+{
+    using namespace helics::ipc::detail;
+    unsigned char *block = new unsigned char[1024];
+    CircularBufferRaw buf (block, 1024);
+
+    std::vector<unsigned char> testData (256, 'a');
+    
+    buf.push (testData.data (), 200);
+    buf.push (testData.data (), 200);
+    buf.push (testData.data (), 200);
+    buf.push (testData.data (), 200);
+    bool pushed=buf.push (testData.data (), 200);
+    BOOST_CHECK (pushed);
+    pushed = buf.push (testData.data (), 200);
+    BOOST_CHECK (!pushed);
+
+	BOOST_CHECK (!buf.isSpaceAvailable (20));
+    int res = buf.pop (testData.data (), 1024);
+    BOOST_CHECK_EQUAL (res, 200);
+    BOOST_CHECK (buf.isSpaceAvailable (20));
+    pushed = buf.push (testData.data (), 200);
+    BOOST_CHECK (pushed);
+
+   buf.clear ();
+    BOOST_CHECK (buf.empty ());
+    delete[] block;
+}
+
+
+BOOST_AUTO_TEST_CASE (test_circularbuffraw_loop_around_repeat)
+{
+    using namespace helics::ipc::detail;
+    unsigned char *block = new unsigned char[1520]; //3x504+4  otherwise there is a potential scenario in which 2 500byte messages cannot fit
+    CircularBufferRaw buf (block, 1520);
+
+    std::vector<unsigned char> testData (500, 'a');
+	for (int ii = 1; ii <= 500;++ii)
+	{
+        bool pushed=buf.push (testData.data (), ii);
+        BOOST_CHECK (pushed);
+        pushed=buf.push (testData.data (), ii);
+        BOOST_CHECK (pushed);
+        int res = buf.pop (testData.data (), 500);
+        BOOST_CHECK_EQUAL (res, ii);
+        res = buf.pop (testData.data (), 500);
+        BOOST_CHECK_EQUAL (res, ii);
+        BOOST_CHECK (buf.empty ());
+	}
+    
+    delete[] block;
+}
 BOOST_AUTO_TEST_SUITE_END ()

@@ -96,7 +96,7 @@ void StackQueueRaw::reverse ()
     {
         return;
     }
-    std::reverse (nextIndex + 1, nextIndex + dataCount+1);
+    std::reverse (nextIndex + 1, nextIndex + dataCount + 1);
 }
 
 void StackQueueRaw::clear ()
@@ -105,6 +105,65 @@ void StackQueueRaw::clear ()
     dataCount = 0;
     nextIndex = reinterpret_cast<dataIndex *> (origin + capacity - sizeof (dataIndex));
 }
+
+
+    StackQueue::StackQueue () noexcept : stack (nullptr, 0){};
+	StackQueue::StackQueue(int size) : data(size), stack(data.data(), size)
+	{
+
+	}
+	
+	StackQueue::StackQueue (StackQueue &&sq) noexcept : data(std::move(sq.data)),stack (std::move(sq.stack))
+	{
+
+	}
+
+	StackQueue::StackQueue (const StackQueue &sq) : data (sq.data), stack (sq.stack)
+    {
+        auto offset = stack.next - stack.origin;
+        stack.origin = data.data ();
+        stack.next = stack.origin + offset;
+        stack.nextIndex = reinterpret_cast<dataIndex *> (stack.origin + stack.capacity - sizeof (dataIndex));
+        stack.nextIndex -= stack.dataCount;
+	}
+
+	StackQueue &StackQueue::operator= (StackQueue &&sq) noexcept { 
+		stack = std::move (sq.stack);
+        data = std::move (sq.data);
+	}
+
+	StackQueue &StackQueue::operator= (const StackQueue &sq)
+	{
+        stack = sq.stack;
+        data = sq.data;
+        auto offset = stack.next - stack.origin;
+        stack.origin = data.data ();
+        stack.next = stack.origin + offset;
+        stack.nextIndex = reinterpret_cast<dataIndex *> (stack.origin + stack.capacity - sizeof (dataIndex));
+        stack.nextIndex -= stack.dataCount;
+	}
+
+	void StackQueue::resize(int newsize)
+	{
+		if (newsize == stack.capacity)
+		{
+            return;
+		}
+		if (stack.dataCount == 0)
+		{
+            data.resize (newsize);
+            stack = StackQueueRaw (data.data (), newsize);
+		}
+        else if (newsize>data.size())
+		{
+            data.resize (newsize);
+
+		}
+		else  //smaller size
+		{
+
+		}
+	}
 
 CircularBufferRaw::CircularBufferRaw (unsigned char *dataBlock, int blockSize)
     : origin (dataBlock), next_write (origin), next_read (origin), capacity_ (blockSize)
@@ -115,17 +174,17 @@ bool CircularBufferRaw::isSpaceAvailable (int sz) const
 {
     if (next_write >= next_read)
     {
-        if ((capacity_ - (next_write - origin)) > sz + 4)
+        if ((capacity_ - (next_write - origin)) >= sz + 4)
         {
             return true;
         }
-        else if ((next_read - origin) > sz + 4)
+        else if ((next_read - origin) >= sz + 4)
         {
             return true;
         }
         return false;
     }
-    else if ((next_read - next_write) > sz + 4)
+    else if ((next_read - next_write) >= sz + 4)
     {
         return true;
     }
@@ -141,19 +200,20 @@ int CircularBufferRaw::push (const unsigned char *data, int blockSize)
     }
     if (next_write >= next_read)
     {
-        if ((capacity_ - (next_write - origin)) > blockSize + 4)
+        if ((capacity_ - (next_write - origin)) >= blockSize + 4)
         {
             *(reinterpret_cast<int *> (next_write)) = blockSize;
             memcpy (next_write + 4, data, blockSize);
             next_write += blockSize + 4;
-            // loop around if there isn't really space for another block of at least 4 bytes
-            if ((capacity_ - (next_write - origin)) < 8)
+            // loop around if there isn't really space for another block of at least 4 bytes and the
+            // next_read>origin
+            if (((capacity_ - (next_write - origin)) < 8) && (next_read > origin))
             {
                 next_write = origin;
             }
             return blockSize;
         }
-        else if ((next_read - origin) > blockSize + 4)
+        else if ((next_read - origin) >= blockSize + 4)
         {
             *(reinterpret_cast<int *> (next_write)) = -1;
             *(reinterpret_cast<int *> (origin)) = blockSize;
@@ -163,7 +223,7 @@ int CircularBufferRaw::push (const unsigned char *data, int blockSize)
         }
         return 0;
     }
-    else if ((next_read - next_write) > blockSize + 4)
+    else if ((next_read - next_write) >= blockSize + 4)
     {
         *(reinterpret_cast<int *> (next_write)) = blockSize;
         memcpy (next_write + 4, data, blockSize);
@@ -425,13 +485,13 @@ int IpcBlockingPriorityQueueImpl::pop (std::chrono::milliseconds timeout, unsign
         {
             return pullData.pop (data, maxSize);
         }
-        
+
         pullLock.unlock ();
         val = try_pop (data, maxSize);
-		if (!timedOut)
-		{
+        if (!timedOut)
+        {
             return val;
-		}
+        }
     }
     // move the value out of the optional
     return val;

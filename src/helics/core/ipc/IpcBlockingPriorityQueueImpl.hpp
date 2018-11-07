@@ -52,32 +52,41 @@ class StackQueueRaw
     void reverse ();
     /** clear all data from the StackQueueRaw*/
     void clear ();
+
+  private:
+    friend class StackQueue;
 };
 
-/*
 class StackQueue
 {
   public:
-    StackQueue ();
-    StackQueue (int size);
-    int getCurrentCount () const { return stack.getCurrentCount(); }
-    bool isSpaceAvailable (int sz) const;
-    bool empty () const { return stack.empty(); }
+    StackQueue () noexcept;
+    explicit StackQueue (int size);
+    ~StackQueue () = default;
+    StackQueue (StackQueue &&sq) noexcept;
+    StackQueue (const StackQueue &sq);
 
-    bool push (const unsigned char *block, int blockSize);
+	StackQueue &operator= (StackQueue &&sq) noexcept;
+    StackQueue &operator= (const StackQueue &sq);
 
-    int next_data_size () const;
+	void resize (int newsize);
+    int getCurrentCount () const { return stack.getCurrentCount (); }
+    bool isSpaceAvailable (int sz) const { return stack.isSpaceAvailable (sz); }
+    bool empty () const { return stack.empty (); }
 
-    int pop (unsigned char *block, int maxSize);
+    bool push (const unsigned char *block, int blockSize) { return stack.push (block, blockSize); }
 
-    void reverse ();
-    void clear ();
-	 private:
+    int next_data_size () const { return stack.next_data_size (); }
+
+    int pop (unsigned char *block, int maxSize) { return stack.pop (block, maxSize); }
+
+    void reverse () { stack.reverse (); }
+    void clear () { stack.clear (); }
+
+  private:
     std::vector<unsigned char> data;
     StackQueueRaw stack;
 };
-
-*/
 
 class CircularBufferRaw
 {
