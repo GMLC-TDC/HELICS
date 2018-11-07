@@ -137,7 +137,7 @@ bool TestBroker::brokerConnect ()
         }
     }
     lock.lock();
-    tbroker = parentBroker;
+    tbroker = std::move(parentBroker);
     return static_cast<bool> (tbroker);
 }
 

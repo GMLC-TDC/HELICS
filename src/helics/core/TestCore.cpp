@@ -72,7 +72,7 @@ bool TestCore::brokerConnect ()
     {
         return true;
     }
-
+    lock.unlock();
     std::chrono::milliseconds totalSleep (0);
     std::shared_ptr<CoreBroker> parentBroker;
     while (!parentBroker)
@@ -120,7 +120,7 @@ bool TestCore::brokerConnect ()
         }
     }
     lock.lock();
-    tbroker = parentBroker;
+    tbroker = std::move(parentBroker);
     return static_cast<bool> (tbroker);
 }
 
