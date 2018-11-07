@@ -37,14 +37,13 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
     {
         variable_map vm;
         argumentParser (argc, argv, vm, extraArgs);
-
-        if (vm.count ("broker") > 0)
+        if (vm.count("broker") > 0)
         {
-            brokerName = vm["broker"].as<std::string> ();
+            brokerName = vm["broker"].as<std::string>();
         }
-        else if (vm.count ("broker_address") > 0)
+        else if (vm.count("broker_address") > 0)
         {
-            brokerName = vm["broker_address"].as<std::string> ();
+            brokerName = vm["broker_address"].as<std::string>();
         }
         else if (vm.count ("brokername") > 0)
         {
@@ -68,27 +67,33 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
 
 bool TestCore::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (routeMutex);
+    std::unique_lock<std::mutex> lock (routeMutex);
+    if (tbroker)
+    {
+        return true;
+    }
+
     std::chrono::milliseconds totalSleep (0);
-    while (!tbroker)
+    std::shared_ptr<CoreBroker> parentBroker;
+    while (!parentBroker)
     {
 		if (brokerName.empty())
 		{
-            tbroker =
+            parentBroker =
               std::dynamic_pointer_cast<CoreBroker> (BrokerFactory::findJoinableBrokerOfType (core_type::TEST));
 		}
 		else
 		{
-            tbroker = std::dynamic_pointer_cast<CoreBroker> (BrokerFactory::findBroker (brokerName));
+           parentBroker= std::dynamic_pointer_cast<CoreBroker> (BrokerFactory::findBroker (brokerName));
 		}
         
-        if (!tbroker)
+        if (!parentBroker)
         {
             if (autoBroker)
             {
-                tbroker = std::static_pointer_cast<CoreBroker> (
+                parentBroker = std::static_pointer_cast<CoreBroker> (
                   BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
-                tbroker->connect ();
+                parentBroker->connect ();
             }
             else
             {
@@ -102,10 +107,9 @@ bool TestCore::brokerConnect ()
         }
         else
         {
-            if (!tbroker->isOpenToNewFederates ())
+            if (!parentBroker->isOpenToNewFederates ())
             {
                 std::cerr << "broker is not open to new federates " << brokerName << std::endl;
-                tbroker = nullptr;
                 BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (200));
                 totalSleep += std::chrono::milliseconds (200);
                 if (totalSleep > std::chrono::milliseconds (timeout))
@@ -115,6 +119,8 @@ bool TestCore::brokerConnect ()
             }
         }
     }
+    lock.lock();
+    tbroker = parentBroker;
     return static_cast<bool> (tbroker);
 }
 
@@ -137,7 +143,7 @@ void TestCore::brokerDisconnect ()
 
 TestCore::~TestCore ()
 {
-    haltOperations = true;
+    haltOperations.store(true);
     joinAllThreads ();
     // lock to ensure all the data is synchronized before deletion
     //std::lock_guard<std::mutex> lock (routeMutex);
@@ -189,7 +195,7 @@ void TestCore::transmit (route_id_t route_id, const ActionMessage &cmd)
 
 void TestCore::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
-    if (brokerState >= broker_state_t::terminated)
+    if (brokerState.load() >= broker_state_t::terminated)
     {
         return;  // no message sent in terminating or higher state
     }

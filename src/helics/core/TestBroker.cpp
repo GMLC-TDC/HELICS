@@ -79,28 +79,36 @@ void TestBroker::initializeFromArgs (int argc, const char *const *argv)
 
 bool TestBroker::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (routeMutex);
-    while (!tbroker)
+    std::unique_lock<std::mutex> lock (routeMutex);
+    if (tbroker)
+    {
+        return true;
+    }
+
+    if ((brokerName.empty()) && (brokerInitString.empty()))
+    {
+        setAsRoot();
+        return true;
+    }
+    lock.unlock();
+    std::shared_ptr<CoreBroker> parentBroker;
+    while (!parentBroker)
     {
         if (isRoot ())
         {
             return true;
         }
-        if ((brokerName.empty ()) && (brokerInitString.empty ()))
-        {
-            setAsRoot ();
-            return true;
-        }
+        
         std::chrono::milliseconds totalSleep (0);
         auto broker = BrokerFactory::findBroker (brokerName);
-        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-        if (!tbroker)
+        parentBroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+        if (!parentBroker)
         {
             if (autoBroker)
             {
-                tbroker = std::static_pointer_cast<CoreBroker> (
+                parentBroker = std::static_pointer_cast<CoreBroker> (
                   BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
-                tbroker->connect ();
+                parentBroker->connect ();
             }
             else
             {
@@ -114,10 +122,10 @@ bool TestBroker::brokerConnect ()
         }
         else
         {
-            if (!tbroker->isOpenToNewFederates ())
+            if (!parentBroker->isOpenToNewFederates ())
             {
                 std::cerr << "broker is not open to new federates " << brokerName << std::endl;
-                tbroker = nullptr;
+                parentBroker = nullptr;
                 broker = nullptr;
                 BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (200));
                 totalSleep += std::chrono::milliseconds (200);
@@ -128,7 +136,8 @@ bool TestBroker::brokerConnect ()
             }
         }
     }
-
+    lock.lock();
+    tbroker = parentBroker;
     return static_cast<bool> (tbroker);
 }
 
