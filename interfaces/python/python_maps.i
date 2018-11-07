@@ -1,17 +1,92 @@
 
-//typemap for short maxlen strings
-%typemap(in, numinputs=0) (char *outputString, int maxlen) {
-  $2=256;
-  $1=(char *)malloc(256);
+%{
+#include "api-data.h"
+
+static PyObject* pHelicsException;
+
+/* throw a helics error */
+static void throwHelicsPythonException(helics_error *err) {
+  char str[256];
+  switch (err->error_code)
+  {
+  case helics_ok:
+    return;
+  case helics_error_registration_failure:
+    strcat(str, "helics:registration_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_connection_failure:
+    strcat(str, "helics:connection_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_invalid_object:
+    strcat(str, "helics:invalid_object - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_invalid_argument:
+    strcat(str, "helics:invalid_argument - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_discard:
+    strcat(str, "helics:discard - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case helics_error_system_failure:
+    strcat(str, "helics:system_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_invalid_state_transition:
+    strcat(str, "helics:invalid_state_transition - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+    break;
+  case   helics_error_invalid_function_call:
+    strcat(str, "helics:invalid_function_call - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+	break;
+  case   helics_error_execution_failure:
+    strcat(str, "helics:execution_failure - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+	break;
+  case   helics_error_other:
+  case   other_error_type:
+  default:
+    strcat(str, "helics:error - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+	break;
+  }
 }
 
-%typemap(argout) (char *outputString, int maxlen) {
-  PyObject *str=PyString_FromString($1);
-  $result = SWIG_Python_AppendOutput($result, str);
+%}
+
+%init %{
+pHelicsException = PyErr_NewException("_helics.HelicsException", NULL, NULL);
+Py_INCREF(pHelicsException);
+PyModule_AddObject(m, "HelicsException", pHelicsException);
+%}
+
+
+%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+    etemp=helicsErrorInitialize();
+    $1=&etemp;
 }
 
-%typemap(freearg) (char *outputString, int maxlen) {
-   if ($1) free($1);
+%typemap(freearg) helics_error *
+{
+    if ($1->error_code!=helics_ok)
+    {
+        throwHelicsPythonException($1);
+        return NULL;
+    }
 }
 
 
@@ -25,7 +100,7 @@
 }
 
 %typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
-    $2=helicsSubscriptionGetStringSize(arg1)+2;
+    $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
@@ -152,7 +227,7 @@
     $1=PyBytes_AsString($input);
 	$2=PyBytes_Size($input);
   }
-  else 
+  else
   {
 	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
     return NULL;
