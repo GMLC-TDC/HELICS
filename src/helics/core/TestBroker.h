@@ -17,10 +17,10 @@ class TestBroker : public CoreBroker
 {
   public:
     /** default constructor*/
-    TestBroker (bool isRoot_ = false) noexcept;
-    TestBroker (const std::string &broker_name);
+    explicit TestBroker (bool isRoot_ = false) noexcept;
+    explicit TestBroker (const std::string &broker_name);
     /** construct with a pointer to a broker*/
-    TestBroker (std::shared_ptr<TestBroker> nbroker);
+    explicit TestBroker (std::shared_ptr<TestBroker> nbroker);
     virtual ~TestBroker ();
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 

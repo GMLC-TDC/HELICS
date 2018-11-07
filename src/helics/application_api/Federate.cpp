@@ -28,9 +28,17 @@ void cleanupHelicsLibrary ()
 {
     auto sz=BrokerFactory::cleanUpBrokers (100ms);
     sz=CoreFactory::cleanUpCores (200ms);
-    std::cerr << sz<<" core remain now cleaning brokers 2" << std::endl;
+    if (sz>0)
+    {
+        std::cerr << sz << " core remain now cleaning brokers 2" << std::endl;
+	}
+    
     sz=BrokerFactory::cleanUpBrokers (100ms);
-    std::cerr << sz<< " broker remain cleaning finished" << std::endl;
+	if (sz > 0)
+	{
+        std::cerr << sz << " broker remain cleaning finished" << std::endl;
+	}
+    
 }
 
 Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (fedName)

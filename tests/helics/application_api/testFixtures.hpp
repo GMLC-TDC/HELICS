@@ -209,7 +209,6 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
-                    std::cout << "finished adding subbroker" << std::endl;
                 if (!subbroker->isConnected ())
                 {
                     throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));

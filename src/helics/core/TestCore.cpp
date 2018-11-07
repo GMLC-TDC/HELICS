@@ -42,14 +42,15 @@ void TestCore::initializeFromArgs (int argc, const char *const *argv)
         {
             brokerName = vm["broker"].as<std::string> ();
         }
-        else if (vm.count ("brokername") > 0)
-        {
-            brokerName = vm["brokername"].as<std::string> ();
-        }
         else if (vm.count ("broker_address") > 0)
         {
             brokerName = vm["broker_address"].as<std::string> ();
         }
+        else if (vm.count ("brokername") > 0)
+        {
+            brokerName = vm["brokername"].as<std::string> ();
+        }
+        
         if (vm.count ("brokerinit") > 0)
         {
             brokerInitString = vm["brokerinit"].as<std::string> ();
@@ -144,63 +145,89 @@ TestCore::~TestCore ()
 
 void TestCore::transmit (route_id_t route_id, const ActionMessage &cmd)
 {
-    std::lock_guard<std::mutex> lock (routeMutex);
+    if (brokerState >= broker_state_t::terminated)
+    {
+        return;  // no message sent in terminating or higher state
+    }
+    std::unique_lock<std::mutex> lock (routeMutex);
+
     if (route_id == parent_route_id)
     {
         if (tbroker)
         {
-            tbroker->addActionMessage (cmd);
+            auto tb = tbroker;
+            lock.unlock ();
+            tb->addActionMessage (cmd);
         }
-
         return;
     }
 
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addActionMessage (cmd);
+        auto tmp = brkfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (cmd);
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
     if (crfnd != coreRoutes.end ())
     {
-        crfnd->second->addActionMessage (cmd);
+        auto tmp = crfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (cmd);
         return;
     }
+
     if (tbroker)
     {
+        auto tb = tbroker;
+        lock.unlock ();
         tbroker->addActionMessage (cmd);
     }
 }
 
 void TestCore::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
-    std::lock_guard<std::mutex> lock (routeMutex);
+    if (brokerState >= broker_state_t::terminated)
+    {
+        return;  // no message sent in terminating or higher state
+    }
+    std::unique_lock<std::mutex> lock (routeMutex);
+
     if (route_id == parent_route_id)
     {
         if (tbroker)
         {
-            tbroker->addActionMessage (std::move (cmd));
+            auto tb = tbroker;
+            lock.unlock ();
+            tb->addActionMessage (cmd);
         }
-
         return;
     }
 
     auto brkfnd = brokerRoutes.find (route_id);
     if (brkfnd != brokerRoutes.end ())
     {
-        brkfnd->second->addActionMessage (std::move (cmd));
+        auto tmp = brkfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (cmd);
         return;
     }
     auto crfnd = coreRoutes.find (route_id);
     if (crfnd != coreRoutes.end ())
     {
-        crfnd->second->addActionMessage (std::move (cmd));
+        auto tmp = crfnd->second;
+        lock.unlock ();
+        tmp->addActionMessage (cmd);
         return;
     }
+
     if (tbroker)
     {
-        tbroker->addActionMessage (std::move (cmd));
+        auto tb = tbroker;
+        lock.unlock ();
+        tbroker->addActionMessage (cmd);
     }
 }
 
