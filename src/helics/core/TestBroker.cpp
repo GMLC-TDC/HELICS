@@ -24,9 +24,6 @@ TestBroker::TestBroker (std::shared_ptr<TestBroker> nbroker) : tbroker (std::mov
 TestBroker::~TestBroker ()
 {
     haltOperations = true;
-    // lock to ensure all the data is synchronized before deletion
-    std::unique_lock<std::mutex> lock (routeMutex);
-    lock.unlock ();
     joinAllThreads ();
 }
 using namespace std::string_literals;
