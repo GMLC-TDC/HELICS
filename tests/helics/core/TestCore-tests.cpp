@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string ());
     BOOST_REQUIRE (broker);
     BOOST_CHECK (broker->isConnected ());
-    std::string initializationString = std::string ("4") + " --broker=" + broker->getIdentifier ();
+    std::string initializationString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();
     auto core = create (helics::core_type::TEST, initializationString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore> (core);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 {
-    const char *initializationString = "1 --autobroker";
+    const char *initializationString = "-f 1 --autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);

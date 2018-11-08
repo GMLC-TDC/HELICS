@@ -37,6 +37,7 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         interfaceNetwork = netInfo.interfaceNetwork;
         maxMessageSize_ = netInfo.maxMessageSize;
         maxMessageCount_ = netInfo.maxMessageCount;
+        autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode)
         {
         case NetworkBrokerData::server_mode_options::server_active:

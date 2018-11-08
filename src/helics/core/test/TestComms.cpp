@@ -3,6 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "TestComms.h"
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "../BrokerFactory.hpp"
@@ -10,7 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../CoreBroker.hpp"
 #include "../CoreFactory.hpp"
 #include "../NetworkBrokerData.hpp"
-#include "TestComms.h"
 
 #include <memory>
 
@@ -48,11 +48,11 @@ void TestComms::queue_rx_function () {}
 
 void TestComms::queue_tx_function ()
 {
-	//make sure the link to the localTarget_ is in place
+    // make sure the link to the localTarget_ is in place
     if (name != localTarget_)
     {
-		if (!brokerName_.empty())
-		{
+        if (!brokerName_.empty ())
+        {
             if (!CoreFactory::copyCoreIdentifier (name, localTarget_))
             {
                 if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
@@ -62,20 +62,28 @@ void TestComms::queue_tx_function ()
                     return;
                 }
             }
-		}
-		else
-		{
-			if (!BrokerFactory::copyBrokerIdentifier(name, localTarget_))
-			{
+        }
+        else
+        {
+            if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
+            {
                 setRxStatus (connection_status::error);
                 setTxStatus (connection_status::error);
                 return;
-			}
-		}
-        
+            }
+        }
     }
     setRxStatus (connection_status::connected);
     std::shared_ptr<CoreBroker> tbroker;
+
+    if (brokerName_.empty ())
+    {
+        if (!brokerTarget_.empty ())
+        {
+            brokerName_ = brokerTarget_;
+        }
+    }
+
     if (!brokerName_.empty ())
     {
         std::chrono::milliseconds totalSleep (0);
@@ -119,7 +127,27 @@ void TestComms::queue_tx_function ()
             }
         }
     }
-
+    else if (!serverMode)
+    {
+        auto broker = BrokerFactory::findJoinableBrokerOfType (core_type::TEST);
+        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+        if (!tbroker)
+        {
+            if (autoBroker)
+            {
+                tbroker = std::static_pointer_cast<CoreBroker> (
+                  BrokerFactory::create (core_type::TEST, "", brokerInitString_));
+                tbroker->connect ();
+            }
+        }
+        else
+        {
+            setTxStatus (connection_status::error);
+            setRxStatus (connection_status::error);
+            return;
+        }
+    }
+    setTxStatus (connection_status::connected);
     std::map<route_id_t, std::shared_ptr<BrokerBase>> routes;
 
     while (true)
@@ -143,22 +171,20 @@ void TestComms::queue_tx_function ()
                     if (core)
                     {
                         auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
-						if (tcore)
-						{
-                            routes.emplace (route_id, std::move (tcore));
-						}
-                        
+                        if (tcore)
+                        {
+                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (tcore));
+                        }
                     }
                     auto brk = BrokerFactory::findBroker (newroute);
 
                     if (brk)
                     {
                         auto cbrk = std::dynamic_pointer_cast<CoreBroker> (brk);
-						if (cbrk)
-						{
-                            routes.emplace (route_id, std::move (cbrk));
-						}
-                       
+                        if (cbrk)
+                        {
+                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (cbrk));
+                        }
                     }
                     processed = true;
                 }

@@ -60,7 +60,7 @@ template <class COMMS, interface_type baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())
+    if ((netInfo.brokerName.empty ())&&(netInfo.brokerAddress.empty ()))
     {
         CoreBroker::setAsRoot ();
     }

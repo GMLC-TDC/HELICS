@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker","_test_broker"};
+constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker",""};
 constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "",""};
 
 template <class COMMS, interface_type baseline>
