@@ -10,11 +10,11 @@ This fixes issue #123
 - [ ] I agree to license my contributions under the same license as in this repository
 - [ ] I have verified that the tests pass
 
-# Description
+### Description
 
 <!-- Describe your Pull Request here -->
 
-# Proposed changes
+### Proposed changes
 
 <!-- Describe the proposed changes of Pull Request here -->
 
