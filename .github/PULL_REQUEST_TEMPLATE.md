@@ -9,14 +9,14 @@ This fixes issue #123
 - [ ] I have reviewed the [Contributing Guidelines](../CONTRIBUTING.md)
 - [ ] I agree to license my contributions under the same license as in this repository (BSD 3 clause)
 
-# Description
+### Description
+
 <!-- please finish the following statement -->
 If merged this pull request will
 
-# Proposed changes
+### Proposed changes
 
 <!-- Describe the proposed changes of Pull Request here -->
-
 -
 -
 -
