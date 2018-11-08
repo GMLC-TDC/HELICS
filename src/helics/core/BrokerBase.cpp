@@ -370,7 +370,7 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
         ticktimer.async_wait (timerCallback);
     }
-    
+    bool tick_show = false;
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -402,6 +402,10 @@ void BrokerBase::queueProcessingLoop ()
         {
             continue;
         }
+        if (tick_show)
+        {
+            std::cout <<identifier << prettyPrintString(command);
+        }
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)
         {
@@ -419,13 +423,14 @@ void BrokerBase::queueProcessingLoop ()
             if (messagesSinceLastTick == 0)
             {
 #ifndef DISABLE_TICK
-                //   std::cout << "sending tick " << std::endl;
+                   std::cout << identifier<<" sending tick " << std::endl;
                 processCommand (std::move (command));
 #endif
             }
             else
             {
-                std::cout << "got tick " << std::endl;
+                std::cout << identifier<<" got tick " << std::endl;
+                tick_show = true;
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
