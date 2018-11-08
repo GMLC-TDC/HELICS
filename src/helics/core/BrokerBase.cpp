@@ -398,6 +398,10 @@ void BrokerBase::queueProcessingLoop ()
         {
             dumpMessages.push_back (command);
         }
+        if (command.action() == CMD_IGNORE)
+        {
+            continue;
+        }
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)
         {
@@ -418,6 +422,10 @@ void BrokerBase::queueProcessingLoop ()
                 //   std::cout << "sending tick " << std::endl;
                 processCommand (std::move (command));
 #endif
+            }
+            else
+            {
+                std::cout << "got tick " << std::endl;
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
