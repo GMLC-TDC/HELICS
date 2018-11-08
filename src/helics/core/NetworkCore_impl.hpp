@@ -5,27 +5,24 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "NetworkBroker.hpp"
+#include "NetworkCore.hpp"
 
 namespace helics
 {
-
-constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
-constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1",
-                                              ""};
-
+constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker","_test_broker"};
+constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "",""};
 
 template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
 {
-	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
 template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
     : CommsBroker<COMMS, CommonCore> (core_name)
 {
-	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_deactivated;
 }
 
 template <class COMMS, interface_type baseline>
@@ -46,13 +43,13 @@ template <class COMMS, interface_type baseline>
 bool NetworkCore<COMMS, baseline>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty())  // cores require a broker
+    if (netInfo.brokerAddress.empty ())  // cores require a broker
     {
         netInfo.brokerAddress = defBrokerInterface[static_cast<int> (baseline)];
     }
     CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
     CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CommonCore>::comms->setTimeout (std::chrono::milliseconds(BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CommonCore>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();
     if (res)
@@ -75,19 +72,37 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
     }
     else
     {
-        std::lock_guard<std::mutex> lock(dataMutex);
-        if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*'))
+        std::lock_guard<std::mutex> lock (dataMutex);
+        switch (baseline)
         {
-            add=makePortAddress(netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
-                netInfo.portNumber);
-        }
-        else
-        {
-            add=makePortAddress(netInfo.localInterface, netInfo.portNumber);
+        case interface_type::tcp:
+        case interface_type::ip:
+        case interface_type::udp:
+            if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
+            {
+                add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
+                                       netInfo.portNumber);
+            }
+            else
+            {
+                add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
+            }
+            break;
+        case interface_type::inproc:
+        case interface_type::ipc:
+        default:
+            if (!netInfo.localInterface.empty ())
+            {
+                add = netInfo.localInterface;
+            }
+            else
+            {
+                add = CommonCore::getIdentifier();
+            }
+            break;
         }
     }
     return add;
-    
 }
 
 }  // namespace helics

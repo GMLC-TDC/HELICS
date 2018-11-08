@@ -15,13 +15,13 @@ constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",  
 
 constexpr const char *tcodeStr (int tcode) { return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15]; }
 
-constexpr const char *defInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker"};
+constexpr const char *defInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker", ""};
 
 template <class COMMS, interface_type baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (bool rootBroker) noexcept
     : CommsBroker<COMMS, CoreBroker> (rootBroker)
 {
-	netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_default_active;
 }
 
 template <class COMMS, interface_type baseline, int tcode>
@@ -66,7 +66,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
     }
     CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (std::chrono::milliseconds(BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
 
     auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)
@@ -90,14 +90,29 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString ()
     else
     {
         std::lock_guard<std::mutex> lock (dataMutex);
-        if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
+        switch (baseline)
         {
-            add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
-                                   netInfo.portNumber);
-        }
-        else
-        {
-            add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
+        case interface_type::tcp:
+        case interface_type::ip:
+        case interface_type::udp:
+          if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*')) {
+              add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
+                                     netInfo.portNumber);
+          } else {
+              add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
+          } break;
+        case interface_type::inproc:
+        case interface_type::ipc:
+        default:
+            if (!netInfo.localInterface.empty ())
+            {
+                add = netInfo.localInterface;
+            }
+            else
+            {
+                add = CoreBroker::getIdentifier();
+            }
+            break;
         }
     }
     return add;

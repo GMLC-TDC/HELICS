@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
-#include "helics/core/TestCore.h"
+#include "helics/core/test/TestCore.h"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/core-types.hpp"
 

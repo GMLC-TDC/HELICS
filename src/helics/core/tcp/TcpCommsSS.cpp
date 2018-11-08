@@ -18,7 +18,7 @@ namespace helics
 namespace tcp
 {
 using boost::asio::ip::tcp;
-TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp) {}
+TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp,CommsInterface::thread_generation::single) {}
 
 /** destructor*/
 TcpCommsSS::~TcpCommsSS () { disconnect (); }
