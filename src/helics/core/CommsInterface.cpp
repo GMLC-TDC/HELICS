@@ -270,7 +270,10 @@ bool CommsInterface::connect ()
                 queue_transmitter.join ();
             }
         }
-        queue_watcher.join ();
+        if (!singleThread)
+        {
+            queue_watcher.join();
+        }
         return false;
     }
 

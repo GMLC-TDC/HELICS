@@ -87,65 +87,79 @@ void TestComms::queue_tx_function ()
     if (!brokerName_.empty ())
     {
         std::chrono::milliseconds totalSleep (0);
-        auto broker = BrokerFactory::findBroker (brokerName_);
-        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-        if (!tbroker)
+        while (!tbroker)
         {
-            if (autoBroker)
+
+            auto broker = BrokerFactory::findBroker(brokerName_);
+            tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+            if (!tbroker)
             {
-                tbroker = std::static_pointer_cast<CoreBroker> (
-                  BrokerFactory::create (core_type::TEST, brokerName_, brokerInitString_));
-                tbroker->connect ();
+                if (autoBroker)
+                {
+                    tbroker = std::static_pointer_cast<CoreBroker> (
+                        BrokerFactory::create(core_type::TEST, brokerName_, brokerInitString_));
+                    tbroker->connect();
+                }
+                else
+                {
+                    if (totalSleep > connectionTimeout)
+                    {
+                        setTxStatus(connection_status::error);
+                        setRxStatus(connection_status::error);
+                        return;
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    totalSleep += std::chrono::milliseconds(200);
+                }
             }
             else
             {
-                if (totalSleep > connectionTimeout)
+                if (!tbroker->isOpenToNewFederates())
                 {
-                    setTxStatus (connection_status::error);
-                    setRxStatus (connection_status::error);
-                    return;
-                }
-                std::this_thread::sleep_for (std::chrono::milliseconds (200));
-                totalSleep += std::chrono::milliseconds (200);
-            }
-        }
-        else
-        {
-            if (!tbroker->isOpenToNewFederates ())
-            {
-                std::cerr << "broker is not open to new federates " << brokerName_ << std::endl;
-                tbroker = nullptr;
-                broker = nullptr;
-                BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (200));
-                totalSleep += std::chrono::milliseconds (200);
-                if (totalSleep > std::chrono::milliseconds (connectionTimeout))
-                {
-                    setTxStatus (connection_status::error);
-                    setRxStatus (connection_status::error);
-                    return;
+                    std::cerr << "broker is not open to new federates " << brokerName_ << std::endl;
+                    tbroker = nullptr;
+                    broker = nullptr;
+                    BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(200));
+                    totalSleep += std::chrono::milliseconds(200);
+                    if (totalSleep > std::chrono::milliseconds(connectionTimeout))
+                    {
+                        setTxStatus(connection_status::error);
+                        setRxStatus(connection_status::error);
+                        return;
+                    }
                 }
             }
         }
     }
     else if (!serverMode)
     {
-        auto broker = BrokerFactory::findJoinableBrokerOfType (core_type::TEST);
-        tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-        if (!tbroker)
+        std::chrono::milliseconds totalSleep(0);
+        while (!tbroker)
         {
-            if (autoBroker)
+            auto broker = BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+            tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+            if (!tbroker)
             {
-                tbroker = std::static_pointer_cast<CoreBroker> (
-                  BrokerFactory::create (core_type::TEST, "", brokerInitString_));
-                tbroker->connect ();
+                if (autoBroker)
+                {
+                    tbroker = std::static_pointer_cast<CoreBroker> (
+                        BrokerFactory::create(core_type::TEST, "", brokerInitString_));
+                    tbroker->connect();
+                }
+                else
+                {
+                    if (totalSleep > connectionTimeout)
+                    {
+                        setTxStatus(connection_status::error);
+                        setRxStatus(connection_status::error);
+                        return;
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    totalSleep += std::chrono::milliseconds(200);
+                }
             }
         }
-        else
-        {
-            setTxStatus (connection_status::error);
-            setRxStatus (connection_status::error);
-            return;
-        }
+        
     }
     setTxStatus (connection_status::connected);
     std::map<route_id_t, std::shared_ptr<BrokerBase>> routes;

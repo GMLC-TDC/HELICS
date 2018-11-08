@@ -438,7 +438,7 @@ void BrokerBase::queueProcessingLoop ()
                 auto tcmd = actionQueue.try_pop();
                 while (tcmd)
                 {
-					if (tcmd->action() != CMD_DISCONNECT)
+					if ((tcmd->action() != CMD_DISCONNECT) && (tcmd->action() != CMD_STOP))
 					{
                         LOG_WARNING (global_broker_id_local, identifier,
                                      std::string ("TI unprocessed command ") + prettyPrintString (*tcmd));
@@ -460,7 +460,10 @@ void BrokerBase::queueProcessingLoop ()
             auto tcmd = actionQueue.try_pop();
             while (tcmd)
             {
-                LOG_WARNING(global_broker_id_local, identifier, std::string("stop unprocessed command ")+prettyPrintString(*tcmd));
+                if ((tcmd->action() != CMD_DISCONNECT)&&(tcmd->action()!=CMD_STOP))
+                {
+                    LOG_WARNING(global_broker_id_local, identifier, std::string("STOPPED unprocessed command ") + prettyPrintString(*tcmd));
+                }
                 tcmd = actionQueue.try_pop();
             }
             return;
