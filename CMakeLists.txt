@@ -133,11 +133,12 @@ if(BUILD_HELICS_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
 endif()
 
 # -----------------------------------------------------------------------------
-# General project wide configuration
+# General project wide configuration for debug postfix
 # -----------------------------------------------------------------------------
-
-if(NOT CMAKE_DEBUG_POSTFIX)
-	set(CMAKE_DEBUG_POSTFIX d)
+if (NOT NO_DEBUG_POSFIX)
+	if(NOT CMAKE_DEBUG_POSTFIX)
+		set(CMAKE_DEBUG_POSTFIX d)
+	endif()
 endif()
 
 # add a baseline library for underlying dependencies and flags

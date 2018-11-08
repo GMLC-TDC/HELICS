@@ -25,31 +25,30 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-static inline std::string genId ()
+static inline std::string genId (size_t seed)
 {
-    std::string nm = std::string (23, ' ');
-    auto seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
-    seed += std::hash<std::thread::id> {} (std::this_thread::get_id ());
-    std::mt19937 rng (seed);  // random-number engine used (Mersenne-Twister in this case)
+    std::string nm = std::string (24, '-');
+    if (seed == 0)
+    {
+        seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        seed += std::hash<std::thread::id> {} (std::this_thread::get_id());
+    }
+    std::mt19937 rng (static_cast<unsigned int>(seed));  // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
-    nm[5] = '-';
-    nm[11] = '-';
-    nm[17] = '-';
-
-    for (int ii = 0; ii < 23; ii++)
+    for (int ii = 1; ii < 24; ii++)
     {
-        if ((ii != 5) && (ii != 11) && (ii != 17))
+        if ((ii != 6) && (ii != 12) && (ii != 18))
         {
             nm[ii] = chars[uni (rng)];
         }
     }
 #ifdef _WIN32
-    std::string pid_str = std::to_string (GetCurrentProcessId ());
+    std::string pid_str = std::to_string (GetCurrentProcessId ())+nm;
 #else
-    std::string pid_str = std::to_string (getpid ());
+    std::string pid_str = std::to_string (getpid ())+nm;
 #endif
-    return pid_str + "-" + nm;
+    return pid_str;
 }
 
 namespace helics
@@ -184,7 +183,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         if (identifier.empty ())
         {
-            identifier = genId ();
+            identifier = genId (reinterpret_cast<size_t>(this));
         }
     }
 
@@ -226,7 +225,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
     return false;
 }
 
-void BrokerBase::generateNewIdentifier () { identifier = genId (); }
+void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {

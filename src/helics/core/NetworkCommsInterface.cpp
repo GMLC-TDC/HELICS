@@ -13,7 +13,7 @@ namespace helics
 {
 NetworkCommsInterface::NetworkCommsInterface (interface_type type) noexcept : networkType (type) {}
 
-const std::string localHostString = "localhost";
+static const std::string localHostString = "localhost";
 
 int NetworkCommsInterface::PortAllocator::findOpenPort (int count, const std::string &host)
 {
