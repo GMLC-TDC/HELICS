@@ -19,7 +19,6 @@ set(
   # CoreBroker-tests.cpp
   CoreFactory-tests.cpp MessageTimerTests.cpp
   # CommonCore-tests.cpp
-  NetworkBrokerData-tests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
   IPCcore_tests.cpp
