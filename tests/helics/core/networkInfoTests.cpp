@@ -36,9 +36,6 @@ BOOST_AUTO_TEST_CASE(networkbrokerdata_stripProtocol_test)
     BOOST_CHECK_EQUAL(stripProtocol("https://127.0.0.1"), "127.0.0.1");
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
-
-
 BOOST_AUTO_TEST_CASE(add_check_detection)
 {
     BOOST_CHECK(helics::isipv6("FEDC:BA98:7654:3210:FEDC:BA98:7654:3210"));
