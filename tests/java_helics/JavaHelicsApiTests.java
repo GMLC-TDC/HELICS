@@ -83,7 +83,7 @@ public class JavaHelicsApiTests {
 			helics.helicsBrokerFree(broker2);
 			helics.helicsCloseLibrary();
 			// Core API Functions
-			SWIGTYPE_p_void core1 = helics.helicsCreateCore("test", "core1", "-f 3 --autobroker");
+			SWIGTYPE_p_void core1 = helics.helicsCreateCore("test", "core1", "--autobroker");
 			if (core1 == null) {
 				javaHelicsApiTests.helicsAssert("core1 == null");
 			}

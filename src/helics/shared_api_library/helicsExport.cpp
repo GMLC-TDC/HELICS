@@ -478,8 +478,16 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     }
     auto core = std::make_unique<helics::CoreObject> ();
     core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr,
-                                                       (initString != nullptr) ? std::string (initString) : nullstr);
+    auto nstring = AS_STRING (name);
+	if (nstring.empty())
+	{
+        core->coreptr = helics::CoreFactory::create (ct, AS_STRING (initString));
+	}
+	else
+	{
+        core->coreptr = helics::CoreFactory::FindOrCreate (ct, nstring, AS_STRING (initString));
+	}
+    
     auto retcore = reinterpret_cast<helics_core> (core.get ());
     getMasterHolder ()->addCore (std::move (core));
 
@@ -506,7 +514,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     auto core = std::make_unique<helics::CoreObject> ();
 
     core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+    core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING(name), argc, argv);
     auto retcore = reinterpret_cast<helics_core> (core.get ());
     getMasterHolder ()->addCore (std::move (core));
 
