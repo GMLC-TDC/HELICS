@@ -120,7 +120,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         {
             brokerState = broker_state_t::terminating;
             sendDisconnect ();
-            if (global_broker_id_local != parent_broker_id)
+            if ((global_broker_id_local != parent_broker_id)&&(global_broker_id_local.isValid()))
             {
                 ActionMessage dis (CMD_DISCONNECT);
                 dis.source_id = global_broker_id_local;
@@ -1161,7 +1161,20 @@ CommonCore::registerFilter (const std::string &filterName, const std::string &ty
         }
     }
 
+	//code in case the core has not received a broker_ack yet
     auto brkid = global_broker_id.load ();
+    int sleepcnt = 0;
+    while ((brkid == parent_broker_id) || (!brkid.isValid()))
+	{
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        brkid = global_broker_id.load ();
+        ++sleepcnt;
+		if (sleepcnt * 50 > timeout)
+		{
+            throw (RegistrationFailure ("registration timeout exceeded"));
+		}
+	}
+
     auto handle =
       createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName, type_in, type_out);
     auto id = handle.getInterfaceHandle ();
@@ -1193,15 +1206,27 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
             throw (RegistrationFailure ("there already exists a filter with this name"));
         }
     }
-    auto brkId = global_broker_id.load ();
+    // code in case the core has not received a broker_ack yet
+    auto brkid = global_broker_id.load ();
+    int sleepcnt = 0;
+    while ((brkid == parent_broker_id) || (!brkid.isValid ()))
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        brkid = global_broker_id.load ();
+        ++sleepcnt;
+        if (sleepcnt * 50 > timeout)
+        {
+            throw (RegistrationFailure ("registration timeout exceeded"));
+        }
+    }
 
-    auto &handle = createBasicHandle (brkId, federate_id_t (), handle_type_t::filter, filterName, type_in,
+    auto &handle = createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName, type_in,
                                       type_out, make_flags (clone_flag));
 
     auto id = handle.getInterfaceHandle ();
 
     ActionMessage m (CMD_REG_FILTER);
-    m.source_id = brkId;
+    m.source_id = brkid;
     m.source_handle = id;
     m.name = handle.key;
     setActionFlag (m, clone_flag);
