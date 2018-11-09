@@ -303,6 +303,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else
         {
             _brokers.back ().route_id = getRoute (command.source_id);
+            if (_brokers.back().route_id == parent_route_id)
+            {
+                std::cout << " invalid route to parent broker or reg broker" << std::endl;
+             }
             _brokers.back ().parent = command.source_id;
             _brokers.back ()._nonLocal = true;
         }
