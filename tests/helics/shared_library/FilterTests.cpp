@@ -62,9 +62,36 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
 
 }
 
-/** test a filter operator
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
-*/
+BOOST_AUTO_TEST_CASE(core_filter_reg)
+{
+    CE(auto core1 = helicsCreateCore("test", "core1", "--autobroker",&err));
+    
+   CE(auto core2 = helicsCoreClone(core1,&err));
+    
+    std::string core1IdentifierString = helicsCoreGetIdentifier(core1);
+
+    BOOST_CHECK_EQUAL(core1IdentifierString, "core1");
+   
+    CE(auto sourceFilter1 = helicsCoreRegisterFilter(core1,
+        helics_filter_type_t::helics_filtertype_delay, "core1SourceFilter",&err));
+   
+    CE(helicsFilterAddSourceTarget(sourceFilter1, "ep1",&err));
+    CE(auto destinationFilter1 = helicsCoreRegisterFilter(core1,
+        helics_filter_type_t::helics_filtertype_delay, "core1DestinationFilter",&err));
+   
+    helicsFilterAddDestinationTarget(destinationFilter1, "ep2",&err);
+    CE(auto cloningFilter1 = helicsCoreRegisterCloningFilter(core1, "ep3",&err));
+   
+    helicsFilterRemoveDeliveryEndpoint(cloningFilter1, "ep3",&err);
+    int core1IsConnected = helicsCoreIsConnected(core1);
+    BOOST_CHECK(core1IsConnected != 0);
+    helicsCoreSetReadyToInit(core1,&err);
+    helicsCoreDisconnect(core1,&err);
+    helicsCoreDisconnect(core2,&err);
+    helicsCoreFree(core1);
+    helicsCoreFree(core2);
+    helicsCloseLibrary();
+}
 
 BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_type)
 {
