@@ -161,10 +161,14 @@ void TestComms::queue_tx_function ()
         }
         
     }
-    if (tbroker->getIdentifier() == localTarget_)
+    if (tbroker)
     {
-        logError("broker == target");
+        if (tbroker->getIdentifier() == localTarget_)
+        {
+            logError("broker == target");
+        }
     }
+    
     setTxStatus (connection_status::connected);
     std::map<route_id_t, std::shared_ptr<BrokerBase>> routes;
 
