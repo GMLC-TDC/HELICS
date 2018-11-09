@@ -146,7 +146,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
+    fi.coreName = "core1"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -193,7 +193,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1b";
+    fi.coreName = "core1b"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = " - f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
+    fi.coreName = "coresrc";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
@@ -537,7 +537,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4";
+    fi.coreName = "core4"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
