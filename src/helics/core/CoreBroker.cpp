@@ -292,10 +292,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _brokers.insert (command.name,
                          nullptr,
                          command.name);
-        if (!command.source_id.isValid())
+        if ((!command.source_id.isValid())||(command.source_id==parent_broker_id))
         {
 			//TODO:: this will need to be updated when we enable mesh routing
-            _brokers.back ().route_id = route_id_t(static_cast<route_id_t::base_type>(_brokers.size ()));
+            _brokers.back ().route_id = route_id_t(routeCount++);
             addRoute (_brokers.back ().route_id, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
             _brokers.back ()._nonLocal = false;
@@ -313,7 +313,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         _brokers.back ()._core = checkActionFlag (command, core_flag);
         if (!isRootc)
         {
-            if (global_broker_id_local.isValid())
+            if ((global_broker_id_local.isValid())&&(global_broker_id_local!=parent_broker_id))
             {
                 command.source_id = global_broker_id_local;
                 transmit (parent_route_id, command);
@@ -384,7 +384,13 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             higher_broker_id = global_broker_id_t (command.source_id);
             timeCoord->source_id = global_federate_id_t (global_broker_id_local);
             transmitDelayedMessages ();
-
+			for (auto &brk : _brokers)
+			{
+				if (!brk._nonLocal)
+				{
+                    brk.parent = global_broker_id_local;
+				}
+			}
             return;
         }
         auto broker = _brokers.find (command.name);

@@ -188,7 +188,7 @@ void TestComms::queue_tx_function ()
                 case NEW_ROUTE:
                 {
                     auto &newroute = cmd.payload;
-
+                    bool foundRoute = false;
                     auto core = CoreFactory::findCore (newroute);
                     if (core)
                     {
@@ -196,6 +196,7 @@ void TestComms::queue_tx_function ()
                         if (tcore)
                         {
                             routes.emplace (route_id_t (cmd.getExtraData ()), std::move (tcore));
+                            foundRoute = true;
                         }
                     }
                     auto brk = BrokerFactory::findBroker (newroute);
@@ -206,8 +207,13 @@ void TestComms::queue_tx_function ()
                         if (cbrk)
                         {
                             routes.emplace (route_id_t (cmd.getExtraData ()), std::move (cbrk));
+                            foundRoute = true;
                         }
                     }
+					if (!foundRoute)
+					{
+                        logError (std::string("unable to establish Route to ")+newroute);
+					}
                     processed = true;
                 }
                 break;
