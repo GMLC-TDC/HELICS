@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "-m 2 --autobroker";
+    fi.coreName = "core1-mult";
+    fi.coreInitString = "-f 2 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate> ("fed1", fi);
 
