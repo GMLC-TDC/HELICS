@@ -214,7 +214,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badInit.source_id = global_broker_id_local;
             badInit.messageID = 5;
             badInit.name = command.name;
-            transmit (getRoute (global_federate_id_t (command.source_id)), badInit);
+            transmit (getRoute (command.source_id), badInit);
             return;
         }
         // this checks for duplicate federate names
@@ -225,7 +225,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badName.source_id = global_broker_id_local;
             badName.messageID = 6;
             badName.name = command.name;
-            transmit (getRoute (global_federate_id_t (command.source_id)), badName);
+            transmit (getRoute (command.source_id), badName);
             return;
         }
         _federates.insert (command.name,nullptr,command.name);
@@ -282,16 +282,47 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         }
         else  // we are initialized already
         {
+            route_id_t newroute;
+            if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id))
+            {
+                newroute = route_id_t(routeCount++);
+                addRoute(newroute, command.getString(targetStringLoc));
+            }
+            else
+            {
+                newroute = getRoute(command.source_id);
+            }
             ActionMessage badInit (CMD_BROKER_ACK);
             setActionFlag (badInit, error_flag);
             badInit.source_id = global_broker_id_local;
             badInit.name = command.name;
-            transmit (getRoute(command.source_id), badInit);
+            badInit.messageID = 5;
+            transmit (newroute, badInit);
             return;
         }
-        _brokers.insert (command.name,
+        auto inserted=_brokers.insert (command.name,
                          nullptr,
                          command.name);
+        if (!inserted)
+        {
+            route_id_t newroute;
+            if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id))
+            {
+                newroute = route_id_t(routeCount++);
+                addRoute(newroute, command.getString(targetStringLoc));
+            }
+            else
+            {
+                newroute = getRoute(command.source_id);
+            }
+            ActionMessage badName(CMD_BROKER_ACK);
+            setActionFlag(badName, error_flag);
+            badName.source_id = global_broker_id_local;
+            badName.messageID = 7;
+            badName.name = command.name;
+            transmit(newroute, badName);
+            return;
+        }
         if ((!command.source_id.isValid())||(command.source_id==parent_broker_id))
         {
 			//TODO:: this will need to be updated when we enable mesh routing

@@ -478,7 +478,9 @@ static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
   {-5, "lost connection with server"},
   {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"}};
+  {6, "duplicate federate name detected"},
+{ 7, "duplicate broker name detected" }
+};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
