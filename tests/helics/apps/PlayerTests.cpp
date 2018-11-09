@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
+    fi.coreName = "core2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
+    fi.coreName = "core3";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 BOOST_AUTO_TEST_CASE (simple_player_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
+    fi.coreName = "core4";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -197,7 +197,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core3";
+    fi.coreName = "core5"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core3";
+    fi.coreName = "core6";
     fi.coreName.push_back (indx++);
     fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
@@ -578,7 +578,7 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core11";
+    fi.coreName = "core11"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
