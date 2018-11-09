@@ -404,7 +404,7 @@ void BrokerBase::queueProcessingLoop ()
         }
         if (tick_show)
         {
-            std::cout <<identifier << prettyPrintString(command);
+            std::cout << identifier << " "<<prettyPrintString(command) << std::endl;;
         }
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)

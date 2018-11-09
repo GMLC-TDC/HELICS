@@ -386,6 +386,12 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         auto broker = _brokers.find (command.name);
         if (broker != _brokers.end ())
         {
+            if (broker->global_id == global_broker_id_t(command.dest_id))
+            {
+                //drop the packet since we have seen this ack already
+                LOG_WARNING(global_broker_id_local, identifier, "repeated broker acks");
+                return;
+            }
             broker->global_id = global_broker_id_t (command.dest_id);
             auto route = broker->route_id;
             _brokers.addSearchTerm (global_broker_id_t (command.dest_id), broker->name);
