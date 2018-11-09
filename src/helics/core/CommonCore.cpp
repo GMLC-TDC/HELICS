@@ -1166,10 +1166,14 @@ CommonCore::registerFilter (const std::string &filterName, const std::string &ty
     int sleepcnt = 0;
     while ((brkid == parent_broker_id) || (!brkid.isValid()))
 	{
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        if (sleepcnt == 0)
+        {
+            LOG_WARNING(parent_broker_id, identifier, "now waiting for the core to finish registration before proceeding");
+        }
+        std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_broker_id.load ();
         ++sleepcnt;
-		if (sleepcnt * 50 > timeout)
+		if (sleepcnt * 100 > timeout)
 		{
             throw (RegistrationFailure ("registration timeout exceeded"));
 		}
@@ -1211,7 +1215,11 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
     int sleepcnt = 0;
     while ((brkid == parent_broker_id) || (!brkid.isValid ()))
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        if (sleepcnt == 0)
+        {
+            LOG_WARNING(parent_broker_id, identifier, "now waiting for the core to finish registration before proceeding");
+        }
+        std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_broker_id.load ();
         ++sleepcnt;
         if (sleepcnt * 50 > timeout)
