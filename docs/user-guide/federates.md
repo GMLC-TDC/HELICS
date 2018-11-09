@@ -1,5 +1,7 @@
 # Federates #
 
+(xxxxxxx TDH: Due to length, I'm likely going to be splitting this page into "Value Federates" and "Message Federates" pages. Maybe even have the introductory "Types of Federates" as its own page as well.)
+
 ## Types of Federates ##
 A "federate", as previously introduced in the [HELICS Key Concepts section](./helics_key_concepts.md), is a specific instance of simulation executable. For example, a federation may contain a bunch of electric vehicles (EVs), each with their own charge controller implemented as a stand-alone federate (maybe the co-simulation designer is trying out a fancy new coordination algorithm); we'll call this code `EV_coordinator_v12.exe`. The code that does this charge coordination is generic in the sense that it can be used to charge any of these EVs; it works with all makes and models. But to run the co-simulation, each EV will have to have its own running instance of this code that controls the charging of a particular vehicle. If the co-simulation is testing this algorithm with five EVs, then there would be five federates each running their own version of `EV_coordinator_v12.exe` which presumably have unique information particular to each individual EV (battery size, maximum charging rate, etc).
 
@@ -51,23 +53,27 @@ As the fundamental role of the co-simulation platform is to manage the synchroni
 "source_only":false,
 "observer":false,
 ```
-* **only_update_on_change [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one. 
+* **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one. 
 
-* **only_transmit_on_change [false]** - Complementarily to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
+* **`only_transmit_on_change` [false]** - Complementarily to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
 
-* **source_only [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true` because xxxxxxx
+* **`source_only` [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true` because xxxxxxx
 
-* **observer [false]** - Conversely, some federates may only participate in the federation by recording values (perhaps for diagnostic purposes or for logging results). If using such a federate, set the `observer` flag to `true` because xxxxxxx
+* **`observer` [false]** - Conversely, some federates may only participate in the federation by recording values (perhaps for diagnostic purposes or for logging results). If using such a federate, set the `observer` flag to `true` because xxxxxxx
 
 (xxxxxxx - How do we configure a subscription so that the subscribing federate is only woken up if the value changes by, say, 10%?)
 
-## Value Federate Configuration in JSON ##
 
-(xxxxxxx - publication and subscription examples)
+### Value Federate Interface Configuration ###
+
+(xxxxxxx - examples of all four interface types as well as an example of the broker JSON for publications and named inputs)
+
+(xxxxxxx - warnings of shooting yourself in the foot by sending overwriting values to the same interface)
+
+(xxxxxxx - discussion of the use of the `info` item in JSON configs)
 
 (xxxxxxxx - data type conversion discussion)
 
-(xxxxxxxx - directed input and output)
 
 ## Example 1a - Basic transmission and distribution powerflow ##
 
@@ -110,7 +116,7 @@ In fact, as you'll see in [a later section](./filters.md), it is possible to cre
 
 The federate code handling these messages can be relatively simple because the data coming in or going out of each endpoint is unique. The voltage controller always receives (and only receives) the voltage measurement at one endpoint and similarly only sends the control signal on another.
 
-Consider a counter-example: automated meter-reading (AMI) using a wireless network from all meters in a distribution system to a data-aggregator in the substation (where, presumably, the data travels over a dedicated wired connection to a control room). All meters will have a single endpoint over which they will send their data but what about the receiver? The co-simulation could be designed with the data-aggregator having a unique endpoint for each meter but this implies come kind of dedicated communication channel for each meter; this is not the case with wireless communication. Instead, it is probably better to create a single endpoint representing the wireless connection the data aggregator has with the AMI network. In this case, messages from any of the meters in the system will be flowing through the same endpoint and to differentiate the messages from each other, the federate will have to be written to examine the metadata with the message to determine its original source.
+Consider a counter-example: automated meter-reading (AMI) using a wireless network that connects all meters in a distribution system to a data-aggregator in the substation (where, presumably, the data travels over a dedicated wired connection to a control room). All meters will have a single endpoint over which they will send their data but what about the receiver? The co-simulation could be designed with the data-aggregator having a unique endpoint for each meter but this implies come kind of dedicated communication channel for each meter; this is not the case with wireless communication. Instead, it is probably better to create a single endpoint representing the wireless connection the data aggregator has with the AMI network. In this case, messages from any of the meters in the system will be flowing through the same endpoint and to differentiate the messages from each other, the federate will have to be written to examine the metadata with the message to determine its original source.
 
 ![ami message federates](../img/ami_message_federate.pdf)
 
@@ -152,7 +158,7 @@ Running the example (located at xxxxxxxx) and looking at the output file (xxxxxx
 
 (xxxxxxx - insert graph of number of EVs and substation load vs time)
 
-As you can see in the data, every time the load on the system exceeded the transformer rating by xxxxxxxx% (xxxxxxxx - specific value), the EV charge controller  disconnected the appropriate number of EVs to drop the load below the limit. Conversely, as the load droped below the rated limit, the EV charge controller was able to connect more EVs for charging. 
+As you can see in the data, every time the load on the system exceeded the transformer rating by xxxxxxxx% (xxxxxxxx - specific value), the EV charge controller  disconnected the appropriate number of EVs to drop the load below the limit. Conversely, as the load dropped below the rated limit, the EV charge controller was able to connect more EVs for charging. 
 
 (xxxxxxxx - Look at impacts of EV charge controller on transmission system; this is why we do co-simulation )
 
