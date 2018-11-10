@@ -149,18 +149,22 @@ void CommonCore::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
-    waitForDisconnect ();
+	if (!waitForDisconnect(200))
+	{
+		LOG_WARNING(global_broker_id.load(),getIdentifier(),"waiting on disconnect");
+	}
 }
 
-void CommonCore::waitForDisconnect (int msToWait) const
+bool CommonCore::waitForDisconnect (int msToWait) const
 {
     if (msToWait <= 0)
     {
         disconnection.wait ();
+        return true;
     }
     else
     {
-        disconnection.wait_for (std::chrono::milliseconds (msToWait));
+        return disconnection.wait_for (std::chrono::milliseconds (msToWait));
     }
 }
 

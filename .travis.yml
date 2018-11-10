@@ -273,7 +273,7 @@ script:
   - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make ${MAKEFLAGS} install ; fi
 
   # Run CI tests
-  - export CTEST_OPTIONS=" --verbose"
+  - export CTEST_OPTIONS="--output-on-failure"
   - travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
 
   # Gather coverage results

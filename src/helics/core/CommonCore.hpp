@@ -166,7 +166,7 @@ class CommonCore : public Core, public BrokerBase
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (int msToWait = -1) const override final;
     /** unregister the core from any process find functions*/
     void unregister ();
     /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper

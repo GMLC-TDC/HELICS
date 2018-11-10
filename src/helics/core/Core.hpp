@@ -78,8 +78,9 @@ class Core
      */
     virtual void disconnect () = 0;
     /** waits in the current thread until the core is disconnected
+	@return true if the disconnect was successful
      */
-    virtual void waitForDisconnect (int msToWait = -1) const = 0;
+    virtual bool waitForDisconnect (int msToWait = -1) const = 0;
 
     /** check if the core is ready to accept new federates
      */
