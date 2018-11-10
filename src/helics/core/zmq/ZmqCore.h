@@ -8,6 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics {
 namespace zeromq {
 class ZmqComms;
+class ZmqCommsTest;
+
 /** implementation for the core that uses zmq messages to communicate*/
 class ZmqCore final: public NetworkCore<ZmqComms, interface_type::tcp> {
 
@@ -16,6 +18,20 @@ public:
   ZmqCore() noexcept;
   /** construct from with a core name*/
   ZmqCore(const std::string &core_name);
+
+private:
+	virtual bool brokerConnect() override;
+
+};
+
+/** implementation for the core that uses zmq messages to communicate*/
+class ZmqCoreTest final: public NetworkCore<ZmqCommsTest, interface_type::tcp> {
+
+public:
+	/** default constructor*/
+  ZmqCoreTest() noexcept;
+  /** construct from with a core name*/
+  ZmqCoreTest(const std::string &core_name);
 
 private:
 	virtual bool brokerConnect() override;

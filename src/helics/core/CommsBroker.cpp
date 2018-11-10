@@ -14,6 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "udp/UdpComms.h"
 #ifdef HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqComms.h"
+#include "zmq/ZmqCommsTest.h"
 #endif
 
 #ifndef DISABLE_TCP_CORE
@@ -32,6 +33,8 @@ template class CommsBroker<ipc::IpcComms, CommonCore>;
 #ifdef HELICS_HAVE_ZEROMQ
 template class CommsBroker<zeromq::ZmqComms, CoreBroker>;
 template class CommsBroker<zeromq::ZmqComms, CommonCore>;
+template class CommsBroker<zeromq::ZmqCommsTest, CoreBroker>;
+template class CommsBroker<zeromq::ZmqCommsTest, CommonCore>;
 #endif
 template class CommsBroker<udp::UdpComms, CoreBroker>;
 template class CommsBroker<udp::UdpComms, CommonCore>;
