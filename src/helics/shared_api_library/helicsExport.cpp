@@ -1221,6 +1221,13 @@ void MasterObjectHolder::clearBroker (int index)
     if ((index < static_cast<int> (broker->size ())) && (index >= 0))
     {
         (*broker)[index] = nullptr;
+        if (broker->size () > 10)
+        {
+            if (std::none_of (broker->begin (), broker->end (), [](const auto &brk) { return static_cast<bool>(brk); }))
+            {
+               broker->clear ();
+            }
+        }
     }
 }
 
@@ -1230,6 +1237,13 @@ void MasterObjectHolder::clearCore (int index)
     if ((index < static_cast<int> (core->size ())) && (index >= 0))
     {
         (*core)[index] = nullptr;
+		if (core->size() > 10)
+		{
+            if (std::none_of (core->begin (), core->end (), [](const auto &cr) { return static_cast<bool> (cr); }))
+			{
+                core->clear ();
+			}
+		}
     }
 }
 
@@ -1239,6 +1253,13 @@ void MasterObjectHolder::clearFed (int index)
     if ((index < static_cast<int> (fed->size ())) && (index >= 0))
     {
         (*fed)[index] = nullptr;
+        if (fed->size () > 10)
+        {
+            if (std::none_of (fed->begin (), fed->end (), [](const auto &fd) { return static_cast<bool> (fd); }))
+            {
+                fed->clear ();
+            }
+        }
     }
 }
 

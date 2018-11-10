@@ -95,6 +95,7 @@ FederateTestFixture::~FederateTestFixture ()
             {
                 helicsCoreDisconnect (core,nullptr);
             }
+            helicsCoreFree (core);
             
         }
     }
