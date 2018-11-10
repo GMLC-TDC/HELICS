@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core6";
+    fi.coreName = "core6-mline";
     fi.coreName.push_back (indx++);
     fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
