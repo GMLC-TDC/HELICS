@@ -170,7 +170,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (int msToWait = -1) const override final;
 
   private:
     /** implementation details of the connection process
