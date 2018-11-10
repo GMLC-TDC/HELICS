@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_SUITE (recorder_tests, *utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (simple_recorder_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
+    fi.coreName = "rcore1";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
 BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1-t2";
+    fi.coreName = "rcore1-t2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 BOOST_AUTO_TEST_CASE (recorder_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core-tm";
+    fi.coreName = "rcore-tm";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
@@ -185,7 +185,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
                       file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "coretmf"+file;
+    fi.coreName = "rcoretmf"+file;
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
@@ -320,7 +320,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
 {
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core-dep";
+    fi.coreName = "rcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
 {
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
+    fi.coreName = "rcore2";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
 
-    fi.coreName = "core3";
+    fi.coreName = "rcore3";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -462,7 +462,7 @@ const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "c
 BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4"+file;
+    fi.coreName = "rcore4"+file;
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -510,7 +510,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core5";
+    fi.coreName = "rcore5";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
@@ -564,7 +564,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core6";
+    fi.coreName = "rcore6";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
@@ -607,7 +607,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core7";
+    fi.coreName = "rcore7";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setTimeProperty (PERIOD_PROPERTY, 1.0);

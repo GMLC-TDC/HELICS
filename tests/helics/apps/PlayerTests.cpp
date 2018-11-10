@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
 
-    fi.coreName = "core1";
+    fi.coreName = "pcore1";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1",fi);
 
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
+    fi.coreName = "pcore2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
 BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core3";
+    fi.coreName = "pcore3";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
 BOOST_AUTO_TEST_CASE (simple_player_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4";
+    fi.coreName = "pcore4";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -197,7 +197,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core5"+file;
+    fi.coreName = "pcore5"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core6-mline";
+    fi.coreName = "pcore6-mline";
     fi.coreName.push_back (indx++);
     fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
@@ -397,7 +397,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core7";
+    fi.coreName = "pcore7";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
     play1.loadFile (std::string (TEST_DIR) + "/test_files/example6.json");
@@ -438,7 +438,7 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
 BOOST_AUTO_TEST_CASE (player_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core8";
+    fi.coreName = "pcore8";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE (player_test_message)
 BOOST_AUTO_TEST_CASE (player_test_message2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core9";
+    fi.coreName = "pcore9";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
 BOOST_AUTO_TEST_CASE (player_test_message3)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core10";
+    fi.coreName = "pcore10";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
@@ -578,7 +578,7 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core11"+file;
+    fi.coreName = "pcore11"+file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
