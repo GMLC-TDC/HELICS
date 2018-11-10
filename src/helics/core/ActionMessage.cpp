@@ -502,6 +502,11 @@ const char *commandErrorString (int errorcode)
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
+	if (ret == unknownStr)
+	{
+        ret += " " + std::to_string (static_cast<int> (command.action ()));
+        return ret;
+	}
     switch (command.action ())
     {
     case CMD_REG_FED:
