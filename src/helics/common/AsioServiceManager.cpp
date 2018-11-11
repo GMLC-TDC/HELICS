@@ -158,7 +158,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
         auto ptr = shared_from_this ();
         std::packaged_task<void()> serviceTask ([ptr=std::move(ptr)]() { serviceProcessingLoop (ptr); });
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
-        std::cout << "run Service loop " << runCounter << "\n";
+        //std::cout << "run Service loop " << runCounter << "\n";
         nullwork = std::make_unique<boost::asio::io_service::work> (getBaseService ());
         loopRet = serviceTask.get_future ();
         nullLock.unlock ();
@@ -170,7 +170,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
         if (getBaseService ().stopped ())
         {
             std::unique_lock<std::mutex> nullLock (runningLoopLock);
-            std::cout << "run Service loop already stopped" << runCounter << "\n";
+           // std::cout << "run Service loop already stopped" << runCounter << "\n";
             if (loopRet.valid ())
             {
                 loopRet.get ();
@@ -247,6 +247,6 @@ void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
         }
 	}
     
-     std::cout << "service loop stopped\n";
+     //std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }

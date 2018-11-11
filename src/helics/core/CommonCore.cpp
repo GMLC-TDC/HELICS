@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
 #include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
-#include "CommonCore.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -89,14 +89,14 @@ bool CommonCore::connect ()
             }
             return res;
         }
-		else
-		{
+        else
+        {
+            LOG_WARNING (global_broker_id.load(), getIdentifier(), "multiple connect calls");
             while (brokerState == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
             }
-		}
-            
+        }
     }
     return isConnected ();
 }
@@ -471,8 +471,8 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
 {
     if (!waitCoreRegistration ())
     {
-        throw (FunctionExecutionFailure (
-          "core is unable to register and has timed out, federate cannot be registered"));
+        throw (
+          RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
     }
     if (brokerState >= operating)
     {
