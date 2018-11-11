@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
         M = std::move (m);
     };
     std::cout << "making timer" << std::endl;
-    auto mtimer = std::make_shared<MessageTimer> (cback,true);
+    auto mtimer = std::make_shared<MessageTimer> (cback);
     std::cout << "timer made" << std::endl;
     std::unique_lock<std::mutex> localLock (mlock);
     mtimer->addTimerFromNow (std::chrono::milliseconds (200), CMD_PROTOCOL);

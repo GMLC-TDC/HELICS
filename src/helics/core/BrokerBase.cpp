@@ -418,7 +418,7 @@ void BrokerBase::queueProcessingLoop ()
             if (checkActionFlag (command, error_flag))
             {
                 serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop ();
+                serviceLoop = serv->startServiceLoop ();
             }
             if (messagesSinceLastTick == 0)
             {

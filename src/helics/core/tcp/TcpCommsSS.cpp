@@ -174,7 +174,7 @@ void TcpCommsSS::queue_tx_function ()
     }
     TcpServer::pointer server;
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->startServiceLoop ();
     auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };

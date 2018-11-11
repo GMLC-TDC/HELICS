@@ -186,7 +186,7 @@ void TcpComms::queue_rx_function ()
             }
         }
     }
-    auto serviceLoop = ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->startServiceLoop ();
     server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
@@ -346,7 +346,7 @@ void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->startServiceLoop ();
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id_t, TcpConnection::pointer> routes;  // for all the other possible routes
