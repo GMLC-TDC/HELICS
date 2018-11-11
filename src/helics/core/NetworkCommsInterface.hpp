@@ -35,7 +35,7 @@ private:
 
   public:
     /** default constructor*/
-	  explicit NetworkCommsInterface(interface_type type) noexcept;
+	  explicit NetworkCommsInterface(interface_type type, CommsInterface::thread_generation threads=CommsInterface::thread_generation::dual) noexcept;
 
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;

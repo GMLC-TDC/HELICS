@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "TestCore.h"
+#include "test/TestCore.h"
 #include "ipc/IpcCore.h"
 #include "udp/UdpCore.h"
 
@@ -294,6 +294,14 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
+        case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
+            return (dynamic_cast<tcp::TcpCoreSS *> (ptr.get ()) != nullptr);
+#else
+            break;
 #endif
         default:
             return true;
@@ -327,9 +335,9 @@ size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
 size_t cleanUpCores (std::chrono::milliseconds delay) { return delayedDestroyer.destroyObjects (delay); }
 
-void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
+bool copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-    searchableObjects.copyObject (copyFromName, copyToName);
+    return searchableObjects.copyObject (copyFromName, copyToName);
 }
 
 void unregisterCore (const std::string &name)

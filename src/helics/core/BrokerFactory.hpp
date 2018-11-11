@@ -65,8 +65,9 @@ registered or when the clean up function is called this prevents some odd thread
 size_t cleanUpBrokers (std::chrono::milliseconds delay);
 
 /** make a copy of the broker pointer to allow access to the new name
+@return true if successful
  */
-void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName);
+bool copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName);
 
 /** display the help listing for a particular core_type*/
 void displayHelp (core_type type = core_type::UNRECOGNIZED);

@@ -18,7 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "mpi/MpiBroker.h"
 #endif
 
-#include "TestBroker.h"
+#include "test/TestBroker.h"
 #include "ipc/IpcBroker.h"
 #include "udp/UdpBroker.h"
 
@@ -292,9 +292,9 @@ bool registerBroker (const std::shared_ptr<Broker> &broker)
 size_t cleanUpBrokers () { return delayedDestroyer.destroyObjects (); }
 size_t cleanUpBrokers (std::chrono::milliseconds delay) { return delayedDestroyer.destroyObjects (delay); }
 
-void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
+bool copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-    searchableObjects.copyObject (copyFromName, copyToName);
+    return searchableObjects.copyObject (copyFromName, copyToName);
 }
 
 void unregisterBroker (const std::string &name)

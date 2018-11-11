@@ -478,8 +478,16 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     }
     auto core = std::make_unique<helics::CoreObject> ();
     core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr,
-                                                       (initString != nullptr) ? std::string (initString) : nullstr);
+    auto nstring = AS_STRING (name);
+	if (nstring.empty())
+	{
+        core->coreptr = helics::CoreFactory::create (ct, AS_STRING (initString));
+	}
+	else
+	{
+        core->coreptr = helics::CoreFactory::FindOrCreate (ct, nstring, AS_STRING (initString));
+	}
+    
     auto retcore = reinterpret_cast<helics_core> (core.get ());
     getMasterHolder ()->addCore (std::move (core));
 
@@ -506,7 +514,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     auto core = std::make_unique<helics::CoreObject> ();
 
     core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+    core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING(name), argc, argv);
     auto retcore = reinterpret_cast<helics_core> (core.get ());
     getMasterHolder ()->addCore (std::move (core));
 
@@ -1213,6 +1221,13 @@ void MasterObjectHolder::clearBroker (int index)
     if ((index < static_cast<int> (broker->size ())) && (index >= 0))
     {
         (*broker)[index] = nullptr;
+        if (broker->size () > 10)
+        {
+            if (std::none_of (broker->begin (), broker->end (), [](const auto &brk) { return static_cast<bool>(brk); }))
+            {
+               broker->clear ();
+            }
+        }
     }
 }
 
@@ -1222,6 +1237,13 @@ void MasterObjectHolder::clearCore (int index)
     if ((index < static_cast<int> (core->size ())) && (index >= 0))
     {
         (*core)[index] = nullptr;
+		if (core->size() > 10)
+		{
+            if (std::none_of (core->begin (), core->end (), [](const auto &cr) { return static_cast<bool> (cr); }))
+			{
+                core->clear ();
+			}
+		}
     }
 }
 
@@ -1231,6 +1253,13 @@ void MasterObjectHolder::clearFed (int index)
     if ((index < static_cast<int> (fed->size ())) && (index >= 0))
     {
         (*fed)[index] = nullptr;
+        if (fed->size () > 10)
+        {
+            if (std::none_of (fed->begin (), fed->end (), [](const auto &fd) { return static_cast<bool> (fd); }))
+            {
+                fed->clear ();
+            }
+        }
     }
 }
 

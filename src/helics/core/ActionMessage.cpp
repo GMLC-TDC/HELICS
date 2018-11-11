@@ -383,6 +383,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
+{ action_message_def::action_t::cmd_user_disconnect, "disconnect from user" },
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -478,7 +479,9 @@ static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
   {-5, "lost connection with server"},
   {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"}};
+  {6, "duplicate federate name detected"},
+{ 7, "duplicate broker name detected" }
+};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -499,6 +502,11 @@ const char *commandErrorString (int errorcode)
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
+	if (ret == unknownStr)
+	{
+        ret += " " + std::to_string (static_cast<int> (command.action ()));
+        return ret;
+	}
     switch (command.action ())
     {
     case CMD_REG_FED:

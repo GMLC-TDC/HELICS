@@ -11,7 +11,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-NetworkCommsInterface::NetworkCommsInterface (interface_type type) noexcept : networkType (type) {}
+NetworkCommsInterface::NetworkCommsInterface (interface_type type,
+                                              CommsInterface::thread_generation threads) noexcept
+    :CommsInterface(threads), networkType (type)
+{
+}
 
 static const std::string localHostString = "localhost";
 

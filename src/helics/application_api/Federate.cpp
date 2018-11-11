@@ -56,6 +56,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
         if (!coreObject->isOpenToNewFederates ())
         {
+            std::cout << "found core object is not open" << std::endl;
             coreObject = nullptr;
             CoreFactory::cleanUpCores (200ms);
             coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));

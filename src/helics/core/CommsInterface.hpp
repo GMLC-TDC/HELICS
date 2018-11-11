@@ -23,8 +23,13 @@ constexpr route_id_t control_route(-1);
 class CommsInterface
 {
   public:
+    enum class thread_generation
+    {
+        single, dual
+    };
     /** default constructor*/
     CommsInterface () = default;
+    explicit CommsInterface (thread_generation threads);
     /** destructor*/
     virtual ~CommsInterface ();
 
@@ -105,13 +110,16 @@ class CommsInterface
     std::string localTarget_;  //!< the base for the receive address
     std::string brokerTarget_;  //!< the base for the broker address
     std::string brokerName_;  //!< the identifier for the broker
+    std::string brokerInitString_;  //!< the initialization string for any automatically generated broker
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
     TriggerVariable txTrigger;
     std::atomic<bool> operating;  //!< the comms interface is in startup mode
+    const bool singleThread = false;
   protected:
 	 bool serverMode = true;  //!< some comms have a server mode and non-server mode
+    bool autoBroker = false; //!< the broker should be automatically generated if needed
      std::chrono::milliseconds connectionTimeout{ 4000 };  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)

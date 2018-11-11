@@ -90,7 +90,7 @@ static const ArgDescriptors extraArgs{
   {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
   {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
   {"minbrokers", ArgDescriptor::arg_type_t::int_type,
-   "the minimum number of core/brokers that need to be connected (ignored in cores)"},
+   "the minimum number of cores/brokers that need to be connected (ignored in cores)"},
   {"identifier", "name of the core/broker"},
   {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then "
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
@@ -353,7 +353,7 @@ void BrokerBase::queueProcessingLoop ()
     std::vector<ActionMessage> dumpMessages;
     
     auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = AsioServiceManager::runServiceLoop ();
+    auto serviceLoop = serv->startServiceLoop();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);
 
@@ -370,7 +370,7 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
         ticktimer.async_wait (timerCallback);
     }
-    
+    bool tick_show = false;
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -398,6 +398,14 @@ void BrokerBase::queueProcessingLoop ()
         {
             dumpMessages.push_back (command);
         }
+        if (command.action() == CMD_IGNORE)
+        {
+            continue;
+        }
+        if (tick_show)
+        {
+            std::cout << identifier << " "<<prettyPrintString(command) << std::endl;;
+        }
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)
         {
@@ -410,14 +418,19 @@ void BrokerBase::queueProcessingLoop ()
             if (checkActionFlag (command, error_flag))
             {
                 serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop ();
+                serviceLoop = serv->startServiceLoop ();
             }
             if (messagesSinceLastTick == 0)
             {
 #ifndef DISABLE_TICK
-                //   std::cout << "sending tick " << std::endl;
+                   std::cout << identifier<<" sending tick " << std::endl;
                 processCommand (std::move (command));
 #endif
+            }
+            else
+            {
+                std::cout << identifier<<" got tick " << std::endl;
+                tick_show = true;
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
@@ -438,7 +451,7 @@ void BrokerBase::queueProcessingLoop ()
                 auto tcmd = actionQueue.try_pop();
                 while (tcmd)
                 {
-					if (tcmd->action() != CMD_DISCONNECT)
+					if (!isDisconnectCommand(*tcmd))
 					{
                         LOG_WARNING (global_broker_id_local, identifier,
                                      std::string ("TI unprocessed command ") + prettyPrintString (*tcmd));
@@ -460,7 +473,10 @@ void BrokerBase::queueProcessingLoop ()
             auto tcmd = actionQueue.try_pop();
             while (tcmd)
             {
-                LOG_WARNING(global_broker_id_local, identifier, std::string("stop unprocessed command ")+prettyPrintString(*tcmd));
+                if (!isDisconnectCommand (*tcmd))
+                {
+                    LOG_WARNING(global_broker_id_local, identifier, std::string("STOPPED unprocessed command ") + prettyPrintString(*tcmd));
+                }
                 tcmd = actionQueue.try_pop();
             }
             return;

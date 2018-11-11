@@ -313,12 +313,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void publish (Publication &pub, double val);
 
     /** add a destination target to a publication
-    @param id the identifier of the input
+    @param pub the publication object to add a target to
     target the name of the input to send the data to
     */
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
-    @param id the identifier of the publication
+    @param inp the input object to add a named publication
     target the name of the input to send the data to
     */
     void addTarget (const Input &inp, const std::string &target);

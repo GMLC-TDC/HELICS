@@ -8,13 +8,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+CommsInterface::CommsInterface (thread_generation threads) : singleThread (threads == thread_generation::single) {}
+
 /** destructor*/
 CommsInterface::~CommsInterface ()
 {
     std::lock_guard<std::mutex> syncLock (threadSyncLock);
-    if (queue_watcher.joinable ())
+    if (!singleThread)
     {
-        queue_watcher.join ();
+        if (queue_watcher.joinable ())
+        {
+            queue_watcher.join ();
+        }
     }
     if (queue_transmitter.joinable ())
     {
@@ -32,6 +37,7 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         interfaceNetwork = netInfo.interfaceNetwork;
         maxMessageSize_ = netInfo.maxMessageSize;
         maxMessageCount_ = netInfo.maxMessageCount;
+        autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode)
         {
         case NetworkBrokerData::server_mode_options::server_active:
@@ -111,7 +117,7 @@ void CommsInterface::addRoute (route_id_t route_id, const std::string &routeInfo
     rt.payload = routeInfo;
     rt.messageID = NEW_ROUTE;
     rt.setExtraData (route_id.baseValue ());
-    transmit (control_route, rt);
+    transmit (control_route, std::move (rt));
 }
 
 void CommsInterface::removeRoute (route_id_t route_id)
@@ -225,17 +231,21 @@ bool CommsInterface::connect ()
     {
         localTarget_ = name;
     }
-    queue_watcher = std::thread ([this] {
-        try
-        {
-            queue_rx_function ();
-        }
-        catch (const std::exception &e)
-        {
-            rx_status = connection_status::error;
-            logError (std::string ("error in receiver >") + e.what ());
-        }
-    });
+    if (!singleThread)
+    {
+        queue_watcher = std::thread ([this] {
+            try
+            {
+                queue_rx_function ();
+            }
+            catch (const std::exception &e)
+            {
+                rx_status = connection_status::error;
+                logError (std::string ("error in receiver >") + e.what ());
+            }
+        });
+    }
+
     queue_transmitter = std::thread ([this] {
         try
         {
@@ -260,19 +270,25 @@ bool CommsInterface::connect ()
                 queue_transmitter.join ();
             }
         }
-        queue_watcher.join ();
+        if (!singleThread)
+        {
+            queue_watcher.join();
+        }
         return false;
     }
 
     if (tx_status != connection_status::connected)
     {
         logError ("transmitter connection failure");
-        if (rx_status == connection_status::connected)
+        if (!singleThread)
         {
-            if (queue_watcher.joinable ())
+            if (rx_status == connection_status::connected)
             {
-                closeReceiver ();
-                queue_watcher.join ();
+                if (queue_watcher.joinable ())
+                {
+                    closeReceiver ();
+                    queue_watcher.join ();
+                }
             }
         }
         queue_transmitter.join ();

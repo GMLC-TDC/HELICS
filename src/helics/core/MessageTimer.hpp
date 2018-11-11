@@ -52,6 +52,6 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
     std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
-    decltype (servicePtr->runServiceLoop ()) loopHandle;  //!< loop controller for async real time operations
+    decltype (servicePtr->startServiceLoop ()) loopHandle;  //!< loop controller for async real time operations
 };
 }  // namespace helics

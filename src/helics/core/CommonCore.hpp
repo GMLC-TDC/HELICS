@@ -166,7 +166,7 @@ class CommonCore : public Core, public BrokerBase
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (int msToWait = -1) const override final;
     /** unregister the core from any process find functions*/
     void unregister ();
     /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
@@ -321,6 +321,8 @@ class CommonCore : public Core, public BrokerBase
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
     TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
+    /** wait for the core to be registered with the broker*/
+    bool waitCoreRegistration ();
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
