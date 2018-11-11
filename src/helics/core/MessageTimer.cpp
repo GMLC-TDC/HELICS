@@ -13,6 +13,14 @@ MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction) : s
     loopHandle = servicePtr->runServiceLoop ();
 }
 
+MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction, bool)
+    : sendFunction (std::move (sFunction)), servicePtr (AsioServiceManager::getServicePointer ())
+{
+    std::cout << "starting service loop"<<std::endl;
+    loopHandle = servicePtr->runServiceLoop ();
+    std::cout << "service loop started" << std::endl;
+}
+
 static void
 processTimerCallback (std::shared_ptr<MessageTimer> mtimer, int32_t index, const boost::system::error_code &ec)
 {

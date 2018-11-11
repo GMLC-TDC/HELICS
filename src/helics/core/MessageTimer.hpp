@@ -20,6 +20,7 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
   public:
     using time_type = decltype (std::chrono::steady_clock::now ());
     explicit MessageTimer (std::function<void(ActionMessage &&)> sFunction);
+    explicit MessageTimer (std::function<void(ActionMessage &&)> sFunction, bool logging);
     /** ad a timer and message to the queue
     @returns an index for referencing the timer in the future*/
     int32_t addTimerFromNow (std::chrono::nanoseconds time, ActionMessage mess);
