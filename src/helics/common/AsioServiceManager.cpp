@@ -33,18 +33,20 @@ static std::mutex serviceLock;
 
 std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const std::string &serviceName)
 {
+    std::shared_ptr<AsioServiceManager> servicePtr;
     std::lock_guard<std::mutex> serveLock (
       serviceLock);  // just to ensure that nothing funny happens if you try to get a context
                      // while it is being constructed
     auto fnd = services.find (serviceName);
     if (fnd != services.end ())
     {
-        return fnd->second;
+        servicePtr = fnd->second;
+        return servicePtr;
     }
 
-    auto newService = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
-    services.emplace (serviceName, newService);
-    return newService;
+    servicePtr = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
+    services.emplace (serviceName, servicePtr);
+    return servicePtr;
     // if it doesn't find it make a new one with the appropriate name
 }
 
@@ -159,7 +161,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
             if (ptr->getBaseService ().stopped ())
             {
                 std::unique_lock<std::mutex> nullLock (ptr->runningLoopLock);
-                // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
+                std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
                 if (ptr->loopRet.valid ())
                 {
                     ptr->loopRet.get ();
@@ -185,7 +187,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
 
 void AsioServiceManager::haltServiceLoop ()
 {
-    if (running)
+    if (running.load())
     {
         // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
         if (--runCounter <= 0)
@@ -237,6 +239,6 @@ void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
         }
 	}
     
-    // std::cout << "service loop stopped\n";
+     std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }
