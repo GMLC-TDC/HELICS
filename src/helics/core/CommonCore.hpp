@@ -321,6 +321,8 @@ class CommonCore : public Core, public BrokerBase
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
     TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
+    /** wait for the core to be registered with the broker*/
+    bool waitCoreRegistration ();
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/

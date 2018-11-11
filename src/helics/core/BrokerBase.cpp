@@ -90,7 +90,7 @@ static const ArgDescriptors extraArgs{
   {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
   {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
   {"minbrokers", ArgDescriptor::arg_type_t::int_type,
-   "the minimum number of core/brokers that need to be connected (ignored in cores)"},
+   "the minimum number of cores/brokers that need to be connected (ignored in cores)"},
   {"identifier", "name of the core/broker"},
   {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then "
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     helics::FederateInfo fi (helics::core_type::TEST);
 
     fi.coreName = "pcore1";
-    fi.coreInitString = "-f 2 --autobroker";
+    fi.coreInitString = "-f2 --autobroker";
     helics::apps::Player play1 ("player1",fi);
 
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
