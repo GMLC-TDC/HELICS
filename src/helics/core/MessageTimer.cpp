@@ -17,7 +17,7 @@ MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction, boo
     : sendFunction (std::move (sFunction)), servicePtr (AsioServiceManager::getServicePointer ())
 {
     std::cout << "starting service loop"<<std::endl;
-    loopHandle = servicePtr->runServiceLoop ();
+    loopHandle = servicePtr->startServiceLoop ();
     std::cout << "service loop started" << std::endl;
 }
 

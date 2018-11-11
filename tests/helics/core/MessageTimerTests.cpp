@@ -23,17 +23,13 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
     };
     std::cout << "making timer" << std::endl;
     auto mtimer = std::make_shared<MessageTimer> (cback,true);
-    std::cout << "time made" << std::endl;
+    std::cout << "timer made" << std::endl;
     std::unique_lock<std::mutex> localLock (mlock);
-    std::cout << "adding timeout" << std::endl;
     mtimer->addTimerFromNow (std::chrono::milliseconds (200), CMD_PROTOCOL);
     BOOST_CHECK (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::cout << "sleeping" << std::endl;
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    std::cout << "checking" << std::endl;
     localLock.lock();
-    std::cout << "locked final check" << std::endl;
     BOOST_CHECK (M.action () == CMD_PROTOCOL);
 }
 

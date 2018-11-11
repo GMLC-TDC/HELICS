@@ -353,7 +353,7 @@ void BrokerBase::queueProcessingLoop ()
     std::vector<ActionMessage> dumpMessages;
     
     auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = AsioServiceManager::runServiceLoop ();
+    auto serviceLoop = serv->startServiceLoop();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);
 
