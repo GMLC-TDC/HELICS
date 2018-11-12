@@ -516,7 +516,7 @@ void CommsInterface::closeTransmitter ()
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.messageID = RECONNECT;
+    rt.messageID = RECONNECT_TRANSMITTER;
     transmit (control_route, rt);
 }
 

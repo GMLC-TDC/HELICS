@@ -464,7 +464,7 @@ void ZmqComms::queue_tx_function ()
             {
                 switch (cmd.messageID)
                 {
-                case RECONNECT:
+                case RECONNECT_TRANSMITTER:
                     setTxStatus (connection_status::connected);
                     break;
                 case NEW_ROUTE:

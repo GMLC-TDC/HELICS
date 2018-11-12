@@ -167,6 +167,10 @@ void TestComms::queue_tx_function ()
         {
             logError("broker == target");
         }
+		if (!tbroker->isOpenToNewFederates())
+		{
+            logError ("broker is not open to new federates");
+		}
     }
     
     setTxStatus (connection_status::connected);

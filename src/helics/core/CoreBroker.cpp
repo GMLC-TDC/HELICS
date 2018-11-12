@@ -180,7 +180,11 @@ route_id_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
     return parent_route_id;
 }
 
-bool CoreBroker::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
+bool CoreBroker::isOpenToNewFederates () const
+{
+    auto cstate = brokerState.load ();
+    return ((cstate != created) && (cstate < operating));
+}
 
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
 {

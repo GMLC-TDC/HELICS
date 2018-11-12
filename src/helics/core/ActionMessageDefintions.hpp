@@ -251,7 +251,7 @@ enum class action_t : int32_t
 #define DISCONNECT_ERROR 2623
 
 #define NAME_NOT_FOUND 2726
-#define RECONNECT 1997
+#define RECONNECT_TRANSMITTER 1997
 #define RECONNECT_RECEIVER 1999
 // for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
