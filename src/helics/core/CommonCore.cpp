@@ -3282,6 +3282,11 @@ bool CommonCore::waitCoreRegistration ()
     auto brkid = global_broker_id.load ();
     while ((brkid == parent_broker_id) || (!brkid.isValid ()))
     {
+        if (sleepcnt > 2)
+        {
+            LOG_WARNING (parent_broker_id, identifier,
+                         fmt::format("broker state={}, broker id={}, sleepcnt={}",static_cast<int>(brokerState.load()),brkid.baseValue(),sleepcnt));
+        }
         if (brokerState.load () <= broker_state_t::initialized)
         {
             connect ();
@@ -3295,6 +3300,7 @@ bool CommonCore::waitCoreRegistration ()
             LOG_WARNING (parent_broker_id, identifier,
                          "now waiting for the core to finish registration before proceeding");
         }
+		
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         brkid = global_broker_id.load ();
         ++sleepcnt;
