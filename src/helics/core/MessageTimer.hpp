@@ -7,9 +7,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/AsioServiceManager.h"
 #include "ActionMessage.hpp"
+#include <boost/asio/steady_timer.hpp>
 #include <memory>
 #include <mutex>
-#include <boost/asio/steady_timer.hpp>
+
 
 namespace helics
 {

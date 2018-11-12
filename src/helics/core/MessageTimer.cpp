@@ -10,7 +10,9 @@ namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction) : sendFunction (std::move (sFunction)), servicePtr(AsioServiceManager::getServicePointer ())
 {
+    std::cout << "getting loop handle for timer" << std::endl;
     loopHandle = servicePtr->startServiceLoop ();
+    std::cout << "got loop handle for timer" << std::endl;
 }
 
 static void
