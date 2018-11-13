@@ -64,6 +64,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
+    case CMD_BROADCAST_DISCONNECT:
         time_state = time_state_t::time_granted;
         //   printf("%d disconnect from %d\n", fedID, m.source_id);
         Tnext = Time::maxVal ();

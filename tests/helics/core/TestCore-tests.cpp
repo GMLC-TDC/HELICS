@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 {
-    const char *initializationString = "1";
+    const char *initializationString = "1 --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -225,6 +225,9 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_CHECK_EQUAL (msg->original_source, "end1");
     auto res = msg->data.to_string ();
     BOOST_CHECK_EQUAL (res.compare (0, 11, "jello world"), 0);
+    core->finalize(id);
+    testSrcFilter = nullptr;
+    testDstFilter = nullptr;
     core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores ();

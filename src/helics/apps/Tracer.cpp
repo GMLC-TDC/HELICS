@@ -91,13 +91,13 @@ void Tracer::loadJsonFile (const std::string &jsonString)
     auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back (fed.get (), ii);
+        subscriptions.emplace_back (fed->getInput(ii));
         subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint(ii));
         eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
@@ -453,7 +453,7 @@ void Tracer::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.push_back (helics::Subscription (fed.get (), key));
+        subscriptions.push_back (helics::make_subscription (*fed, key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
         subkeys[key] = index;  // this is a potential replacement
     }
@@ -465,7 +465,7 @@ void Tracer::addEndpoint (const std::string &endpoint)
     auto res = eptNames.find (endpoint);
     if ((res == eptNames.end ()) || (res->second == -1))
     {
-        endpoints.push_back (helics::Endpoint (GLOBAL, fed.get (), endpoint));
+        endpoints.push_back (helics::Endpoint (GLOBAL, fed, endpoint));
         auto index = static_cast<int> (endpoints.size ()) - 1;
         eptNames[endpoint] = index;  // this is a potential replacement
     }

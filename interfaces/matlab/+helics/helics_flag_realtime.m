@@ -1,7 +1,7 @@
 function v = helics_flag_realtime()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1936535399);
+    vInitialized = helicsMEX(0, 1593856900);
   end
   v = vInitialized;
 end

@@ -117,9 +117,9 @@ private:
     */
     void haltServiceLoop();
 
-    friend void serviceProcessingLoop(const std::shared_ptr<AsioServiceManager> &ptr);
+    friend void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
 };
 
-void serviceProcessingLoop(const std::shared_ptr<AsioServiceManager> &ptr);
+void serviceProcessingLoop(std::shared_ptr<AsioServiceManager> ptr);
 
 

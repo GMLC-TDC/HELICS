@@ -37,6 +37,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** flag indicating that a federate needs to run in real time*/
 #define HELICS_REALTIME_FLAG 16
 
+/** flag indicating that the federate will only interact on a single thread*/
+#define HELICS_SINGLE_THREAD_FEDERATE_FLAG 27
+
 /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
 #define HELICS_DELAY_INIT_ENTRY 45
 /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
@@ -44,7 +47,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** used to not display warnings on mismatched requested times*/
 #define HELICS_IGNORE_TIME_MISMATCH_WARNINGS 67
-
 
 /* log level definitions*/
 #define HELICS_LOG_LEVEL_NO_PRINT (-1)

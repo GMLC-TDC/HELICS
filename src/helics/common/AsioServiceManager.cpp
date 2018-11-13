@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <map>
 #include <mutex>
 #include <stdexcept>
+#include <chrono>
 
 /** a storage system for the available core objects allowing references by name to the core
  */
@@ -84,17 +85,15 @@ void AsioServiceManager::closeService (const std::string &serviceName)
     if (fnd != services.end ())
     {
         auto ptr = fnd->second;
-        services.erase(fnd);
-        servelock.unlock();
+        services.erase (fnd);
+        servelock.unlock ();
         if (ptr->running)
         {
-            std::lock_guard<std::mutex> nullLock(ptr->runningLoopLock);
+            std::lock_guard<std::mutex> nullLock (ptr->runningLoopLock);
             ptr->nullwork.reset ();
             ptr->iserv->stop ();
             ptr->loopRet.get ();
         }
-
-        
     }
 }
 
@@ -112,7 +111,7 @@ AsioServiceManager::~AsioServiceManager ()
     //  std::cout << "deleting service manager\n";
     if (running)
     {
-        std::lock_guard<std::mutex> nullLock(runningLoopLock);
+        std::lock_guard<std::mutex> nullLock (runningLoopLock);
         nullwork.reset ();
         iserv->stop ();
         loopRet.get ();
@@ -121,7 +120,7 @@ AsioServiceManager::~AsioServiceManager ()
     {
         // yes I am purposefully leaking this PHILIP TOP
         // this capability is needed for some operations on particular OS's with the shared library operations that
-        // will crash if this is closed before the library closes
+        // will crash if this is closed before the library closes which really only happens at program termination
         auto val = iserv.release ();
         (void)(val);
     }
@@ -130,6 +129,7 @@ AsioServiceManager::~AsioServiceManager ()
 AsioServiceManager::AsioServiceManager (const std::string &serviceName)
     : name (serviceName), iserv (std::make_unique<boost::asio::io_service> ())
 {
+
 }
 
 AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::string &serviceName)
@@ -139,34 +139,42 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
     if (fnd != services.end ())
     {
         auto ptr = fnd->second;
-        servelock.unlock();
+        servelock.unlock ();
         ++ptr->runCounter;
-       
+
         bool exp = false;
-        if (ptr->running.compare_exchange_strong(exp,true))
+        if (ptr->running.compare_exchange_strong (exp, true))
         {
-            std::lock_guard<std::mutex> nullLock(ptr->runningLoopLock);
+            std::packaged_task<void()> serviceTask ([ptr]() { serviceProcessingLoop (ptr); });
+            std::unique_lock<std::mutex> nullLock (ptr->runningLoopLock);
             // std::cout << "run Service loop " << ptr->runCounter << "\n";
             ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
-            ptr->loopRet = std::async (std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+            ptr->loopRet = serviceTask.get_future ();
+            nullLock.unlock ();
+            std::thread serviceThread (std::move (serviceTask));
+            serviceThread.detach ();
         }
         else
         {
             if (ptr->getBaseService ().stopped ())
             {
-                std::unique_lock<std::mutex> nullLock(ptr->runningLoopLock);
+                std::unique_lock<std::mutex> nullLock (ptr->runningLoopLock);
                 // std::cout << "run Service loop already stopped" << ptr->runCounter << "\n";
                 if (ptr->loopRet.valid ())
                 {
                     ptr->loopRet.get ();
                 }
-                nullLock.unlock();
+                nullLock.unlock ();
                 exp = false;
-                if (ptr->running.compare_exchange_strong(exp, true))
+                if (ptr->running.compare_exchange_strong (exp, true))
                 {
-                    nullLock.lock();
-                    ptr->nullwork = std::make_unique<boost::asio::io_service::work>(ptr->getBaseService());
-                    ptr->loopRet = std::async(std::launch::async, [ptr]() { serviceProcessingLoop(ptr); });
+                    std::packaged_task<void()> serviceTask ([ptr]() { serviceProcessingLoop (ptr); });
+                    nullLock.lock ();
+                    ptr->nullwork = std::make_unique<boost::asio::io_service::work> (ptr->getBaseService ());
+                    ptr->loopRet = serviceTask.get_future ();
+                    nullLock.unlock ();
+                    std::thread serviceThread (std::move (serviceTask));
+                    serviceThread.detach ();
                 }
             }
         }
@@ -180,43 +188,55 @@ void AsioServiceManager::haltServiceLoop ()
     if (running)
     {
         // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
-        if (runCounter > 0)
+        if (--runCounter <= 0)
         {
-            --runCounter;
-        }
-        if (runCounter <= 0)
-        {
-            std::lock_guard<std::mutex> nullLock(runningLoopLock);
+            std::lock_guard<std::mutex> nullLock (runningLoopLock);
             //    std::cout << "calling halt on service loop \n";
-            if (nullwork)
+            if (runCounter <= 0)
             {
-                nullwork.reset ();
-                iserv->stop ();
-                loopRet.get ();
-                iserv->reset ();  // prepare for future runs
+                if (nullwork)
+                {
+                    nullwork.reset ();
+                    iserv->stop ();
+                    loopRet.get ();
+                    iserv->reset ();  // prepare for future runs
+                }
             }
         }
     }
     else
     {
-        runCounter = 0;
+        runCounter.store (0);
     }
 }
 
-void serviceProcessingLoop (const std::shared_ptr<AsioServiceManager> &ptr)
+void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
 {
-    try
-    {
-        ptr->iserv->run ();
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "std::exception in service loop " << e.what () << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "caught other error in service loop" << std::endl;
-    }
+	while (ptr->runCounter > 0)
+	{
+        auto clk = std::chrono::steady_clock::now ();
+        try
+        {
+            ptr->iserv->run ();
+        }
+        catch (const boost::system::system_error &se)
+        {
+            auto nclk = std::chrono::steady_clock::now ();
+            std::cerr << "boost system error in service loop " << se.what () << " ran for "
+                      << (nclk - clk).count () / 1000000 << "ms" << std::endl;
+        }
+        catch (const std::exception &e)
+        {
+            auto nclk = std::chrono::steady_clock::now ();
+            std::cerr << "std::exception in service loop " << e.what () << " ran for "
+                      << (nclk - clk).count () / 1000000 << "ms" << std::endl;
+        }
+        catch (...)
+        {
+            std::cout << "caught other error in service loop" << std::endl;
+        }
+	}
+    
     // std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }

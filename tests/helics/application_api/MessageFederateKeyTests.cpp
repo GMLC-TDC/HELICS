@@ -224,7 +224,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     auto mFed1 = GetFederateAs<MessageFederate> (0);
     auto mFed2 = GetFederateAs<MessageFederate> (1);
 
-    Endpoint epid (mFed1.get (), "ep1");
+    Endpoint epid (mFed1, "ep1");
 
     Endpoint epid2 (GLOBAL, mFed2.get (), "ep2", "random");
 
@@ -379,7 +379,7 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types_all), cor
 
     BOOST_REQUIRE_EQUAL (gtime, 0.5);
 
-    BOOST_REQUIRE (mFed2->hasMessage (epid));
+    BOOST_REQUIRE (mFed2->hasMessage (epid2));
 
     auto M2 = mFed2->getMessage (epid2);
     BOOST_REQUIRE_EQUAL (M2->data.size (), data.size ());

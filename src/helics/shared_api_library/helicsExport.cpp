@@ -29,6 +29,8 @@ const char *helicsGetVersion (void) { return helics::versionString; }
 
 static const char *nullstrPtr = "";
 
+const std::string emptyStr;
+
 helics_error helicsErrorInitialize ()
 {
     helics_error err;
@@ -79,7 +81,7 @@ helics_federate_info_t helicsCreateFederateInfo ()
 /** this function is based on the lippencott function template
 http://cppsecrets.blogspot.com/2013/12/using-lippincott-function-for.html
 */
-const char unknown_err_string[] = "unknown error";
+constexpr char unknown_err_string[] = "unknown error";
 
 void helicsErrorHandler (helics_error *err) noexcept
 {

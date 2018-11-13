@@ -174,8 +174,6 @@ HELICS_EXPORT const char* helicsCoreGetIdentifier (helics_core core);
 
 /** get the network address associated with a broker
 @param broker the broker to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
 HELICS_EXPORT const char* helicsBrokerGetAddress (helics_broker broker);
@@ -188,8 +186,6 @@ HELICS_EXPORT void helicsCoreSetReadyToInit (helics_core core, helics_error *err
 
 /** get an identifier for the core
 @param core the core to query
-@param[out] identifier storage space to place the identifier string
-@param maxlen the maximum space available in identifier
 @return a void enumeration indicating any error condition
 */
 HELICS_EXPORT void helicsCoreDisconnect (helics_core core, helics_error *err);
@@ -247,7 +243,7 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, 
 /** create a message federate from a JSON file or JSON string or TOML file
 @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an
 argument
-@param configFile  a Config(json,toml) file or a JSON string that contains setup and configuration information
+@param configFile  a Config(JSON,TOML) file or a JSON string that contains setup and configuration information
 @return an opaque message federate object
 */
 HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, helics_error *err);
@@ -530,8 +526,6 @@ HELICS_EXPORT helics_time_t helicsFederateRequestTimeIterativeComplete (helics_f
 
 /** get the name of the federate
 @param fed the federate object to query
-@param[out] outputString memory buffer to store the result
-@param maxlen the maximum size of the buffer
 @return void object indicating success or error
 */
 HELICS_EXPORT const char *helicsFederateGetName (helics_federate fed);

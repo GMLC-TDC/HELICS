@@ -9,7 +9,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 namespace helics
 {
-
 /** namespace for message definitions*/
 namespace action_message_def
 {
@@ -34,15 +33,17 @@ enum class action_t : int32_t
     cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
-	cmd_broker_setup = -1,  //!< command to load the setup information for a broker
+    cmd_broker_setup = -1,  //!< command to load the setup information for a broker
     cmd_ignore = 0,  //!< null command
     cmd_tick = 1,  //!< command for a timer tick
-	cmd_user_disconnect = 2, //!< command specifying that a user has issued a disconnect signal
+    cmd_user_disconnect = 2,  //!< command specifying that a user has issued a disconnect signal
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
-	cmd_disconnect_check = 5, //!< check for a disconnect
-    cmd_ping = 6,  //!< request for an Echo response
-    cmd_ping_reply = 7,  //!< response to a ping request
+    cmd_disconnect_check = 5,  //!< check for a disconnect
+    cmd_disconnect_fed = 6,  //!< disconnect a federate
+	cmd_broadcast_disconnect=7, //!< a broadcast disconnect message
+    cmd_ping = 298,  //!< request for an Echo response
+    cmd_ping_reply = 299,  //!< response to a ping request
 
     cmd_init = 10,  //!< request entry to init mode
     cmd_init_grant = 11,  //!< grant entry to initialization mode
@@ -61,9 +62,9 @@ enum class action_t : int32_t
 
     cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
     cmd_time_unblock = 41,  //!< clear a time block
-	cmd_time_barrier_request=42, //!< request a time barrier
-	cmd_time_barrier=43, //!< setup a global time barrier
-	cmd_time_barrier_clear=44, //!< clear a global time barrier
+    cmd_time_barrier_request = 42,  //!< request a time barrier
+    cmd_time_barrier = 43,  //!< setup a global time barrier
+    cmd_time_barrier_clear = 44,  //!< clear a global time barrier
 
     cmd_pub = 52,  //!< publish a value
     cmd_bye = 2000,  //!< message stating this is the last communication from a federate
@@ -142,6 +143,8 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
+#define CMD_DISCONNECT_FED action_message_def::action_t::cmd_disconnect_fed
+#define CMD_BROADCAST_DISCONNECT action_message_def::action_t::cmd_broadcast_disconnect
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 #define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup
@@ -260,13 +263,6 @@ enum class action_t : int32_t
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 
-/** check if the action has an info structure associated with it*/
-/*inline bool hasInfo (action_message_def::action_t action) noexcept
-{
-    return ((action > action_message_def::action_t::null_info_command) ||
-            (action < action_message_def::action_t::priority_null_info_command));
-}
-*/
 /** return the name of the action
 @param action The action to get the name for
 @return a pointer to string with the name

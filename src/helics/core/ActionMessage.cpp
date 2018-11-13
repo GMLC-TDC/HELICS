@@ -21,7 +21,9 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 {
 }
 
-ActionMessage::ActionMessage (action_message_def::action_t startingAction, global_federate_id_t sourceId, global_federate_id_t destId)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction,
+                              global_federate_id_t sourceId,
+                              global_federate_id_t destId)
     : ActionMessage (startingAction)
 {
     source_id = sourceId;
@@ -109,14 +111,14 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 
 void ActionMessage::setAction (action_message_def::action_t newAction) { messageAction = newAction; }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 const std::string &ActionMessage::getString (int index) const
 {
     if (isValidIndex (index, stringData))
     {
         return stringData[index];
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void ActionMessage::setString (int index, const std::string &str)
@@ -371,12 +373,12 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
     return msg;
 }
 
-constexpr char unknownStr[] = "unknown";
+static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
 // consts can cause seg faults
 
-constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
+static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
@@ -458,7 +460,7 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
+static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
 // can (in actuality) be used as the program is shutting down
 const char *actionMessageType (action_message_def::action_t action)
@@ -468,17 +470,18 @@ const char *actionMessageType (action_message_def::action_t action)
     if (res != pptr + actEnd)
     {
         return res->second;
-    }
+    }  
     return static_cast<const char *> (unknownStr);
 }
 
-constexpr std::pair<int, const char *> errorStrings[] = {
+static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
+  {-5, "lost connection with server"},
   {5, "already in initialization mode"},
   {6, "duplicate federate name detected"}};
 
 using errorPair = std::pair<int, const char *>;
-constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
+static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
 // can (in actuality) be used as the program is shutting down
@@ -512,13 +515,14 @@ std::string prettyPrintString (const ActionMessage &command)
         }
         else
         {
-            ret.append (std::to_string (command.dest_id.baseValue()));
+            ret.append (std::to_string (command.dest_id.baseValue ()));
         }
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id.baseValue(), command.dest_handle.baseValue(),
-                                 command.payload.size (), static_cast<double> (command.actionTime),command.dest_id.baseValue()));
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id.baseValue (),
+                                 command.dest_handle.baseValue (), command.payload.size (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -526,14 +530,14 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_TIME_GRANT:
         ret.push_back (':');
-        ret.append (
-          fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id.baseValue(), static_cast<double> (command.actionTime),command.dest_id.baseValue()));
+        ret.append (fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id.baseValue (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id.baseValue(),
+        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id.baseValue (),
                                  static_cast<double> (command.actionTime), static_cast<double> (command.Te),
-                                 static_cast<double> (command.Tdemin),command.dest_id.baseValue()));
+                                 static_cast<double> (command.Tdemin), command.dest_id.baseValue ()));
         break;
     case CMD_FED_CONFIGURE_TIME:
     case CMD_FED_CONFIGURE_INT:
@@ -542,11 +546,12 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
         ret.append (fmt::format ("From ({})({}:{}) To {} size {} at {}", command.getString (origSourceStringLoc),
-                                 command.source_id.baseValue(), command.source_handle.baseValue(), command.getString (targetStringLoc),
-                                 command.payload.size (), static_cast<double> (command.actionTime)));
+                                 command.source_id.baseValue (), command.source_handle.baseValue (),
+                                 command.getString (targetStringLoc), command.payload.size (),
+                                 static_cast<double> (command.actionTime)));
         break;
     default:
-        ret.append (fmt::format ( ":From {}",command.source_id.baseValue()));
+        ret.append (fmt::format (":From {}", command.source_id.baseValue ()));
         break;
     }
     return ret;
@@ -556,5 +561,15 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
 {
     os << prettyPrintString (command);
     return os;
+}
+
+int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
+{
+    if (m.action () == CMD_MULTI_MESSAGE)
+    {
+        m.setString (++m.counter, newMessage.to_string ());
+        return m.counter;
+    }
+    return (-1);
 }
 }  // namespace helics

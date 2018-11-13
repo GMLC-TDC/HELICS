@@ -19,9 +19,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include "../common/fmt_format.h"
 
-static const std::string nullStr;
-#define LOG_ERROR(message) logMessage (HELICS_LOG_LEVEL_ERROR, nullStr, message)
-#define LOG_WARNING(message) logMessage (HELICS_LOG_LEVEL_WARNING, nullStr, message)
+static const std::string emptyStr;
+#define LOG_ERROR(message) logMessage (HELICS_LOG_LEVEL_ERROR, emptyStr, message)
+#define LOG_WARNING(message) logMessage (HELICS_LOG_LEVEL_WARNING, emptyStr, message)
 
 #ifdef ENABLE_LOGGING
 
@@ -30,7 +30,7 @@ static const std::string nullStr;
     {                                                                                                             \
         if (logLevel >= HELICS_LOG_LEVEL_SUMMARY)                                                                        \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_SUMMARY, nullStr, message);                                                     \
+            logMessage (HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                                                     \
         }                                                                                                         \
     } while (false)
 
@@ -39,7 +39,7 @@ static const std::string nullStr;
     {                                                                                                             \
         if (logLevel >= HELICS_LOG_LEVEL_INTERFACES)                                                                     \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_INTERFACES, nullStr, message);                                                  \
+            logMessage (HELICS_LOG_LEVEL_INTERFACES, emptyStr, message);                                                  \
         }                                                                                                         \
     } while (false)
 
@@ -49,7 +49,7 @@ static const std::string nullStr;
     {                                                                                                             \
         if (logLevel >= HELICS_LOG_LEVEL_TIMING)                                                                         \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_TIMING, nullStr, message);                                                      \
+            logMessage (HELICS_LOG_LEVEL_TIMING, emptyStr, message);                                                      \
         }                                                                                                         \
     } while (false)
 
@@ -58,7 +58,7 @@ static const std::string nullStr;
     {                                                                                                             \
         if (logLevel >= HELICS_LOG_LEVEL_DATA)                                                                           \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_DATA, nullStr, message);                                                        \
+            logMessage (HELICS_LOG_LEVEL_DATA, emptyStr, message);                                                        \
         }                                                                                                         \
     } while (false)
 #else
@@ -72,7 +72,7 @@ static const std::string nullStr;
     {                                                                                                             \
         if (logLevel >= HELICS_LOG_LEVEL_TRACE)                                                                          \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_TRACE, nullStr, message);                                                       \
+            logMessage (HELICS_LOG_LEVEL_TRACE, emptyStr, message);                                                       \
         }                                                                                                         \
     } while (false)
 #else
@@ -261,8 +261,14 @@ void FederateState::addAction (const ActionMessage &action)
     }
 }
 
-void FederateState::addAction (ActionMessage &&action)
+
+stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/) 
 {
+    return stx::nullopt;
+}
+
+    void FederateState::addAction (ActionMessage && action)
+    {
     if (action.action () != CMD_IGNORE)
     {
         queue.push (std::move (action));
@@ -1006,6 +1012,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (cmd.payload.empty ())
         {
             errorString = commandErrorString (cmd.messageID);
+			if(errorString == "unknown")
+			{
+                errorString += " code:" + std::to_string (cmd.messageID);
+			}
         }
         else
         {

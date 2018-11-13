@@ -22,6 +22,7 @@ do
         --tsan)
             echo "Tests using thread sanitizer"
             CTEST_OPTIONS+=" --verbose"
+			export TSAN_OPTIONS=second_deadlock_stack=1
             ;;
         --ubsan)
             echo "Tests using undefined behavior sanitizer"
@@ -89,7 +90,7 @@ else
                 TEST_CONFIG="Daily"
                 ;;
             *)
-                TEST_CONFIG="DebugTest"
+                TEST_CONFIG="Continuous"
 		CTEST_OPTIONS+=" --timeout 220"
                 ;;
         esac

@@ -3,10 +3,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "Federate.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
-#include "Federate.hpp"
 #include "Filters.hpp"
 
 #include "../common/GuardedTypes.hpp"
@@ -15,6 +15,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
+
+#include "FilterFederateManager.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -76,6 +78,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
@@ -120,6 +123,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
 Federate::Federate (const std::string &configString) : Federate (std::string (), loadFederateInfo (configString))
@@ -147,7 +151,7 @@ Federate::Federate (Federate &&fed) noexcept
     currentTime = fed.currentTime;
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
-    localFilters = std::move (fed.localFilters);
+    fManager = std::move (fed.fManager);
     name = std::move (fed.name);
 }
 
@@ -160,7 +164,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     currentTime = fed.currentTime;
     separator_ = fed.separator_;
     asyncCallInfo = std::move (fed.asyncCallInfo);
-    localFilters = std::move (fed.localFilters);
+    fManager = std::move (fed.fManager);
     name = std::move (fed.name);
     return *this;
 }
@@ -645,6 +649,42 @@ void Federate::registerFilterInterfaces (const std::string &configString)
     }
 }
 
+static Filter &generateFilter (Federate *fed,
+                               bool global,
+                               bool cloning,
+                               const std::string &name,
+                               defined_filter_types operation,
+                               const std::string &inputType,
+                               const std::string &outputType)
+{
+    bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
+    if (useTypes)
+    {
+        if (cloning)
+        {
+            return (global) ? fed->registerGlobalCloningFilter (name, inputType, outputType) :
+                              fed->registerCloningFilter (name, inputType, outputType);
+        }
+        else
+        {
+            return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
+                              fed->registerFilter (name, inputType, outputType);
+        }
+    }
+    else
+    {
+        if (cloning)
+        {
+            return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
+                              make_cloning_filter (operation, fed, name);
+        }
+        else
+        {
+            return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
+        }
+    }
+}
+
 void Federate::registerFilterInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
@@ -657,154 +697,129 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
             bool cloningflag = jsonGetOrDefault (filt, "cloning", false);
-          bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
+            bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation = jsonGetOrDefault (filt, "operation", std::string("custom"));
+            std::string operation = jsonGetOrDefault (filt, "operation", std::string ("custom"));
 
+            auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))
             {
                 std::cerr << "input and output types may only be specified for custom filters\n";
                 continue;
             }
-            std::shared_ptr<Filter> filter;
-            if (useTypes)
+            if (!useTypes)
             {
-				if (cloningflag)
-				{
-                    auto fid = registerCloningFilter (key, inputType, outputType);
-                    filter = std::make_shared<CloningFilter> (this, fid.value());
-				}
-				else
-				{
-                    auto fid = registerFilter (key, inputType, outputType);
-                    filter = std::make_shared<Filter> (this, fid.value());
-				}
-               
-            }
-            else
-            {
-                auto type = filterTypeFromString (operation);
-                if (type == defined_filter_types::unrecognized)
+                if (opType == defined_filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
-                if (cloningflag)
+            }
+            auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
+
+            if (filt.isMember ("targets"))
+            {
+                auto targets = filt["targets"];
+                if (targets.isArray ())
                 {
-                    filter = make_cloning_filter (type, this, key);
-				}
+                    for (const auto &target : targets)
+                    {
+                        filter.addSourceTarget (target.asString ());
+                    }
+                }
                 else
                 {
-					filter = make_filter (type, this, key);
+                    filter.addSourceTarget (targets.asString ());
                 }
+            }
 
-				if (filt.isMember("targets"))
-				{
-                    auto targets = filt["targets"];
-					if (targets.isArray())
-					{
-                        for (const auto &target : targets)
-                        {
-                            filter->addSourceTarget (target.asString());
-						}
-					}
-					else
-					{
-                        filter->addSourceTarget (targets.asString ());
-					}
-				}
+            if (filt.isMember ("sourcetargets"))
+            {
+                auto targets = filt["targets"];
+                if (targets.isArray ())
+                {
+                    for (const auto &target : targets)
+                    {
+                        filter.addSourceTarget (target.asString ());
+                    }
+                }
+                else
+                {
+                    filter.addSourceTarget (targets.asString ());
+                }
+            }
 
-				if (filt.isMember("sourcetargets"))
-				{
+            if (filt.isMember ("desttargets"))
+            {
+                auto targets = filt["targets"];
+                if (targets.isArray ())
+                {
+                    for (const auto &target : targets)
+                    {
+                        filter.addDestinationTarget (target.asString ());
+                    }
+                }
+                else
+                {
+                    filter.addDestinationTarget (targets.asString ());
+                }
+            }
+            if (cloningflag)
+            {
+                if (filt.isMember ("delivery"))
+                {
                     auto targets = filt["targets"];
                     if (targets.isArray ())
                     {
                         for (const auto &target : targets)
                         {
-                            filter->addSourceTarget (target.asString ());
+                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.asString ());
                         }
                     }
                     else
                     {
-                        filter->addSourceTarget (targets.asString ());
-                    }
-				}
-
-				if (filt.isMember("desttargets"))
-				{
-                    auto targets = filt["targets"];
-                    if (targets.isArray ())
-                    {
-                        for (const auto &target : targets)
-                        {
-                            filter->addDestinationTarget (target.asString ());
-                        }
-                    }
-                    else
-                    {
-                        filter->addDestinationTarget (targets.asString ());
-                    }
-				}
-                if (cloningflag)
-                {
-                    if (filt.isMember ("delivery"))
-                    {
-                        auto targets = filt["targets"];
-                        if (targets.isArray ())
-                        {
-                            for (const auto &target : targets)
-                            {
-                                std::static_pointer_cast<CloningFilter> (filter)->addDeliveryEndpoint (
-                                  target.asString());
-                            }
-                        }
-                        else
-                        {
-                            std::static_pointer_cast<CloningFilter> (filter)->addDeliveryEndpoint (
-                              targets.asString());
-                        }
+                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets.asString ());
                     }
                 }
-                if (filt.isMember ("properties"))
+            }
+            if (filt.isMember ("properties"))
+            {
+                auto props = filt["properties"];
+                if (props.isArray ())
                 {
-                    auto props = filt["properties"];
-                    if (props.isArray ())
+                    for (const auto &prop : props)
                     {
-                        for (const auto &prop : props)
-                        {
-                            if ((!prop.isMember ("name")) && (!prop.isMember ("value")))
-                            {
-                                std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
-                                continue;
-                            }
-                            if (prop["value"].isDouble ())
-                            {
-                                filter->set (prop["name"].asString (), prop["value"].asDouble ());
-                            }
-                            else
-                            {
-                                filter->setString (prop["name"].asString (), prop["value"].asString ());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if ((!props.isMember ("name")) && (!props.isMember ("value")))
+                        if ((!prop.isMember ("name")) && (!prop.isMember ("value")))
                         {
                             std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
                             continue;
                         }
-                        if (props["value"].isDouble ())
+                        if (prop["value"].isDouble ())
                         {
-                            filter->set (props["name"].asString (), props["value"].asDouble ());
+                            filter.set (prop["name"].asString (), prop["value"].asDouble ());
                         }
                         else
                         {
-                            filter->setString (props["name"].asString (), props["value"].asString ());
+                            filter.setString (prop["name"].asString (), prop["value"].asString ());
                         }
                     }
                 }
-                addFilterObject (std::move (filter));
+                else
+                {
+                    if ((!props.isMember ("name")) && (!props.isMember ("value")))
+                    {
+                        std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
+                        continue;
+                    }
+                    if (props["value"].isDouble ())
+                    {
+                        filter.set (props["name"].asString (), props["value"].asDouble ());
+                    }
+                    else
+                    {
+                        filter.setString (props["name"].asString (), props["value"].asString ());
+                    }
+                }
             }
         }
     }
@@ -836,43 +851,74 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
 
             std::string operation = tomlGetOrDefault (filt, "operation", std::string ("custom"));
 
+            auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))
             {
                 std::cerr << "input and output types may only be specified for custom filters\n";
                 continue;
             }
-            std::shared_ptr<Filter> filter;
-            if (useTypes)
+            if (!useTypes)
             {
-                if (cloningflag)
-                {
-                    auto fid = registerCloningFilter (key, inputType, outputType);
-                    filter = std::make_shared<CloningFilter> (this, fid.value());
-                }
-                else
-                {
-                    auto fid = registerFilter (key, inputType, outputType);
-                    filter = std::make_shared<Filter> (this, fid.value());
-                }
-            }
-            else
-            {
-                auto type = filterTypeFromString (operation);
-                if (type == defined_filter_types::unrecognized)
+                if (opType == defined_filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
                 }
-                if (cloningflag)
+            }
+            auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
+
+            auto targets = filt.find ("targets");
+            if (targets != nullptr)
+            {
+                if (targets->is<toml::Array> ())
                 {
-                    filter = make_cloning_filter (type, this, key);
+                    auto &targetArray = targets->as<toml::Array> ();
+                    for (const auto &target : targetArray)
+                    {
+                        filter.addSourceTarget (target.as<std::string> ());
+                    }
                 }
                 else
                 {
-                    filter = make_filter (type, this, key);
+                    filter.addSourceTarget (targets->as<std::string> ());
                 }
+            }
 
-                auto targets = filt.find ("targets");
+            targets = filt.find ("sourcetargets");
+            if (targets != nullptr)
+            {
+                if (targets->is<toml::Array> ())
+                {
+                    auto &targetArray = targets->as<toml::Array> ();
+                    for (const auto &target : targetArray)
+                    {
+                        filter.addSourceTarget (target.as<std::string> ());
+                    }
+                }
+                else
+                {
+                    filter.addSourceTarget (targets->as<std::string> ());
+                }
+            }
+            targets = filt.find ("desttargets");
+            if (targets != nullptr)
+            {
+                if (targets->is<toml::Array> ())
+                {
+                    auto &targetArray = targets->as<toml::Array> ();
+                    for (const auto &target : targetArray)
+                    {
+                        filter.addDestinationTarget (target.as<std::string> ());
+                    }
+                }
+                else
+                {
+                    filter.addDestinationTarget (targets->as<std::string> ());
+                }
+            }
+            if (cloningflag)
+            {
+                targets = filt.find ("delivery");
                 if (targets != nullptr)
                 {
                     if (targets->is<toml::Array> ())
@@ -880,97 +926,25 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                         auto &targetArray = targets->as<toml::Array> ();
                         for (const auto &target : targetArray)
                         {
-                            filter->addSourceTarget (target.as<std::string> ());
+                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.as<std::string> ());
                         }
                     }
                     else
                     {
-                        filter->addSourceTarget (targets->as<std::string> ());
+                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets->as<std::string> ());
                     }
                 }
-
-                targets = filt.find ("sourcetargets");
-                if (targets != nullptr)
+            }
+            auto props = filt.find ("properties");
+            if (props != nullptr)
+            {
+                if (props->is<toml::Array> ())
                 {
-                    if (targets->is<toml::Array> ())
+                    auto &propArray = props->as<toml::Array> ();
+                    for (const auto &prop : propArray)
                     {
-                        auto &targetArray = targets->as<toml::Array> ();
-                        for (const auto &target : targetArray)
-                        {
-                            filter->addSourceTarget (target.as<std::string> ());
-                        }
-                    }
-                    else
-                    {
-                        filter->addSourceTarget (targets->as<std::string> ());
-                    }
-                }
-                targets = filt.find ("desttargets");
-                if (targets != nullptr)
-                {
-                    if (targets->is<toml::Array> ())
-                    {
-                        auto &targetArray = targets->as<toml::Array> ();
-                        for (const auto &target : targetArray)
-                        {
-                            filter->addDestinationTarget (target.as<std::string>());
-                        }
-                    }
-                    else
-                    {
-                        filter->addDestinationTarget (targets->as<std::string> ());
-                    }
-                }
-				if (cloningflag)
-				{
-                    targets = filt.find ("delivery");
-                    if (targets != nullptr)
-                    {
-                        if (targets->is<toml::Array> ())
-                        {
-                            auto &targetArray = targets->as<toml::Array> ();
-                            for (const auto &target : targetArray)
-                            {
-                                std::static_pointer_cast<CloningFilter>(filter)->addDeliveryEndpoint (target.as<std::string> ());
-                            }
-                        }
-                        else
-                        {
-                            std::static_pointer_cast<CloningFilter> (filter)->addDeliveryEndpoint (
-                              targets->as<std::string> ());
-                        }
-                    }
-				}
-                auto props = filt.find ("properties");
-                if (props != nullptr)
-                {
-                    if (props->is<toml::Array> ())
-                    {
-                        auto &propArray = props->as<toml::Array> ();
-                        for (const auto &prop : propArray)
-                        {
-                            auto propname = prop.find ("name");
-                            auto propval = prop.find ("value");
-
-                            if ((propname == nullptr) || (propval == nullptr))
-                            {
-                                std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
-                                continue;
-                            }
-                            if (propval->isNumber ())
-                            {
-                                filter->set (propname->as<std::string> (), propval->as<double> ());
-                            }
-                            else
-                            {
-                                filter->setString (propname->as<std::string> (), propval->as<std::string> ());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        auto propname = props->find ("name");
-                        auto propval = props->find ("value");
+                        auto propname = prop.find ("name");
+                        auto propval = prop.find ("value");
 
                         if ((propname == nullptr) || (propval == nullptr))
                         {
@@ -979,53 +953,60 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                         }
                         if (propval->isNumber ())
                         {
-                            filter->set (propname->as<std::string> (), propval->as<double> ());
+                            filter.set (propname->as<std::string> (), propval->as<double> ());
                         }
                         else
                         {
-                            filter->setString (propname->as<std::string> (), propval->as<std::string> ());
+                            filter.setString (propname->as<std::string> (), propval->as<std::string> ());
                         }
                     }
                 }
-                addFilterObject (std::move (filter));
+                else
+                {
+                    auto propname = props->find ("name");
+                    auto propval = props->find ("value");
+
+                    if ((propname == nullptr) || (propval == nullptr))
+                    {
+                        std::cerr << "properties must be specified with \"name\" and \"value\" fields\n";
+                        continue;
+                    }
+                    if (propval->isNumber ())
+                    {
+                        filter.set (propname->as<std::string> (), propval->as<double> ());
+                    }
+                    else
+                    {
+                        filter.setString (propname->as<std::string> (), propval->as<std::string> ());
+                    }
+                }
             }
         }
     }
 }
 
-std::shared_ptr<Filter> Federate::getFilterObject (int index)
-{
-    if (isValidIndex (index, localFilters))
-    {
-        return localFilters[index];
-    }
-    return nullptr;
-}
+Filter &Federate::getFilter (int index) { return fManager->getFilter (index); }
 
-void Federate::addFilterObject (std::shared_ptr<Filter> obj) { localFilters.push_back (std::move (obj)); }
+const Filter &Federate::getFilter (int index) const { return fManager->getFilter (index); }
 
-int Federate::filterObjectCount () const { return static_cast<int> (localFilters.size ()); }
+int Federate::filterCount () const { return fManager->getFilterCount (); }
 
-
-std::string Federate::localQuery(const std::string & /*queryStr*/) const
-{
-    return std::string();
-}
+std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string (); }
 
 std::string Federate::query (const std::string &queryStr)
 {
     std::string res;
     if (queryStr == "name")
     {
-        res=getName ();
+        res = getName ();
     }
     else
     {
-        res = localQuery(queryStr);
+        res = localQuery (queryStr);
     }
-    if (res.empty())
+    if (res.empty ())
     {
-        res = coreObject->query(getName(), queryStr);
+        res = coreObject->query (getName (), queryStr);
     }
     return res;
 }
@@ -1033,13 +1014,13 @@ std::string Federate::query (const std::string &queryStr)
 std::string Federate::query (const std::string &target, const std::string &queryStr)
 {
     std::string res;
-    if ((target.empty ()) || (target == "federate")||(target==getName()))
+    if ((target.empty ()) || (target == "federate") || (target == getName ()))
     {
-        res=query (queryStr);
+        res = query (queryStr);
     }
     else
     {
-        res = coreObject->query(target, queryStr);
+        res = coreObject->query (target, queryStr);
     }
     return res;
 }
@@ -1052,7 +1033,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
-    return query_id_t(cnt);
+    return query_id_t (cnt);
 }
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
@@ -1062,7 +1043,7 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace (cnt, std::move (queryFut));
-    return query_id_t(cnt);
+    return query_id_t (cnt);
 }
 
 std::string Federate::queryComplete (query_id_t queryIndex)
@@ -1087,85 +1068,89 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
     return false;
 }
 
-filter_id_t Federate::registerFilter (const std::string &filterName,
-                                      const std::string &inputType,
-                                      const std::string &outputType)
+Filter &Federate::registerFilter (const std::string &filterName,
+                                  const std::string &inputType,
+                                  const std::string &outputType)
 {
-    auto id =
-      coreObject->registerFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) : filterName,
-                                  inputType, outputType);
-    return filter_id_t (id.baseValue());
+    return fManager->registerFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) : filterName,
+                                     inputType, outputType);
 }
 
-filter_id_t Federate::registerCloningFilter (const std::string &filterName,
-                                             const std::string &inputType,
-                                             const std::string &outputType)
+CloningFilter &Federate::registerCloningFilter (const std::string &filterName,
+                                                const std::string &inputType,
+                                                const std::string &outputType)
 {
-    auto id = coreObject->registerCloningFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) :
-                                                                          filterName,
-                                                 inputType, outputType);
-    return filter_id_t (id.baseValue ());
+    return fManager->registerCloningFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) :
+                                                                     filterName,
+                                            inputType, outputType);
 }
 
-filter_id_t Federate::registerGlobalFilter (const std::string &filterName,
-                                            const std::string &inputType,
-                                            const std::string &outputType)
+Filter &Federate::registerGlobalFilter (const std::string &filterName,
+                                        const std::string &inputType,
+                                        const std::string &outputType)
 {
-    auto id = coreObject->registerFilter (filterName, inputType, outputType);
-    return filter_id_t (id.baseValue());
+    return fManager->registerFilter (filterName, inputType, outputType);
 }
 
-filter_id_t Federate::registerGlobalCloningFilter (const std::string &filterName,
-                                                   const std::string &inputType,
-                                                   const std::string &outputType)
+CloningFilter &Federate::registerGlobalCloningFilter (const std::string &filterName,
+                                                      const std::string &inputType,
+                                                      const std::string &outputType)
 {
-    auto id = coreObject->registerCloningFilter (filterName, inputType, outputType);
-    return filter_id_t (id.baseValue());
+    return fManager->registerCloningFilter (filterName, inputType, outputType);
 }
 
-void Federate::addSourceTarget (filter_id_t id, const std::string &targetEndpoint)
+void Federate::addSourceTarget (const Filter &filt, const std::string &targetEndpoint)
 {
-    coreObject->addSourceTarget (interface_handle (id.value ()), targetEndpoint);
+    coreObject->addSourceTarget (filt.getHandle (), targetEndpoint);
 }
 
-void Federate::addDestinationTarget (filter_id_t id, const std::string &targetEndpoint)
+void Federate::addDestinationTarget (const Filter &filt, const std::string &targetEndpoint)
 {
-    coreObject->addDestinationTarget (interface_handle (id.value ()), targetEndpoint);
+    coreObject->addDestinationTarget (filt.getHandle (), targetEndpoint);
 }
 
-std::string Federate::getFilterName (filter_id_t id) const
+const std::string &Federate::getFilterName (const Filter &filt) const { return filt.getName (); }
+
+const std::string &Federate::getFilterInputType (const Filter &filt) const
 {
-    return coreObject->getHandleName (interface_handle (id.value ()));
+    return coreObject->getType (filt.getHandle ());
 }
 
-std::string Federate::getFilterInputType (filter_id_t id) const
+const std::string &Federate::getFilterOutputType (const Filter &filt) const
 {
-    return coreObject->getType (interface_handle (id.value ()));
+    return coreObject->getType (filt.getHandle ());
 }
 
-std::string Federate::getFilterOutputType (filter_id_t id) const
+const Filter &Federate::getFilter (const std::string &filterName) const
 {
-    return coreObject->getType (interface_handle (id.value ()));
+    auto &filt = fManager->getFilter (filterName);
+    if (!filt.isValid ())
+    {
+        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        return filt2;
+    }
+    return filt;
 }
 
-filter_id_t Federate::getFilterId (const std::string &filterName) const
+Filter &Federate::getFilter (const std::string &filterName)
 {
-    auto id = coreObject->getFilter (filterName);
-	if (!id.isValid())
-	{
-        id = coreObject->getFilter ((getName () + separator_ + filterName));
-	}
-    return (id.isValid ()) ? filter_id_t (id.baseValue()) : filter_id_t();
+    auto &filt = fManager->getFilter (filterName);
+    if (!filt.isValid ())
+    {
+        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        return filt2;
+    }
+    return filt;
 }
 
-void Federate::setFilterOperator (filter_id_t id, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
 {
-    coreObject->setFilterOperator (interface_handle (id.value ()), std::move (mo));
+    coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
 }
 
-void Federate::setFilterOption(filter_id_t id, int32_t option, bool option_value)
+void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_value)
 {
-	coreObject->setHandleOption(interface_handle(id.value()), option,option_value);
+    coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
 }  // namespace helics
