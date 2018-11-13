@@ -2236,6 +2236,24 @@ void CommonCore::processCommand (ActionMessage &&command)
             timeoutMon->pingReply (command);
         }
         break;
+    case CMD_RESEND:
+		if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
+		{
+            if ((global_broker_id.load() == parent_broker_id)
+				|| (!(global_broker_id.load().isValid())))
+			{
+                LOG_WARNING_SIMPLE ("resending broker reg");
+				 ActionMessage m (CMD_REG_BROKER);
+            m.source_id = global_federate_id_t ();
+            m.name = getIdentifier ();
+            m.setStringData (getAddress ());
+            setActionFlag (m, core_flag);
+            m.counter = 1;
+            transmit (parent_route_id, m);
+			}
+           
+		}
+        break;
     case CMD_CHECK_CONNECTIONS:
     {
         auto res = checkAndProcessDisconnect ();
@@ -3300,7 +3318,11 @@ bool CommonCore::waitCoreRegistration ()
             LOG_WARNING (parent_broker_id, identifier,
                          "now waiting for the core to finish registration before proceeding");
         }
-		
+		if (sleepcnt == 4)
+		{
+            ActionMessage M (CMD_RESEND);
+            M.messageID = static_cast<int32_t>(CMD_REG_BROKER);
+		}
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
         brkid = global_broker_id.load ();
         ++sleepcnt;

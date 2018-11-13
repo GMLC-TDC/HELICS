@@ -41,8 +41,8 @@ enum class action_t : int32_t
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
     cmd_disconnect_check = 5,  //!< check for a disconnect
     cmd_disconnect_fed = 6,  //!< disconnect a federate
-	cmd_broadcast_disconnect=7, //!< a broadcast disconnect message
-	cmd_check_connections=297, //!< command to check for any connections
+    cmd_broadcast_disconnect = 7,  //!< a broadcast disconnect message
+    cmd_check_connections = 297,  //!< command to check for any connections
     cmd_ping = 298,  //!< request for an Echo response
     cmd_ping_reply = 299,  //!< response to a ping request
 
@@ -129,8 +129,8 @@ enum class action_t : int32_t
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
-    cmd_protocol_big = cmd_info_basis + 60000  //!< command used in the protocol stacks with the additional info
-
+    cmd_protocol_big = cmd_info_basis + 60000,  //!< command used in the protocol stacks with the additional info
+    cmd_resend = 121212  //!< command to resend some data
 };
 
 }  // namespace action_message_def
@@ -187,6 +187,7 @@ enum class action_t : int32_t
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
 #define CMD_ERROR action_message_def::action_t::cmd_error
+#define CMD_RESEND action_message_def::action_t::cmd_resend
 
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
 #define CMD_ADD_PUBLISHER action_message_def::action_t::cmd_add_publisher

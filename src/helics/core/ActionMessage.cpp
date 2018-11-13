@@ -448,6 +448,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_reg_input, "reg_input"},
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
+  {action_message_def::action_t::cmd_resend, "reg_resend"},
   {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
   {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
   {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
