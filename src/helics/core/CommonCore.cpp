@@ -3301,7 +3301,7 @@ bool CommonCore::waitCoreRegistration ()
     auto brkid = global_broker_id.load ();
     while ((brkid == parent_broker_id) || (!brkid.isValid ()))
     {
-        if (sleepcnt > 2)
+        if (sleepcnt > 6)
         {
             LOG_WARNING (parent_broker_id, identifier,
                          fmt::format("broker state={}, broker id={}, sleepcnt={}",static_cast<int>(brokerState.load()),brkid.baseValue(),sleepcnt));
@@ -3314,22 +3314,22 @@ bool CommonCore::waitCoreRegistration ()
         {
             return false;
         }
-        if (sleepcnt == 1)
+        if (sleepcnt == 4)
         {
             LOG_WARNING (parent_broker_id, identifier,
                          "now waiting for the core to finish registration before proceeding");
         }
-		if (sleepcnt == 4)
+		if (sleepcnt == 20)
 		{
             LOG_WARNING (parent_broker_id, identifier,
                          "resending reg message");
             ActionMessage M (CMD_RESEND);
             M.messageID = static_cast<int32_t>(CMD_REG_BROKER);
 		}
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_broker_id.load ();
         ++sleepcnt;
-        if (sleepcnt * 50 > timeout)
+        if (sleepcnt * 100 > timeout)
         {
             return false;
         }

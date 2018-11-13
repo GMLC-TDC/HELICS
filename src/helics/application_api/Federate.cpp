@@ -26,19 +26,9 @@ namespace helics
 using namespace std::literals::chrono_literals;
 void cleanupHelicsLibrary ()
 {
-    auto sz=BrokerFactory::cleanUpBrokers (100ms);
-    sz=CoreFactory::cleanUpCores (200ms);
-    if (sz>0)
-    {
-        std::cerr << sz << " core remain now cleaning brokers 2" << std::endl;
-	}
-    
-    sz=BrokerFactory::cleanUpBrokers (100ms);
-	if (sz > 0)
-	{
-        std::cerr << sz << " broker remain cleaning finished" << std::endl;
-	}
-    
+    BrokerFactory::cleanUpBrokers (100ms);
+    CoreFactory::cleanUpCores (200ms);
+    BrokerFactory::cleanUpBrokers (100ms);
 }
 
 Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (fedName)
