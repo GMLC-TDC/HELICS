@@ -28,6 +28,29 @@ BOOST_AUTO_TEST_CASE(basic_test)
     BOOST_CHECK_EQUAL(bdata.portNumber, 45);
 }
 
+BOOST_AUTO_TEST_CASE(networkbrokerdata_stripProtocol_test)
+{
+    BOOST_CHECK_EQUAL(helics::stripProtocol("tcp://127.0.0.1"), "127.0.0.1");
+}
+
+BOOST_AUTO_TEST_CASE(networkbrokerdata_removeProtocol_test)
+{
+    std::string networkAddress = "tcp://127.0.0.1";
+    helics::removeProtocol(networkAddress);
+    BOOST_CHECK_EQUAL(networkAddress, "127.0.0.1");
+}
+
+BOOST_AUTO_TEST_CASE(networkbrokerdata_addProtocol_test)
+{
+    BOOST_CHECK_EQUAL(helics::addProtocol("127.0.0.1", helics::interface_type::tcp), "tcp://127.0.0.1");
+}
+
+BOOST_AUTO_TEST_CASE(networkbrokerdata_insertProtocol_test)
+{
+    std::string networkAddress = "127.0.0.1";
+    helics::insertProtocol(networkAddress, helics::interface_type::tcp);
+    BOOST_CHECK_EQUAL(networkAddress, "tcp://127.0.0.1");
+}
 
 BOOST_AUTO_TEST_CASE(add_check_detection)
 {

@@ -360,7 +360,7 @@ std::string stripProtocol (const std::string &networkAddress)
     auto loc = networkAddress.find ("://");
     if (loc != std::string::npos)
     {
-        return networkAddress.substr (loc + 2);
+        return networkAddress.substr(loc + 3);
     }
     return networkAddress;
 }
@@ -370,7 +370,7 @@ void removeProtocol (std::string &networkAddress)
     auto loc = networkAddress.find ("://");
     if (loc != std::string::npos)
     {
-        networkAddress.erase (0, loc + 2);
+        networkAddress.erase(0, loc + 3);
     }
 }
 
