@@ -1,92 +1,90 @@
 function valueFedTests
-  helics
+   %helics
 end
 
 
-function [fedStruct,success]=generateFed()
-import helics
-success=true;
-initstring = '1';
-fedinitstring = '--broker=mainbroker --federates=1';
-fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
-if (~helicsBrokerIsValid(fedStruct.broker))
-    success=false;
-    return;
-end
-fedInfo=helicsCreateFederateInfo();
-if (fedInfo==0)
-    success=false;
-    return;
-end
-try
-helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
-helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
-helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
-catch ec
-    success=false;
-    helicsBrokerDestroy(fedStruct.broker);
-    helicsFederateInfoFree(fedInfo);
-    return
-end
-try
-fedStruct.vFed=helicsCreateValueFederate('fed1',fedInfo);
-if (~helicsFederateIsValid(fedStruct.vFed))
-    success=false;
-end
-catch ec
-    success=false;
-end
-helicsFederateInfoFree(fedInfo);
-end
+%!function [fedStruct,success]=generateFed()
+%! helics
+%! success=true;
+%! initstring = '-f 1';
+%! fedinitstring = '--broker=mainbroker --federates=1';
+%! fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
+%! if (~helicsBrokerIsValid(fedStruct.broker))
+%!    success=false;
+%!    return;
+%! end
+%! fedInfo=helicsCreateFederateInfo();
+%! if (fedInfo==0)
+%!    success=false;
+%!    return;
+%! end
+%! try
+%! helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
+%! helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
+%! helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
+%! helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
+%! catch ec
+%!    success=false;
+%!    helicsBrokerDestroy(fedStruct.broker);
+%!    helicsFederateInfoFree(fedInfo);
+%!    return
+%! end
+%! try
+%! fedStruct.vFed=helicsCreateValueFederate('fed1',fedInfo);
+%! if (~helicsFederateIsValid(fedStruct.vFed))
+%!    success=false;
+%! end
+%! catch ec
+%!     success=false;
+%! end
+%! helicsFederateInfoFree(fedInfo);
+%!endfunction
 
-function success=closeStruct(fedStruct)
-import helics.*
-success=true;
-helicsFederateFinalize(fedStruct.vFed);
-helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
+%!function success=closeStruct(fedStruct)
+%! helics
+%! success=true;
+%! helicsFederateFinalize(fedStruct.vFed);
+%! helicsBrokerWaitForDisconnect(fedStruct.broker,2000);
+%!
+%! helicsFederateFree(fedStruct.vFed);
+%! helicsBrokerFree(fedStruct.broker);
+%! helicsCloseLibrary();
+%!
+%!endfunction
 
-helicsFederateFree(fedStruct.vFed);
-helicsBrokerFree(fedStruct.broker);
-helicsCloseLibrary();
-
-end
-
-function forceCloseStruct(fedStruct)
-import helics.
-helicsFederateFinalize(fedStruct.vFed);
-
-cnt=0;
-while (helicsBrokerIsConnected(fedStruct.broker))
-    pause(1);
-    cnt=cnt+1;
-    if (cnt>5)
-        helicsBrokerDisconnect(fedStruct.broker);
-        break;
-    end
-end
-
-helicsFederateFree(fedStruct.vFed);
-helicsBrokerFree(fedStruct.broker);
-helicsCloseLibrary();
-
-end
+%!function forceCloseStruct(fedStruct)
+%! helics
+%! helicsFederateFinalize(fedStruct.vFed);
+%!
+%! cnt=0;
+%! while (helicsBrokerIsConnected(fedStruct.broker))
+%!    pause(1);
+%!    cnt=cnt+1;
+%!    if (cnt>5)
+%!        helicsBrokerDisconnect(fedStruct.broker);
+%!        break;
+%!    end
+%! end
+%!
+%! helicsFederateFree(fedStruct.vFed);
+%! helicsBrokerFree(fedStruct.broker);
+%! helicsCloseLibrary();
+%!
+%!endfunction
 
 %!test
 %! ver=helicsGetVersion();
 %! assert(length(ver)>10);
 
-
-
 %!test
 %! [feds,success]=generateFed();
-%! try
 %! assert(success)
 %! helicsFederateEnterExecutionMode(feds.vFed);
-% state=helics.helicsFederateGetState(feds.vFed);
-% testCase.verifyEqual(state,helics.helics_state_execution);
-% success=closeStruct(feds);
-% testCase.verifyThat(success,IsTrue);
+%! state=helics.helicsFederateGetState(feds.vFed);
+%! assert(state==helics.helics_state_execution);
+%! success=closeStruct(feds)
+%! assert(success)
+
 % catch e
 %     testCase.verifyThat(false,IsTrue);
 %     disp(e.message)
