@@ -210,6 +210,21 @@ void AsioServiceManager::haltServiceLoop ()
                 {
                     nullwork.reset ();
                     iserv->stop ();
+                    int lcnt = 0;
+					while (loopRet.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+					{
+						if (lcnt == 0)
+						{
+                            std::this_thread::yield ();
+						}
+						else
+						{
+                            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+                            ++lcnt;
+                            iserv->stop ();
+						}
+                        
+					}
                     loopRet.get ();
                     iserv->reset ();  // prepare for future runs
                 }
