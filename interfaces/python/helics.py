@@ -813,6 +813,13 @@ def helicsFederateInfoSetCoreInitString(fi: 'helics_federate_info_t', coreInit: 
     """
     return _helics.helicsFederateInfoSetCoreInitString(fi, coreInit)
 
+def helicsFederateInfoSetCoreType(fi: 'helics_federate_info_t', coretype: 'int') -> "void":
+    """
+
+
+    """
+    return _helics.helicsFederateInfoSetCoreType(fi, coretype)
+
 def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info_t', coretype: 'char const *') -> "void":
     """
 
@@ -834,12 +841,17 @@ def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info_t', corety
     """
     return _helics.helicsFederateInfoSetCoreTypeFromString(fi, coretype)
 
-def helicsFederateInfoSetCoreType(fi: 'helics_federate_info_t', coretype: 'int') -> "void":
-    """
+def helicsFederateInfoSetBroker(fi: 'helics_federate_info_t', broker: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetBroker(fi, broker)
+helicsFederateInfoSetBroker = _helics.helicsFederateInfoSetBroker
 
+def helicsFederateInfoSetBrokerPort(fi: 'helics_federate_info_t', brokerPort: 'int') -> "void":
+    return _helics.helicsFederateInfoSetBrokerPort(fi, brokerPort)
+helicsFederateInfoSetBrokerPort = _helics.helicsFederateInfoSetBrokerPort
 
-    """
-    return _helics.helicsFederateInfoSetCoreType(fi, coretype)
+def helicsFederateInfoSetLocalPort(fi: 'helics_federate_info_t', localPort: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetLocalPort(fi, localPort)
+helicsFederateInfoSetLocalPort = _helics.helicsFederateInfoSetLocalPort
 
 def helicsFederateInfoSetFlagOption(fi: 'helics_federate_info_t', flag: 'int', value: 'helics_bool_t') -> "void":
     return _helics.helicsFederateInfoSetFlagOption(fi, flag, value)

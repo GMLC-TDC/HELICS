@@ -26,6 +26,8 @@ public interface helicsConstants {
   public final static int HELICS_DATA_TYPE_VECTOR = helicsJNI.HELICS_DATA_TYPE_VECTOR_get();
   public final static int HELICS_DATA_TYPE_NAMEDPOINT = helicsJNI.HELICS_DATA_TYPE_NAMEDPOINT_get();
   public final static int HELICS_DATA_TYPE_BOOLEAN = helicsJNI.HELICS_DATA_TYPE_BOOLEAN_get();
+  public final static int HELICS_DATA_TYPE_CHAR = helicsJNI.HELICS_DATA_TYPE_CHAR_get();
+  public final static int HELICS_DATA_TYPE_TIME = helicsJNI.HELICS_DATA_TYPE_TIME_get();
   public final static int HELICS_DATA_TYPE_RAW = helicsJNI.HELICS_DATA_TYPE_RAW_get();
   public final static int HELICS_DATA_TYPE_ANY = helicsJNI.HELICS_DATA_TYPE_ANY_get();
 }
