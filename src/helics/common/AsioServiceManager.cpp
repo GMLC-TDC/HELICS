@@ -204,10 +204,13 @@ void AsioServiceManager::haltServiceLoop ()
         {
             std::lock_guard<std::mutex> nullLock (runningLoopLock);
             //    std::cout << "calling halt on service loop \n";
+            
             if (runCounter <= 0)
             {
+               
                 if (nullwork)
                 {
+                    terminateLoop = true;
                     nullwork.reset ();
                     iserv->stop ();
                     int lcnt = 0;
@@ -227,6 +230,7 @@ void AsioServiceManager::haltServiceLoop ()
 					}
                     loopRet.get ();
                     iserv->reset ();  // prepare for future runs
+                    terminateLoop = false;
                 }
             }
         }
@@ -239,7 +243,7 @@ void AsioServiceManager::haltServiceLoop ()
 
 void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
 {
-	while (ptr->runCounter > 0)
+	while ((ptr->runCounter > 0)&&(!(ptr->terminateLoop)))
 	{
         auto clk = std::chrono::steady_clock::now ();
         try
@@ -264,6 +268,6 @@ void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
         }
 	}
     
-     //std::cout << "service loop stopped\n";
+     std::cout << "service loop stopped\n";
     ptr->running.store (false);
 }

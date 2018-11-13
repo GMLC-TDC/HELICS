@@ -41,8 +41,8 @@ class AsioServiceManager: public std::enable_shared_from_this<AsioServiceManager
       nullwork;  //!< pointer to an object used to keep a service running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{false};
-    std::mutex runningLoopLock;  // lock protecting the nullwork object the return future
-
+    std::mutex runningLoopLock;  //!< lock protecting the nullwork object the return future
+    std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
     AsioServiceManager (const std::string &serviceName);
 
