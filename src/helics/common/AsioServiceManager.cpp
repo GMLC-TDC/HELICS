@@ -165,7 +165,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
         nullLock.unlock ();
         std::thread serviceThread (std::move (serviceTask));
         serviceThread.detach ();
-        std::cout << "starting service loop thread" << runCounter << "\n";
+        std::cout << "starting service loop thread " << runCounter << "\n";
     }
     else
     {

@@ -2237,6 +2237,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_RESEND:
+        LOG_WARNING_SIMPLE ("got resend");
 		if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
 		{
             if ((global_broker_id.load() == parent_broker_id)
@@ -3320,6 +3321,8 @@ bool CommonCore::waitCoreRegistration ()
         }
 		if (sleepcnt == 4)
 		{
+            LOG_WARNING (parent_broker_id, identifier,
+                         "resending reg message");
             ActionMessage M (CMD_RESEND);
             M.messageID = static_cast<int32_t>(CMD_REG_BROKER);
 		}
