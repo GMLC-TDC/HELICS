@@ -132,52 +132,35 @@ bool IpcBlockingPriorityQueueImpl::try_pushPriority(const unsigned char *data, i
     return false;
 }
 
-void IpcBlockingPriorityQueueImpl::push (const unsigned char *data, int size)  // forwarding reference
+void IpcBlockingPriorityQueueImpl::push (const unsigned char *data, int size)
 {
-    scoped_lock<interprocess_mutex> pushLock (m_pushLock);  // only one lock on this branch
-    if (!pushData.empty ())
-    {
-		if (!pushData.push(data, size))
+	if (try_push(data,size))
+	{
+		return;
+	}
+	
+	while (true)
+	{
+		scoped_lock<interprocess_mutex> pushLock(m_pushLock);  // only one lock on this branch
+		if (size>pushData.capacity() - 12)
 		{
-            scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
-            if (queueFullFlag)
-            {
-
-			}
+			throw(std::invalid_argument("data size is greater than buffer capacity"));
 		}
-    }
-    else
-    {
-        scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
-        if (queueEmptyFlag)
-        {
-            queueEmptyFlag = false;
-            conditionLock.unlock ();
-            // release the push lock so we don't get a potential deadlock condition
-            pushLock.unlock ();
-            // all locks released
-            // no lock the pullLock
-            scoped_lock<interprocess_mutex> pullLock (m_pullLock);
-            conditionLock.lock ();
-            queueEmptyFlag = false;  // reset the queueEmptyflag
-            conditionLock.unlock ();
-            if (pullData.empty ())
-            {
-                pullData.push (data, size);
-                // pullLock.unlock ();
-                condition_empty.notify_all ();
-            }
-            else
-            {
-                pushLock.lock ();
-                pushData.push (data, size);
-            }
-        }
-        else
-        {
-            pushData.push (data, size);
-        }
-    }
+		if (pushData.isSpaceAvailable(size))
+		{
+			pushData.push(data, size);
+			return;
+		}
+		scoped_lock<interprocess_mutex> conditionLock(m_conditionLock);
+		queueFullFlag = true;
+		conditionLock.unlock();
+		condition_full.wait(pushLock);  // now wait
+		if (pushData.isSpaceAvailable(size))
+		{
+			pushData.push(data, size);
+			return;
+		}
+	}
 }
 
 /** push an element onto the queue
@@ -185,32 +168,35 @@ val the value to push on the queue
 */
 void IpcBlockingPriorityQueueImpl::pushPriority (const unsigned char *data, int size)  // forwarding reference
 {
-    scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
 
-    if (queueEmptyFlag)
-    {
-        conditionLock.unlock ();
-        scoped_lock<interprocess_mutex> pullLock (m_pullLock);
-        conditionLock.lock ();
-        queueEmptyFlag = false;  // need to set the flag again just in case after we get the lock
-        conditionLock.unlock ();
-        priorityData.push (data, size);
-        // pullLock.unlock ();
-        condition_empty.notify_all ();
-    }
-    else
-    {
-        conditionLock.unlock ();
-        scoped_lock<interprocess_mutex> pullLock (m_pullLock);
-        priorityData.push (data, size);
-        conditionLock.lock ();
-        if (queueEmptyFlag)
-        {
-            queueEmptyFlag = false;
-            conditionLock.unlock ();
-            condition_empty.notify_all ();
-        }
-    }
+	if (try_pushPriority(data, size))
+	{
+		return;
+	}
+
+	while (true)
+	{
+		scoped_lock<interprocess_mutex> pullLock(m_pullLock);
+		if (size>priorityData.capacity() - 8)
+		{
+			throw(std::invalid_argument("data size is greater than priority buffer capacity"));
+		}
+		if (priorityData.isSpaceAvailable(size))
+		{
+			priorityData.push(data, size);
+			return;
+		}
+		scoped_lock<interprocess_mutex> conditionLock(m_conditionLock);
+		queueFullFlag = true;
+		conditionLock.unlock();
+		condition_full.wait(pullLock);  // now wait
+		if (priorityData.isSpaceAvailable(size))
+		{
+			priorityData.push(data, size);
+			return;
+		}
+
+	}
 }
 
 int IpcBlockingPriorityQueueImpl::try_pop (unsigned char *data, int maxSize)
@@ -218,6 +204,13 @@ int IpcBlockingPriorityQueueImpl::try_pop (unsigned char *data, int maxSize)
     scoped_lock<interprocess_mutex> pullLock (m_pullLock);
     if (!priorityData.empty ())
     {
+		scoped_lock<interprocess_mutex> conditionLock(m_conditionLock);
+		if (queueFullFlag)
+		{
+			queueFullFlag = false;
+			conditionLock.unlock();
+			condition_full.notify_all();
+		}
         return priorityData.pop (data, maxSize);
     }
     if (pullData.empty ())
@@ -226,6 +219,13 @@ int IpcBlockingPriorityQueueImpl::try_pop (unsigned char *data, int maxSize)
         if (!pushData.empty ())
         {  // on the off chance the queue got out of sync
             pushData.swap (pullData);
+			scoped_lock<interprocess_mutex> conditionLock(m_conditionLock);
+			if (queueFullFlag)
+			{
+				queueFullFlag = false;
+				conditionLock.unlock();
+				condition_full.notify_all();
+			}
             pushLock.unlock ();  // we can free the push function to accept more elements after the swap call;
             pullData.reverse ();
             int ret = pullData.pop (data, maxSize);
@@ -241,7 +241,7 @@ int IpcBlockingPriorityQueueImpl::try_pop (unsigned char *data, int maxSize)
                 }
                 else
                 {
-                    scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
+					conditionLock.lock();
                     queueEmptyFlag = true;
                 }
             }
