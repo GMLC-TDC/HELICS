@@ -2980,27 +2980,26 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-#define SWIGTYPE_p_data_t swig_types[1]
-#define SWIGTYPE_p_double swig_types[2]
-#define SWIGTYPE_p_federate_state swig_types[3]
-#define SWIGTYPE_p_helics_complex swig_types[4]
-#define SWIGTYPE_p_helics_error swig_types[5]
-#define SWIGTYPE_p_helics_error_types swig_types[6]
-#define SWIGTYPE_p_helics_federate_flags swig_types[7]
-#define SWIGTYPE_p_helics_filter_type_t swig_types[8]
-#define SWIGTYPE_p_helics_handle_options swig_types[9]
-#define SWIGTYPE_p_helics_int_properties swig_types[10]
-#define SWIGTYPE_p_helics_iteration_request swig_types[11]
-#define SWIGTYPE_p_helics_iteration_status swig_types[12]
-#define SWIGTYPE_p_helics_time_properties swig_types[13]
-#define SWIGTYPE_p_int swig_types[14]
-#define SWIGTYPE_p_int16_t swig_types[15]
-#define SWIGTYPE_p_int32_t swig_types[16]
-#define SWIGTYPE_p_message_t swig_types[17]
-#define SWIGTYPE_p_p_char swig_types[18]
-#define SWIGTYPE_p_void swig_types[19]
-static swig_type_info *swig_types[21];
-static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
+#define SWIGTYPE_p_double swig_types[1]
+#define SWIGTYPE_p_federate_state swig_types[2]
+#define SWIGTYPE_p_helics_complex swig_types[3]
+#define SWIGTYPE_p_helics_error swig_types[4]
+#define SWIGTYPE_p_helics_error_types swig_types[5]
+#define SWIGTYPE_p_helics_federate_flags swig_types[6]
+#define SWIGTYPE_p_helics_filter_type_t swig_types[7]
+#define SWIGTYPE_p_helics_handle_options swig_types[8]
+#define SWIGTYPE_p_helics_int_properties swig_types[9]
+#define SWIGTYPE_p_helics_iteration_request swig_types[10]
+#define SWIGTYPE_p_helics_iteration_status swig_types[11]
+#define SWIGTYPE_p_helics_time_properties swig_types[12]
+#define SWIGTYPE_p_int swig_types[13]
+#define SWIGTYPE_p_int16_t swig_types[14]
+#define SWIGTYPE_p_int32_t swig_types[15]
+#define SWIGTYPE_p_message_t swig_types[16]
+#define SWIGTYPE_p_p_char swig_types[17]
+#define SWIGTYPE_p_void swig_types[18]
+static swig_type_info *swig_types[20];
+static swig_module_info swig_module = {swig_types, 19, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3115,6 +3114,52 @@ SWIGINTERNINLINE PyObject*
 
 
   #define SWIG_From_double   PyFloat_FromDouble 
+
+
+SWIGINTERN int
+SWIG_AsVal_double (PyObject *obj, double *val)
+{
+  int res = SWIG_TypeError;
+  if (PyFloat_Check(obj)) {
+    if (val) *val = PyFloat_AsDouble(obj);
+    return SWIG_OK;
+#if PY_VERSION_HEX < 0x03000000
+  } else if (PyInt_Check(obj)) {
+    if (val) *val = (double) PyInt_AsLong(obj);
+    return SWIG_OK;
+#endif
+  } else if (PyLong_Check(obj)) {
+    double v = PyLong_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    double d = PyFloat_AsDouble(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = d;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      long v = PyLong_AsLong(obj);
+      if (!PyErr_Occurred()) {
+	if (val) *val = v;
+	return SWIG_AddCast(SWIG_AddCast(SWIG_OK));
+      } else {
+	PyErr_Clear();
+      }
+    }
+  }
+#endif
+  return res;
+}
 
 
 SWIGINTERN swig_type_info*
@@ -3279,52 +3324,6 @@ SWIGINTERNINLINE PyObject *
 SWIG_FromCharPtr(const char *cptr)
 { 
   return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_double (PyObject *obj, double *val)
-{
-  int res = SWIG_TypeError;
-  if (PyFloat_Check(obj)) {
-    if (val) *val = PyFloat_AsDouble(obj);
-    return SWIG_OK;
-#if PY_VERSION_HEX < 0x03000000
-  } else if (PyInt_Check(obj)) {
-    if (val) *val = (double) PyInt_AsLong(obj);
-    return SWIG_OK;
-#endif
-  } else if (PyLong_Check(obj)) {
-    double v = PyLong_AsDouble(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      PyErr_Clear();
-    }
-  }
-#ifdef SWIG_PYTHON_CAST_MODE
-  {
-    int dispatch = 0;
-    double d = PyFloat_AsDouble(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = d;
-      return SWIG_AddCast(SWIG_OK);
-    } else {
-      PyErr_Clear();
-    }
-    if (!dispatch) {
-      long v = PyLong_AsLong(obj);
-      if (!PyErr_Occurred()) {
-	if (val) *val = v;
-	return SWIG_AddCast(SWIG_AddCast(SWIG_OK));
-      } else {
-	PyErr_Clear();
-      }
-    }
-  }
-#endif
-  return res;
 }
 
 
@@ -3626,160 +3625,6 @@ SWIGINTERN PyObject *Swig_var_helics_false_get(void) {
   return pyobj;
 }
 
-
-SWIGINTERN PyObject *_wrap_data_t_data_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *arg1 = (struct data_t *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:data_t_data_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_set" "', argument " "1"" of type '" "struct data_t *""'"); 
-  }
-  arg1 = (struct data_t *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "data_t_data_set" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  if (arg1->data) free((char*)arg1->data);
-  if (arg2) {
-    size_t size = strlen((const char *)(arg2)) + 1;
-    arg1->data = (char *)(char *)memcpy(malloc((size)*sizeof(char)), (const char *)(arg2), sizeof(char)*(size));
-  } else {
-    arg1->data = 0;
-  }
-  resultobj = SWIG_Py_Void();
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_data_t_data_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *arg1 = (struct data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  char *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:data_t_data_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_get" "', argument " "1"" of type '" "struct data_t *""'"); 
-  }
-  arg1 = (struct data_t *)(argp1);
-  result = (char *) ((arg1)->data);
-  resultobj = SWIG_FromCharPtr((const char *)result);
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_data_t_length_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *arg1 = (struct data_t *) 0 ;
-  int64_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  long long val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:data_t_length_set",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_set" "', argument " "1"" of type '" "struct data_t *""'"); 
-  }
-  arg1 = (struct data_t *)(argp1);
-  ecode2 = SWIG_AsVal_long_SS_long(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "data_t_length_set" "', argument " "2"" of type '" "int64_t""'");
-  } 
-  arg2 = (int64_t)(val2);
-  if (arg1) (arg1)->length = arg2;
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_data_t_length_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *arg1 = (struct data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int64_t result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:data_t_length_get",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_get" "', argument " "1"" of type '" "struct data_t *""'"); 
-  }
-  arg1 = (struct data_t *)(argp1);
-  result =  ((arg1)->length);
-  resultobj = SWIG_From_long_SS_long((long long)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_new_data_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)":new_data_t")) SWIG_fail;
-  result = (struct data_t *)calloc(1, sizeof(struct data_t));
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_data_t, SWIG_POINTER_NEW |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_data_t(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  struct data_t *arg1 = (struct data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_data_t",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_data_t, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_data_t" "', argument " "1"" of type '" "struct data_t *""'"); 
-  }
-  arg1 = (struct data_t *)(argp1);
-  free((char *) arg1);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *data_t_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char *)"O:swigregister", &obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_data_t, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
 
 SWIGINTERN PyObject *_wrap_helics_complex_real_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -6358,6 +6203,54 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreType",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreTypeFromString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
@@ -6409,7 +6302,58 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetBroker(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetBroker",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBroker" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBroker" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsFederateInfoSetBroker(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetBrokerPort(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
@@ -6425,17 +6369,17 @@ SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreType(PyObject *SWIGUNUSEDPAR
     etemp3=helicsErrorInitialize();
     arg3=&etemp3;
   }
-  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetCoreType",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetBrokerPort",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  helicsFederateInfoSetBrokerPort(arg1,arg2,arg3);
   resultobj = SWIG_Py_Void();
   {
     if (arg3->error_code!=helics_ok)
@@ -6446,6 +6390,57 @@ SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreType(PyObject *SWIGUNUSEDPAR
   }
   return resultobj;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetLocalPort(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetLocalPort",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsFederateInfoSetLocalPort(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   {
     if (arg3->error_code!=helics_ok)
     {
@@ -12929,22 +12924,6 @@ fail:
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"data_t_data_set", _wrap_data_t_data_set, METH_VARARGS, NULL},
-	 { (char *)"data_t_data_get", _wrap_data_t_data_get, METH_VARARGS, NULL},
-	 { (char *)"data_t_length_set", _wrap_data_t_length_set, METH_VARARGS, NULL},
-	 { (char *)"data_t_length_get", _wrap_data_t_length_get, METH_VARARGS, NULL},
-	 { (char *)"new_data_t", _wrap_new_data_t, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"Data to be communicated.\n"
-		"\n"
-		"Core operates on opaque byte buffers.\n"
-		"\n"
-		"C++ includes: api-data.h\n"
-		"\n"
-		""},
-	 { (char *)"delete_data_t", _wrap_delete_data_t, METH_VARARGS, NULL},
-	 { (char *)"data_t_swigregister", data_t_swigregister, METH_VARARGS, NULL},
 	 { (char *)"helics_complex_real_set", _wrap_helics_complex_real_set, METH_VARARGS, NULL},
 	 { (char *)"helics_complex_real_get", _wrap_helics_complex_real_get, METH_VARARGS, NULL},
 	 { (char *)"helics_complex_imag_set", _wrap_helics_complex_imag_set, METH_VARARGS, NULL},
@@ -13341,6 +13320,10 @@ static PyMethodDef SwigMethods[] = {
 		"not a valid reference\n"
 		"\n"
 		""},
+	 { (char *)"helicsFederateInfoSetCoreType", _wrap_helicsFederateInfoSetCoreType, METH_VARARGS, (char *)"\n"
+		"\n"
+		"\n"
+		""},
 	 { (char *)"helicsFederateInfoSetCoreTypeFromString", _wrap_helicsFederateInfoSetCoreTypeFromString, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -13359,10 +13342,9 @@ static PyMethodDef SwigMethods[] = {
 		"not a valid reference helics_discard if the string is not recognized\n"
 		"\n"
 		""},
-	 { (char *)"helicsFederateInfoSetCoreType", _wrap_helicsFederateInfoSetCoreType, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateInfoSetBroker", _wrap_helicsFederateInfoSetBroker, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetBrokerPort", _wrap_helicsFederateInfoSetBrokerPort, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetLocalPort", _wrap_helicsFederateInfoSetLocalPort, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetFlagOption", _wrap_helicsFederateInfoSetFlagOption, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetSeparator", _wrap_helicsFederateInfoSetSeparator, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetTimeProperty", _wrap_helicsFederateInfoSetTimeProperty, METH_VARARGS, NULL},
@@ -13928,7 +13910,6 @@ static PyMethodDef SwigMethods[] = {
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_data_t = {"_p_data_t", "struct data_t *|data_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "helics_time_t *|double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_federate_state = {"_p_federate_state", "enum federate_state *|federate_state *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_complex = {"_p_helics_complex", "struct helics_complex *|helics_complex *", 0, 0, (void*)0, 0};
@@ -13950,7 +13931,6 @@ static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_co
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
-  &_swigt__p_data_t,
   &_swigt__p_double,
   &_swigt__p_federate_state,
   &_swigt__p_helics_complex,
@@ -13972,7 +13952,6 @@ static swig_type_info *swig_type_initial[] = {
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_data_t[] = {  {&_swigt__p_data_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_federate_state[] = {  {&_swigt__p_federate_state, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_complex[] = {  {&_swigt__p_helics_complex, 0, 0, 0},{0, 0, 0, 0}};
@@ -13994,7 +13973,6 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
-  _swigc__p_data_t,
   _swigc__p_double,
   _swigc__p_federate_state,
   _swigc__p_helics_complex,

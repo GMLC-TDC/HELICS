@@ -103,12 +103,10 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_obj, bdata::make (core_types
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
-    // extraBrokerArgs = "--logleve=4";
     SetupTest<helics::MessageFederate> (core_type, 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto mFed2 = GetFederateAs<helics::MessageFederate> (1);
-    // mFed1->setLoggingLevel(4);
-    // mFed2->setLoggingLevel(4);
+
     auto epid = mFed1->registerEndpoint ("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
@@ -161,22 +159,17 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
 
 BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
 {
-    // extraBrokerArgs = "--loglevel=4";
     SetupTest<helics::MessageFederate>("test_7", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    // mFed1->setLoggingLevel(4);
-    // mFed2->setLoggingLevel(4);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);  
     auto epid = mFed1->registerEndpoint("ep1");
     auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
 
     mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
     mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
-
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::execution);
     BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::execution);
 
@@ -212,7 +205,6 @@ BOOST_AUTO_TEST_CASE(message_federate_send_receive_2fed_extra)
     BOOST_CHECK_EQUAL(M2->data[245], data[245]);
     mFed1->finalize();
     mFed2->finalize();
-
     BOOST_CHECK(mFed1->getCurrentState() == helics::Federate::op_states::finalize);
     BOOST_CHECK(mFed2->getCurrentState() == helics::Federate::op_states::finalize);
 }

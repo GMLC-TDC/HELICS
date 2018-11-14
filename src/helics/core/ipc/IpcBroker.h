@@ -6,7 +6,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../NetworkBroker.hpp"
-#include "IpcComms.h"
 
 namespace helics
 {

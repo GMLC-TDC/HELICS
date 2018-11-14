@@ -345,7 +345,7 @@ class PingPongFed
     {
         helics::FederateInfo fi (coreType);
         fi.coreName = "pptest";
-        fi.coreInitString = "3";
+        fi.coreInitString = "-f 3";
         fi.setTimeProperty (TIME_DELTA_PROPERTY, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";
@@ -438,7 +438,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     {
         return;
     }
-    AddBroker (core_type, "3");
+    AddBroker (core_type, "-f 3");
 
     auto crtype = helics::coreTypeFromString (core_type);
     PingPongFed p1 ("fedA", 0.5, crtype);

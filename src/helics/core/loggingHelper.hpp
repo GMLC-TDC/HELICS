@@ -5,8 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "helics/helics-config.h"
 #include "helics/flag-definitions.h"
+#include "helics/helics-config.h"
 
 /** @file
 this file is meant to be included in the commonCore.cpp and coreBroker.cpp
@@ -30,7 +30,11 @@ enum log_level : int
 };
 
 #define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);
+#define LOG_ERROR_SIMPLE(message)                                                                                 \
+    semdToLogger (global_broker_id_local, log_level::error, getIdentifier (), message);
 #define LOG_WARNING(id, ident, message) sendToLogger (id, log_level::warning, ident, message);
+
+#define LOG_WARNING_SIMPLE(message) sendToLogger (global_broker_id_local, log_level::warning, getIdentifier(), message);
 
 #ifdef ENABLE_LOGGING
 #define LOG_SUMMARY(id, ident, message)                                                                           \
