@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/ipc/IpcBlockingPriorityQueueImpl.hpp"
+#include "helics/common/StackQueue.hpp"
 
 
 namespace utf = boost::unit_test;
@@ -177,8 +177,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueueraw_reverse)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_simple)
 {
-    using namespace helics::ipc::detail;
-    
     StackQueue stack (4096);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -199,7 +197,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_simple)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_3_push)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack (4096);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -236,7 +233,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_3_push)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_push_full)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack (1024);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -291,7 +287,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_push_full)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_reverse)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack ( 4096);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -332,7 +327,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_reverse)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_move)
 {
-    using namespace helics::ipc::detail;
 
     StackQueue stack (2048);
 
@@ -356,7 +350,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_move)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_3_push_and_copy)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack (4096);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -415,8 +408,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_3_push_and_copy)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_move_assignement)
 {
-    using namespace helics::ipc::detail;
-
     StackQueue stack (2048);
     StackQueue stack2 (1024);
     std::vector<unsigned char> testData (1024, 'a');
@@ -442,7 +433,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_move_assignement)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_3_push_resize)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack (2048);
 
     std::vector<unsigned char> testData (1024, 'a');
@@ -483,7 +473,6 @@ BOOST_AUTO_TEST_CASE (test_stackqueue_3_push_resize)
 
 BOOST_AUTO_TEST_CASE (test_stackqueue_3_push_resize_shrink)
 {
-    using namespace helics::ipc::detail;
     StackQueue stack (2048);
 
     std::vector<unsigned char> testData (1024, 'a');

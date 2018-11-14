@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "StackQueue.hpp"
 #include <algorithm>
+#include <cstring>
 
 namespace helics
 {

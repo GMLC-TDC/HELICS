@@ -3,11 +3,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#pragma once
 
 #include "CircularBuffer.hpp"
 #include <algorithm>
-
+#include <cstring>
 
 namespace helics
 {
@@ -126,7 +125,7 @@ bool CircularBufferRaw::empty () const { return (next_write == next_read); }
 void CircularBufferRaw::clear () { next_write = next_read = origin; }
 
 
-CircularBuffer::CircularBuffer () noexcept : buffer (nullptr, 0){};
+CircularBuffer::CircularBuffer () noexcept : buffer (nullptr, 0){}
 CircularBuffer::CircularBuffer (int size) : data (size), buffer (data.data (), size) {}
 
 CircularBuffer::CircularBuffer (CircularBuffer &&cb) noexcept
@@ -182,7 +181,7 @@ void CircularBuffer::resize (int newsize)
         data.resize (newsize);
         buffer = CircularBufferRaw (data.data (), newsize);
     }
-    else if (newsize > data.size ())
+    else if (newsize > static_cast<int>(data.size ()))
     {
         data.resize (newsize);
         int read_offset = static_cast<int> (buffer.next_read - buffer.origin);
