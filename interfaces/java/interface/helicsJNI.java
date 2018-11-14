@@ -9,7 +9,9 @@
 package com.java.helics;
 
 public class helicsJNI {
-
+  static {
+    System.loadLibrary("JNIhelicsd");
+  }
   public final static native int helics_ok_get();
   public final static native int helics_error_registration_failure_get();
   public final static native int helics_error_connection_failure_get();
@@ -64,12 +66,6 @@ public class helicsJNI {
   public final static native int helics_handle_option_multiple_connections_allowed_get();
   public final static native int helics_handle_option_only_transmit_on_change_get();
   public final static native int helics_handle_option_only_update_on_change_get();
-  public final static native void data_t_data_set(long jarg1, data_t jarg1_, String jarg2);
-  public final static native String data_t_data_get(long jarg1, data_t jarg1_);
-  public final static native void data_t_length_set(long jarg1, data_t jarg1_, long jarg2);
-  public final static native long data_t_length_get(long jarg1, data_t jarg1_);
-  public final static native long new_data_t();
-  public final static native void delete_data_t(long jarg1);
   public final static native void helics_complex_real_set(long jarg1, helics_complex jarg1_, double jarg2);
   public final static native double helics_complex_real_get(long jarg1, helics_complex jarg1_);
   public final static native void helics_complex_imag_set(long jarg1, helics_complex jarg1_, double jarg2);

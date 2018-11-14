@@ -13,5 +13,5 @@ function varargout = helicsCreateValueFederate(varargin)
     %-------
     %an opaque value federate object
     %
-  [varargout{1:nargout}] = helicsMEX(68, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(62, varargin{:});
 end

@@ -1,7 +1,7 @@
 function v = helics_flag_only_transmit_on_change()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 40);
+    vInitialized = helicsMEX(0, 1398230892);
   end
   v = vInitialized;
 end

@@ -1,3 +1,3 @@
 function varargout = helicsFederateInfoSetIntegerProperty(varargin)
-  [varargout{1:nargout}] = helicsMEX(89, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(83, varargin{:});
 end

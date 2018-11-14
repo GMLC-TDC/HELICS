@@ -1,3 +1,3 @@
 function varargout = helicsInputGetVectorSize(varargin)
-  [varargout{1:nargout}] = helicsMEX(167, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(161, varargin{:});
 end

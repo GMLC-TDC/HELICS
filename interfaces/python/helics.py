@@ -158,60 +158,6 @@ helics_handle_option_single_connection_only = _helics.helics_handle_option_singl
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
-class data_t(_object):
-    """
-
-
-    Data to be communicated.
-
-    Core operates on opaque byte buffers.
-
-    C++ includes: api-data.h
-
-    """
-
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, data_t, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, data_t, name)
-    __repr__ = _swig_repr
-    __swig_setmethods__["data"] = _helics.data_t_data_set
-    __swig_getmethods__["data"] = _helics.data_t_data_get
-    if _newclass:
-        data = _swig_property(_helics.data_t_data_get, _helics.data_t_data_set)
-    __swig_setmethods__["length"] = _helics.data_t_length_set
-    __swig_getmethods__["length"] = _helics.data_t_length_get
-    if _newclass:
-        length = _swig_property(_helics.data_t_length_get, _helics.data_t_length_set)
-
-    def __init__(self):
-        """
-
-
-        Data to be communicated.
-
-        Core operates on opaque byte buffers.
-
-        C++ includes: api-data.h
-
-        """
-        this = _helics.new_data_t()
-        try:
-            self.this.append(this)
-        except __builtin__.Exception:
-            self.this = this
-    __swig_destroy__ = _helics.delete_data_t
-    __del__ = lambda self: None
-data_t_swigregister = _helics.data_t_swigregister
-data_t_swigregister(data_t)
-cvar = _helics.cvar
-helics_time_zero = cvar.helics_time_zero
-helics_time_epsilon = cvar.helics_time_epsilon
-helics_time_invalid = cvar.helics_time_invalid
-helics_time_maxtime = cvar.helics_time_maxtime
-helics_true = cvar.helics_true
-helics_false = cvar.helics_false
-
 class helics_complex(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, helics_complex, name, value)
@@ -237,6 +183,13 @@ class helics_complex(_object):
     __del__ = lambda self: None
 helics_complex_swigregister = _helics.helics_complex_swigregister
 helics_complex_swigregister(helics_complex)
+cvar = _helics.cvar
+helics_time_zero = cvar.helics_time_zero
+helics_time_epsilon = cvar.helics_time_epsilon
+helics_time_invalid = cvar.helics_time_invalid
+helics_time_maxtime = cvar.helics_time_maxtime
+helics_true = cvar.helics_true
+helics_false = cvar.helics_false
 
 class message_t(_object):
     """

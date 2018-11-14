@@ -1,3 +1,3 @@
 function varargout = helicsFederateSetTimeProperty(varargin)
-  [varargout{1:nargout}] = helicsMEX(114, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(108, varargin{:});
 end

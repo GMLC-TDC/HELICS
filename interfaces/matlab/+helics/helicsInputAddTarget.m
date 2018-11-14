@@ -1,3 +1,3 @@
 function varargout = helicsInputAddTarget(varargin)
-  [varargout{1:nargout}] = helicsMEX(156, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(150, varargin{:});
 end
