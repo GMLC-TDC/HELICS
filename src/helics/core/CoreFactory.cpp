@@ -58,6 +58,21 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         throw (HelicsException ("ZMQ core is not available"));
 #endif
         break;
+    case core_type::ZMQ_TEST:
+#if HELICS_HAVE_ZEROMQ
+        if (name.empty ())
+        {
+            core = std::make_shared<zeromq::ZmqCoreTest> ();
+        }
+        else
+        {
+            core = std::make_shared<zeromq::ZmqCoreTest> (name);
+        }
+
+#else
+        throw (HelicsException ("ZMQ core is not available"));
+#endif
+        break;
     case core_type::MPI:
 #if HELICS_HAVE_MPI
         if (name.empty ())

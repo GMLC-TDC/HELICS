@@ -11,15 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <set>
 #include <string>
 
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
-#include <memory>
-#include <cereal/archives/portable_binary.hpp>
-#include <complex>
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-
-#include <algorithm>
 
 namespace zmq
 {
@@ -48,12 +39,13 @@ private:
 	virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 	/** process an incoming message
 	return code for required action 0=NONE, -1 TERMINATE*/
-	int processIncomingMessage(zmq::message_t &msg);
+	int processIncomingMessage(zmq::message_t &msg,
+			std::map<std::string, std::string> &connection_info);
 	/** process an incoming message
 		return code for required action TRUE=close connection, FALSE=continue*/
 	bool processTxControlCmd(ActionMessage cmd,
-			std::map<route_id_t, std::string> routes,
-			std::map<std::string, std::string> connection_info);
+			std::map<route_id_t, std::string> &routes,
+			std::map<std::string, std::string> &connection_info);
     /** process an incoming message and send and ack in response
     return code for required action 0=NONE, -1 TERMINATE*/
 	int replyToIncomingMessage(zmq::message_t &msg, zmq::socket_t &sock);

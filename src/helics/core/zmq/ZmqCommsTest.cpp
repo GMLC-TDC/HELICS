@@ -92,7 +92,8 @@ ZmqCommsTest::~ZmqCommsTest () { disconnect (); }
 
 int ZmqCommsTest::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
 
-int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg)
+int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg,
+		std::map<std::string, std::string> &connection_info)
 {
 	int status = 0;
     if (msg.size () == 5)
@@ -104,6 +105,9 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg)
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
+	//std::cout << "****NAME: " << name << " Frontend rx message" <<
+	//		" Protocol command action: " << M.action() << " message ID: " << M.messageID << std::endl;
+
     if (!isValidCommand (M))
     {
         std::cerr << "invalid command received" << std::endl;
@@ -117,7 +121,7 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg)
         	loadPortDefinitions (M);
         	break;
         case NAME_NOT_FOUND:
-			std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
+			//std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
 			disconnecting = true;
 			setRxStatus (connection_status::error);
 			status = -1;
@@ -137,6 +141,15 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg)
         case RECONNECT_RECEIVER:
             setRxStatus (connection_status::connected);
             break;
+        case CONNECTION_INFORMATION:
+        		if(serverMode) {
+        			//std::cout << name << "Adding connection info: " << M.payload << std::endl;
+        			connection_info.emplace(M.name, M.payload);
+//        			for(auto &mc : connection_info) {
+//        				//std::cout << name << "conn info: " << mc.first << "second: " << mc.second << std::endl;
+//        			}
+        		}
+        		break;
         default:
             break;
         }
@@ -229,6 +242,7 @@ void ZmqCommsTest::queue_rx_function ()
 		cmessage.name = name;
 		cmessage.payload = getAddress ();
 		cmessage.to_vector(buffer);
+		//std::cout << "***NAME: " << name << " action: " << cmessage.action() << '\n';
 		brokerConnection.send(buffer.data(), buffer.size());
 	}
 
@@ -252,11 +266,15 @@ void ZmqCommsTest::queue_rx_function ()
             	ActionMessage wrapper (static_cast<char *> (msg.data ()), msg.size ());
             	route_id_t route_id(wrapper.messageID);
             	ActionMessage cmd (wrapper.payload);
+            	//std::cout << name << "route_id: " << route_id << " parent route id: " << parent_route_id << '\n';
+            	//std::cout << "**** NAME: " << name << " BACKEND RX message" << ": protocol command: " << cmd.action() << "message ID:" << cmd.messageID << std::endl;
             	if (isProtocolCommand (cmd))
 				{
 					if (route_id == control_route)
 					{
+						//std::cout << "Enter control route" << std::endl;
 						bool close_tx = processTxControlCmd(cmd, routes, connection_info);
+
 						if(close_tx) {
 							routes.clear();
 							if (getRxStatus () == connection_status::connected)
@@ -271,41 +289,66 @@ void ZmqCommsTest::queue_rx_function ()
 					}
 					continue;
 				}
+            	buffer.clear();
 				cmd.to_vector(buffer);
 				if (route_id == parent_route_id)
 				{
-					// send out through the front end socket connection
-					auto rt_find = routes.find (route_id);
-					if (rt_find != routes.end ())
-					{
-						std::string name = rt_find->second;
-						//Need to first send identity and empty string
-						brokerConnection.send (name.c_str(), name.size (), ZMQ_NOBLOCK);
-						brokerConnection.send ("", name.size (), ZMQ_NOBLOCK);
-						//Send the actual data
-						brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+					if(hasBroker) {
+						//std::cout << "**** NAME: " << name << " Sending message to broker: " << cmd.action()
+//								<< "message ID: " << cmd.messageID << std::endl;
+						brokerConnection.send (buffer.data (), buffer.size ());
 					}
 					else
-					{
-						logWarning ("no route to broker for message");
-					}
+		            {
+		                logWarning ("no route to broker for message");
+		            }
 				}
 				else if (route_id == control_route)
 				{
-					auto status = processIncomingMessage (msg);
+					auto status = processIncomingMessage (msg, connection_info);//----------> ToCheck
 					if (status < 0)
 					{
 						break;
 					}
 				} else {
-					brokerConnection.send (buffer.data (), buffer.size ());
+					// send out through the front end socket connection
+					auto rt_find = routes.find (route_id);
+					if (rt_find != routes.end ())
+					{
+						std::string name = rt_find->second;
+						//std::cout << "Sending message to core: " << name << std::endl;
+						//Need to first send identity and empty string
+						brokerConnection.send (name.c_str(), name.size (), ZMQ_SNDMORE);
+						brokerConnection.send ("", name.size (), ZMQ_SNDMORE);
+						//Send the actual data
+						brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+					}
+					else
+					{
+						if (hasBroker)
+						{
+							brokerConnection.send (buffer.data (), buffer.size ());
+						}
+						else
+						{
+							logWarning ("unknown route and no broker, dropping message");
+						}
+					}
 				}
-
             }
             if ((poller[1].revents & ZMQ_POLLIN) != 0)
             {
             	brokerConnection.recv(&msg);
-                auto status = processIncomingMessage (msg);
+            	std::string str (static_cast<char *> (msg.data ()), msg.size ());
+
+            	//std::cout << " FRONTEND RX MESSAGE: Identity" << name << " *****DATA: " << str << '\n';
+            	brokerConnection.recv(&msg);
+            	std::string str2 (static_cast<char *> (msg.data ()), msg.size ());
+            	//std::cout << " FRONTEND RX MESSAGE: message data" << name << " *****DATA: " << str2 << '\n';
+                auto status = processIncomingMessage (msg, connection_info);
+//				for(auto &mc : connection_info) {
+//					//std::cout << name << " mc.second: " << mc.second << std::endl;
+//				}
                 if (status < 0)
                 {
                     break;
@@ -322,8 +365,8 @@ void ZmqCommsTest::queue_rx_function ()
 }
 
 bool ZmqCommsTest::processTxControlCmd(ActionMessage cmd,
-		std::map<route_id_t, std::string> routes,
-		std::map<std::string, std::string> connection_info)
+		std::map<route_id_t, std::string> &routes,
+		std::map<std::string, std::string> &connection_info)
 {
 	bool close_tx = false;
 
@@ -333,16 +376,21 @@ bool ZmqCommsTest::processTxControlCmd(ActionMessage cmd,
 		setTxStatus (connection_status::connected);
 		break;
 	case CONNECTION_INFORMATION:
+		// Shouldn't reach here ideally
 		if(serverMode) {
 			connection_info.emplace(cmd.name, cmd.payload);
 		}
 		break;
 	case NEW_ROUTE:
+		////std::cout << name << " update connection info" << std::endl;
 		try
 		{
 			for(auto &mc : connection_info) {
+				//std::cout << name << " mc.second: " << mc.second << " cmd.payload: " << cmd.payload << std::endl;
 				if(mc.second == cmd.payload) {
+
 					routes.emplace(route_id_t(cmd.getExtraData()), mc.first);
+					//std::cout << "Route id: " << cmd.getExtraData() << std::endl;
 					break;
 				}
 			}
@@ -363,6 +411,10 @@ bool ZmqCommsTest::processTxControlCmd(ActionMessage cmd,
 void ZmqCommsTest::queue_tx_function ()
 {
     std::vector<char> buffer;
+    if (!brokerTarget_.empty())
+	{
+		hasBroker = true;
+	}
     auto ctx = zmqContextManager::getContextPointer ();
 
     // Setup the backend socket for comms with the receiver
@@ -381,6 +433,8 @@ void ZmqCommsTest::queue_tx_function ()
     {
         route_id_t route_id;
         ActionMessage cmd;
+		//std::cout << "***NAME: " << name << " BACKEND TX message: " << " action: " << cmd.action() << " route id: " <<
+		//		route_id << " message ID: " << cmd.messageID << '\n';
         ActionMessage backendMessage = ActionMessage();
 
         std::tie (route_id, cmd) = txQueue.pop ();
@@ -388,8 +442,17 @@ void ZmqCommsTest::queue_tx_function ()
         backendMessage.payload = cmd.packetize();
         backendMessage.to_vector (buffer);
         backendSocket.send (buffer.data (), buffer.size ());
+        // Todo check for close and exit from loop
+        if (isProtocolCommand (cmd) && (route_id == control_route))
+        {
+        	if(cmd.messageID == DISCONNECT) {
+        		backendSocket.close();
+        		return;
+        	}
+        }
     }
 }
+
 void ZmqCommsTest::closeReceiver ()
 {
     switch (getTxStatus ())
