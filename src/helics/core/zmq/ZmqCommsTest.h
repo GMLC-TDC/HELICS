@@ -19,8 +19,8 @@ class socket_t;
 }
 namespace helics {
 namespace zeromq {
-/** implementation for the communication interface that uses ZMQ messages to communicate
- * This is ROUTER-DEALER pattern */
+/** implementation for the communication interface that uses ZMQ messages to communicate with
+ * single socket and using ROUTER-DEALER communication pattern */
 class ZmqCommsTest final:public NetworkCommsInterface {
 
 public:
