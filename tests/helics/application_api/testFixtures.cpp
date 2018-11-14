@@ -164,7 +164,7 @@ void FederateTestFixture::FullDisconnect ()
 
 std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
-    return AddBroker (core_type_name, std::to_string (count));
+    return AddBroker (core_type_name, std::string("-f ")+std::to_string (count));
 }
 
 std::shared_ptr<helics::Broker>

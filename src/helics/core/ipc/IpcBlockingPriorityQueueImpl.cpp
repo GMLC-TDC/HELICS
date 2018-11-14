@@ -16,259 +16,20 @@ namespace ipc
 {
 namespace detail
 {
-StackQueueRaw::StackQueueRaw (unsigned char *newBlock, int blockSize)
-    : origin (newBlock), next (newBlock), capacity (blockSize)
-{
-    nextIndex = reinterpret_cast<dataIndex *> (origin + capacity - sizeof (dataIndex));
-}
 
-void StackQueueRaw::swap (StackQueueRaw &other) noexcept
-{
-    std::swap (origin, other.origin);
-    std::swap (next, other.next);
-    std::swap (capacity, other.capacity);
-    std::swap (nextIndex, other.nextIndex);
-    std::swap (dataCount, other.dataCount);
-}
-
-bool StackQueueRaw::isSpaceAvailable (int sz) const
-{
-    return (capacity - (next - origin) - (dataCount + 1) * sizeof (dataIndex)) >= sz;
-}
-
-bool StackQueueRaw::push (const unsigned char *block, int blockSize)
-{
-    if (blockSize <= 0)
-    {
-        return false;
-    }
-    if (!isSpaceAvailable (blockSize))
-    {
-        return false;
-    }
-    memcpy (next, block, blockSize);
-    nextIndex->offset = static_cast<int> (next - origin);
-    nextIndex->dataSize = blockSize;
-    next += blockSize;
-    --nextIndex;
-    ++dataCount;
-    return true;
-}
-
-int StackQueueRaw::next_data_size () const
-{
-    if (dataCount > 0)
-    {
-        return nextIndex[1].dataSize;
-    }
-    return 0;
-}
-
-int StackQueueRaw::pop (unsigned char *block, int maxSize)
-{
-    if (dataCount > 0)
-    {
-        int blkSize = nextIndex[1].dataSize;
-        if (maxSize >= blkSize)
-        {
-            memcpy (block, origin + nextIndex[1].offset, blkSize);
-            if (nextIndex[1].offset + blkSize == static_cast<int> (next - origin))
-            {
-                next -= blkSize;
-            }
-            ++nextIndex;
-            --dataCount;
-            if (dataCount == 0)
-            {
-                next = origin;
-                nextIndex = reinterpret_cast<dataIndex *> (origin + capacity - sizeof (dataIndex));
-            }
-            return blkSize;
-        }
-    }
-    return 0;
-}
-
-/** reverse the order in which the data will be extracted*/
-void StackQueueRaw::reverse ()
-{
-    if (dataCount <= 1)
-    {
-        return;
-    }
-    std::reverse (nextIndex + 1, nextIndex + dataCount + 1);
-}
-
-void StackQueueRaw::clear ()
-{
-    next = origin;
-    dataCount = 0;
-    nextIndex = reinterpret_cast<dataIndex *> (origin + capacity - sizeof (dataIndex));
-}
-
-
-    StackQueue::StackQueue () noexcept : stack (nullptr, 0){};
-	StackQueue::StackQueue(int size) : data(size), stack(data.data(), size)
-	{
-
-	}
-	
-	StackQueue::StackQueue (StackQueue &&sq) noexcept : data(std::move(sq.data)),stack (std::move(sq.stack))
-	{
-
-	}
-
-	StackQueue::StackQueue (const StackQueue &sq) : data (sq.data), stack (sq.stack)
-    {
-        auto offset = stack.next - stack.origin;
-        stack.origin = data.data ();
-        stack.next = stack.origin + offset;
-        stack.nextIndex = reinterpret_cast<dataIndex *> (stack.origin + stack.capacity - sizeof (dataIndex));
-        stack.nextIndex -= stack.dataCount;
-	}
-
-	StackQueue &StackQueue::operator= (StackQueue &&sq) noexcept { 
-		stack = std::move (sq.stack);
-        data = std::move (sq.data);
-	}
-
-	StackQueue &StackQueue::operator= (const StackQueue &sq)
-	{
-        stack = sq.stack;
-        data = sq.data;
-        auto offset = stack.next - stack.origin;
-        stack.origin = data.data ();
-        stack.next = stack.origin + offset;
-        stack.nextIndex = reinterpret_cast<dataIndex *> (stack.origin + stack.capacity - sizeof (dataIndex));
-        stack.nextIndex -= stack.dataCount;
-	}
-
-	void StackQueue::resize(int newsize)
-	{
-		if (newsize == stack.capacity)
-		{
-            return;
-		}
-		if (stack.dataCount == 0)
-		{
-            data.resize (newsize);
-            stack = StackQueueRaw (data.data (), newsize);
-		}
-        else if (newsize>data.size())
-		{
-            data.resize (newsize);
-
-		}
-		else  //smaller size
-		{
-
-		}
-	}
-
-CircularBufferRaw::CircularBufferRaw (unsigned char *dataBlock, int blockSize)
-    : origin (dataBlock), next_write (origin), next_read (origin), capacity_ (blockSize)
-{
-}
-
-bool CircularBufferRaw::isSpaceAvailable (int sz) const
-{
-    if (next_write >= next_read)
-    {
-        if ((capacity_ - (next_write - origin)) >= sz + 4)
-        {
-            return true;
-        }
-        else if ((next_read - origin) >= sz + 4)
-        {
-            return true;
-        }
-        return false;
-    }
-    else if ((next_read - next_write) >= sz + 4)
-    {
-        return true;
-    }
-    return false;
-}
-
-// Return number of bytes written.
-int CircularBufferRaw::push (const unsigned char *data, int blockSize)
-{
-    if (blockSize <= 0)
-    {
-        return 0;
-    }
-    if (next_write >= next_read)
-    {
-        if ((capacity_ - (next_write - origin)) >= blockSize + 4)
-        {
-            *(reinterpret_cast<int *> (next_write)) = blockSize;
-            memcpy (next_write + 4, data, blockSize);
-            next_write += blockSize + 4;
-            // loop around if there isn't really space for another block of at least 4 bytes and the
-            // next_read>origin
-            if (((capacity_ - (next_write - origin)) < 8) && (next_read > origin))
-            {
-                next_write = origin;
-            }
-            return blockSize;
-        }
-        else if ((next_read - origin) >= blockSize + 4)
-        {
-            *(reinterpret_cast<int *> (next_write)) = -1;
-            *(reinterpret_cast<int *> (origin)) = blockSize;
-            memcpy (origin + 4, data, blockSize);
-            next_write = origin + blockSize + 4;
-            return blockSize;
-        }
-        return 0;
-    }
-    else if ((next_read - next_write) >= blockSize + 4)
-    {
-        *(reinterpret_cast<int *> (next_write)) = blockSize;
-        memcpy (next_write + 4, data, blockSize);
-        next_write += blockSize + 4;
-        return blockSize;
-    }
-    return 0;
-}
-
-// Return number of bytes read.
-int CircularBufferRaw::pop (unsigned char *data, int maxLen)
-{
-    if (next_write == next_read)
-    {
-        return 0;
-    }
-    int size = *(reinterpret_cast<int *> (next_read));
-    if (size < 0)
-    {
-        next_read = origin;
-        size = *(reinterpret_cast<int *> (next_read));
-    }
-    if (size <= maxLen)
-    {
-        memcpy (data, next_read + 4, size);
-        next_read += size + 4;
-        if ((capacity_ - (next_read - origin)) < 8)
-        {
-            next_read = origin;
-        }
-        return size;
-    }
-    return 0;
-}
-/** check if the block is Empty or not*/
-bool CircularBufferRaw::empty () const { return (next_write == next_read); }
-void CircularBufferRaw::clear () { next_write = next_read = origin; }
 
 using namespace boost::interprocess;
 
-/** default constructor*/
+static constexpr int sizeAlign8(int fullSize, double fraction)
+{
+    return (static_cast<int> (fullSize * fraction) >> 3) * 8;
+}
+
+  /** default constructor*/
 IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl (unsigned char *dataBlock, int blockSize)
-    : pushData (dataBlock, static_cast<int> (blockSize * 0.4)),
-      pullData (dataBlock + static_cast<int> (blockSize * 0.4), static_cast<int> (blockSize * 0.4)),
-      priorityData (dataBlock + static_cast<int> (blockSize * 0.8), static_cast<int> (blockSize * 0.2)),
+    : pushData (dataBlock, sizeAlign8(blockSize,0.4)),
+      pullData (dataBlock + sizeAlign8 (blockSize, 0.4), sizeAlign8 (blockSize, 0.4)),
+      priorityData (dataBlock + 2*sizeAlign8(blockSize,0.4), sizeAlign8(blockSize,0.2)),
       dataBlock_ (dataBlock), dataSize (blockSize)
 {
 }
@@ -284,16 +45,106 @@ void IpcBlockingPriorityQueueImpl::clear ()
     queueEmptyFlag = true;
 }
 
+bool IpcBlockingPriorityQueueImpl::try_push(const unsigned char *data, int size)
+{
+    scoped_lock<interprocess_mutex> pushLock (m_pushLock);  // only one lock on this branch
+    if (!pushData.empty ())
+    {
+        return pushData.push (data, size);
+    }
+    else
+    {
+        scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
+        if (queueEmptyFlag)
+        {
+            queueEmptyFlag = false;
+            conditionLock.unlock ();
+            // release the push lock so we don't get a potential deadlock condition
+            pushLock.unlock ();
+            // all locks released
+            // no lock the pullLock
+            scoped_lock<interprocess_mutex> pullLock (m_pullLock);
+            conditionLock.lock ();
+            queueEmptyFlag = false;  // reset the queueEmptyflag
+            conditionLock.unlock ();
+            if (pullData.empty ())
+            {
+				if (pullData.push(data, size))
+				{
+                    // pullLock.unlock ();
+                    condition_empty.notify_all ();
+                    return true;
+				}
+                return false;
+            }
+            else
+            {
+                pushLock.lock ();
+                return pushData.push (data, size);
+            }
+        }
+        else
+        {
+            return pushData.push (data, size);
+        }
+    }
+}
+
 /** push an element onto the queue
 val the value to push on the queue
 */
+bool IpcBlockingPriorityQueueImpl::try_pushPriority(const unsigned char *data, int size)
+{
+    scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
+
+    if (queueEmptyFlag)
+    {
+        conditionLock.unlock ();
+        scoped_lock<interprocess_mutex> pullLock (m_pullLock);
+        conditionLock.lock ();
+        queueEmptyFlag = false;  // need to set the flag again just in case after we get the lock
+        conditionLock.unlock ();
+		if (priorityData.push(data, size))
+		{
+            // pullLock.unlock ();
+            condition_empty.notify_all ();
+            return true;
+		}
+       
+    }
+    else
+    {
+        conditionLock.unlock ();
+        scoped_lock<interprocess_mutex> pullLock (m_pullLock);
+		if (priorityData.push(data, size))
+		{
+            conditionLock.lock ();
+            if (queueEmptyFlag)
+            {
+                queueEmptyFlag = false;
+                conditionLock.unlock ();
+                condition_empty.notify_all ();
+            }
+            return true;
+		}
+        
+    }
+    return false;
+}
 
 void IpcBlockingPriorityQueueImpl::push (const unsigned char *data, int size)  // forwarding reference
 {
     scoped_lock<interprocess_mutex> pushLock (m_pushLock);  // only one lock on this branch
     if (!pushData.empty ())
     {
-        pushData.push (data, size);
+		if (!pushData.push(data, size))
+		{
+            scoped_lock<interprocess_mutex> conditionLock (m_conditionLock);
+            if (queueFullFlag)
+            {
+
+			}
+		}
     }
     else
     {

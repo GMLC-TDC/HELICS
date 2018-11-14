@@ -9,74 +9,49 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-InputBase::InputBase (ValueFederate *valueFed,
-                      const std::string &name,
-                      const std::string &type,
-                      const std::string &units)
-    : fed (valueFed), name_ (name), type_ (type), units_ (units)
+Input::Input (ValueFederate *valueFed,
+              const std::string &key,
+              const std::string &defType,
+              const std::string &units)
 {
-    try
+    auto &inp = valueFed->getInput (key);
+    if (inp.isValid ())
     {
-		if (name.empty())
-		{
-            id = fed->registerGlobalInput (name_, type_, units_);
-		}
-		else
-		{
-            id = fed->registerInput (name_, type_, units_);
-		}
-            
+        operator= (inp);
     }
-    catch (const RegistrationFailure &)
+    else
     {
-        id = fed->getInputId (name_);
-        loadFromId ();
+        operator= (valueFed->registerInput (key, defType, units));
     }
 }
 
-InputBase::InputBase (interface_visibility locality,
-                      ValueFederate *valueFed,
-                      const std::string &name,
-                      const std::string &type,
-                      const std::string &units)
-    : fed (valueFed), name_ (name), type_ (type), units_ (units)
+Input::Input (interface_visibility locality,
+              ValueFederate *valueFed,
+              const std::string &key,
+              const std::string &defType,
+              const std::string &units)
 {
     try
     {
-        if ((locality == GLOBAL)||(name_.empty()))
+        if (locality == interface_visibility::global)
         {
-            id = fed->registerGlobalInput (name_, type_, units_);
+            operator= (valueFed->registerGlobalInput (key, defType, units));
         }
         else
         {
-            id = fed->registerInput (name_, type_, units_);
+            operator= (valueFed->registerInput (key, defType, units));
         }
     }
-    catch (const RegistrationFailure &)
+    catch (const RegistrationFailure &e)
     {
-        id = fed->getInputId (name_);
-        loadFromId ();
+        operator= (valueFed->getInput (key));
+        if (!isValid ())
+        {
+            throw (e);
+        }
     }
 }
 
-InputBase::InputBase (ValueFederate *valueFed, int subIndex) : fed (valueFed)
-{
-    auto cnt = fed->getInputCount ();
-    if ((subIndex >= cnt) || (cnt < 0))
-    {
-        throw (helics::InvalidParameter ("no input with the specified index"));
-    }
-    id = static_cast<input_id_t> (subIndex);
-    loadFromId ();
-}
-
-void InputBase::loadFromId ()
-{
-    name_ = fed->getInputKey (id);
-
-    type_ = fed->getInputType (id);
-    units_ = fed->getInputUnits (id);
-}
 void Input::handleCallback (Time time)
 {
     if (!isUpdated ())
@@ -135,10 +110,16 @@ void Input::handleCallback (Time time)
         mpark::get<std::function<void(const bool &, Time)>> (value_callback) (val, time);
     }
     break;
+    case 8:  // Time loc
+    {
+        auto val = getValue<Time> ();
+        mpark::get<std::function<void(const Time &, Time)>> (value_callback) (val, time);
+    }
+    break;
     }
 }
 
-bool Input::isUpdated () const
+bool Input::isUpdated ()
 {
     if (hasUpdate)
     {
@@ -146,88 +127,59 @@ bool Input::isUpdated () const
     }
     if (changeDetectionEnabled)
     {
-        if (InputBase::isUpdated ())
+        if (fed->isUpdated (*this))
         {
-            if (type == helics_type_t::helicsInvalid)
+            auto dv = fed->getValueRaw (*this);
+            if (type == helics_type_t::helicsUnknown)
             {
-                return true;
+                type = getTypeFromString (fed->getPublicationType (*this));
             }
-            auto dv = fed->getValueRaw (id);
-            auto visitor = [&](auto &&arg) -> bool {
-                std::remove_const_t<std::remove_reference_t<decltype (arg)>> newVal;
+            auto visitor = [&, this](auto &&arg) {
+                std::remove_reference_t<decltype (arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
                 valueExtract (dv, type, newVal);
-                return (changeDetected (lastValue, newVal, delta));
+                if (changeDetected (lastValue, newVal, delta))
+                {
+                    lastValue = newVal;
+                    hasUpdate = true;
+                }
             };
-            return mpark::visit (visitor, lastValue);
-        }
-        return false;
-    }
-    else
-    {
-        return InputBase::isUpdated ();
-    }
-}
-
-bool Input::getAndCheckForUpdate ()
-{
-    if (hasUpdate)
-    {
-        return true;
-    }
-    if (changeDetectionEnabled)
-    {
-        if (InputBase::isUpdated ())
-        {
-            auto dv = fed->getValueRaw (id);
-            if (type == helics_type_t::helicsInvalid)
-            {
-                type = getTypeFromString (fed->getPublicationType (id));
-            }
-            if (type != helics_type_t::helicsInvalid)
-            {
-                auto visitor = [&](auto &&arg) {
-                    std::remove_reference_t<decltype (arg)> newVal;
-                    (void)arg;  // suppress VS2015 warning
-                    valueExtract (dv, type, newVal);
-                    if (changeDetected (lastValue, newVal, delta))
-                    {
-                        lastValue = newVal;
-                        hasUpdate = true;
-                    }
-                };
-                mpark::visit (visitor, lastValue);
-            }
+            mpark::visit (visitor, lastValue);
         }
     }
     else
     {
-        hasUpdate = InputBase::isUpdated ();
+        hasUpdate = fed->isUpdated (*this);
     }
-
     return hasUpdate;
 }
 
 size_t Input::getRawSize ()
 {
-    getAndCheckForUpdate ();
-    auto dv = fed->getValueRaw (id);
+    isUpdated ();
+    auto dv = fed->getValueRaw (*this);
     if (dv.empty ())
     {
-        auto out = getValue<std::string> ();
+        auto &out = getValueRef<std::string> ();
         return out.size ();
     }
     return dv.size ();
 }
 
+data_view Input::getRawValue ()
+{
+    hasUpdate = false;
+    return fed->getValueRaw (*this);
+}
+
 size_t Input::getStringSize ()
 {
-    getAndCheckForUpdate ();
+    isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
         if (lastValue.index () == namedPointLoc)
         {
-            auto np = getValue<named_point> ();
+            auto &np = getValueRef<named_point> ();
             if (np.name.empty ())
             {
                 return 30;  //"#invalid" string +20
@@ -241,7 +193,7 @@ size_t Input::getStringSize ()
         }
         else
         {
-            auto out = getValue<std::string> ();
+            auto &out = getValueRef<std::string> ();
             return out.size ();
         }
     }
@@ -256,7 +208,7 @@ size_t Input::getStringSize ()
 
         if (np.name.empty ())
         {
-            return 30;  //"#invalid" string +20
+            return 30;  //"~length of #invalid" string +20
         }
         else
         {
@@ -265,16 +217,16 @@ size_t Input::getStringSize ()
             return np.name.size () + 20;
         }
     }
-    auto out = getValue<std::string> ();
+    auto &out = getValueRef<std::string> ();
     return out.size ();
 }
 
 size_t Input::getVectorSize ()
 {
-    getAndCheckForUpdate ();
+    isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
-        auto out = getValue<std::vector<double>> ();
+        auto &out = getValueRef<std::vector<double>> ();
         return out.size ();
     }
     switch (lastValue.index ())
@@ -291,14 +243,63 @@ size_t Input::getVectorSize ()
     default:
         break;
     }
-    auto out = getValue<std::vector<double>> ();
+    auto &out = getValueRef<std::vector<double>> ();
     return out.size ();
+}
+
+char Input::getValueChar ()
+{
+    if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
+    {
+        auto dv = fed->getValueRaw (*this);
+        if (type == helics_type_t::helicsUnknown)
+        {
+            type = getTypeFromString (fed->getPublicationType (*this));
+        }
+
+        if ((type == helics_type_t::helicsString) || (type == helics_type_t::helicsAny) ||
+            (type == helics_type_t::helicsCustom))
+        {
+            std::string out;
+            valueExtract (dv, type, out);
+            if (changeDetectionEnabled)
+            {
+                if (changeDetected (lastValue, out, delta))
+                {
+                    lastValue = out;
+                }
+            }
+            else
+            {
+                lastValue = out;
+            }
+        }
+        else
+        {
+            int64_t out;
+            valueExtract (dv, type, out);
+            if (changeDetectionEnabled)
+            {
+                if (changeDetected (lastValue, out, delta))
+                {
+                    lastValue = out;
+                }
+            }
+            else
+            {
+                lastValue = out;
+            }
+        }
+    }
+    char V;
+    valueExtract (lastValue, V);
+    hasUpdate = false;
+    return V;
 }
 
 int Input::getValue (double *data, int maxsize)
 {
-    // TODO:: need to figure out some way to get rid of the copy if the stored value is actually a vector
-    auto V = getValue<std::vector<double>> ();
+    auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
     std::copy (V.data (), V.data () + length, data);
     return length;
@@ -306,9 +307,7 @@ int Input::getValue (double *data, int maxsize)
 
 int Input::getValue (char *str, int maxsize)
 {
-    // TODO:: need to figure out some way to get rid of the copy if the stored value is actually a string or named
-    // point probably need a getValueRef function for primaryTypes
-    auto S = getValue<std::string> ();
+    auto &S = getValueRef<std::string> ();
     int length = std::min (static_cast<int> (S.size ()), maxsize);
     memcpy (str, S.data (), length);
     if (length == maxsize)

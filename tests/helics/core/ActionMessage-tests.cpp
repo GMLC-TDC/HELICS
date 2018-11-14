@@ -14,24 +14,7 @@ namespace utf = boost::unit_test;
 BOOST_AUTO_TEST_SUITE (ActionMessage_tests, *utf::label ("ci"))
 
 using namespace helics;
-/*
-int32_t messageAction = action_t::cmd_ignore; //4 -- command
-public:
-    int32_t source_id = 0;		//8 -- for federate_id or route_id
-    int32_t source_handle = 0;	//12 -- for local handle or local code
-    int32_t dest_id = 0;	//16 fed_id for a targeted message
-    int32_t dest_handle = 0; //20 local handle for a targeted message
-    bool iterationComplete = false; //24
-    bool required = false;  //!< flag indicating a publication is required
-    bool error = false;		//!< flag indicating an error condition associated with the command
-    bool flag = false;     //!< general flag for many purposes
-    Time actionTime = timeZero;	//!< the time an action took place or will take place	//32
-    std::string payload;		//!< string containing the data	//56 std::string is 24 bytes on most platforms
-    std::string &name;  //!<alias payload to a name reference for registration functions
-private:
-    std::unique_ptr<AdditionalInfo> extraInfo;   //!< pointer to an additional info structure with more data if
-required
-*/
+
 BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
 {
     helics::ActionMessage m (CMD_IGNORE);

@@ -18,23 +18,23 @@
 %typemap(jstype) (char *outputString, int maxlen) "byte[]"
 %typemap(javain) (char *outputString, int maxlen) "$javainput"
 
-%apply (char *outputString, int maxlen) { (char *outputString, int maxStringlen) };
+%apply (char *outputString, int maxlen) { (char *outputString, int maxStringLen) };
 
 ////typemap for large string output with a length return in C
-//%typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {
+//%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
 //  $3=&($2);
 //}
 //
-//%typemap(freearg) (char *outputString, int maxStringlen, int *actualLength) {
+//%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
 //   if ($1) free($1);
 //}
 //
-//%typemap(check)(char *outputString, int maxStringlen, int *actualLength) {
+//%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
 //    $2=helicsInputGetStringSize(arg1)+2;
 //    $1 = (char *) malloc($2);
 //}
 //
-//%typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
+//%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
 //  PyObject *o2=PyString_FromString($1);
 //  $result = SWIG_Python_AppendOutput($result, o2);
 //}

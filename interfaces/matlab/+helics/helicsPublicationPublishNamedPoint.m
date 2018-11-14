@@ -1,3 +1,3 @@
 function varargout = helicsPublicationPublishNamedPoint(varargin)
-  [varargout{1:nargout}] = helicsMEX(149, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(148, varargin{:});
 end

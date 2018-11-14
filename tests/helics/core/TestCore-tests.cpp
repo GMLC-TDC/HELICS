@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
-#include "helics/core/TestCore.h"
+#include "helics/core/test/TestCore.h"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/core-types.hpp"
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string ());
     BOOST_REQUIRE (broker);
     BOOST_CHECK (broker->isConnected ());
-    std::string initializationString = std::string ("4") + " --broker=" + broker->getIdentifier ();
+    std::string initializationString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();
     auto core = create (helics::core_type::TEST, initializationString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore> (core);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 {
-    const char *initializationString = "1";
+    const char *initializationString = "-f 1 --autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 {
-    const char *initializationString = "1 --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
+    const char *initializationString = "--autobroker --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         std::string filterName;
     };
 
-    std::string initializationString = "1";
+    std::string initializationString = "--autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);

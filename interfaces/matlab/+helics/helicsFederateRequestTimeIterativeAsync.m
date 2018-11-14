@@ -1,4 +1,4 @@
 function varargout = helicsFederateRequestTimeIterativeAsync(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(108, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(105, varargin{:});
 end

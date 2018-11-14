@@ -73,7 +73,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_t
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), core_type)
 {
-    // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
+    // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost data test case for some unknown reason
     decltype (auto) cstr = "this is the third\0 string";
     std::string specialString (cstr, sizeof (cstr));
     std::vector<std::string> sv1{"hip", "hop"};

@@ -4,13 +4,14 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
+#include "helicsTypes.hpp"
 #include "../common/stringOps.h"
 #include "ValueConverter.hpp"
-#include "helicsTypes.hpp"
-#include <map>
-#include <numeric>
 #include <algorithm>
+#include <numeric>
 #include <regex>
+#include <unordered_map>
+#include <boost/core/demangle.hpp>
 #include <boost/lexical_cast.hpp>
 
 namespace helics
@@ -23,6 +24,7 @@ static const std::string boolString ("bool");
 static const std::string doubleVecString ("double_vector");
 static const std::string complexVecString ("complex_vector");
 static const std::string namedPointString ("named_point");
+static const std::string timeString ("time");
 static const std::string nullString;
 
 const std::string &typeNameStringRef (helics_type_t type)
@@ -39,6 +41,8 @@ const std::string &typeNameStringRef (helics_type_t type)
         return stringString;
     case helics_type_t::helicsComplex:
         return complexString;
+    case helics_type_t::helicsTime:
+        return timeString;
     case helics_type_t::helicsVector:
         return doubleVecString;
     case helics_type_t::helicsComplexVector:
@@ -77,45 +81,107 @@ std::string helicsComplexString (std::complex<double> val)
 {
     return helicsComplexString (val.real (), val.imag ());
 }
-
-static const std::map<std::string, helics_type_t> typeMap{{"double", helics_type_t::helicsDouble},
-                                                          {"string", helics_type_t::helicsString},
-                                                          {"binary", helics_type_t::helicsBool},
-                                                          {"bool", helics_type_t::helicsBool},
-                                                          {"boolean", helics_type_t::helicsBool},
-                                                          {"flag", helics_type_t::helicsBool},
-                                                          {"float", helics_type_t::helicsDouble},
-                                                          {"vector", helics_type_t::helicsVector},
-                                                          {"double_vector", helics_type_t::helicsVector},
-                                                          {"complex", helics_type_t::helicsComplex},
-                                                          {"pair", helics_type_t::helicsComplex},
-                                                          {"int", helics_type_t::helicsInt},
-                                                          {"int64", helics_type_t::helicsInt},
-                                                          {"integer", helics_type_t::helicsInt},
-                                                          {"complex_vector", helics_type_t::helicsComplexVector},
-                                                          {"d", helics_type_t::helicsDouble},
-                                                          {"s", helics_type_t::helicsString},
-                                                          {"f", helics_type_t::helicsDouble},
-                                                          {"v", helics_type_t::helicsVector},
-                                                          {"c", helics_type_t::helicsComplex},
-                                                          {"i", helics_type_t::helicsInt},
-                                                          {"i64", helics_type_t::helicsInt},
-                                                          {"cv", helics_type_t::helicsComplexVector},
-                                                          {"np", helics_type_t::helicsNamedPoint},
-                                                          {"point", helics_type_t::helicsNamedPoint},
-                                                          {"pt", helics_type_t::helicsNamedPoint},
-                                                          {"named_point", helics_type_t::helicsNamedPoint},
-                                                          {"default", helics_type_t::helicsAny},
-                                                          {"def", helics_type_t::helicsAny},
-                                                          {"any", helics_type_t::helicsAny},
-                                                          {"all", helics_type_t::helicsAny}};
+/** map of an assortment of type string that can be converted to a known type*/
+static const std::unordered_map<std::string, helics_type_t> typeMap{
+  {"double", helics_type_t::helicsDouble},
+  {"string", helics_type_t::helicsString},
+  {"binary", helics_type_t::helicsBool},
+  {"bool", helics_type_t::helicsBool},
+  {"boolean", helics_type_t::helicsBool},
+  {"flag", helics_type_t::helicsBool},
+  {"float", helics_type_t::helicsDouble},
+  {"vector", helics_type_t::helicsVector},
+  {"double_vector", helics_type_t::helicsVector},
+  {"double vector", helics_type_t::helicsVector},
+  {typeid (std::vector<double>).name (), helics_type_t::helicsVector},
+  {boost::core::demangle (typeid (std::vector<double>).name ()), helics_type_t::helicsVector},
+  {typeid (double *).name (), helics_type_t::helicsVector},
+  {"complex", helics_type_t::helicsComplex},
+  {"pair", helics_type_t::helicsComplex},
+  {"int", helics_type_t::helicsInt},
+  {"int64", helics_type_t::helicsInt},
+  {typeid (double).name (), helics_type_t::helicsDouble},
+  {typeid (float).name (), helics_type_t::helicsDouble},
+  {typeid (char).name (), helics_type_t::helicsString},
+  {typeid (unsigned char).name (), helics_type_t::helicsInt},
+  {typeid (short).name (), helics_type_t::helicsInt},
+  {typeid (unsigned short).name (), helics_type_t::helicsInt},
+  {typeid (int).name (), helics_type_t::helicsInt},
+  {typeid (unsigned int).name (), helics_type_t::helicsInt},
+  {typeid (long).name (), helics_type_t::helicsInt},
+  {typeid (unsigned long).name (), helics_type_t::helicsInt},
+  {typeid (long long).name (), helics_type_t::helicsInt},
+  {typeid (unsigned long long).name (), helics_type_t::helicsInt},
+  {typeid (int64_t).name (), helics_type_t::helicsInt},
+  {typeid (uint64_t).name (), helics_type_t::helicsInt},
+  {typeid (int32_t).name (), helics_type_t::helicsInt},
+  {typeid (uint32_t).name (), helics_type_t::helicsInt},
+  {typeid (int16_t).name (), helics_type_t::helicsInt},
+  {typeid (uint16_t).name (), helics_type_t::helicsInt},
+  {typeid (int8_t).name (), helics_type_t::helicsInt},
+  {typeid (uint8_t).name (), helics_type_t::helicsInt},
+  {typeid (bool).name (), helics_type_t::helicsBool},
+  {"long long", helics_type_t::helicsInt},
+  {"integer", helics_type_t::helicsInt},
+  {"int32", helics_type_t::helicsInt},
+  {"uint32", helics_type_t::helicsInt},
+  {"uint64", helics_type_t::helicsInt},
+  {"int16", helics_type_t::helicsInt},
+  {"uint16", helics_type_t::helicsInt},
+  {"short", helics_type_t::helicsInt},
+  {"unsigned short", helics_type_t::helicsInt},
+  {"long", helics_type_t::helicsInt},
+  {"unsigned long", helics_type_t::helicsInt},
+  {"char", helics_type_t::helicsString},
+  {"uchar", helics_type_t::helicsInt},
+  {"unsigned char", helics_type_t::helicsInt},
+  {"byte", helics_type_t::helicsInt},
+  {"int8", helics_type_t::helicsInt},
+  {"uint8", helics_type_t::helicsInt},
+  {"complex_vector", helics_type_t::helicsComplexVector},
+  {"complex vector", helics_type_t::helicsComplexVector},
+  {typeid (std::vector<std::complex<double>>).name (), helics_type_t::helicsComplexVector},
+  {boost::core::demangle (typeid (std::vector<std::complex<double>>).name ()), helics_type_t::helicsComplexVector},
+  {"d", helics_type_t::helicsDouble},
+  {"s", helics_type_t::helicsString},
+  {"f", helics_type_t::helicsDouble},
+  {"v", helics_type_t::helicsVector},
+  {"c", helics_type_t::helicsComplex},
+  {typeid (std::complex<double>).name (), helics_type_t::helicsComplex},
+  {boost::core::demangle (typeid (std::complex<double>).name ()), helics_type_t::helicsComplex},
+  {"t", helics_type_t::helicsTime},
+  {"i", helics_type_t::helicsInt},
+  {"i64", helics_type_t::helicsInt},
+  {"cv", helics_type_t::helicsComplexVector},
+  {"np", helics_type_t::helicsNamedPoint},
+  {"point", helics_type_t::helicsNamedPoint},
+  {"pt", helics_type_t::helicsNamedPoint},
+  {"named_point", helics_type_t::helicsNamedPoint},
+  {typeid (std::string).name (), helics_type_t::helicsString},
+  {boost::core::demangle (typeid (std::string).name ()), helics_type_t::helicsString},
+  {typeid (char *).name (), helics_type_t::helicsString},
+  {typeid (const char *).name (), helics_type_t::helicsString},
+  {"default", helics_type_t::helicsAny},
+  {"time", helics_type_t::helicsTime},
+  {typeid (Time).name (), helics_type_t::helicsTime},
+  {boost::core::demangle (typeid (Time).name ()), helics_type_t::helicsTime},
+  {"tm", helics_type_t::helicsTime},
+  {"def", helics_type_t::helicsAny},
+  {"any", helics_type_t::helicsAny},
+  {"", helics_type_t::helicsAny},
+  {"all", helics_type_t::helicsAny}};
 
 helics_type_t getTypeFromString (const std::string &typeName)
 {
     auto res = typeMap.find (typeName);
     if (res == typeMap.end ())
     {
-        return helics_type_t::helicsInvalid;
+        auto lcStr = convertToLowerCase (typeName);
+        res = typeMap.find (lcStr);
+        if (res == typeMap.end ())
+        {
+            return helics_type_t::helicsCustom;
+        }
     }
     return res->second;
 }
@@ -323,21 +389,19 @@ named_point helicsGetNamedPoint (const std::string &val)
 static int readSize (const std::string &val)
 {
     auto fb = val.find_first_of ('[');
-	if (fb > 1)
-	{
-		try
-		{
+    if (fb > 1)
+    {
+        try
+        {
             auto size = std::stoi (val.substr (1, fb - 1));
             return size;
-		}
-		catch (const std::invalid_argument &)
-		{
-			//go to the alternative path if this fails
-		}
-       
-	}
-    return std::count_if (val.begin ()+fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); })+1;
-        
+        }
+        catch (const std::invalid_argument &)
+        {
+            // go to the alternative path if this fails
+        }
+    }
+    return std::count_if (val.begin () + fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); }) + 1;
 }
 
 std::complex<double> getComplexFromString (const std::string &val)
@@ -399,10 +463,10 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
     if (val.front () == 'v')
     {
         auto sz = readSize (val);
-		if (sz > 0)
-		{
+        if (sz > 0)
+        {
             data.reserve (sz);
-		}
+        }
         data.resize (0);
         auto fb = val.find_first_of ('[');
         for (decltype (sz) ii = 0; ii < sz; ++ii)

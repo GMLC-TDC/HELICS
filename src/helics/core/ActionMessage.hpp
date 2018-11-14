@@ -58,7 +58,9 @@ class ActionMessage
     /* implicit */ ActionMessage (action_message_def::action_t startingAction);
     /** construct from action, source and destination id's
      */
-    ActionMessage (action_message_def::action_t startingAction, global_federate_id_t sourceId, global_federate_id_t destId);
+    ActionMessage (action_message_def::action_t startingAction,
+                   global_federate_id_t sourceId,
+                   global_federate_id_t destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -98,6 +100,7 @@ class ActionMessage
         dest_id = hand.fed_id;
         dest_handle = hand.handle;
     }
+    /** get the reference to the string data vector*/
     const std::vector<std::string> &getStringData () const { return stringData; }
 
     void clearStringData () { stringData.clear (); }
@@ -136,15 +139,9 @@ class ActionMessage
 
     void setString (int index, const std::string &str);
     /** get the source global_handle*/
-    global_handle getSource () const
-    {
-        return global_handle (source_id, source_handle);
-    }
+    global_handle getSource () const { return global_handle (source_id, source_handle); }
     /** get the global destination handle*/
-    global_handle getDest () const
-    {
-        return global_handle (dest_id, dest_handle);
-    }
+    global_handle getDest () const { return global_handle (dest_id, dest_handle); }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
     {
@@ -154,13 +151,13 @@ class ActionMessage
     /** set some extra piece of data if the full destination is not used*/
     void setExtraData (int32_t data) { dest_handle = interface_handle (data); }
     /** get the extra piece of integer data*/
-	int32_t getExtraData() const { return dest_handle.baseValue ();
-	}
+    int32_t getExtraData () const { return dest_handle.baseValue (); }
     /** save the data to an archive*/
     template <class Archive>
     void save (Archive &ar) const
     {
-        ar (messageAction, messageID, source_id.baseValue(), source_handle.baseValue(), dest_id.baseValue(), dest_handle.baseValue());
+        ar (messageAction, messageID, source_id.baseValue (), source_handle.baseValue (), dest_id.baseValue (),
+            dest_handle.baseValue ());
         ar (counter, flags);
 
         auto btc = actionTime.getBaseTimeCode ();
@@ -175,19 +172,16 @@ class ActionMessage
     void load (Archive &ar)
     {
         ar (messageAction, messageID);
-		identififier_base_type sid,sh, did,dh; 
-		ar(sid,sh,did,dh);
-		source_id=global_federate_id_t(sid);
-		source_handle=interface_handle(sh);
-		dest_id=global_federate_id_t(did);
+        identififier_base_type sid, sh, did, dh;
+        ar (sid, sh, did, dh);
+        source_id = global_federate_id_t (sid);
+        source_handle = interface_handle (sh);
+        dest_id = global_federate_id_t (did);
         dest_handle = interface_handle (dh);
 
         ar (counter, flags);
-
-        decltype (actionTime.getBaseTimeCode ()) btc;
-        decltype (Te.getBaseTimeCode ()) Tebase;
-        decltype (Tdemin.getBaseTimeCode ()) Tdeminbase;
-        decltype (Tso.getBaseTimeCode ()) Tsobase;
+        using timeBaseType = decltype ((actionTime.getBaseTimeCode ()));
+        timeBaseType btc, Tebase, Tdeminbase, Tsobase;
         ar (btc, Tebase, Tsobase, Tdeminbase, payload);
 
         actionTime.setBaseTimeCode (btc);
@@ -268,6 +262,7 @@ inline bool isTimingCommand (const ActionMessage &command) noexcept
     case CMD_EXEC_GRANT:
     case CMD_EXEC_REQUEST:
     case CMD_PRIORITY_DISCONNECT:
+    case CMD_TERMINATE_IMMEDIATELY:
         return true;
     default:
         return false;
@@ -293,8 +288,19 @@ inline bool isDependencyCommand (const ActionMessage &command) noexcept
 /** check if a command is a disconnect command*/
 inline bool isDisconnectCommand (const ActionMessage &command) noexcept
 {
-    return ((command.action () == CMD_DISCONNECT) || (command.action () == CMD_PRIORITY_DISCONNECT) ||
-            (command.action () == CMD_TERMINATE_IMMEDIATELY));
+    switch (command.action ())
+    {
+    case CMD_DISCONNECT:
+    case CMD_DISCONNECT_CHECK:
+    case CMD_DISCONNECT_NAME:
+    case CMD_USER_DISCONNECT:
+    case CMD_PRIORITY_DISCONNECT:
+    case CMD_TERMINATE_IMMEDIATELY:
+    case CMD_STOP:
+        return true;
+    default:
+        return false;
+    }
 }
 
 /** check if a command is a valid command*/
@@ -312,4 +318,9 @@ std::string prettyPrintString (const ActionMessage &command);
  */
 std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
+/** append a message to multi message container
+@param m the message to add the extra message to
+@param newMessage the message to append
+@return the integer location of the message in the stringData section*/
+int appendMessage (ActionMessage &m, const ActionMessage &newMessage);
 }  // namespace helics

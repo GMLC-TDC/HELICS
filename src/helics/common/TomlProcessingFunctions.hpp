@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 /** @file
-@details functions related to loading and evaluating Toml files and helper functions for reading them
+@details functions related to loading and evaluating TOML files and helper functions for reading them
 using the toml library
 */
 
@@ -15,7 +15,7 @@ using the toml library
 #include "../core/helics-time.hpp"
 #include <functional>
 
-/** load a Toml string or filename that points to a TOML file and return a
+/** load a TOML string or filename that points to a TOML file and return a
 toml::Value to the root object
 */
 toml::Value loadToml (const std::string &tomlString);
@@ -25,7 +25,7 @@ bool hasTomlExtension (const std::string &tomlString);
  */
 toml::Value loadTomlStr (const std::string &tomlString);
 
-/** read a time from a JSON value element*/
+/** read a time from a TOML value element*/
 helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);
 
 /** get a name or key from the element*/

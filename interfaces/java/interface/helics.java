@@ -224,12 +224,24 @@ public class helics implements helicsConstants {
     helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fi), coreInit);
   }
 
+  public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fi, int coretype) {
+    helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fi), coretype);
+  }
+
   public static void helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void fi, String coretype) {
     helicsJNI.helicsFederateInfoSetCoreTypeFromString(SWIGTYPE_p_void.getCPtr(fi), coretype);
   }
 
-  public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fi, int coretype) {
-    helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fi), coretype);
+  public static void helicsFederateInfoSetBroker(SWIGTYPE_p_void fi, String broker) {
+    helicsJNI.helicsFederateInfoSetBroker(SWIGTYPE_p_void.getCPtr(fi), broker);
+  }
+
+  public static void helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void fi, int brokerPort) {
+    helicsJNI.helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void.getCPtr(fi), brokerPort);
+  }
+
+  public static void helicsFederateInfoSetLocalPort(SWIGTYPE_p_void fi, String localPort) {
+    helicsJNI.helicsFederateInfoSetLocalPort(SWIGTYPE_p_void.getCPtr(fi), localPort);
   }
 
   public static void helicsFederateInfoSetFlagOption(SWIGTYPE_p_void fi, int flag, int value) {
@@ -504,6 +516,14 @@ public class helics implements helicsConstants {
     helicsJNI.helicsPublicationPublishDouble(SWIGTYPE_p_void.getCPtr(pub), val);
   }
 
+  public static void helicsPublicationPublishTime(SWIGTYPE_p_void pub, double val) {
+    helicsJNI.helicsPublicationPublishTime(SWIGTYPE_p_void.getCPtr(pub), val);
+  }
+
+  public static void helicsPublicationPublishChar(SWIGTYPE_p_void pub, char val) {
+    helicsJNI.helicsPublicationPublishChar(SWIGTYPE_p_void.getCPtr(pub), val);
+  }
+
   public static void helicsPublicationPublishComplex(SWIGTYPE_p_void pub, double real, double imag) {
     helicsJNI.helicsPublicationPublishComplex(SWIGTYPE_p_void.getCPtr(pub), real, imag);
   }
@@ -552,6 +572,14 @@ public class helics implements helicsConstants {
     return helicsJNI.helicsInputGetDouble(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
+  public static double helicsInputGetTime(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetTime(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
+  public static char helicsInputGetChar(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetChar(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
   public static helics_complex helicsInputGetComplexObject(SWIGTYPE_p_void ipt) {
     return new helics_complex(helicsJNI.helicsInputGetComplexObject(SWIGTYPE_p_void.getCPtr(ipt)), true);
   }
@@ -586,6 +614,14 @@ public class helics implements helicsConstants {
 
   public static void helicsInputSetDefaultBoolean(SWIGTYPE_p_void ipt, int val) {
     helicsJNI.helicsInputSetDefaultBoolean(SWIGTYPE_p_void.getCPtr(ipt), val);
+  }
+
+  public static void helicsInputSetDefaultTime(SWIGTYPE_p_void ipt, double val) {
+    helicsJNI.helicsInputSetDefaultTime(SWIGTYPE_p_void.getCPtr(ipt), val);
+  }
+
+  public static void helicsInputSetDefaultChar(SWIGTYPE_p_void ipt, char val) {
+    helicsJNI.helicsInputSetDefaultChar(SWIGTYPE_p_void.getCPtr(ipt), val);
   }
 
   public static void helicsInputSetDefaultDouble(SWIGTYPE_p_void ipt, double val) {

@@ -99,16 +99,16 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back (fed.get (), ii);
-        subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
+        subscriptions.emplace_back (fed->getInput(ii));
+        subids.emplace (subscriptions.back ().getHandle (), static_cast<int> (subscriptions.size ()) - 1);
         subkeys.emplace (subscriptions.back ().getTarget (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint(ii));
         eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
-        eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
+        eptids.emplace (endpoints.back ().getHandle (), static_cast<int> (endpoints.size () - 1));
     }
 
     auto doc = loadJson (jsonString);
@@ -438,7 +438,7 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
         if (sub.isUpdated ())
         {
             auto val = sub.getValue<std::string> ();
-            int ii = subids[sub.getID ()];
+            int ii = subids[sub.getHandle()];
             points.emplace_back (currentTime, ii, val);
             if (iteration > 0)
             {
@@ -593,9 +593,9 @@ void Recorder::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.emplace_back (fed, key);
+        subscriptions.emplace_back (fed->registerSubscription(key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
-        auto id = subscriptions.back ().getID ();
+        auto id = subscriptions.back ().getHandle();
         subids[id] = index;  // this is a new element
         subkeys[key] = index;  // this is a potential replacement
     }
@@ -608,7 +608,7 @@ void Recorder::addEndpoint (const std::string &endpoint)
     {
         endpoints.emplace_back (GLOBAL, fed.get (), endpoint);
         auto index = static_cast<int> (endpoints.size ()) - 1;
-        auto id = endpoints.back ().getID ();
+        auto id = endpoints.back ().getHandle ();
         eptids.emplace (id, index);  // this is a new element
         eptNames[endpoint] = index;  // this is a potential replacement
     }

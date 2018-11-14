@@ -3,15 +3,16 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include "helics/application_api/Filters.hpp"
+#include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/FilterOperations.hpp"
-#include "helics/application_api/MessageOperators.hpp"
+#include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.hpp"
+#include <helics/core/Broker.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-#include <helics/core/Broker.hpp>
 
 #include <future>
 /** these test cases test out the message federates
@@ -29,25 +30,24 @@ This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
-BOOST_DATA_TEST_CASE(message_reroute_filter_object1, bdata::make (core_types), core_type)
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
+BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), core_type)
 {
     auto broker = AddBroker (core_type, 2);
-	
+
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
-    auto p3 = mFed->registerGlobalEndpoint ("port3");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto Filt =
-      helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
-    Filt->setString ("newdestination", "port3");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
+    Filt.addSourceTarget ("port1");
+    Filt.setString ("newdestination", "port3");
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -85,9 +85,10 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 This means message sent from this endpoint will be rerouted to a new destination
 endpoint only if condition matches.
 */
-BOOST_TEST_DECORATOR(*utf::label("ci"))
-BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make (core_types), core_type)
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
+BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), core_type)
 {
+	
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
@@ -95,11 +96,11 @@ BOOST_DATA_TEST_CASE(message_reroute_filter_condition, bdata::make (core_types),
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("endpt2");
-    auto p3 = mFed->registerGlobalEndpoint ("port3");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("endpt2");
+    auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
     auto filter_op = std::make_shared<helics::RerouteFilterOperation> ();
     filter_op->setString ("newdestination", "port3");
@@ -151,11 +152,11 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
-    auto p3 = mFed->registerGlobalEndpoint ("port3");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
     auto filter_op = std::make_shared<helics::RerouteFilterOperation> ();
     filter_op->setString ("newdestination", "port3");
@@ -184,19 +185,17 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-	if (mFed->hasMessage(p3) == false)
-	{
-        BOOST_CHECK(mFed->hasMessage (p3));
-	}
-	else
-	{
+    if (mFed->hasMessage (p3) == false)
+    {
+        BOOST_CHECK (mFed->hasMessage (p3));
+    }
+    else
+    {
         auto m2 = mFed->getMessage (p3);
         BOOST_CHECK_EQUAL (m2->source, "port1");
         BOOST_CHECK_EQUAL (m2->dest, "port3");
         BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
-	}
-
-   
+    }
 
     mFed->finalize ();
     fFed->finalize ();
@@ -218,14 +217,13 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto Filt =
-      helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
+    Filt.addSourceTarget ("port1");
     double drop_prob = 0.75;
-    Filt->set ("dropprob", drop_prob);
+    Filt.set ("dropprob", drop_prob);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -279,10 +277,10 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
     auto op = std::make_shared<helics::RandomDropFilterOperation> ();
     double prob = 0.45;
@@ -338,14 +336,13 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto Filt =
-      helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
-    Filt->addDestinationTarget ("port2");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
+    Filt.addDestinationTarget ("port2");
     double drop_prob = 0.25;
-    Filt->set ("dropprob", drop_prob);
+    Filt.set ("dropprob", drop_prob);
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();
@@ -400,10 +397,10 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = fFed->registerFilter ("filter1");
+    auto &f1 = fFed->registerFilter ("filter1");
     fFed->addDestinationTarget (f1, "port2");
     auto op = std::make_shared<helics::RandomDropFilterOperation> ();
     double prob = 0.1;
@@ -440,7 +437,6 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     BOOST_CHECK_LE (pest, prob + ebar);
     mFed->finalize ();
     fFed->finalize ();
-
 }
 
 /**
@@ -458,16 +454,15 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
-    auto p1 = mFed->registerGlobalEndpoint ("port1");
-    auto p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto Filt =
-      helics::make_filter (helics::defined_filter_types::randomDelay, fFed.get (), "filter1");
-    Filt->addSourceTarget ("port1");
-    Filt->setString ("distribution", "binomial");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDelay, fFed.get (), "filter1");
+    Filt.addSourceTarget ("port1");
+    Filt.setString ("distribution", "binomial");
 
-    Filt->set ("param1", 4);  // max_delay=4
-    Filt->set ("param2", 0.5);  // prob
+    Filt.set ("param1", 4);  // max_delay=4
+    Filt.set ("param2", 0.5);  // prob
 
     fFed->enterExecutingModeAsync ();
     mFed->enterExecutingMode ();

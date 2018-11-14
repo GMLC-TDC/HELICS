@@ -21,7 +21,9 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 {
 }
 
-ActionMessage::ActionMessage (action_message_def::action_t startingAction, global_federate_id_t sourceId, global_federate_id_t destId)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction,
+                              global_federate_id_t sourceId,
+                              global_federate_id_t destId)
     : ActionMessage (startingAction)
 {
     source_id = sourceId;
@@ -109,14 +111,14 @@ void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 
 void ActionMessage::setAction (action_message_def::action_t newAction) { messageAction = newAction; }
 
-static const std::string nullStr;
+static const std::string emptyStr;
 const std::string &ActionMessage::getString (int index) const
 {
     if (isValidIndex (index, stringData))
     {
         return stringData[index];
     }
-    return nullStr;
+    return emptyStr;
 }
 
 void ActionMessage::setString (int index, const std::string &str)
@@ -381,6 +383,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
+{ action_message_def::action_t::cmd_user_disconnect, "disconnect from user" },
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -445,6 +448,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_reg_input, "reg_input"},
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
+  {action_message_def::action_t::cmd_resend, "reg_resend"},
   {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
   {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
   {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
@@ -476,7 +480,9 @@ static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
   {-5, "lost connection with server"},
   {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"}};
+  {6, "duplicate federate name detected"},
+{ 7, "duplicate broker name detected" }
+};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -497,6 +503,11 @@ const char *commandErrorString (int errorcode)
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
+	if (ret == unknownStr)
+	{
+        ret += " " + std::to_string (static_cast<int> (command.action ()));
+        return ret;
+	}
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -513,13 +524,14 @@ std::string prettyPrintString (const ActionMessage &command)
         }
         else
         {
-            ret.append (std::to_string (command.dest_id.baseValue()));
+            ret.append (std::to_string (command.dest_id.baseValue ()));
         }
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id.baseValue(), command.dest_handle.baseValue(),
-                                 command.payload.size (), static_cast<double> (command.actionTime),command.dest_id.baseValue()));
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id.baseValue (),
+                                 command.dest_handle.baseValue (), command.payload.size (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -527,14 +539,14 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_TIME_GRANT:
         ret.push_back (':');
-        ret.append (
-          fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id.baseValue(), static_cast<double> (command.actionTime),command.dest_id.baseValue()));
+        ret.append (fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id.baseValue (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id.baseValue(),
+        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id.baseValue (),
                                  static_cast<double> (command.actionTime), static_cast<double> (command.Te),
-                                 static_cast<double> (command.Tdemin),command.dest_id.baseValue()));
+                                 static_cast<double> (command.Tdemin), command.dest_id.baseValue ()));
         break;
     case CMD_FED_CONFIGURE_TIME:
     case CMD_FED_CONFIGURE_INT:
@@ -543,11 +555,12 @@ std::string prettyPrintString (const ActionMessage &command)
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
         ret.append (fmt::format ("From ({})({}:{}) To {} size {} at {}", command.getString (origSourceStringLoc),
-                                 command.source_id.baseValue(), command.source_handle.baseValue(), command.getString (targetStringLoc),
-                                 command.payload.size (), static_cast<double> (command.actionTime)));
+                                 command.source_id.baseValue (), command.source_handle.baseValue (),
+                                 command.getString (targetStringLoc), command.payload.size (),
+                                 static_cast<double> (command.actionTime)));
         break;
     default:
-        ret.append (fmt::format ( ":From {}",command.source_id.baseValue()));
+        ret.append (fmt::format (":From {}", command.source_id.baseValue ()));
         break;
     }
     return ret;
@@ -557,5 +570,15 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
 {
     os << prettyPrintString (command);
     return os;
+}
+
+int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
+{
+    if (m.action () == CMD_MULTI_MESSAGE)
+    {
+        m.setString (m.counter++, newMessage.to_string ());
+        return m.counter;
+    }
+    return (-1);
 }
 }  // namespace helics

@@ -34,6 +34,8 @@ set(
   TripWire.hpp
   fmt_format.h
   fmt_ostream.h
+  CircularBuffer.hpp
+  StackQueue.hpp
 )
 
 set(
@@ -49,6 +51,8 @@ set(
   argParser.cpp
   TripWire.cpp
   TriggerVariable.cpp
+  CircularBuffer.cpp
+  StackQueue.cpp
 )
 
 set(

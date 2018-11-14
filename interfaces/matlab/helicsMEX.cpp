@@ -1207,26 +1207,25 @@ namespace swig {
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-#define SWIGTYPE_p_data_t swig_types[1]
-#define SWIGTYPE_p_double swig_types[2]
-#define SWIGTYPE_p_federate_state swig_types[3]
-#define SWIGTYPE_p_helics_error swig_types[4]
-#define SWIGTYPE_p_helics_error_types swig_types[5]
-#define SWIGTYPE_p_helics_federate_flags swig_types[6]
-#define SWIGTYPE_p_helics_filter_type_t swig_types[7]
-#define SWIGTYPE_p_helics_handle_options swig_types[8]
-#define SWIGTYPE_p_helics_int_properties swig_types[9]
-#define SWIGTYPE_p_helics_iteration_request swig_types[10]
-#define SWIGTYPE_p_helics_iteration_status swig_types[11]
-#define SWIGTYPE_p_helics_time_properties swig_types[12]
-#define SWIGTYPE_p_int swig_types[13]
-#define SWIGTYPE_p_int16_t swig_types[14]
-#define SWIGTYPE_p_int32_t swig_types[15]
-#define SWIGTYPE_p_message_t swig_types[16]
-#define SWIGTYPE_p_p_char swig_types[17]
-#define SWIGTYPE_p_void swig_types[18]
-static swig_type_info *swig_types[20];
-static swig_module_info swig_module = {swig_types, 19, 0, 0, 0, 0};
+#define SWIGTYPE_p_double swig_types[1]
+#define SWIGTYPE_p_federate_state swig_types[2]
+#define SWIGTYPE_p_helics_error swig_types[3]
+#define SWIGTYPE_p_helics_error_types swig_types[4]
+#define SWIGTYPE_p_helics_federate_flags swig_types[5]
+#define SWIGTYPE_p_helics_filter_type_t swig_types[6]
+#define SWIGTYPE_p_helics_handle_options swig_types[7]
+#define SWIGTYPE_p_helics_int_properties swig_types[8]
+#define SWIGTYPE_p_helics_iteration_request swig_types[9]
+#define SWIGTYPE_p_helics_iteration_status swig_types[10]
+#define SWIGTYPE_p_helics_time_properties swig_types[11]
+#define SWIGTYPE_p_int swig_types[12]
+#define SWIGTYPE_p_int16_t swig_types[13]
+#define SWIGTYPE_p_int32_t swig_types[14]
+#define SWIGTYPE_p_message_t swig_types[15]
+#define SWIGTYPE_p_p_char swig_types[16]
+#define SWIGTYPE_p_void swig_types[17]
+static swig_type_info *swig_types[19];
+static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -1313,6 +1312,14 @@ SWIG_From_int  (int value)
   SWIGINTERNINLINE mxArray* SWIG_From_double    (double value)
     {    
       return mxCreateDoubleScalar(value);
+    }
+
+
+  SWIGINTERN int SWIG_AsVal_double (mxArray* pm, double* val)
+    {
+      if(!mxIsDouble(pm) || mxGetNumberOfElements(pm)!=1) return SWIG_TypeError;
+      if (val) *val = mxGetScalar(pm);
+      return SWIG_OK;
     }
 
 
@@ -1410,14 +1417,6 @@ SWIG_FromCharPtr(const char *cptr)
       mxArray* out = mxCreateNumericMatrix(1,1,mxINT64_CLASS,mxREAL);
       *((int64_T*)mxGetData(out)) = (int64_T)value;
       return out;
-    }
-
-
-  SWIGINTERN int SWIG_AsVal_double (mxArray* pm, double* val)
-    {
-      if(!mxIsDouble(pm) || mxGetNumberOfElements(pm)!=1) return SWIG_TypeError;
-      if (val) *val = mxGetScalar(pm);
-      return SWIG_OK;
     }
 
 
@@ -1523,6 +1522,13 @@ SWIG_AsVal_char (mxArray* obj, char *val)
   return res;
 }
 
+
+SWIGINTERNINLINE mxArray*
+SWIG_From_char  (char c) 
+{ 
+  return SWIG_FromCharPtrAndSize(&c,1);
+}
+
 SWIGINTERN int _wrap_helics_time_zero_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   resv[0] = SWIG_From_double(static_cast< double >(helics_time_zero));
   return 0;
@@ -1556,169 +1562,6 @@ SWIGINTERN int _wrap_helics_true_get(int resc, mxArray *resv[], int argc, mxArra
 SWIGINTERN int _wrap_helics_false_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   resv[0] = SWIG_From_int(static_cast< int >(helics_false));
   return 0;
-}
-
-
-int _wrap_data_t_data_set(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  data_t *arg1 = (data_t *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  mxArray * _out;
-  
-  if (!SWIG_check_num_args("data_t_data_set",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_set" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "data_t_data_set" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  if (arg1->data) delete[] arg1->data;
-  if (arg2) {
-    size_t size = strlen(reinterpret_cast< const char * >(arg2)) + 1;
-    arg1->data = (char *)reinterpret_cast< char* >(memcpy((new char[size]), reinterpret_cast< const char * >(arg2), sizeof(char)*(size)));
-  } else {
-    arg1->data = 0;
-  }
-  _out = (mxArray*)0;
-  if (_out) --resc, *resv++ = _out;
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 0;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return 1;
-}
-
-
-int _wrap_data_t_data_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  mxArray * _out;
-  char *result = 0 ;
-  
-  if (!SWIG_check_num_args("data_t_data_get",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_get" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  result = (char *) ((arg1)->data);
-  _out = SWIG_FromCharPtr((const char *)result);
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_data_t_length_set(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  data_t *arg1 = (data_t *) 0 ;
-  int64_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  long long val2 ;
-  int ecode2 = 0 ;
-  mxArray * _out;
-  
-  if (!SWIG_check_num_args("data_t_length_set",argc,2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_set" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  ecode2 = SWIG_AsVal_long_SS_long(argv[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "data_t_length_set" "', argument " "2"" of type '" "int64_t""'");
-  } 
-  arg2 = static_cast< int64_t >(val2);
-  if (arg1) (arg1)->length = arg2;
-  _out = (mxArray*)0;
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_data_t_length_get(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  mxArray * _out;
-  int64_t result;
-  
-  if (!SWIG_check_num_args("data_t_length_get",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_get" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  result =  ((arg1)->length);
-  _out = SWIG_From_long_SS_long(static_cast< long long >(result));
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_new_data_t(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  mxArray * _out;
-  data_t *result = 0 ;
-  
-  if (!SWIG_check_num_args("new_data_t",argc,0,0,0)) {
-    SWIG_fail;
-  }
-  (void)argv;
-  result = (data_t *)new data_t();
-  _out = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_data_t, 1 |  0 );
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
-}
-
-
-int _wrap_delete_data_t(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  mxArray * _out;
-  
-  int is_owned;
-  if (!SWIG_check_num_args("delete_data_t",argc,1,1,0)) {
-    SWIG_fail;
-  }
-  is_owned = SWIG_Matlab_isOwned(argv[0]);
-  res1 = SWIG_ConvertPtr(argv[0], &argp1,SWIGTYPE_p_data_t, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_data_t" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  if (is_owned) {
-    delete arg1;
-  }
-  _out = (mxArray*)0;
-  if (_out) --resc, *resv++ = _out;
-  return 0;
-fail:
-  return 1;
 }
 
 
@@ -4240,6 +4083,53 @@ fail:
 }
 
 
+int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetCoreType",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
 int _wrap_helicsFederateInfoSetCoreTypeFromString(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   char *arg2 = (char *) 0 ;
@@ -4290,7 +4180,57 @@ fail:
 }
 
 
-int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+int _wrap_helicsFederateInfoSetBroker(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetBroker",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBroker" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBroker" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetBroker(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateInfoSetBrokerPort(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
   int arg2 ;
   helics_error *arg3 = (helics_error *) 0 ;
@@ -4304,19 +4244,19 @@ int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxA
     etemp3=helicsErrorInitialize();
     arg3=&etemp3;
   }
-  if (!SWIG_check_num_args("helicsFederateInfoSetCoreType",argc,2,2,0)) {
+  if (!SWIG_check_num_args("helicsFederateInfoSetBrokerPort",argc,2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
   }
   ecode2 = SWIG_AsVal_int(argv[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  helicsFederateInfoSetBrokerPort(arg1,arg2,arg3);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
@@ -4327,6 +4267,56 @@ int _wrap_helicsFederateInfoSetCoreType(int resc, mxArray *resv[], int argc, mxA
   }
   return 0;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsFederateInfoSetLocalPort(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetLocalPort",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(argv[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetLocalPort(arg1,(char const *)arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
     if (arg3->error_code!=helics_ok)
     {
@@ -7375,6 +7365,100 @@ fail:
 }
 
 
+int _wrap_helicsPublicationPublishTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  helics_time_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishTime",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishTime" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishTime" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = static_cast< helics_time_t >(val2);
+  helicsPublicationPublishTime(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsPublicationPublishChar(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  char val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishChar",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishChar" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_char(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishChar" "', argument " "2"" of type '" "char""'");
+  } 
+  arg2 = static_cast< char >(val2);
+  helicsPublicationPublishChar(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
 int _wrap_helicsPublicationPublishComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_publication arg1 = (helics_publication) 0 ;
   double arg2 ;
@@ -7928,6 +8012,86 @@ fail:
 }
 
 
+int _wrap_helicsInputGetTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  mxArray * _out;
+  helics_time_t result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetTime",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetTime" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_time_t)helicsInputGetTime(arg1,arg2);
+  _out = SWIG_From_double(static_cast< double >(result));
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsInputGetChar(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  mxArray * _out;
+  char result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetChar",argc,1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetChar" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char)helicsInputGetChar(arg1,arg2);
+  _out = SWIG_From_char(static_cast< char >(result));
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg2);
+    }
+  }
+  return 1;
+}
+
+
 int _wrap_helicsInputGetComplex(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_input arg1 = (helics_input) 0 ;
   double *arg2 = (double *) 0 ;
@@ -8075,18 +8239,14 @@ int _wrap_helicsInputGetNamedPoint(int resc, mxArray *resv[], int argc, mxArray 
   double *arg5 = (double *) 0 ;
   helics_error *arg6 = (helics_error *) 0 ;
   int res1 ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
   double temp5 ;
   int res5 = SWIG_TMPOBJ ;
   helics_error etemp6 ;
   mxArray * _out;
   
   {
-    arg3=256;
-    arg2=(char *)malloc(256);
+    arg4=&(arg3);
   }
-  arg4 = &temp4;
   arg5 = &temp5;
   {
     etemp6=helicsErrorInitialize();
@@ -8099,17 +8259,15 @@ int _wrap_helicsInputGetNamedPoint(int resc, mxArray *resv[], int argc, mxArray 
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetNamedPoint" "', argument " "1"" of type '" "helics_input""'"); 
   }
+  {
+    arg3=helicsInputGetStringSize(arg1)+2;
+    arg2 = (char *) malloc(arg3);
+  }
   helicsInputGetNamedPoint(arg1,arg2,arg3,arg4,arg5,arg6);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtr(arg2);
-  }
-  if (SWIG_IsTmpObj(res4)) {
-    if (--resc>=0) *resv++ = SWIG_From_int((*arg4));
-  } else {
-    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    if (--resc>=0) *resv++ = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags);
+    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4-1);
   }
   if (SWIG_IsTmpObj(res5)) {
     if (--resc>=0) *resv++ = SWIG_From_double((*arg5));
@@ -8318,6 +8476,100 @@ int _wrap_helicsInputSetDefaultBoolean(int resc, mxArray *resv[], int argc, mxAr
   } 
   arg2 = static_cast< helics_bool_t >(val2);
   helicsInputSetDefaultBoolean(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsInputSetDefaultTime(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_time_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultTime",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultTime" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultTime" "', argument " "2"" of type '" "helics_time_t""'");
+  } 
+  arg2 = static_cast< helics_time_t >(val2);
+  helicsInputSetDefaultTime(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
+int _wrap_helicsInputSetDefaultChar(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_input arg1 = (helics_input) 0 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  char val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultChar",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultChar" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_char(argv[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultChar" "', argument " "2"" of type '" "char""'");
+  } 
+  arg2 = static_cast< char >(val2);
+  helicsInputSetDefaultChar(arg1,arg2,arg3);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
@@ -10323,7 +10575,6 @@ fail:
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_data_t = {"_p_data_t", "data_t *", 0, 0, (void*)"helics.data_t", 0};
 static swig_type_info _swigt__p_double = {"_p_double", "helics_time_t *|double *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_federate_state = {"_p_federate_state", "enum federate_state *|federate_state *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_error = {"_p_helics_error", "helics_error *", 0, 0, (void*)0, 0};
@@ -10344,7 +10595,6 @@ static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_co
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
-  &_swigt__p_data_t,
   &_swigt__p_double,
   &_swigt__p_federate_state,
   &_swigt__p_helics_error,
@@ -10365,7 +10615,6 @@ static swig_type_info *swig_type_initial[] = {
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_data_t[] = {  {&_swigt__p_data_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_federate_state[] = {  {&_swigt__p_federate_state, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_error[] = {  {&_swigt__p_helics_error, 0, 0, 0},{0, 0, 0, 0}};
@@ -10386,7 +10635,6 @@ static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0,
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
-  _swigc__p_data_t,
   _swigc__p_double,
   _swigc__p_federate_state,
   _swigc__p_helics_error,
@@ -10742,8 +10990,10 @@ SWIGINTERN const char* SwigConstantName(int con_id) {
   case 77: return "HELICS_DATA_TYPE_VECTOR";
   case 78: return "HELICS_DATA_TYPE_NAMEDPOINT";
   case 79: return "HELICS_DATA_TYPE_BOOLEAN";
-  case 80: return "HELICS_DATA_TYPE_RAW";
-  case 81: return "HELICS_DATA_TYPE_ANY";
+  case 80: return "HELICS_DATA_TYPE_CHAR";
+  case 81: return "HELICS_DATA_TYPE_TIME";
+  case 82: return "HELICS_DATA_TYPE_RAW";
+  case 83: return "HELICS_DATA_TYPE_ANY";
   default: return 0;
   }
 }
@@ -10774,88 +11024,90 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   }
   int con_id = (int)mxGetScalar(*argv++);
   switch (con_id) {
-  case 1128095488: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
-  case 1128095489: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_registration_failure",SWIG_From_int(static_cast< int >(helics_error_registration_failure)));; break;
-  case 1128095490: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_connection_failure",SWIG_From_int(static_cast< int >(helics_error_connection_failure)));; break;
-  case 1128095491: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_object",SWIG_From_int(static_cast< int >(helics_error_invalid_object)));; break;
-  case 1128095492: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_argument",SWIG_From_int(static_cast< int >(helics_error_invalid_argument)));; break;
-  case 1128095493: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_discard",SWIG_From_int(static_cast< int >(helics_error_discard)));; break;
-  case 1128095494: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_system_failure",SWIG_From_int(static_cast< int >(helics_error_system_failure)));; break;
-  case 1128095495: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
-  case 1128095496: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_error_invalid_state_transition)));; break;
-  case 1128095497: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_function_call",SWIG_From_int(static_cast< int >(helics_error_invalid_function_call)));; break;
-  case 1128095498: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_execution_failure",SWIG_From_int(static_cast< int >(helics_error_execution_failure)));; break;
-  case 1128095499: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_other",SWIG_From_int(static_cast< int >(helics_error_other)));; break;
-  case 1128095500: *resv = SWIG_Matlab_SetConstant(module_ns,"other_error_type",SWIG_From_int(static_cast< int >(other_error_type)));; break;
-  case 1128095501: *resv = SWIG_Matlab_SetConstant(module_ns,"no_iteration",SWIG_From_int(static_cast< int >(no_iteration)));; break;
-  case 1128095502: *resv = SWIG_Matlab_SetConstant(module_ns,"force_iteration",SWIG_From_int(static_cast< int >(force_iteration)));; break;
-  case 1128095503: *resv = SWIG_Matlab_SetConstant(module_ns,"iterate_if_needed",SWIG_From_int(static_cast< int >(iterate_if_needed)));; break;
-  case 1128095504: *resv = SWIG_Matlab_SetConstant(module_ns,"next_step",SWIG_From_int(static_cast< int >(next_step)));; break;
-  case 1128095505: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_error",SWIG_From_int(static_cast< int >(iteration_error)));; break;
-  case 1128095506: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_halted",SWIG_From_int(static_cast< int >(iteration_halted)));; break;
-  case 1128095507: *resv = SWIG_Matlab_SetConstant(module_ns,"iterating",SWIG_From_int(static_cast< int >(iterating)));; break;
-  case 1128095508: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_startup",SWIG_From_int(static_cast< int >(helics_state_startup)));; break;
-  case 1128095509: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_initialization",SWIG_From_int(static_cast< int >(helics_state_initialization)));; break;
-  case 1128095510: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_execution",SWIG_From_int(static_cast< int >(helics_state_execution)));; break;
-  case 1128095511: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_finalize",SWIG_From_int(static_cast< int >(helics_state_finalize)));; break;
-  case 1128095512: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_error",SWIG_From_int(static_cast< int >(helics_state_error)));; break;
-  case 1128095513: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_init",SWIG_From_int(static_cast< int >(helics_state_pending_init)));; break;
-  case 1128095514: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_exec",SWIG_From_int(static_cast< int >(helics_state_pending_exec)));; break;
-  case 1128095515: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));; break;
-  case 1128095516: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));; break;
-  case 1128095517: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_custom",SWIG_From_int(static_cast< int >(helics_filtertype_custom)));; break;
-  case 1128095518: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_delay",SWIG_From_int(static_cast< int >(helics_filtertype_delay)));; break;
-  case 1128095519: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_delay",SWIG_From_int(static_cast< int >(helics_filtertype_random_delay)));; break;
-  case 1128095520: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_drop",SWIG_From_int(static_cast< int >(helics_filtertype_random_drop)));; break;
-  case 1128095521: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_reroute",SWIG_From_int(static_cast< int >(helics_filtertype_reroute)));; break;
-  case 1128095522: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_clone",SWIG_From_int(static_cast< int >(helics_filtertype_clone)));; break;
-  case 1128095523: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_firewall",SWIG_From_int(static_cast< int >(helics_filtertype_firewall)));; break;
-  case 1128095524: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_observer",SWIG_From_int(static_cast< int >(helics_flag_observer)));; break;
-  case 1128095525: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_uninterruptible",SWIG_From_int(static_cast< int >(helics_flag_uninterruptible)));; break;
-  case 1128095526: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_interruptible",SWIG_From_int(static_cast< int >(helics_flag_interruptible)));; break;
-  case 1128095527: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_source_only",SWIG_From_int(static_cast< int >(helics_flag_source_only)));; break;
-  case 1128095528: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_transmit_on_change)));; break;
-  case 1128095529: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_update_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_update_on_change)));; break;
-  case 1128095530: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_wait_for_current_time_update",SWIG_From_int(static_cast< int >(helics_flag_wait_for_current_time_update)));; break;
-  case 1128095531: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_rollback",SWIG_From_int(static_cast< int >(helics_flag_rollback)));; break;
-  case 1128095532: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));; break;
-  case 1128095533: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));; break;
-  case 1128095534: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
-  case 1128095535: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_time_delta",SWIG_From_int(static_cast< int >(helics_time_property_time_delta)));; break;
-  case 1128095536: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_period",SWIG_From_int(static_cast< int >(helics_time_property_period)));; break;
-  case 1128095537: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_offset",SWIG_From_int(static_cast< int >(helics_time_property_offset)));; break;
-  case 1128095538: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_lag",SWIG_From_int(static_cast< int >(helics_time_property_rt_lag)));; break;
-  case 1128095539: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_lead",SWIG_From_int(static_cast< int >(helics_time_property_rt_lead)));; break;
-  case 1128095540: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_tolerance",SWIG_From_int(static_cast< int >(helics_time_property_rt_tolerance)));; break;
-  case 1128095541: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_input_delay",SWIG_From_int(static_cast< int >(helics_time_property_input_delay)));; break;
-  case 1128095542: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_output_delay",SWIG_From_int(static_cast< int >(helics_time_property_output_delay)));; break;
-  case 1128095543: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_int_property_max_iterations",SWIG_From_int(static_cast< int >(helics_int_property_max_iterations)));; break;
-  case 1128095544: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_int_property_log_level",SWIG_From_int(static_cast< int >(helics_int_property_log_level)));; break;
-  case 1128095545: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_required",SWIG_From_int(static_cast< int >(helics_handle_option_connection_required)));; break;
-  case 1128095546: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_optional",SWIG_From_int(static_cast< int >(helics_handle_option_connection_optional)));; break;
-  case 1128095547: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_single_connection_only",SWIG_From_int(static_cast< int >(helics_handle_option_single_connection_only)));; break;
-  case 1128095548: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_multiple_connections_allowed",SWIG_From_int(static_cast< int >(helics_handle_option_multiple_connections_allowed)));; break;
-  case 1128095549: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_transmit_on_change)));; break;
-  case 1128095550: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_update_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_update_on_change)));; break;
-  case 1128095551: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_DEFAULT",SWIG_From_int(static_cast< int >(0)));; break;
-  case 1128095552: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ",SWIG_From_int(static_cast< int >(1)));; break;
-  case 1128095553: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_MPI",SWIG_From_int(static_cast< int >(2)));; break;
-  case 1128095554: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TEST",SWIG_From_int(static_cast< int >(3)));; break;
-  case 1128095555: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_INTERPROCESS",SWIG_From_int(static_cast< int >(4)));; break;
-  case 1128095556: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_IPC",SWIG_From_int(static_cast< int >(5)));; break;
-  case 1128095557: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP",SWIG_From_int(static_cast< int >(6)));; break;
-  case 1128095558: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_UDP",SWIG_From_int(static_cast< int >(7)));; break;
-  case 1128095559: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ_TEST",SWIG_From_int(static_cast< int >(10)));; break;
-  case 1128095560: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP_SS",SWIG_From_int(static_cast< int >(11)));; break;
-  case 1128095561: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_STRING",SWIG_From_int(static_cast< int >(0)));; break;
-  case 1128095562: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_DOUBLE",SWIG_From_int(static_cast< int >(1)));; break;
-  case 1128095563: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_INT",SWIG_From_int(static_cast< int >(2)));; break;
-  case 1128095564: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_COMPLEX",SWIG_From_int(static_cast< int >(3)));; break;
-  case 1128095565: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_VECTOR",SWIG_From_int(static_cast< int >(4)));; break;
-  case 1128095566: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_NAMEDPOINT",SWIG_From_int(static_cast< int >(6)));; break;
-  case 1128095567: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_BOOLEAN",SWIG_From_int(static_cast< int >(7)));; break;
-  case 1128095568: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_RAW",SWIG_From_int(static_cast< int >(25)));; break;
-  case 1128095569: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_ANY",SWIG_From_int(static_cast< int >(25262)));; break;
+  case 1398230852: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
+  case 1398230853: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_registration_failure",SWIG_From_int(static_cast< int >(helics_error_registration_failure)));; break;
+  case 1398230854: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_connection_failure",SWIG_From_int(static_cast< int >(helics_error_connection_failure)));; break;
+  case 1398230855: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_object",SWIG_From_int(static_cast< int >(helics_error_invalid_object)));; break;
+  case 1398230856: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_argument",SWIG_From_int(static_cast< int >(helics_error_invalid_argument)));; break;
+  case 1398230857: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_discard",SWIG_From_int(static_cast< int >(helics_error_discard)));; break;
+  case 1398230858: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_system_failure",SWIG_From_int(static_cast< int >(helics_error_system_failure)));; break;
+  case 1398230859: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
+  case 1398230860: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_error_invalid_state_transition)));; break;
+  case 1398230861: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_function_call",SWIG_From_int(static_cast< int >(helics_error_invalid_function_call)));; break;
+  case 1398230862: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_execution_failure",SWIG_From_int(static_cast< int >(helics_error_execution_failure)));; break;
+  case 1398230863: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_other",SWIG_From_int(static_cast< int >(helics_error_other)));; break;
+  case 1398230864: *resv = SWIG_Matlab_SetConstant(module_ns,"other_error_type",SWIG_From_int(static_cast< int >(other_error_type)));; break;
+  case 1398230865: *resv = SWIG_Matlab_SetConstant(module_ns,"no_iteration",SWIG_From_int(static_cast< int >(no_iteration)));; break;
+  case 1398230866: *resv = SWIG_Matlab_SetConstant(module_ns,"force_iteration",SWIG_From_int(static_cast< int >(force_iteration)));; break;
+  case 1398230867: *resv = SWIG_Matlab_SetConstant(module_ns,"iterate_if_needed",SWIG_From_int(static_cast< int >(iterate_if_needed)));; break;
+  case 1398230868: *resv = SWIG_Matlab_SetConstant(module_ns,"next_step",SWIG_From_int(static_cast< int >(next_step)));; break;
+  case 1398230869: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_error",SWIG_From_int(static_cast< int >(iteration_error)));; break;
+  case 1398230870: *resv = SWIG_Matlab_SetConstant(module_ns,"iteration_halted",SWIG_From_int(static_cast< int >(iteration_halted)));; break;
+  case 1398230871: *resv = SWIG_Matlab_SetConstant(module_ns,"iterating",SWIG_From_int(static_cast< int >(iterating)));; break;
+  case 1398230872: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_startup",SWIG_From_int(static_cast< int >(helics_state_startup)));; break;
+  case 1398230873: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_initialization",SWIG_From_int(static_cast< int >(helics_state_initialization)));; break;
+  case 1398230874: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_execution",SWIG_From_int(static_cast< int >(helics_state_execution)));; break;
+  case 1398230875: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_finalize",SWIG_From_int(static_cast< int >(helics_state_finalize)));; break;
+  case 1398230876: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_error",SWIG_From_int(static_cast< int >(helics_state_error)));; break;
+  case 1398230877: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_init",SWIG_From_int(static_cast< int >(helics_state_pending_init)));; break;
+  case 1398230878: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_exec",SWIG_From_int(static_cast< int >(helics_state_pending_exec)));; break;
+  case 1398230879: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));; break;
+  case 1398230880: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));; break;
+  case 1398230881: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_custom",SWIG_From_int(static_cast< int >(helics_filtertype_custom)));; break;
+  case 1398230882: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_delay",SWIG_From_int(static_cast< int >(helics_filtertype_delay)));; break;
+  case 1398230883: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_delay",SWIG_From_int(static_cast< int >(helics_filtertype_random_delay)));; break;
+  case 1398230884: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_drop",SWIG_From_int(static_cast< int >(helics_filtertype_random_drop)));; break;
+  case 1398230885: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_reroute",SWIG_From_int(static_cast< int >(helics_filtertype_reroute)));; break;
+  case 1398230886: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_clone",SWIG_From_int(static_cast< int >(helics_filtertype_clone)));; break;
+  case 1398230887: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_firewall",SWIG_From_int(static_cast< int >(helics_filtertype_firewall)));; break;
+  case 1398230888: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_observer",SWIG_From_int(static_cast< int >(helics_flag_observer)));; break;
+  case 1398230889: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_uninterruptible",SWIG_From_int(static_cast< int >(helics_flag_uninterruptible)));; break;
+  case 1398230890: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_interruptible",SWIG_From_int(static_cast< int >(helics_flag_interruptible)));; break;
+  case 1398230891: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_source_only",SWIG_From_int(static_cast< int >(helics_flag_source_only)));; break;
+  case 1398230892: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_transmit_on_change)));; break;
+  case 1398230893: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_update_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_update_on_change)));; break;
+  case 1398230894: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_wait_for_current_time_update",SWIG_From_int(static_cast< int >(helics_flag_wait_for_current_time_update)));; break;
+  case 1398230895: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_rollback",SWIG_From_int(static_cast< int >(helics_flag_rollback)));; break;
+  case 1398230896: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));; break;
+  case 1398230897: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));; break;
+  case 1398230898: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
+  case 1398230899: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_time_delta",SWIG_From_int(static_cast< int >(helics_time_property_time_delta)));; break;
+  case 1398230900: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_period",SWIG_From_int(static_cast< int >(helics_time_property_period)));; break;
+  case 1398230901: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_offset",SWIG_From_int(static_cast< int >(helics_time_property_offset)));; break;
+  case 1398230902: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_lag",SWIG_From_int(static_cast< int >(helics_time_property_rt_lag)));; break;
+  case 1398230903: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_lead",SWIG_From_int(static_cast< int >(helics_time_property_rt_lead)));; break;
+  case 1398230904: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_rt_tolerance",SWIG_From_int(static_cast< int >(helics_time_property_rt_tolerance)));; break;
+  case 1398230905: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_input_delay",SWIG_From_int(static_cast< int >(helics_time_property_input_delay)));; break;
+  case 1398230906: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_time_property_output_delay",SWIG_From_int(static_cast< int >(helics_time_property_output_delay)));; break;
+  case 1398230907: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_int_property_max_iterations",SWIG_From_int(static_cast< int >(helics_int_property_max_iterations)));; break;
+  case 1398230908: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_int_property_log_level",SWIG_From_int(static_cast< int >(helics_int_property_log_level)));; break;
+  case 1398230909: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_required",SWIG_From_int(static_cast< int >(helics_handle_option_connection_required)));; break;
+  case 1398230910: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_optional",SWIG_From_int(static_cast< int >(helics_handle_option_connection_optional)));; break;
+  case 1398230911: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_single_connection_only",SWIG_From_int(static_cast< int >(helics_handle_option_single_connection_only)));; break;
+  case 1398230912: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_multiple_connections_allowed",SWIG_From_int(static_cast< int >(helics_handle_option_multiple_connections_allowed)));; break;
+  case 1398230913: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_transmit_on_change)));; break;
+  case 1398230914: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_update_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_update_on_change)));; break;
+  case 1398230915: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_DEFAULT",SWIG_From_int(static_cast< int >(0)));; break;
+  case 1398230916: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ",SWIG_From_int(static_cast< int >(1)));; break;
+  case 1398230917: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_MPI",SWIG_From_int(static_cast< int >(2)));; break;
+  case 1398230918: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TEST",SWIG_From_int(static_cast< int >(3)));; break;
+  case 1398230919: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_INTERPROCESS",SWIG_From_int(static_cast< int >(4)));; break;
+  case 1398230920: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_IPC",SWIG_From_int(static_cast< int >(5)));; break;
+  case 1398230921: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP",SWIG_From_int(static_cast< int >(6)));; break;
+  case 1398230922: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_UDP",SWIG_From_int(static_cast< int >(7)));; break;
+  case 1398230923: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ_TEST",SWIG_From_int(static_cast< int >(10)));; break;
+  case 1398230924: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP_SS",SWIG_From_int(static_cast< int >(11)));; break;
+  case 1398230925: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_STRING",SWIG_From_int(static_cast< int >(0)));; break;
+  case 1398230926: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_DOUBLE",SWIG_From_int(static_cast< int >(1)));; break;
+  case 1398230927: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_INT",SWIG_From_int(static_cast< int >(2)));; break;
+  case 1398230928: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_COMPLEX",SWIG_From_int(static_cast< int >(3)));; break;
+  case 1398230929: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_VECTOR",SWIG_From_int(static_cast< int >(4)));; break;
+  case 1398230930: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_NAMEDPOINT",SWIG_From_int(static_cast< int >(6)));; break;
+  case 1398230931: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_BOOLEAN",SWIG_From_int(static_cast< int >(7)));; break;
+  case 1398230932: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_CHAR",SWIG_From_int(static_cast< int >(0)));; break;
+  case 1398230933: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_TIME",SWIG_From_int(static_cast< int >(8)));; break;
+  case 1398230934: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_RAW",SWIG_From_int(static_cast< int >(25)));; break;
+  case 1398230935: *resv = SWIG_Matlab_SetConstant(module_ns,"HELICS_DATA_TYPE_ANY",SWIG_From_int(static_cast< int >(25262)));; break;
   default:
     SWIG_Error(SWIG_RuntimeError, "No such constant.");
     return 1;
@@ -10876,211 +11128,214 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 8: return "helics_time_maxtime_get";
   case 9: return "helics_true_get";
   case 10: return "helics_false_get";
-  case 11: return "data_t_data_get";
-  case 12: return "data_t_data_set";
-  case 13: return "data_t_length_get";
-  case 14: return "data_t_length_set";
-  case 15: return "new_data_t";
-  case 16: return "delete_data_t";
-  case 17: return "message_t_time_get";
-  case 18: return "message_t_time_set";
-  case 19: return "message_t_data_get";
-  case 20: return "message_t_data_set";
-  case 21: return "message_t_length_get";
-  case 22: return "message_t_length_set";
-  case 23: return "message_t_messageID_get";
-  case 24: return "message_t_messageID_set";
-  case 25: return "message_t_flags_get";
-  case 26: return "message_t_flags_set";
-  case 27: return "message_t_original_source_get";
-  case 28: return "message_t_original_source_set";
-  case 29: return "message_t_source_get";
-  case 30: return "message_t_source_set";
-  case 31: return "message_t_dest_get";
-  case 32: return "message_t_dest_set";
-  case 33: return "message_t_original_dest_get";
-  case 34: return "message_t_original_dest_set";
-  case 35: return "new_message_t";
-  case 36: return "delete_message_t";
-  case 37: return "_wrap_helicsGetVersion";
-  case 38: return "_wrap_helicsIsCoreTypeAvailable";
-  case 39: return "_wrap_helicsCreateCore";
-  case 40: return "_wrap_helicsCreateCoreFromArgs";
-  case 41: return "_wrap_helicsCoreClone";
-  case 42: return "_wrap_helicsCoreIsValid";
-  case 43: return "_wrap_helicsCreateBroker";
-  case 44: return "_wrap_helicsCreateBrokerFromArgs";
-  case 45: return "_wrap_helicsBrokerClone";
-  case 46: return "_wrap_helicsBrokerIsValid";
-  case 47: return "_wrap_helicsBrokerIsConnected";
-  case 48: return "_wrap_helicsBrokerDataLink";
-  case 49: return "_wrap_helicsBrokerAddSourceFilterToEndpoint";
-  case 50: return "_wrap_helicsBrokerAddDestinationFilterToEndpoint";
-  case 51: return "_wrap_helicsBrokerWaitForDisconnect";
-  case 52: return "_wrap_helicsCoreIsConnected";
-  case 53: return "_wrap_helicsCoreDataLink";
-  case 54: return "_wrap_helicsCoreAddSourceFilterToEndpoint";
-  case 55: return "_wrap_helicsCoreAddDestinationFilterToEndpoint";
-  case 56: return "_wrap_helicsBrokerGetIdentifier";
-  case 57: return "_wrap_helicsCoreGetIdentifier";
-  case 58: return "_wrap_helicsBrokerGetAddress";
-  case 59: return "_wrap_helicsCoreSetReadyToInit";
-  case 60: return "_wrap_helicsCoreDisconnect";
-  case 61: return "_wrap_helicsGetFederateByName";
-  case 62: return "_wrap_helicsBrokerDisconnect";
-  case 63: return "_wrap_helicsFederateDestroy";
-  case 64: return "_wrap_helicsBrokerDestroy";
-  case 65: return "_wrap_helicsCoreDestroy";
-  case 66: return "_wrap_helicsCoreFree";
-  case 67: return "_wrap_helicsBrokerFree";
-  case 68: return "_wrap_helicsCreateValueFederate";
-  case 69: return "_wrap_helicsCreateValueFederateFromConfig";
-  case 70: return "_wrap_helicsCreateMessageFederate";
-  case 71: return "_wrap_helicsCreateMessageFederateFromConfig";
-  case 72: return "_wrap_helicsCreateCombinationFederate";
-  case 73: return "_wrap_helicsCreateCombinationFederateFromConfig";
-  case 74: return "_wrap_helicsFederateClone";
-  case 75: return "_wrap_helicsCreateFederateInfo";
-  case 76: return "_wrap_helicsFederateInfoLoadFromArgs";
-  case 77: return "_wrap_helicsFederateInfoFree";
-  case 78: return "_wrap_helicsFederateIsValid";
-  case 79: return "_wrap_helicsFederateInfoSetCoreName";
-  case 80: return "_wrap_helicsFederateInfoSetCoreInitString";
-  case 81: return "_wrap_helicsFederateInfoSetCoreTypeFromString";
-  case 82: return "_wrap_helicsFederateInfoSetCoreType";
-  case 83: return "_wrap_helicsFederateInfoSetFlagOption";
-  case 84: return "_wrap_helicsFederateInfoSetSeparator";
-  case 85: return "_wrap_helicsFederateInfoSetTimeProperty";
-  case 86: return "_wrap_helicsFederateInfoSetIntegerProperty";
-  case 87: return "_wrap_helicsFederateRegisterInterfaces";
-  case 88: return "_wrap_helicsFederateFinalize";
-  case 89: return "_wrap_helicsFederateFree";
-  case 90: return "_wrap_helicsCloseLibrary";
-  case 91: return "_wrap_helicsFederateEnterInitializingMode";
-  case 92: return "_wrap_helicsFederateEnterInitializingModeAsync";
-  case 93: return "_wrap_helicsFederateIsAsyncOperationCompleted";
-  case 94: return "_wrap_helicsFederateEnterInitializingModeComplete";
-  case 95: return "_wrap_helicsFederateEnterExecutingMode";
-  case 96: return "_wrap_helicsFederateEnterExecutingModeAsync";
-  case 97: return "_wrap_helicsFederateEnterExecutingModeComplete";
-  case 98: return "_wrap_helicsFederateEnterExecutingModeIterative";
-  case 99: return "_wrap_helicsFederateEnterExecutingModeIterativeAsync";
-  case 100: return "_wrap_helicsFederateEnterExecutingModeIterativeComplete";
-  case 101: return "_wrap_helicsFederateGetState";
-  case 102: return "_wrap_helicsFederateGetCoreObject";
-  case 103: return "_wrap_helicsFederateRequestTime";
-  case 104: return "_wrap_helicsFederateRequestNextStep";
-  case 105: return "_wrap_helicsFederateRequestTimeIterative";
-  case 106: return "_wrap_helicsFederateRequestTimeAsync";
-  case 107: return "_wrap_helicsFederateRequestTimeComplete";
-  case 108: return "_wrap_helicsFederateRequestTimeIterativeAsync";
-  case 109: return "_wrap_helicsFederateRequestTimeIterativeComplete";
-  case 110: return "_wrap_helicsFederateGetName";
-  case 111: return "_wrap_helicsFederateSetTimeProperty";
-  case 112: return "_wrap_helicsFederateSetFlagOption";
-  case 113: return "_wrap_helicsFederateSetSeparator";
-  case 114: return "_wrap_helicsFederateSetIntegerProperty";
-  case 115: return "_wrap_helicsFederateGetTimeProperty";
-  case 116: return "_wrap_helicsFederateGetFlagOption";
-  case 117: return "_wrap_helicsFederateGetIntegerProperty";
-  case 118: return "_wrap_helicsFederateGetCurrentTime";
-  case 119: return "_wrap_helicsCreateQuery";
-  case 120: return "_wrap_helicsQueryExecute";
-  case 121: return "_wrap_helicsQueryCoreExecute";
-  case 122: return "_wrap_helicsQueryBrokerExecute";
-  case 123: return "_wrap_helicsQueryExecuteAsync";
-  case 124: return "_wrap_helicsQueryExecuteComplete";
-  case 125: return "_wrap_helicsQueryIsCompleted";
-  case 126: return "_wrap_helicsQueryFree";
-  case 127: return "_wrap_helicsCleanupLibrary";
-  case 128: return "_wrap_helicsFederateRegisterSubscription";
-  case 129: return "_wrap_helicsFederateRegisterPublication";
-  case 130: return "_wrap_helicsFederateRegisterTypePublication";
-  case 131: return "_wrap_helicsFederateRegisterGlobalPublication";
-  case 132: return "_wrap_helicsFederateRegisterGlobalTypePublication";
-  case 133: return "_wrap_helicsFederateRegisterInput";
-  case 134: return "_wrap_helicsFederateRegisterTypeInput";
-  case 135: return "_wrap_helicsFederateRegisterGlobalInput";
-  case 136: return "_wrap_helicsFederateRegisterGlobalTypeInput";
-  case 137: return "_wrap_helicsFederateGetPublication";
-  case 138: return "_wrap_helicsFederateGetPublicationByIndex";
-  case 139: return "_wrap_helicsFederateGetInput";
-  case 140: return "_wrap_helicsFederateGetInputByIndex";
-  case 141: return "_wrap_helicsFederateGetSubscription";
-  case 142: return "_wrap_helicsPublicationPublishRaw";
-  case 143: return "_wrap_helicsPublicationPublishString";
-  case 144: return "_wrap_helicsPublicationPublishInteger";
-  case 145: return "_wrap_helicsPublicationPublishBoolean";
-  case 146: return "_wrap_helicsPublicationPublishDouble";
-  case 147: return "_wrap_helicsPublicationPublishComplex";
-  case 148: return "_wrap_helicsPublicationPublishVector";
-  case 149: return "_wrap_helicsPublicationPublishNamedPoint";
-  case 150: return "_wrap_helicsPublicationAddTarget";
-  case 151: return "_wrap_helicsInputAddTarget";
-  case 152: return "_wrap_helicsInputGetRawValueSize";
-  case 153: return "_wrap_helicsInputGetRawValue";
-  case 154: return "_wrap_helicsInputGetStringSize";
-  case 155: return "_wrap_helicsInputGetString";
-  case 156: return "_wrap_helicsInputGetInteger";
-  case 157: return "_wrap_helicsInputGetBoolean";
-  case 158: return "_wrap_helicsInputGetDouble";
-  case 159: return "_wrap_helicsInputGetComplex";
-  case 160: return "_wrap_helicsInputGetVectorSize";
-  case 161: return "_wrap_helicsInputGetVector";
-  case 162: return "_wrap_helicsInputGetNamedPoint";
-  case 163: return "_wrap_helicsInputSetDefaultRaw";
-  case 164: return "_wrap_helicsInputSetDefaultString";
-  case 165: return "_wrap_helicsInputSetDefaultInteger";
-  case 166: return "_wrap_helicsInputSetDefaultBoolean";
-  case 167: return "_wrap_helicsInputSetDefaultDouble";
-  case 168: return "_wrap_helicsInputSetDefaultComplex";
-  case 169: return "_wrap_helicsInputSetDefaultVector";
-  case 170: return "_wrap_helicsInputSetDefaultNamedPoint";
-  case 171: return "_wrap_helicsInputGetType";
-  case 172: return "_wrap_helicsPublicationGetType";
-  case 173: return "_wrap_helicsInputGetKey";
-  case 174: return "_wrap_helicsSubscriptionGetKey";
-  case 175: return "_wrap_helicsPublicationGetKey";
-  case 176: return "_wrap_helicsInputGetUnits";
-  case 177: return "_wrap_helicsPublicationGetUnits";
-  case 178: return "_wrap_helicsInputIsUpdated";
-  case 179: return "_wrap_helicsInputLastUpdateTime";
-  case 180: return "_wrap_helicsFederateGetPublicationCount";
-  case 181: return "_wrap_helicsFederateGetInputCount";
-  case 182: return "_wrap_helicsFederateRegisterEndpoint";
-  case 183: return "_wrap_helicsFederateRegisterGlobalEndpoint";
-  case 184: return "_wrap_helicsFederateGetEndpoint";
-  case 185: return "_wrap_helicsFederateGetEndpointByIndex";
-  case 186: return "_wrap_helicsEndpointSetDefaultDestination";
-  case 187: return "_wrap_helicsEndpointSendMessageRaw";
-  case 188: return "_wrap_helicsEndpointSendEventRaw";
-  case 189: return "_wrap_helicsEndpointSendMessage";
-  case 190: return "_wrap_helicsEndpointSubscribe";
-  case 191: return "_wrap_helicsFederateHasMessage";
-  case 192: return "_wrap_helicsEndpointHasMessage";
-  case 193: return "_wrap_helicsFederatePendingMessages";
-  case 194: return "_wrap_helicsEndpointPendingMessages";
-  case 195: return "_wrap_helicsEndpointGetMessage";
-  case 196: return "_wrap_helicsFederateGetMessage";
-  case 197: return "_wrap_helicsEndpointGetType";
-  case 198: return "_wrap_helicsEndpointGetName";
-  case 199: return "_wrap_helicsFederateGetEndpointCount";
-  case 200: return "_wrap_helicsFederateRegisterFilter";
-  case 201: return "_wrap_helicsFederateRegisterGlobalFilter";
-  case 202: return "_wrap_helicsFederateRegisterCloningFilter";
-  case 203: return "_wrap_helicsFederateRegisterGlobalCloningFilter";
-  case 204: return "_wrap_helicsCoreRegisterFilter";
-  case 205: return "_wrap_helicsCoreRegisterCloningFilter";
-  case 206: return "_wrap_helicsFederateGetFilter";
-  case 207: return "_wrap_helicsFederateGetFilterByIndex";
-  case 208: return "_wrap_helicsFilterGetName";
-  case 209: return "_wrap_helicsFilterSet";
-  case 210: return "_wrap_helicsFilterSetString";
-  case 211: return "_wrap_helicsFilterAddDestinationTarget";
-  case 212: return "_wrap_helicsFilterAddSourceTarget";
-  case 213: return "_wrap_helicsFilterAddDeliveryEndpoint";
-  case 214: return "_wrap_helicsFilterRemoveTarget";
-  case 215: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
+  case 11: return "message_t_time_get";
+  case 12: return "message_t_time_set";
+  case 13: return "message_t_data_get";
+  case 14: return "message_t_data_set";
+  case 15: return "message_t_length_get";
+  case 16: return "message_t_length_set";
+  case 17: return "message_t_messageID_get";
+  case 18: return "message_t_messageID_set";
+  case 19: return "message_t_flags_get";
+  case 20: return "message_t_flags_set";
+  case 21: return "message_t_original_source_get";
+  case 22: return "message_t_original_source_set";
+  case 23: return "message_t_source_get";
+  case 24: return "message_t_source_set";
+  case 25: return "message_t_dest_get";
+  case 26: return "message_t_dest_set";
+  case 27: return "message_t_original_dest_get";
+  case 28: return "message_t_original_dest_set";
+  case 29: return "new_message_t";
+  case 30: return "delete_message_t";
+  case 31: return "_wrap_helicsGetVersion";
+  case 32: return "_wrap_helicsIsCoreTypeAvailable";
+  case 33: return "_wrap_helicsCreateCore";
+  case 34: return "_wrap_helicsCreateCoreFromArgs";
+  case 35: return "_wrap_helicsCoreClone";
+  case 36: return "_wrap_helicsCoreIsValid";
+  case 37: return "_wrap_helicsCreateBroker";
+  case 38: return "_wrap_helicsCreateBrokerFromArgs";
+  case 39: return "_wrap_helicsBrokerClone";
+  case 40: return "_wrap_helicsBrokerIsValid";
+  case 41: return "_wrap_helicsBrokerIsConnected";
+  case 42: return "_wrap_helicsBrokerDataLink";
+  case 43: return "_wrap_helicsBrokerAddSourceFilterToEndpoint";
+  case 44: return "_wrap_helicsBrokerAddDestinationFilterToEndpoint";
+  case 45: return "_wrap_helicsBrokerWaitForDisconnect";
+  case 46: return "_wrap_helicsCoreIsConnected";
+  case 47: return "_wrap_helicsCoreDataLink";
+  case 48: return "_wrap_helicsCoreAddSourceFilterToEndpoint";
+  case 49: return "_wrap_helicsCoreAddDestinationFilterToEndpoint";
+  case 50: return "_wrap_helicsBrokerGetIdentifier";
+  case 51: return "_wrap_helicsCoreGetIdentifier";
+  case 52: return "_wrap_helicsBrokerGetAddress";
+  case 53: return "_wrap_helicsCoreSetReadyToInit";
+  case 54: return "_wrap_helicsCoreDisconnect";
+  case 55: return "_wrap_helicsGetFederateByName";
+  case 56: return "_wrap_helicsBrokerDisconnect";
+  case 57: return "_wrap_helicsFederateDestroy";
+  case 58: return "_wrap_helicsBrokerDestroy";
+  case 59: return "_wrap_helicsCoreDestroy";
+  case 60: return "_wrap_helicsCoreFree";
+  case 61: return "_wrap_helicsBrokerFree";
+  case 62: return "_wrap_helicsCreateValueFederate";
+  case 63: return "_wrap_helicsCreateValueFederateFromConfig";
+  case 64: return "_wrap_helicsCreateMessageFederate";
+  case 65: return "_wrap_helicsCreateMessageFederateFromConfig";
+  case 66: return "_wrap_helicsCreateCombinationFederate";
+  case 67: return "_wrap_helicsCreateCombinationFederateFromConfig";
+  case 68: return "_wrap_helicsFederateClone";
+  case 69: return "_wrap_helicsCreateFederateInfo";
+  case 70: return "_wrap_helicsFederateInfoLoadFromArgs";
+  case 71: return "_wrap_helicsFederateInfoFree";
+  case 72: return "_wrap_helicsFederateIsValid";
+  case 73: return "_wrap_helicsFederateInfoSetCoreName";
+  case 74: return "_wrap_helicsFederateInfoSetCoreInitString";
+  case 75: return "_wrap_helicsFederateInfoSetCoreType";
+  case 76: return "_wrap_helicsFederateInfoSetCoreTypeFromString";
+  case 77: return "_wrap_helicsFederateInfoSetBroker";
+  case 78: return "_wrap_helicsFederateInfoSetBrokerPort";
+  case 79: return "_wrap_helicsFederateInfoSetLocalPort";
+  case 80: return "_wrap_helicsFederateInfoSetFlagOption";
+  case 81: return "_wrap_helicsFederateInfoSetSeparator";
+  case 82: return "_wrap_helicsFederateInfoSetTimeProperty";
+  case 83: return "_wrap_helicsFederateInfoSetIntegerProperty";
+  case 84: return "_wrap_helicsFederateRegisterInterfaces";
+  case 85: return "_wrap_helicsFederateFinalize";
+  case 86: return "_wrap_helicsFederateFree";
+  case 87: return "_wrap_helicsCloseLibrary";
+  case 88: return "_wrap_helicsFederateEnterInitializingMode";
+  case 89: return "_wrap_helicsFederateEnterInitializingModeAsync";
+  case 90: return "_wrap_helicsFederateIsAsyncOperationCompleted";
+  case 91: return "_wrap_helicsFederateEnterInitializingModeComplete";
+  case 92: return "_wrap_helicsFederateEnterExecutingMode";
+  case 93: return "_wrap_helicsFederateEnterExecutingModeAsync";
+  case 94: return "_wrap_helicsFederateEnterExecutingModeComplete";
+  case 95: return "_wrap_helicsFederateEnterExecutingModeIterative";
+  case 96: return "_wrap_helicsFederateEnterExecutingModeIterativeAsync";
+  case 97: return "_wrap_helicsFederateEnterExecutingModeIterativeComplete";
+  case 98: return "_wrap_helicsFederateGetState";
+  case 99: return "_wrap_helicsFederateGetCoreObject";
+  case 100: return "_wrap_helicsFederateRequestTime";
+  case 101: return "_wrap_helicsFederateRequestNextStep";
+  case 102: return "_wrap_helicsFederateRequestTimeIterative";
+  case 103: return "_wrap_helicsFederateRequestTimeAsync";
+  case 104: return "_wrap_helicsFederateRequestTimeComplete";
+  case 105: return "_wrap_helicsFederateRequestTimeIterativeAsync";
+  case 106: return "_wrap_helicsFederateRequestTimeIterativeComplete";
+  case 107: return "_wrap_helicsFederateGetName";
+  case 108: return "_wrap_helicsFederateSetTimeProperty";
+  case 109: return "_wrap_helicsFederateSetFlagOption";
+  case 110: return "_wrap_helicsFederateSetSeparator";
+  case 111: return "_wrap_helicsFederateSetIntegerProperty";
+  case 112: return "_wrap_helicsFederateGetTimeProperty";
+  case 113: return "_wrap_helicsFederateGetFlagOption";
+  case 114: return "_wrap_helicsFederateGetIntegerProperty";
+  case 115: return "_wrap_helicsFederateGetCurrentTime";
+  case 116: return "_wrap_helicsCreateQuery";
+  case 117: return "_wrap_helicsQueryExecute";
+  case 118: return "_wrap_helicsQueryCoreExecute";
+  case 119: return "_wrap_helicsQueryBrokerExecute";
+  case 120: return "_wrap_helicsQueryExecuteAsync";
+  case 121: return "_wrap_helicsQueryExecuteComplete";
+  case 122: return "_wrap_helicsQueryIsCompleted";
+  case 123: return "_wrap_helicsQueryFree";
+  case 124: return "_wrap_helicsCleanupLibrary";
+  case 125: return "_wrap_helicsFederateRegisterSubscription";
+  case 126: return "_wrap_helicsFederateRegisterPublication";
+  case 127: return "_wrap_helicsFederateRegisterTypePublication";
+  case 128: return "_wrap_helicsFederateRegisterGlobalPublication";
+  case 129: return "_wrap_helicsFederateRegisterGlobalTypePublication";
+  case 130: return "_wrap_helicsFederateRegisterInput";
+  case 131: return "_wrap_helicsFederateRegisterTypeInput";
+  case 132: return "_wrap_helicsFederateRegisterGlobalInput";
+  case 133: return "_wrap_helicsFederateRegisterGlobalTypeInput";
+  case 134: return "_wrap_helicsFederateGetPublication";
+  case 135: return "_wrap_helicsFederateGetPublicationByIndex";
+  case 136: return "_wrap_helicsFederateGetInput";
+  case 137: return "_wrap_helicsFederateGetInputByIndex";
+  case 138: return "_wrap_helicsFederateGetSubscription";
+  case 139: return "_wrap_helicsPublicationPublishRaw";
+  case 140: return "_wrap_helicsPublicationPublishString";
+  case 141: return "_wrap_helicsPublicationPublishInteger";
+  case 142: return "_wrap_helicsPublicationPublishBoolean";
+  case 143: return "_wrap_helicsPublicationPublishDouble";
+  case 144: return "_wrap_helicsPublicationPublishTime";
+  case 145: return "_wrap_helicsPublicationPublishChar";
+  case 146: return "_wrap_helicsPublicationPublishComplex";
+  case 147: return "_wrap_helicsPublicationPublishVector";
+  case 148: return "_wrap_helicsPublicationPublishNamedPoint";
+  case 149: return "_wrap_helicsPublicationAddTarget";
+  case 150: return "_wrap_helicsInputAddTarget";
+  case 151: return "_wrap_helicsInputGetRawValueSize";
+  case 152: return "_wrap_helicsInputGetRawValue";
+  case 153: return "_wrap_helicsInputGetStringSize";
+  case 154: return "_wrap_helicsInputGetString";
+  case 155: return "_wrap_helicsInputGetInteger";
+  case 156: return "_wrap_helicsInputGetBoolean";
+  case 157: return "_wrap_helicsInputGetDouble";
+  case 158: return "_wrap_helicsInputGetTime";
+  case 159: return "_wrap_helicsInputGetChar";
+  case 160: return "_wrap_helicsInputGetComplex";
+  case 161: return "_wrap_helicsInputGetVectorSize";
+  case 162: return "_wrap_helicsInputGetVector";
+  case 163: return "_wrap_helicsInputGetNamedPoint";
+  case 164: return "_wrap_helicsInputSetDefaultRaw";
+  case 165: return "_wrap_helicsInputSetDefaultString";
+  case 166: return "_wrap_helicsInputSetDefaultInteger";
+  case 167: return "_wrap_helicsInputSetDefaultBoolean";
+  case 168: return "_wrap_helicsInputSetDefaultTime";
+  case 169: return "_wrap_helicsInputSetDefaultChar";
+  case 170: return "_wrap_helicsInputSetDefaultDouble";
+  case 171: return "_wrap_helicsInputSetDefaultComplex";
+  case 172: return "_wrap_helicsInputSetDefaultVector";
+  case 173: return "_wrap_helicsInputSetDefaultNamedPoint";
+  case 174: return "_wrap_helicsInputGetType";
+  case 175: return "_wrap_helicsPublicationGetType";
+  case 176: return "_wrap_helicsInputGetKey";
+  case 177: return "_wrap_helicsSubscriptionGetKey";
+  case 178: return "_wrap_helicsPublicationGetKey";
+  case 179: return "_wrap_helicsInputGetUnits";
+  case 180: return "_wrap_helicsPublicationGetUnits";
+  case 181: return "_wrap_helicsInputIsUpdated";
+  case 182: return "_wrap_helicsInputLastUpdateTime";
+  case 183: return "_wrap_helicsFederateGetPublicationCount";
+  case 184: return "_wrap_helicsFederateGetInputCount";
+  case 185: return "_wrap_helicsFederateRegisterEndpoint";
+  case 186: return "_wrap_helicsFederateRegisterGlobalEndpoint";
+  case 187: return "_wrap_helicsFederateGetEndpoint";
+  case 188: return "_wrap_helicsFederateGetEndpointByIndex";
+  case 189: return "_wrap_helicsEndpointSetDefaultDestination";
+  case 190: return "_wrap_helicsEndpointSendMessageRaw";
+  case 191: return "_wrap_helicsEndpointSendEventRaw";
+  case 192: return "_wrap_helicsEndpointSendMessage";
+  case 193: return "_wrap_helicsEndpointSubscribe";
+  case 194: return "_wrap_helicsFederateHasMessage";
+  case 195: return "_wrap_helicsEndpointHasMessage";
+  case 196: return "_wrap_helicsFederatePendingMessages";
+  case 197: return "_wrap_helicsEndpointPendingMessages";
+  case 198: return "_wrap_helicsEndpointGetMessage";
+  case 199: return "_wrap_helicsFederateGetMessage";
+  case 200: return "_wrap_helicsEndpointGetType";
+  case 201: return "_wrap_helicsEndpointGetName";
+  case 202: return "_wrap_helicsFederateGetEndpointCount";
+  case 203: return "_wrap_helicsFederateRegisterFilter";
+  case 204: return "_wrap_helicsFederateRegisterGlobalFilter";
+  case 205: return "_wrap_helicsFederateRegisterCloningFilter";
+  case 206: return "_wrap_helicsFederateRegisterGlobalCloningFilter";
+  case 207: return "_wrap_helicsCoreRegisterFilter";
+  case 208: return "_wrap_helicsCoreRegisterCloningFilter";
+  case 209: return "_wrap_helicsFederateGetFilter";
+  case 210: return "_wrap_helicsFederateGetFilterByIndex";
+  case 211: return "_wrap_helicsFilterGetName";
+  case 212: return "_wrap_helicsFilterSet";
+  case 213: return "_wrap_helicsFilterSetString";
+  case 214: return "_wrap_helicsFilterAddDestinationTarget";
+  case 215: return "_wrap_helicsFilterAddSourceTarget";
+  case 216: return "_wrap_helicsFilterAddDeliveryEndpoint";
+  case 217: return "_wrap_helicsFilterRemoveTarget";
+  case 218: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
   default: return 0;
   }
 }
@@ -11148,211 +11403,214 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 8: flag=_wrap_helics_time_maxtime_get(resc,resv,argc,(mxArray**)(argv)); break;
   case 9: flag=_wrap_helics_true_get(resc,resv,argc,(mxArray**)(argv)); break;
   case 10: flag=_wrap_helics_false_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 11: flag=_wrap_data_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 12: flag=_wrap_data_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 13: flag=_wrap_data_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 14: flag=_wrap_data_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 15: flag=_wrap_new_data_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 16: flag=_wrap_delete_data_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 17: flag=_wrap_message_t_time_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 18: flag=_wrap_message_t_time_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 19: flag=_wrap_message_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 20: flag=_wrap_message_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 21: flag=_wrap_message_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 22: flag=_wrap_message_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 23: flag=_wrap_message_t_messageID_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 24: flag=_wrap_message_t_messageID_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 25: flag=_wrap_message_t_flags_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 26: flag=_wrap_message_t_flags_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 27: flag=_wrap_message_t_original_source_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 28: flag=_wrap_message_t_original_source_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 29: flag=_wrap_message_t_source_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 30: flag=_wrap_message_t_source_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 31: flag=_wrap_message_t_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 32: flag=_wrap_message_t_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 33: flag=_wrap_message_t_original_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
-  case 34: flag=_wrap_message_t_original_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
-  case 35: flag=_wrap_new_message_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 36: flag=_wrap_delete_message_t(resc,resv,argc,(mxArray**)(argv)); break;
-  case 37: flag=_wrap_helicsGetVersion(resc,resv,argc,(mxArray**)(argv)); break;
-  case 38: flag=_wrap_helicsIsCoreTypeAvailable(resc,resv,argc,(mxArray**)(argv)); break;
-  case 39: flag=_wrap_helicsCreateCore(resc,resv,argc,(mxArray**)(argv)); break;
-  case 40: flag=_wrap_helicsCreateCoreFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 41: flag=_wrap_helicsCoreClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 42: flag=_wrap_helicsCoreIsValid(resc,resv,argc,(mxArray**)(argv)); break;
-  case 43: flag=_wrap_helicsCreateBroker(resc,resv,argc,(mxArray**)(argv)); break;
-  case 44: flag=_wrap_helicsCreateBrokerFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 45: flag=_wrap_helicsBrokerClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 46: flag=_wrap_helicsBrokerIsValid(resc,resv,argc,(mxArray**)(argv)); break;
-  case 47: flag=_wrap_helicsBrokerIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
-  case 48: flag=_wrap_helicsBrokerDataLink(resc,resv,argc,(mxArray**)(argv)); break;
-  case 49: flag=_wrap_helicsBrokerAddSourceFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 50: flag=_wrap_helicsBrokerAddDestinationFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 51: flag=_wrap_helicsBrokerWaitForDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 52: flag=_wrap_helicsCoreIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
-  case 53: flag=_wrap_helicsCoreDataLink(resc,resv,argc,(mxArray**)(argv)); break;
-  case 54: flag=_wrap_helicsCoreAddSourceFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 55: flag=_wrap_helicsCoreAddDestinationFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 56: flag=_wrap_helicsBrokerGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
-  case 57: flag=_wrap_helicsCoreGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
-  case 58: flag=_wrap_helicsBrokerGetAddress(resc,resv,argc,(mxArray**)(argv)); break;
-  case 59: flag=_wrap_helicsCoreSetReadyToInit(resc,resv,argc,(mxArray**)(argv)); break;
-  case 60: flag=_wrap_helicsCoreDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 61: flag=_wrap_helicsGetFederateByName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 62: flag=_wrap_helicsBrokerDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
-  case 63: flag=_wrap_helicsFederateDestroy(resc,resv,argc,(mxArray**)(argv)); break;
-  case 64: flag=_wrap_helicsBrokerDestroy(resc,resv,argc,(mxArray**)(argv)); break;
-  case 65: flag=_wrap_helicsCoreDestroy(resc,resv,argc,(mxArray**)(argv)); break;
-  case 66: flag=_wrap_helicsCoreFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 67: flag=_wrap_helicsBrokerFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 68: flag=_wrap_helicsCreateValueFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 69: flag=_wrap_helicsCreateValueFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
-  case 70: flag=_wrap_helicsCreateMessageFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 71: flag=_wrap_helicsCreateMessageFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
-  case 72: flag=_wrap_helicsCreateCombinationFederate(resc,resv,argc,(mxArray**)(argv)); break;
-  case 73: flag=_wrap_helicsCreateCombinationFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
-  case 74: flag=_wrap_helicsFederateClone(resc,resv,argc,(mxArray**)(argv)); break;
-  case 75: flag=_wrap_helicsCreateFederateInfo(resc,resv,argc,(mxArray**)(argv)); break;
-  case 76: flag=_wrap_helicsFederateInfoLoadFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
-  case 77: flag=_wrap_helicsFederateInfoFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 78: flag=_wrap_helicsFederateIsValid(resc,resv,argc,(mxArray**)(argv)); break;
-  case 79: flag=_wrap_helicsFederateInfoSetCoreName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 80: flag=_wrap_helicsFederateInfoSetCoreInitString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 81: flag=_wrap_helicsFederateInfoSetCoreTypeFromString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 82: flag=_wrap_helicsFederateInfoSetCoreType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 83: flag=_wrap_helicsFederateInfoSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
-  case 84: flag=_wrap_helicsFederateInfoSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
-  case 85: flag=_wrap_helicsFederateInfoSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 86: flag=_wrap_helicsFederateInfoSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 87: flag=_wrap_helicsFederateRegisterInterfaces(resc,resv,argc,(mxArray**)(argv)); break;
-  case 88: flag=_wrap_helicsFederateFinalize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 89: flag=_wrap_helicsFederateFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 90: flag=_wrap_helicsCloseLibrary(resc,resv,argc,(mxArray**)(argv)); break;
-  case 91: flag=_wrap_helicsFederateEnterInitializingMode(resc,resv,argc,(mxArray**)(argv)); break;
-  case 92: flag=_wrap_helicsFederateEnterInitializingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 93: flag=_wrap_helicsFederateIsAsyncOperationCompleted(resc,resv,argc,(mxArray**)(argv)); break;
-  case 94: flag=_wrap_helicsFederateEnterInitializingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 95: flag=_wrap_helicsFederateEnterExecutingMode(resc,resv,argc,(mxArray**)(argv)); break;
-  case 96: flag=_wrap_helicsFederateEnterExecutingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 97: flag=_wrap_helicsFederateEnterExecutingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 98: flag=_wrap_helicsFederateEnterExecutingModeIterative(resc,resv,argc,(mxArray**)(argv)); break;
-  case 99: flag=_wrap_helicsFederateEnterExecutingModeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 100: flag=_wrap_helicsFederateEnterExecutingModeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 101: flag=_wrap_helicsFederateGetState(resc,resv,argc,(mxArray**)(argv)); break;
-  case 102: flag=_wrap_helicsFederateGetCoreObject(resc,resv,argc,(mxArray**)(argv)); break;
-  case 103: flag=_wrap_helicsFederateRequestTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 104: flag=_wrap_helicsFederateRequestNextStep(resc,resv,argc,(mxArray**)(argv)); break;
-  case 105: flag=_wrap_helicsFederateRequestTimeIterative(resc,resv,argc,(mxArray**)(argv)); break;
-  case 106: flag=_wrap_helicsFederateRequestTimeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 107: flag=_wrap_helicsFederateRequestTimeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 108: flag=_wrap_helicsFederateRequestTimeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 109: flag=_wrap_helicsFederateRequestTimeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 110: flag=_wrap_helicsFederateGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 111: flag=_wrap_helicsFederateSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 112: flag=_wrap_helicsFederateSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
-  case 113: flag=_wrap_helicsFederateSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
-  case 114: flag=_wrap_helicsFederateSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 115: flag=_wrap_helicsFederateGetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 116: flag=_wrap_helicsFederateGetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
-  case 117: flag=_wrap_helicsFederateGetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
-  case 118: flag=_wrap_helicsFederateGetCurrentTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 119: flag=_wrap_helicsCreateQuery(resc,resv,argc,(mxArray**)(argv)); break;
-  case 120: flag=_wrap_helicsQueryExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 121: flag=_wrap_helicsQueryCoreExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 122: flag=_wrap_helicsQueryBrokerExecute(resc,resv,argc,(mxArray**)(argv)); break;
-  case 123: flag=_wrap_helicsQueryExecuteAsync(resc,resv,argc,(mxArray**)(argv)); break;
-  case 124: flag=_wrap_helicsQueryExecuteComplete(resc,resv,argc,(mxArray**)(argv)); break;
-  case 125: flag=_wrap_helicsQueryIsCompleted(resc,resv,argc,(mxArray**)(argv)); break;
-  case 126: flag=_wrap_helicsQueryFree(resc,resv,argc,(mxArray**)(argv)); break;
-  case 127: flag=_wrap_helicsCleanupLibrary(resc,resv,argc,(mxArray**)(argv)); break;
-  case 128: flag=_wrap_helicsFederateRegisterSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 129: flag=_wrap_helicsFederateRegisterPublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 130: flag=_wrap_helicsFederateRegisterTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 131: flag=_wrap_helicsFederateRegisterGlobalPublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 132: flag=_wrap_helicsFederateRegisterGlobalTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 133: flag=_wrap_helicsFederateRegisterInput(resc,resv,argc,(mxArray**)(argv)); break;
-  case 134: flag=_wrap_helicsFederateRegisterTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
-  case 135: flag=_wrap_helicsFederateRegisterGlobalInput(resc,resv,argc,(mxArray**)(argv)); break;
-  case 136: flag=_wrap_helicsFederateRegisterGlobalTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
-  case 137: flag=_wrap_helicsFederateGetPublication(resc,resv,argc,(mxArray**)(argv)); break;
-  case 138: flag=_wrap_helicsFederateGetPublicationByIndex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 139: flag=_wrap_helicsFederateGetInput(resc,resv,argc,(mxArray**)(argv)); break;
-  case 140: flag=_wrap_helicsFederateGetInputByIndex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 141: flag=_wrap_helicsFederateGetSubscription(resc,resv,argc,(mxArray**)(argv)); break;
-  case 142: flag=_wrap_helicsPublicationPublishRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 143: flag=_wrap_helicsPublicationPublishString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 144: flag=_wrap_helicsPublicationPublishInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 145: flag=_wrap_helicsPublicationPublishBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 146: flag=_wrap_helicsPublicationPublishDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 147: flag=_wrap_helicsPublicationPublishComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 148: flag=_wrap_helicsPublicationPublishVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 149: flag=_wrap_helicsPublicationPublishNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 150: flag=_wrap_helicsPublicationAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 151: flag=_wrap_helicsInputAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 152: flag=_wrap_helicsInputGetRawValueSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 153: flag=_wrap_helicsInputGetRawValue(resc,resv,argc,(mxArray**)(argv)); break;
-  case 154: flag=_wrap_helicsInputGetStringSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 155: flag=_wrap_helicsInputGetString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 156: flag=_wrap_helicsInputGetInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 157: flag=_wrap_helicsInputGetBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 158: flag=_wrap_helicsInputGetDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 159: flag=_wrap_helicsInputGetComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 160: flag=_wrap_helicsInputGetVectorSize(resc,resv,argc,(mxArray**)(argv)); break;
-  case 161: flag=_wrap_helicsInputGetVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 162: flag=_wrap_helicsInputGetNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 163: flag=_wrap_helicsInputSetDefaultRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 164: flag=_wrap_helicsInputSetDefaultString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 165: flag=_wrap_helicsInputSetDefaultInteger(resc,resv,argc,(mxArray**)(argv)); break;
-  case 166: flag=_wrap_helicsInputSetDefaultBoolean(resc,resv,argc,(mxArray**)(argv)); break;
-  case 167: flag=_wrap_helicsInputSetDefaultDouble(resc,resv,argc,(mxArray**)(argv)); break;
-  case 168: flag=_wrap_helicsInputSetDefaultComplex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 169: flag=_wrap_helicsInputSetDefaultVector(resc,resv,argc,(mxArray**)(argv)); break;
-  case 170: flag=_wrap_helicsInputSetDefaultNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 171: flag=_wrap_helicsInputGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 172: flag=_wrap_helicsPublicationGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 173: flag=_wrap_helicsInputGetKey(resc,resv,argc,(mxArray**)(argv)); break;
-  case 174: flag=_wrap_helicsSubscriptionGetKey(resc,resv,argc,(mxArray**)(argv)); break;
-  case 175: flag=_wrap_helicsPublicationGetKey(resc,resv,argc,(mxArray**)(argv)); break;
-  case 176: flag=_wrap_helicsInputGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
-  case 177: flag=_wrap_helicsPublicationGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
-  case 178: flag=_wrap_helicsInputIsUpdated(resc,resv,argc,(mxArray**)(argv)); break;
-  case 179: flag=_wrap_helicsInputLastUpdateTime(resc,resv,argc,(mxArray**)(argv)); break;
-  case 180: flag=_wrap_helicsFederateGetPublicationCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 181: flag=_wrap_helicsFederateGetInputCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 182: flag=_wrap_helicsFederateRegisterEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 183: flag=_wrap_helicsFederateRegisterGlobalEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 184: flag=_wrap_helicsFederateGetEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 185: flag=_wrap_helicsFederateGetEndpointByIndex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 186: flag=_wrap_helicsEndpointSetDefaultDestination(resc,resv,argc,(mxArray**)(argv)); break;
-  case 187: flag=_wrap_helicsEndpointSendMessageRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 188: flag=_wrap_helicsEndpointSendEventRaw(resc,resv,argc,(mxArray**)(argv)); break;
-  case 189: flag=_wrap_helicsEndpointSendMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 190: flag=_wrap_helicsEndpointSubscribe(resc,resv,argc,(mxArray**)(argv)); break;
-  case 191: flag=_wrap_helicsFederateHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 192: flag=_wrap_helicsEndpointHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 193: flag=_wrap_helicsFederatePendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
-  case 194: flag=_wrap_helicsEndpointPendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
-  case 195: flag=_wrap_helicsEndpointGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 196: flag=_wrap_helicsFederateGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
-  case 197: flag=_wrap_helicsEndpointGetType(resc,resv,argc,(mxArray**)(argv)); break;
-  case 198: flag=_wrap_helicsEndpointGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 199: flag=_wrap_helicsFederateGetEndpointCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 200: flag=_wrap_helicsFederateRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 201: flag=_wrap_helicsFederateRegisterGlobalFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 202: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 203: flag=_wrap_helicsFederateRegisterGlobalCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 204: flag=_wrap_helicsCoreRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 205: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 206: flag=_wrap_helicsFederateGetFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 207: flag=_wrap_helicsFederateGetFilterByIndex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 208: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 209: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
-  case 210: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 211: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 212: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 213: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 214: flag=_wrap_helicsFilterRemoveTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 215: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 11: flag=_wrap_message_t_time_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 12: flag=_wrap_message_t_time_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 13: flag=_wrap_message_t_data_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 14: flag=_wrap_message_t_data_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 15: flag=_wrap_message_t_length_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 16: flag=_wrap_message_t_length_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 17: flag=_wrap_message_t_messageID_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 18: flag=_wrap_message_t_messageID_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 19: flag=_wrap_message_t_flags_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 20: flag=_wrap_message_t_flags_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 21: flag=_wrap_message_t_original_source_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 22: flag=_wrap_message_t_original_source_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 23: flag=_wrap_message_t_source_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 24: flag=_wrap_message_t_source_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 25: flag=_wrap_message_t_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 26: flag=_wrap_message_t_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 27: flag=_wrap_message_t_original_dest_get(resc,resv,argc,(mxArray**)(argv)); break;
+  case 28: flag=_wrap_message_t_original_dest_set(resc,resv,argc,(mxArray**)(argv)); break;
+  case 29: flag=_wrap_new_message_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 30: flag=_wrap_delete_message_t(resc,resv,argc,(mxArray**)(argv)); break;
+  case 31: flag=_wrap_helicsGetVersion(resc,resv,argc,(mxArray**)(argv)); break;
+  case 32: flag=_wrap_helicsIsCoreTypeAvailable(resc,resv,argc,(mxArray**)(argv)); break;
+  case 33: flag=_wrap_helicsCreateCore(resc,resv,argc,(mxArray**)(argv)); break;
+  case 34: flag=_wrap_helicsCreateCoreFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 35: flag=_wrap_helicsCoreClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 36: flag=_wrap_helicsCoreIsValid(resc,resv,argc,(mxArray**)(argv)); break;
+  case 37: flag=_wrap_helicsCreateBroker(resc,resv,argc,(mxArray**)(argv)); break;
+  case 38: flag=_wrap_helicsCreateBrokerFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 39: flag=_wrap_helicsBrokerClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 40: flag=_wrap_helicsBrokerIsValid(resc,resv,argc,(mxArray**)(argv)); break;
+  case 41: flag=_wrap_helicsBrokerIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
+  case 42: flag=_wrap_helicsBrokerDataLink(resc,resv,argc,(mxArray**)(argv)); break;
+  case 43: flag=_wrap_helicsBrokerAddSourceFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 44: flag=_wrap_helicsBrokerAddDestinationFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 45: flag=_wrap_helicsBrokerWaitForDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 46: flag=_wrap_helicsCoreIsConnected(resc,resv,argc,(mxArray**)(argv)); break;
+  case 47: flag=_wrap_helicsCoreDataLink(resc,resv,argc,(mxArray**)(argv)); break;
+  case 48: flag=_wrap_helicsCoreAddSourceFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 49: flag=_wrap_helicsCoreAddDestinationFilterToEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 50: flag=_wrap_helicsBrokerGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
+  case 51: flag=_wrap_helicsCoreGetIdentifier(resc,resv,argc,(mxArray**)(argv)); break;
+  case 52: flag=_wrap_helicsBrokerGetAddress(resc,resv,argc,(mxArray**)(argv)); break;
+  case 53: flag=_wrap_helicsCoreSetReadyToInit(resc,resv,argc,(mxArray**)(argv)); break;
+  case 54: flag=_wrap_helicsCoreDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 55: flag=_wrap_helicsGetFederateByName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 56: flag=_wrap_helicsBrokerDisconnect(resc,resv,argc,(mxArray**)(argv)); break;
+  case 57: flag=_wrap_helicsFederateDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 58: flag=_wrap_helicsBrokerDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 59: flag=_wrap_helicsCoreDestroy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 60: flag=_wrap_helicsCoreFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 61: flag=_wrap_helicsBrokerFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 62: flag=_wrap_helicsCreateValueFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 63: flag=_wrap_helicsCreateValueFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 64: flag=_wrap_helicsCreateMessageFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 65: flag=_wrap_helicsCreateMessageFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 66: flag=_wrap_helicsCreateCombinationFederate(resc,resv,argc,(mxArray**)(argv)); break;
+  case 67: flag=_wrap_helicsCreateCombinationFederateFromConfig(resc,resv,argc,(mxArray**)(argv)); break;
+  case 68: flag=_wrap_helicsFederateClone(resc,resv,argc,(mxArray**)(argv)); break;
+  case 69: flag=_wrap_helicsCreateFederateInfo(resc,resv,argc,(mxArray**)(argv)); break;
+  case 70: flag=_wrap_helicsFederateInfoLoadFromArgs(resc,resv,argc,(mxArray**)(argv)); break;
+  case 71: flag=_wrap_helicsFederateInfoFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 72: flag=_wrap_helicsFederateIsValid(resc,resv,argc,(mxArray**)(argv)); break;
+  case 73: flag=_wrap_helicsFederateInfoSetCoreName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 74: flag=_wrap_helicsFederateInfoSetCoreInitString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 75: flag=_wrap_helicsFederateInfoSetCoreType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 76: flag=_wrap_helicsFederateInfoSetCoreTypeFromString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 77: flag=_wrap_helicsFederateInfoSetBroker(resc,resv,argc,(mxArray**)(argv)); break;
+  case 78: flag=_wrap_helicsFederateInfoSetBrokerPort(resc,resv,argc,(mxArray**)(argv)); break;
+  case 79: flag=_wrap_helicsFederateInfoSetLocalPort(resc,resv,argc,(mxArray**)(argv)); break;
+  case 80: flag=_wrap_helicsFederateInfoSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 81: flag=_wrap_helicsFederateInfoSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
+  case 82: flag=_wrap_helicsFederateInfoSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 83: flag=_wrap_helicsFederateInfoSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 84: flag=_wrap_helicsFederateRegisterInterfaces(resc,resv,argc,(mxArray**)(argv)); break;
+  case 85: flag=_wrap_helicsFederateFinalize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 86: flag=_wrap_helicsFederateFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 87: flag=_wrap_helicsCloseLibrary(resc,resv,argc,(mxArray**)(argv)); break;
+  case 88: flag=_wrap_helicsFederateEnterInitializingMode(resc,resv,argc,(mxArray**)(argv)); break;
+  case 89: flag=_wrap_helicsFederateEnterInitializingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 90: flag=_wrap_helicsFederateIsAsyncOperationCompleted(resc,resv,argc,(mxArray**)(argv)); break;
+  case 91: flag=_wrap_helicsFederateEnterInitializingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 92: flag=_wrap_helicsFederateEnterExecutingMode(resc,resv,argc,(mxArray**)(argv)); break;
+  case 93: flag=_wrap_helicsFederateEnterExecutingModeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 94: flag=_wrap_helicsFederateEnterExecutingModeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 95: flag=_wrap_helicsFederateEnterExecutingModeIterative(resc,resv,argc,(mxArray**)(argv)); break;
+  case 96: flag=_wrap_helicsFederateEnterExecutingModeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 97: flag=_wrap_helicsFederateEnterExecutingModeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 98: flag=_wrap_helicsFederateGetState(resc,resv,argc,(mxArray**)(argv)); break;
+  case 99: flag=_wrap_helicsFederateGetCoreObject(resc,resv,argc,(mxArray**)(argv)); break;
+  case 100: flag=_wrap_helicsFederateRequestTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 101: flag=_wrap_helicsFederateRequestNextStep(resc,resv,argc,(mxArray**)(argv)); break;
+  case 102: flag=_wrap_helicsFederateRequestTimeIterative(resc,resv,argc,(mxArray**)(argv)); break;
+  case 103: flag=_wrap_helicsFederateRequestTimeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 104: flag=_wrap_helicsFederateRequestTimeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 105: flag=_wrap_helicsFederateRequestTimeIterativeAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 106: flag=_wrap_helicsFederateRequestTimeIterativeComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 107: flag=_wrap_helicsFederateGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 108: flag=_wrap_helicsFederateSetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 109: flag=_wrap_helicsFederateSetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 110: flag=_wrap_helicsFederateSetSeparator(resc,resv,argc,(mxArray**)(argv)); break;
+  case 111: flag=_wrap_helicsFederateSetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 112: flag=_wrap_helicsFederateGetTimeProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 113: flag=_wrap_helicsFederateGetFlagOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 114: flag=_wrap_helicsFederateGetIntegerProperty(resc,resv,argc,(mxArray**)(argv)); break;
+  case 115: flag=_wrap_helicsFederateGetCurrentTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 116: flag=_wrap_helicsCreateQuery(resc,resv,argc,(mxArray**)(argv)); break;
+  case 117: flag=_wrap_helicsQueryExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 118: flag=_wrap_helicsQueryCoreExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 119: flag=_wrap_helicsQueryBrokerExecute(resc,resv,argc,(mxArray**)(argv)); break;
+  case 120: flag=_wrap_helicsQueryExecuteAsync(resc,resv,argc,(mxArray**)(argv)); break;
+  case 121: flag=_wrap_helicsQueryExecuteComplete(resc,resv,argc,(mxArray**)(argv)); break;
+  case 122: flag=_wrap_helicsQueryIsCompleted(resc,resv,argc,(mxArray**)(argv)); break;
+  case 123: flag=_wrap_helicsQueryFree(resc,resv,argc,(mxArray**)(argv)); break;
+  case 124: flag=_wrap_helicsCleanupLibrary(resc,resv,argc,(mxArray**)(argv)); break;
+  case 125: flag=_wrap_helicsFederateRegisterSubscription(resc,resv,argc,(mxArray**)(argv)); break;
+  case 126: flag=_wrap_helicsFederateRegisterPublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 127: flag=_wrap_helicsFederateRegisterTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 128: flag=_wrap_helicsFederateRegisterGlobalPublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 129: flag=_wrap_helicsFederateRegisterGlobalTypePublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 130: flag=_wrap_helicsFederateRegisterInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 131: flag=_wrap_helicsFederateRegisterTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 132: flag=_wrap_helicsFederateRegisterGlobalInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 133: flag=_wrap_helicsFederateRegisterGlobalTypeInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 134: flag=_wrap_helicsFederateGetPublication(resc,resv,argc,(mxArray**)(argv)); break;
+  case 135: flag=_wrap_helicsFederateGetPublicationByIndex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 136: flag=_wrap_helicsFederateGetInput(resc,resv,argc,(mxArray**)(argv)); break;
+  case 137: flag=_wrap_helicsFederateGetInputByIndex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 138: flag=_wrap_helicsFederateGetSubscription(resc,resv,argc,(mxArray**)(argv)); break;
+  case 139: flag=_wrap_helicsPublicationPublishRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 140: flag=_wrap_helicsPublicationPublishString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 141: flag=_wrap_helicsPublicationPublishInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 142: flag=_wrap_helicsPublicationPublishBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 143: flag=_wrap_helicsPublicationPublishDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 144: flag=_wrap_helicsPublicationPublishTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 145: flag=_wrap_helicsPublicationPublishChar(resc,resv,argc,(mxArray**)(argv)); break;
+  case 146: flag=_wrap_helicsPublicationPublishComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 147: flag=_wrap_helicsPublicationPublishVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 148: flag=_wrap_helicsPublicationPublishNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 149: flag=_wrap_helicsPublicationAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 150: flag=_wrap_helicsInputAddTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 151: flag=_wrap_helicsInputGetRawValueSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 152: flag=_wrap_helicsInputGetRawValue(resc,resv,argc,(mxArray**)(argv)); break;
+  case 153: flag=_wrap_helicsInputGetStringSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 154: flag=_wrap_helicsInputGetString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 155: flag=_wrap_helicsInputGetInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 156: flag=_wrap_helicsInputGetBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 157: flag=_wrap_helicsInputGetDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 158: flag=_wrap_helicsInputGetTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 159: flag=_wrap_helicsInputGetChar(resc,resv,argc,(mxArray**)(argv)); break;
+  case 160: flag=_wrap_helicsInputGetComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 161: flag=_wrap_helicsInputGetVectorSize(resc,resv,argc,(mxArray**)(argv)); break;
+  case 162: flag=_wrap_helicsInputGetVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 163: flag=_wrap_helicsInputGetNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 164: flag=_wrap_helicsInputSetDefaultRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 165: flag=_wrap_helicsInputSetDefaultString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 166: flag=_wrap_helicsInputSetDefaultInteger(resc,resv,argc,(mxArray**)(argv)); break;
+  case 167: flag=_wrap_helicsInputSetDefaultBoolean(resc,resv,argc,(mxArray**)(argv)); break;
+  case 168: flag=_wrap_helicsInputSetDefaultTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 169: flag=_wrap_helicsInputSetDefaultChar(resc,resv,argc,(mxArray**)(argv)); break;
+  case 170: flag=_wrap_helicsInputSetDefaultDouble(resc,resv,argc,(mxArray**)(argv)); break;
+  case 171: flag=_wrap_helicsInputSetDefaultComplex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 172: flag=_wrap_helicsInputSetDefaultVector(resc,resv,argc,(mxArray**)(argv)); break;
+  case 173: flag=_wrap_helicsInputSetDefaultNamedPoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 174: flag=_wrap_helicsInputGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 175: flag=_wrap_helicsPublicationGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 176: flag=_wrap_helicsInputGetKey(resc,resv,argc,(mxArray**)(argv)); break;
+  case 177: flag=_wrap_helicsSubscriptionGetKey(resc,resv,argc,(mxArray**)(argv)); break;
+  case 178: flag=_wrap_helicsPublicationGetKey(resc,resv,argc,(mxArray**)(argv)); break;
+  case 179: flag=_wrap_helicsInputGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
+  case 180: flag=_wrap_helicsPublicationGetUnits(resc,resv,argc,(mxArray**)(argv)); break;
+  case 181: flag=_wrap_helicsInputIsUpdated(resc,resv,argc,(mxArray**)(argv)); break;
+  case 182: flag=_wrap_helicsInputLastUpdateTime(resc,resv,argc,(mxArray**)(argv)); break;
+  case 183: flag=_wrap_helicsFederateGetPublicationCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 184: flag=_wrap_helicsFederateGetInputCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 185: flag=_wrap_helicsFederateRegisterEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 186: flag=_wrap_helicsFederateRegisterGlobalEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 187: flag=_wrap_helicsFederateGetEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 188: flag=_wrap_helicsFederateGetEndpointByIndex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 189: flag=_wrap_helicsEndpointSetDefaultDestination(resc,resv,argc,(mxArray**)(argv)); break;
+  case 190: flag=_wrap_helicsEndpointSendMessageRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 191: flag=_wrap_helicsEndpointSendEventRaw(resc,resv,argc,(mxArray**)(argv)); break;
+  case 192: flag=_wrap_helicsEndpointSendMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 193: flag=_wrap_helicsEndpointSubscribe(resc,resv,argc,(mxArray**)(argv)); break;
+  case 194: flag=_wrap_helicsFederateHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 195: flag=_wrap_helicsEndpointHasMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 196: flag=_wrap_helicsFederatePendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
+  case 197: flag=_wrap_helicsEndpointPendingMessages(resc,resv,argc,(mxArray**)(argv)); break;
+  case 198: flag=_wrap_helicsEndpointGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 199: flag=_wrap_helicsFederateGetMessage(resc,resv,argc,(mxArray**)(argv)); break;
+  case 200: flag=_wrap_helicsEndpointGetType(resc,resv,argc,(mxArray**)(argv)); break;
+  case 201: flag=_wrap_helicsEndpointGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 202: flag=_wrap_helicsFederateGetEndpointCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 203: flag=_wrap_helicsFederateRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 204: flag=_wrap_helicsFederateRegisterGlobalFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 205: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 206: flag=_wrap_helicsFederateRegisterGlobalCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 207: flag=_wrap_helicsCoreRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 208: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 209: flag=_wrap_helicsFederateGetFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 210: flag=_wrap_helicsFederateGetFilterByIndex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 211: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 212: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
+  case 213: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 214: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 215: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 216: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 217: flag=_wrap_helicsFilterRemoveTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 218: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
   default: flag=1, SWIG_Error(SWIG_RuntimeError, "No function id %d.", fcn_id);
   }
   if (flag) {

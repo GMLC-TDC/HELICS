@@ -9,6 +9,9 @@
 package com.java.helics;
 
 public class helicsJNI {
+  static {
+    System.loadLibrary("JNIhelicsd");
+  }
   public final static native int helics_ok_get();
   public final static native int helics_error_registration_failure_get();
   public final static native int helics_error_connection_failure_get();
@@ -63,12 +66,6 @@ public class helicsJNI {
   public final static native int helics_handle_option_multiple_connections_allowed_get();
   public final static native int helics_handle_option_only_transmit_on_change_get();
   public final static native int helics_handle_option_only_update_on_change_get();
-  public final static native void data_t_data_set(long jarg1, data_t jarg1_, String jarg2);
-  public final static native String data_t_data_get(long jarg1, data_t jarg1_);
-  public final static native void data_t_length_set(long jarg1, data_t jarg1_, long jarg2);
-  public final static native long data_t_length_get(long jarg1, data_t jarg1_);
-  public final static native long new_data_t();
-  public final static native void delete_data_t(long jarg1);
   public final static native void helics_complex_real_set(long jarg1, helics_complex jarg1_, double jarg2);
   public final static native double helics_complex_real_get(long jarg1, helics_complex jarg1_);
   public final static native void helics_complex_imag_set(long jarg1, helics_complex jarg1_, double jarg2);
@@ -149,8 +146,11 @@ public class helicsJNI {
   public final static native int helicsFederateIsValid(long jarg1);
   public final static native void helicsFederateInfoSetCoreName(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetCoreInitString(long jarg1, String jarg2);
-  public final static native void helicsFederateInfoSetCoreTypeFromString(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetCoreType(long jarg1, int jarg2);
+  public final static native void helicsFederateInfoSetCoreTypeFromString(long jarg1, String jarg2);
+  public final static native void helicsFederateInfoSetBroker(long jarg1, String jarg2);
+  public final static native void helicsFederateInfoSetBrokerPort(long jarg1, int jarg2);
+  public final static native void helicsFederateInfoSetLocalPort(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetFlagOption(long jarg1, int jarg2, int jarg3);
   public final static native void helicsFederateInfoSetSeparator(long jarg1, char jarg2);
   public final static native void helicsFederateInfoSetTimeProperty(long jarg1, int jarg2, double jarg3);
@@ -203,6 +203,8 @@ public class helicsJNI {
   public final static native int HELICS_DATA_TYPE_VECTOR_get();
   public final static native int HELICS_DATA_TYPE_NAMEDPOINT_get();
   public final static native int HELICS_DATA_TYPE_BOOLEAN_get();
+  public final static native int HELICS_DATA_TYPE_CHAR_get();
+  public final static native int HELICS_DATA_TYPE_TIME_get();
   public final static native int HELICS_DATA_TYPE_RAW_get();
   public final static native int HELICS_DATA_TYPE_ANY_get();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3);
@@ -224,6 +226,8 @@ public class helicsJNI {
   public final static native void helicsPublicationPublishInteger(long jarg1, long jarg2);
   public final static native void helicsPublicationPublishBoolean(long jarg1, int jarg2);
   public final static native void helicsPublicationPublishDouble(long jarg1, double jarg2);
+  public final static native void helicsPublicationPublishTime(long jarg1, double jarg2);
+  public final static native void helicsPublicationPublishChar(long jarg1, char jarg2);
   public final static native void helicsPublicationPublishComplex(long jarg1, double jarg2, double jarg3);
   public final static native void helicsPublicationPublishVector(long jarg1, double[] jarg2, int jarg3);
   public final static native void helicsPublicationPublishNamedPoint(long jarg1, String jarg2, double jarg3);
@@ -236,6 +240,8 @@ public class helicsJNI {
   public final static native long helicsInputGetInteger(long jarg1);
   public final static native int helicsInputGetBoolean(long jarg1);
   public final static native double helicsInputGetDouble(long jarg1);
+  public final static native double helicsInputGetTime(long jarg1);
+  public final static native char helicsInputGetChar(long jarg1);
   public final static native long helicsInputGetComplexObject(long jarg1);
   public final static native void helicsInputGetComplex(long jarg1, double[] jarg2, double[] jarg3);
   public final static native int helicsInputGetVectorSize(long jarg1);
@@ -245,6 +251,8 @@ public class helicsJNI {
   public final static native void helicsInputSetDefaultString(long jarg1, String jarg2);
   public final static native void helicsInputSetDefaultInteger(long jarg1, long jarg2);
   public final static native void helicsInputSetDefaultBoolean(long jarg1, int jarg2);
+  public final static native void helicsInputSetDefaultTime(long jarg1, double jarg2);
+  public final static native void helicsInputSetDefaultChar(long jarg1, char jarg2);
   public final static native void helicsInputSetDefaultDouble(long jarg1, double jarg2);
   public final static native void helicsInputSetDefaultComplex(long jarg1, double jarg2, double jarg3);
   public final static native void helicsInputSetDefaultVector(long jarg1, double[] jarg2, int jarg3);

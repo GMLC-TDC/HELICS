@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_SUITE (combo_tests, *utf::label("ci"))
 BOOST_AUTO_TEST_CASE (save_load_file1)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreName = "ccore2";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1",fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -88,8 +88,8 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
 BOOST_AUTO_TEST_CASE(save_load_file_binary)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
-    fi.coreName = "core3";
-    fi.coreInitString = "3";
+    fi.coreName = "ccore3";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
@@ -156,8 +156,8 @@ BOOST_AUTO_TEST_CASE(save_load_file_binary)
 BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4";
-    fi.coreInitString = "1";
+    fi.coreName = "ccore4";
+    fi.coreInitString = "-f 1 --autobroker";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
@@ -177,8 +177,8 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
 BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core5";
-    fi.coreInitString = "1";
+    fi.coreName = "ccore5";
+    fi.coreInitString = "-f 1 --autobroker";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1 ("play1",fi);
@@ -200,8 +200,8 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary1, *boost::unit_test::depends_on(
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core6";
-    fi.coreInitString = "1";
+    fi.coreName = "ccore6";
+    fi.coreInitString = "-f 1 --autobroker";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1("play1",fi);
@@ -237,8 +237,8 @@ BOOST_AUTO_TEST_CASE(check_created_files_binary2, *boost::unit_test::depends_on(
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core7";
-    fi.coreInitString = "1";
+    fi.coreName = "ccore7";
+    fi.coreInitString = "-f 1 --autobroker";
     fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
 
     helics::apps::Player play1("play1",fi);

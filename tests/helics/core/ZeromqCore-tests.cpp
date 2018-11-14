@@ -543,7 +543,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     //sleep to clear any residual from the previous test
     std::this_thread::sleep_for(400ms);
     std::string initializationString =
-      "1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
+      "-f 1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 {
     //sleep to clear any residual from the previous test
     std::this_thread::sleep_for(400ms);
-    std::string initializationString = "1";
+    std::string initializationString = "-f 1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ, initializationString);
 
