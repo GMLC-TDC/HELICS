@@ -9,9 +9,6 @@
 package com.java.helics;
 
 public class helicsJNI {
-  static {
-    System.loadLibrary("JNIhelicsd");
-  }
   public final static native int helics_ok_get();
   public final static native int helics_error_registration_failure_get();
   public final static native int helics_error_connection_failure_get();
