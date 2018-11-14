@@ -38,6 +38,7 @@ static const ArgDescriptors InfoArgs{
   {"rt_lead"s,
    "the amount of the time the federate is allowed to lead realtime before corrective action is taken"s},
   {"coreinit,i"s, "the core initialization string"s},
+  {"coreinitstring"s, "the core initialization string"s},
   {"maxiterations"s, ArgDescriptor::arg_type_t::int_type,
    "the maximum number of iterations a federate is allowed to take"s},
   {"log_level"s, ArgDescriptor::arg_type_t::int_type, "the logging level of a federate"s},
@@ -46,6 +47,8 @@ static const ArgDescriptors InfoArgs{
   {"outputdelay"s, "the output delay for outgoing communication of the federate"s},
   {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
   {"localport"s, "port number for the local receive port"s},
+  {"autobroker"s, ArgDescriptor::arg_type_t::flag_type,
+   "tell the core to automatically generate a broker if needed"s},
   {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
   {"flags,f"s, ArgDescriptor::arg_type_t::vector_string, "named flag for the federate"s}};
 
@@ -71,13 +74,13 @@ static const std::map<std::string, int> propStringsTranslations{
   {"loglevel", LOG_LEVEL_PROPERTY},
   {"log_level", LOG_LEVEL_PROPERTY},
   {"maxiterations", MAX_ITERATIONS_PROPERTY},
-{ "iterations", MAX_ITERATIONS_PROPERTY },
+  {"iterations", MAX_ITERATIONS_PROPERTY},
   {"interruptible", HELICS_INTERRUPTIBLE_FLAG},
   {"uninterruptible", HELICS_UNINTERRUPTIBLE_FLAG},
   {"observer", HELICS_OBSERVER_FLAG},
   {"source_only", HELICS_SOURCE_ONLY_FLAG},
   {"sourceonly", HELICS_SOURCE_ONLY_FLAG},
-{ "source", HELICS_SOURCE_ONLY_FLAG },
+  {"source", HELICS_SOURCE_ONLY_FLAG},
   {"only_update_on_change", HELICS_ONLY_UPDATE_ON_CHANGE_FLAG},
   {"only_transmit_on_change", HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG},
   {"forward_compute", HELICS_FORWARD_COMPUTE_FLAG},
@@ -102,6 +105,11 @@ static void loadFlags (FederateInfo &fi, const std::string &flags)
     auto sflgs = stringOps::splitline (flags);
     for (auto &flg : sflgs)
     {
+        if (flg == "autobroker")
+        {
+            fi.autobroker = true;
+            continue;
+        }
         auto loc = validFlagOptions.find (flg);
         if (loc != validFlagOptions.end ())
         {
@@ -129,13 +137,13 @@ int getPropertyIndex (std::string val)
     {
         return fnd->second;
     }
-	makeLowerCase(val);
-	fnd = propStringsTranslations.find(val);
-	if (fnd != propStringsTranslations.end())
-	{
-		return fnd->second;
-	}
-	return -1;
+    makeLowerCase (val);
+    fnd = propStringsTranslations.find (val);
+    if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    return -1;
 }
 
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
@@ -176,6 +184,11 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         coreInitString.push_back (' ');
         coreInitString = vm["coreinit"].as<std::string> ();
+    }
+    if (vm.count ("coreinitstring") > 0)
+    {
+        coreInitString.push_back (' ');
+        coreInitString = vm["coreinitstring"].as<std::string> ();
     }
     if (vm.count ("broker") > 0)
     {
@@ -227,6 +240,11 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
         {
             separator = sep[0];
         }
+    }
+
+    if (vm.count ("autobroker") > 0)
+    {
+        autobroker = true;
     }
     if (vm.count ("flags") > 0)
     {
@@ -306,6 +324,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     jsonReplaceIfMember (doc, "broker", fi.broker);
     fi.brokerPort = jsonGetOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
     jsonReplaceIfMember (doc, "localport", fi.localport);
+    jsonReplaceIfMember (doc, "autobroker", fi.autobroker);
     if (doc.isMember ("port"))
     {
         if (fi.localport.empty ())
@@ -371,6 +390,8 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     jsonReplaceIfMember (doc, "name", fi.defName);
     jsonReplaceIfMember (doc, "coreName", fi.coreName);
     jsonReplaceIfMember (doc, "coreInit", fi.coreInitString);
+    jsonReplaceIfMember (doc, "coreinit", fi.coreInitString);
+    jsonReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
     return fi;
 }
 
@@ -416,6 +437,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     {
         loadFlags (fi, doc["flags"].as<std::string> ());
     }
+    tomlReplaceIfMember (doc, "autobroker", fi.autobroker);
     tomlReplaceIfMember (doc, "broker", fi.broker);
     fi.brokerPort = tomlGetOrDefault (doc, "brokerport", fi.brokerPort);
     tomlReplaceIfMember (doc, "localport", fi.localport);
@@ -484,6 +506,8 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     tomlReplaceIfMember (doc, "name", fi.defName);
     tomlReplaceIfMember (doc, "coreName", fi.coreName);
     tomlReplaceIfMember (doc, "coreInit", fi.coreInitString);
+    tomlReplaceIfMember (doc, "coreinit", fi.coreInitString);
+    tomlReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
 
     return fi;
 }
@@ -505,6 +529,10 @@ std::string generateFullCoreInitString (const FederateInfo &fi)
     {
         res += " --localport=";
         res.append (fi.localport);
+    }
+    if (fi.autobroker)
+    {
+        res.append (" --autobroker");
     }
     return res;
 }

@@ -14,13 +14,17 @@ class FederateInfo : public CoreFederateInfo
 {
   public:
     char separator = '/';  //!< separator for global name of localFederates
+    bool autobroker = false;  //!< specify that the core should generate a broker if not found otherwise
     core_type coreType = core_type::ZMQ;  //!< the type of the core
+    int brokerPort = -1;  //!< broker port information
+
     std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
     std::string broker;  //!< connection information for the broker
-    std::string localport;  //!< string for defining the local port to use
-    int brokerPort = -1;  //!< broker port information
+    std::string
+      localport;  //!< string for defining the local port to use usually a number but other strings are possible
+
     /** default constructor*/
     FederateInfo () = default;
     /** construct from the name and type*/
@@ -47,4 +51,4 @@ std::string generateFullCoreInitString (const FederateInfo &fi);
 /** get an integer property/flag from a string name of the property or flag*/
 int getPropertyIndex (std::string val);
 
-}  // namepace helics
+}  // namespace helics

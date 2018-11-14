@@ -38,7 +38,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
         if (!coreObject)
         {
-            coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString(fi));
+            coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
         }
     }
     else
@@ -67,6 +67,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject->connect ();
         if (!coreObject->isConnected ())
         {
+            coreObject->disconnect ();
             throw (RegistrationFailure ("Unable to connect to broker->unable to register federate"));
         }
     }
