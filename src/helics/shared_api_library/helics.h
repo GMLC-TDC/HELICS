@@ -295,12 +295,12 @@ HELICS_EXPORT helics_bool_t helicsFederateIsValid (helics_federate fed);
 @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
 */
 HELICS_EXPORT void helicsFederateInfoSetCoreName (helics_federate_info_t fi, const char *corename, helics_error *err);
+
 /** set the initialization string for the core usually in the form of command line arguments
 @param fi the federate info object to alter
 @param coreInit a string with the core initialization strings
 @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
 */
-
 HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info_t fi, const char *coreInit, helics_error *err);
 
 /** set the core type by integer code
@@ -346,6 +346,12 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerPort (helics_federate_info_t fi, i
 */
 
 HELICS_EXPORT void helicsFederateInfoSetLocalPort (helics_federate_info_t fi, const char *localPort, helics_error *err);
+
+/** get a property index for use in helicsFederateInfoSetFlagOption, helicsFederateInfoSetTimeProperty, helicsFederateInfoSetIntegerProperty
+@param val a string with the property name
+@return an int with the property code
+*/
+HELICS_EXPORT int helicsGetPropertyIndex(const char *val);
 
 /** set a flag in the info structure
 @details valid flags are available  flag-definitions.h

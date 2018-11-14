@@ -55,6 +55,7 @@ static const std::map<std::string, int> propStringsTranslations{
   {"period", PERIOD_PROPERTY},
   {"timedelta", TIME_DELTA_PROPERTY},
   {"time_delta", TIME_DELTA_PROPERTY},
+  {"delta", TIME_DELTA_PROPERTY},
   {"offset", OFFSET_PROPERTY},
   {"rtlead", RT_LEAD_PROPERTY},
   {"rtlag", RT_LEAD_PROPERTY},
@@ -70,11 +71,13 @@ static const std::map<std::string, int> propStringsTranslations{
   {"loglevel", LOG_LEVEL_PROPERTY},
   {"log_level", LOG_LEVEL_PROPERTY},
   {"maxiterations", MAX_ITERATIONS_PROPERTY},
+{ "iterations", MAX_ITERATIONS_PROPERTY },
   {"interruptible", HELICS_INTERRUPTIBLE_FLAG},
   {"uninterruptible", HELICS_UNINTERRUPTIBLE_FLAG},
   {"observer", HELICS_OBSERVER_FLAG},
   {"source_only", HELICS_SOURCE_ONLY_FLAG},
   {"sourceonly", HELICS_SOURCE_ONLY_FLAG},
+{ "source", HELICS_SOURCE_ONLY_FLAG },
   {"only_update_on_change", HELICS_ONLY_UPDATE_ON_CHANGE_FLAG},
   {"only_transmit_on_change", HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG},
   {"forward_compute", HELICS_FORWARD_COMPUTE_FLAG},
@@ -117,6 +120,22 @@ static void loadFlags (FederateInfo &fi, const std::string &flags)
             }
         }
     }
+}
+
+int getPropertyIndex (std::string val)
+{
+    auto fnd = propStringsTranslations.find (val);
+    if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+	makeLowerCase(val);
+	fnd = propStringsTranslations.find(val);
+	if (fnd != propStringsTranslations.end())
+	{
+		return fnd->second;
+	}
+	return -1;
 }
 
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
@@ -486,7 +505,7 @@ std::string generateFullCoreInitString (const FederateInfo &fi)
     {
         res += " --localport=";
         res.append (fi.localport);
-	}
+    }
     return res;
 }
 

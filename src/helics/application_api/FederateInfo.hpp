@@ -44,4 +44,7 @@ FederateInfo loadFederateInfo (const std::string &configString);
 /** generate string for passing arguments to the core*/
 std::string generateFullCoreInitString (const FederateInfo &fi);
 
+/** get an integer property/flag from a string name of the property or flag*/
+int getPropertyIndex (std::string val);
+
 }  // namepace helics

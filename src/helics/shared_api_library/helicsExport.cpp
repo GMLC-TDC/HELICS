@@ -317,6 +317,15 @@ void helicsFederateInfoSetLocalPort (helics_federate_info_t fi, const char *loca
     }
 }
 
+int helicsGetPropertyIndex(const char *val)
+{
+	if (val==nullptr)
+	{
+		return -1;
+	}
+	return helics::getPropertyIndex(val);
+}
+
 void helicsFederateInfoSetFlagOption (helics_federate_info_t fi, int flag, helics_bool_t value, helics_error *err)
 {
     auto hfi = getFedInfo (fi, err);
