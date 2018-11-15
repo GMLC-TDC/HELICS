@@ -25,7 +25,7 @@ enum PubSubTypes
     VECTOR_TYPE = helics_data_type_vector,
     TIME_TYPE = helics_data_type_time,
     BOOLEAN_TYPE = helics_data_type_boolean,
-    RAW_TYPE = helics_data_type_raw,
+    RAW_TYPE = helics_data_type_raw
 };
 
 class ValueFederate : public virtual Federate
