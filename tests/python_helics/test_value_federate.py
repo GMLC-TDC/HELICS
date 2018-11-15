@@ -188,7 +188,7 @@ def test_value_federate_runFederateTestBool(vFed):
 
 def test_value_federate_publisher_registration(vFed):
     pubid1 = h.helicsFederateRegisterPublication(vFed, "pub1", h.helics_data_type_string, "")
-    pubid2 = h.helicsFederateRegisterGlobalPublication(vFed, "pub2", h.helicds_data_type_int, "")
+    pubid2 = h.helicsFederateRegisterGlobalPublication(vFed, "pub2", h.helics_data_type_int, "")
     pubid3 = h.helicsFederateRegisterPublication(vFed, "pub3", h.helics_data_type_double, "V")
     h.helicsFederateEnterExecutingMode(vFed)
 
