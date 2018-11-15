@@ -17,7 +17,7 @@ extern "C"
 {
 #endif
 
-/* sub/pub registration */
+    /* sub/pub registration */
 
     /** create a subscription
     @details the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free
@@ -45,7 +45,7 @@ extern "C"
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
-    helicsFederateRegisterPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err);
+    helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err);
 
     /** register a publication with a defined type
     @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
@@ -70,8 +70,11 @@ extern "C"
     @param units a string listing the units of the subscription maybe NULL
     @return an object containing the publication
     */
-    HELICS_EXPORT helics_publication
-    helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err);
+    HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication (helics_federate fed,
+                                                                              const char *key,
+                                                                              helics_data_type type,
+                                                                              const char *units,
+                                                                              helics_error *err);
 
     /** register a global publication with a defined type
     @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
@@ -100,7 +103,7 @@ extern "C"
     @return an object containing the publication
     */
     HELICS_EXPORT helics_input
-    helicsFederateRegisterInput (helics_federate fed, const char *name, int type, const char *units, helics_error *err);
+    helicsFederateRegisterInput (helics_federate fed, const char *name, helics_data_type type, const char *units, helics_error *err);
 
     /** register a publication with a defined type
     @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
@@ -125,7 +128,7 @@ extern "C"
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
-    helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, int type, const char *units, helics_error *err);
+    helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err);
 
     /** register a global publication with an arbitrary type
     @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free

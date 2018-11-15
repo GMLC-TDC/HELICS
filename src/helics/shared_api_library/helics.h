@@ -604,7 +604,7 @@ extern "C"
 
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
-    @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
+    @param intProperty a code for the property to set
     */
     HELICS_EXPORT int helicsFederateGetIntegerProperty (helics_federate fed, int intProperty, helics_error *err);
 

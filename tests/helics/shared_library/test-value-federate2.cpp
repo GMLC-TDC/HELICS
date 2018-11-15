@@ -76,8 +76,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     auto vFed2 = fixture.GetFederateAt (1);
 
     // register the publications
-    auto pubid =
-      helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", helics_data_type_string, nullptr, &err);
+    auto pubid = helicsFederateRegisterGlobalPublication (vFed1, "pub1", helics_data_type_string, nullptr, &err);
     auto subid = helicsFederateRegisterSubscription (vFed2, "pub1", "", &err);
     CE (helicsFederateSetTimeProperty (vFed1, helics_property_time_delta, 1.0, &err));
     CE (helicsFederateSetTimeProperty (vFed2, helics_property_time_delta, 1.0, &err));

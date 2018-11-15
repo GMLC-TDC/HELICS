@@ -1,7 +1,7 @@
-function v = HELICS_DATA_TYPE_STRING()
+function v = helics_data_type_string()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183119);
+    vInitialized = helicsMEX(0, 1946183044);
   end
   v = vInitialized;
 end
