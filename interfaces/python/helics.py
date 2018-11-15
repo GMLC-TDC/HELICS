@@ -107,6 +107,17 @@ helics_core_type_zmq_test = _helics.helics_core_type_zmq_test
 helics_core_type_nng = _helics.helics_core_type_nng
 helics_core_type_tcp_ss = _helics.helics_core_type_tcp_ss
 helics_core_type_http = _helics.helics_core_type_http
+helics_data_type_string = _helics.helics_data_type_string
+helics_data_type_double = _helics.helics_data_type_double
+helics_data_type_int = _helics.helics_data_type_int
+helics_data_type_complex = _helics.helics_data_type_complex
+helics_data_type_vector = _helics.helics_data_type_vector
+helics_data_type_complex_vector = _helics.helics_data_type_complex_vector
+helics_data_type_named_point = _helics.helics_data_type_named_point
+helics_data_type_boolean = _helics.helics_data_type_boolean
+helics_data_type_time = _helics.helics_data_type_time
+helics_data_type_raw = _helics.helics_data_type_raw
+helics_data_type_any = _helics.helics_data_type_any
 helics_flag_observer = _helics.helics_flag_observer
 helics_flag_uninterruptible = _helics.helics_flag_uninterruptible
 helics_flag_interruptible = _helics.helics_flag_interruptible
@@ -1211,17 +1222,6 @@ def helicsQueryFree(arg1: 'helics_query') -> "void":
 def helicsCleanupLibrary() -> "void":
     return _helics.helicsCleanupLibrary()
 helicsCleanupLibrary = _helics.helicsCleanupLibrary
-HELICS_DATA_TYPE_STRING = _helics.HELICS_DATA_TYPE_STRING
-HELICS_DATA_TYPE_DOUBLE = _helics.HELICS_DATA_TYPE_DOUBLE
-HELICS_DATA_TYPE_INT = _helics.HELICS_DATA_TYPE_INT
-HELICS_DATA_TYPE_COMPLEX = _helics.HELICS_DATA_TYPE_COMPLEX
-HELICS_DATA_TYPE_VECTOR = _helics.HELICS_DATA_TYPE_VECTOR
-HELICS_DATA_TYPE_NAMEDPOINT = _helics.HELICS_DATA_TYPE_NAMEDPOINT
-HELICS_DATA_TYPE_BOOLEAN = _helics.HELICS_DATA_TYPE_BOOLEAN
-HELICS_DATA_TYPE_CHAR = _helics.HELICS_DATA_TYPE_CHAR
-HELICS_DATA_TYPE_TIME = _helics.HELICS_DATA_TYPE_TIME
-HELICS_DATA_TYPE_RAW = _helics.HELICS_DATA_TYPE_RAW
-HELICS_DATA_TYPE_ANY = _helics.HELICS_DATA_TYPE_ANY
 
 def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const *', units: 'char const *') -> "helics_input":
     """
@@ -1252,7 +1252,7 @@ def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const 
     """
     return _helics.helicsFederateRegisterSubscription(fed, key, units)
 
-def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
     """
 
 
@@ -1266,7 +1266,7 @@ def helicsFederateRegisterTypePublication(fed: 'helics_federate', key: 'char con
     """
     return _helics.helicsFederateRegisterTypePublication(fed, key, type, units)
 
-def helicsFederateRegisterGlobalPublication(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterGlobalPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
     """
 
 
@@ -1280,7 +1280,7 @@ def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'ch
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
 
-def helicsFederateRegisterInput(fed: 'helics_federate', name: 'char const *', type: 'int', units: 'char const *') -> "helics_input":
+def helicsFederateRegisterInput(fed: 'helics_federate', name: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_input":
     return _helics.helicsFederateRegisterInput(fed, name, type, units)
 helicsFederateRegisterInput = _helics.helicsFederateRegisterInput
 
@@ -1288,7 +1288,7 @@ def helicsFederateRegisterTypeInput(fed: 'helics_federate', key: 'char const *',
     return _helics.helicsFederateRegisterTypeInput(fed, key, type, units)
 helicsFederateRegisterTypeInput = _helics.helicsFederateRegisterTypeInput
 
-def helicsFederateRegisterGlobalInput(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterGlobalInput(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
     return _helics.helicsFederateRegisterGlobalInput(fed, key, type, units)
 helicsFederateRegisterGlobalInput = _helics.helicsFederateRegisterGlobalInput
 

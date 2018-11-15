@@ -208,7 +208,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("ep2 == null");
 			}
 			SWIGTYPE_p_void pub1 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub1",
-					helicsConstants.HELICS_DATA_TYPE_DOUBLE, null);
+					helics_data_type.helics_data_type_double, null);
 			if (pub1 == null) {
 				javaHelicsApiTests.helicsAssert("pub1 == null");
 			}
@@ -227,7 +227,7 @@ public class JavaHelicsApiTests {
 			}
 			helics.helicsInputAddTarget(sub2, "Ep2");
 			SWIGTYPE_p_void pub3 = helics.helicsFederateRegisterPublication(fed1, "pub3",
-					helicsConstants.HELICS_DATA_TYPE_STRING, null);
+					helics_data_type.helics_data_type_string, null);
 			if (pub3 == null) {
 				javaHelicsApiTests.helicsAssert("pub3 == null");
 			}
@@ -294,7 +294,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("sub5 == null");
 			}
 			SWIGTYPE_p_void pub6 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub6",
-					helicsConstants.HELICS_DATA_TYPE_VECTOR, null);
+					helics_data_type.helics_data_type_vector, null);
 			if (pub6 == null) {
 				javaHelicsApiTests.helicsAssert("pub6 == null");
 			}
@@ -305,7 +305,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("sub6 == null");
 			}
 			SWIGTYPE_p_void pub7 = helics.helicsFederateRegisterGlobalPublication(fed1, "pub7",
-					helicsConstants.HELICS_DATA_TYPE_NAMEDPOINT, null);
+					helics_data_type.helics_data_type_named_point, null);
 			if (pub7 == null) {
 				javaHelicsApiTests.helicsAssert("pub7 == null");
 			}

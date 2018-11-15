@@ -8,7 +8,7 @@
 
 package com.java.helics;
 
-public class helics implements helicsConstants {
+public class helics {
   public static double getHelics_time_zero() {
     return helicsJNI.helics_time_zero_get();
   }
@@ -435,8 +435,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterPublication(SWIGTYPE_p_void fed, String key, int type, String units) {
-    long cPtr = helicsJNI.helicsFederateRegisterPublication(SWIGTYPE_p_void.getCPtr(fed), key, type, units);
+  public static SWIGTYPE_p_void helicsFederateRegisterPublication(SWIGTYPE_p_void fed, String key, helics_data_type type, String units) {
+    long cPtr = helicsJNI.helicsFederateRegisterPublication(SWIGTYPE_p_void.getCPtr(fed), key, type.swigValue(), units);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -445,8 +445,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterGlobalPublication(SWIGTYPE_p_void fed, String key, int type, String units) {
-    long cPtr = helicsJNI.helicsFederateRegisterGlobalPublication(SWIGTYPE_p_void.getCPtr(fed), key, type, units);
+  public static SWIGTYPE_p_void helicsFederateRegisterGlobalPublication(SWIGTYPE_p_void fed, String key, helics_data_type type, String units) {
+    long cPtr = helicsJNI.helicsFederateRegisterGlobalPublication(SWIGTYPE_p_void.getCPtr(fed), key, type.swigValue(), units);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -455,8 +455,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterInput(SWIGTYPE_p_void fed, String name, int type, String units) {
-    long cPtr = helicsJNI.helicsFederateRegisterInput(SWIGTYPE_p_void.getCPtr(fed), name, type, units);
+  public static SWIGTYPE_p_void helicsFederateRegisterInput(SWIGTYPE_p_void fed, String name, helics_data_type type, String units) {
+    long cPtr = helicsJNI.helicsFederateRegisterInput(SWIGTYPE_p_void.getCPtr(fed), name, type.swigValue(), units);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -465,8 +465,8 @@ public class helics implements helicsConstants {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterGlobalInput(SWIGTYPE_p_void fed, String key, int type, String units) {
-    long cPtr = helicsJNI.helicsFederateRegisterGlobalInput(SWIGTYPE_p_void.getCPtr(fed), key, type, units);
+  public static SWIGTYPE_p_void helicsFederateRegisterGlobalInput(SWIGTYPE_p_void fed, String key, helics_data_type type, String units) {
+    long cPtr = helicsJNI.helicsFederateRegisterGlobalInput(SWIGTYPE_p_void.getCPtr(fed), key, type.swigValue(), units);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 

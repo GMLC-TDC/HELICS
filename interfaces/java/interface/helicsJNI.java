@@ -9,6 +9,7 @@
 package com.java.helics;
 
 public class helicsJNI {
+
   public final static native int helics_core_type_default_get();
   public final static native int helics_core_type_zmq_get();
   public final static native int helics_core_type_mpi_get();
@@ -21,6 +22,17 @@ public class helicsJNI {
   public final static native int helics_core_type_nng_get();
   public final static native int helics_core_type_tcp_ss_get();
   public final static native int helics_core_type_http_get();
+  public final static native int helics_data_type_string_get();
+  public final static native int helics_data_type_double_get();
+  public final static native int helics_data_type_int_get();
+  public final static native int helics_data_type_complex_get();
+  public final static native int helics_data_type_vector_get();
+  public final static native int helics_data_type_complex_vector_get();
+  public final static native int helics_data_type_named_point_get();
+  public final static native int helics_data_type_boolean_get();
+  public final static native int helics_data_type_time_get();
+  public final static native int helics_data_type_raw_get();
+  public final static native int helics_data_type_any_get();
   public final static native int helics_flag_observer_get();
   public final static native int helics_flag_uninterruptible_get();
   public final static native int helics_flag_interruptible_get();
@@ -208,17 +220,6 @@ public class helicsJNI {
   public final static native int helicsQueryIsCompleted(long jarg1);
   public final static native void helicsQueryFree(long jarg1);
   public final static native void helicsCleanupLibrary();
-  public final static native int HELICS_DATA_TYPE_STRING_get();
-  public final static native int HELICS_DATA_TYPE_DOUBLE_get();
-  public final static native int HELICS_DATA_TYPE_INT_get();
-  public final static native int HELICS_DATA_TYPE_COMPLEX_get();
-  public final static native int HELICS_DATA_TYPE_VECTOR_get();
-  public final static native int HELICS_DATA_TYPE_NAMEDPOINT_get();
-  public final static native int HELICS_DATA_TYPE_BOOLEAN_get();
-  public final static native int HELICS_DATA_TYPE_CHAR_get();
-  public final static native int HELICS_DATA_TYPE_TIME_get();
-  public final static native int HELICS_DATA_TYPE_RAW_get();
-  public final static native int HELICS_DATA_TYPE_ANY_get();
   public final static native long helicsFederateRegisterSubscription(long jarg1, String jarg2, String jarg3);
   public final static native long helicsFederateRegisterPublication(long jarg1, String jarg2, int jarg3, String jarg4);
   public final static native long helicsFederateRegisterTypePublication(long jarg1, String jarg2, String jarg3, String jarg4);
