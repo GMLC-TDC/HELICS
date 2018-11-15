@@ -89,7 +89,8 @@ set(
   CoreFederateInfo.hpp
   helicsVersion.hpp
   federate_id.hpp
-  ../flag-definitions.h
+  helics_definitions.hpp
+  ../helics_enums.h
 )
 
 set(

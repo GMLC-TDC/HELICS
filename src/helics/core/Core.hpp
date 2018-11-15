@@ -78,7 +78,7 @@ class Core
      */
     virtual void disconnect () = 0;
     /** waits in the current thread until the core is disconnected
-	@return true if the disconnect was successful
+    @return true if the disconnect was successful
      */
     virtual bool waitForDisconnect (int msToWait = -1) const = 0;
 
@@ -228,13 +228,13 @@ class Core
      */
     virtual uint64_t getCurrentReiteration (federate_id_t federateID) const = 0;
 
-    virtual void setTimeProperty(federate_id_t federateID, int32_t property, Time timeValue) = 0;
+    virtual void setTimeProperty (federate_id_t federateID, int32_t property, Time timeValue) = 0;
 
-    virtual Time getTimeProperty(federate_id_t federateID, int32_t property) const=0;
+    virtual Time getTimeProperty (federate_id_t federateID, int32_t property) const = 0;
 
-    virtual void setIntegerProperty(federate_id_t federateID, int32_t property, int16_t propValue) = 0;
+    virtual void setIntegerProperty (federate_id_t federateID, int32_t property, int16_t propValue) = 0;
 
-    virtual int16_t getIntegerProperty(federate_id_t federateID, int32_t property) const = 0;
+    virtual int16_t getIntegerProperty (federate_id_t federateID, int32_t property) const = 0;
     /** get the most recent granted Time
     @param federateID, the id of the federate to get the time
     @return the most recent granted time or the startup time
@@ -250,7 +250,7 @@ class Core
      * May only be invoked in the initialize state.
      */
 
-  //  virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) = 0;
+    //  virtual void setMaximumIterations (federate_id_t federateID, int32_t iterations) = 0;
 
     /**
      * Set the minimum time resolution for the specified federate.
@@ -262,7 +262,7 @@ class Core
      *
      * @param time
      */
- //   virtual void setTimeProperty (TIME_DELTA_PROPERTY, federate_id_t federateID, Time time) = 0;
+    //   virtual void setTimeProperty (helics_property_time_delta, federate_id_t federateID, Time time) = 0;
 
     /**
      * Set the outputDelay time for the specified federate.
@@ -272,7 +272,7 @@ class Core
      * @param federateID  the identifier for the federate
      * @param timeoutputDelay
      */
-  //  virtual void setOutputDelay (federate_id_t federateID, Time timeoutputDelay) = 0;
+    //  virtual void setOutputDelay (federate_id_t federateID, Time timeoutputDelay) = 0;
     /**
      * Set the period for a specified federate.
      *
@@ -281,7 +281,7 @@ class Core
      * @param federateID  the identifier for the federate
      * @param timeoutputDelay
      */
-  //  virtual void setTimeProperty (PERIOD_PROPERTY, federate_id_t federateID, Time timePeriod) = 0;
+    //  virtual void setTimeProperty (helics_property_time_period, federate_id_t federateID, Time timePeriod) = 0;
     /**
     * Set the periodic offset for a specified federate.
     *
@@ -294,7 +294,7 @@ class Core
     * @param federateID  the identifier for the federate
     * @param timeOffset the periodic phase shift
     */
-   // virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
+    // virtual void setTimeOffset (federate_id_t federateID, Time timeOffset) = 0;
     /**
      * Set the inputDelay time.
      *
@@ -303,7 +303,7 @@ class Core
      * @param federateID  the identifier for the federate
      * @param timeImpact the length of time it take outside message to propagate into a federate
      */
-   // virtual void setInputDelay (federate_id_t federateID, Time timeImpact) = 0;
+    // virtual void setInputDelay (federate_id_t federateID, Time timeImpact) = 0;
     /**
     Set the logging level
     @details set the logging level for an individual federate
@@ -312,7 +312,7 @@ class Core
     * @param loggingLevel the level of logging to enable
     <0-no logging, 0 -error only, 1- warnings, 2-normal, 3-debug, 4-trace
     */
-  //  virtual void setLoggingLevel (federate_id_t federateID, int loggingLevel) = 0;
+    //  virtual void setLoggingLevel (federate_id_t federateID, int loggingLevel) = 0;
 
     /**
     Set a flag in a a federate
@@ -328,7 +328,7 @@ class Core
     * @param flag an index code for the flag to set
     @param flagValue the value to set the flag to
     */
-    virtual bool getFlagOption(federate_id_t federateID, int32_t flag) const = 0;
+    virtual bool getFlagOption (federate_id_t federateID, int32_t flag) const = 0;
     /**
      * Value interface.
      */
@@ -344,9 +344,9 @@ class Core
      @return a handle to identify the publication
      */
     virtual interface_handle registerPublication (federate_id_t federateID,
-                                             const std::string &key,
-                                             const std::string &type,
-                                             const std::string &units) = 0;
+                                                  const std::string &key,
+                                                  const std::string &type,
+                                                  const std::string &units) = 0;
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
@@ -355,32 +355,32 @@ class Core
     virtual interface_handle getPublication (federate_id_t federateID, const std::string &key) const = 0;
 
     /**
-    * Register a control input for the specified federate.
-    *
-    * May only be invoked in the initialize state.
-    * @param[in] federateID
-    * @param[in] key the name of the control input
-    * @param[in] type a string describing the type of the federate
-    * @param[in] units a string naming the units of the federate
-    */
-    virtual interface_handle registerInput(federate_id_t federateID,
-        const std::string &key,
-        const std::string &type,
-        const std::string &units) = 0;
+     * Register a control input for the specified federate.
+     *
+     * May only be invoked in the initialize state.
+     * @param[in] federateID
+     * @param[in] key the name of the control input
+     * @param[in] type a string describing the type of the federate
+     * @param[in] units a string naming the units of the federate
+     */
+    virtual interface_handle registerInput (federate_id_t federateID,
+                                            const std::string &key,
+                                            const std::string &type,
+                                            const std::string &units) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
     @key the tag of the named input
     @return a handle to identify the input*/
-    virtual interface_handle getInput(federate_id_t federateID, const std::string &key) const = 0;
+    virtual interface_handle getInput (federate_id_t federateID, const std::string &key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle
      */
     virtual const std::string &getHandleName (interface_handle handle) const = 0;
     /** remove a target from a handles operation
-	@param handle the handle to remove the target on
-	@param targetToRemove the name of the target to remove*/
-    virtual void removeTarget(interface_handle handle, const std::string &targetToRemove) = 0;
+    @param handle the handle to remove the target on
+    @param targetToRemove the name of the target to remove*/
+    virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) = 0;
 
     /**
      * Returns units for specified handle.
@@ -403,19 +403,19 @@ class Core
     */
     virtual const std::string &getOutputType (interface_handle handle) const = 0;
 
-    /** set a handle option 
+    /** set a handle option
     @param handle the handle to set the option for
     @param option the option to set
     @param value the value to set the option (mostly 0 or 1)
     */
-    virtual void setHandleOption(interface_handle handle, int32_t option, bool option_value) = 0;
+    virtual void setHandleOption (interface_handle handle, int32_t option, bool option_value) = 0;
 
     /** get a handle option
     @param handle the handle to set the option for
     @param option the option to set
     @param value the value to set the option (mostly 0 or 1)
     */
-    virtual bool getHandleOption(interface_handle handle, int32_t option) const = 0;
+    virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
     /**
      * Publish specified data to the specified key.
@@ -432,10 +432,10 @@ class Core
      */
     virtual std::shared_ptr<const data_block> getValue (interface_handle handle) = 0;
     /**
-    * Return all the data for the specified handle or the latest input
-    *
-    */
-    virtual std::vector<std::shared_ptr<const data_block>> getAllValues(interface_handle handle) = 0;
+     * Return all the data for the specified handle or the latest input
+     *
+     */
+    virtual std::vector<std::shared_ptr<const data_block>> getAllValues (interface_handle handle) = 0;
 
     /**
      * Returns vector of input handles that received an update during the last
@@ -472,9 +472,9 @@ class Core
     @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
     @return the handle for the new filter
     */
-    virtual interface_handle registerCloningFilter(const std::string &filterName,
-        const std::string &type_in,
-        const std::string &type_out) = 0;
+    virtual interface_handle registerCloningFilter (const std::string &filterName,
+                                                    const std::string &type_in,
+                                                    const std::string &type_out) = 0;
 
     /**
      * Register source filter.
@@ -485,10 +485,9 @@ class Core
      @param type_out the output type of the filter (may be left blank if the filter doesn't change type)
      this is important for ordering in filters with operators
      @return the handle for the new filter
-     */ 
-    virtual interface_handle registerFilter (const std::string &filterName,
-                                              const std::string &type_in,
-                                              const std::string &type_out) = 0;
+     */
+    virtual interface_handle
+    registerFilter (const std::string &filterName, const std::string &type_in, const std::string &type_out) = 0;
     /**
     * add a destination target,  the handle can be for a filter or a publication
     @details a filter will create an additional processing step for messages before they get to a
@@ -504,9 +503,9 @@ class Core
     virtual void addDestinationTarget (interface_handle handle, const std::string &dest) = 0;
 
     /** add a source target,  the handle can be a subscription, input, filter or endpoint
-    @details for subscriptions and inputs this establishes a link from a publication, for endpoints this creates a linkage to a particular publication,
-    for filters it add a source endpoint to filter
-    @param handle the identifier of the interface 
+    @details for subscriptions and inputs this establishes a link from a publication, for endpoints this creates a
+    linkage to a particular publication, for filters it add a source endpoint to filter
+    @param handle the identifier of the interface
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
     virtual void addSourceTarget (interface_handle handle, const std::string &name) = 0;
@@ -536,17 +535,17 @@ class Core
     virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) = 0;
 
     /** create a data connection between a named publication and a named input
-    @param source the name of the publication 
+    @param source the name of the publication
     @param target the name of the input*/
-    virtual void dataLink(const std::string &source, const std::string &target) = 0;
+    virtual void dataLink (const std::string &source, const std::string &target) = 0;
     /** create a filter connection between a named publication and a named input
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void addSourceFilterToEndpoint(const std::string &filter, const std::string &target) = 0;
+    virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
     /** create a filter connection between a named publication and a named input
     @param source the name of the filter
     @param target the name of the source target*/
-    virtual void addDestinationFilterToEndpoint(const std::string &filter, const std::string &target) = 0;
+    virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
     /**
      * Send data from source to destination.
      *
@@ -640,7 +639,7 @@ class Core
     setLoggingCallback (federate_id_t federateID,
                         std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 
-	/** set the core logging level*/
+    /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;
 
     /** make a query for information from the co-simulation

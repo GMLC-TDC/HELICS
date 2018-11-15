@@ -1,7 +1,7 @@
-function v = HELICS_CORE_TYPE_UDP()
+function v = helics_core_type_udp()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1398230922);
+    vInitialized = helicsMEX(0, 1946183039);
   end
   v = vInitialized;
 end

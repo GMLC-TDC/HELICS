@@ -1,7 +1,7 @@
-function v = HELICS_CORE_TYPE_TCP()
+function v = helics_core_type_tcp()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1398230921);
+    vInitialized = helicsMEX(0, 1946183038);
   end
   v = vInitialized;
 end

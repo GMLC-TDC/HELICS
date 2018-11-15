@@ -31,14 +31,14 @@ class MessageFederate : public virtual Federate
     MessageFederate () {}
 
     /** Methods for registering endpoints **/
-    Endpoint registerEndpoint(const std::string &name, const std::string &type = std::string())
+    Endpoint registerEndpoint (const std::string &name, const std::string &type = std::string ())
     {
         helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
         local_endpoints.push_back (ep);
         return Endpoint (ep);
     }
 
-    Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = std::string())
+    Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ())
     {
         helics_endpoint ep =
           helicsFederateRegisterGlobalEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
@@ -46,7 +46,7 @@ class MessageFederate : public virtual Federate
         return Endpoint (ep);
     }
 
-	Endpoint getEndpoint (const std::string &name)
+    Endpoint getEndpoint (const std::string &name)
     {
         return Endpoint (helicsFederateGetEndpoint (fed, name.c_str (), hThrowOnError ()));
     }
@@ -66,7 +66,7 @@ class MessageFederate : public virtual Federate
     int pendingMessages () const { return helicsFederatePendingMessages (fed); }
 
     /** Get a packet for any endpoints in the federate **/
-    message_t getMessage () { return helicsFederateGetMessage (fed); }
+    helics_message getMessage () { return helicsFederateGetMessage (fed); }
 
   private:
     std::vector<helics_endpoint> local_endpoints;

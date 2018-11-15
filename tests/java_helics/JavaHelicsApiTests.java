@@ -137,19 +137,19 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateInfoSetCoreTypeFromString(fedInfo1, "zmq");
 			helics.helicsFederateInfoSetFlagOption(fedInfo1, 1, helics.getHelics_true());
 			helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-					helics_time_properties.helics_time_property_input_delay.swigValue(), 1.0);
+					helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
 			helics.helicsFederateInfoSetIntegerProperty(fedInfo1,
-					helics_int_properties.helics_int_property_log_level.swigValue(), 1);
+					helics_properties.helics_property_int_log_level.swigValue(), 1);
 			helics.helicsFederateInfoSetIntegerProperty(fedInfo1,
-					helics_int_properties.helics_int_property_max_iterations.swigValue(), 100);
+					helics_properties.helics_property_int_max_iterations.swigValue(), 100);
 			helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-					helics_time_properties.helics_time_property_output_delay.swigValue(), 1.0);
+					helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
 			helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-					helics_time_properties.helics_time_property_period.swigValue(), 1.0);
+					helics_properties.helics_property_time_period.swigValue(), 1.0);
 			helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-					helics_time_properties.helics_time_property_time_delta.swigValue(), 1.0);
+					helics_properties.helics_property_time_delta.swigValue(), 1.0);
 			helics.helicsFederateInfoSetTimeProperty(fedInfo1,
-					helics_time_properties.helics_time_property_offset.swigValue(), 0.1);
+					helics_properties.helics_property_time_offset.swigValue(), 0.1);
 			helics.helicsFederateInfoFree(fedInfo1);
 			// Federate API Functions
 			SWIGTYPE_p_void broker3 = helics.helicsCreateBroker("zmq", "broker3", "--federates 1 --loglevel 1");
@@ -158,9 +158,9 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateInfoSetCoreInitString(fedInfo2, coreInitString);
 			helics.helicsFederateInfoSetCoreTypeFromString(fedInfo2, "zmq");
 			helics.helicsFederateInfoSetIntegerProperty(fedInfo2,
-					helics_int_properties.helics_int_property_log_level.swigValue(), 1);
+					helics_properties.helics_property_int_log_level.swigValue(), 1);
 			helics.helicsFederateInfoSetTimeProperty(fedInfo2,
-					helics_time_properties.helics_time_property_time_delta.swigValue(), 1.0);
+					helics_properties.helics_property_time_delta.swigValue(), 1.0);
 			SWIGTYPE_p_void fed1 = helics.helicsCreateCombinationFederate("fed1", fedInfo2);
 			if (fed1 == null) {
 				javaHelicsApiTests.helicsAssert("fed1 == null");
@@ -176,17 +176,17 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateSetFlagOption(fed2, 1, helics.getHelics_false());
 
 			helics.helicsFederateSetTimeProperty(fed2,
-					helics_time_properties.helics_time_property_input_delay.swigValue(), 1.0);
+					helics_properties.helics_property_time_input_delay.swigValue(), 1.0);
 			helics.helicsFederateSetIntegerProperty(fed1,
-					helics_int_properties.helics_int_property_log_level.swigValue(), 1);
+					helics_properties.helics_property_int_log_level.swigValue(), 1);
 			helics.helicsFederateSetIntegerProperty(fed2,
-					helics_int_properties.helics_int_property_max_iterations.swigValue(), 100);
+					helics_properties.helics_property_int_max_iterations.swigValue(), 100);
 			helics.helicsFederateSetTimeProperty(fed2,
-					helics_time_properties.helics_time_property_output_delay.swigValue(), 1.0);
-			helics.helicsFederateSetTimeProperty(fed2, helics_time_properties.helics_time_property_period.swigValue(),
+					helics_properties.helics_property_time_output_delay.swigValue(), 1.0);
+			helics.helicsFederateSetTimeProperty(fed2, helics_properties.helics_property_time_period.swigValue(),
 					0.0);
 			helics.helicsFederateSetTimeProperty(fed2,
-					helics_time_properties.helics_time_property_time_delta.swigValue(), 1.0);
+					helics_properties.helics_property_time_delta.swigValue(), 1.0);
 
 			SWIGTYPE_p_void fed1CloningFilter = helics.helicsFederateRegisterCloningFilter(fed1, "fed1/Ep1");
 			if (fed1CloningFilter == null) {
@@ -341,7 +341,7 @@ public class JavaHelicsApiTests {
 			helics.helicsFederateEnterInitializingModeComplete(fed1);
 			helics.helicsFederateEnterExecutingModeAsync(fed1);
 			helics.helicsFederateEnterExecutingModeComplete(fed1);
-			message_t mesg1 = new message_t();
+			helics_message mesg1 = new helics_message();
 			mesg1.setData("Hello");
 			mesg1.setDest("Ep2");
 			mesg1.setLength(5);
@@ -384,7 +384,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("!fed1NameString.contains(\"fed1\")");
 			}
 
-			federate_state fed1State = helics.helicsFederateGetState(fed1);
+			helics_federate_state fed1State = helics.helicsFederateGetState(fed1);
 			if (fed1State.swigValue() != 2) {
 				javaHelicsApiTests.helicsAssert("fed1State != 2");
 			}
@@ -420,7 +420,7 @@ public class JavaHelicsApiTests {
 			if (ep2HasMsg != 1) {
 				javaHelicsApiTests.helicsAssert("ep2HasMsg != 1");
 			}
-			message_t msg2 = helics.helicsEndpointGetMessage(ep2);
+			helics_message msg2 = helics.helicsEndpointGetMessage(ep2);
 			double msg2Time = msg2.getTime();
 			if (msg2Time != 1.0) {
 				javaHelicsApiTests.helicsAssert("msg2Time != 1.0");
@@ -457,7 +457,7 @@ public class JavaHelicsApiTests {
 			if (fed1HasMsg != 1) {
 				javaHelicsApiTests.helicsAssert("fed1HasMsg != 1");
 			}
-			message_t msg3 = helics.helicsFederateGetMessage(fed1);
+			helics_message msg3 = helics.helicsFederateGetMessage(fed1);
 			double msg3Time = msg3.getTime();
 			if (msg3Time != 1.0) {
 				javaHelicsApiTests.helicsAssert("msg3Time != 1.0");

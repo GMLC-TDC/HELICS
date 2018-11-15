@@ -244,6 +244,10 @@ public class helics implements helicsConstants {
     helicsJNI.helicsFederateInfoSetLocalPort(SWIGTYPE_p_void.getCPtr(fi), localPort);
   }
 
+  public static int helicsGetPropertyIndex(String val) {
+    return helicsJNI.helicsGetPropertyIndex(val);
+  }
+
   public static void helicsFederateInfoSetFlagOption(SWIGTYPE_p_void fi, int flag, int value) {
     helicsJNI.helicsFederateInfoSetFlagOption(SWIGTYPE_p_void.getCPtr(fi), flag, value);
   }
@@ -304,20 +308,20 @@ public class helics implements helicsConstants {
     helicsJNI.helicsFederateEnterExecutingModeComplete(SWIGTYPE_p_void.getCPtr(fed));
   }
 
-  public static helics_iteration_status helicsFederateEnterExecutingModeIterative(SWIGTYPE_p_void fed, helics_iteration_request iterate) {
-    return helics_iteration_status.swigToEnum(helicsJNI.helicsFederateEnterExecutingModeIterative(SWIGTYPE_p_void.getCPtr(fed), iterate.swigValue()));
+  public static helics_iteration_result helicsFederateEnterExecutingModeIterative(SWIGTYPE_p_void fed, helics_iteration_request iterate) {
+    return helics_iteration_result.swigToEnum(helicsJNI.helicsFederateEnterExecutingModeIterative(SWIGTYPE_p_void.getCPtr(fed), iterate.swigValue()));
   }
 
   public static void helicsFederateEnterExecutingModeIterativeAsync(SWIGTYPE_p_void fed, helics_iteration_request iterate) {
     helicsJNI.helicsFederateEnterExecutingModeIterativeAsync(SWIGTYPE_p_void.getCPtr(fed), iterate.swigValue());
   }
 
-  public static helics_iteration_status helicsFederateEnterExecutingModeIterativeComplete(SWIGTYPE_p_void fed) {
-    return helics_iteration_status.swigToEnum(helicsJNI.helicsFederateEnterExecutingModeIterativeComplete(SWIGTYPE_p_void.getCPtr(fed)));
+  public static helics_iteration_result helicsFederateEnterExecutingModeIterativeComplete(SWIGTYPE_p_void fed) {
+    return helics_iteration_result.swigToEnum(helicsJNI.helicsFederateEnterExecutingModeIterativeComplete(SWIGTYPE_p_void.getCPtr(fed)));
   }
 
-  public static federate_state helicsFederateGetState(SWIGTYPE_p_void fed) {
-    return federate_state.swigToEnum(helicsJNI.helicsFederateGetState(SWIGTYPE_p_void.getCPtr(fed)));
+  public static helics_federate_state helicsFederateGetState(SWIGTYPE_p_void fed) {
+    return helics_federate_state.swigToEnum(helicsJNI.helicsFederateGetState(SWIGTYPE_p_void.getCPtr(fed)));
   }
 
   public static SWIGTYPE_p_void helicsFederateGetCoreObject(SWIGTYPE_p_void fed) {
@@ -716,8 +720,8 @@ public class helics implements helicsConstants {
     helicsJNI.helicsEndpointSendEventRaw(SWIGTYPE_p_void.getCPtr(endpoint), dest, SWIGTYPE_p_void.getCPtr(data), inputDataLength, time);
   }
 
-  public static void helicsEndpointSendMessage(SWIGTYPE_p_void endpoint, message_t message) {
-    helicsJNI.helicsEndpointSendMessage(SWIGTYPE_p_void.getCPtr(endpoint), message_t.getCPtr(message), message);
+  public static void helicsEndpointSendMessage(SWIGTYPE_p_void endpoint, helics_message message) {
+    helicsJNI.helicsEndpointSendMessage(SWIGTYPE_p_void.getCPtr(endpoint), helics_message.getCPtr(message), message);
   }
 
   public static void helicsEndpointSubscribe(SWIGTYPE_p_void endpoint, String key) {
@@ -740,12 +744,12 @@ public class helics implements helicsConstants {
     return helicsJNI.helicsEndpointPendingMessages(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
-  public static message_t helicsEndpointGetMessage(SWIGTYPE_p_void endpoint) {
-    return new message_t(helicsJNI.helicsEndpointGetMessage(SWIGTYPE_p_void.getCPtr(endpoint)), true);
+  public static helics_message helicsEndpointGetMessage(SWIGTYPE_p_void endpoint) {
+    return new helics_message(helicsJNI.helicsEndpointGetMessage(SWIGTYPE_p_void.getCPtr(endpoint)), true);
   }
 
-  public static message_t helicsFederateGetMessage(SWIGTYPE_p_void fed) {
-    return new message_t(helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed)), true);
+  public static helics_message helicsFederateGetMessage(SWIGTYPE_p_void fed) {
+    return new helics_message(helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed)), true);
   }
 
   public static String helicsEndpointGetType(SWIGTYPE_p_void endpoint) {

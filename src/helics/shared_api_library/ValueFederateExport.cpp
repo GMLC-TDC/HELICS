@@ -593,7 +593,7 @@ void helicsPublicationPublishInteger (helics_publication pub, int64_t val, helic
     }
 }
 
-void helicsPublicationPublishBoolean (helics_publication pub, helics_bool_t val, helics_error *err)
+void helicsPublicationPublishBoolean (helics_publication pub, helics_bool val, helics_error *err)
 {
     auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
@@ -627,7 +627,7 @@ void helicsPublicationPublishDouble (helics_publication pub, double val, helics_
     }
 }
 
-void helicsPublicationPublishTime (helics_publication pub, helics_time_t val, helics_error *err)
+void helicsPublicationPublishTime (helics_publication pub, helics_time val, helics_error *err)
 {
     auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
@@ -848,7 +848,7 @@ int64_t helicsInputGetInteger (helics_input inp, helics_error *err)
     }
 }
 
-helics_bool_t helicsInputGetBoolean (helics_input inp, helics_error *err)
+helics_bool helicsInputGetBoolean (helics_input inp, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -885,7 +885,7 @@ double helicsInputGetDouble (helics_input inp, helics_error *err)
     }
 }
 
-helics_time_t helicsInputGetTime (helics_input inp, helics_error *err)
+helics_time helicsInputGetTime (helics_input inp, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -895,7 +895,7 @@ helics_time_t helicsInputGetTime (helics_input inp, helics_error *err)
     try
     {
         auto T = inpObj->inputPtr->getValue<helics::Time> ();
-        return static_cast<helics_time_t> (T);
+        return static_cast<helics_time> (T);
     }
     catch (...)
     {
@@ -1141,7 +1141,7 @@ void helicsInputSetDefaultInteger (helics_input inp, int64_t val, helics_error *
     }
 }
 
-void helicsInputSetDefaultBoolean (helics_input inp, helics_bool_t val, helics_error *err)
+void helicsInputSetDefaultBoolean (helics_input inp, helics_bool val, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1175,7 +1175,7 @@ void helicsInputSetDefaultDouble (helics_input inp, double val, helics_error *er
     }
 }
 
-void helicsInputSetDefaultTime (helics_input inp, helics_time_t val, helics_error *err)
+void helicsInputSetDefaultTime (helics_input inp, helics_time val, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1398,7 +1398,7 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     }
 }
 
-helics_bool_t helicsInputIsUpdated (helics_input inp)
+helics_bool helicsInputIsUpdated (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1410,7 +1410,7 @@ helics_bool_t helicsInputIsUpdated (helics_input inp)
     return (val) ? helics_true : helics_false;
 }
 
-helics_time_t helicsInputLastUpdateTime (helics_input inp)
+helics_time helicsInputLastUpdateTime (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1420,7 +1420,7 @@ helics_time_t helicsInputLastUpdateTime (helics_input inp)
     try
     {
         auto time = inpObj->inputPtr->getLastUpdate ();
-        return static_cast<helics_time_t> (time);
+        return static_cast<helics_time> (time);
     }
     catch (...)
     {

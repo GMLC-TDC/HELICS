@@ -6,7 +6,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
-#include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -20,6 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
+#include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>
@@ -91,7 +91,7 @@ bool CommonCore::connect ()
         }
         else
         {
-            LOG_WARNING (global_broker_id.load(), getIdentifier(), "multiple connect calls");
+            LOG_WARNING (global_broker_id.load (), getIdentifier (), "multiple connect calls");
             while (brokerState == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -378,7 +378,7 @@ bool CommonCore::allDisconnected () const
 void CommonCore::setCoreReadyToInit ()
 {
     // use the flag mechanics that do the same thing
-    setFlagOption (local_core_id, HELICS_ENABLE_INIT_ENTRY);
+    setFlagOption (local_core_id, defs::flags::enable_init_entry);
 }
 
 /** this function will generate an appropriate exception for the error
@@ -390,17 +390,17 @@ static void generateFederateException (const FederateState *fed)
     {
     case 0:
         return;
-    case ERROR_CODE_INVALID_ARGUMENT:
+    case defs::errors::invalid_argument:
         throw (InvalidParameter (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_FUNCTION_CALL:
+    case defs::errors::invalid_function_call:
         throw (InvalidFunctionCall (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_OBJECT:
+    case defs::errors::invalid_object:
         throw (InvalidIdentifier (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_STATE_TRANSITION:
+    case defs::errors::invalid_state_transition:
         throw (InvalidFunctionCall (fed->lastErrorString ()));
-    case ERROR_CODE_CONNECTION_FAILURE:
+    case defs::errors::connection_failure:
         throw (ConnectionFailure (fed->lastErrorString ()));
-    case ERROR_CODE_REGISTRATION_FAILURE:
+    case defs::errors::registration_failure:
         throw (RegistrationFailure (fed->lastErrorString ()));
     default:
         throw (HelicsException (fed->lastErrorString ()));
@@ -719,7 +719,7 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
 {
     if (federateID == local_core_id)
     {
-        if (flag == HELICS_DELAY_INIT_ENTRY)
+        if (flag == defs::flags::delay_init_entry)
         {
             if (flagValue)
             {
@@ -728,7 +728,7 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
             else
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
-                cmd.messageID = HELICS_DELAY_INIT_ENTRY;
+                cmd.messageID = defs::flags::delay_init_entry;
                 if (flagValue)
                 {
                     setActionFlag (cmd, indicator_flag);
@@ -736,10 +736,10 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
                 addActionMessage (cmd);
             }
         }
-        else if (flag == HELICS_ENABLE_INIT_ENTRY)
+        else if (flag == defs::flags::enable_init_entry)
         {
             ActionMessage cmd (CMD_CORE_CONFIGURE);
-            cmd.messageID = HELICS_ENABLE_INIT_ENTRY;
+            cmd.messageID = defs::flags::enable_init_entry;
             if (flagValue)
             {
                 setActionFlag (cmd, indicator_flag);
@@ -1644,7 +1644,7 @@ void CommonCore::setLoggingLevel (int logLevel)
 {
     ActionMessage cmd (CMD_CORE_CONFIGURE);
     cmd.dest_id = global_broker_id.load ();
-    cmd.messageID = LOG_LEVEL_PROPERTY;
+    cmd.messageID = defs::properties::log_level;
     cmd.counter = logLevel;
     addActionMessage (cmd);
 }
@@ -2238,22 +2238,20 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_RESEND:
         LOG_WARNING_SIMPLE ("got resend");
-		if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
-		{
-            if ((global_broker_id.load() == parent_broker_id)
-				|| (!(global_broker_id.load().isValid())))
-			{
+        if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
+        {
+            if ((global_broker_id.load () == parent_broker_id) || (!(global_broker_id.load ().isValid ())))
+            {
                 LOG_WARNING_SIMPLE ("resending broker reg");
-				 ActionMessage m (CMD_REG_BROKER);
-            m.source_id = global_federate_id_t ();
-            m.name = getIdentifier ();
-            m.setStringData (getAddress ());
-            setActionFlag (m, core_flag);
-            m.counter = 1;
-            transmit (parent_route_id, m);
-			}
-           
-		}
+                ActionMessage m (CMD_REG_BROKER);
+                m.source_id = global_federate_id_t ();
+                m.name = getIdentifier ();
+                m.setStringData (getAddress ());
+                setActionFlag (m, core_flag);
+                m.counter = 1;
+                transmit (parent_route_id, m);
+            }
+        }
         break;
     case CMD_CHECK_CONNECTIONS:
     {
@@ -2918,7 +2916,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     err.dest_id = command.source_id;
                     err.source_id = command.dest_id;
                     err.source_handle = command.dest_handle;
-                    err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+                    err.messageID = defs::errors::registration_failure;
                     err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
                     return;
@@ -2984,7 +2982,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            if (fed->getOptionFlag (HELICS_OBSERVER_FLAG))
+            if (fed->getOptionFlag (defs::flags::observer))
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2994,7 +2992,7 @@ void CommonCore::checkDependencies ()
                 fed->addAction (rmdep);
                 isobs = true;
             }
-            else if (fed->getOptionFlag (HELICS_SOURCE_ONLY_FLAG))
+            else if (fed->getOptionFlag (defs::flags::source_only))
             {
                 timeCoord->removeDependent (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENCY);
@@ -3179,7 +3177,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
 {
     switch (cmd.messageID)
     {
-    case HELICS_ENABLE_INIT_ENTRY:
+    case defs::flags::enable_init_entry:
         if (delayInitCounter <= 1)
         {
             delayInitCounter = 0;
@@ -3201,7 +3199,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             --delayInitCounter;
         }
         break;
-    case LOG_LEVEL_PROPERTY:
+    case defs::properties::log_level:
         setLogLevel (cmd.counter);
         break;
     case UPDATE_LOGGING_CALLBACK:
@@ -3304,7 +3302,8 @@ bool CommonCore::waitCoreRegistration ()
         if (sleepcnt > 6)
         {
             LOG_WARNING (parent_broker_id, identifier,
-                         fmt::format("broker state={}, broker id={}, sleepcnt={}",static_cast<int>(brokerState.load()),brkid.baseValue(),sleepcnt));
+                         fmt::format ("broker state={}, broker id={}, sleepcnt={}",
+                                      static_cast<int> (brokerState.load ()), brkid.baseValue (), sleepcnt));
         }
         if (brokerState.load () <= broker_state_t::initialized)
         {
@@ -3319,13 +3318,12 @@ bool CommonCore::waitCoreRegistration ()
             LOG_WARNING (parent_broker_id, identifier,
                          "now waiting for the core to finish registration before proceeding");
         }
-		if (sleepcnt == 20)
-		{
-            LOG_WARNING (parent_broker_id, identifier,
-                         "resending reg message");
+        if (sleepcnt == 20)
+        {
+            LOG_WARNING (parent_broker_id, identifier, "resending reg message");
             ActionMessage M (CMD_RESEND);
-            M.messageID = static_cast<int32_t>(CMD_REG_BROKER);
-		}
+            M.messageID = static_cast<int32_t> (CMD_REG_BROKER);
+        }
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_broker_id.load ();
         ++sleepcnt;

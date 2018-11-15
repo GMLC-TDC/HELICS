@@ -1,7 +1,7 @@
 function v = helics_handle_option_connection_optional()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1398230910);
+    vInitialized = helicsMEX(0, 1946183091);
   end
   v = vInitialized;
 end

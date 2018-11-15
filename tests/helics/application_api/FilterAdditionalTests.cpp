@@ -53,7 +53,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
 
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 /**
@@ -88,7 +88,6 @@ endpoint only if condition matches.
 BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), core_type)
 {
-	
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
@@ -112,7 +111,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "endpt2", data);
 
@@ -133,7 +132,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
 
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 /**
@@ -169,7 +168,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -199,7 +198,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
 
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 /**
@@ -220,7 +219,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     double drop_prob = 0.75;
     Filt.set ("dropprob", drop_prob);
@@ -229,7 +228,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -259,7 +258,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     BOOST_CHECK_LE (pest, drop_prob + ebar);
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 /**
@@ -291,7 +290,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -318,7 +317,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     BOOST_CHECK_LE (pest, prob + ebar);
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 /**
@@ -339,7 +338,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDrop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
     Filt.addDestinationTarget ("port2");
     double drop_prob = 0.25;
     Filt.set ("dropprob", drop_prob);
@@ -348,7 +347,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -411,7 +410,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (500, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -457,7 +456,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::randomDelay, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::defined_filter_types::random_delay, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("distribution", "binomial");
 
@@ -468,7 +467,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
     helics::data_block data (100, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -497,7 +496,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
 
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (test_empty) {}

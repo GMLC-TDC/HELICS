@@ -9,16 +9,6 @@
 package com.java.helics;
 
 public interface helicsConstants {
-  public final static int HELICS_CORE_TYPE_DEFAULT = helicsJNI.HELICS_CORE_TYPE_DEFAULT_get();
-  public final static int HELICS_CORE_TYPE_ZMQ = helicsJNI.HELICS_CORE_TYPE_ZMQ_get();
-  public final static int HELICS_CORE_TYPE_MPI = helicsJNI.HELICS_CORE_TYPE_MPI_get();
-  public final static int HELICS_CORE_TYPE_TEST = helicsJNI.HELICS_CORE_TYPE_TEST_get();
-  public final static int HELICS_CORE_TYPE_INTERPROCESS = helicsJNI.HELICS_CORE_TYPE_INTERPROCESS_get();
-  public final static int HELICS_CORE_TYPE_IPC = helicsJNI.HELICS_CORE_TYPE_IPC_get();
-  public final static int HELICS_CORE_TYPE_TCP = helicsJNI.HELICS_CORE_TYPE_TCP_get();
-  public final static int HELICS_CORE_TYPE_UDP = helicsJNI.HELICS_CORE_TYPE_UDP_get();
-  public final static int HELICS_CORE_TYPE_ZMQ_TEST = helicsJNI.HELICS_CORE_TYPE_ZMQ_TEST_get();
-  public final static int HELICS_CORE_TYPE_TCP_SS = helicsJNI.HELICS_CORE_TYPE_TCP_SS_get();
   public final static int HELICS_DATA_TYPE_STRING = helicsJNI.HELICS_DATA_TYPE_STRING_get();
   public final static int HELICS_DATA_TYPE_DOUBLE = helicsJNI.HELICS_DATA_TYPE_DOUBLE_get();
   public final static int HELICS_DATA_TYPE_INT = helicsJNI.HELICS_DATA_TYPE_INT_get();

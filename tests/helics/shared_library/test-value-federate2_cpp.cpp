@@ -19,7 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *utf::label("ci"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *utf::label ("ci"))
 
 // const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
@@ -27,14 +27,14 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *u
 
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
 {
-    helics_time_t gtime;
+    helics_time gtime;
     std::string s (500, ';');
     int len = static_cast<int> (s.size ());
-    BOOST_TEST_CHECKPOINT("calling setup");
+    BOOST_TEST_CHECKPOINT ("calling setup");
     SetupTest<helicscpp::ValueFederate> (core_type, 1);
-    BOOST_TEST_CHECKPOINT("calling get federate");
+    BOOST_TEST_CHECKPOINT ("calling get federate");
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate> (0);
-    BOOST_REQUIRE((vFed1));
+    BOOST_REQUIRE ((vFed1));
     auto pubid1 = vFed1->registerTypePublication ("pub1", "string", "");
     BOOST_CHECK (pubid1.baseObject () != nullptr);
     auto pubid2 = vFed1->registerGlobalPublication ("pub2", HELICS_DATA_TYPE_INT, "");
@@ -42,13 +42,13 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     auto pubid3 = vFed1->registerTypePublication ("pub3", "");
     BOOST_CHECK (pubid3.baseObject () != nullptr);
     auto sub1 = vFed1->registerSubscription ("fed0/pub3");
-    BOOST_TEST_CHECKPOINT("reg opt1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    BOOST_TEST_CHECKPOINT("set Delta");
+    BOOST_TEST_CHECKPOINT ("reg opt1");
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    BOOST_TEST_CHECKPOINT ("set Delta");
     vFed1->enterExecutingMode ();
-    BOOST_TEST_CHECKPOINT("publish");
+    BOOST_TEST_CHECKPOINT ("publish");
     pubid3.publish (s);
-    BOOST_TEST_CHECKPOINT("reqtime");
+    BOOST_TEST_CHECKPOINT ("reqtime");
     gtime = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK (sub1.isUpdated ());
@@ -71,9 +71,9 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 {
-    helics_time_t gtime;
-    helics_time_t f1time;
-    // federate_state state;
+    helics_time gtime;
+    helics_time f1time;
+    // helics_federate_state state;
     SetupTest<helicscpp::ValueFederate> (core_type, 2);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helicscpp::ValueFederate> (1);
@@ -81,8 +81,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication ("pub1", HELICS_DATA_TYPE_STRING, "");
     auto subid = vFed2->registerSubscription ("pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingModeAsync ();
