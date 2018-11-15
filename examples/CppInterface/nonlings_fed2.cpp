@@ -42,7 +42,7 @@ int main (int /*argc*/, char ** /*argv*/)
     printf (" Subscription registered\n");
 
     /* Register the publication */
-    pub = vfed->registerGlobalPublication ("testB", HELICS_DATA_TYPE_DOUBLE);
+    pub = vfed->registerGlobalPublication ("testB", helics_data_type_double);
     printf (" Publication registered\n");
 
     /* Enter initialization state */

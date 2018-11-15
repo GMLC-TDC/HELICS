@@ -135,16 +135,16 @@ helicsFederateRegisterTypePublication (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_TIME))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterTypePublication (fed, key, "raw", units, err);
         }
@@ -198,16 +198,16 @@ helicsFederateRegisterGlobalTypePublication (helics_federate fed, const char *ke
 }
 
 helics_publication
-helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < 0) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterGlobalTypePublication (fed, key, "raw", units, err);
         }
@@ -261,20 +261,20 @@ helics_input helicsFederateRegisterTypeInput (helics_federate fed, const char *k
     return nullptr;
 }
 
-helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterTypeInput (fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY)
+        if (type != helics_data_type_any)
         {
             if (err != nullptr)
             {
@@ -327,20 +327,20 @@ helicsFederateRegisterGlobalTypeInput (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterGlobalTypeInput (fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY)
+        if (type != helics_data_type_any)
         {
             if (err != nullptr)
             {

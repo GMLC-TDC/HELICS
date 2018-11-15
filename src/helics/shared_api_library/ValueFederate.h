@@ -19,30 +19,6 @@ extern "C"
 
 /* sub/pub registration */
 
-/** a sequence of characters*/
-#define HELICS_DATA_TYPE_STRING 0
-/** a double precision floating point number*/
-#define HELICS_DATA_TYPE_DOUBLE 1
-/** a 64 bit integer*/
-#define HELICS_DATA_TYPE_INT 2
-/** a pair of doubles representing a complex number*/
-#define HELICS_DATA_TYPE_COMPLEX 3
-/** an array of doubles*/
-#define HELICS_DATA_TYPE_VECTOR 4
-/** a named point consisting of a string and a double*/
-#define HELICS_DATA_TYPE_NAMEDPOINT 6
-
-/** a boolean data type*/
-#define HELICS_DATA_TYPE_BOOLEAN 7
-/** single character data type  this is intentionally the same as string*/
-#define HELICS_DATA_TYPE_CHAR 0
-/** time data type*/
-#define HELICS_DATA_TYPE_TIME 8
-
-/** raw data type*/
-#define HELICS_DATA_TYPE_RAW 25
-#define HELICS_DATA_TYPE_ANY 25262
-
     /** create a subscription
     @details the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free
     functions for subscriptions and publications
@@ -62,7 +38,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication the global publication key will be prepended with the federate name
-    @param type a known type identifier  HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_DOUBLE,
+    @param type a known type identifier  helics_data_type_string, helics_data_type_int, HELICS_DATA_TYPE_DOUBLE,
     HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN,
     HELICS_DATA_TYPE_RAW, HELICS_DATA_TYPE_ANY
     @param units a string listing the units of the subscription maybe NULL
@@ -76,7 +52,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT,
+    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
     HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
     HELICS_DATA_TYPE_RAW
     @param units a string listing the units of the subscription maybe NULL
@@ -102,7 +78,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT,
+    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
     HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
     HELICS_DATA_TYPE_RAW
     @param units a string listing the units of the subscription maybe NULL
@@ -131,7 +107,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT,
+    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
     HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
     HELICS_DATA_TYPE_RAW
     @param units a string listing the units of the subscription maybe NULL
@@ -156,7 +132,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_INT,
+    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
     HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
     HELICS_DATA_TYPE_RAW
     @param units a string listing the units of the subscription maybe NULL

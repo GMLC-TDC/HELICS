@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** @file
 @details base helics enumerations for C++ API's
 */
+#include "helics/helics_enums.h"
 
 namespace helics
 {

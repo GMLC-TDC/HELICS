@@ -18,12 +18,14 @@ namespace helicscpp
 {
 enum PubSubTypes
 {
-    STRING_TYPE = HELICS_DATA_TYPE_STRING,
-    DOUBLE_TYPE = HELICS_DATA_TYPE_DOUBLE,
-    INT_TYPE = HELICS_DATA_TYPE_INT,
-    COMPLEX_TYPE = HELICS_DATA_TYPE_COMPLEX,
-    VECTOR_TYPE = HELICS_DATA_TYPE_VECTOR,
-    RAW_TYPE = HELICS_DATA_TYPE_RAW
+    STRING_TYPE = helics_data_type_string,
+    DOUBLE_TYPE = helics_data_type_double,
+    INT_TYPE = helics_data_type_int,
+    COMPLEX_TYPE = helics_data_type_complex,
+    VECTOR_TYPE = helics_data_type_vector,
+    TIME_TYPE = helics_data_type_time,
+    BOOLEAN_TYPE = helics_data_type_boolean,
+    RAW_TYPE = helics_data_type_raw,
 };
 
 class ValueFederate : public virtual Federate

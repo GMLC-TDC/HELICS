@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2)
     CE (helicsFederateSetTimeProperty (vFed1, helics_property_time_period, 0.5, &err));
     CE (helicsFederateSetTimeProperty (vFed2, helics_property_time_period, 0.5, &err));
 
-    auto pub = helicsFederateRegisterGlobalPublication (vFed1, "pub1", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
+    auto pub = helicsFederateRegisterGlobalPublication (vFed1, "pub1", helics_data_type_double, "", nullptr);
     helicsFederateRegisterSubscription (vFed2, "pub1", "", nullptr);
 
     CE (helicsFederateEnterExecutingModeAsync (vFed1, &err));

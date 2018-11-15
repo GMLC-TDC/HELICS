@@ -40,6 +40,36 @@ extern "C"
 
     typedef enum
     {
+        /** a sequence of characters*/
+        helics_data_type_string=0,
+        /** a double precision floating point number*/
+        helics_data_type_double=1,
+        /** a 64 bit integer*/
+        helics_data_type_int=2,
+        /** a pair of doubles representing a complex number*/
+        helics_data_type_complex=3,
+        /** an array of doubles*/
+        helics_data_type_vector=4,
+        helics_data_type_complex_vector=5,
+        /** a named point consisting of a string and a double*/
+        helics_data_type_named_point=6,
+
+        /** a boolean data type*/
+        helics_data_type_boolean=7,
+        
+        /** time data type*/
+        helics_data_type_time=8,
+
+        /** raw data type*/
+        helics_data_type_raw=25,
+        helics_data_type_any=25262,
+    } helics_data_type;
+
+    /** single character data type  this is intentionally the same as string*/
+    #define helics_data_type_char helics_data_type_string
+
+    typedef enum
+    {
         /** flag indicating that a federate is observe only*/
         helics_flag_observer = 0,
         /** flag indicating that a federate can only return requested times*/

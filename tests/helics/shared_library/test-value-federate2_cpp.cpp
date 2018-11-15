@@ -37,7 +37,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     BOOST_REQUIRE ((vFed1));
     auto pubid1 = vFed1->registerTypePublication ("pub1", "string", "");
     BOOST_CHECK (pubid1.baseObject () != nullptr);
-    auto pubid2 = vFed1->registerGlobalPublication ("pub2", HELICS_DATA_TYPE_INT, "");
+    auto pubid2 = vFed1->registerGlobalPublication ("pub2", helics_data_type_int, "");
     BOOST_CHECK (pubid2.baseObject () != nullptr);
     auto pubid3 = vFed1->registerTypePublication ("pub3", "");
     BOOST_CHECK (pubid3.baseObject () != nullptr);
@@ -79,7 +79,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     auto vFed2 = GetFederateAs<helicscpp::ValueFederate> (1);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication ("pub1", HELICS_DATA_TYPE_STRING, "");
+    auto pubid = vFed1->registerGlobalPublication ("pub1", helics_data_type_string, "");
     auto subid = vFed2->registerSubscription ("pub1");
     vFed1->setTimeProperty (helics_property_time_delta, 1.0);
     vFed2->setTimeProperty (helics_property_time_delta, 1.0);
