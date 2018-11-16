@@ -90,7 +90,6 @@ set(
   helicsVersion.hpp
   federate_id.hpp
   helics_definitions.hpp
-  ../helics_enums.h
 )
 
 set(
@@ -128,6 +127,7 @@ set(
 	NetworkCore.hpp
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
+	../helics_enums.h
 )
 
 set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
@@ -245,5 +245,11 @@ endif(HELICS_HAVE_MPI)
 install(
   FILES ${PUBLIC_INCLUDE_FILES}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
+  COMPONENT headers
+)
+
+install(
+  FILES ../helics_enums.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )

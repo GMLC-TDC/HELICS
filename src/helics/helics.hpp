@@ -7,15 +7,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** @file
 Header file for inclusion of the entire CPP static library
 */
+#pragma once
 
-#ifndef HELICS_APPLICATION_API_HEADER_
-#define HELICS_APPLICATION_API_HEADER_
-
-#include "application_api/CombinationFederate.hpp"
-#include "application_api/Filters.hpp"
-#include "application_api/Endpoints.hpp"
-#include "application_api/Publications.hpp"
-#include "application_api/Subscriptions.hpp"
-
-#endif /*HELICS_APPLICATION_API_HEADER_*/
-
+#include "application_api.hpp"
+#include "common/argParser.h"
+#include "common/stringToCmdLine.h"
+#include "core/Broker.hpp"
+#include "core/BrokerFactory.hpp"
+#include "core/Core.hpp"
+#include "core/CoreFactory.hpp"
+#include "core/helicsVersion.hpp"
+#include "core/helics_definitions.hpp"

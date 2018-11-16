@@ -42,7 +42,7 @@ class ValueFederate : public virtual Federate
         fed = helicsCreateValueFederate (fedname.c_str (), fi.getInfo (), hThrowOnError ());
         if (fed == NULL)
         {
-            throw (std::runtime_error ("fed==NULL constructor"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL"));
         }
     }
 
@@ -51,7 +51,7 @@ class ValueFederate : public virtual Federate
         fed = helicsCreateValueFederateFromConfig (configString.c_str (), hThrowOnError ());
         if (fed == NULL)
         {
-            throw (std::runtime_error ("fed==NULL create from configuration file"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL"));
         }
     }
 
@@ -63,7 +63,7 @@ class ValueFederate : public virtual Federate
         pubs = fedObj.pubs;
         if (fed == NULL)
         {
-            throw (std::runtime_error ("fed==NULL assignment"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL move constructor"));
         }
         return *this;
     }
@@ -74,7 +74,7 @@ class ValueFederate : public virtual Federate
         Federate::operator= (std::move (fedObj));
         if (fed == NULL)
         {
-            throw (std::runtime_error ("fed==NULL move constructor"));
+            throw (HelicsException (helics_error_registration_failure, "fed==NULL move constructor"));
         }
     }
     ValueFederate &operator= (ValueFederate &&fedObj)
@@ -84,7 +84,7 @@ class ValueFederate : public virtual Federate
         Federate::operator= (std::move (fedObj));
         if (fed == NULL)
         {
-            throw (std::runtime_error ("fed==NULL move assignment"));
+            throw (HelicsException (helics_error_registration_failure, "fed==NULL move assignment"));
         }
         return *this;
     }
