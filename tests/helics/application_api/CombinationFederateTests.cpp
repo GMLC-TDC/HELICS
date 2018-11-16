@@ -4,18 +4,18 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
+#include "helics/application_api/Endpoints.hpp"
+#include "helics/application_api/Publications.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
 #include <future>
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
@@ -31,11 +31,11 @@ BOOST_DATA_TEST_CASE (combo_federate_initialize_tests, bdata::make (core_types_s
 
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
 
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core_types_single), core_type)
@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     auto &pubid3 = vFed1->registerPublication ("pub3", "double", "V");
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
 
     auto &sv = vFed1->getPublicationKey (pubid);
     auto &sv2 = vFed1->getPublicationKey (pubid2);
@@ -66,7 +66,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     BOOST_CHECK (vFed1->getPublication ("fed0/pub1").getHandle () == pubid.getHandle ());
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_single), core_type)
@@ -77,8 +77,8 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     // register the publications
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto &subid = vFed1->registerSubscription("pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    auto &subid = vFed1->registerSubscription ("pub1");
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -92,14 +92,14 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    s=vFed1->getString (subid);
-	
+    s = vFed1->getString (subid);
+
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     gtime = vFed1->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    s=vFed1->getString (subid);
+    s = vFed1->getString (subid);
 
     BOOST_CHECK_EQUAL (s, "string2");
 }
@@ -114,7 +114,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
 
     auto &sv = mFed1->getEndpointName (epid);
     auto &sv2 = mFed1->getEndpointName (epid2);
@@ -129,7 +129,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_types), core_type)
@@ -141,15 +141,15 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     auto &epid = mFed1->registerEndpoint ("ep1");
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    mFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed2->setTimeProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::execution);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -182,8 +182,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core_types), core_type)
@@ -198,10 +198,10 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // register the publications
     auto &pubid = cFed1->registerGlobalPublication<std::string> ("pub1");
 
-    auto &subid = cFed2->registerSubscription("pub1");
+    auto &subid = cFed2->registerSubscription ("pub1");
 
-    cFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    cFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    cFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    cFed2->setTimeProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutingMode (); });
     cFed2->enterExecutingMode ();
@@ -209,8 +209,8 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // publish string1 at time=0.0;
     cFed1->publish (pubid, "string1");
 
-    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::op_states::execution);
-    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::states::execution);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -231,7 +231,7 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // publish a second string
     cFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    s=cFed2->getString(subid);
+    s = cFed2->getString (subid);
 
     BOOST_CHECK_EQUAL (s, "string1");
 
@@ -260,15 +260,15 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     BOOST_CHECK_EQUAL (f1time.get (), 2.0);
     // make sure the value was updated
 
-    auto &ns=cFed2->getString (subid);
+    auto &ns = cFed2->getString (subid);
 
     BOOST_CHECK_EQUAL (ns, "string2");
 
     cFed1->finalize ();
     cFed2->finalize ();
 
-    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::op_states::finalize);
-    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load)

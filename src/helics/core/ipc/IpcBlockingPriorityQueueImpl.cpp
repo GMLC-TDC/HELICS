@@ -238,7 +238,7 @@ int IpcBlockingPriorityQueueImpl::try_pop (unsigned char *data, int maxSize)
                     // we can free the push function to accept more elements after the swap call;
                     pushLock.unlock ();
                     pullData.reverse ();
-                }
+                } 
                 else
                 {
 					conditionLock.lock();
