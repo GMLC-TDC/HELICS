@@ -99,6 +99,14 @@ Input &ValueFederate::registerSubscription (const std::string &key, const std::s
     return inp;
 }
 
+void ValueFederate::setPublicationInfo(const Publication &pub, const std::string &info){
+    vfManager->setPublicationInfo(pub, info);
+}
+
+void ValueFederate::setInputInfo(const Input &inp, const std::string &info){
+    vfManager->setInputInfo(inp, info);
+}
+
 void ValueFederate::addTarget (const Publication &pub, const std::string &target)
 {
     vfManager->addTarget (pub, target);
@@ -138,37 +146,42 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
 {
     auto doc = loadJson (configString);
 
-    if (doc.isMember ("publications"))
+    if (doc.isMember ("publications")) // TODO: add info field loading
     {
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
         {
             auto key = getKey (pub);
 
-            Publication *pubAct = &vfManager->getPublication (key);
-            if (pubAct->isValid ())
+            auto &pubAct = vfManager->getPublication (key);
+            if (pubAct.isValid ())
             {
                 continue;
             }
             auto type = jsonGetOrDefault (pub, "type", std::string ());
             auto units = jsonGetOrDefault (pub, "units", std::string ());
+            auto info = jsonGetOrDefault (pub, "info", std::string ());
             bool global = jsonGetOrDefault (pub, "global", false);
             if (global)
             {
-                pubAct=&registerGlobalPublication (key, type, units);
+                pubAct = registerGlobalPublication (key, type, units);
+                // TODO: get register return and set interface
             }
             else
             {
-                pubAct=&registerPublication (key, type, units);
+                pubAct = registerPublication (key, type, units);
             }
             auto tol = jsonGetOrDefault (pub, "tolerance", -1.0);
             if (tol > 0.0)
             {
-                pubAct->setMinimumChange (tol);
+                pubAct.setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setPublicationInfo(pubAct, info);
             }
         }
     }
-    if (doc.isMember ("subscriptions"))
+    if (doc.isMember ("subscriptions")) // TODO: add info field loading
     {
         auto subs = doc["subscriptions"];
         for (const auto &sub : subs)
@@ -180,6 +193,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 continue;
             }
             auto units = jsonGetOrDefault (sub, "units", std::string ());
+            auto info = jsonGetOrDefault (sub, "info", std::string ());
+            //TODO:
+//            auto info = (sub.isMember("info")) ? (sub["info"].asString()) : std::string();
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
@@ -199,6 +215,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 subNew.setMinimumChange (tol);
             }
+            if(!info.empty()){
+                setInputInfo(subNew, info);
+            }
         }
     }
     if (doc.isMember ("inputs"))
@@ -208,26 +227,30 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
         {
             auto key = getKey (ipt);
 
-            Input *inp = &vfManager->getInput (key);
-            if (inp->isValid ())
+            auto &inp = vfManager->getInput (key);
+            if (inp.isValid ())
             {
                 continue;
             }
             auto type = jsonGetOrDefault (ipt, "type", std::string ());
             auto units = jsonGetOrDefault (ipt, "units", std::string ());
+            auto info = jsonGetOrDefault (ipt, "info", std::string ());
             bool global = jsonGetOrDefault (ipt, "global", false);
             if (global)
             {
-                inp=&registerGlobalInput (key, type, units);
+                inp = registerGlobalInput (key, type, units);
             }
             else
             {
-                inp=&registerInput (key, type, units);
+                inp = registerInput (key, type, units);
             }
             auto tol = jsonGetOrDefault (ipt, "tolerance", -1.0);
             if (tol > 0.0)
             {
-                inp->setMinimumChange (tol);
+                inp.setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInputInfo(inp, info);
             }
         }
     }
@@ -245,7 +268,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-    auto pubs = doc.find ("publications");
+    auto pubs = doc.find ("publications"); // TODO: add info field loading
     if (pubs != nullptr)
     {
         auto &pubArray = pubs->as<toml::Array> ();
@@ -277,7 +300,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
         }
     }
-    auto subs = doc.find ("subscriptions");
+    auto subs = doc.find ("subscriptions"); // TODO: add info field loading
     if (subs != nullptr)
     {
         auto &subArray = subs->as<toml::Array> ();

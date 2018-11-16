@@ -119,6 +119,7 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         {
             auto eptName = getKey (ept);
             auto type = jsonGetOrDefault (ept, "type", std::string ());
+            auto info = jsonGetOrDefault (ept, "info", std::string ());
             bool global = jsonGetOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
             
@@ -140,7 +141,7 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                 }
             }
             // endpoints can subscribe to publications
-            if (ept.isMember ("subscriptions"))
+            if (ept.isMember ("subscriptions")) // TODO: add info field loading
             {
                 auto subs = ept["subscriptions"];
                 if (subs.isString ())
@@ -205,7 +206,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
                     registerKnownCommunicationPath (epObj, kp->as<std::string> ());
                 }
             }
-            auto subs = ept.find ("subscriptions");
+            auto subs = ept.find ("subscriptions"); // TODO: add info field loading
             // endpoints can subscribe to publications
             if (subs!=nullptr)
             {

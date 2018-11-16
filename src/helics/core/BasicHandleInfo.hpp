@@ -58,6 +58,7 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
+    const std::string interface_info;
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 

@@ -161,6 +161,35 @@ class ValueFederateManager
     /** get an option values for a publication*/
     bool getPublicationOption (const Publication &pub, int32_t option) const;
 
+    // TODO: tags
+    /**
+     *
+     * @param inp
+     * @return
+     */
+    std::string getInputInfo(const Input &inp) const;
+
+    /**
+     *
+     * @param pub
+     * @return
+     */
+    std::string getPublicationInfo(const Publication &pub) const;
+
+    /**
+     *
+     * @param inp
+     * @param info
+     */
+    void setInputInfo(const Input &inp, const std::string &info) const;
+
+    /**
+     *
+     * @param pub
+     * @param info
+     */
+    void setPublicationInfo(const Publication &pub, const std::string &info) const;
+
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call

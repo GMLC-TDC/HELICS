@@ -173,6 +173,9 @@ class CommonCore : public Core, public BrokerBase
      * class of some sort*/
     virtual void processDisconnect (bool skipUnregister = false) override final;
 
+    virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
+    virtual const std::string &getInterfaceInfo(interface_handle handle) const override final;
+
   private:
     /** implementation details of the connection process
      */
