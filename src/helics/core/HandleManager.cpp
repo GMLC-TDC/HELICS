@@ -36,21 +36,6 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
     return handles.back ();
 }
 
-//    BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-//                                               interface_handle local_id,
-//                                               handle_type_t what,
-//                                               const std::string &key,
-//                                               const std::string &type,
-//                                               const std::string &units,
-//                                               const std::string &info)
-//    {
-//        auto index = static_cast<int32_t> (handles.size ());
-//        std::string actKey = (!key.empty ()) ? key : generateName (what);
-//        handles.emplace_back ( fed_id, local_id, what, actKey, type, units, info);
-//        addSearchFields (handles.back (), index);
-//        return handles.back ();
-//    }
-
 void HandleManager::addHandle(const BasicHandleInfo &otherHandle)
 {
     auto index = static_cast<int32_t> (handles.size());

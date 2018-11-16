@@ -3755,10 +3755,6 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     }
 
     void CommonCore::setInterfaceInfo(helics::interface_handle handle, std::string info) {
-        auto handleInfo = getHandleInfo (handle);
-        if (handleInfo != nullptr)
-        {
-//            handleInfo->interface_info = info;
-        }
+        handles.modify ([&](auto &hdls) { hdls.getHandleInfo (handle.baseValue ())->interface_info = info; });
     }
 }  // namespace helics

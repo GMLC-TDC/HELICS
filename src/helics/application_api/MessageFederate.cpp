@@ -119,7 +119,6 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         {
             auto eptName = getKey (ept);
             auto type = jsonGetOrDefault (ept, "type", std::string ());
-            auto info = jsonGetOrDefault (ept, "info", std::string ());
             bool global = jsonGetOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
             
@@ -141,7 +140,7 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
                 }
             }
             // endpoints can subscribe to publications
-            if (ept.isMember ("subscriptions")) // TODO: add info field loading
+            if (ept.isMember ("subscriptions"))
             {
                 auto subs = ept["subscriptions"];
                 if (subs.isString ())
@@ -160,6 +159,11 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
             if (!defTarget.empty ())
             {
                 epObj.setTargetDestination (defTarget);
+            }
+
+            auto info = jsonGetOrDefault (ept, "info", std::string ());
+            if(!info.empty()){
+                coreObject->setInterfaceInfo(epObj.getHandle(), info);
             }
         }
     }
@@ -206,7 +210,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
                     registerKnownCommunicationPath (epObj, kp->as<std::string> ());
                 }
             }
-            auto subs = ept.find ("subscriptions"); // TODO: add info field loading
+            auto subs = ept.find ("subscriptions");
             // endpoints can subscribe to publications
             if (subs!=nullptr)
             {
@@ -227,6 +231,11 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
 			{
                 epObj.setTargetDestination (defTarget);
 			}
+
+            auto info = tomlGetOrDefault (ept, "info", std::string ());
+            if(!info.empty()){
+                coreObject->setInterfaceInfo(epObj.getHandle(), info);
+            }
         }
     }
    

@@ -490,10 +490,6 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get a count of the number subscriptions registered*/
     int getInputCount () const;
 
-    void setPublicationInfo(const Publication &pub, const std::string &info);
-
-    void setInputInfo(const Input &inp, const std::string &info);
-
   private:
     /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
     std::unique_ptr<ValueFederateManager> vfManager;

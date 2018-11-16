@@ -437,40 +437,6 @@ bool ValueFederateManager::getPublicationOption (const Publication &pub, int32_t
     return coreObject->getHandleOption (pub.handle, option);
 }
 
-std::string ValueFederateManager::getInputInfo(const Input &imp) const {
-    auto inpHandle = inputs.lock_shared();
-    if (imp.isValid()) {
-        return coreObject->getInterfaceInfo(imp.handle);
-    }
-    throw (InvalidIdentifier("Input Id is invalid"));
-}
-
-std::string ValueFederateManager::getPublicationInfo(const Publication &pub) const {
-    auto pubHandle = publications.lock_shared();
-    if (pub.isValid()) {
-        return coreObject->getInterfaceInfo((pub.handle));
-    }
-    throw (InvalidIdentifier("Publication Id is invalid"));
-}
-
-void ValueFederateManager::setInputInfo(const Input &imp, const std::string &info) const {
-    auto pubHandle = inputs.lock_shared();
-    if (imp.isValid()) {
-        coreObject->setInterfaceInfo(imp.handle, info);
-        return;
-    }
-    throw (InvalidIdentifier("Input Id is invalid"));
-}
-
-void ValueFederateManager::setPublicationInfo(const Publication &pub, const std::string &info) const {
-    auto pubHandle = publications.lock_shared();
-    if (pub.isValid()) {
-        coreObject->setInterfaceInfo(pub.handle, info);
-        return;
-    }
-    throw (InvalidIdentifier("Publication Id is invalid"));
-}
-
 /** get a count of the number publications registered*/
 int ValueFederateManager::getPublicationCount () const
 {
