@@ -419,211 +419,203 @@ end
 %!     forceCloseStruct(feds);
 %!     assert(false)
 %! end_try_catch
-% end
 % 
 % 
-% function testInteger(testCase)
-% import matlab.unittest.constraints.IsTrue;
-% import helics.*
-% [feds,success]=generateFed();
-% assert(success);
-% 
-% try
-% defaultValue = int64(45626678);
-%     testValue1 = int64(-27);
-%     testValue2 = int64(0);
-% 
-%     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_INT, '');
-%     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
-% 
-%     helicsInputSetDefaultInteger(subid, defaultValue);
-%     
-% 
-%     helicsFederateEnterExecutingMode(feds.vFed);
-%     
-% 
-%     % publish string1 at time=0.0;
-%     helicsPublicationPublishInteger(pubid, testValue1);
-%     
-% 
-%     % double val;
-%     value = helicsInputGetInteger(subid);
-%     
-%     assert(value,defaultValue);
-% 
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
-%     
-%     assert(grantedtime,0.01);
-% 
-%     % get the value
-%     value = helicsInputGetInteger(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % publish a second string
-%     helicsPublicationPublishInteger(pubid, testValue2);
-%     
-%     % make sure the value is still what we expect
-%     value = helicsInputGetInteger(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % advance time
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
-%     
-%     assert(grantedtime,0.02);
-% 
-%     % make sure the value was updated
-%     value = helicsInputGetInteger(subid);
-%     
-%     % make sure the value is what we expect
-%     assert(value,testValue2);
-%     success=closeStruct(feds);
-%     assert(success);
-% catch e
-%     assert(false)
-%     disp(e.message)
-%     disp(e.stack(1))
-%     forceCloseStruct(feds);
-% end
-% end
+% testInteger
+%!test
+%! helics
+%! [feds,success]=generateFed();
+%! assert(success)
+%! 
+%! try
+%! defaultValue = int64(45626678);
+%!     testValue1 = int64(-27);
+%!     testValue2 = int64(0);
+%! 
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_INT, '');
+%!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
+%! 
+%!     helicsInputSetDefaultInteger(subid, defaultValue);
+%!     
+%!     helicsFederateEnterExecutingMode(feds.vFed);
+%!     
+%!     % publish string1 at time=0.0;
+%!     helicsPublicationPublishInteger(pubid, testValue1);
+%!     
+%!     % double val;
+%!     value = helicsInputGetInteger(subid);
+%!     
+%!     assert(value,defaultValue);
+%! 
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
+%!     
+%!     assert(grantedtime,0.01);
+%! 
+%!     % get the value
+%!     value = helicsInputGetInteger(subid);
+%!     
+%!     % make sure the string is what we expect
+%!     assert(value,testValue1);
+%! 
+%!     % publish a second string
+%!     helicsPublicationPublishInteger(pubid, testValue2);
+%!     
+%!     % make sure the value is still what we expect
+%!     value = helicsInputGetInteger(subid);
+%!     
+%!     % make sure the string is what we expect
+%!    assert(value,testValue1);
+%! 
+%!     % advance time
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
+%!     
+%!     assert(grantedtime,0.02);
+%! 
+%!     % make sure the value was updated
+%!     value = helicsInputGetInteger(subid);
+%!     
+%!     % make sure the value is what we expect
+%!     assert(value,testValue2);
+%!     success=closeStruct(feds);
+%!     assert(success);
+%! catch e
+%!     disp(e.message)
+%!     disp(e.stack(1))
+%!     forceCloseStruct(feds);
+%!     assert(false)
+%! end_try_catch
 % 
 % 
-% function testString(testCase)
-% import matlab.unittest.constraints.IsTrue;
-% import helics.*
-% [feds,success]=generateFed();
-% assert(success);
-% 
-% try
-% defaultValue = 'string1';
-%     testValue1 = 'this is a longer test string to bypass sso';
-%     testValue2 = '';
-% 
-%     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
-%     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
-% 
-%     helicsInputSetDefaultString(subid, defaultValue);
-%     
-%     helicsFederateEnterExecutingMode(feds.vFed);
-%     
-%     % publish string1 at time=0.0;
-%     helicsPublicationPublishString(pubid, testValue1);
-%     
-% 
-%     % double val;
-%     value = helicsInputGetString(subid);
-%     
-%     assert(value,defaultValue);
-% 
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
-%     
-%     assert(grantedtime,0.01);
-% 
-%     % get the value
-%     value = helicsInputGetString(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % publish a second string
-%     helicsPublicationPublishString(pubid, testValue2);
-%     
-% 
-%     % make sure the value is still what we expect
-%     value = helicsInputGetString(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % advance time
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
-%     
-%     assert(grantedtime,0.02);
-% 
-%     % make sure the value was updated
-%     value = helicsInputGetString(subid);
-%     
-%     % make sure the value is what we expect
-%     assert(isempty(value),isempty(testValue2));
-%     success=closeStruct(feds);
-%     assert(success);
-% catch e
-%     assert(false)
-%     disp(e.message)
-%     disp(e.stack(1))
-%     forceCloseStruct(feds);
-% end
-% end
+% testString
+%!test
+%! helics
+%! [feds,success]=generateFed();
+%! assert(success)
+%! 
+%! try
+%! defaultValue = 'string1';
+%!     testValue1 = 'this is a longer test string to bypass sso';
+%!     testValue2 = '';
+%! 
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_STRING, '');
+%!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
+%! 
+%!     helicsInputSetDefaultString(subid, defaultValue);
+%!     
+%!     helicsFederateEnterExecutingMode(feds.vFed);
+%!     
+%!     % publish string1 at time=0.0;
+%!     helicsPublicationPublishString(pubid, testValue1);
+%!     
+%!     % double val;
+%!     value = helicsInputGetString(subid);
+%!     assert(value,defaultValue);
+%! 
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
+%!     
+%!     assert(grantedtime,0.01);
+%! 
+%!     % get the value
+%!     value = helicsInputGetString(subid);
+%!     
+%!     % make sure the string is what we expect
+%!     assert(value,testValue1);
+%! 
+%!     % publish a second string
+%!     helicsPublicationPublishString(pubid, testValue2);
+%!     
+%! 
+%!     % make sure the value is still what we expect
+%!     value = helicsInputGetString(subid);
+%!     
+%!     % make sure the string is what we expect
+%!     assert(value,testValue1);
+%! 
+%!     % advance time
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
+%!     
+%!     assert(grantedtime,0.02);
+%! 
+%!     % make sure the value was updated
+%!     value = helicsInputGetString(subid);
+%!     
+%!     % make sure the value is what we expect
+%!     assert(isempty(value),isempty(testValue2));
+%!     success=closeStruct(feds);
+%!     assert(success);
+%! catch e
+%!     disp(e.message)
+%!     disp(e.stack(1))
+%!     forceCloseStruct(feds);
+%!     assert(false)
+%! end_try_catch
+
 % 
 % 
-% function testVector(testCase)
-% import matlab.unittest.constraints.IsTrue;
-% import helics.*
-% [feds,success]=generateFed();
-% assert(success);
-% 
-% try
-% defaultValue = [34.5;22.1;-10.4];
-%     testValue1 = ones(22,1);
-%     testValue2 = [99.1;-99;2;0.0;-1e35;4.56e-7];
-% 
-%     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
-%     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
-% 
-%     helicsInputSetDefaultVector(subid, defaultValue);
-%     
-% 
-%     helicsFederateEnterExecutingMode(feds.vFed);
-%     
-% 
-%     % publish string1 at time=0.0;
-%     helicsPublicationPublishVector(pubid, testValue1);
-%     
-% 
-%     % double val;
-%     value = helicsInputGetVector(subid);
-%     
-%     assert(value,defaultValue);
-% 
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
-%     
-%     assert(grantedtime,0.01);
-% 
-%     % get the value
-%     value = helicsInputGetVector(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % publish a second string
-%     helicsPublicationPublishVector(pubid, testValue2);
-%     
-% 
-%     % make sure the value is still what we expect
-%     value = helicsInputGetVector(subid);
-%     
-%     % make sure the string is what we expect
-%     assert(value,testValue1);
-% 
-%     % advance time
-%     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
-%     
-%     assert(grantedtime,0.02);
-% 
-%     % make sure the value was updated
-%     value = helicsInputGetVector(subid);
-%     
-%     % make sure the value is what we expect
-%     assert(isempty(value),isempty(testValue2));
-%     success=closeStruct(feds);
-%     assert(success);
-% catch e
-%     assert(false)
-%     disp(e.message)
-%     disp(e.stack(1))
-%     forceCloseStruct(feds);
-% end
-% end
+% testVector
+%!test
+%! helics
+%! [feds,success]=generateFed();
+%! assert(success)
+%! 
+%! try
+%!     defaultValue = [36.5;22.1;-10.4];
+%!     testValue1 = ones(22,1);
+%!     testValue2 = [99.1;-99;2;0.0;-1e35;4.56e-7];
+%! 
+%!     pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', HELICS_DATA_TYPE_VECTOR, '');
+%!     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
+%! 
+%!     helicsInputSetDefaultVector(subid, defaultValue);
+%!     
+%! 
+%!     helicsFederateEnterExecutingMode(feds.vFed);
+%! 
+%!     % publish string1 at time=0.0;
+%!     helicsPublicationPublishVector(pubid, testValue1);
+%!     
+%! 
+%!     % double val;
+%!     value = helicsInputGetVector(subid);
+%!     value
+%!     assert(value,defaultValue);
+%! 
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 1.0);
+%!     
+%!     assert(grantedtime,0.01);
+%! 
+%!     % get the value
+%!     value = helicsInputGetVector(subid);
+%!     
+%!     % make sure the string is what we expect
+%!     assert(value,testValue1);
+%! 
+%!     % publish a second string
+%!     helicsPublicationPublishVector(pubid, testValue2);
+%!     
+%! 
+%!     % make sure the value is still what we expect
+%!     value = helicsInputGetVector(subid);
+%!     
+%!     % make sure the string is what we expect
+%!     assert(value,testValue1);
+%! 
+%!     % advance time
+%!     grantedtime = helicsFederateRequestTime(feds.vFed, 2.0);
+%!     
+%!     assert(grantedtime,0.02);
+%! 
+%!     % make sure the value was updated
+%!     value = helicsInputGetVector(subid);
+%!     
+%!     % make sure the value is what we expect
+%!     assert(isempty(value),isempty(testValue2));
+%!     success=closeStruct(feds);
+%!     assert(success);
+%! catch e
+%!     disp(e.message)
+%!     disp(e.stack(1))
+%!     forceCloseStruct(feds);
+%!     assert(false)
+%! end_try_catch
+

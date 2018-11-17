@@ -1234,20 +1234,25 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxlen,
         if (length == maxlen)
         {
             outputString[maxlen - 1] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = maxlen;
+            }
         }
         else
         {
             outputString[length] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = length+1;
+            }
         }
 
         if (val != nullptr)
         {
             *val = np.value;
         }
-        if (actualLength != nullptr)
-        {
-            *actualLength = length;
-        }
+        
         return;
     }
     catch (...)

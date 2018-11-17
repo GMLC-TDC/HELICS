@@ -71,7 +71,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
-	_outv = SWIG_FromCharPtrAndSize($1,*$3);
+	_outv = SWIG_FromCharPtrAndSize($1,*$3-1);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
 
@@ -85,7 +85,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 {
 	Complex c(*$1,*$2);
 	//octave_complex cv(c);
-	octave_value v(c)
+	octave_value v(c);
 	_outp = SWIG_Octave_AppendOutput(_outp, v);
 }
 
@@ -150,7 +150,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 // typemap for vector input functions
 %typemap(in) (const double *vectorInput, int vectorlength) {
-  if ($input.is_real_matrix()) {
+  if (!$input.is_real_matrix()) {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
     return octave_value_list();
   }
@@ -174,14 +174,13 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %typemap(freearg) (double data[], int maxlen, int *actualSize) {
-   //if ($1) free($1);
+   if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(double data[], int maxlen, int *actualSize) {
     $2=helicsInputGetVectorSize(arg1);
-    OCTAVE_LOCAL_BUFFER(double,tmp,$2);
-    $1=tmp;
+    $1=(double *)malloc(sizeof(double)*$2);
 }
 
 %typemap(argout) (double data[], int maxlen, int *actualSize) {
@@ -196,42 +195,6 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
-/*
-// typemap for raw data input
-%typemap(in) (const void *data, int inputDataLength) {
-  if (PyUnicode_Check($input)) {
-	int kind=PyUnicode_KIND($input);
-    $1=PyUnicode_DATA($input);
-	switch(kind)
-	{
-	case PyUnicode_1BYTE_KIND:
-	default:
-		$2=PyUnicode_GetLength($input);
-	break;
-	case PyUnicode_2BYTE_KIND:
-	case PyUnicode_WCHAR_KIND:
-		$2=PyUnicode_GetLength($input)*2;
-	break;
-	case PyUnicode_4BYTE_KIND:
-		$2=PyUnicode_GetLength($input)*4;
-	break;
-	}
-  }
-  else if (PyBytes_Check($input)) {
-    $1=PyBytes_AsString($input);
-	$2=PyBytes_Size($input);
-  }
-  else 
-  {
-	PyErr_SetString(PyExc_ValueError,"Expected a string or bytes");
-   return NULL;
- }
-}
-*/
-
-//%typemap(argout) (const void *data, int inputDataLength)
-//{
-//}
 
 
 // typemap for raw data output function
