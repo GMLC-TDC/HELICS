@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <iostream>
 
 // random integer for validation purposes of inputs
 static const int InputValidationIdentifier = 0x3456'E052;
@@ -1194,6 +1195,14 @@ void helicsInputGetVector (helics_input inp, double data[], int maxlen, int *act
             {
                 *actualSize = length;
             }
+            std::cout<<"vector outputC ("<<length<<")[";
+	for (int ii=0;ii<length;++ii)
+	{
+
+        std::cout<<data[ii]<<',';
+	}
+	
+  std::cout<<"]"<<std::endl;
         }
     }
     catch (...)
