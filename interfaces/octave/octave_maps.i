@@ -2,6 +2,8 @@
 %{
 #include "api-data.h"
 #include "CMatrix.h"
+#include "ov-complex.h"
+
 /* throw a helics error */
 static octave_value Helics_ErrorType(helics_error *err) {
 switch (err->error_code)
@@ -81,9 +83,10 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 %typemap(argout)(double *real, double *imag)
 {
-	Complex c($1,$2);
-	octave_complex cv(c);
-	_outp = SWIG_Octave_AppendOutput(_outp, cv);
+	Complex c(*$1,*$2);
+	//octave_complex cv(c);
+	octave_value v(c)
+	_outp = SWIG_Octave_AppendOutput(_outp, v);
 }
 
 
