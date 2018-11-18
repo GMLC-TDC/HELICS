@@ -155,14 +155,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
     return octave_value_list();
   }
   $2=static_cast<int>($input.numel());
-  Matrix M=$input.matrix_value();
-  $1=M.fortran_vec();
-  std::cout<<"vector input ("<<$2<<")[";
-  for (int ii=0;ii<$2;++ii)
-  {
-    std::cout<<$1[ii]<<',';
-  }
-  std::cout<<"]"<<std::endl;
+  $1=reinterpret_cast<double *>($input.mex_get_data());
 }
 
 %typemap(argout) (const double *vectorInput, int vectorlength)
@@ -193,14 +186,11 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 
 	Matrix a(*$3,1);
 	double *dat=a.fortran_vec();
-	std::cout<<"vector output ("<<*$3<<")[";
 	for (int ii=0;ii<*$3;++ii)
 	{
         dat[ii]=$1[ii];
-        std::cout<<$1[ii]<<',';
 	}
 	
-  std::cout<<"]"<<std::endl;
   _outp = SWIG_Octave_AppendOutput(_outp, a);
 }
 

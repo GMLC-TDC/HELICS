@@ -18,9 +18,11 @@ end
 %! try
 %!    helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 %!    helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-%!   helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
-%!    helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
-%! catch
+%!   helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
+%!    helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+%! catch e
+%!     disp(e.message)
+%!     disp(e.stack(1))
 %!    success=false;
 %!    helicsBrokerDestroy(fedStruct.broker);
 %!    helicsFederateInfoFree(fedInfo);
@@ -31,7 +33,9 @@ end
 %!   if (helicsFederateIsValid(fedStruct.mFed)==0)
 %!     success=false;
 %!   endif
-%! catch
+%! catch e
+%!     disp(e.message)
+%!     disp(e.stack(1))
 %!     success=false;
 %! end_try_catch
 %! helicsFederateInfoFree(fedInfo);

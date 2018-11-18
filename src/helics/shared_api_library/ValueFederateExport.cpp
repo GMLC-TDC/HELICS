@@ -7,7 +7,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../helics.hpp"
 #include "ValueFederate.h"
 #include "internal/api_objects.h"
-#include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -697,7 +696,7 @@ void helicsPublicationPublishVector (helics_publication pub, const double *vecto
         }
         else
         {
-            pubObj->pubPtr->publish (std::vector<double> (vectorInput, vectorInput + vectorlength));
+            pubObj->pubPtr->publish (vectorInput, vectorlength);
         }
     }
     catch (...)
@@ -1033,13 +1032,6 @@ void helicsInputGetVector (helics_input inp, double data[], int maxlen, int *act
         {
             *actualSize = length;
         }
-        std::cout << "vector outputC (" << length << ")[";
-        for (int ii = 0; ii < length; ++ii)
-        {
-            std::cout << data[ii] << ',';
-        }
-
-        std::cout << "]" << std::endl;
     }
     catch (...)
     {
