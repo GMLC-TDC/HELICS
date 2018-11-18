@@ -24,30 +24,30 @@ BOOST_FIXTURE_TEST_SUITE (iteration_tests, FederateTestFixture)
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (execution_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     // register the publications
-    auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
+    auto &pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    auto &subid = vFed1->registerSubscription ("pub1");
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 27.0);
 
     auto comp = vFed1->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
-    auto val = vFed1->getValue<double> (subid);
+    auto val = subid.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 27.0);
 
     comp = vFed1->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
-    auto val2 = vFed1->getValue<double> (subid);
+    auto val2 = subid.getValue<double> ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
@@ -63,8 +63,8 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     std::string high_target = "fed";
     high_target += std::to_string ((index == total - 1) ? (0) : index + 1);
     high_target += "/pub";
-    Subscription sub_low (vfed, low_target);
-    Subscription sub_high (vfed, high_target);
+    auto &sub_low = vfed->registerSubscription (low_target);
+    auto &sub_high = vfed->registerSubscription (high_target);
     sub_low.setDefault (static_cast<double> (2 * index));
     sub_high.setDefault (static_cast<double> (2 * index + 1));
     vfed->enterInitializingMode ();
@@ -105,7 +105,6 @@ run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &
     return results;
 }
 
-
 BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types_all), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 3);
@@ -123,7 +122,7 @@ BOOST_DATA_TEST_CASE (execution_iteration_round_robin, bdata::make (core_types_a
     BOOST_CHECK_CLOSE (res1.first, 2.5, 0.1);
 }
 
-BOOST_AUTO_TEST_CASE (execution_iteration_loop3, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (execution_iteration_loop3, *utf::label ("ci"))
 {
     int N = 5;
     SetupTest<helics::ValueFederate> ("test", N);
@@ -142,7 +141,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_loop3, *utf::label("ci"))
     }
 }
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -161,21 +160,21 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test_2fed)
     auto comp = vFed2->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::iterating);
-    auto val = vFed2->getValue<double> (subid);
+    auto val = vFed2->getDouble (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
     comp = vFed2->enterExecutingMode (helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp == helics::iteration_result::next_step);
 
-    auto val2 = vFed2->getValue<double> (subid);
+    auto val2 = vFed2->getDouble (subid);
     vFed1->enterExecutingModeComplete ();
     BOOST_CHECK_EQUAL (val2, val);
 }
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (time_iteration_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
@@ -183,9 +182,9 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     // register the publications
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
-    auto subid = vFed1->registerSubscription("pub1");
-    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    auto subid = vFed1->registerSubscription ("pub1");
+    vFed1->setTimeProperty (helics_property_time_period, 1.0);
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     vFed1->publish (pubid, 27.0);
 
@@ -193,18 +192,17 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
     BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
-    auto val = vFed1->getValue<double> (subid);
+    auto val = vFed1->getDouble (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
     comp = vFed1->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
     BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
-    auto val2 = vFed1->getValue<double> (subid);
+    auto val2 = vFed1->getDouble (subid);
 
     BOOST_CHECK_EQUAL (val2, val);
 }
-
 
 BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 {
@@ -216,8 +214,8 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 
     auto subid = vFed2->registerSubscription ("pub1");
 
-    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
-    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    vFed1->setTimeProperty (helics_property_time_period, 1.0);
+    vFed2->setTimeProperty (helics_property_time_period, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -229,20 +227,20 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 
     BOOST_CHECK (comp.state == helics::iteration_result::iterating);
     BOOST_CHECK_EQUAL (comp.grantedTime, helics::timeZero);
-    auto val = vFed2->getValue<double> (subid);
+    auto val = vFed2->getDouble (subid);
     BOOST_CHECK_EQUAL (val, 27.0);
 
     comp = vFed2->requestTimeIterative (1.0, helics::iteration_request::iterate_if_needed);
 
     BOOST_CHECK (comp.state == helics::iteration_result::next_step);
     BOOST_CHECK_EQUAL (comp.grantedTime, 1.0);
-    auto val2 = vFed2->getValue<double> (subid);
+    auto val2 = vFed2->getDouble (subid);
     vFed1->requestTimeComplete ();
 
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -251,11 +249,11 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
-    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY,1.0);
-    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
-    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    auto &sub1 = vFed2->registerSubscription ("pub1");
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setTimeProperty (helics_property_time_period, 1.0);
+    vFed2->setTimeProperty (helics_property_time_period, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -283,7 +281,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     BOOST_CHECK_EQUAL (val2, val);
 }
 
-BOOST_TEST_DECORATOR(*utf::label("ci"))
+BOOST_TEST_DECORATOR (*utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (test_iteration_counter)
 {
     SetupTest<helics::ValueFederate> ("test", 2, 1.0);
@@ -292,13 +290,13 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     // register the publications
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
 
-    auto sub1 = helics::Subscription (vFed2.get (), "pub1");
+    auto &sub1 = vFed2->registerSubscription ("pub1");
 
     auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
 
-    auto sub2 = helics::Subscription (vFed1.get (), "pub2");
-    vFed1->setTimeProperty (PERIOD_PROPERTY, 1.0);
-    vFed2->setTimeProperty (PERIOD_PROPERTY, 1.0);
+    auto &sub2 = vFed1->registerSubscription ("pub2");
+    vFed1->setTimeProperty (helics_property_time_period, 1.0);
+    vFed2->setTimeProperty (helics_property_time_period, 1.0);
     // vFed1->setLoggingLevel(5);
     // vFed2->setLoggingLevel(5);
     vFed1->enterInitializingModeAsync ();

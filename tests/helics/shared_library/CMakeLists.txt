@@ -49,6 +49,7 @@ target_link_libraries(
   helics_test_base
 )
 
+add_dependencies(shared-library-tests helicsSharedLib)
 set_target_properties(
   shared-library-tests shared-library-tests-cpp
   PROPERTIES FOLDER tests

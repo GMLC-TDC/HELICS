@@ -50,7 +50,7 @@ template <typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t
 {
   private:
-    BaseType ivalue=invalidValue;  //!< the underlying index value
+    BaseType ivalue = invalidValue;  //!< the underlying index value
 
   public:
     static const identifiers identity{ID};  //!< the type of the identifier
@@ -82,7 +82,7 @@ class identifier_id_t
     bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
     /** less than operator for sorting*/
     bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
-	//check if the current value is not the invalidValue
+    // check if the current value is not the invalidValue
     bool isValid () const noexcept { return (ivalue != invalidValue); };
 };
 }  // namespace helics
@@ -95,16 +95,19 @@ struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
     using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;
     using result_type = std::size_t;
-    result_type operator() (argument_type const &key) const noexcept { return std::hash<BaseType>{}(key.value ());}
+    result_type operator() (argument_type const &key) const noexcept
+    {
+        return std::hash<BaseType>{}(key.value ());
+    }
 };
-} //namespace std
+}  // namespace std
 
 namespace helics
 {
 using publication_id_t = identifier_id_t<identifier_type, identifiers::publication, invalid_id_value>;
 using input_id_t = identifier_id_t<identifier_type, identifiers::input, invalid_id_value>;
-using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
-using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
+//using endpoint_id_t = identifier_id_t<identifier_type, identifiers::endpoint, invalid_id_value>;
+//using filter_id_t = identifier_id_t<identifier_type, identifiers::filter, invalid_id_value>;
 using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_id_value>;
 
 /** data class for pair of a string and double*/
@@ -258,18 +261,26 @@ inline const char *typeNameString<named_point> ()
 /** the base types for  helics*/
 enum class helics_type_t : int
 {
-    helicsString = 0,
-    helicsDouble = 1,
-    helicsInt = 2,
+    helicsString = helics_data_type_string,
+    helicsDouble = helics_data_type_double,
+    helicsInt = helics_data_type_int,
 
-    helicsComplex = 3,
-    helicsVector = 4,
-    helicsComplexVector = 5,
-    helicsNamedPoint = 6,
-    helicsBool = 7,
-    helicsInvalid = 23425,
-    helicsAny = 247652,
+    helicsComplex = helics_data_type_complex,
+    helicsVector = helics_data_type_vector,
+    helicsComplexVector = helics_data_type_complex_vector,
+    helicsNamedPoint = helics_data_type_named_point,
+    helicsBool = helics_data_type_boolean,
+	helicsTime = helics_data_type_time,
+    helicsCustom = helics_data_type_raw,
+    helicsAny = helics_data_type_any,
+	helicsUnknown=262355,
 };
+
+
+inline constexpr bool isRawType (helics_type_t type)
+{
+    return (type == helics_type_t::helicsAny) || (type == helics_type_t::helicsCustom);
+}
 
 /** sometimes we just need a ref to a string for the basic types*/
 const std::string &typeNameStringRef (helics_type_t type);
@@ -336,7 +347,7 @@ data_block typeConvert (helics_type_t type, bool val);
 template <class X>
 constexpr helics_type_t helicsType ()
 {
-    return helics_type_t::helicsInvalid;
+    return helics_type_t::helicsCustom;
 }
 
 template <>
@@ -366,6 +377,12 @@ template <>
 constexpr helics_type_t helicsType<double> ()
 {
     return helics_type_t::helicsDouble;
+}
+
+template <>
+constexpr helics_type_t helicsType<Time> ()
+{
+    return helics_type_t::helicsTime;
 }
 
 template <>
@@ -424,13 +441,13 @@ constexpr bool isConvertableType<uint16_t> ()
 }
 
 template <>
-constexpr bool isConvertableType<int8_t> ()
+constexpr bool isConvertableType<char> ()
 {
     return true;
 }
 
 template <>
-constexpr bool isConvertableType<uint8_t> ()
+constexpr bool isConvertableType<unsigned char> ()
 {
     return true;
 }
@@ -467,6 +484,12 @@ constexpr uint64_t invalidValue<uint64_t> ()
 }
 
 template <>
+constexpr Time invalidValue<Time> ()
+{
+    return Time::minVal();
+}
+
+template <>
 inline named_point invalidValue<named_point> ()
 {
     return {std::string (), std::nan ("0")};
@@ -478,4 +501,17 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
     return {invalidValue<double> (), 0.0};
 }
 
+template <typename T>
+using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
+
+/** template dividing types into 3 categories
+0 is primary types
+1 types convertible to primary types
+2 type not convertible to primary types */
+template <typename X>
+using typeCategory = std::conditional_t < helicsType<remove_cv_ref<X>> () != helics_type_t::helicsCustom,
+                                                  std::integral_constant<int, 0>,
+                                                  std::conditional_t<isConvertableType<remove_cv_ref<X>>(),
+                                                                     std::integral_constant<int, 1>,
+                                                                     std::integral_constant<int, 2>>>;
 }  // namespace helics

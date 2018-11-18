@@ -22,6 +22,7 @@ do
         --tsan)
             echo "Tests using thread sanitizer"
             CTEST_OPTIONS+=" --verbose"
+			export TSAN_OPTIONS=second_deadlock_stack=1
             ;;
         --ubsan)
             echo "Tests using undefined behavior sanitizer"

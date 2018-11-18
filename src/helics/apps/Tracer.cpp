@@ -20,8 +20,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/logger.h"
 #include "../common/fmt_format.h"
+#include "../common/logger.h"
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
@@ -32,7 +32,10 @@ namespace helics
 {
 namespace apps
 {
-Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName,fi) { fed->setFlagOption (HELICS_OBSERVER_FLAG); }
+Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName, fi)
+{
+    fed->setFlagOption (helics_flag_observer);
+}
 
 static const ArgDescriptors InfoArgs{
   {"tags", ArgDescriptor::arg_type_t::vector_string,
@@ -56,7 +59,7 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (HELICS_OBSERVER_FLAG);
+        fed->setFlagOption (helics_flag_observer);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -71,14 +74,14 @@ Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
 }
 
 Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : App (appName,core, fi)
+    : App (appName, core, fi)
 {
-    fed->setFlagOption (HELICS_OBSERVER_FLAG);
+    fed->setFlagOption (helics_flag_observer);
 }
 
 Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlagOption (HELICS_OBSERVER_FLAG);
+    fed->setFlagOption (helics_flag_observer);
     loadJsonFile (jsonString);
 }
 
@@ -91,13 +94,13 @@ void Tracer::loadJsonFile (const std::string &jsonString)
     auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back (fed.get (), ii);
+        subscriptions.emplace_back (fed->getInput (ii));
         subkeys.emplace (subscriptions.back ().getName (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint (ii));
         eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
@@ -255,7 +258,7 @@ void Tracer::loadTextFile (const std::string &textFile)
 void Tracer::initialize ()
 {
     auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    if (state == Federate::states::startup)
     {
         generateInterfaces ();
 
@@ -320,12 +323,13 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getTarget (),
-                                              val.size ());
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration,
+                                              sub.getTarget (), val.size ());
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
+                        valstr =
+                          fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
                 logger->addMessage (std::move (valstr));
@@ -397,13 +401,13 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
 void Tracer::runTo (Time runToTime)
 {
     auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    if (state == Federate::states::startup)
     {
         initialize ();
-        state = Federate::op_states::initialization;
+        state = Federate::states::initialization;
     }
 
-    if (state == Federate::op_states::initialization)
+    if (state == Federate::states::initialization)
     {
         fed->enterExecutingMode ();
         captureForCurrentTime (0.0);
@@ -453,7 +457,7 @@ void Tracer::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.push_back (helics::Subscription (fed.get (), key));
+        subscriptions.push_back (helics::make_subscription (*fed, key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
         subkeys[key] = index;  // this is a potential replacement
     }
@@ -465,7 +469,7 @@ void Tracer::addEndpoint (const std::string &endpoint)
     auto res = eptNames.find (endpoint);
     if ((res == eptNames.end ()) || (res->second == -1))
     {
-        endpoints.push_back (helics::Endpoint (GLOBAL, fed.get (), endpoint));
+        endpoints.push_back (helics::Endpoint (GLOBAL, fed, endpoint));
         auto index = static_cast<int> (endpoints.size ()) - 1;
         eptNames[endpoint] = index;  // this is a potential replacement
     }

@@ -234,7 +234,7 @@ void ZmqComms::queue_rx_function ()
         pullSocket.close ();
         repSocket.close ();
         disconnecting = true;
-        logError (std::string ("Unable to bind zmq reply socket giving up ") +
+        logError (std::string ("Unable to bind zmq pull socket giving up ") +
                   makePortAddress (localTarget_, PortNumber));
         setRxStatus (connection_status::error);
         return;
@@ -464,7 +464,7 @@ void ZmqComms::queue_tx_function ()
             {
                 switch (cmd.messageID)
                 {
-                case RECONNECT:
+                case RECONNECT_TRANSMITTER:
                     setTxStatus (connection_status::connected);
                     break;
                 case NEW_ROUTE:

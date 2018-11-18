@@ -99,7 +99,7 @@ void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, const ActionMes
 template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, ActionMessage &&cmd)
 {
-    comms->transmit (route_id, std::move (cmd));
+    comms->transmit (route_id, std::move (cmd));  
 }
 
 template <class COMMS, class BrokerT>

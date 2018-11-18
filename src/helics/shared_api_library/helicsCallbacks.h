@@ -26,8 +26,9 @@ helicsCreateCombinationFederate
 the function arguments are loglevel,  an identifier, and a message string
 @return an object containing the subscription
 */
-HELICS_EXPORT void
-helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *), helics_error *err);
+HELICS_EXPORT void helicsBrokerAddLoggingCallback (helics_broker broker,
+                                                   void (*logger) (int loglevel, const char *identifier, const char *message),
+                                                   helics_error *err);
 
 /** add a logging callback to a core
 @details add a logging callback function for the C The logging callback will be called when
@@ -38,7 +39,9 @@ helicsCreateCombinationFederate
 the function arguments are loglevel,  an identifier, and a message string
 @return an object containing the subscription
 */
-HELICS_EXPORT void helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const char *, const char *), helics_error *err);
+HELICS_EXPORT void helicsCoreAddLoggingCallback (helics_core core,
+                                                 void (*logger) (int loglevel, const char *identifier, const char *message),
+                                                 helics_error *err);
 
 /** add a logging callback to a federate
    @details add a logging callback function for the C The logging callback will be called when
@@ -49,8 +52,9 @@ HELICS_EXPORT void helicsCoreAddLoggingCallback (helics_core core, void (*logger
     the function arguments are loglevel,  an identifier, and a message string
    @return an object containing the subscription
    */
-HELICS_EXPORT void
-helicsFederateAddLoggingCallback (helics_federate fed, void (*logger) (int, const char *, const char *), helics_error *err);
+HELICS_EXPORT void helicsFederateAddLoggingCallback (helics_federate fed,
+                                                     void (*logger) (int loglevel, const char *identifier, const char *message),
+                                                     helics_error *err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

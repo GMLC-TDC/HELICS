@@ -83,14 +83,17 @@ App::App (const std::string &appName, int argc, char *argv[])
         return;
     }
     FederateInfo fi (argc, argv);
-    fed = std::make_shared<CombinationFederate> (appName,fi);
+    fed = std::make_shared<CombinationFederate> (appName, fi);
     App::loadArguments (vm_map);
 }
 
-App::App (const std::string &appName, const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (appName,fi)) {}
+App::App (const std::string &appName, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName, fi))
+{
+}
 
 App::App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (appName,core, fi))
+    : fed (std::make_shared<CombinationFederate> (appName, core, fi))
 {
 }
 
@@ -195,7 +198,7 @@ void App::loadConfigOptions (const Json_helics::Value &element)
 void App::initialize ()
 {
     auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    if (state == Federate::states::startup)
     {
         fed->enterInitializingMode ();
     }

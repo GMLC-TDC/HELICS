@@ -1,3 +1,3 @@
 function varargout = helicsFederateSetSeparator(varargin)
-  [varargout{1:nargout}] = helicsMEX(113, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(111, varargin{:});
 end

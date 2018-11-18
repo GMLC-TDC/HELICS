@@ -133,11 +133,12 @@ if(BUILD_HELICS_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
 endif()
 
 # -----------------------------------------------------------------------------
-# General project wide configuration
+# General project wide configuration for debug postfix
 # -----------------------------------------------------------------------------
-
-if(NOT CMAKE_DEBUG_POSTFIX)
-	set(CMAKE_DEBUG_POSTFIX d)
+if (NOT NO_DEBUG_POSFIX)
+	if(NOT CMAKE_DEBUG_POSTFIX)
+		set(CMAKE_DEBUG_POSTFIX d)
+	endif()
 endif()
 
 # add a baseline library for underlying dependencies and flags
@@ -385,7 +386,7 @@ target_include_directories(
   INTERFACE
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
 	$<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+	$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
 )
 
 target_include_directories(

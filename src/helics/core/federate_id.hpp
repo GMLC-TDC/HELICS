@@ -64,8 +64,9 @@ class interface_handle
     bool operator== (interface_handle id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
     bool operator!= (interface_handle id) const noexcept { return (_id != id._id); };
-    /** less than operator for sorting*/
+    /** comparison operator for sorting*/
     bool operator< (interface_handle id) const noexcept { return (_id < id._id); };
+    bool operator> (interface_handle id) const noexcept { return (_id > id._id); };
     bool isValid () const { return (_id != -1'700'000'000); }
 
   private:

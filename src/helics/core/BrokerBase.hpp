@@ -77,7 +77,7 @@ class BrokerBase
     bool noAutomaticID = false;
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
-    bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
+    bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
     
   public:
@@ -119,7 +119,9 @@ class BrokerBase
   private:
     /** start main broker loop*/
     void queueProcessingLoop ();
-
+    /** helper function for doing some preprocessing on a command
+	@return (-1) if the command is a termination command*/
+    action_message_def::action_t commandProcessor (ActionMessage &command);
   protected:
     /** process a disconnect signal*/
     virtual void processDisconnect (bool skipUnregister = false) = 0;
@@ -152,6 +154,7 @@ class BrokerBase
   public:
     /** close all the threads*/
     void joinAllThreads ();
+    friend class TimeoutMonitor;
 };
 
 }  // namespace helics

@@ -32,10 +32,11 @@ set(
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
 	federate_id.cpp
+	TimeoutMonitor.cpp
 
 )
 
-set(TESTCORE_SOURCE_FILES TestBroker.cpp TestCore.cpp)
+set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
 
 set(
   IPC_SOURCE_FILES
@@ -43,6 +44,8 @@ set(
 	ipc/IpcBroker.cpp
 	ipc/IpcComms.cpp
 	ipc/IpcQueueHelper.cpp
+	#ipc/IpcBlockingPriorityQueue.cpp
+	#ipc/IpcBlockingPriorityQueueImpl.cpp
 )
 
 set(
@@ -86,7 +89,7 @@ set(
   CoreFederateInfo.hpp
   helicsVersion.hpp
   federate_id.hpp
-  ../flag-definitions.h
+  helics_definitions.hpp
 )
 
 set(
@@ -98,6 +101,7 @@ set(
 	loggingHelper.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
+	TimeoutMonitor.h
 	CoreBroker.hpp
 	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
@@ -123,11 +127,15 @@ set(
 	NetworkCore.hpp
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
+	../helics_enums.h
 )
 
-set(TESTCORE_HEADER_FILES TestCore.h TestBroker.h)
+set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
 
-set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h)
+set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h 
+#ipc/IpcBlockingPriorityQueue.hpp 
+#ipc/IpcBlockingPriorityQueueImpl.hpp
+)
 
 set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqRequestSets.h)
 
@@ -237,5 +245,11 @@ endif(HELICS_HAVE_MPI)
 install(
   FILES ${PUBLIC_INCLUDE_FILES}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
+  COMPONENT headers
+)
+
+install(
+  FILES ../helics_enums.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )

@@ -10,13 +10,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../application_api/queryFunctions.hpp"
 #include "../common/stringOps.h"
 
-
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/argParser.h"
 #include "../common/base64.h"
-#include "../common/logger.h"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
+#include "../common/logger.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -34,9 +33,9 @@ namespace helics
 {
 namespace apps
 {
-Recorder::Recorder (const std::string &appName, FederateInfo &fi) : App (appName,fi)
+Recorder::Recorder (const std::string &appName, FederateInfo &fi) : App (appName, fi)
 {
-    fed->setFlagOption (HELICS_OBSERVER_FLAG);
+    fed->setFlagOption (helics_flag_observer);
 }
 
 static const ArgDescriptors InfoArgs{
@@ -56,7 +55,7 @@ static const ArgDescriptors InfoArgs{
   {"output,o", "the output file for recording the data"},
   {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
   {"verbose", ArgDescriptor::arg_type_t::flag_type, "print all value results to the screen"},
-  {"marker","print a statement indicating time advancement every <arg> period during the simulation"},
+  {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
   {"mapfile", "write progress to a map file for concurrent progress monitoring"}};
 
 Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
@@ -64,7 +63,7 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (HELICS_OBSERVER_FLAG);
+        fed->setFlagOption (helics_flag_observer);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -79,14 +78,14 @@ Recorder::Recorder (int argc, char *argv[]) : App ("recorder", argc, argv)
 }
 
 Recorder::Recorder (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : App (appName,core, fi)
+    : App (appName, core, fi)
 {
-    fed->setFlagOption (HELICS_OBSERVER_FLAG);
+    fed->setFlagOption (helics_flag_observer);
 }
 
 Recorder::Recorder (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
-    fed->setFlagOption (HELICS_OBSERVER_FLAG);
+    fed->setFlagOption (helics_flag_observer);
     Recorder::loadJsonFile (jsonString);
 }
 
@@ -99,16 +98,16 @@ void Recorder::loadJsonFile (const std::string &jsonString)
     auto subCount = fed->getInputCount ();
     for (int ii = 0; ii < subCount; ++ii)
     {
-        subscriptions.emplace_back (fed.get (), ii);
-        subids.emplace (subscriptions.back ().getID (), static_cast<int> (subscriptions.size ()) - 1);
+        subscriptions.emplace_back (fed->getInput (ii));
+        subids.emplace (subscriptions.back ().getHandle (), static_cast<int> (subscriptions.size ()) - 1);
         subkeys.emplace (subscriptions.back ().getTarget (), static_cast<int> (subscriptions.size ()) - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint (ii));
         eptNames[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
-        eptids.emplace (endpoints.back ().getID (), static_cast<int> (endpoints.size () - 1));
+        eptids.emplace (endpoints.back ().getHandle (), static_cast<int> (endpoints.size () - 1));
     }
 
     auto doc = loadJson (jsonString);
@@ -438,7 +437,7 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
         if (sub.isUpdated ())
         {
             auto val = sub.getValue<std::string> ();
-            int ii = subids[sub.getID ()];
+            int ii = subids[sub.getHandle ()];
             points.emplace_back (currentTime, ii, val);
             if (iteration > 0)
             {
@@ -462,12 +461,13 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
                 {
                     if (iteration > 0)
                     {
-                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration, sub.getTarget (),
-                                              val.size ());
+                        valstr = fmt::format ("[{}:{}]value {}=block[{}]", currentTime, iteration,
+                                              sub.getTarget (), val.size ());
                     }
                     else
                     {
-                        valstr = fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
+                        valstr =
+                          fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
                 logger->addMessage (std::move (valstr));
@@ -532,14 +532,15 @@ void Recorder::runTo (Time runToTime)
         std::ofstream out (mapfile);
         for (auto &stat : vStat)
         {
-        //    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' << stat.lastVal
-        //        << '\n';
+            //    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' <<
+            //    stat.lastVal
+            //        << '\n';
             fmt::print (out, "{}\t{}\t{}\t{}\n", stat.key, stat.cnt, static_cast<double> (stat.time),
                         stat.lastVal);
         }
         out.flush ();
     }
-    Time nextPrintTime = (nextPrintTimeStep>timeZero)?nextPrintTimeStep:Time::maxVal();
+    Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     try
     {
         while (true)
@@ -576,7 +577,7 @@ void Recorder::runTo (Time runToTime)
             {
                 break;
             }
-            if ((T >= nextPrintTime)&&(nextPrintTimeStep>timeZero))
+            if ((T >= nextPrintTime) && (nextPrintTimeStep > timeZero))
             {
                 std::cout << "processed for time " << static_cast<double> (T) << "\n";
                 nextPrintTime += nextPrintTimeStep;
@@ -593,9 +594,9 @@ void Recorder::addSubscription (const std::string &key)
     auto res = subkeys.find (key);
     if ((res == subkeys.end ()) || (res->second == -1))
     {
-        subscriptions.emplace_back (fed, key);
+        subscriptions.emplace_back (fed->registerSubscription (key));
         auto index = static_cast<int> (subscriptions.size ()) - 1;
-        auto id = subscriptions.back ().getID ();
+        auto id = subscriptions.back ().getHandle ();
         subids[id] = index;  // this is a new element
         subkeys[key] = index;  // this is a potential replacement
     }
@@ -608,7 +609,7 @@ void Recorder::addEndpoint (const std::string &endpoint)
     {
         endpoints.emplace_back (GLOBAL, fed.get (), endpoint);
         auto index = static_cast<int> (endpoints.size ()) - 1;
-        auto id = endpoints.back ().getID ();
+        auto id = endpoints.back ().getHandle ();
         eptids.emplace (id, index);  // this is a new element
         eptNames[endpoint] = index;  // this is a potential replacement
     }
@@ -751,7 +752,7 @@ int Recorder::loadArguments (boost::program_options::variables_map &vm_map)
     }
     if (vm_map.count ("marker") > 0)
     {
-        nextPrintTimeStep = loadTimeFromString(vm_map["marker"].as<std::string> ());
+        nextPrintTimeStep = loadTimeFromString (vm_map["marker"].as<std::string> ());
     }
     if (vm_map.count ("mapfile") > 0)
     {

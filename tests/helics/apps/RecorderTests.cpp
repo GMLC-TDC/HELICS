@@ -7,27 +7,27 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
 
-#include <cstdio>
 #include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Recorder.hpp"
 #include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
+#include <cstdio>
 #include <future>
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (recorder_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (recorder_tests, *utf::label ("ci"))
 
 BOOST_AUTO_TEST_CASE (simple_recorder_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "rcore1";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
 
-    helics::ValueFederate vfed ("block1",fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -52,12 +52,12 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
 BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "rcore1-t2";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
     rec1.addSubscription ("pub1");
 
-    helics::ValueFederate vfed ("block1",fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -94,11 +94,11 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 BOOST_AUTO_TEST_CASE (recorder_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "rcore-tm";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
 
-    helics::MessageFederate mfed ("block1",fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
 
     rec1.addEndpoint ("src1");
@@ -127,13 +127,13 @@ const std::vector<std::string> simple_files{"example1.recorder", "example2.recor
 BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (simple_files), file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "coref" + file;
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
-    helics::ValueFederate vfed ("block1",fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::helics_type_t::helicsDouble);
 
@@ -185,82 +185,13 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
                       file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "rcoretmf" + file;
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
 
-    helics::CombinationFederate cfed ("block1",fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
-    helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
-
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
-    cfed.enterExecutingMode ();
-    auto retTime = cfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
-    pub1.publish (3.4);
-    e1.send ("src1", "this is a test message");
-
-    retTime = cfed.requestTime (1.5);
-    BOOST_CHECK_EQUAL (retTime, 1.5);
-    pub2.publish (5.7);
-
-    retTime = cfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
-    e1.send ("src1", "this is a test message2");
-    pub1.publish (4.7);
-
-    retTime = cfed.requestTime (3.0);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
-    pub2.publish ("3.9");
-
-    retTime = cfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
-
-    cfed.finalize ();
-    fut.get ();
-    rec1.finalize ();
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 4);
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-
-    auto v1 = rec1.getValue (0);
-    BOOST_CHECK_EQUAL (v1.first, "pub1");
-    BOOST_CHECK_EQUAL (v1.second, std::to_string (3.4));
-    v1 = rec1.getValue (1);
-    BOOST_CHECK_EQUAL (v1.first, "pub2");
-    BOOST_CHECK_EQUAL (v1.second, std::to_string (5.7));
-
-    v1 = rec1.getValue (2);
-    BOOST_CHECK_EQUAL (v1.first, "pub1");
-    BOOST_CHECK_EQUAL (v1.second, std::to_string (4.7));
-
-    v1 = rec1.getValue (3);
-    BOOST_CHECK_EQUAL (v1.first, "pub2");
-    BOOST_CHECK_EQUAL (v1.second, std::to_string (3.9));
-
-    auto m = rec1.getMessage (1);
-    BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
-}
-
-BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
-                      boost::unit_test::data::make (simple_message_files),
-                      file)
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(600));
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "2");
-    brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
-
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
-
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
-
-    helics::FederateInfo fi (helics::core_type::IPC);
-    fi.coreInitString = "1 --broker=ipc_broker";
-
-    helics::CombinationFederate cfed ("obj",fi);
+    helics::CombinationFederate cfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
@@ -312,20 +243,89 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     auto m = rec1.getMessage (1);
     BOOST_REQUIRE (m);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
+BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
+                      boost::unit_test::data::make (simple_message_files),
+                      file)
+{
+    std::this_thread::sleep_for (std::chrono::milliseconds (600));
+    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
+    brk->connect ();
+    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+
+    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
+
+    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+
+    helics::FederateInfo fi (helics::core_type::IPC);
+    fi.coreInitString = "1 --broker=ipc_broker";
+
+    helics::CombinationFederate cfed ("obj", fi);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::helics_type_t::helicsDouble);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::helics_type_t::helicsDouble);
+    helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
+
+    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
+    cfed.enterExecutingMode ();
+    auto retTime = cfed.requestTime (1);
+    BOOST_CHECK_EQUAL (retTime, 1.0);
+    pub1.publish (3.4);
+    e1.send ("src1", "this is a test message");
+
+    retTime = cfed.requestTime (1.5);
+    BOOST_CHECK_EQUAL (retTime, 1.5);
+    pub2.publish (5.7);
+
+    retTime = cfed.requestTime (2.0);
+    BOOST_CHECK_EQUAL (retTime, 2.0);
+    e1.send ("src1", "this is a test message2");
+    pub1.publish (4.7);
+
+    retTime = cfed.requestTime (3.0);
+    BOOST_CHECK_EQUAL (retTime, 3.0);
+    pub2.publish ("3.9");
+
+    retTime = cfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 5.0);
+
+    cfed.finalize ();
+    fut.get ();
+    rec1.finalize ();
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 4);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+
+    auto v1 = rec1.getValue (0);
+    BOOST_CHECK_EQUAL (v1.first, "pub1");
+    BOOST_CHECK_EQUAL (v1.second, std::to_string (3.4));
+    v1 = rec1.getValue (1);
+    BOOST_CHECK_EQUAL (v1.first, "pub2");
+    BOOST_CHECK_EQUAL (v1.second, std::to_string (5.7));
+
+    v1 = rec1.getValue (2);
+    BOOST_CHECK_EQUAL (v1.first, "pub1");
+    BOOST_CHECK_EQUAL (v1.second, std::to_string (4.7));
+
+    v1 = rec1.getValue (3);
+    BOOST_CHECK_EQUAL (v1.first, "pub2");
+    BOOST_CHECK_EQUAL (v1.second, std::to_string (3.9));
+
+    auto m = rec1.getMessage (1);
+    BOOST_REQUIRE (m);
+    BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
+    std::this_thread::sleep_for (std::chrono::milliseconds (500));
 }
 
 BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
 {
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
-    fi.coreInitString = "3";
+    fi.coreName = "rcore-dep";
+    fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
-
 
     helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
@@ -366,13 +366,13 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
 {
     helics::FederateInfo fi;
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
-    fi.coreInitString = "3";
-    helics::apps::Recorder rec1 ("rec1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.coreName = "rcore2";
+    fi.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
-    helics::MessageFederate mfed ("block1",fi);
-    helics::MessageFederate mfed2 ("block2",fi);
+    helics::MessageFederate mfed ("block1", fi);
+    helics::MessageFederate mfed2 ("block2", fi);
 
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
@@ -412,14 +412,14 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
 
-    fi.coreName = "core3";
-    fi.coreInitString = "3";
-    helics::apps::Recorder rec1 ("rec1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.coreName = "rcore3";
+    fi.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
-    helics::MessageFederate mfed ("block1",fi);
+    helics::MessageFederate mfed ("block1", fi);
 
-    helics::MessageFederate mfed2 ("block2",fi);
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -462,14 +462,14 @@ const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "c
 BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core4";
-    fi.coreInitString = "3";
-    helics::apps::Recorder rec1 ("rec1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.coreName = "rcore4" + file;
+    fi.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
-    helics::MessageFederate mfed ("block1",fi);
+    helics::MessageFederate mfed ("block1", fi);
 
-    helics::MessageFederate mfed2 ("block2",fi);
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -510,13 +510,12 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core5";
-    fi.coreInitString = "3";
-    helics::apps::Recorder rec1 ("rec1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.coreName = "rcore5";
+    fi.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
-
 
     helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
@@ -565,13 +564,13 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core6";
-    fi.coreInitString = "2";
-    helics::apps::Recorder rec1 ("rec1",fi);
+    fi.coreName = "rcore6";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
 
     rec1.addSubscription ("pub1");
 
-    helics::ValueFederate vfed ("block1",fi);
+    helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -608,14 +607,14 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core7";
-    fi.coreInitString = "3";
-    helics::apps::Recorder rec1 ("rec1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.0);
+    fi.coreName = "rcore7";
+    fi.coreInitString = "-f 3 --autobroker";
+    helics::apps::Recorder rec1 ("rec1", fi);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
-    helics::CombinationFederate mfed ("block1",fi);
+    helics::CombinationFederate mfed ("block1", fi);
 
-    helics::MessageFederate mfed2 ("block2",fi);
+    helics::MessageFederate mfed2 ("block2", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
@@ -667,17 +666,17 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     boost::filesystem::remove (filename2);
 }
 
-BOOST_AUTO_TEST_CASE(recorder_test_help)
+BOOST_AUTO_TEST_CASE (recorder_test_help)
 {
-    StringToCmdLine cmdArg("--version --quiet");
-    helics::apps::Recorder rec1(cmdArg.getArgCount(), cmdArg.getArgV());
+    StringToCmdLine cmdArg ("--version --quiet");
+    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
-    BOOST_CHECK(!rec1.isActive());
+    BOOST_CHECK (!rec1.isActive ());
 
-    StringToCmdLine cmdArg2("-? --quiet");
-    helics::apps::Recorder rec2(cmdArg2.getArgCount(), cmdArg2.getArgV());
+    StringToCmdLine cmdArg2 ("-? --quiet");
+    helics::apps::Recorder rec2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
 
-    BOOST_CHECK(!rec2.isActive());
+    BOOST_CHECK (!rec2.isActive ());
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

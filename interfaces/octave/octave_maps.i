@@ -57,20 +57,20 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 //typemap for large string output with a length return in C
-%typemap(in, numinputs=0) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(in, numinputs=0) (char *outputString, int maxStringLen, int *actualLength) {
   $3=&($2);
 }
 
-%typemap(freearg) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(freearg) (char *outputString, int maxStringLen, int *actualLength) {
    if ($1) free($1);
 }
 
-%typemap(check)(char *outputString, int maxStringlen, int *actualLength) {
+%typemap(check)(char *outputString, int maxStringLen, int *actualLength) {
     $2=helicsInputGetStringSize(arg1)+2;
     $1 = (char *) malloc($2);
 }
 
-%typemap(argout) (char *outputString, int maxStringlen, int *actualLength) {
+%typemap(argout) (char *outputString, int maxStringLen, int *actualLength) {
 	_outv = SWIG_FromCharPtrAndSize($1,*$3-1);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }

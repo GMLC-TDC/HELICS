@@ -95,161 +95,191 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+helics_core_type_default = _helics.helics_core_type_default
+helics_core_type_zmq = _helics.helics_core_type_zmq
+helics_core_type_mpi = _helics.helics_core_type_mpi
+helics_core_type_test = _helics.helics_core_type_test
+helics_core_type_interprocess = _helics.helics_core_type_interprocess
+helics_core_type_ipc = _helics.helics_core_type_ipc
+helics_core_type_tcp = _helics.helics_core_type_tcp
+helics_core_type_udp = _helics.helics_core_type_udp
+helics_core_type_zmq_test = _helics.helics_core_type_zmq_test
+helics_core_type_nng = _helics.helics_core_type_nng
+helics_core_type_tcp_ss = _helics.helics_core_type_tcp_ss
+helics_core_type_http = _helics.helics_core_type_http
+helics_data_type_string = _helics.helics_data_type_string
+helics_data_type_double = _helics.helics_data_type_double
+helics_data_type_int = _helics.helics_data_type_int
+helics_data_type_complex = _helics.helics_data_type_complex
+helics_data_type_vector = _helics.helics_data_type_vector
+helics_data_type_complex_vector = _helics.helics_data_type_complex_vector
+helics_data_type_named_point = _helics.helics_data_type_named_point
+helics_data_type_boolean = _helics.helics_data_type_boolean
+helics_data_type_time = _helics.helics_data_type_time
+helics_data_type_raw = _helics.helics_data_type_raw
+helics_data_type_any = _helics.helics_data_type_any
+helics_flag_observer = _helics.helics_flag_observer
+helics_flag_uninterruptible = _helics.helics_flag_uninterruptible
+helics_flag_interruptible = _helics.helics_flag_interruptible
+helics_flag_source_only = _helics.helics_flag_source_only
+helics_flag_only_transmit_on_change = _helics.helics_flag_only_transmit_on_change
+helics_flag_only_update_on_change = _helics.helics_flag_only_update_on_change
+helics_flag_wait_for_current_time_update = _helics.helics_flag_wait_for_current_time_update
+helics_flag_rollback = _helics.helics_flag_rollback
+helics_flag_forward_compute = _helics.helics_flag_forward_compute
+helics_flag_realtime = _helics.helics_flag_realtime
+helics_flag_single_thread_federate = _helics.helics_flag_single_thread_federate
+helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
+helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
+helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mismatch_warnings
+helics_log_level_no_print = _helics.helics_log_level_no_print
+helics_log_level_error = _helics.helics_log_level_error
+helics_log_level_warning = _helics.helics_log_level_warning
+helics_log_level_summary = _helics.helics_log_level_summary
+helics_log_level_connections = _helics.helics_log_level_connections
+helics_log_level_interfaces = _helics.helics_log_level_interfaces
+helics_log_level_timing = _helics.helics_log_level_timing
+helics_log_level_data = _helics.helics_log_level_data
+helics_log_level_trace = _helics.helics_log_level_trace
 helics_ok = _helics.helics_ok
-helics_registration_failure = _helics.helics_registration_failure
-helics_invalid_object = _helics.helics_invalid_object
-helics_invalid_argument = _helics.helics_invalid_argument
-helics_discard = _helics.helics_discard
-helics_terminated = _helics.helics_terminated
+helics_error_registration_failure = _helics.helics_error_registration_failure
+helics_error_connection_failure = _helics.helics_error_connection_failure
+helics_error_invalid_object = _helics.helics_error_invalid_object
+helics_error_invalid_argument = _helics.helics_error_invalid_argument
+helics_error_discard = _helics.helics_error_discard
+helics_error_system_failure = _helics.helics_error_system_failure
 helics_warning = _helics.helics_warning
-helics_invalid_state_transition = _helics.helics_invalid_state_transition
-helics_invalid_function_call = _helics.helics_invalid_function_call
-helics_error = _helics.helics_error
-no_iteration = _helics.no_iteration
-force_iteration = _helics.force_iteration
-iterate_if_needed = _helics.iterate_if_needed
-next_step = _helics.next_step
-iteration_error = _helics.iteration_error
-iteration_halted = _helics.iteration_halted
-iterating = _helics.iterating
-helics_startup_state = _helics.helics_startup_state
-helics_initialization_state = _helics.helics_initialization_state
-helics_execution_state = _helics.helics_execution_state
-helics_finalize_state = _helics.helics_finalize_state
-helics_error_state = _helics.helics_error_state
-helics_pending_init_state = _helics.helics_pending_init_state
-helics_pending_exec_state = _helics.helics_pending_exec_state
-helics_pending_time_state = _helics.helics_pending_time_state
-helics_pending_iterative_time_state = _helics.helics_pending_iterative_time_state
-helics_custom_filter = _helics.helics_custom_filter
-helics_delay_filter = _helics.helics_delay_filter
-helics_randomDelay_filter = _helics.helics_randomDelay_filter
-helics_randomDrop_filter = _helics.helics_randomDrop_filter
-helics_reroute_filter = _helics.helics_reroute_filter
-helics_clone_filter = _helics.helics_clone_filter
-class data_t(_object):
-    """
-
-
-    Data to be communicated.
-
-    Core operates on opaque byte buffers.
-
-    C++ includes: api-data.h
-
-    """
-
+helics_error_invalid_state_transition = _helics.helics_error_invalid_state_transition
+helics_error_invalid_function_call = _helics.helics_error_invalid_function_call
+helics_error_execution_failure = _helics.helics_error_execution_failure
+helics_error_other = _helics.helics_error_other
+other_error_type = _helics.other_error_type
+helics_property_time_delta = _helics.helics_property_time_delta
+helics_property_time_period = _helics.helics_property_time_period
+helics_property_time_offset = _helics.helics_property_time_offset
+helics_property_time_rt_lag = _helics.helics_property_time_rt_lag
+helics_property_time_rt_lead = _helics.helics_property_time_rt_lead
+helics_property_time_rt_tolerance = _helics.helics_property_time_rt_tolerance
+helics_property_time_input_delay = _helics.helics_property_time_input_delay
+helics_property_time_output_delay = _helics.helics_property_time_output_delay
+helics_property_int_max_iterations = _helics.helics_property_int_max_iterations
+helics_property_int_log_level = _helics.helics_property_int_log_level
+helics_handle_option_connection_required = _helics.helics_handle_option_connection_required
+helics_handle_option_connection_optional = _helics.helics_handle_option_connection_optional
+helics_handle_option_single_connection_only = _helics.helics_handle_option_single_connection_only
+helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
+helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
+helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
+helics_filtertype_custom = _helics.helics_filtertype_custom
+helics_filtertype_delay = _helics.helics_filtertype_delay
+helics_filtertype_random_delay = _helics.helics_filtertype_random_delay
+helics_filtertype_random_drop = _helics.helics_filtertype_random_drop
+helics_filtertype_reroute = _helics.helics_filtertype_reroute
+helics_filtertype_clone = _helics.helics_filtertype_clone
+helics_filtertype_firewall = _helics.helics_filtertype_firewall
+helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
+helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
+helics_iteration_request_iterate_if_needed = _helics.helics_iteration_request_iterate_if_needed
+helics_iteration_result_next_step = _helics.helics_iteration_result_next_step
+helics_iteration_result_error = _helics.helics_iteration_result_error
+helics_iteration_result_halted = _helics.helics_iteration_result_halted
+helics_iteration_result_iterating = _helics.helics_iteration_result_iterating
+helics_state_startup = _helics.helics_state_startup
+helics_state_initialization = _helics.helics_state_initialization
+helics_state_execution = _helics.helics_state_execution
+helics_state_finalize = _helics.helics_state_finalize
+helics_state_error = _helics.helics_state_error
+helics_state_pending_init = _helics.helics_state_pending_init
+helics_state_pending_exec = _helics.helics_state_pending_exec
+helics_state_pending_time = _helics.helics_state_pending_time
+helics_state_pending_iterative_time = _helics.helics_state_pending_iterative_time
+class helics_complex(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, data_t, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, helics_complex, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, data_t, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, helics_complex, name)
     __repr__ = _swig_repr
-    __swig_setmethods__["data"] = _helics.data_t_data_set
-    __swig_getmethods__["data"] = _helics.data_t_data_get
+    __swig_setmethods__["real"] = _helics.helics_complex_real_set
+    __swig_getmethods__["real"] = _helics.helics_complex_real_get
     if _newclass:
-        data = _swig_property(_helics.data_t_data_get, _helics.data_t_data_set)
-    __swig_setmethods__["length"] = _helics.data_t_length_set
-    __swig_getmethods__["length"] = _helics.data_t_length_get
+        real = _swig_property(_helics.helics_complex_real_get, _helics.helics_complex_real_set)
+    __swig_setmethods__["imag"] = _helics.helics_complex_imag_set
+    __swig_getmethods__["imag"] = _helics.helics_complex_imag_get
     if _newclass:
-        length = _swig_property(_helics.data_t_length_get, _helics.data_t_length_set)
+        imag = _swig_property(_helics.helics_complex_imag_get, _helics.helics_complex_imag_set)
 
     def __init__(self):
-        """
-
-
-        Data to be communicated.
-
-        Core operates on opaque byte buffers.
-
-        C++ includes: api-data.h
-
-        """
-        this = _helics.new_data_t()
+        this = _helics.new_helics_complex()
         try:
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
-    __swig_destroy__ = _helics.delete_data_t
+    __swig_destroy__ = _helics.delete_helics_complex
     __del__ = lambda self: None
-data_t_swigregister = _helics.data_t_swigregister
-data_t_swigregister(data_t)
+helics_complex_swigregister = _helics.helics_complex_swigregister
+helics_complex_swigregister(helics_complex)
 cvar = _helics.cvar
 helics_time_zero = cvar.helics_time_zero
 helics_time_epsilon = cvar.helics_time_epsilon
+helics_time_invalid = cvar.helics_time_invalid
+helics_time_maxtime = cvar.helics_time_maxtime
 helics_true = cvar.helics_true
 helics_false = cvar.helics_false
 
-class message_t(_object):
-    """
-
-
-    Message_t mapped to a c compatible structure
-
-    C++ includes: api-data.h
-
-    """
-
+class helics_message(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, message_t, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, helics_message, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, message_t, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, helics_message, name)
     __repr__ = _swig_repr
-    __swig_setmethods__["time"] = _helics.message_t_time_set
-    __swig_getmethods__["time"] = _helics.message_t_time_get
+    __swig_setmethods__["time"] = _helics.helics_message_time_set
+    __swig_getmethods__["time"] = _helics.helics_message_time_get
     if _newclass:
-        time = _swig_property(_helics.message_t_time_get, _helics.message_t_time_set)
-    __swig_setmethods__["data"] = _helics.message_t_data_set
-    __swig_getmethods__["data"] = _helics.message_t_data_get
+        time = _swig_property(_helics.helics_message_time_get, _helics.helics_message_time_set)
+    __swig_setmethods__["data"] = _helics.helics_message_data_set
+    __swig_getmethods__["data"] = _helics.helics_message_data_get
     if _newclass:
-        data = _swig_property(_helics.message_t_data_get, _helics.message_t_data_set)
-    __swig_setmethods__["length"] = _helics.message_t_length_set
-    __swig_getmethods__["length"] = _helics.message_t_length_get
+        data = _swig_property(_helics.helics_message_data_get, _helics.helics_message_data_set)
+    __swig_setmethods__["length"] = _helics.helics_message_length_set
+    __swig_getmethods__["length"] = _helics.helics_message_length_get
     if _newclass:
-        length = _swig_property(_helics.message_t_length_get, _helics.message_t_length_set)
-    __swig_setmethods__["original_source"] = _helics.message_t_original_source_set
-    __swig_getmethods__["original_source"] = _helics.message_t_original_source_get
+        length = _swig_property(_helics.helics_message_length_get, _helics.helics_message_length_set)
+    __swig_setmethods__["messageID"] = _helics.helics_message_messageID_set
+    __swig_getmethods__["messageID"] = _helics.helics_message_messageID_get
     if _newclass:
-        original_source = _swig_property(_helics.message_t_original_source_get, _helics.message_t_original_source_set)
-    __swig_setmethods__["source"] = _helics.message_t_source_set
-    __swig_getmethods__["source"] = _helics.message_t_source_get
+        messageID = _swig_property(_helics.helics_message_messageID_get, _helics.helics_message_messageID_set)
+    __swig_setmethods__["flags"] = _helics.helics_message_flags_set
+    __swig_getmethods__["flags"] = _helics.helics_message_flags_get
     if _newclass:
-        source = _swig_property(_helics.message_t_source_get, _helics.message_t_source_set)
-    __swig_setmethods__["dest"] = _helics.message_t_dest_set
-    __swig_getmethods__["dest"] = _helics.message_t_dest_get
+        flags = _swig_property(_helics.helics_message_flags_get, _helics.helics_message_flags_set)
+    __swig_setmethods__["original_source"] = _helics.helics_message_original_source_set
+    __swig_getmethods__["original_source"] = _helics.helics_message_original_source_get
     if _newclass:
-        dest = _swig_property(_helics.message_t_dest_get, _helics.message_t_dest_set)
-    __swig_setmethods__["original_dest"] = _helics.message_t_original_dest_set
-    __swig_getmethods__["original_dest"] = _helics.message_t_original_dest_get
+        original_source = _swig_property(_helics.helics_message_original_source_get, _helics.helics_message_original_source_set)
+    __swig_setmethods__["source"] = _helics.helics_message_source_set
+    __swig_getmethods__["source"] = _helics.helics_message_source_get
     if _newclass:
-        original_dest = _swig_property(_helics.message_t_original_dest_get, _helics.message_t_original_dest_set)
+        source = _swig_property(_helics.helics_message_source_get, _helics.helics_message_source_set)
+    __swig_setmethods__["dest"] = _helics.helics_message_dest_set
+    __swig_getmethods__["dest"] = _helics.helics_message_dest_get
+    if _newclass:
+        dest = _swig_property(_helics.helics_message_dest_get, _helics.helics_message_dest_set)
+    __swig_setmethods__["original_dest"] = _helics.helics_message_original_dest_set
+    __swig_getmethods__["original_dest"] = _helics.helics_message_original_dest_get
+    if _newclass:
+        original_dest = _swig_property(_helics.helics_message_original_dest_get, _helics.helics_message_original_dest_set)
 
     def __init__(self):
-        """
-
-
-        Message_t mapped to a c compatible structure
-
-        C++ includes: api-data.h
-
-        """
-        this = _helics.new_message_t()
+        this = _helics.new_helics_message()
         try:
             self.this.append(this)
         except __builtin__.Exception:
             self.this = this
-    __swig_destroy__ = _helics.delete_message_t
+    __swig_destroy__ = _helics.delete_helics_message
     __del__ = lambda self: None
-message_t_swigregister = _helics.message_t_swigregister
-message_t_swigregister(message_t)
+helics_message_swigregister = _helics.helics_message_swigregister
+helics_message_swigregister(helics_message)
 
-HELICS_CORE_TYPE_DEFAULT = _helics.HELICS_CORE_TYPE_DEFAULT
-HELICS_CORE_TYPE_ZMQ = _helics.HELICS_CORE_TYPE_ZMQ
-HELICS_CORE_TYPE_MPI = _helics.HELICS_CORE_TYPE_MPI
-HELICS_CORE_TYPE_TEST = _helics.HELICS_CORE_TYPE_TEST
-HELICS_CORE_TYPE_INTERPROCESS = _helics.HELICS_CORE_TYPE_INTERPROCESS
-HELICS_CORE_TYPE_IPC = _helics.HELICS_CORE_TYPE_IPC
-HELICS_CORE_TYPE_TCP = _helics.HELICS_CORE_TYPE_TCP
-HELICS_CORE_TYPE_UDP = _helics.HELICS_CORE_TYPE_UDP
 
 def helicsGetVersion() -> "char const *":
     """
@@ -258,7 +288,7 @@ def helicsGetVersion() -> "char const *":
     """
     return _helics.helicsGetVersion()
 
-def helicsIsCoreTypeAvailable(type: 'char const *') -> "helics_bool_t":
+def helicsIsCoreTypeAvailable(type: 'char const *') -> "helics_bool":
     """
 
 
@@ -321,6 +351,10 @@ def helicsCoreClone(core: 'helics_core') -> "helics_core":
     return _helics.helicsCoreClone(core)
 helicsCoreClone = _helics.helicsCoreClone
 
+def helicsCoreIsValid(core: 'helics_core') -> "helics_bool":
+    return _helics.helicsCoreIsValid(core)
+helicsCoreIsValid = _helics.helicsCoreIsValid
+
 def helicsCreateBroker(type: 'char const *', name: 'char const *', initString: 'char const *') -> "helics_broker":
     """
 
@@ -376,7 +410,11 @@ def helicsBrokerClone(broker: 'helics_broker') -> "helics_broker":
     return _helics.helicsBrokerClone(broker)
 helicsBrokerClone = _helics.helicsBrokerClone
 
-def helicsBrokerIsConnected(broker: 'helics_broker') -> "int":
+def helicsBrokerIsValid(broker: 'helics_broker') -> "helics_bool":
+    return _helics.helicsBrokerIsValid(broker)
+helicsBrokerIsValid = _helics.helicsBrokerIsValid
+
+def helicsBrokerIsConnected(broker: 'helics_broker') -> "helics_bool":
     """
 
 
@@ -387,11 +425,23 @@ def helicsBrokerIsConnected(broker: 'helics_broker') -> "int":
     """
     return _helics.helicsBrokerIsConnected(broker)
 
-def helicsBrokerWaitForDisconnect(broker: 'helics_broker', msToWait: 'int') -> "helics_status":
+def helicsBrokerDataLink(broker: 'helics_broker', source: 'char const *', target: 'char const *') -> "void":
+    return _helics.helicsBrokerDataLink(broker, source, target)
+helicsBrokerDataLink = _helics.helicsBrokerDataLink
+
+def helicsBrokerAddSourceFilterToEndpoint(broker: 'helics_broker', filter: 'char const *', endpoint: 'char const *') -> "void":
+    return _helics.helicsBrokerAddSourceFilterToEndpoint(broker, filter, endpoint)
+helicsBrokerAddSourceFilterToEndpoint = _helics.helicsBrokerAddSourceFilterToEndpoint
+
+def helicsBrokerAddDestinationFilterToEndpoint(broker: 'helics_broker', filter: 'char const *', endpoint: 'char const *') -> "void":
+    return _helics.helicsBrokerAddDestinationFilterToEndpoint(broker, filter, endpoint)
+helicsBrokerAddDestinationFilterToEndpoint = _helics.helicsBrokerAddDestinationFilterToEndpoint
+
+def helicsBrokerWaitForDisconnect(broker: 'helics_broker', msToWait: 'int') -> "helics_bool":
     return _helics.helicsBrokerWaitForDisconnect(broker, msToWait)
 helicsBrokerWaitForDisconnect = _helics.helicsBrokerWaitForDisconnect
 
-def helicsCoreIsConnected(core: 'helics_core') -> "int":
+def helicsCoreIsConnected(core: 'helics_core') -> "helics_bool":
     """
 
 
@@ -402,7 +452,19 @@ def helicsCoreIsConnected(core: 'helics_core') -> "int":
     """
     return _helics.helicsCoreIsConnected(core)
 
-def helicsBrokerGetIdentifier(broker: 'helics_broker') -> "int":
+def helicsCoreDataLink(core: 'helics_core', source: 'char const *', target: 'char const *') -> "void":
+    return _helics.helicsCoreDataLink(core, source, target)
+helicsCoreDataLink = _helics.helicsCoreDataLink
+
+def helicsCoreAddSourceFilterToEndpoint(core: 'helics_core', filter: 'char const *', endpoint: 'char const *') -> "void":
+    return _helics.helicsCoreAddSourceFilterToEndpoint(core, filter, endpoint)
+helicsCoreAddSourceFilterToEndpoint = _helics.helicsCoreAddSourceFilterToEndpoint
+
+def helicsCoreAddDestinationFilterToEndpoint(core: 'helics_core', filter: 'char const *', endpoint: 'char const *') -> "void":
+    return _helics.helicsCoreAddDestinationFilterToEndpoint(core, filter, endpoint)
+helicsCoreAddDestinationFilterToEndpoint = _helics.helicsCoreAddDestinationFilterToEndpoint
+
+def helicsBrokerGetIdentifier(broker: 'helics_broker') -> "char const *":
     """
 
 
@@ -424,7 +486,7 @@ def helicsBrokerGetIdentifier(broker: 'helics_broker') -> "int":
     """
     return _helics.helicsBrokerGetIdentifier(broker)
 
-def helicsCoreGetIdentifier(core: 'helics_core') -> "int":
+def helicsCoreGetIdentifier(core: 'helics_core') -> "char const *":
     """
 
 
@@ -446,7 +508,7 @@ def helicsCoreGetIdentifier(core: 'helics_core') -> "int":
     """
     return _helics.helicsCoreGetIdentifier(core)
 
-def helicsBrokerGetAddress(broker: 'helics_broker') -> "int":
+def helicsBrokerGetAddress(broker: 'helics_broker') -> "char const *":
     """
 
 
@@ -468,11 +530,11 @@ def helicsBrokerGetAddress(broker: 'helics_broker') -> "int":
     """
     return _helics.helicsBrokerGetAddress(broker)
 
-def helicsCoreSetReadyToInit(core: 'helics_core') -> "helics_status":
+def helicsCoreSetReadyToInit(core: 'helics_core') -> "void":
     return _helics.helicsCoreSetReadyToInit(core)
 helicsCoreSetReadyToInit = _helics.helicsCoreSetReadyToInit
 
-def helicsCoreDisconnect(core: 'helics_core') -> "helics_status":
+def helicsCoreDisconnect(core: 'helics_core') -> "void":
     """
 
 
@@ -498,7 +560,7 @@ def helicsGetFederateByName(fedName: 'char const *') -> "helics_federate":
     return _helics.helicsGetFederateByName(fedName)
 helicsGetFederateByName = _helics.helicsGetFederateByName
 
-def helicsBrokerDisconnect(broker: 'helics_broker') -> "helics_status":
+def helicsBrokerDisconnect(broker: 'helics_broker') -> "void":
     """
 
 
@@ -520,17 +582,17 @@ def helicsBrokerDisconnect(broker: 'helics_broker') -> "helics_status":
     """
     return _helics.helicsBrokerDisconnect(broker)
 
-def helicsDestroyFederate(fed: 'helics_federate') -> "void":
-    return _helics.helicsDestroyFederate(fed)
-helicsDestroyFederate = _helics.helicsDestroyFederate
+def helicsFederateDestroy(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateDestroy(fed)
+helicsFederateDestroy = _helics.helicsFederateDestroy
 
-def helicsDestroyBroker(broker: 'helics_broker') -> "void":
-    return _helics.helicsDestroyBroker(broker)
-helicsDestroyBroker = _helics.helicsDestroyBroker
+def helicsBrokerDestroy(broker: 'helics_broker') -> "void":
+    return _helics.helicsBrokerDestroy(broker)
+helicsBrokerDestroy = _helics.helicsBrokerDestroy
 
-def helicsDestroyCore(core: 'helics_core') -> "void":
-    return _helics.helicsDestroyCore(core)
-helicsDestroyCore = _helics.helicsDestroyCore
+def helicsCoreDestroy(core: 'helics_core') -> "void":
+    return _helics.helicsCoreDestroy(core)
+helicsCoreDestroy = _helics.helicsCoreDestroy
 
 def helicsCoreFree(core: 'helics_core') -> "void":
     """
@@ -550,7 +612,7 @@ def helicsBrokerFree(broker: 'helics_broker') -> "void":
     """
     return _helics.helicsBrokerFree(broker)
 
-def helicsCreateValueFederate(fi: 'helics_federate_info_t const') -> "helics_federate":
+def helicsCreateValueFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
     """
 
 
@@ -569,31 +631,13 @@ def helicsCreateValueFederate(fi: 'helics_federate_info_t const') -> "helics_fed
     an opaque value federate object
 
     """
-    return _helics.helicsCreateValueFederate(fi)
+    return _helics.helicsCreateValueFederate(fedName, fi)
 
-def helicsCreateValueFederateFromJson(JSON: 'char const *') -> "helics_federate":
-    """
+def helicsCreateValueFederateFromConfig(configFile: 'char const *') -> "helics_federate":
+    return _helics.helicsCreateValueFederateFromConfig(configFile)
+helicsCreateValueFederateFromConfig = _helics.helicsCreateValueFederateFromConfig
 
-
-    create a value federate from a JSON file or JSON string
-
-    helics_federate objects can be used in all functions that take a helics_federate
-    or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `JSON` :
-        a JSON file or a JSON string that contains setup and configuration
-        information
-
-    Returns
-    -------
-    an opaque value federate object
-
-    """
-    return _helics.helicsCreateValueFederateFromJson(JSON)
-
-def helicsCreateMessageFederate(fi: 'helics_federate_info_t const') -> "helics_federate":
+def helicsCreateMessageFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
     """
 
 
@@ -612,31 +656,13 @@ def helicsCreateMessageFederate(fi: 'helics_federate_info_t const') -> "helics_f
     an opaque message federate object
 
     """
-    return _helics.helicsCreateMessageFederate(fi)
+    return _helics.helicsCreateMessageFederate(fedName, fi)
 
-def helicsCreateMessageFederateFromJson(JSON: 'char const *') -> "helics_federate":
-    """
+def helicsCreateMessageFederateFromConfig(configFile: 'char const *') -> "helics_federate":
+    return _helics.helicsCreateMessageFederateFromConfig(configFile)
+helicsCreateMessageFederateFromConfig = _helics.helicsCreateMessageFederateFromConfig
 
-
-    create a message federate from a JSON file or JSON string
-
-    helics_message_federate objects can be used in all functions that take a
-    helics_message_federate or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `JSON` :
-        a JSON file or a JSON string that contains setup and configuration
-        information
-
-    Returns
-    -------
-    an opaque message federate object
-
-    """
-    return _helics.helicsCreateMessageFederateFromJson(JSON)
-
-def helicsCreateCombinationFederate(fi: 'helics_federate_info_t const') -> "helics_federate":
+def helicsCreateCombinationFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
     """
 
 
@@ -656,50 +682,21 @@ def helicsCreateCombinationFederate(fi: 'helics_federate_info_t const') -> "heli
     an opaque value federate object nullptr if the object creation failed
 
     """
-    return _helics.helicsCreateCombinationFederate(fi)
+    return _helics.helicsCreateCombinationFederate(fedName, fi)
 
-def helicsCreateCombinationFederateFromJson(JSON: 'char const *') -> "helics_federate":
-    """
-
-
-    create a combination federate from a JSON file or JSON string
-
-    combination federates are both value federates and message federates, objects
-    can be used in all functions that take a helics_federate,
-    helics_message_federate or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `JSON` :
-        a JSON file or a JSON string that contains setup and configuration
-        information
-
-    Returns
-    -------
-    an opaque combination federate object
-
-    """
-    return _helics.helicsCreateCombinationFederateFromJson(JSON)
+def helicsCreateCombinationFederateFromConfig(configFile: 'char const *') -> "helics_federate":
+    return _helics.helicsCreateCombinationFederateFromConfig(configFile)
+helicsCreateCombinationFederateFromConfig = _helics.helicsCreateCombinationFederateFromConfig
 
 def helicsFederateClone(fed: 'helics_federate') -> "helics_federate":
     return _helics.helicsFederateClone(fed)
 helicsFederateClone = _helics.helicsFederateClone
 
-def helicsFederateInfoCreate() -> "helics_federate_info_t":
-    """
+def helicsCreateFederateInfo() -> "helics_federate_info":
+    return _helics.helicsCreateFederateInfo()
+helicsCreateFederateInfo = _helics.helicsCreateFederateInfo
 
-
-    create a federate info object for specifying federate information when
-    constructing a federate
-
-    Returns
-    -------
-    a helics_federate_info_t object which is a reference to the created object
-
-    """
-    return _helics.helicsFederateInfoCreate()
-
-def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info_t', argc: 'int') -> "helics_status":
+def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int') -> "void":
     """
 
 
@@ -721,7 +718,7 @@ def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info_t', argc: 'int') ->
     """
     return _helics.helicsFederateInfoLoadFromArgs(fi, argc)
 
-def helicsFederateInfoFree(fi: 'helics_federate_info_t') -> "void":
+def helicsFederateInfoFree(fi: 'helics_federate_info') -> "void":
     """
 
 
@@ -730,27 +727,11 @@ def helicsFederateInfoFree(fi: 'helics_federate_info_t') -> "void":
     """
     return _helics.helicsFederateInfoFree(fi)
 
-def helicsFederateInfoSetFederateName(fi: 'helics_federate_info_t', name: 'char const *') -> "helics_status":
-    """
+def helicsFederateIsValid(fed: 'helics_federate') -> "helics_bool":
+    return _helics.helicsFederateIsValid(fed)
+helicsFederateIsValid = _helics.helicsFederateIsValid
 
-
-    set the federate name in the Federate Info structure
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object to alter
-    * `name` :
-        the new identifier for the federate
-
-    Returns
-    -------
-    a helics_status enumeration helics_ok on success
-
-    """
-    return _helics.helicsFederateInfoSetFederateName(fi, name)
-
-def helicsFederateInfoSetCoreName(fi: 'helics_federate_info_t', corename: 'char const *') -> "helics_status":
+def helicsFederateInfoSetCoreName(fi: 'helics_federate_info', corename: 'char const *') -> "void":
     """
 
 
@@ -771,7 +752,7 @@ def helicsFederateInfoSetCoreName(fi: 'helics_federate_info_t', corename: 'char 
     """
     return _helics.helicsFederateInfoSetCoreName(fi, corename)
 
-def helicsFederateInfoSetCoreInitString(fi: 'helics_federate_info_t', coreInit: 'char const *') -> "helics_status":
+def helicsFederateInfoSetCoreInitString(fi: 'helics_federate_info', coreInit: 'char const *') -> "void":
     """
 
 
@@ -793,7 +774,14 @@ def helicsFederateInfoSetCoreInitString(fi: 'helics_federate_info_t', coreInit: 
     """
     return _helics.helicsFederateInfoSetCoreInitString(fi, coreInit)
 
-def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info_t', coretype: 'char const *') -> "helics_status":
+def helicsFederateInfoSetCoreType(fi: 'helics_federate_info', coretype: 'int') -> "void":
+    """
+
+
+    """
+    return _helics.helicsFederateInfoSetCoreType(fi, coretype)
+
+def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info', coretype: 'char const *') -> "void":
     """
 
 
@@ -814,78 +802,43 @@ def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info_t', corety
     """
     return _helics.helicsFederateInfoSetCoreTypeFromString(fi, coretype)
 
-def helicsFederateInfoSetCoreType(fi: 'helics_federate_info_t', coretype: 'int') -> "helics_status":
-    """
+def helicsFederateInfoSetBroker(fi: 'helics_federate_info', broker: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetBroker(fi, broker)
+helicsFederateInfoSetBroker = _helics.helicsFederateInfoSetBroker
 
+def helicsFederateInfoSetBrokerPort(fi: 'helics_federate_info', brokerPort: 'int') -> "void":
+    return _helics.helicsFederateInfoSetBrokerPort(fi, brokerPort)
+helicsFederateInfoSetBrokerPort = _helics.helicsFederateInfoSetBrokerPort
 
-    """
-    return _helics.helicsFederateInfoSetCoreType(fi, coretype)
+def helicsFederateInfoSetLocalPort(fi: 'helics_federate_info', localPort: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetLocalPort(fi, localPort)
+helicsFederateInfoSetLocalPort = _helics.helicsFederateInfoSetLocalPort
 
-def helicsFederateInfoSetFlag(fi: 'helics_federate_info_t', flag: 'int', value: 'helics_bool_t') -> "helics_status":
-    """
+def helicsGetPropertyIndex(val: 'char const *') -> "int":
+    return _helics.helicsGetPropertyIndex(val)
+helicsGetPropertyIndex = _helics.helicsGetPropertyIndex
 
+def helicsFederateInfoSetFlagOption(fi: 'helics_federate_info', flag: 'int', value: 'helics_bool') -> "void":
+    return _helics.helicsFederateInfoSetFlagOption(fi, flag, value)
+helicsFederateInfoSetFlagOption = _helics.helicsFederateInfoSetFlagOption
 
-    """
-    return _helics.helicsFederateInfoSetFlag(fi, flag, value)
-
-def helicsFederateInfoSetSeparator(fi: 'helics_federate_info_t', separator: 'char') -> "helics_status":
+def helicsFederateInfoSetSeparator(fi: 'helics_federate_info', separator: 'char') -> "void":
     return _helics.helicsFederateInfoSetSeparator(fi, separator)
 helicsFederateInfoSetSeparator = _helics.helicsFederateInfoSetSeparator
 
-def helicsFederateInfoSetOutputDelay(fi: 'helics_federate_info_t', outputDelay: 'helics_time_t') -> "helics_status":
-    """
+def helicsFederateInfoSetTimeProperty(fi: 'helics_federate_info', timeProperty: 'int', propertyValue: 'helics_time') -> "void":
+    return _helics.helicsFederateInfoSetTimeProperty(fi, timeProperty, propertyValue)
+helicsFederateInfoSetTimeProperty = _helics.helicsFederateInfoSetTimeProperty
 
+def helicsFederateInfoSetIntegerProperty(fi: 'helics_federate_info', intProperty: 'int', propertyValue: 'int') -> "void":
+    return _helics.helicsFederateInfoSetIntegerProperty(fi, intProperty, propertyValue)
+helicsFederateInfoSetIntegerProperty = _helics.helicsFederateInfoSetIntegerProperty
 
-    """
-    return _helics.helicsFederateInfoSetOutputDelay(fi, outputDelay)
+def helicsFederateRegisterInterfaces(fed: 'helics_federate', file: 'char const *') -> "void":
+    return _helics.helicsFederateRegisterInterfaces(fed, file)
+helicsFederateRegisterInterfaces = _helics.helicsFederateRegisterInterfaces
 
-def helicsFederateInfoSetTimeDelta(fi: 'helics_federate_info_t', timeDelta: 'helics_time_t') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetTimeDelta(fi, timeDelta)
-
-def helicsFederateInfoSetInputDelay(fi: 'helics_federate_info_t', inputDelay: 'helics_time_t') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetInputDelay(fi, inputDelay)
-
-def helicsFederateInfoSetTimeOffset(fi: 'helics_federate_info_t', timeOffset: 'helics_time_t') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetTimeOffset(fi, timeOffset)
-
-def helicsFederateInfoSetPeriod(fi: 'helics_federate_info_t', period: 'helics_time_t') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetPeriod(fi, period)
-
-def helicsFederateInfoSetMaxIterations(fi: 'helics_federate_info_t', maxIterations: 'int') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetMaxIterations(fi, maxIterations)
-
-def helicsFederateInfoSetLoggingLevel(fi: 'helics_federate_info_t', logLevel: 'int') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateInfoSetLoggingLevel(fi, logLevel)
-
-def helicsFederateLoadInterfaces(fed: 'helics_federate', file: 'char const *') -> "helics_status":
-    return _helics.helicsFederateLoadInterfaces(fed, file)
-helicsFederateLoadInterfaces = _helics.helicsFederateLoadInterfaces
-
-def helicsFederateFinalize(fed: 'helics_federate') -> "helics_status":
+def helicsFederateFinalize(fed: 'helics_federate') -> "void":
     """
 
 
@@ -914,31 +867,15 @@ def helicsCloseLibrary() -> "void":
     """
     return _helics.helicsCloseLibrary()
 
-def helicsFederateEnterInitializationMode(fed: 'helics_federate') -> "helics_status":
-    """
+def helicsFederateEnterInitializingMode(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterInitializingMode(fed)
+helicsFederateEnterInitializingMode = _helics.helicsFederateEnterInitializingMode
 
+def helicsFederateEnterInitializingModeAsync(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterInitializingModeAsync(fed)
+helicsFederateEnterInitializingModeAsync = _helics.helicsFederateEnterInitializingModeAsync
 
-    enter the initialization state of a federate
-
-    the initialization state allows initial values to be set and received if the
-    iteration is requested on entry to the execution state This is a blocking call
-    and will block until the core allows it to proceed
-
-    """
-    return _helics.helicsFederateEnterInitializationMode(fed)
-
-def helicsFederateEnterInitializationModeAsync(fed: 'helics_federate') -> "helics_status":
-    """
-
-
-    non blocking alternative to  the function
-    helicsFederateEnterInitializationModeFinalize must be called to finish the
-    operation
-
-    """
-    return _helics.helicsFederateEnterInitializationModeAsync(fed)
-
-def helicsFederateIsAsyncOperationCompleted(fed: 'helics_federate') -> "helics_bool_t":
+def helicsFederateIsAsyncOperationCompleted(fed: 'helics_federate') -> "helics_bool":
     """
 
 
@@ -956,85 +893,35 @@ def helicsFederateIsAsyncOperationCompleted(fed: 'helics_federate') -> "helics_b
     """
     return _helics.helicsFederateIsAsyncOperationCompleted(fed)
 
-def helicsFederateEnterInitializationModeComplete(fed: 'helics_federate') -> "helics_status":
-    """
+def helicsFederateEnterInitializingModeComplete(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterInitializingModeComplete(fed)
+helicsFederateEnterInitializingModeComplete = _helics.helicsFederateEnterInitializingModeComplete
 
+def helicsFederateEnterExecutingMode(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterExecutingMode(fed)
+helicsFederateEnterExecutingMode = _helics.helicsFederateEnterExecutingMode
 
-    finalize the entry to initialize mode that was initiated with
+def helicsFederateEnterExecutingModeAsync(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterExecutingModeAsync(fed)
+helicsFederateEnterExecutingModeAsync = _helics.helicsFederateEnterExecutingModeAsync
 
-    """
-    return _helics.helicsFederateEnterInitializationModeComplete(fed)
+def helicsFederateEnterExecutingModeComplete(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateEnterExecutingModeComplete(fed)
+helicsFederateEnterExecutingModeComplete = _helics.helicsFederateEnterExecutingModeComplete
 
-def helicsFederateEnterExecutionMode(fed: 'helics_federate') -> "helics_status":
-    """
+def helicsFederateEnterExecutingModeIterative(fed: 'helics_federate', iterate: 'helics_iteration_request') -> "helics_iteration_result":
+    return _helics.helicsFederateEnterExecutingModeIterative(fed, iterate)
+helicsFederateEnterExecutingModeIterative = _helics.helicsFederateEnterExecutingModeIterative
 
+def helicsFederateEnterExecutingModeIterativeAsync(fed: 'helics_federate', iterate: 'helics_iteration_request') -> "void":
+    return _helics.helicsFederateEnterExecutingModeIterativeAsync(fed, iterate)
+helicsFederateEnterExecutingModeIterativeAsync = _helics.helicsFederateEnterExecutingModeIterativeAsync
 
-    request that the federate enter the Execution mode
+def helicsFederateEnterExecutingModeIterativeComplete(fed: 'helics_federate') -> "helics_iteration_result":
+    return _helics.helicsFederateEnterExecutingModeIterativeComplete(fed)
+helicsFederateEnterExecutingModeIterativeComplete = _helics.helicsFederateEnterExecutingModeIterativeComplete
 
-    this call is blocking until granted entry by the core object for an asynchronous
-    alternative call /ref helicsFederateEnterExecutionModeAsync
-
-    Parameters
-    ----------
-    * `fed` :
-        a federate to change modes
-
-    Returns
-    -------
-    a helics_status enumeration helics_error if something went wrong
-    helicsInvalidReference if fed is invalid
-
-    """
-    return _helics.helicsFederateEnterExecutionMode(fed)
-
-def helicsFederateEnterExecutionModeAsync(fed: 'helics_federate') -> "helics_status":
-    """
-
-
-    request that the federate enter the Execution mode
-
-    this call is non-blocking and will return immediately call /ref
-    helicsFederateEnterExecutionModeComplete to finish the call sequence /ref
-
-    """
-    return _helics.helicsFederateEnterExecutionModeAsync(fed)
-
-def helicsFederateEnterExecutionModeComplete(fed: 'helics_federate') -> "helics_status":
-    """
-
-
-    complete the call to /ref EnterExecutionModeAsync
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object to complete the call
-
-    """
-    return _helics.helicsFederateEnterExecutionModeComplete(fed)
-
-def helicsFederateEnterExecutionModeIterative(fed: 'helics_federate', iterate: 'helics_iteration_request') -> "helics_iteration_status *":
-    """
-
-
-    """
-    return _helics.helicsFederateEnterExecutionModeIterative(fed, iterate)
-
-def helicsFederateEnterExecutionModeIterativeAsync(fed: 'helics_federate', iterate: 'helics_iteration_request') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFederateEnterExecutionModeIterativeAsync(fed, iterate)
-
-def helicsFederateEnterExecutionModeIterativeComplete(fed: 'helics_federate') -> "helics_iteration_status *":
-    """
-
-
-    """
-    return _helics.helicsFederateEnterExecutionModeIterativeComplete(fed)
-
-def helicsFederateGetState(fed: 'helics_federate') -> "federate_state *":
+def helicsFederateGetState(fed: 'helics_federate') -> "helics_federate_state":
     """
 
 
@@ -1068,7 +955,7 @@ def helicsFederateGetCoreObject(fed: 'helics_federate') -> "helics_core":
     """
     return _helics.helicsFederateGetCoreObject(fed)
 
-def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time_t') -> "helics_time_t *":
+def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time') -> "helics_time":
     """
 
 
@@ -1091,11 +978,11 @@ def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time_
     """
     return _helics.helicsFederateRequestTime(fed, requestTime)
 
-def helicsFederateRequestNextStep(fed: 'helics_federate') -> "helics_time_t *":
+def helicsFederateRequestNextStep(fed: 'helics_federate') -> "helics_time":
     return _helics.helicsFederateRequestNextStep(fed)
 helicsFederateRequestNextStep = _helics.helicsFederateRequestNextStep
 
-def helicsFederateRequestTimeIterative(fed: 'helics_federate', requestTime: 'helics_time_t', iterate: 'helics_iteration_request') -> "helics_time_t *, helics_iteration_status *":
+def helicsFederateRequestTimeIterative(fed: 'helics_federate', requestTime: 'helics_time', iterate: 'helics_iteration_request') -> "helics_iteration_result *":
     """
 
 
@@ -1125,35 +1012,35 @@ def helicsFederateRequestTimeIterative(fed: 'helics_federate', requestTime: 'hel
     """
     return _helics.helicsFederateRequestTimeIterative(fed, requestTime, iterate)
 
-def helicsFederateRequestTimeAsync(fed: 'helics_federate', requestTime: 'helics_time_t') -> "helics_status":
+def helicsFederateRequestTimeAsync(fed: 'helics_federate', requestTime: 'helics_time') -> "void":
     """
 
 
     """
     return _helics.helicsFederateRequestTimeAsync(fed, requestTime)
 
-def helicsFederateRequestTimeComplete(fed: 'helics_federate') -> "helics_time_t *":
+def helicsFederateRequestTimeComplete(fed: 'helics_federate') -> "helics_time":
     """
 
 
     """
     return _helics.helicsFederateRequestTimeComplete(fed)
 
-def helicsFederateRequestTimeIterativeAsync(fed: 'helics_federate', requestTime: 'helics_time_t', iterate: 'helics_iteration_request') -> "helics_status":
+def helicsFederateRequestTimeIterativeAsync(fed: 'helics_federate', requestTime: 'helics_time', iterate: 'helics_iteration_request') -> "void":
     """
 
 
     """
     return _helics.helicsFederateRequestTimeIterativeAsync(fed, requestTime, iterate)
 
-def helicsFederateRequestTimeIterativeComplete(fed: 'helics_federate') -> "helics_time_t *, helics_iteration_status *":
+def helicsFederateRequestTimeIterativeComplete(fed: 'helics_federate') -> "helics_iteration_result *":
     """
 
 
     """
     return _helics.helicsFederateRequestTimeIterativeComplete(fed)
 
-def helicsFederateGetName(fed: 'helics_federate') -> "int":
+def helicsFederateGetName(fed: 'helics_federate') -> "char const *":
     """
 
 
@@ -1175,114 +1062,35 @@ def helicsFederateGetName(fed: 'helics_federate') -> "int":
     """
     return _helics.helicsFederateGetName(fed)
 
-def helicsFederateSetTimeDelta(fed: 'helics_federate', time: 'helics_time_t') -> "helics_status":
-    """
+def helicsFederateSetTimeProperty(fed: 'helics_federate', timeProperty: 'int', time: 'helics_time') -> "void":
+    return _helics.helicsFederateSetTimeProperty(fed, timeProperty, time)
+helicsFederateSetTimeProperty = _helics.helicsFederateSetTimeProperty
 
+def helicsFederateSetFlagOption(fed: 'helics_federate', flag: 'int', flagValue: 'helics_bool') -> "void":
+    return _helics.helicsFederateSetFlagOption(fed, flag, flagValue)
+helicsFederateSetFlagOption = _helics.helicsFederateSetFlagOption
 
-    set the minimum time delta for the federate
-
-    Parameters
-    ----------
-    * `tdelta` :
-        the minimum time delta to return from a time request function
-
-    """
-    return _helics.helicsFederateSetTimeDelta(fed, time)
-
-def helicsFederateSetOutputDelay(fed: 'helics_federate', outputDelay: 'helics_time_t') -> "helics_status":
-    """
-
-
-    set the look ahead time
-
-    the look ahead is the propagation time for messages/event to propagate from the
-    Federate the federate
-
-    Parameters
-    ----------
-    * `lookAhead` :
-        the look ahead time
-
-    """
-    return _helics.helicsFederateSetOutputDelay(fed, outputDelay)
-
-def helicsFederateSetInputDelay(fed: 'helics_federate', inputDelay: 'helics_time_t') -> "helics_status":
-    """
-
-
-    set the impact Window time
-
-    the impact window is the time window around the time request in which other
-    federates cannot affect the federate
-
-    Parameters
-    ----------
-    * `lookAhead` :
-        the look ahead time
-
-    """
-    return _helics.helicsFederateSetInputDelay(fed, inputDelay)
-
-def helicsFederateSetPeriod(fed: 'helics_federate', period: 'helics_time_t', offset: 'helics_time_t') -> "helics_status":
-    """
-
-
-    set the period and offset of the federate
-
-    the federate will on grant time on N*period+offset interval
-
-    Parameters
-    ----------
-    * `period` :
-        the length of time between each subsequent grants
-    * `offset` :
-        the shift of the period from 0 offset must be < period
-
-    """
-    return _helics.helicsFederateSetPeriod(fed, period, offset)
-
-def helicsFederateSetFlag(fed: 'helics_federate', flag: 'int', flagValue: 'helics_bool_t') -> "helics_status":
-    """
-
-
-    set a flag for the federate
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate to alter a flag for
-    * `flag` :
-        the flag to change
-    * `flagValue` :
-        the new value of the flag 0 for false !=0 for true
-
-    """
-    return _helics.helicsFederateSetFlag(fed, flag, flagValue)
-
-def helicsFederateSetSeparator(fed: 'helics_federate', separator: 'char') -> "helics_status":
+def helicsFederateSetSeparator(fed: 'helics_federate', separator: 'char') -> "void":
     return _helics.helicsFederateSetSeparator(fed, separator)
 helicsFederateSetSeparator = _helics.helicsFederateSetSeparator
 
-def helicsFederateSetLoggingLevel(fed: 'helics_federate', loggingLevel: 'int') -> "helics_status":
-    """
+def helicsFederateSetIntegerProperty(fed: 'helics_federate', intProperty: 'int', propertyVal: 'int') -> "void":
+    return _helics.helicsFederateSetIntegerProperty(fed, intProperty, propertyVal)
+helicsFederateSetIntegerProperty = _helics.helicsFederateSetIntegerProperty
 
+def helicsFederateGetTimeProperty(fed: 'helics_federate', timeProperty: 'int') -> "helics_time":
+    return _helics.helicsFederateGetTimeProperty(fed, timeProperty)
+helicsFederateGetTimeProperty = _helics.helicsFederateGetTimeProperty
 
-    set the logging level for the federate @ details debug and trace only do
-    anything if they were enabled in the compilation
+def helicsFederateGetFlagOption(fed: 'helics_federate', flag: 'int') -> "helics_bool":
+    return _helics.helicsFederateGetFlagOption(fed, flag)
+helicsFederateGetFlagOption = _helics.helicsFederateGetFlagOption
 
-    Parameters
-    ----------
-    * `loggingLevel` :
-        (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
+def helicsFederateGetIntegerProperty(fed: 'helics_federate', intProperty: 'int') -> "int":
+    return _helics.helicsFederateGetIntegerProperty(fed, intProperty)
+helicsFederateGetIntegerProperty = _helics.helicsFederateGetIntegerProperty
 
-    """
-    return _helics.helicsFederateSetLoggingLevel(fed, loggingLevel)
-
-def helicsFederateSetMaxIterations(fi: 'helics_federate', maxIterations: 'int') -> "helics_status":
-    return _helics.helicsFederateSetMaxIterations(fi, maxIterations)
-helicsFederateSetMaxIterations = _helics.helicsFederateSetMaxIterations
-
-def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time_t *":
+def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time":
     """
 
 
@@ -1345,7 +1153,7 @@ def helicsQueryBrokerExecute(query: 'helics_query', broker: 'helics_broker') -> 
     return _helics.helicsQueryBrokerExecute(query, broker)
 helicsQueryBrokerExecute = _helics.helicsQueryBrokerExecute
 
-def helicsQueryExecuteAsync(query: 'helics_query', fed: 'helics_federate') -> "helics_status":
+def helicsQueryExecuteAsync(query: 'helics_query', fed: 'helics_federate') -> "void":
     """
 
 
@@ -1387,7 +1195,7 @@ def helicsQueryExecuteComplete(query: 'helics_query') -> "char const *":
     """
     return _helics.helicsQueryExecuteComplete(query)
 
-def helicsQueryIsCompleted(query: 'helics_query') -> "helics_bool_t":
+def helicsQueryIsCompleted(query: 'helics_query') -> "helics_bool":
     """
 
 
@@ -1411,19 +1219,11 @@ def helicsQueryFree(arg1: 'helics_query') -> "void":
     """
     return _helics.helicsQueryFree(arg1)
 
-def helicsCleanupHelicsLibrary() -> "void":
-    return _helics.helicsCleanupHelicsLibrary()
-helicsCleanupHelicsLibrary = _helics.helicsCleanupHelicsLibrary
-HELICS_DATA_TYPE_STRING = _helics.HELICS_DATA_TYPE_STRING
-HELICS_DATA_TYPE_DOUBLE = _helics.HELICS_DATA_TYPE_DOUBLE
-HELICS_DATA_TYPE_INT = _helics.HELICS_DATA_TYPE_INT
-HELICS_DATA_TYPE_COMPLEX = _helics.HELICS_DATA_TYPE_COMPLEX
-HELICS_DATA_TYPE_VECTOR = _helics.HELICS_DATA_TYPE_VECTOR
-HELICS_DATA_TYPE_NAMEDPOINT = _helics.HELICS_DATA_TYPE_NAMEDPOINT
-HELICS_DATA_TYPE_BOOLEAN = _helics.HELICS_DATA_TYPE_BOOLEAN
-HELICS_DATA_TYPE_RAW = _helics.HELICS_DATA_TYPE_RAW
+def helicsCleanupLibrary() -> "void":
+    return _helics.helicsCleanupLibrary()
+helicsCleanupLibrary = _helics.helicsCleanupLibrary
 
-def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_subscription":
+def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const *', units: 'char const *') -> "helics_input":
     """
 
 
@@ -1450,134 +1250,51 @@ def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const 
     an object containing the subscription
 
     """
-    return _helics.helicsFederateRegisterSubscription(fed, key, type, units)
+    return _helics.helicsFederateRegisterSubscription(fed, key, units)
 
-def helicsFederateRegisterTypeSubscription(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_subscription":
-    """
-
-
-    create a subscription of a specific known type
-
-    the subscription becomes part of the federate and is destroyed when the federate
-    is freed so there are no separate free functions for subscriptions and
-    publications
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object in which to create a subscription
-    * `key` :
-        the identifier matching a publication to get a subscription for
-    * `type` :
-        a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE,
-        HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
-    * `units` :
-        a string listing the units of the subscription maybe NULL
-
-    Returns
-    -------
-    an object containing the subscription
-
-    """
-    return _helics.helicsFederateRegisterTypeSubscription(fed, key, type, units)
-
-def helicsFederateRegisterOptionalSubscription(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_subscription":
-    """
-
-
-    create a subscription that is specifically stated to be optional
-
-    the subscription becomes part of the federate and is destroyed when the federate
-    is freed so there are no separate free functions for subscriptions and
-    publications
-
-    optional implies that there may or may not be matching publication elsewhere in
-    the federation
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object in which to create a subscription
-    * `key` :
-        the identifier matching a publication to get a subscription for
-    * `type` :
-        a string describing the expected type of the publication may be NULL
-    * `units` :
-        a string listing the units of the subscription maybe NULL
-
-    Returns
-    -------
-    an object containing the subscription
-
-    """
-    return _helics.helicsFederateRegisterOptionalSubscription(fed, key, type, units)
-
-def helicsFederateRegisterOptionalTypeSubscription(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_subscription":
-    """
-
-
-    create a subscription of a specific known type that is specifically stated to be
-    optional
-
-    the subscription becomes part of the federate and is destroyed when the federate
-    is freed so there are no separate free functions for subscriptions and
-    publications optional implies that there may or may not be matching publication
-    elsewhere in the federation
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object in which to create a subscription
-    * `key` :
-        the identifier matching a publication to get a subscription for
-    * `type` :
-        a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE,
-        HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE
-    * `units` :
-        a string listing the units of the subscription maybe NULL
-
-    Returns
-    -------
-    an object containing the subscription
-
-    """
-    return _helics.helicsFederateRegisterOptionalTypeSubscription(fed, key, type, units)
-
-def helicsFederateGetSubscription(fed: 'helics_federate', key: 'char const *') -> "helics_subscription":
-    return _helics.helicsFederateGetSubscription(fed, key)
-helicsFederateGetSubscription = _helics.helicsFederateGetSubscription
-
-def helicsFederateGetSubscriptionByIndex(fed: 'helics_federate', index: 'int') -> "helics_subscription":
-    return _helics.helicsFederateGetSubscriptionByIndex(fed, index)
-helicsFederateGetSubscriptionByIndex = _helics.helicsFederateGetSubscriptionByIndex
-
-def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
     """
 
 
     """
     return _helics.helicsFederateRegisterPublication(fed, key, type, units)
 
-def helicsFederateRegisterTypePublication(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterTypePublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
     """
 
 
     """
     return _helics.helicsFederateRegisterTypePublication(fed, key, type, units)
 
-def helicsFederateRegisterGlobalPublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterGlobalPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
     """
 
 
     """
     return _helics.helicsFederateRegisterGlobalPublication(fed, key, type, units)
 
-def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'char const *', type: 'int', units: 'char const *') -> "helics_publication":
+def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
     """
 
 
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
+
+def helicsFederateRegisterInput(fed: 'helics_federate', name: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_input":
+    return _helics.helicsFederateRegisterInput(fed, name, type, units)
+helicsFederateRegisterInput = _helics.helicsFederateRegisterInput
+
+def helicsFederateRegisterTypeInput(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_input":
+    return _helics.helicsFederateRegisterTypeInput(fed, key, type, units)
+helicsFederateRegisterTypeInput = _helics.helicsFederateRegisterTypeInput
+
+def helicsFederateRegisterGlobalInput(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
+    return _helics.helicsFederateRegisterGlobalInput(fed, key, type, units)
+helicsFederateRegisterGlobalInput = _helics.helicsFederateRegisterGlobalInput
+
+def helicsFederateRegisterGlobalTypeInput(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
+    return _helics.helicsFederateRegisterGlobalTypeInput(fed, key, type, units)
+helicsFederateRegisterGlobalTypeInput = _helics.helicsFederateRegisterGlobalTypeInput
 
 def helicsFederateGetPublication(fed: 'helics_federate', key: 'char const *') -> "helics_publication":
     return _helics.helicsFederateGetPublication(fed, key)
@@ -1587,36 +1304,56 @@ def helicsFederateGetPublicationByIndex(fed: 'helics_federate', index: 'int') ->
     return _helics.helicsFederateGetPublicationByIndex(fed, index)
 helicsFederateGetPublicationByIndex = _helics.helicsFederateGetPublicationByIndex
 
+def helicsFederateGetInput(fed: 'helics_federate', key: 'char const *') -> "helics_input":
+    return _helics.helicsFederateGetInput(fed, key)
+helicsFederateGetInput = _helics.helicsFederateGetInput
+
+def helicsFederateGetInputByIndex(fed: 'helics_federate', index: 'int') -> "helics_input":
+    return _helics.helicsFederateGetInputByIndex(fed, index)
+helicsFederateGetInputByIndex = _helics.helicsFederateGetInputByIndex
+
+def helicsFederateGetSubscription(fed: 'helics_federate', key: 'char const *') -> "helics_input":
+    return _helics.helicsFederateGetSubscription(fed, key)
+helicsFederateGetSubscription = _helics.helicsFederateGetSubscription
+
 def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *') -> "int":
     return _helics.helicsPublicationPublishRaw(pub, data)
 helicsPublicationPublishRaw = _helics.helicsPublicationPublishRaw
 
-def helicsPublicationPublishString(pub: 'helics_publication', str: 'char const *') -> "helics_status":
+def helicsPublicationPublishString(pub: 'helics_publication', str: 'char const *') -> "void":
     """
 
 
     """
     return _helics.helicsPublicationPublishString(pub, str)
 
-def helicsPublicationPublishInteger(pub: 'helics_publication', val: 'int64_t') -> "helics_status":
+def helicsPublicationPublishInteger(pub: 'helics_publication', val: 'int64_t') -> "void":
     """
 
 
     """
     return _helics.helicsPublicationPublishInteger(pub, val)
 
-def helicsPublicationPublishBoolean(pub: 'helics_publication', val: 'helics_bool_t') -> "helics_status":
+def helicsPublicationPublishBoolean(pub: 'helics_publication', val: 'helics_bool') -> "void":
     return _helics.helicsPublicationPublishBoolean(pub, val)
 helicsPublicationPublishBoolean = _helics.helicsPublicationPublishBoolean
 
-def helicsPublicationPublishDouble(pub: 'helics_publication', val: 'double') -> "helics_status":
+def helicsPublicationPublishDouble(pub: 'helics_publication', val: 'double') -> "void":
     """
 
 
     """
     return _helics.helicsPublicationPublishDouble(pub, val)
 
-def helicsPublicationPublishComplex(pub: 'helics_publication', real: 'double', imag: 'double') -> "helics_status":
+def helicsPublicationPublishTime(pub: 'helics_publication', val: 'helics_time') -> "void":
+    return _helics.helicsPublicationPublishTime(pub, val)
+helicsPublicationPublishTime = _helics.helicsPublicationPublishTime
+
+def helicsPublicationPublishChar(pub: 'helics_publication', val: 'char') -> "void":
+    return _helics.helicsPublicationPublishChar(pub, val)
+helicsPublicationPublishChar = _helics.helicsPublicationPublishChar
+
+def helicsPublicationPublishComplex(pub: 'helics_publication', real: 'double', imag: 'double') -> "void":
     """
 
 
@@ -1630,198 +1367,169 @@ def helicsPublicationPublishVector(pub: 'helics_publication', vectorInput: 'doub
     """
     return _helics.helicsPublicationPublishVector(pub, vectorInput)
 
-def helicsPublicationPublishNamedPoint(pub: 'helics_publication', str: 'char const *', val: 'double') -> "helics_status":
+def helicsPublicationPublishNamedPoint(pub: 'helics_publication', str: 'char const *', val: 'double') -> "void":
     return _helics.helicsPublicationPublishNamedPoint(pub, str, val)
 helicsPublicationPublishNamedPoint = _helics.helicsPublicationPublishNamedPoint
 
-def helicsSubscriptionGetValueSize(sub: 'helics_subscription') -> "int":
-    """
+def helicsPublicationAddTarget(pub: 'helics_publication', target: 'char const *') -> "void":
+    return _helics.helicsPublicationAddTarget(pub, target)
+helicsPublicationAddTarget = _helics.helicsPublicationAddTarget
 
+def helicsInputAddTarget(ipt: 'helics_input', target: 'char const *') -> "void":
+    return _helics.helicsInputAddTarget(ipt, target)
+helicsInputAddTarget = _helics.helicsInputAddTarget
 
-    """
-    return _helics.helicsSubscriptionGetValueSize(sub)
+def helicsInputGetRawValueSize(ipt: 'helics_input') -> "int":
+    return _helics.helicsInputGetRawValueSize(ipt)
+helicsInputGetRawValueSize = _helics.helicsInputGetRawValueSize
 
-def helicsSubscriptionGetRawValue(sub: 'helics_subscription', data: 'void *', maxlen: 'int') -> "int *":
-    return _helics.helicsSubscriptionGetRawValue(sub, data, maxlen)
-helicsSubscriptionGetRawValue = _helics.helicsSubscriptionGetRawValue
+def helicsInputGetRawValue(ipt: 'helics_input', data: 'void *', maxlen: 'int') -> "int *":
+    return _helics.helicsInputGetRawValue(ipt, data, maxlen)
+helicsInputGetRawValue = _helics.helicsInputGetRawValue
 
-def helicsSubscriptionGetStringSize(sub: 'helics_subscription') -> "int":
-    return _helics.helicsSubscriptionGetStringSize(sub)
-helicsSubscriptionGetStringSize = _helics.helicsSubscriptionGetStringSize
+def helicsInputGetStringSize(ipt: 'helics_input') -> "int":
+    return _helics.helicsInputGetStringSize(ipt)
+helicsInputGetStringSize = _helics.helicsInputGetStringSize
 
-def helicsSubscriptionGetString(sub: 'helics_subscription') -> "int *":
-    """
+def helicsInputGetString(ipt: 'helics_input') -> "int *":
+    return _helics.helicsInputGetString(ipt)
+helicsInputGetString = _helics.helicsInputGetString
 
+def helicsInputGetInteger(ipt: 'helics_input') -> "int64_t":
+    return _helics.helicsInputGetInteger(ipt)
+helicsInputGetInteger = _helics.helicsInputGetInteger
 
-    """
-    return _helics.helicsSubscriptionGetString(sub)
+def helicsInputGetBoolean(ipt: 'helics_input') -> "helics_bool":
+    return _helics.helicsInputGetBoolean(ipt)
+helicsInputGetBoolean = _helics.helicsInputGetBoolean
 
-def helicsSubscriptionGetInteger(sub: 'helics_subscription') -> "int64_t *":
-    """
+def helicsInputGetDouble(ipt: 'helics_input') -> "double":
+    return _helics.helicsInputGetDouble(ipt)
+helicsInputGetDouble = _helics.helicsInputGetDouble
 
+def helicsInputGetTime(ipt: 'helics_input') -> "helics_time":
+    return _helics.helicsInputGetTime(ipt)
+helicsInputGetTime = _helics.helicsInputGetTime
 
-    """
-    return _helics.helicsSubscriptionGetInteger(sub)
+def helicsInputGetChar(ipt: 'helics_input') -> "char":
+    return _helics.helicsInputGetChar(ipt)
+helicsInputGetChar = _helics.helicsInputGetChar
 
-def helicsSubscriptionGetBoolean(sub: 'helics_subscription') -> "int *":
-    return _helics.helicsSubscriptionGetBoolean(sub)
-helicsSubscriptionGetBoolean = _helics.helicsSubscriptionGetBoolean
+def helicsInputGetComplexObject(ipt: 'helics_input') -> "helics_complex":
+    return _helics.helicsInputGetComplexObject(ipt)
+helicsInputGetComplexObject = _helics.helicsInputGetComplexObject
 
-def helicsSubscriptionGetDouble(sub: 'helics_subscription') -> "double *":
-    """
+def helicsInputGetComplex(ipt: 'helics_input') -> "double *, double *":
+    return _helics.helicsInputGetComplex(ipt)
+helicsInputGetComplex = _helics.helicsInputGetComplex
 
+def helicsInputGetVectorSize(ipt: 'helics_input') -> "int":
+    return _helics.helicsInputGetVectorSize(ipt)
+helicsInputGetVectorSize = _helics.helicsInputGetVectorSize
 
-    """
-    return _helics.helicsSubscriptionGetDouble(sub)
+def helicsInputGetVector(ipt: 'helics_input') -> "int *":
+    return _helics.helicsInputGetVector(ipt)
+helicsInputGetVector = _helics.helicsInputGetVector
 
-def helicsSubscriptionGetComplex(sub: 'helics_subscription') -> "double *, double *":
-    """
+def helicsInputGetNamedPoint(ipt: 'helics_input') -> "int *, double *":
+    return _helics.helicsInputGetNamedPoint(ipt)
+helicsInputGetNamedPoint = _helics.helicsInputGetNamedPoint
 
+def helicsInputSetDefaultRaw(ipt: 'helics_input', data: 'void const *') -> "int":
+    return _helics.helicsInputSetDefaultRaw(ipt, data)
+helicsInputSetDefaultRaw = _helics.helicsInputSetDefaultRaw
 
-    """
-    return _helics.helicsSubscriptionGetComplex(sub)
+def helicsInputSetDefaultString(ipt: 'helics_input', str: 'char const *') -> "void":
+    return _helics.helicsInputSetDefaultString(ipt, str)
+helicsInputSetDefaultString = _helics.helicsInputSetDefaultString
 
-def helicsSubscriptionGetVectorSize(sub: 'helics_subscription') -> "int":
-    """
+def helicsInputSetDefaultInteger(ipt: 'helics_input', val: 'int64_t') -> "void":
+    return _helics.helicsInputSetDefaultInteger(ipt, val)
+helicsInputSetDefaultInteger = _helics.helicsInputSetDefaultInteger
 
+def helicsInputSetDefaultBoolean(ipt: 'helics_input', val: 'helics_bool') -> "void":
+    return _helics.helicsInputSetDefaultBoolean(ipt, val)
+helicsInputSetDefaultBoolean = _helics.helicsInputSetDefaultBoolean
 
-    """
-    return _helics.helicsSubscriptionGetVectorSize(sub)
+def helicsInputSetDefaultTime(ipt: 'helics_input', val: 'helics_time') -> "void":
+    return _helics.helicsInputSetDefaultTime(ipt, val)
+helicsInputSetDefaultTime = _helics.helicsInputSetDefaultTime
 
-def helicsSubscriptionGetVector(sub: 'helics_subscription') -> "int *":
-    """
+def helicsInputSetDefaultChar(ipt: 'helics_input', val: 'char') -> "void":
+    return _helics.helicsInputSetDefaultChar(ipt, val)
+helicsInputSetDefaultChar = _helics.helicsInputSetDefaultChar
 
+def helicsInputSetDefaultDouble(ipt: 'helics_input', val: 'double') -> "void":
+    return _helics.helicsInputSetDefaultDouble(ipt, val)
+helicsInputSetDefaultDouble = _helics.helicsInputSetDefaultDouble
 
-    get a vector from a subscription
+def helicsInputSetDefaultComplex(ipt: 'helics_input', real: 'double', imag: 'double') -> "void":
+    return _helics.helicsInputSetDefaultComplex(ipt, real, imag)
+helicsInputSetDefaultComplex = _helics.helicsInputSetDefaultComplex
 
-    Parameters
-    ----------
-    * `sub` :
-        the subscription to get the result for
-    * `data` :
-        the location to store the data
-    * `maxlen` :
-        the maximum size of the vector
-    * `actualSize` :
-        pointer to variable to store the actual size
+def helicsInputSetDefaultVector(ipt: 'helics_input', vectorInput: 'double const *') -> "int":
+    return _helics.helicsInputSetDefaultVector(ipt, vectorInput)
+helicsInputSetDefaultVector = _helics.helicsInputSetDefaultVector
 
-    """
-    return _helics.helicsSubscriptionGetVector(sub)
+def helicsInputSetDefaultNamedPoint(ipt: 'helics_input', str: 'char const *', val: 'double') -> "void":
+    return _helics.helicsInputSetDefaultNamedPoint(ipt, str, val)
+helicsInputSetDefaultNamedPoint = _helics.helicsInputSetDefaultNamedPoint
 
-def helicsSubscriptionGetNamedPoint(sub: 'helics_subscription') -> "int *, double *":
-    return _helics.helicsSubscriptionGetNamedPoint(sub)
-helicsSubscriptionGetNamedPoint = _helics.helicsSubscriptionGetNamedPoint
+def helicsInputGetType(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetType(ipt)
+helicsInputGetType = _helics.helicsInputGetType
 
-def helicsSubscriptionSetDefaultRaw(sub: 'helics_subscription', data: 'void const *') -> "int":
-    return _helics.helicsSubscriptionSetDefaultRaw(sub, data)
-helicsSubscriptionSetDefaultRaw = _helics.helicsSubscriptionSetDefaultRaw
-
-def helicsSubscriptionSetDefaultString(sub: 'helics_subscription', str: 'char const *') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionSetDefaultString(sub, str)
-
-def helicsSubscriptionSetDefaultInteger(sub: 'helics_subscription', val: 'int64_t') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionSetDefaultInteger(sub, val)
-
-def helicsSubscriptionSetDefaultBoolean(sub: 'helics_subscription', val: 'helics_bool_t') -> "helics_status":
-    return _helics.helicsSubscriptionSetDefaultBoolean(sub, val)
-helicsSubscriptionSetDefaultBoolean = _helics.helicsSubscriptionSetDefaultBoolean
-
-def helicsSubscriptionSetDefaultDouble(sub: 'helics_subscription', val: 'double') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionSetDefaultDouble(sub, val)
-
-def helicsSubscriptionSetDefaultComplex(sub: 'helics_subscription', real: 'double', imag: 'double') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionSetDefaultComplex(sub, real, imag)
-
-def helicsSubscriptionSetDefaultVector(sub: 'helics_subscription', vectorInput: 'double const *') -> "int":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionSetDefaultVector(sub, vectorInput)
-
-def helicsSubscriptionSetDefaultNamedPoint(sub: 'helics_subscription', str: 'char const *', val: 'double') -> "helics_status":
-    return _helics.helicsSubscriptionSetDefaultNamedPoint(sub, str, val)
-helicsSubscriptionSetDefaultNamedPoint = _helics.helicsSubscriptionSetDefaultNamedPoint
-
-def helicsSubscriptionGetType(sub: 'helics_subscription') -> "int":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionGetType(sub)
-
-def helicsPublicationGetType(pub: 'helics_publication') -> "int":
+def helicsPublicationGetType(pub: 'helics_publication') -> "char const *":
     """
 
 
     """
     return _helics.helicsPublicationGetType(pub)
 
-def helicsSubscriptionGetKey(sub: 'helics_subscription') -> "int":
+def helicsInputGetKey(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetKey(ipt)
+helicsInputGetKey = _helics.helicsInputGetKey
+
+def helicsSubscriptionGetKey(sub: 'helics_input') -> "char const *":
     """
 
 
     """
     return _helics.helicsSubscriptionGetKey(sub)
 
-def helicsPublicationGetKey(pub: 'helics_publication') -> "int":
+def helicsPublicationGetKey(pub: 'helics_publication') -> "char const *":
     """
 
 
     """
     return _helics.helicsPublicationGetKey(pub)
 
-def helicsSubscriptionGetUnits(sub: 'helics_subscription') -> "int":
-    """
+def helicsInputGetUnits(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetUnits(ipt)
+helicsInputGetUnits = _helics.helicsInputGetUnits
 
-
-    """
-    return _helics.helicsSubscriptionGetUnits(sub)
-
-def helicsPublicationGetUnits(pub: 'helics_publication') -> "int":
+def helicsPublicationGetUnits(pub: 'helics_publication') -> "char const *":
     """
 
 
     """
     return _helics.helicsPublicationGetUnits(pub)
 
-def helicsSubscriptionIsUpdated(sub: 'helics_subscription') -> "helics_bool_t":
-    """
+def helicsInputIsUpdated(ipt: 'helics_input') -> "helics_bool":
+    return _helics.helicsInputIsUpdated(ipt)
+helicsInputIsUpdated = _helics.helicsInputIsUpdated
 
-
-    """
-    return _helics.helicsSubscriptionIsUpdated(sub)
-
-def helicsSubscriptionLastUpdateTime(sub: 'helics_subscription') -> "helics_time_t":
-    """
-
-
-    """
-    return _helics.helicsSubscriptionLastUpdateTime(sub)
+def helicsInputLastUpdateTime(ipt: 'helics_input') -> "helics_time":
+    return _helics.helicsInputLastUpdateTime(ipt)
+helicsInputLastUpdateTime = _helics.helicsInputLastUpdateTime
 
 def helicsFederateGetPublicationCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetPublicationCount(fed)
 helicsFederateGetPublicationCount = _helics.helicsFederateGetPublicationCount
 
-def helicsFederateGetSubscriptionCount(fed: 'helics_federate') -> "int":
-    return _helics.helicsFederateGetSubscriptionCount(fed)
-helicsFederateGetSubscriptionCount = _helics.helicsFederateGetSubscriptionCount
+def helicsFederateGetInputCount(fed: 'helics_federate') -> "int":
+    return _helics.helicsFederateGetInputCount(fed)
+helicsFederateGetInputCount = _helics.helicsFederateGetInputCount
 
 def helicsFederateRegisterEndpoint(fed: 'helics_federate', name: 'char const *', type: 'char const *') -> "helics_endpoint":
     """
@@ -1845,7 +1553,7 @@ def helicsFederateGetEndpointByIndex(fed: 'helics_federate', index: 'int') -> "h
     return _helics.helicsFederateGetEndpointByIndex(fed, index)
 helicsFederateGetEndpointByIndex = _helics.helicsFederateGetEndpointByIndex
 
-def helicsEndpointSetDefaultDestination(endpoint: 'helics_endpoint', dest: 'char const *') -> "helics_status":
+def helicsEndpointSetDefaultDestination(endpoint: 'helics_endpoint', dest: 'char const *') -> "void":
     """
 
 
@@ -1859,21 +1567,21 @@ def helicsEndpointSendMessageRaw(endpoint: 'helics_endpoint', dest: 'char const 
     """
     return _helics.helicsEndpointSendMessageRaw(endpoint, dest, data)
 
-def helicsEndpointSendEventRaw(endpoint: 'helics_endpoint', dest: 'char const *', data: 'void const *', time: 'helics_time_t') -> "int":
+def helicsEndpointSendEventRaw(endpoint: 'helics_endpoint', dest: 'char const *', data: 'void const *', time: 'helics_time') -> "int":
     """
 
 
     """
     return _helics.helicsEndpointSendEventRaw(endpoint, dest, data, time)
 
-def helicsEndpointSendMessage(endpoint: 'helics_endpoint', message: 'message_t') -> "helics_status":
+def helicsEndpointSendMessage(endpoint: 'helics_endpoint', message: 'helics_message') -> "void":
     """
 
 
     """
     return _helics.helicsEndpointSendMessage(endpoint, message)
 
-def helicsEndpointSubscribe(endpoint: 'helics_endpoint', key: 'char const *', type: 'char const *') -> "helics_status":
+def helicsEndpointSubscribe(endpoint: 'helics_endpoint', key: 'char const *') -> "void":
     """
 
 
@@ -1890,9 +1598,9 @@ def helicsEndpointSubscribe(endpoint: 'helics_endpoint', key: 'char const *', ty
         CARE)
 
     """
-    return _helics.helicsEndpointSubscribe(endpoint, key, type)
+    return _helics.helicsEndpointSubscribe(endpoint, key)
 
-def helicsFederateHasMessage(fed: 'helics_federate') -> "helics_bool_t":
+def helicsFederateHasMessage(fed: 'helics_federate') -> "helics_bool":
     """
 
 
@@ -1901,32 +1609,22 @@ def helicsFederateHasMessage(fed: 'helics_federate') -> "helics_bool_t":
     """
     return _helics.helicsFederateHasMessage(fed)
 
-def helicsEndpointHasMessage(endpoint: 'helics_endpoint') -> "helics_bool_t":
+def helicsEndpointHasMessage(endpoint: 'helics_endpoint') -> "helics_bool":
     """
 
 
     """
     return _helics.helicsEndpointHasMessage(endpoint)
 
-def helicsFederateReceiveCount(fed: 'helics_federate') -> "int":
-    """
+def helicsFederatePendingMessages(fed: 'helics_federate') -> "int":
+    return _helics.helicsFederatePendingMessages(fed)
+helicsFederatePendingMessages = _helics.helicsFederatePendingMessages
 
+def helicsEndpointPendingMessages(endpoint: 'helics_endpoint') -> "int":
+    return _helics.helicsEndpointPendingMessages(endpoint)
+helicsEndpointPendingMessages = _helics.helicsEndpointPendingMessages
 
-    Returns the number of pending receives for the specified destination endpoint.
-
-    """
-    return _helics.helicsFederateReceiveCount(fed)
-
-def helicsEndpointReceiveCount(endpoint: 'helics_endpoint') -> "int":
-    """
-
-
-    Returns the number of pending receives for all endpoints of particular federate.
-
-    """
-    return _helics.helicsEndpointReceiveCount(endpoint)
-
-def helicsEndpointGetMessage(endpoint: 'helics_endpoint') -> "message_t":
+def helicsEndpointGetMessage(endpoint: 'helics_endpoint') -> "helics_message":
     """
 
 
@@ -1944,7 +1642,7 @@ def helicsEndpointGetMessage(endpoint: 'helics_endpoint') -> "message_t":
     """
     return _helics.helicsEndpointGetMessage(endpoint)
 
-def helicsFederateGetMessage(fed: 'helics_federate') -> "message_t":
+def helicsFederateGetMessage(fed: 'helics_federate') -> "helics_message":
     """
 
 
@@ -1960,7 +1658,7 @@ def helicsFederateGetMessage(fed: 'helics_federate') -> "message_t":
     """
     return _helics.helicsFederateGetMessage(fed)
 
-def helicsEndpointGetType(endpoint: 'helics_endpoint') -> "int":
+def helicsEndpointGetType(endpoint: 'helics_endpoint') -> "char const *":
     """
 
 
@@ -1982,7 +1680,7 @@ def helicsEndpointGetType(endpoint: 'helics_endpoint') -> "int":
     """
     return _helics.helicsEndpointGetType(endpoint)
 
-def helicsEndpointGetName(endpoint: 'helics_endpoint') -> "int":
+def helicsEndpointGetName(endpoint: 'helics_endpoint') -> "char const *":
     """
 
 
@@ -2008,40 +1706,13 @@ def helicsFederateGetEndpointCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetEndpointCount(fed)
 helicsFederateGetEndpointCount = _helics.helicsFederateGetEndpointCount
 
-def helicsFederateRegisterSourceFilter(fed: 'helics_federate', type: 'helics_filter_type_t', target: 'char const *', name: 'char const *') -> "helics_filter":
-    """
+def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+    return _helics.helicsFederateRegisterFilter(fed, type, name)
+helicsFederateRegisterFilter = _helics.helicsFederateRegisterFilter
 
-
-    create a source Filter on the specified federate
-
-    filters can be created through a federate or a core , linking through a federate
-    allows a few extra features of name matching to function on the federate
-    interface but otherwise equivalent behavior
-
-    Parameters
-    ----------
-    * `fed` :
-        the fed to register through
-    * `name` :
-        the name of the filter (can be nullptr)
-    * `inputType` :
-        the input type of the filter, used for ordering (can be nullptr)
-    * `outputType` :
-        the output type of the filter, used for ordering (can be nullptr)
-
-    Returns
-    -------
-    a helics_source_filter object
-
-    """
-    return _helics.helicsFederateRegisterSourceFilter(fed, type, target, name)
-
-def helicsFederateRegisterDestinationFilter(fed: 'helics_federate', type: 'helics_filter_type_t', target: 'char const *', name: 'char const *') -> "helics_filter":
-    """
-
-
-    """
-    return _helics.helicsFederateRegisterDestinationFilter(fed, type, target, name)
+def helicsFederateRegisterGlobalFilter(fed: 'helics_federate', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+    return _helics.helicsFederateRegisterGlobalFilter(fed, type, name)
+helicsFederateRegisterGlobalFilter = _helics.helicsFederateRegisterGlobalFilter
 
 def helicsFederateRegisterCloningFilter(fed: 'helics_federate', deliveryEndpoint: 'char const *') -> "helics_filter":
     """
@@ -2050,19 +1721,13 @@ def helicsFederateRegisterCloningFilter(fed: 'helics_federate', deliveryEndpoint
     """
     return _helics.helicsFederateRegisterCloningFilter(fed, deliveryEndpoint)
 
-def helicsCoreRegisterSourceFilter(core: 'helics_core', type: 'helics_filter_type_t', target: 'char const *', name: 'char const *') -> "helics_filter":
-    """
+def helicsFederateRegisterGlobalCloningFilter(fed: 'helics_federate', deliveryEndpoint: 'char const *') -> "helics_filter":
+    return _helics.helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint)
+helicsFederateRegisterGlobalCloningFilter = _helics.helicsFederateRegisterGlobalCloningFilter
 
-
-    """
-    return _helics.helicsCoreRegisterSourceFilter(core, type, target, name)
-
-def helicsCoreRegisterDestinationFilter(core: 'helics_core', type: 'helics_filter_type_t', target: 'char const *', name: 'char const *') -> "helics_filter":
-    """
-
-
-    """
-    return _helics.helicsCoreRegisterDestinationFilter(core, type, target, name)
+def helicsCoreRegisterFilter(core: 'helics_core', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+    return _helics.helicsCoreRegisterFilter(core, type, name)
+helicsCoreRegisterFilter = _helics.helicsCoreRegisterFilter
 
 def helicsCoreRegisterCloningFilter(core: 'helics_core', deliveryEndpoint: 'char const *') -> "helics_filter":
     """
@@ -2079,16 +1744,7 @@ def helicsFederateGetFilterByIndex(fed: 'helics_federate', index: 'int') -> "hel
     return _helics.helicsFederateGetFilterByIndex(fed, index)
 helicsFederateGetFilterByIndex = _helics.helicsFederateGetFilterByIndex
 
-def helicsFilterGetTarget(filt: 'helics_filter') -> "int":
-    """
-
-
-    get the target of the filter
-
-    """
-    return _helics.helicsFilterGetTarget(filt)
-
-def helicsFilterGetName(filt: 'helics_filter') -> "int":
+def helicsFilterGetName(filt: 'helics_filter') -> "char const *":
     """
 
 
@@ -2097,53 +1753,43 @@ def helicsFilterGetName(filt: 'helics_filter') -> "int":
     """
     return _helics.helicsFilterGetName(filt)
 
-def helicsFilterSet(filt: 'helics_filter', property: 'char const *', val: 'double') -> "helics_status":
+def helicsFilterSet(filt: 'helics_filter', property: 'char const *', val: 'double') -> "void":
     """
 
 
     """
     return _helics.helicsFilterSet(filt, property, val)
 
-def helicsFilterSetString(filt: 'helics_filter', property: 'char const *', val: 'char const *') -> "helics_status":
+def helicsFilterSetString(filt: 'helics_filter', property: 'char const *', val: 'char const *') -> "void":
     return _helics.helicsFilterSetString(filt, property, val)
 helicsFilterSetString = _helics.helicsFilterSetString
 
-def helicsFilterAddDestinationTarget(filt: 'helics_filter', dest: 'char const *') -> "helics_status":
+def helicsFilterAddDestinationTarget(filt: 'helics_filter', dest: 'char const *') -> "void":
     """
 
 
     """
     return _helics.helicsFilterAddDestinationTarget(filt, dest)
 
-def helicsFilterAddSourceTarget(filt: 'helics_filter', source: 'char const *') -> "helics_status":
+def helicsFilterAddSourceTarget(filt: 'helics_filter', source: 'char const *') -> "void":
     """
 
 
     """
     return _helics.helicsFilterAddSourceTarget(filt, source)
 
-def helicsFilterAddDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "helics_status":
+def helicsFilterAddDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "void":
     """
 
 
     """
     return _helics.helicsFilterAddDeliveryEndpoint(filt, deliveryEndpoint)
 
-def helicsFilterRemoveDestinationTarget(filt: 'helics_filter', dest: 'char const *') -> "helics_status":
-    """
+def helicsFilterRemoveTarget(filt: 'helics_filter', dest: 'char const *') -> "void":
+    return _helics.helicsFilterRemoveTarget(filt, dest)
+helicsFilterRemoveTarget = _helics.helicsFilterRemoveTarget
 
-
-    """
-    return _helics.helicsFilterRemoveDestinationTarget(filt, dest)
-
-def helicsFilterRemoveSourceTarget(filt: 'helics_filter', source: 'char const *') -> "helics_status":
-    """
-
-
-    """
-    return _helics.helicsFilterRemoveSourceTarget(filt, source)
-
-def helicsFilterRemoveDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "helics_status":
+def helicsFilterRemoveDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "void":
     """
 
 

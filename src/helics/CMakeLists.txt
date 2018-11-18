@@ -23,6 +23,10 @@ add_library(
 target_link_libraries(helics-static PUBLIC helics_base)
 # add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
+target_include_directories(
+  helics-static
+  INTERFACE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
+)
 if(BUILD_SHARED_LIBS)
   add_library(
     helics-shared
@@ -35,6 +39,10 @@ if(BUILD_SHARED_LIBS)
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
   target_link_libraries(helics-shared PRIVATE helics_base)
+  target_include_directories(
+    helics-shared
+    INTERFACE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -44,7 +52,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 install(
-  FILES flag-definitions.h helics.hpp
+  FILES helics.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )
