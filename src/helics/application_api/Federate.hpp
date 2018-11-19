@@ -9,8 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 
+#include "../helics_enums.h"
 #include "FederateInfo.hpp"
-#include "../flag-definitions.h"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -41,7 +41,7 @@ class Federate
 {
   public:
     /** the allowable states of the federate*/
-    enum class op_states : char
+    enum class states : char
     {
         startup = 0,  //!< when created the federate is in startup state
         initialization = 1,  //!< entered after the enterInitializingMode call has returned
@@ -56,7 +56,7 @@ class Federate
     };
 
   protected:
-    std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
+    std::atomic<states> state{states::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
     federate_id_t fedID;  //!< the federate ID of the object for use in the core
@@ -426,7 +426,7 @@ class Federate
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
-    op_states getCurrentState () const { return state; }
+    states getCurrentState () const { return state; }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }

@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../common/argParser.h"
 #include "Player.hpp"
+#include "../common/argParser.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -52,17 +52,17 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data type to use"},
+static const ArgDescriptors InfoArgs{
+  {"datatype", "type of the publication data type to use"},
   {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
-                                     {"timeunits",
-                                      "the default units on the timestamps used in file based input"}};
+  {"timeunits", "the default units on the timestamps used in file based input"}};
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
+        fed->setFlagOption (helics_flag_source_only);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -76,20 +76,20 @@ Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
     }
 }
 
-Player::Player (const std::string &appName, const FederateInfo &fi) : App (appName,fi)
+Player::Player (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
 {
-    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
 }
 
 Player::Player (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : App (appName,core, fi)
+    : App (appName, core, fi)
 {
-    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
 }
 
 Player::Player (const std::string &appName, const std::string &configString) : App (appName, configString)
 {
-    fed->setFlagOption (HELICS_SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
     Player::loadJsonFile (configString);
 }
 
@@ -217,7 +217,7 @@ void Player::loadTextFile (const std::string &filename)
         {
             if (fc + 2 < str.size ())
             {
-                if ((str[fc] == '#') && (str[fc+1] == '#') && (str[fc+2] == ']'))
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']'))
                 {
                     mlineComment = false;
                 }
@@ -295,8 +295,8 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-			if (blk.size() == 2)
-			{
+            if (blk.size () == 2)
+            {
                 auto cloc = blk[0].find_last_of (':');
                 if (cloc == std::string::npos)
                 {
@@ -318,79 +318,80 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     points[pIndex].pubName = points[pIndex - 1].pubName;
                 }
-				else
-				{
-                    std::cerr << "lines without publication name but follow one with a publication line " << lcount << '\n';
-				}
+                else
+                {
+                    std::cerr << "lines without publication name but follow one with a publication line " << lcount
+                              << '\n';
+                }
                 points[pIndex].value = blk[1];
                 ++pIndex;
-			}
-                else if (blk.size () == 3)
+            }
+            else if (blk.size () == 3)
+            {
+                auto cloc = blk[0].find_last_of (':');
+                if (cloc == std::string::npos)
                 {
-                    auto cloc = blk[0].find_last_of (':');
-                    if (cloc == std::string::npos)
+                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
                     {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
-                        {
-                            continue;
-                        }
+                        continue;
                     }
-                    else
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                            Time::minVal ())
-                        {
-                            continue;
-                        }
-                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
-                    }
-                    if ((blk[1].empty ()) && (pIndex > 0))
-                    {
-                        points[pIndex].pubName = points[pIndex - 1].pubName;
-                    }
-                    else
-                    {
-                        points[pIndex].pubName = blk[1];
-                    }
-
-                    points[pIndex].value = blk[2];
-                    ++pIndex;
-                }
-                else if (blk.size () == 4)
-                {
-                    auto cloc = blk[0].find_last_of (':');
-                    if (cloc == std::string::npos)
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                            Time::minVal ())
-                        {
-                            continue;
-                        }
-                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
-                    }
-                    if ((blk[1].empty ()) && (pIndex > 0))
-                    {
-                        points[pIndex].pubName = points[pIndex - 1].pubName;
-                    }
-                    else
-                    {
-                        points[pIndex].pubName = blk[1];
-                    }
-                    points[pIndex].type = blk[2];
-                    points[pIndex].value = blk[3];
-                    ++pIndex;
                 }
                 else
                 {
-                    std::cerr << "unknown publish format line " << lcount << '\n';
+                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                        Time::minVal ())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
                 }
+                if ((blk[1].empty ()) && (pIndex > 0))
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+                else
+                {
+                    points[pIndex].pubName = blk[1];
+                }
+
+                points[pIndex].value = blk[2];
+                ++pIndex;
+            }
+            else if (blk.size () == 4)
+            {
+                auto cloc = blk[0].find_last_of (':');
+                if (cloc == std::string::npos)
+                {
+                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                        Time::minVal ())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                }
+                if ((blk[1].empty ()) && (pIndex > 0))
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+                else
+                {
+                    points[pIndex].pubName = blk[1];
+                }
+                points[pIndex].type = blk[2];
+                points[pIndex].value = blk[3];
+                ++pIndex;
+            }
+            else
+            {
+                std::cerr << "unknown publish format line " << lcount << '\n';
+            }
         }
     }
 }
@@ -402,13 +403,13 @@ void Player::loadJsonFile (const std::string &jsonFile)
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
-        publications.emplace_back (fed->getPublication(ii));
+        publications.emplace_back (fed->getPublication (ii));
         pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed->getEndpoint(ii));
+        endpoints.emplace_back (fed->getEndpoint (ii));
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
@@ -686,7 +687,7 @@ void Player::cleanUpPointList ()
 void Player::initialize ()
 {
     auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    if (state == Federate::states::startup)
     {
         sortTags ();
         generatePublications ();
@@ -736,11 +737,11 @@ void Player::sendInformation (Time sendTime, int iteration)
 void Player::runTo (Time stopTime_input)
 {
     auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    if (state == Federate::states::startup)
     {
         initialize ();
     }
-    if (state < Federate::op_states::execution)
+    if (state < Federate::states::execution)
     {
         sendInformation (-Time::epsilon ());
 
@@ -775,7 +776,7 @@ void Player::runTo (Time stopTime_input)
         }
     }
 
-     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
+    Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     bool moreToSend = true;
     Time nextSendTime = timeZero;
     int nextIteration = 0;
@@ -820,7 +821,6 @@ void Player::runTo (Time stopTime_input)
             ++currentIteration;
             sendInformation (nextSendTime, currentIteration);
         }
-       
     }
 }
 

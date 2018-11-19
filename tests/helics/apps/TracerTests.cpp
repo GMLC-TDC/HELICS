@@ -146,7 +146,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "tcore1"+file;
+    fi.coreName = "tcore1" + file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -193,7 +193,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "tcore1b"+file;
+    fi.coreName = "tcore1b" + file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = " - f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     fi.coreName = "tcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
-    fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -537,11 +537,11 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "tcore4"+file;
+    fi.coreName = "tcore4" + file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
-    fi.setTimeProperty (PERIOD_PROPERTY, 1.0);
+    fi.setTimeProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -653,11 +653,11 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     int mcount = 0;
     int valcount = 0;
     auto vec = stringOps::splitline (outAct, "\n\r", stringOps::delimiter_compression::on);
-    auto cnt=std::count_if (vec.begin (), vec.end (),
-                        [](const std::string &str) { return (!(str.empty ()) && (str[0] == '[')); });
-      // 6 messages, 1 return line, 1 empty line
-      BOOST_CHECK_EQUAL (cnt, 6);
-    BOOST_CHECK_EQUAL (*(vec.end()-2), "execution returned 0");
+    auto cnt = std::count_if (vec.begin (), vec.end (),
+                              [](const std::string &str) { return (!(str.empty ()) && (str[0] == '[')); });
+    // 6 messages, 1 return line, 1 empty line
+    BOOST_CHECK_EQUAL (cnt, 6);
+    BOOST_CHECK_EQUAL (*(vec.end () - 2), "execution returned 0");
     for (const auto &line : vec)
     {
         if (line.find ("]value") != std::string::npos)

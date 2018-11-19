@@ -21,9 +21,15 @@ set(
   HelicsPrimaryTypes.hpp
   queryFunctions.hpp
   FederateInfo.hpp
-Inputs.hpp
+  Inputs.hpp
 )
 
+set (conv_headers
+   ../application_api.hpp
+   ../ValueFederates.hpp
+   ../MessageFederates.hpp
+   )
+   
 set(
   private_application_api_headers
   MessageFederateManager.hpp
@@ -59,6 +65,7 @@ add_library(
   application_api
   OBJECT
   ${application_api_sources}
+  ${conv_headers}
   ${public_application_api_headers}
   ${private_application_api_headers}
 )
@@ -83,5 +90,11 @@ target_compile_options(
 install(
   FILES ${public_application_api_headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
+  COMPONENT headers
+)
+
+install(
+  FILES ${conv_headers}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )

@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/Core.hpp"
 #include "Federate.hpp"
 #include "helics/helics-config.h"
+#include "helics/helics_enums.h"
 
 namespace helics
 {
@@ -17,13 +18,13 @@ class Federate;
 /** a set of common defined filters*/
 enum class defined_filter_types
 {
-    custom = 0,
-    delay = 1,
-    randomDelay = 2,
-    randomDrop = 3,
-    reroute = 4,
-    clone = 5,
-    firewall = 6,
+    custom = helics_filtertype_custom,
+    delay = helics_filtertype_delay,
+    random_delay = helics_filtertype_random_delay,
+    random_drop = helics_filtertype_random_drop,
+    reroute = helics_filtertype_reroute,
+    clone = helics_filtertype_clone,
+    firewall = helics_filtertype_firewall,
     unrecognized = 7
 
 };

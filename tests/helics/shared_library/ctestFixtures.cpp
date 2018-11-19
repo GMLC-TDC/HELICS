@@ -9,15 +9,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <cctype>
 
-
 #ifndef DISABLE_TCP_CORE
 #ifdef HELICS_HAVE_ZEROMQ
 const std::vector<std::string> core_types = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+                                             "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
 const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "zmq", "udp"};
 #else
 const std::vector<std::string> core_types = {"test",  "ipc",   "udp",   "tcp",  "test_2",
-                                               "ipc_2", "zmq_2", "udp_2", "tcp_2"};
+                                             "ipc_2", "zmq_2", "udp_2", "tcp_2"};
 const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "udp"};
 #endif
 #else
@@ -44,20 +43,20 @@ static bool hasIndexCode (const std::string &type_name)
 
 static auto StartBrokerImp (const std::string &core_type_name, std::string initialization_string)
 {
-    if (core_type_name.compare(0, 3, "tcp") == 0)
+    if (core_type_name.compare (0, 3, "tcp") == 0)
     {
         initialization_string += " --reuse_address";
     }
-	else if (core_type_name.compare(0, 3, "ipc") == 0)
-	{
+    else if (core_type_name.compare (0, 3, "ipc") == 0)
+    {
         initialization_string += " --client";
-	}
+    }
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str (),0);
+        return helicsCreateBroker (new_type.c_str (), NULL, initialization_string.c_str (), 0);
     }
-    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str (),0);
+    return helicsCreateBroker (core_type_name.c_str (), NULL, initialization_string.c_str (), 0);
 }
 
 bool FederateTestFixture::hasIndexCode (const std::string &type_name)
@@ -84,42 +83,40 @@ FederateTestFixture::~FederateTestFixture ()
     {
         if (fed)
         {
-            federate_state state = helicsFederateGetState (fed, nullptr);
-            helics_core core = helicsFederateGetCoreObject (fed,nullptr);
+            helics_federate_state state = helicsFederateGetState (fed, nullptr);
+            helics_core core = helicsFederateGetCoreObject (fed, nullptr);
             if (state != helics_state_finalize)
             {
                 helicsFederateFinalize (fed, nullptr);
             }
             helicsFederateFree (fed);
-            if (helicsCoreIsValid(core))
+            if (helicsCoreIsValid (core))
             {
-                helicsCoreDisconnect (core,nullptr);
+                helicsCoreDisconnect (core, nullptr);
             }
             helicsCoreFree (core);
-            
         }
     }
     federates.clear ();
-    
 
     for (auto &broker : brokers)
     {
-        helics_bool_t res;
-        if (ctype.compare(0, 3, "tcp") == 0)
+        helics_bool res;
+        if (ctype.compare (0, 3, "tcp") == 0)
         {
-            res=helicsBrokerWaitForDisconnect(broker, 2000,nullptr);
+            res = helicsBrokerWaitForDisconnect (broker, 2000, nullptr);
         }
         else
         {
-            res=helicsBrokerWaitForDisconnect(broker, 200,nullptr);
+            res = helicsBrokerWaitForDisconnect (broker, 200, nullptr);
         }
-        
-		if (res != helics_true)
-		{
+
+        if (res != helics_true)
+        {
             printf ("forcing disconnect\n");
-            helicsBrokerDisconnect (broker,nullptr);
-		}
-        
+            helicsBrokerDisconnect (broker, nullptr);
+        }
+
         helicsBrokerFree (broker);
     }
     brokers.clear ();
@@ -150,12 +147,11 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     return broker;
 }
 
-
 void FederateTestFixture::SetupTest (FedCreator ctor,
-                const std::string &core_type_name,
-                int count,
-                helics_time_t time_delta,
-                const std::string &name_prefix)
+                                     const std::string &core_type_name,
+                                     int count,
+                                     helics_time time_delta,
+                                     const std::string &name_prefix)
 {
     ctype = core_type_name;
     helics_broker broker = AddBroker (core_type_name, count);
@@ -164,11 +160,11 @@ void FederateTestFixture::SetupTest (FedCreator ctor,
 }
 
 std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
-                                           std::string core_type_name,
-                                           int count,
-                                           helics_broker broker,
-                                           helics_time_t time_delta,
-                                           const std::string &name_prefix)
+                                                                std::string core_type_name,
+                                                                int count,
+                                                                helics_broker broker,
+                                                                helics_time time_delta,
+                                                                const std::string &name_prefix)
 {
     bool hasIndex = hasIndexCode (core_type_name);
     int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -189,9 +185,9 @@ std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
         initString.append (extraCoreArgs);
     }
 
-    helics_federate_info_t fi = helicsCreateFederateInfo ();
+    helics_federate_info fi = helicsCreateFederateInfo ();
     CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str (), &err));
-    CE (helicsFederateInfoSetTimeProperty (fi, TIME_DELTA_PROPERTY, time_delta, &err));
+    CE (helicsFederateInfoSetTimeProperty (fi, helics_property_time_delta, time_delta, &err));
 
     std::vector<helics_federate> federates_added;
 

@@ -135,16 +135,16 @@ helicsFederateRegisterTypePublication (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_TIME))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterTypePublication (fed, key, "raw", units, err);
         }
@@ -198,16 +198,16 @@ helicsFederateRegisterGlobalTypePublication (helics_federate fed, const char *ke
 }
 
 helics_publication
-helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < 0) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterGlobalTypePublication (fed, key, "raw", units, err);
         }
@@ -261,20 +261,20 @@ helics_input helicsFederateRegisterTypeInput (helics_federate fed, const char *k
     return nullptr;
 }
 
-helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterTypeInput (fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY)
+        if (type != helics_data_type_any)
         {
             if (err != nullptr)
             {
@@ -327,20 +327,20 @@ helicsFederateRegisterGlobalTypeInput (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, int type, const char *units, helics_error *err)
+helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
     {
         return nullptr;
     }
-    if ((type < 0) || (type > HELICS_DATA_TYPE_BOOLEAN))
+    if ((type < helics_data_type_string) || (type > helics_data_type_time))
     {
-        if (type == HELICS_DATA_TYPE_RAW)
+        if (type == helics_data_type_raw)
         {
             return helicsFederateRegisterGlobalTypeInput (fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY)
+        if (type != helics_data_type_any)
         {
             if (err != nullptr)
             {
@@ -593,7 +593,7 @@ void helicsPublicationPublishInteger (helics_publication pub, int64_t val, helic
     }
 }
 
-void helicsPublicationPublishBoolean (helics_publication pub, helics_bool_t val, helics_error *err)
+void helicsPublicationPublishBoolean (helics_publication pub, helics_bool val, helics_error *err)
 {
     auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
@@ -627,7 +627,7 @@ void helicsPublicationPublishDouble (helics_publication pub, double val, helics_
     }
 }
 
-void helicsPublicationPublishTime (helics_publication pub, helics_time_t val, helics_error *err)
+void helicsPublicationPublishTime (helics_publication pub, helics_time val, helics_error *err)
 {
     auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
@@ -848,7 +848,7 @@ int64_t helicsInputGetInteger (helics_input inp, helics_error *err)
     }
 }
 
-helics_bool_t helicsInputGetBoolean (helics_input inp, helics_error *err)
+helics_bool helicsInputGetBoolean (helics_input inp, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -885,7 +885,7 @@ double helicsInputGetDouble (helics_input inp, helics_error *err)
     }
 }
 
-helics_time_t helicsInputGetTime (helics_input inp, helics_error *err)
+helics_time helicsInputGetTime (helics_input inp, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -895,7 +895,7 @@ helics_time_t helicsInputGetTime (helics_input inp, helics_error *err)
     try
     {
         auto T = inpObj->inputPtr->getValue<helics::Time> ();
-        return static_cast<helics_time_t> (T);
+        return static_cast<helics_time> (T);
     }
     catch (...)
     {
@@ -1141,7 +1141,7 @@ void helicsInputSetDefaultInteger (helics_input inp, int64_t val, helics_error *
     }
 }
 
-void helicsInputSetDefaultBoolean (helics_input inp, helics_bool_t val, helics_error *err)
+void helicsInputSetDefaultBoolean (helics_input inp, helics_bool val, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1175,7 +1175,7 @@ void helicsInputSetDefaultDouble (helics_input inp, double val, helics_error *er
     }
 }
 
-void helicsInputSetDefaultTime (helics_input inp, helics_time_t val, helics_error *err)
+void helicsInputSetDefaultTime (helics_input inp, helics_time val, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1398,7 +1398,7 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     }
 }
 
-helics_bool_t helicsInputIsUpdated (helics_input inp)
+helics_bool helicsInputIsUpdated (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1410,7 +1410,7 @@ helics_bool_t helicsInputIsUpdated (helics_input inp)
     return (val) ? helics_true : helics_false;
 }
 
-helics_time_t helicsInputLastUpdateTime (helics_input inp)
+helics_time helicsInputLastUpdateTime (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1420,7 +1420,7 @@ helics_time_t helicsInputLastUpdateTime (helics_input inp)
     try
     {
         auto time = inpObj->inputPtr->getLastUpdate ();
-        return static_cast<helics_time_t> (time);
+        return static_cast<helics_time> (time);
     }
     catch (...)
     {
