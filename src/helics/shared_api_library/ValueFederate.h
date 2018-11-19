@@ -88,7 +88,7 @@ extern "C"
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate fed,
-                                                                    const char *key,
+                                                                                  const char *key,
                                                                                   const char *type,
                                                                                   const char *units,
                                                                                   helics_error *err);
@@ -475,9 +475,9 @@ extern "C"
     /**@}*/
 
     /**
- * \defgroup information retrieval
- * @{
- */
+     * \defgroup information retrieval
+     * @{
+     */
 
     /** get the type of an input
     @param ipt the input to query

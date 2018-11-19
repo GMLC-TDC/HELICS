@@ -135,6 +135,7 @@ helicsFederateRegisterTypePublication (helics_federate fed, const char *key, con
     return nullptr;
 }
 
+
 helics_publication
 helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
@@ -328,8 +329,7 @@ helicsFederateRegisterGlobalTypeInput (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_input
-helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
+helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
