@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_SUITE (source_tests, *utf::label("ci"))
 BOOST_AUTO_TEST_CASE (simple_source_test )
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreName = "score-source";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1",fi);
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto gen = src1.getGenerator (index);
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
+    fi.coreName = "score-simple";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
 
     auto index = src1.addSignalGenerator ("ramp", "ramp");
@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreName = "score-sine";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
 
     auto index = src1.addSignalGenerator ("sine", "sine");
@@ -189,8 +189,8 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
 BOOST_AUTO_TEST_CASE (simple_source_test_file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "corep";
-    fi.coreInitString = "2";
+    fi.coreName = "scorep";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("source1",fi);
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test.json");
 
@@ -232,8 +232,8 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
 BOOST_AUTO_TEST_CASE (simple_source_test2_file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
+    fi.coreName = "score2";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
 
 
@@ -284,8 +284,8 @@ BOOST_AUTO_TEST_CASE (sine_source_test_file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
 
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
+    fi.coreName = "score1";
+    fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
     src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_sine_source.json");
 

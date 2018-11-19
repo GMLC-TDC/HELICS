@@ -1,4 +1,4 @@
 function varargout = helicsFederateRegisterGlobalPublication(varargin)
     %
-  [varargout{1:nargout}] = helicsMEX(131, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(129, varargin{:});
 end

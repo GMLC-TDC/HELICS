@@ -17,18 +17,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-static const std::map<std::string, defined_filter_types> filterTypes{{"clone", defined_filter_types::clone},
-                                                                     {"cloning", defined_filter_types::clone},
-                                                                     {"delay", defined_filter_types::delay},
-                                                                     {"timedelay", defined_filter_types::delay},
-                                                                     {"randomdelay",
-                                                                      defined_filter_types::randomDelay},
-                                                                     {"randomdrop",
-                                                                      defined_filter_types::randomDrop},
-                                                                     {"reroute", defined_filter_types::reroute},
-                                                                     {"redirect", defined_filter_types::reroute},
-                                                                     {"firewall", defined_filter_types::firewall},
-                                                                     {"custom", defined_filter_types::custom}};
+static const std::map<std::string, defined_filter_types> filterTypes{
+  {"clone", defined_filter_types::clone},
+  {"cloning", defined_filter_types::clone},
+  {"delay", defined_filter_types::delay},
+  {"timedelay", defined_filter_types::delay},
+  {"randomdelay", defined_filter_types::random_delay},
+  {"randomdrop", defined_filter_types::random_drop},
+  {"time_delay", defined_filter_types::delay},
+  {"random_delay", defined_filter_types::random_delay},
+  {"random_drop", defined_filter_types::random_drop},
+  {"time delay", defined_filter_types::delay},
+  {"random delay", defined_filter_types::random_delay},
+  {"random drop", defined_filter_types::random_drop},
+  {"reroute", defined_filter_types::reroute},
+  {"redirect", defined_filter_types::reroute},
+  {"firewall", defined_filter_types::firewall},
+  {"custom", defined_filter_types::custom}};
 
 defined_filter_types filterTypeFromString (const std::string &filterType) noexcept
 {
@@ -54,7 +59,7 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
     case defined_filter_types::custom:
     default:
         break;
-    case defined_filter_types::randomDelay:
+    case defined_filter_types::random_delay:
     {
         auto op = std::make_shared<RandomDelayFilterOperation> ();
         filt->setFilterOperations (std::move (op));
@@ -66,7 +71,7 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
         filt->setFilterOperations (std::move (op));
     }
     break;
-    case defined_filter_types::randomDrop:
+    case defined_filter_types::random_drop:
     {
         auto op = std::make_shared<RandomDropFilterOperation> ();
         filt->setFilterOperations (std::move (op));
@@ -93,14 +98,10 @@ void addOperations (Filter *filt, defined_filter_types type, Core *cptr)
     }
 }
 
+Filter::Filter (Federate *ffed, const std::string &filtName) : Filter (ffed->registerFilter (filtName)) {}
 
-Filter::Filter (Federate *ffed, const std::string &filtName) : Filter (ffed->registerFilter (filtName))
-{
-   
-}
-
-
-Filter::Filter (Federate *ffed, const std::string &filtName, interface_handle handle) : fed(ffed), id (handle), name (filtName)
+Filter::Filter (Federate *ffed, const std::string &filtName, interface_handle handle)
+    : fed (ffed), id (handle), name (filtName)
 {
     if (ffed != nullptr)
     {
@@ -108,31 +109,29 @@ Filter::Filter (Federate *ffed, const std::string &filtName, interface_handle ha
     }
 }
 
-Filter::Filter(interface_visibility locality, Federate *ffed, const std::string &filtName)
+Filter::Filter (interface_visibility locality, Federate *ffed, const std::string &filtName)
 {
     if (ffed != nullptr)
     {
-        corePtr = ffed->getCorePointer().get();
+        corePtr = ffed->getCorePointer ().get ();
         if (locality == interface_visibility::global)
         {
-            operator=(ffed->registerGlobalFilter(filtName));
+            operator= (ffed->registerGlobalFilter (filtName));
         }
         else
         {
-            operator=(ffed->registerFilter(filtName));
+            operator= (ffed->registerFilter (filtName));
         }
     }
-
 }
 
 Filter::Filter (Core *cr, const std::string &filtName) : corePtr (cr), name (filtName)
 {
-	if (corePtr != nullptr)
-	{
+    if (corePtr != nullptr)
+    {
         id = corePtr->registerFilter (filtName, std::string (), std::string ());
         fed = nullptr;
-	}
-    
+    }
 }
 
 void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
@@ -160,7 +159,6 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 }
 
 static const std::string emptyStr;
-
 
 const std::string &Filter::getName () const
 {
@@ -205,61 +203,58 @@ void Filter::setString (const std::string &property, const std::string &val)
     }
 }
 
-
-
 CloningFilter::CloningFilter (Core *cr, const std::string &filtName)
 {
     corePtr = cr;
     if (corePtr != nullptr)
     {
-        id =corePtr->registerCloningFilter (filtName,std::string(),std::string());
+        id = corePtr->registerCloningFilter (filtName, std::string (), std::string ());
         name = filtName;
     }
-    setFilterOperations(std::make_shared<CloneFilterOperation> (cr));
+    setFilterOperations (std::make_shared<CloneFilterOperation> (cr));
 }
 
-CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName) : Filter (ffed->registerCloningFilter (filtName))
+CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName)
+    : Filter (ffed->registerCloningFilter (filtName))
 {
-		if (corePtr != nullptr)
-		{
-            setFilterOperations(std::make_shared<CloneFilterOperation> (corePtr));
-		}
+    if (corePtr != nullptr)
+    {
+        setFilterOperations (std::make_shared<CloneFilterOperation> (corePtr));
+    }
 }
 
-CloningFilter::CloningFilter(Federate *ffed, const std::string &filtName, interface_handle handle)
-	: Filter(ffed, filtName, handle)
+CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle)
+    : Filter (ffed, filtName, handle)
 {
-
 }
 
-CloningFilter::CloningFilter(interface_visibility locality, Federate *ffed, const std::string &filtName)
+CloningFilter::CloningFilter (interface_visibility locality, Federate *ffed, const std::string &filtName)
 {
     if (ffed != nullptr)
     {
-        corePtr = ffed->getCorePointer().get();
+        corePtr = ffed->getCorePointer ().get ();
         if (locality == interface_visibility::global)
         {
-            operator=(ffed->registerGlobalCloningFilter(filtName));
+            operator= (ffed->registerGlobalCloningFilter (filtName));
         }
         else
         {
-            operator=(ffed->registerCloningFilter(filtName));
+            operator= (ffed->registerCloningFilter (filtName));
         }
-       
-        setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));
-    }
 
+        setFilterOperations (std::make_shared<CloneFilterOperation> (corePtr));
+    }
 }
 
 void Filter::addSourceTarget (const std::string &sourceName)
 {
-   // sourceEndpoints.push_back (sourceName);
+    // sourceEndpoints.push_back (sourceName);
     corePtr->addSourceTarget (id, sourceName);
 }
 
 void Filter::addDestinationTarget (const std::string &destinationName)
 {
-   // destEndpoints.push_back (destinationName);
+    // destEndpoints.push_back (destinationName);
     corePtr->addDestinationTarget (id, destinationName);
 }
 
@@ -268,10 +263,7 @@ void CloningFilter::addDeliveryEndpoint (const std::string &endpoint)
     Filter::setString ("add delivery", endpoint);
 }
 
-void Filter::removeTarget (const std::string &sourceName)
-{
-    corePtr->removeTarget (id, sourceName);
-}
+void Filter::removeTarget (const std::string &sourceName) { corePtr->removeTarget (id, sourceName); }
 
 void CloningFilter::removeDeliveryEndpoint (const std::string &endpoint)
 {
@@ -312,9 +304,7 @@ void CloningFilter::setString (const std::string &property, const std::string &v
     }
 }
 
-Filter & make_filter (defined_filter_types type,
-                                                            Federate *mFed,
-                                                            const std::string &name)
+Filter &make_filter (defined_filter_types type, Federate *mFed, const std::string &name)
 
 {
     if (type == defined_filter_types::clone)
@@ -332,31 +322,28 @@ Filter & make_filter (defined_filter_types type,
     }
 }
 
-Filter &make_filter(interface_visibility locality, defined_filter_types type,
-    Federate *mFed,
-    const std::string &name)
+Filter &
+make_filter (interface_visibility locality, defined_filter_types type, Federate *mFed, const std::string &name)
 
 {
     if (type == defined_filter_types::clone)
     {
         Filter &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalCloningFilter (name) :
-                                                                     mFed->registerCloningFilter (name); 
-        addOperations(&dfilt, type, mFed->getCorePointer().get());
-        dfilt.setString("delivery", name);
+                                                                     mFed->registerCloningFilter (name);
+        addOperations (&dfilt, type, mFed->getCorePointer ().get ());
+        dfilt.setString ("delivery", name);
         return dfilt;
     }
     else
     {
         auto &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalFilter (name) :
                                                                    mFed->registerFilter (name);
-        addOperations(&dfilt, type, nullptr);
+        addOperations (&dfilt, type, nullptr);
         return dfilt;
     }
 }
 
-
-std::unique_ptr<Filter>
-make_filter (defined_filter_types type, Core *cr, const std::string &name)
+std::unique_ptr<Filter> make_filter (defined_filter_types type, Core *cr, const std::string &name)
 
 {
     if (type == defined_filter_types::clone)
@@ -374,17 +361,19 @@ make_filter (defined_filter_types type, Core *cr, const std::string &name)
     }
 }
 
-
-CloningFilter &make_cloning_filter (defined_filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
+CloningFilter &make_cloning_filter (defined_filter_types type,
+                                    Federate *mFed,
+                                    const std::string &delivery,
+                                    const std::string &name)
 
 {
     auto &dfilt = mFed->registerCloningFilter (name);
-        addOperations (&dfilt, type, mFed->getCorePointer ().get ());
-        dfilt.addDeliveryEndpoint (delivery);
-        return dfilt;
+    addOperations (&dfilt, type, mFed->getCorePointer ().get ());
+    dfilt.addDeliveryEndpoint (delivery);
+    return dfilt;
 }
 
-CloningFilter & make_cloning_filter (interface_visibility locality,
+CloningFilter &make_cloning_filter (interface_visibility locality,
                                     defined_filter_types type,
                                     Federate *mFed,
                                     const std::string &delivery,
@@ -392,9 +381,9 @@ CloningFilter & make_cloning_filter (interface_visibility locality,
 
 {
     auto &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalCloningFilter (name) :
-                                                               mFed->registerCloningFilter (name); 
-    addOperations(&dfilt, type, mFed->getCorePointer().get());
-    dfilt.addDeliveryEndpoint(delivery);
+                                                               mFed->registerCloningFilter (name);
+    addOperations (&dfilt, type, mFed->getCorePointer ().get ());
+    dfilt.addDeliveryEndpoint (delivery);
     return dfilt;
 }
 
@@ -402,10 +391,10 @@ std::unique_ptr<CloningFilter>
 make_cloning_filter (defined_filter_types type, Core *cr, const std::string &delivery, const std::string &name)
 
 {
-        auto dfilt = std::make_unique<CloningFilter> (cr, name);
-        addOperations (dfilt.get (), type, cr);
-        dfilt->addDeliveryEndpoint(delivery);
-        return dfilt;
+    auto dfilt = std::make_unique<CloningFilter> (cr, name);
+    addOperations (dfilt.get (), type, cr);
+    dfilt->addDeliveryEndpoint (delivery);
+    return dfilt;
 }
 
 }  // namespace helics

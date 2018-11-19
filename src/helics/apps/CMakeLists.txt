@@ -37,6 +37,7 @@ if(BUILD_APPS)
   add_library(
     helics_apps
     STATIC
+	../helics_apps.hpp
     ${helics_apps_library_files}
     ${helics_apps_public_headers}
     ${helics_apps_private_headers}
@@ -117,6 +118,11 @@ if(BUILD_APPS)
   install(
     FILES ${helics_apps_public_headers}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
+    COMPONENT headers
+  )
+  install(
+    FILES ../helics_apps.hpp
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
 

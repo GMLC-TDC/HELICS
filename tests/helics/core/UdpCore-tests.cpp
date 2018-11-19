@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::string initializationString =
-      "1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
+      "-f 1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -329,7 +329,7 @@ also tests the automatic port determination for cores
 BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 {
     std::this_thread::sleep_for (500ms);
-    std::string initializationString = "1";
+    std::string initializationString = "-f 1";
 
     auto broker = helics::BrokerFactory::create (helics::core_type::UDP, initializationString);
 

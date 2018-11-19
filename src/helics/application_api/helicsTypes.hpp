@@ -261,18 +261,18 @@ inline const char *typeNameString<named_point> ()
 /** the base types for  helics*/
 enum class helics_type_t : int
 {
-    helicsString = 0,
-    helicsDouble = 1,
-    helicsInt = 2,
+    helicsString = helics_data_type_string,
+    helicsDouble = helics_data_type_double,
+    helicsInt = helics_data_type_int,
 
-    helicsComplex = 3,
-    helicsVector = 4,
-    helicsComplexVector = 5,
-    helicsNamedPoint = 6,
-    helicsBool = 7,
-	helicsTime = 8,
-    helicsCustom = 23425,
-    helicsAny = 247652,
+    helicsComplex = helics_data_type_complex,
+    helicsVector = helics_data_type_vector,
+    helicsComplexVector = helics_data_type_complex_vector,
+    helicsNamedPoint = helics_data_type_named_point,
+    helicsBool = helics_data_type_boolean,
+	helicsTime = helics_data_type_time,
+    helicsCustom = helics_data_type_raw,
+    helicsAny = helics_data_type_any,
 	helicsUnknown=262355,
 };
 

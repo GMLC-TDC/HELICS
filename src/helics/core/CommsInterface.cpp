@@ -8,13 +8,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+CommsInterface::CommsInterface (thread_generation threads) : singleThread (threads == thread_generation::single) {}
+
 /** destructor*/
 CommsInterface::~CommsInterface ()
 {
     std::lock_guard<std::mutex> syncLock (threadSyncLock);
-    if (queue_watcher.joinable ())
+    if (!singleThread)
     {
-        queue_watcher.join ();
+        if (queue_watcher.joinable ())
+        {
+            queue_watcher.join ();
+        }
     }
     if (queue_transmitter.joinable ())
     {
@@ -30,21 +35,22 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         brokerTarget_ = netInfo.brokerAddress;
         brokerName_ = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
-		maxMessageSize_ = netInfo.maxMessageSize;
-		maxMessageCount_ = netInfo.maxMessageCount;
-		switch (netInfo.server_mode)
-		{
-		case NetworkBrokerData::server_mode_options::server_active:
-		case NetworkBrokerData::server_mode_options::server_default_active:
-			serverMode = true;
-			break;
-		case NetworkBrokerData::server_mode_options::server_deactivated:
-		case NetworkBrokerData::server_mode_options::server_default_deactivated:
-			serverMode = false;
-			break;
+        maxMessageSize_ = netInfo.maxMessageSize;
+        maxMessageCount_ = netInfo.maxMessageCount;
+        autoBroker = netInfo.autobroker;
+        switch (netInfo.server_mode)
+        {
+        case NetworkBrokerData::server_mode_options::server_active:
+        case NetworkBrokerData::server_mode_options::server_default_active:
+            serverMode = true;
+            break;
+        case NetworkBrokerData::server_mode_options::server_deactivated:
+        case NetworkBrokerData::server_mode_options::server_default_deactivated:
+            serverMode = false;
+            break;
         case NetworkBrokerData::server_mode_options::unspecified:
             break;
-		}
+        }
         propertyUnLock ();
     }
 }
@@ -110,16 +116,16 @@ void CommsInterface::addRoute (route_id_t route_id, const std::string &routeInfo
     ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
     rt.messageID = NEW_ROUTE;
-    rt.setExtraData(route_id.baseValue());
-    transmit (control_route, rt);
+    rt.setExtraData (route_id.baseValue ());
+    transmit (control_route, std::move (rt));
 }
 
-void CommsInterface::removeRoute(route_id_t route_id)
+void CommsInterface::removeRoute (route_id_t route_id)
 {
-    ActionMessage rt(CMD_PROTOCOL);
+    ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = REMOVE_ROUTE;
-    rt.setExtraData(route_id.baseValue());
-    transmit(control_route, rt);
+    rt.setExtraData (route_id.baseValue ());
+    transmit (control_route, rt);
 }
 
 void CommsInterface::setTxStatus (connection_status txStatus)
@@ -211,12 +217,12 @@ bool CommsInterface::connect ()
         logError ("no callback specified, the receiver cannot start");
         return false;
     }
-    if (!propertyLock())
+    if (!propertyLock ())
     {
-        //this will lock all the properties and should not be unlocked;
-        return isConnected();
+        // this will lock all the properties and should not be unlocked;
+        return isConnected ();
     }
-    std::lock_guard<std::mutex> syncLock (threadSyncLock);
+    std::unique_lock<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
         name = localTarget_;
@@ -225,17 +231,21 @@ bool CommsInterface::connect ()
     {
         localTarget_ = name;
     }
-    queue_watcher = std::thread ([this] {
-        try
-        {
-            queue_rx_function ();
-        }
-        catch (const std::exception &e)
-        {
-            rx_status = connection_status::error;
-            logError(std::string("error in receiver >")+e.what ());
-        }
-    });
+    if (!singleThread)
+    {
+        queue_watcher = std::thread ([this] {
+            try
+            {
+                queue_rx_function ();
+            }
+            catch (const std::exception &e)
+            {
+                rx_status = connection_status::error;
+                logError (std::string ("error in receiver >") + e.what ());
+            }
+        });
+    }
+
     queue_transmitter = std::thread ([this] {
         try
         {
@@ -260,19 +270,25 @@ bool CommsInterface::connect ()
                 queue_transmitter.join ();
             }
         }
-        queue_watcher.join ();
+        if (!singleThread)
+        {
+            queue_watcher.join();
+        }
         return false;
     }
 
     if (tx_status != connection_status::connected)
     {
         logError ("transmitter connection failure");
-        if (rx_status == connection_status::connected)
+        if (!singleThread)
         {
-            if (queue_watcher.joinable ())
+            if (rx_status == connection_status::connected)
             {
-                closeReceiver ();
-                queue_watcher.join ();
+                if (queue_watcher.joinable ())
+                {
+                    closeReceiver ();
+                    queue_watcher.join ();
+                }
             }
         }
         queue_transmitter.join ();
@@ -292,19 +308,17 @@ void CommsInterface::setName (const std::string &name_)
 
 void CommsInterface::disconnect ()
 {
-   
     if (!operating)
     {
-        if (propertyLock())
+        if (propertyLock ())
         {
-            setRxStatus(connection_status::terminated);
-            setTxStatus(connection_status::terminated);
+            setRxStatus (connection_status::terminated);
+            setTxStatus (connection_status::terminated);
             return;
         }
     }
     requestDisconnect.store (true, std::memory_order::memory_order_release);
-    
-   
+
     if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
@@ -313,10 +327,10 @@ void CommsInterface::disconnect ()
     {
         closeTransmitter ();
     }
-    if (tripDetector.isTripped())
+    if (tripDetector.isTripped ())
     {
-        setRxStatus(connection_status::terminated);
-        setTxStatus(connection_status::terminated);
+        setRxStatus (connection_status::terminated);
+        setTxStatus (connection_status::terminated);
         return;
     }
     int cnt = 0;
@@ -437,23 +451,30 @@ void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
     }
 }
 
-void CommsInterface::setTimeout(std::chrono::milliseconds timeOut) 
-{ 
-	if (propertyLock())
-	{
-		connectionTimeout = timeOut;
-		propertyUnLock();
-	}
+void CommsInterface::setFlag (const std::string &flag, bool val)
+{
+    if (flag == "server_mode")
+    {
+        setServerMode (val);
+    }
 }
 
-
-void CommsInterface::setServerMode(bool serverActive)
+void CommsInterface::setTimeout (std::chrono::milliseconds timeOut)
 {
-	if (propertyLock())
-	{
-		serverMode = serverActive;
-		propertyUnLock();
-	}
+    if (propertyLock ())
+    {
+        connectionTimeout = timeOut;
+        propertyUnLock ();
+    }
+}
+
+void CommsInterface::setServerMode (bool serverActive)
+{
+    if (propertyLock ())
+    {
+        serverMode = serverActive;
+        propertyUnLock ();
+    }
 }
 
 bool CommsInterface::isConnected () const
@@ -461,20 +482,19 @@ bool CommsInterface::isConnected () const
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
-
-void CommsInterface::logWarning(const std::string &message) const
-{ 
-	if (loggingCallback)
+void CommsInterface::logWarning (const std::string &message) const
+{
+    if (loggingCallback)
     {
         loggingCallback (1, name, message);
     }
-	else
-	{
+    else
+    {
         std::cerr << "commWarning||" << name << ":" << message << std::endl;
-	}
+    }
 }
 
-void CommsInterface::logError(const std::string &message) const
+void CommsInterface::logError (const std::string &message) const
 {
     if (loggingCallback)
     {
@@ -482,7 +502,7 @@ void CommsInterface::logError(const std::string &message) const
     }
     else
     {
-        std::cerr <<"commERROR||"<<name<<":"<< message << std::endl;
+        std::cerr << "commERROR||" << name << ":" << message << std::endl;
     }
 }
 
@@ -496,7 +516,7 @@ void CommsInterface::closeTransmitter ()
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.messageID = RECONNECT;
+    rt.messageID = RECONNECT_TRANSMITTER;
     transmit (control_route, rt);
 }
 

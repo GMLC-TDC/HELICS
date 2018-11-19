@@ -35,7 +35,7 @@ private:
 
   public:
     /** default constructor*/
-	  explicit NetworkCommsInterface(interface_type type) noexcept;
+	  explicit NetworkCommsInterface(interface_type type, CommsInterface::thread_generation threads=CommsInterface::thread_generation::dual) noexcept;
 
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
@@ -43,7 +43,7 @@ private:
     void setBrokerPort (int brokerPortNumber);
     void setPortNumber (int localPortNumber);
     void setAutomaticPortStartPort (int startingPort);
-
+    virtual void setFlag (const std::string &flag, bool val) override;
   protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};

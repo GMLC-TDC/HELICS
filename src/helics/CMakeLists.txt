@@ -52,7 +52,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 install(
-  FILES flag-definitions.h helics.hpp
+  FILES helics.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )
