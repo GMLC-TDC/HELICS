@@ -226,6 +226,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual const std::string &getAddress () const override final;
     virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
+    virtual void makeConnections(const std::string &file) override final;
     virtual void dataLink (const std::string &publication, const std::string &input) override final;
 
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;

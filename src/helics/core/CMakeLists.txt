@@ -125,6 +125,7 @@ set(
 	NetworkCore.hpp
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
+	fileConnections.hpp
 )
 
 set(TESTCORE_HEADER_FILES TestCore.h TestBroker.h)

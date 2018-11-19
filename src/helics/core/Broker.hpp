@@ -72,7 +72,9 @@ class Broker
       the query is answered so use with caution
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
-
+    /** load a file containing connection information 
+    @param file a JSON or TOML file containing connection information*/
+    virtual void makeConnections(const std::string &file) = 0;
     /** create a data Link between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/

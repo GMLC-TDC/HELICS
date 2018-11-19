@@ -124,6 +124,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
+    virtual void makeConnections(const std::string &file)override final;
     virtual void dataLink (const std::string &source, const std::string &target) override final;
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
     virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
