@@ -201,13 +201,13 @@ extern "C"
     HELICS_EXPORT void helicsBrokerDisconnect (helics_broker broker, helics_error *err);
 
     /** disconnect and free a broker*/
-    HELICS_EXPORT void helicsFederateDestroy (helics_federate fed, helics_error *err);
+    HELICS_EXPORT void helicsFederateDestroy (helics_federate fed);
 
     /** disconnect and free a broker*/
-    HELICS_EXPORT void helicsBrokerDestroy (helics_broker broker, helics_error *err);
+    HELICS_EXPORT void helicsBrokerDestroy (helics_broker broker);
 
     /** disconnect and free a core*/
-    HELICS_EXPORT void helicsCoreDestroy (helics_core core, helics_error *err);
+    HELICS_EXPORT void helicsCoreDestroy (helics_core core);
 
     /** release the memory associated with a core*/
     HELICS_EXPORT void helicsCoreFree (helics_core core);

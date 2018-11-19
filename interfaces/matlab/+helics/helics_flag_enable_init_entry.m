@@ -1,7 +1,7 @@
 function v = helics_flag_enable_init_entry()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183067);
+    vInitialized = helicsMEX(0, 35);
   end
   v = vInitialized;
 end

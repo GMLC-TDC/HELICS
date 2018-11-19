@@ -3352,15 +3352,9 @@ fail:
 
 int _wrap_helicsFederateDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_error etemp2 ;
   mxArray * _out;
   
-  {
-    etemp2=helicsErrorInitialize();
-    arg2=&etemp2;
-  }
   if (!SWIG_check_num_args("helicsFederateDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3368,38 +3362,20 @@ int _wrap_helicsFederateDestroy(int resc, mxArray *resv[], int argc, mxArray *ar
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDestroy" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  helicsFederateDestroy(arg1,arg2);
+  helicsFederateDestroy(arg1);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 0;
 fail:
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 1;
 }
 
 
 int _wrap_helicsBrokerDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_broker arg1 = (helics_broker) 0 ;
-  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_error etemp2 ;
   mxArray * _out;
   
-  {
-    etemp2=helicsErrorInitialize();
-    arg2=&etemp2;
-  }
   if (!SWIG_check_num_args("helicsBrokerDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3407,38 +3383,20 @@ int _wrap_helicsBrokerDestroy(int resc, mxArray *resv[], int argc, mxArray *argv
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDestroy" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  helicsBrokerDestroy(arg1,arg2);
+  helicsBrokerDestroy(arg1);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 0;
 fail:
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 1;
 }
 
 
 int _wrap_helicsCoreDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_core arg1 = (helics_core) 0 ;
-  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_error etemp2 ;
   mxArray * _out;
   
-  {
-    etemp2=helicsErrorInitialize();
-    arg2=&etemp2;
-  }
   if (!SWIG_check_num_args("helicsCoreDestroy",argc,1,1,0)) {
     SWIG_fail;
   }
@@ -3446,23 +3404,11 @@ int _wrap_helicsCoreDestroy(int resc, mxArray *resv[], int argc, mxArray *argv[]
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDestroy" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  helicsCoreDestroy(arg1,arg2);
+  helicsCoreDestroy(arg1);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 0;
 fail:
-  {
-    if (arg2->error_code!=helics_ok)
-    {
-      throwHelicsMatlabError(arg2);
-    }
-  }
   return 1;
 }
 
@@ -11073,104 +11019,104 @@ SWIGINTERN int swigConstant(int SWIGUNUSEDPARM(resc), mxArray *resv[], int argc,
   }
   int con_id = (int)mxGetScalar(*argv++);
   switch (con_id) {
-  case 1946183032: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_default",SWIG_From_int(static_cast< int >(helics_core_type_default)));; break;
-  case 1946183033: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_zmq",SWIG_From_int(static_cast< int >(helics_core_type_zmq)));; break;
-  case 1946183034: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_mpi",SWIG_From_int(static_cast< int >(helics_core_type_mpi)));; break;
-  case 1946183035: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_test",SWIG_From_int(static_cast< int >(helics_core_type_test)));; break;
-  case 1946183036: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_interprocess",SWIG_From_int(static_cast< int >(helics_core_type_interprocess)));; break;
-  case 1946183037: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_ipc",SWIG_From_int(static_cast< int >(helics_core_type_ipc)));; break;
-  case 1946183038: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_tcp",SWIG_From_int(static_cast< int >(helics_core_type_tcp)));; break;
-  case 1946183039: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_udp",SWIG_From_int(static_cast< int >(helics_core_type_udp)));; break;
-  case 1946183040: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_zmq_test",SWIG_From_int(static_cast< int >(helics_core_type_zmq_test)));; break;
-  case 1946183041: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_nng",SWIG_From_int(static_cast< int >(helics_core_type_nng)));; break;
-  case 1946183042: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_tcp_ss",SWIG_From_int(static_cast< int >(helics_core_type_tcp_ss)));; break;
-  case 1946183043: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_http",SWIG_From_int(static_cast< int >(helics_core_type_http)));; break;
-  case 1946183044: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_string",SWIG_From_int(static_cast< int >(helics_data_type_string)));; break;
-  case 1946183045: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_double",SWIG_From_int(static_cast< int >(helics_data_type_double)));; break;
-  case 1946183046: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_int",SWIG_From_int(static_cast< int >(helics_data_type_int)));; break;
-  case 1946183047: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_complex",SWIG_From_int(static_cast< int >(helics_data_type_complex)));; break;
-  case 1946183048: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_vector",SWIG_From_int(static_cast< int >(helics_data_type_vector)));; break;
-  case 1946183049: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_complex_vector",SWIG_From_int(static_cast< int >(helics_data_type_complex_vector)));; break;
-  case 1946183050: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_named_point",SWIG_From_int(static_cast< int >(helics_data_type_named_point)));; break;
-  case 1946183051: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_boolean",SWIG_From_int(static_cast< int >(helics_data_type_boolean)));; break;
-  case 1946183052: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_time",SWIG_From_int(static_cast< int >(helics_data_type_time)));; break;
-  case 1946183053: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_raw",SWIG_From_int(static_cast< int >(helics_data_type_raw)));; break;
-  case 1946183054: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_any",SWIG_From_int(static_cast< int >(helics_data_type_any)));; break;
-  case 1946183055: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_observer",SWIG_From_int(static_cast< int >(helics_flag_observer)));; break;
-  case 1946183056: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_uninterruptible",SWIG_From_int(static_cast< int >(helics_flag_uninterruptible)));; break;
-  case 1946183057: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_interruptible",SWIG_From_int(static_cast< int >(helics_flag_interruptible)));; break;
-  case 1946183058: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_source_only",SWIG_From_int(static_cast< int >(helics_flag_source_only)));; break;
-  case 1946183059: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_transmit_on_change)));; break;
-  case 1946183060: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_update_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_update_on_change)));; break;
-  case 1946183061: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_wait_for_current_time_update",SWIG_From_int(static_cast< int >(helics_flag_wait_for_current_time_update)));; break;
-  case 1946183062: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_rollback",SWIG_From_int(static_cast< int >(helics_flag_rollback)));; break;
-  case 1946183063: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));; break;
-  case 1946183064: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));; break;
-  case 1946183065: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_single_thread_federate",SWIG_From_int(static_cast< int >(helics_flag_single_thread_federate)));; break;
-  case 1946183066: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_delay_init_entry",SWIG_From_int(static_cast< int >(helics_flag_delay_init_entry)));; break;
-  case 1946183067: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_enable_init_entry",SWIG_From_int(static_cast< int >(helics_flag_enable_init_entry)));; break;
-  case 1946183068: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
-  case 1946183069: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_no_print",SWIG_From_int(static_cast< int >(helics_log_level_no_print)));; break;
-  case 1946183070: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_error",SWIG_From_int(static_cast< int >(helics_log_level_error)));; break;
-  case 1946183071: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_warning",SWIG_From_int(static_cast< int >(helics_log_level_warning)));; break;
-  case 1946183072: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_summary",SWIG_From_int(static_cast< int >(helics_log_level_summary)));; break;
-  case 1946183073: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_connections",SWIG_From_int(static_cast< int >(helics_log_level_connections)));; break;
-  case 1946183074: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_interfaces",SWIG_From_int(static_cast< int >(helics_log_level_interfaces)));; break;
-  case 1946183075: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_timing",SWIG_From_int(static_cast< int >(helics_log_level_timing)));; break;
-  case 1946183076: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_data",SWIG_From_int(static_cast< int >(helics_log_level_data)));; break;
-  case 1946183077: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_trace",SWIG_From_int(static_cast< int >(helics_log_level_trace)));; break;
-  case 1946183078: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
-  case 1946183079: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_registration_failure",SWIG_From_int(static_cast< int >(helics_error_registration_failure)));; break;
-  case 1946183080: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_connection_failure",SWIG_From_int(static_cast< int >(helics_error_connection_failure)));; break;
-  case 1946183081: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_object",SWIG_From_int(static_cast< int >(helics_error_invalid_object)));; break;
-  case 1946183082: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_argument",SWIG_From_int(static_cast< int >(helics_error_invalid_argument)));; break;
-  case 1946183083: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_discard",SWIG_From_int(static_cast< int >(helics_error_discard)));; break;
-  case 1946183084: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_system_failure",SWIG_From_int(static_cast< int >(helics_error_system_failure)));; break;
-  case 1946183085: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
-  case 1946183086: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_error_invalid_state_transition)));; break;
-  case 1946183087: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_function_call",SWIG_From_int(static_cast< int >(helics_error_invalid_function_call)));; break;
-  case 1946183088: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_execution_failure",SWIG_From_int(static_cast< int >(helics_error_execution_failure)));; break;
-  case 1946183089: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_other",SWIG_From_int(static_cast< int >(helics_error_other)));; break;
-  case 1946183090: *resv = SWIG_Matlab_SetConstant(module_ns,"other_error_type",SWIG_From_int(static_cast< int >(other_error_type)));; break;
-  case 1946183091: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_delta",SWIG_From_int(static_cast< int >(helics_property_time_delta)));; break;
-  case 1946183092: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_period",SWIG_From_int(static_cast< int >(helics_property_time_period)));; break;
-  case 1946183093: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_offset",SWIG_From_int(static_cast< int >(helics_property_time_offset)));; break;
-  case 1946183094: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_lag",SWIG_From_int(static_cast< int >(helics_property_time_rt_lag)));; break;
-  case 1946183095: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_lead",SWIG_From_int(static_cast< int >(helics_property_time_rt_lead)));; break;
-  case 1946183096: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_tolerance",SWIG_From_int(static_cast< int >(helics_property_time_rt_tolerance)));; break;
-  case 1946183097: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_input_delay",SWIG_From_int(static_cast< int >(helics_property_time_input_delay)));; break;
-  case 1946183098: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_output_delay",SWIG_From_int(static_cast< int >(helics_property_time_output_delay)));; break;
-  case 1946183099: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_int_max_iterations",SWIG_From_int(static_cast< int >(helics_property_int_max_iterations)));; break;
-  case 1946183100: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_int_log_level",SWIG_From_int(static_cast< int >(helics_property_int_log_level)));; break;
-  case 1946183101: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_required",SWIG_From_int(static_cast< int >(helics_handle_option_connection_required)));; break;
-  case 1946183102: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_optional",SWIG_From_int(static_cast< int >(helics_handle_option_connection_optional)));; break;
-  case 1946183103: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_single_connection_only",SWIG_From_int(static_cast< int >(helics_handle_option_single_connection_only)));; break;
-  case 1946183104: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_multiple_connections_allowed",SWIG_From_int(static_cast< int >(helics_handle_option_multiple_connections_allowed)));; break;
-  case 1946183105: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_transmit_on_change)));; break;
-  case 1946183106: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_update_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_update_on_change)));; break;
-  case 1946183107: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_custom",SWIG_From_int(static_cast< int >(helics_filtertype_custom)));; break;
-  case 1946183108: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_delay",SWIG_From_int(static_cast< int >(helics_filtertype_delay)));; break;
-  case 1946183109: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_delay",SWIG_From_int(static_cast< int >(helics_filtertype_random_delay)));; break;
-  case 1946183110: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_drop",SWIG_From_int(static_cast< int >(helics_filtertype_random_drop)));; break;
-  case 1946183111: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_reroute",SWIG_From_int(static_cast< int >(helics_filtertype_reroute)));; break;
-  case 1946183112: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_clone",SWIG_From_int(static_cast< int >(helics_filtertype_clone)));; break;
-  case 1946183113: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_firewall",SWIG_From_int(static_cast< int >(helics_filtertype_firewall)));; break;
-  case 1946183114: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_no_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_no_iteration)));; break;
-  case 1946183115: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_force_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_force_iteration)));; break;
-  case 1946183116: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_iterate_if_needed",SWIG_From_int(static_cast< int >(helics_iteration_request_iterate_if_needed)));; break;
-  case 1946183117: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_next_step",SWIG_From_int(static_cast< int >(helics_iteration_result_next_step)));; break;
-  case 1946183118: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_error",SWIG_From_int(static_cast< int >(helics_iteration_result_error)));; break;
-  case 1946183119: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_halted",SWIG_From_int(static_cast< int >(helics_iteration_result_halted)));; break;
-  case 1946183120: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_iterating",SWIG_From_int(static_cast< int >(helics_iteration_result_iterating)));; break;
-  case 1946183121: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_startup",SWIG_From_int(static_cast< int >(helics_state_startup)));; break;
-  case 1946183122: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_initialization",SWIG_From_int(static_cast< int >(helics_state_initialization)));; break;
-  case 1946183123: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_execution",SWIG_From_int(static_cast< int >(helics_state_execution)));; break;
-  case 1946183124: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_finalize",SWIG_From_int(static_cast< int >(helics_state_finalize)));; break;
-  case 1946183125: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_error",SWIG_From_int(static_cast< int >(helics_state_error)));; break;
-  case 1946183126: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_init",SWIG_From_int(static_cast< int >(helics_state_pending_init)));; break;
-  case 1946183127: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_exec",SWIG_From_int(static_cast< int >(helics_state_pending_exec)));; break;
-  case 1946183128: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));; break;
-  case 1946183129: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));; break;
+  case 0: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_default",SWIG_From_int(static_cast< int >(helics_core_type_default)));; break;
+  case 1: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_zmq",SWIG_From_int(static_cast< int >(helics_core_type_zmq)));; break;
+  case 2: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_mpi",SWIG_From_int(static_cast< int >(helics_core_type_mpi)));; break;
+  case 3: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_test",SWIG_From_int(static_cast< int >(helics_core_type_test)));; break;
+  case 4: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_interprocess",SWIG_From_int(static_cast< int >(helics_core_type_interprocess)));; break;
+  case 5: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_ipc",SWIG_From_int(static_cast< int >(helics_core_type_ipc)));; break;
+  case 6: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_tcp",SWIG_From_int(static_cast< int >(helics_core_type_tcp)));; break;
+  case 7: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_udp",SWIG_From_int(static_cast< int >(helics_core_type_udp)));; break;
+  case 8: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_zmq_test",SWIG_From_int(static_cast< int >(helics_core_type_zmq_test)));; break;
+  case 9: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_nng",SWIG_From_int(static_cast< int >(helics_core_type_nng)));; break;
+  case 10: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_tcp_ss",SWIG_From_int(static_cast< int >(helics_core_type_tcp_ss)));; break;
+  case 11: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_core_type_http",SWIG_From_int(static_cast< int >(helics_core_type_http)));; break;
+  case 12: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_string",SWIG_From_int(static_cast< int >(helics_data_type_string)));; break;
+  case 13: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_double",SWIG_From_int(static_cast< int >(helics_data_type_double)));; break;
+  case 14: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_int",SWIG_From_int(static_cast< int >(helics_data_type_int)));; break;
+  case 15: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_complex",SWIG_From_int(static_cast< int >(helics_data_type_complex)));; break;
+  case 16: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_vector",SWIG_From_int(static_cast< int >(helics_data_type_vector)));; break;
+  case 17: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_complex_vector",SWIG_From_int(static_cast< int >(helics_data_type_complex_vector)));; break;
+  case 18: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_named_point",SWIG_From_int(static_cast< int >(helics_data_type_named_point)));; break;
+  case 19: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_boolean",SWIG_From_int(static_cast< int >(helics_data_type_boolean)));; break;
+  case 20: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_time",SWIG_From_int(static_cast< int >(helics_data_type_time)));; break;
+  case 21: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_raw",SWIG_From_int(static_cast< int >(helics_data_type_raw)));; break;
+  case 22: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_data_type_any",SWIG_From_int(static_cast< int >(helics_data_type_any)));; break;
+  case 23: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_observer",SWIG_From_int(static_cast< int >(helics_flag_observer)));; break;
+  case 24: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_uninterruptible",SWIG_From_int(static_cast< int >(helics_flag_uninterruptible)));; break;
+  case 25: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_interruptible",SWIG_From_int(static_cast< int >(helics_flag_interruptible)));; break;
+  case 26: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_source_only",SWIG_From_int(static_cast< int >(helics_flag_source_only)));; break;
+  case 27: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_transmit_on_change)));; break;
+  case 28: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_only_update_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_update_on_change)));; break;
+  case 29: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_wait_for_current_time_update",SWIG_From_int(static_cast< int >(helics_flag_wait_for_current_time_update)));; break;
+  case 30: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_rollback",SWIG_From_int(static_cast< int >(helics_flag_rollback)));; break;
+  case 31: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));; break;
+  case 32: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));; break;
+  case 33: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_single_thread_federate",SWIG_From_int(static_cast< int >(helics_flag_single_thread_federate)));; break;
+  case 34: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_delay_init_entry",SWIG_From_int(static_cast< int >(helics_flag_delay_init_entry)));; break;
+  case 35: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_enable_init_entry",SWIG_From_int(static_cast< int >(helics_flag_enable_init_entry)));; break;
+  case 36: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));; break;
+  case 37: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_no_print",SWIG_From_int(static_cast< int >(helics_log_level_no_print)));; break;
+  case 38: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_error",SWIG_From_int(static_cast< int >(helics_log_level_error)));; break;
+  case 39: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_warning",SWIG_From_int(static_cast< int >(helics_log_level_warning)));; break;
+  case 40: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_summary",SWIG_From_int(static_cast< int >(helics_log_level_summary)));; break;
+  case 41: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_connections",SWIG_From_int(static_cast< int >(helics_log_level_connections)));; break;
+  case 42: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_interfaces",SWIG_From_int(static_cast< int >(helics_log_level_interfaces)));; break;
+  case 43: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_timing",SWIG_From_int(static_cast< int >(helics_log_level_timing)));; break;
+  case 44: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_data",SWIG_From_int(static_cast< int >(helics_log_level_data)));; break;
+  case 45: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_log_level_trace",SWIG_From_int(static_cast< int >(helics_log_level_trace)));; break;
+  case 46: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));; break;
+  case 47: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_registration_failure",SWIG_From_int(static_cast< int >(helics_error_registration_failure)));; break;
+  case 48: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_connection_failure",SWIG_From_int(static_cast< int >(helics_error_connection_failure)));; break;
+  case 49: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_object",SWIG_From_int(static_cast< int >(helics_error_invalid_object)));; break;
+  case 50: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_argument",SWIG_From_int(static_cast< int >(helics_error_invalid_argument)));; break;
+  case 51: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_discard",SWIG_From_int(static_cast< int >(helics_error_discard)));; break;
+  case 52: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_system_failure",SWIG_From_int(static_cast< int >(helics_error_system_failure)));; break;
+  case 53: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));; break;
+  case 54: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_error_invalid_state_transition)));; break;
+  case 55: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_invalid_function_call",SWIG_From_int(static_cast< int >(helics_error_invalid_function_call)));; break;
+  case 56: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_execution_failure",SWIG_From_int(static_cast< int >(helics_error_execution_failure)));; break;
+  case 57: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_error_other",SWIG_From_int(static_cast< int >(helics_error_other)));; break;
+  case 58: *resv = SWIG_Matlab_SetConstant(module_ns,"other_error_type",SWIG_From_int(static_cast< int >(other_error_type)));; break;
+  case 59: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_delta",SWIG_From_int(static_cast< int >(helics_property_time_delta)));; break;
+  case 60: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_period",SWIG_From_int(static_cast< int >(helics_property_time_period)));; break;
+  case 61: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_offset",SWIG_From_int(static_cast< int >(helics_property_time_offset)));; break;
+  case 62: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_lag",SWIG_From_int(static_cast< int >(helics_property_time_rt_lag)));; break;
+  case 63: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_lead",SWIG_From_int(static_cast< int >(helics_property_time_rt_lead)));; break;
+  case 64: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_rt_tolerance",SWIG_From_int(static_cast< int >(helics_property_time_rt_tolerance)));; break;
+  case 65: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_input_delay",SWIG_From_int(static_cast< int >(helics_property_time_input_delay)));; break;
+  case 66: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_time_output_delay",SWIG_From_int(static_cast< int >(helics_property_time_output_delay)));; break;
+  case 67: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_int_max_iterations",SWIG_From_int(static_cast< int >(helics_property_int_max_iterations)));; break;
+  case 68: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_property_int_log_level",SWIG_From_int(static_cast< int >(helics_property_int_log_level)));; break;
+  case 69: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_required",SWIG_From_int(static_cast< int >(helics_handle_option_connection_required)));; break;
+  case 70: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_connection_optional",SWIG_From_int(static_cast< int >(helics_handle_option_connection_optional)));; break;
+  case 71: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_single_connection_only",SWIG_From_int(static_cast< int >(helics_handle_option_single_connection_only)));; break;
+  case 72: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_multiple_connections_allowed",SWIG_From_int(static_cast< int >(helics_handle_option_multiple_connections_allowed)));; break;
+  case 73: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_transmit_on_change)));; break;
+  case 74: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_handle_option_only_update_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_update_on_change)));; break;
+  case 75: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_custom",SWIG_From_int(static_cast< int >(helics_filtertype_custom)));; break;
+  case 76: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_delay",SWIG_From_int(static_cast< int >(helics_filtertype_delay)));; break;
+  case 77: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_delay",SWIG_From_int(static_cast< int >(helics_filtertype_random_delay)));; break;
+  case 78: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_random_drop",SWIG_From_int(static_cast< int >(helics_filtertype_random_drop)));; break;
+  case 79: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_reroute",SWIG_From_int(static_cast< int >(helics_filtertype_reroute)));; break;
+  case 80: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_clone",SWIG_From_int(static_cast< int >(helics_filtertype_clone)));; break;
+  case 81: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_filtertype_firewall",SWIG_From_int(static_cast< int >(helics_filtertype_firewall)));; break;
+  case 82: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_no_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_no_iteration)));; break;
+  case 83: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_force_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_force_iteration)));; break;
+  case 84: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_request_iterate_if_needed",SWIG_From_int(static_cast< int >(helics_iteration_request_iterate_if_needed)));; break;
+  case 85: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_next_step",SWIG_From_int(static_cast< int >(helics_iteration_result_next_step)));; break;
+  case 86: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_error",SWIG_From_int(static_cast< int >(helics_iteration_result_error)));; break;
+  case 87: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_halted",SWIG_From_int(static_cast< int >(helics_iteration_result_halted)));; break;
+  case 88: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_iteration_result_iterating",SWIG_From_int(static_cast< int >(helics_iteration_result_iterating)));; break;
+  case 89: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_startup",SWIG_From_int(static_cast< int >(helics_state_startup)));; break;
+  case 90: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_initialization",SWIG_From_int(static_cast< int >(helics_state_initialization)));; break;
+  case 91: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_execution",SWIG_From_int(static_cast< int >(helics_state_execution)));; break;
+  case 92: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_finalize",SWIG_From_int(static_cast< int >(helics_state_finalize)));; break;
+  case 93: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_error",SWIG_From_int(static_cast< int >(helics_state_error)));; break;
+  case 94: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_init",SWIG_From_int(static_cast< int >(helics_state_pending_init)));; break;
+  case 95: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_exec",SWIG_From_int(static_cast< int >(helics_state_pending_exec)));; break;
+  case 96: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));; break;
+  case 97: *resv = SWIG_Matlab_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));; break;
   default:
     SWIG_Error(SWIG_RuntimeError, "No such constant.");
     return 1;

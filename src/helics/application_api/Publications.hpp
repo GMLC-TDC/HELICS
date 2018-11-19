@@ -23,6 +23,7 @@ class Publication
   protected:
     helics_type_t pubType = helics_type_t::helicsAny;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
+    bool disableAssign = false;  //!< disable assignment for the object
   private:
     size_t customTypeHash = 0;  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
