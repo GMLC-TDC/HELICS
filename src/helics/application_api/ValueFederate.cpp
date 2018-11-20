@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "Publications.hpp"
-#include "ValueFederate.hpp"
 #include "ValueFederateManager.hpp"
 
 namespace helics
@@ -155,11 +155,11 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             bool global = jsonGetOrDefault (pub, "global", false);
             if (global)
             {
-                pubAct=&registerGlobalPublication (key, type, units);
+                pubAct = &registerGlobalPublication (key, type, units);
             }
             else
             {
-                pubAct=&registerPublication (key, type, units);
+                pubAct = &registerPublication (key, type, units);
             }
             auto tol = jsonGetOrDefault (pub, "tolerance", -1.0);
             if (tol > 0.0)
@@ -218,11 +218,11 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             bool global = jsonGetOrDefault (ipt, "global", false);
             if (global)
             {
-                inp=&registerGlobalInput (key, type, units);
+                inp = &registerGlobalInput (key, type, units);
             }
             else
             {
-                inp=&registerInput (key, type, units);
+                inp = &registerInput (key, type, units);
             }
             auto tol = jsonGetOrDefault (ipt, "tolerance", -1.0);
             if (tol > 0.0)
@@ -264,7 +264,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             Publication *pubObj = nullptr;
             if (global)
             {
-                pubObj=&registerGlobalPublication (key, type, units);
+                pubObj = &registerGlobalPublication (key, type, units);
             }
             else
             {
@@ -328,11 +328,11 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             bool global = tomlGetOrDefault (ipt, "global", false);
             if (global)
             {
-                id=&registerGlobalInput (key, type, units);
+                id = &registerGlobalInput (key, type, units);
             }
             else
             {
-                id=&registerInput (key, type, units);
+                id = &registerInput (key, type, units);
             }
             auto tol = tomlGetOrDefault (ipt, "tolerance", -1.0);
             if (tol > 0.0)
@@ -351,7 +351,7 @@ const std::string &ValueFederate::getString (Input &inp) { return inp.getValueRe
 
 void ValueFederate::publishRaw (const Publication &pub, data_view block)
 {
-    if ((state == op_states::execution) || (state == op_states::initialization))
+    if ((state == states::execution) || (state == states::initialization))
     {
         vfManager->publish (pub, block);
     }
@@ -464,24 +464,26 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
 
 const std::string &ValueFederate::getInputUnits (const Input &inp) const
 {
-    return coreObject->getUnits (inp.getHandle());
+    return coreObject->getUnits (inp.getHandle ());
 }
 const std::string &ValueFederate::getPublicationUnits (const Publication &pub) const
 {
-    return coreObject->getUnits (pub.getHandle());
+    return coreObject->getUnits (pub.getHandle ());
 }
 
 const std::string &ValueFederate::getInputType (const Input &inp) const
 {
-    return coreObject->getType (inp.getHandle());
+    return coreObject->getType (inp.getHandle ());
 }
 const std::string &ValueFederate::getPublicationType (const Publication &pub) const
 {
-    return coreObject->getType (pub.getHandle());
+    return coreObject->getType (pub.getHandle ());
 }
 
 std::string ValueFederate::getPublicationType (const Input &inp) const
-{ return coreObject->getType (inp.getHandle()); }
+{
+    return coreObject->getType (inp.getHandle ());
+}
 
 void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
 {

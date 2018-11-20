@@ -19,6 +19,9 @@ public final class helics_federate_flags {
   public final static helics_federate_flags helics_flag_rollback = new helics_federate_flags("helics_flag_rollback", helicsJNI.helics_flag_rollback_get());
   public final static helics_federate_flags helics_flag_forward_compute = new helics_federate_flags("helics_flag_forward_compute", helicsJNI.helics_flag_forward_compute_get());
   public final static helics_federate_flags helics_flag_realtime = new helics_federate_flags("helics_flag_realtime", helicsJNI.helics_flag_realtime_get());
+  public final static helics_federate_flags helics_flag_single_thread_federate = new helics_federate_flags("helics_flag_single_thread_federate", helicsJNI.helics_flag_single_thread_federate_get());
+  public final static helics_federate_flags helics_flag_delay_init_entry = new helics_federate_flags("helics_flag_delay_init_entry", helicsJNI.helics_flag_delay_init_entry_get());
+  public final static helics_federate_flags helics_flag_enable_init_entry = new helics_federate_flags("helics_flag_enable_init_entry", helicsJNI.helics_flag_enable_init_entry_get());
   public final static helics_federate_flags helics_flag_ignore_time_mismatch_warnings = new helics_federate_flags("helics_flag_ignore_time_mismatch_warnings", helicsJNI.helics_flag_ignore_time_mismatch_warnings_get());
 
   public final int swigValue() {
@@ -55,7 +58,7 @@ public final class helics_federate_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_ignore_time_mismatch_warnings };
+  private static helics_federate_flags[] swigValues = { helics_flag_observer, helics_flag_uninterruptible, helics_flag_interruptible, helics_flag_source_only, helics_flag_only_transmit_on_change, helics_flag_only_update_on_change, helics_flag_wait_for_current_time_update, helics_flag_rollback, helics_flag_forward_compute, helics_flag_realtime, helics_flag_single_thread_federate, helics_flag_delay_init_entry, helics_flag_enable_init_entry, helics_flag_ignore_time_mismatch_warnings };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

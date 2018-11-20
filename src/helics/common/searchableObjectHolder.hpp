@@ -63,10 +63,10 @@ class SearchableObjectHolder
             }
         }
     }
-    bool addObject (const std::string &name, std::shared_ptr<X> &obj)
+    bool addObject (const std::string &name, std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock (mapLock);
-        auto res = ObjectMap.emplace (name, obj);
+        auto res = ObjectMap.emplace (name, std::move(obj));
         return res.second;
     }
 

@@ -16,7 +16,7 @@ end
 function [fedStruct,success]=generateFeds(count)
 import helics.*
 success=true;
-initstring = '1';
+initstring = '-f1';
 fedinitstring = '--broker=mainbroker --federates=1';
 fedStruct.broker=helicsCreateBroker('zmq','mainbroker',initstring);
 if (~helicsBrokerIsValid(fedStruct.broker))
@@ -31,8 +31,8 @@ end
 try
 helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeProperty(fedInfo,helics_time_property_time_delta, 0.01);
-helicsFederateInfoSetIntegerProperty(fedInfo,helics_int_property_log_level,1);
+helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
 catch ec
     success=false;
     helicsBrokerDestroy(fedStruct.broker);
@@ -93,7 +93,7 @@ end
 function testBrokerFunctions(testCase)
 import matlab.unittest.constraints.IsTrue;
 import helics.*
-initstring = '1 --name=mainbroker';
+initstring = '-f 1 --name=mainbroker';
 broker=helicsCreateBroker('zmq','',initstring);
 ident=helicsBrokerGetIdentifier(broker);
 testCase.verifyEqual(ident,'mainbroker');

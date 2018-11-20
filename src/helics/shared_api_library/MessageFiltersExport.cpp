@@ -329,8 +329,6 @@ const char *helicsFilterGetName (helics_filter filt)
     }
 }
 
-static constexpr char invalidPropertyString[] = "the specified property is invalid";
-
 void helicsFilterSet (helics_filter filt, const char *prop, double val, helics_error *err)
 {
     auto filter = getFilter (filt,err);

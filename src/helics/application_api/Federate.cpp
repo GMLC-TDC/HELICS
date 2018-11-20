@@ -38,17 +38,18 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
         if (!coreObject)
         {
-            coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
+            coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
         }
     }
     else
     {
-        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
         if (!coreObject->isOpenToNewFederates ())
         {
+            std::cout << "found core object is not open" << std::endl;
             coreObject = nullptr;
             CoreFactory::cleanUpCores (200ms);
-            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
             if (!coreObject->isOpenToNewFederates ())
             {
                 throw (
@@ -66,6 +67,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
         coreObject->connect ();
         if (!coreObject->isConnected ())
         {
+            coreObject->disconnect ();
             throw (RegistrationFailure ("Unable to connect to broker->unable to register federate"));
         }
     }
@@ -91,18 +93,18 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
             coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
             if (!coreObject)
             {
-                coreObject = CoreFactory::create (fi.coreType, fi.coreInitString);
+                coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
             }
         }
         else
         {
-            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, fi.coreInitString);
+            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
         }
     }
 
     if (!coreObject)
     {
-        state = op_states::error;
+        state = states::error;
         return;
     }
     /** make sure the core is connected */
@@ -117,7 +119,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     fedID = coreObject->registerFederate (name, fi);
     if (!fedID.isValid ())
     {
-        state = op_states::error;
+        state = states::error;
         return;
     }
     separator_ = fi.separator;
@@ -126,7 +128,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
-Federate::Federate (const std::string &configString) : Federate (std::string (), loadFederateInfo (configString))
+Federate::Federate (const std::string &configString) : Federate (std::string{}, loadFederateInfo (configString))
 {
     registerFilterInterfaces (configString);
 }
@@ -180,18 +182,18 @@ Federate::~Federate ()
 void Federate::enterInitializingMode ()
 {
     auto currentState = state.load ();
-    if (currentState == op_states::startup)
+    if (currentState == states::startup)
     {
         coreObject->enterInitializingMode (fedID);
-        state = op_states::initialization;
+        state = states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
-    else if (currentState == op_states::pending_init)
+    else if (currentState == states::pending_init)
     {
         enterInitializingModeComplete ();
     }
-    else if (currentState != op_states::initialization)  // if we are already in initialization do nothing
+    else if (currentState != states::initialization)  // if we are already in initialization do nothing
     {
         throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
     }
@@ -200,17 +202,17 @@ void Federate::enterInitializingMode ()
 void Federate::enterInitializingModeAsync ()
 {
     auto asyncInfo = asyncCallInfo->lock ();
-    if (state == op_states::startup)
+    if (state == states::startup)
     {
-        state = op_states::pending_init;
+        state = states::pending_init;
         asyncInfo->initFuture =
           std::async (std::launch::async, [this]() { coreObject->enterInitializingMode (fedID); });
     }
-    else if (state == op_states::pending_init)
+    else if (state == states::pending_init)
     {
         return;
     }
-    else if (state != op_states::initialization)  // if we are already in initialization do nothing
+    else if (state != states::initialization)  // if we are already in initialization do nothing
     {
         throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
     }
@@ -221,13 +223,13 @@ bool Federate::isAsyncOperationCompleted () const
     auto asyncInfo = asyncCallInfo->lock_shared ();
     switch (state)
     {
-    case op_states::pending_init:
+    case states::pending_init:
         return (asyncInfo->initFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case op_states::pending_exec:
+    case states::pending_exec:
         return (asyncInfo->execFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case op_states::pending_time:
+    case states::pending_time:
         return (asyncInfo->timeRequestFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case op_states::pending_iterative_time:
+    case states::pending_iterative_time:
         return (asyncInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
                 std::future_status::ready);
     default:
@@ -239,18 +241,18 @@ void Federate::enterInitializingModeComplete ()
 {
     switch (state)
     {
-    case op_states::pending_init:
+    case states::pending_init:
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->initFuture.get ();
-        state = op_states::initialization;
+        state = states::initialization;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
     break;
-    case op_states::initialization:
+    case states::initialization:
         break;
-    case op_states::startup:
+    case states::startup:
         enterInitializingMode ();
         break;
     default:
@@ -264,44 +266,44 @@ iteration_result Federate::enterExecutingMode (iteration_request iterate)
     iteration_result res = iteration_result::next_step;
     switch (state)
     {
-    case op_states::startup:
-    case op_states::pending_init:
+    case states::startup:
+    case states::pending_init:
         enterInitializingMode ();
         FALLTHROUGH
         /* FALLTHROUGH */
-    case op_states::initialization:
+    case states::initialization:
     {
         res = coreObject->enterExecutingMode (fedID, iterate);
         switch (res)
         {
         case iteration_result::next_step:
-            state = op_states::execution;
+            state = states::execution;
             currentTime = timeZero;
             initializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
-            state = op_states::initialization;
+            state = states::initialization;
             updateTime (getCurrentTime (), getCurrentTime ());
             break;
         case iteration_result::error:
-            state = op_states::error;
+            state = states::error;
             break;
         case iteration_result::halted:
-            state = op_states::finalize;
+            state = states::finalize;
             break;
         }
         break;
     }
-    case op_states::pending_exec:
+    case states::pending_exec:
         return enterExecutingModeComplete ();
-    case op_states::execution:
+    case states::execution:
         // already in this state --> do nothing
         break;
-    case op_states::pending_time:
+    case states::pending_time:
         requestTimeComplete ();
         break;
-    case op_states::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
-                                             // this fashion
+    case states::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
+                                          // this fashion
     default:
         throw (InvalidFunctionCall ("cannot transition from current state to execution state"));
         break;
@@ -313,7 +315,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
 {
     switch (state)
     {
-    case op_states::startup:
+    case states::startup:
     {
         auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingMode (fedID);
@@ -321,25 +323,25 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
             return coreObject->enterExecutingMode (fedID, iterate);
         };
         auto asyncInfo = asyncCallInfo->lock ();
-        state = op_states::pending_exec;
+        state = states::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
-    case op_states::pending_init:
+    case states::pending_init:
         enterInitializingModeComplete ();
         FALLTHROUGH
         /* FALLTHROUGH */
-    case op_states::initialization:
+    case states::initialization:
     {
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingMode (fedID, iterate); };
         auto asyncInfo = asyncCallInfo->lock ();
-        state = op_states::pending_exec;
+        state = states::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
-    case op_states::pending_exec:
+    case states::pending_exec:
         break;
-    case op_states::execution:
+    case states::execution:
         // already in this state --> do nothing
         break;
     default:
@@ -350,7 +352,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutingModeComplete ()
 {
-    if (state != op_states::pending_exec)
+    if (state != states::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
@@ -359,19 +361,19 @@ iteration_result Federate::enterExecutingModeComplete ()
     switch (res)
     {
     case iteration_result::next_step:
-        state = op_states::execution;
+        state = states::execution;
         currentTime = timeZero;
         initializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:
-        state = op_states::initialization;
+        state = states::initialization;
         updateTime (getCurrentTime (), getCurrentTime ());
         break;
     case iteration_result::error:
-        state = op_states::error;
+        state = states::error;
         break;
     case iteration_result::halted:
-        state = op_states::finalize;
+        state = states::finalize;
         break;
     }
 
@@ -405,33 +407,33 @@ void Federate::finalize ()
 {
     switch (state)
     {
-    case op_states::startup:
+    case states::startup:
         break;
-    case op_states::pending_init:
+    case states::pending_init:
         enterInitializingModeComplete ();
         break;
-    case op_states::initialization:
+    case states::initialization:
         break;
-    case op_states::pending_exec:
+    case states::pending_exec:
         enterExecutingModeComplete ();
         break;
-    case op_states::pending_time:
+    case states::pending_time:
         requestTimeComplete ();
         break;
-    case op_states::execution:
+    case states::execution:
         break;
-    case op_states::pending_iterative_time:
+    case states::pending_iterative_time:
         requestTimeIterativeComplete ();  // I don't care about the return any more
         break;
-    case op_states::finalize:
-    case op_states::error:
+    case states::finalize:
+    case states::error:
         return;
         // do nothing
     default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
-    state = op_states::finalize;
+    state = states::finalize;
 }
 
 void Federate::disconnect ()
@@ -440,26 +442,26 @@ void Federate::disconnect ()
     {
         coreObject->finalize (fedID);
     }
-    state = op_states::finalize;
+    state = states::finalize;
     coreObject = nullptr;
 }
 
 void Federate::error (int errorcode)
 {
-    state = op_states::error;
+    state = states::error;
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
 }
 
 void Federate::error (int errorcode, const std::string &message)
 {
-    state = op_states::error;
+    state = states::error;
     coreObject->logMessage (fedID, errorcode, message);
 }
 
 Time Federate::requestTime (Time nextInternalTimeStep)
 {
-    if (state == op_states::execution)
+    if (state == states::execution)
     {
         try
         {
@@ -469,17 +471,17 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             updateTime (newTime, oldTime);
             if (newTime == Time::maxVal ())
             {
-                state = op_states::finalize;
+                state = states::finalize;
             }
             return newTime;
         }
         catch (const FunctionExecutionFailure &fee)
         {
-            state = op_states::error;
+            state = states::error;
             throw;
         }
     }
-    else if (state == op_states::finalize)
+    else if (state == states::finalize)
     {
         return Time::maxVal ();
     }
@@ -491,7 +493,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 
 iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
-    if (state == op_states::execution)
+    if (state == states::execution)
     {
         auto iterativeTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
@@ -507,15 +509,15 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         case iteration_result::halted:
             currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
-            state = op_states::finalize;
+            state = states::finalize;
             break;
         case iteration_result::error:
-            state = op_states::error;
+            state = states::error;
             break;
         }
         return iterativeTime;
     }
-    else if (state == op_states::finalize)
+    else if (state == states::finalize)
     {
         return iteration_time (Time::maxVal (), iteration_result::halted);
     }
@@ -527,8 +529,8 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-    auto exp = op_states::execution;
-    if (state.compare_exchange_strong (exp, op_states::pending_time))
+    auto exp = states::execution;
+    if (state.compare_exchange_strong (exp, states::pending_time))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
@@ -546,8 +548,8 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-    auto exp = op_states::execution;
-    if (state.compare_exchange_strong (exp, op_states::pending_iterative_time))
+    auto exp = states::execution;
+    if (state.compare_exchange_strong (exp, states::pending_iterative_time))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestIterativeFuture =
@@ -566,8 +568,8 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    auto exp = op_states::pending_time;
-    if (state.compare_exchange_strong (exp, op_states::execution))
+    auto exp = states::pending_time;
+    if (state.compare_exchange_strong (exp, states::execution))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         auto newTime = asyncInfo->timeRequestFuture.get ();
@@ -589,8 +591,8 @@ Time Federate::requestTimeComplete ()
 iteration_time Federate::requestTimeIterativeComplete ()
 {
     auto asyncInfo = asyncCallInfo->lock ();
-    auto exp = op_states::pending_iterative_time;
-    if (state.compare_exchange_strong (exp, op_states::execution))
+    auto exp = states::pending_iterative_time;
+    if (state.compare_exchange_strong (exp, states::execution))
     {
         auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get ();
         Time oldTime = currentTime;
@@ -606,10 +608,10 @@ iteration_time Federate::requestTimeIterativeComplete ()
         case iteration_result::halted:
             currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
-            state = op_states::finalize;
+            state = states::finalize;
             break;
         case iteration_result::error:
-            state = op_states::error;
+            state = states::error;
             break;
         }
         return iterativeTime;

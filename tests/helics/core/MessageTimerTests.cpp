@@ -23,7 +23,6 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
     };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::unique_lock<std::mutex> localLock (mlock);
-
     mtimer->addTimerFromNow (std::chrono::milliseconds (200), CMD_PROTOCOL);
     BOOST_CHECK (M.action () == CMD_IGNORE);
     localLock.unlock ();

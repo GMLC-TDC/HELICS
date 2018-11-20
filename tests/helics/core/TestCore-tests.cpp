@@ -9,13 +9,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
-#include "helics/core/TestCore.h"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/core-types.hpp"
+#include "helics/core/test/TestCore.h"
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (TestCore_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (TestCore_tests, *utf::label ("ci"))
 
 using helics::Core;
 using namespace helics::CoreFactory;
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string ());
     BOOST_REQUIRE (broker);
     BOOST_CHECK (broker->isConnected ());
-    std::string initializationString = std::string ("4") + " --broker=" + broker->getIdentifier ();
+    std::string initializationString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();
     auto core = create (helics::core_type::TEST, initializationString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore> (core);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 {
-    const char *initializationString = "1";
+    const char *initializationString = "-f 1 --autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -60,18 +60,17 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     BOOST_CHECK_EQUAL (core->getFederationSize (), 1);
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
-    BOOST_CHECK (core->getFederateId ("sim1")==id);
+    BOOST_CHECK (core->getFederateId ("sim1") == id);
 
-    core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
+    core->setTimeProperty (id, helics_property_time_delta, 1.0);
 
-    auto sub1 =
-      core->registerInput (id, "", "type", "units");
+    auto sub1 = core->registerInput (id, "", "type", "units");
     core->addSourceTarget (sub1, "sim1_pub");
     BOOST_CHECK_EQUAL (core->getType (sub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (sub1), "units");
 
     auto pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
-    BOOST_CHECK (core->getPublication (id, "sim1_pub")==pub1);
+    BOOST_CHECK (core->getPublication (id, "sim1_pub") == pub1);
     BOOST_CHECK_EQUAL (core->getType (pub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (pub1), "units");
 
@@ -89,9 +88,9 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     core->timeRequest (id, 100.0);
     valueUpdates = core->getValueUpdates (id);
-    BOOST_REQUIRE_EQUAL(valueUpdates.size(), 1u);
+    BOOST_REQUIRE_EQUAL (valueUpdates.size (), 1u);
     BOOST_CHECK_EQUAL (valueUpdates[0], sub1);
-    
+
     data = core->getValue (sub1);
     std::string str2 (data->to_string ());
     BOOST_CHECK_EQUAL (str1, str2);
@@ -118,7 +117,7 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
 BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
 {
-    const char *initializationString = "1 --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
+    const char *initializationString = "--autobroker --broker=\"brk1\" --brokerinit=\"--name=brk1\"";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -130,9 +129,9 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     auto id = core->registerFederate ("sim1", helics::CoreFederateInfo ());
 
     BOOST_CHECK_EQUAL (core->getFederateName (id), "sim1");
-    BOOST_CHECK (core->getFederateId ("sim1")==id);
+    BOOST_CHECK (core->getFederateId ("sim1") == id);
 
-    core->setTimeProperty (id,TIME_DELTA_PROPERTY, 1.0);
+    core->setTimeProperty (id, helics_property_time_delta, 1.0);
 
     auto end1 = core->registerEndpoint (id, "end1", "type");
     BOOST_CHECK_EQUAL (core->getType (end1), "type");
@@ -185,7 +184,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         std::string filterName;
     };
 
-    std::string initializationString = "1";
+    std::string initializationString = "--autobroker";
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
@@ -225,7 +224,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
     BOOST_CHECK_EQUAL (msg->original_source, "end1");
     auto res = msg->data.to_string ();
     BOOST_CHECK_EQUAL (res.compare (0, 11, "jello world"), 0);
-    core->finalize(id);
+    core->finalize (id);
     testSrcFilter = nullptr;
     testDstFilter = nullptr;
     core->disconnect ();

@@ -9,9 +9,9 @@
 package com.java.helics;
 
 public final class helics_iteration_request {
-  public final static helics_iteration_request no_iteration = new helics_iteration_request("no_iteration");
-  public final static helics_iteration_request force_iteration = new helics_iteration_request("force_iteration");
-  public final static helics_iteration_request iterate_if_needed = new helics_iteration_request("iterate_if_needed");
+  public final static helics_iteration_request helics_iteration_request_no_iteration = new helics_iteration_request("helics_iteration_request_no_iteration");
+  public final static helics_iteration_request helics_iteration_request_force_iteration = new helics_iteration_request("helics_iteration_request_force_iteration");
+  public final static helics_iteration_request helics_iteration_request_iterate_if_needed = new helics_iteration_request("helics_iteration_request_iterate_if_needed");
 
   public final int swigValue() {
     return swigValue;
@@ -47,7 +47,7 @@ public final class helics_iteration_request {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_iteration_request[] swigValues = { no_iteration, force_iteration, iterate_if_needed };
+  private static helics_iteration_request[] swigValues = { helics_iteration_request_no_iteration, helics_iteration_request_force_iteration, helics_iteration_request_iterate_if_needed };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

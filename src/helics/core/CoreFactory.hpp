@@ -101,9 +101,10 @@ registered or when the clean up function is called this prevents some odd thread
 */
 size_t cleanUpCores (std::chrono::milliseconds delay);
 
-/** make a copy of the broker pointer to allow access to the new name
+/** make a copy of the core pointer to allow access to the new name
+@return true if the copyFromName was found and the copy successful
  */
-void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName);
+bool copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName);
 }  // namespace CoreFactory
 
 }  // namespace helics
