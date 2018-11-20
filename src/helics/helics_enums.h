@@ -175,6 +175,8 @@ extern "C"
         helics_handle_option_single_connection_only = 407,
         /** specify that multiple connections are allowed for an interface*/
         helics_handle_option_multiple_connections_allowed = 409,
+        /** specify that the last data should be buffered and send on subscriptions after init*/
+        helics_handle_option_buffer_data = 411,
         /** specify that an interface will only transmit on change(only applicable to publications)*/
         helics_handle_option_only_transmit_on_change = 6,
         /** specify that an interface will only update if the value has actually changed*/
