@@ -160,7 +160,7 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
 
             auto info = jsonGetOrDefault (ept, "info", std::string ());
             if(!info.empty()){
-                coreObject->setInterfaceInfo(epObj.getHandle(), info);
+                setInfo(epObj.getHandle(), info);
             }
         }
     }
@@ -230,7 +230,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
 
             auto info = tomlGetOrDefault (ept, "info", std::string ());
             if(!info.empty()){
-                coreObject->setInterfaceInfo(epObj.getHandle(), info);
+                setInfo(epObj.getHandle(), info);
             }
         }
     }

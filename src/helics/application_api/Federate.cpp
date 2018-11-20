@@ -1155,4 +1155,12 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
+    void Federate::setInfo(interface_handle handle, const std::string& info) {
+        coreObject->setInterfaceInfo(handle, info);
+    }
+
+std::string const &Federate::getInfo(interface_handle handle) {
+    return coreObject->getInterfaceInfo(handle);
+}
+
 }  // namespace helics

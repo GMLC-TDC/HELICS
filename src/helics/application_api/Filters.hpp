@@ -77,6 +77,10 @@ class Filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
     */
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(id); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(id, info); }
     virtual void set (const std::string &property, double val);
     /** set a string property on a filter
     @param property the name of the property of the filter to change

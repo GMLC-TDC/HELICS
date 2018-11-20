@@ -168,7 +168,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 pubAct->setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(pubAct->getHandle(), info);
+                setInfo(pubAct->getHandle(), info);
             }
         }
     }
@@ -205,7 +205,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 subNew.setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(subNew.getHandle(), info);
+                setInfo(subNew.getHandle(), info);
             }
         }
     }
@@ -239,7 +239,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 inp->setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(inp->getHandle(), info);
+                setInfo(inp->getHandle(), info);
             }
         }
     }
@@ -289,7 +289,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
                 pubObj->setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(pubObj->getHandle(), info);
+                setInfo(pubObj->getHandle(), info);
             }
         }
     }
@@ -326,7 +326,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
                 id->setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(id->getHandle(), info);
+                setInfo(id->getHandle(), info);
             }
         }
     }
@@ -361,7 +361,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
                 id->setMinimumChange (tol);
             }
             if(!info.empty()){
-                coreObject->setInterfaceInfo(id->getHandle(), info);
+                setInfo(id->getHandle(), info);
             }
         }
     }

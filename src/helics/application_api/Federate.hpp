@@ -438,7 +438,10 @@ class Federate
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
 
-  private:
+    void setInfo(interface_handle handle, const std::string& info);
+    std::string const &getInfo(interface_handle handle);
+
+private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces
