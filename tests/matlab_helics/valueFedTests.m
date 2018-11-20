@@ -150,7 +150,7 @@ defaultValue = 'start';
     testValue2 = 'I am a string';
     testVal2 = 0.0;
 try
-    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_namedpoint, '');
+    pubid = helicsFederateRegisterGlobalPublication(feds.vFed, 'pub1', helics_data_type_named_point, '');
     subid = helicsFederateRegisterSubscription(feds.vFed, 'pub1', '');
 
     helicsInputSetDefaultNamedPoint(subid, defaultValue, defVal);
@@ -161,7 +161,7 @@ try
     helicsPublicationPublishNamedPoint(pubid, testValue1, testVal1);
 
     % double val;
-    [value, ~,val] = helicsInputGetNamedPoint(subid);
+    [value,val] = helicsInputGetNamedPoint(subid);
     testCase.verifyEqual(value,defaultValue);
     testCase.verifyEqual(val,defVal);
 
@@ -169,7 +169,7 @@ try
     testCase.verifyEqual(grantedtime,0.01);
 
     % get the value
-    [value, ~,val] = helicsInputGetNamedPoint(subid);
+    [value,val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
     testCase.verifyEqual(val,testVal1);
@@ -178,7 +178,7 @@ try
     helicsPublicationPublishNamedPoint(pubid, testValue2, testVal2);
 
     % make sure the value is still what we expect
-    [value,~, val] = helicsInputGetNamedPoint(subid);
+    [value, val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue1);
     testCase.verifyEqual(val,testVal1);
@@ -188,7 +188,7 @@ try
     testCase.verifyEqual(grantedtime,0.02);
 
     % make sure the value was updated
-    [value,~, val] = helicsInputGetNamedPoint(subid);
+    [value, val] = helicsInputGetNamedPoint(subid);
     % make sure the string is what we expect
     testCase.verifyEqual(value,testValue2);
     testCase.verifyEqual(val,testVal2);
