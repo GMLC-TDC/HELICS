@@ -28,24 +28,30 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define TCPTEST2 "tcp_2",
 #define TCPTEST3 "tcp_3",
 #define TCPTEST4 "tcp_4",
+
+#define TCPSSTEST "tcp",
+#define TCPSSTEST2 "tcp_2",
 #else
 #define TCPTEST
 #define TCPTEST2
 #define TCPTEST3
 #define TCPTEST4
+
+#define TCPSSTEST
+#define TCPSSTEST2
 #endif
 
 const std::vector<std::string> ztypes = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
 const std::vector<std::string> core_types = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
 
-const std::vector<std::string> core_types_2 = {"ipc_2", TCPTEST2 "test_2", ZMQTEST2 "udp_2"};
+const std::vector<std::string> core_types_2 = {"ipc_2", TCPTEST2 "test_2", TCPSSTEST2 ZMQTEST2 "udp_2"};
 
-const std::vector<std::string> core_types_simple = {"test", "ipc", TCPTEST ZMQTEST "udp"};
-const std::vector<std::string> core_types_single = {"test", "ipc", TCPTEST ZMQTEST "udp", "test_3",
-                                                    ZMQTEST3 TCPTEST3 "udp_3"};
+const std::vector<std::string> core_types_simple = {"test", TCPSSTEST "ipc", TCPTEST ZMQTEST "udp"};
+const std::vector<std::string> core_types_single = {"test", TCPSSTEST "ipc", TCPTEST ZMQTEST "udp", "test_3",
+                                                    TCPSSTEST2 ZMQTEST3 TCPTEST3 "udp_3"};
 const std::vector<std::string> core_types_all = {
-  "test",         "ipc_2",          TCPTEST "test_2", ZMQTEST "udp",     "test_3",
-  ZMQTEST3 "ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
+  "test",         TCPSSTEST "ipc_2", TCPTEST "test_2", ZMQTEST "udp",     TCPSSTEST2 "test_3",
+  ZMQTEST3 "ipc", ZMQTEST2 "udp_2",  TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
 const std::vector<std::string> core_types_extended = {"ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4",
                                                       ZMQTEST4 TCPTEST4 "udp_4"};
 

@@ -90,8 +90,8 @@ enum options : int
     connection_optional = helics_handle_option_connection_optional,
     single_connection_only = helics_handle_option_single_connection_only,
     multiple_connections_allowed = helics_handle_option_multiple_connections_allowed,
-    only_transmit_on_change = helics_handle_option_only_transmit_on_change,
-    only_update_on_change = helics_handle_option_only_update_on_change,
+    handle_only_transmit_on_change = helics_handle_option_only_transmit_on_change,
+    handle_only_update_on_change = helics_handle_option_only_update_on_change,
     buffer_data = helics_handle_option_buffer_data,
     ignore_interrupts = helics_handle_option_ignore_interrupts
 };
