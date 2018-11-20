@@ -190,7 +190,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
         - CCACHE_CPP2=yes
-		- CI_TEST_CONFIG="TSAN"
+        - CI_TEST_CONFIG="TSAN"
         - RUN_TSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
