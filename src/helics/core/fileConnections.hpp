@@ -46,11 +46,24 @@ void makeConnectionsToml(brkX *brk, const std::string &file)
                 std::string pub = tomlGetOrDefault(conn, "publication", std::string());
                 if (conn.has("targets"))
                 {
-                    auto &targetArray = conn.get<toml::Array>("targets");
-                    for (const auto &target : targetArray)
+                    auto targets = conn.findChild("targets");
+                    if (targets->is<toml::Array>())
                     {
-                        brk->dataLink(pub, target.as<std::string>());
+                        auto &targetArray = targets->as<toml::Array>();
+                        for (const auto &target : targetArray)
+                        {
+                            brk->dataLink(pub, target.as<std::string>());
+                        }
                     }
+                    else
+                    {
+                        brk->dataLink(pub, targets->as<std::string>());
+                    }
+                    
+                }
+                if (conn.has("target"))
+                {
+                     brk->dataLink(pub,conn.get<std::string>("target"));
                 }
             }
         }
@@ -102,7 +115,15 @@ template<class brkX>
 void makeConnectionsJson(brkX *brk, const std::string &file)
 {
     static_assert(std::is_base_of <Broker, brkX>::value || std::is_base_of <Core, brkX>::value, "broker must be Core or broker");
-    auto doc = loadJson(file);
+    Json_helics::Value doc;
+    try
+    {
+        doc = loadJson(file);
+    }
+    catch (const std::invalid_argument &ia)
+    {
+        throw (helics::InvalidParameter(ia.what()));
+    }
 
     if (doc.isMember("connections"))
     {
@@ -117,10 +138,22 @@ void makeConnectionsJson(brkX *brk, const std::string &file)
                 std::string pub = jsonGetOrDefault(conn, "publication", std::string());
                 if (conn.isMember("targets"))
                 {
-                    for (const auto &target : conn["targets"])
+                    if (conn["targets"].isArray())
                     {
-                        brk->dataLink(pub, target.asString());
+                        for (const auto &target : conn["targets"])
+                        {
+                            brk->dataLink(pub, target.asString());
+                        }
                     }
+                    else
+                    {
+                        brk->dataLink(pub, conn["targets"].asString());
+                    }
+                   
+                }
+                if (conn.isMember("target"))
+                {
+                    brk->dataLink(pub, conn["target"].asString());
                 }
             }
         }
