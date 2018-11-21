@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
     auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
     mFed.disconnect ();
 }
 
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
     auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
     mFed.disconnect ();
 }
 
@@ -509,6 +509,8 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
 
     auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
     BOOST_CHECK (cloneFilt != nullptr);
+
+	BOOST_CHECK_EQUAL(mFed.getFilter(0).getInfo(), "this is an information string for use by the application");
     mFed.disconnect ();
 }
 
@@ -527,7 +529,9 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
     auto filt = &mFed.getFilter (2);
 
     auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
-    BOOST_CHECK (cloneFilt);
+    BOOST_CHECK (cloneFilt!=nullptr);
+
+	BOOST_CHECK_EQUAL(mFed.getFilter(0).getInfo(), "this is an information string for use by the application");
     mFed.disconnect ();
 }
 

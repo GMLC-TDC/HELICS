@@ -32,10 +32,13 @@ helics::Time loadJsonTime (const Json_helics::Value &timeElement, timeUnits defa
 /** get a name or key from the element*/
 std::string getKey (const Json_helics::Value &element);
 
+/** generate a Json String*/
+std::string generateJsonString(const Json_helics::Value &block);
+
 inline std::string
 jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, const std::string &defVal)
 {
-    return (element.isMember (key)) ? element[key].asString () : defVal;
+    return (element.isMember (key)) ? ((element[key].isString())?element[key].asString (): generateJsonString(element[key])): defVal;
 }
 
 inline double jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, double defVal)
@@ -106,6 +109,3 @@ inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::s
         bval = element[key].asBool ();
     }
 }
-
-/** generate a Json String*/
-std::string generateJsonString (const Json_helics::Value &block);

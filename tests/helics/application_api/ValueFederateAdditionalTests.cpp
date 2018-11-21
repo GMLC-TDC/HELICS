@@ -496,9 +496,14 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
 
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
     auto pub2name = vFed.getPublicationKey (vFed.getPublication (1));
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
-    vFed.disconnect ();
+	//test the info from a file
+	BOOST_CHECK_EQUAL(vFed.getPublication(0).getInfo(), "this is an information string for use by the application");
+	vFed.disconnect ();
+
+
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load_toml)
@@ -514,8 +519,13 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
 
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
+
     auto pub2name = vFed.getPublicationKey (vFed.getPublication (1));
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
+
+	//test the info from a file
+	BOOST_CHECK_EQUAL(vFed.getPublication(0).getInfo(), "this is an information string for use by the application");
     vFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

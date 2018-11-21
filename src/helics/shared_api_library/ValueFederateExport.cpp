@@ -1287,6 +1287,7 @@ const char *helicsInputGetType (helics_input inp)
     }
 }
 
+
 const char *helicsPublicationGetType (helics_publication pub)
 {
     auto pubObj = verifyPublication (pub, nullptr);
@@ -1396,6 +1397,41 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     {
         return emptyStr.c_str ();
     }
+}
+
+const char *helicsInputGetInfo(helics_input inp)
+{
+	auto inpObj = verifyInput(inp, nullptr);
+	if (inpObj == nullptr)
+	{
+		return emptyStr.c_str();
+	}
+	try
+	{
+		const std::string &info = inpObj->inputPtr->getInfo();
+		return info.c_str();
+	}
+	catch (...)
+	{
+		return emptyStr.c_str();
+	}
+}
+
+void helicsInputSetInfo(helics_input inp, const char *info, helics_error *err)
+{
+	auto inpObj = verifyInput(inp, err);
+	if (inpObj == nullptr)
+	{
+		return;
+	}
+	try
+	{
+		inpObj->inputPtr->setInfo(AS_STRING(info));
+	}
+	catch (...)
+	{
+		helicsErrorHandler(err);
+	}
 }
 
 helics_bool helicsInputIsUpdated (helics_input inp)
