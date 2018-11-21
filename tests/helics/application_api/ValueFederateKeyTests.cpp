@@ -393,6 +393,28 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_direct2, bdata::mak
     BOOST_CHECK (res);
 }
 
+static const std::vector<std::string> simple_connection_files{ "example_connections1.json", "example_connections2.json",
+"example_connections1.toml","example_connections2.toml" };
+
+BOOST_DATA_TEST_CASE(value_federate_dual_transfer_core_link_file, bdata::make(simple_connection_files), file_name)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto testFile=std::string(TEST_DIR) + "/test_files/"+file_name);
+    core->makeConnections(testFile);
+    core = nullptr;
+    // register the publications
+    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK(res);
+}
+
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
