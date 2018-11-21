@@ -694,7 +694,7 @@ void helicsPublicationPublishVector (helics_publication pub, const double *vecto
         }
         else
         {
-            pubObj->pubPtr->publish (std::vector<double> (vectorInput, vectorInput + vectorlength));
+            pubObj->pubPtr->publish (vectorInput, vectorlength);
         }
     }
     catch (...)
@@ -1061,20 +1061,25 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
         if (length == maxStringLen)
         {
             outputString[maxStringLen - 1] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = maxStringLen;
+        }
         }
         else
         {
             outputString[length] = '\0';
+            if (actualLength != nullptr)
+            {
+                *actualLength = length + 1;
+        }
         }
 
         if (val != nullptr)
         {
             *val = np.value;
         }
-        if (actualLength != nullptr)
-        {
-            *actualLength = length;
-        }
+
         return;
     }
     catch (...)
