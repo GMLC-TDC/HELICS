@@ -34,6 +34,9 @@ else()
   #set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
 endif() # ENABLE_SWIG
 
+# Set the output library name to _helics
+set_target_properties(CShelics PROPERTIES DEBUG_POSTFIX "")
+
 if(WIN32)
   foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
     add_custom_command(

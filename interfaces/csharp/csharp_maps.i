@@ -3,7 +3,7 @@
 	$1=&etemp;
 }
 
-%typemap(freearg) helics_error *
+%typemap(freearg, canthrow=1) helics_error *
 {
 	if ($1->error_code!=helics_ok)
 	{
