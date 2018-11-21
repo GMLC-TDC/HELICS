@@ -1,3 +1,17 @@
+%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+	etemp=helicsErrorInitialize();
+	$1=&etemp;
+}
+
+%typemap(freearg) helics_error *
+{
+	if ($1->error_code!=helics_ok)
+	{
+		SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, $1->message);
+	}
+}
+
+
 
 //typemap for short maxlen strings
 //%typemap(in) (char *outputString, int maxlen) {
