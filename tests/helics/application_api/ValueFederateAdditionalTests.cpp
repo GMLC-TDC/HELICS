@@ -454,6 +454,8 @@ BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make(core_types_single), core_
 
     vFed1->enterExecutingMode();
 
+
+    // Check all values can be accessed and returned through the federate.
     auto info1 = vFed1->getInfo(pubid1.getHandle());
     auto info2 = vFed1->getInfo(sub1.getHandle());
     auto info3 = vFed1->getInfo(sub2.getHandle());
@@ -463,6 +465,15 @@ BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make(core_types_single), core_
     BOOST_CHECK_EQUAL (info2, "sub_test1");
     BOOST_CHECK_EQUAL (info3, "sub_test2");
     BOOST_CHECK_EQUAL (info4, "sub_test3");
+
+    // Check all values can be accessed and returned directly from their subscriptions.
+    auto sub_info2 = sub1.getInfo();
+    auto sub_info3 = sub2.getInfo();
+    auto sub_info4 = sub3.getInfo();
+
+    BOOST_CHECK_EQUAL (sub_info2, "sub_test1");
+    BOOST_CHECK_EQUAL (sub_info3, "sub_test2");
+    BOOST_CHECK_EQUAL (sub_info4, "sub_test3");
 
     vFed1->finalize();
 }

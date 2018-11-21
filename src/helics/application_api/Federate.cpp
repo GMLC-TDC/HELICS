@@ -698,6 +698,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             std::string key = jsonGetOrDefault (filt, "name", std::string ());
             std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
+            auto info = jsonGetOrDefault (filt, "info", std::string ());
             bool cloningflag = jsonGetOrDefault (filt, "cloning", false);
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
@@ -823,6 +824,9 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     }
                 }
             }
+            if(!info.empty()){
+                setInfo(filter.getHandle(), info);
+            }
         }
     }
 }
@@ -849,6 +853,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             bool cloningflag = tomlGetOrDefault (filt, "cloning", false);
             std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
             std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
+            auto info = tomlGetOrDefault (filt, "info", std::string ());
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
             std::string operation = tomlGetOrDefault (filt, "operation", std::string ("custom"));
@@ -982,6 +987,9 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                         filter.setString (propname->as<std::string> (), propval->as<std::string> ());
                     }
                 }
+            }
+            if(!info.empty()){
+                setInfo(filter.getHandle(), info);
             }
         }
     }
@@ -1155,9 +1163,9 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
-    void Federate::setInfo(interface_handle handle, const std::string& info) {
-        coreObject->setInterfaceInfo(handle, info);
-    }
+void Federate::setInfo(interface_handle handle, const std::string& info) {
+    coreObject->setInterfaceInfo(handle, info);
+}
 
 std::string const &Federate::getInfo(interface_handle handle) {
     return coreObject->getInterfaceInfo(handle);
