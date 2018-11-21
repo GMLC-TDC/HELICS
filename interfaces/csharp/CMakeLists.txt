@@ -10,7 +10,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 
   set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
   #set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
-  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc.helics")
+  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")
 
   swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
 
