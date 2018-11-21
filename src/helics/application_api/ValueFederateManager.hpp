@@ -161,6 +161,10 @@ class ValueFederateManager
     /** get an option values for a publication*/
     bool getPublicationOption (const Publication &pub, int32_t option) const;
 
+    /** register a callback function to call when any subscribed value is updated
+    @details there can only be one generic callback
+    @param[in] callback the function to call
+    */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param[in] id  the id to register the callback for
