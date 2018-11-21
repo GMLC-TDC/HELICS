@@ -190,6 +190,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
         - CCACHE_CPP2=yes
+        - CI_TEST_CONFIG="TSAN"
         - RUN_TSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
@@ -254,6 +255,7 @@ install:
   - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
   - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
   - if [[ "$RUN_TSAN" ]]; then TEST_FLAGS_ARR+=("--tsan") ; fi
+  - if [[ "$CI_TEST_CONFIG" ]]; then TEST_FLAGS_ARR+=("$CI_TEST_CONFIG") ; fi
   - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
   - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
   - if [[ "$CTEST_VERBOSE" ]]; then TEST_FLAGS_ARR+=("--ctest-verbose") ; fi
