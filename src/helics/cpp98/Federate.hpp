@@ -53,9 +53,9 @@ class FederateInfo
         helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, NULL);
     }
 
-    void setIntegerProperty (int integerProperty, int intValue)
+    void setIntegerProperty (int integerProperty, int propertyValue)
     {
-        helicsFederateInfoSetIntegerProperty (fi, integerProperty, intValue, NULL);
+        helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, NULL);
     }
 
     helics_federate_info getInfo () { return fi; }
