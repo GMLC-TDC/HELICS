@@ -97,7 +97,7 @@ public class JavaHelicsApiTests {
 			if (!core1IdentifierString.contains("core1")) {
 				javaHelicsApiTests.helicsAssert("!core1IdentifierString.equals(\"core1\")");
 			}
-			
+
 			int core1IsConnected = helics.helicsCoreIsConnected(core1);
 			if (core1IsConnected != 0) {
 				javaHelicsApiTests.helicsAssert("core1IsConnected != 0");
@@ -119,7 +119,7 @@ public class JavaHelicsApiTests {
 				javaHelicsApiTests.helicsAssert("cloningFilter1 == null");
 			}
 			helics.helicsFilterRemoveDeliveryEndpoint(cloningFilter1, "ep3");
-			
+
 			helics.helicsCoreSetReadyToInit(core1);
 			helics.helicsCoreDisconnect(core1);
 			helics.helicsCoreDisconnect(core2);
@@ -531,8 +531,8 @@ public class JavaHelicsApiTests {
 			if (!sub7PointString.contains("Blah Blah")) {
 				javaHelicsApiTests.helicsAssert("!sub7PointString.contains(\"Blah Blah\")");
 			}
-			if (sub7PointLength[0] != 9) {
-				javaHelicsApiTests.helicsAssert("sub7PointLength[0] != 9");
+			if (sub7PointLength[0] != 10) {
+				javaHelicsApiTests.helicsAssert("sub7PointLength[0] != 10");
 			}
 			if (sub7DoubleValue[0] != 20.0) {
 				javaHelicsApiTests.helicsAssert("sub7DoubleValue[0] != 20.0");
