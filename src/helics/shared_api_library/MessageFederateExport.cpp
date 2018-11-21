@@ -506,3 +506,38 @@ int helicsFederateGetEndpointCount (helics_federate fed)
     }
     return static_cast<int> (mfedObj->getEndpointCount ());
 }
+
+const char *helicsEndpointGetInfo(helics_endpoint end)
+{
+    auto endObj = verifyEndpoint(end, nullptr);
+    if (endObj == nullptr)
+    {
+        return emptyStr.c_str();
+    }
+    try
+    {
+        const std::string &info = endObj->endPtr->getInfo();
+        return info.c_str();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str();
+    }
+}
+
+void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err)
+{
+    auto endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        endObj->endPtr->setInfo(AS_STRING(info));
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+    }
+}
