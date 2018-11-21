@@ -98,19 +98,17 @@ void UdpComms::queue_rx_function ()
                         }
                     }
                 }
-                if (bindsuccess)
-                {
-                    continue;
-                }
-                else
+                if (!bindsuccess)
                 {
                     disconnecting = true;
-                    logError (fmt::format ("unable to bind socket {} :{}",
-                                           makePortAddress (localTarget_, PortNumber), error.what ()));
-                    socket.close ();
-                    setRxStatus (connection_status::error);
+                    logError(fmt::format("unable to bind socket {} :{}",
+                        makePortAddress(localTarget_, PortNumber), error.what()));
+                    socket.close();
+                    setRxStatus(connection_status::error);
                     return;
                 }
+                continue;
+                    
             }
             if (t_cnt == std::chrono::milliseconds(0))
             {

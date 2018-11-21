@@ -4,9 +4,9 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
+#include "NetworkBrokerData.hpp"
 #include "../common/argParser.h"
 #include "BrokerFactory.hpp"
-#include "NetworkBrokerData.hpp"
 
 #include "../common/AsioServiceManager.h"
 #include <boost/asio/ip/host_name.hpp>
@@ -360,7 +360,7 @@ std::string stripProtocol (const std::string &networkAddress)
     auto loc = networkAddress.find ("://");
     if (loc != std::string::npos)
     {
-        return networkAddress.substr(loc + 3);
+        return networkAddress.substr (loc + 3);
     }
     return networkAddress;
 }
@@ -370,7 +370,7 @@ void removeProtocol (std::string &networkAddress)
     auto loc = networkAddress.find ("://");
     if (loc != std::string::npos)
     {
-        networkAddress.erase(0, loc + 3);
+        networkAddress.erase (0, loc + 3);
     }
 }
 
@@ -424,19 +424,17 @@ bool isipv6 (const std::string &address)
     {
         return true;
     }
-    else
+
+    auto brkcnt = address.find_first_of ('[');
+    if (brkcnt != std::string::npos)
     {
-        auto brkcnt = address.find_first_of ('[');
-        if (brkcnt != std::string::npos)
-        {
-            return true;
-        }
-        if (address.compare (0, 2, "::") == 0)
-        {
-            return true;
-        }
-        return false;
+        return true;
     }
+    if (address.compare (0, 2, "::") == 0)
+    {
+        return true;
+    }
+    return false;
 }
 
 template <class InputIt1, class InputIt2>
@@ -561,10 +559,7 @@ std::string getLocalExternalAddress (const std::string &server)
     {
         return getLocalExternalAddressV6 (server);
     }
-    else
-    {
-        return getLocalExternalAddressV4 (server);
-    }
+    return getLocalExternalAddressV4 (server);
 }
 
 std::string generateMatchingInterfaceAddress (const std::string &server, interface_networks network)
