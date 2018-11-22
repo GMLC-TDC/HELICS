@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "fileConnections.hpp"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
@@ -137,6 +138,18 @@ uint16_t CoreBroker::getNextAirlockIndex ()
         }
     }
     return index;
+}
+
+void  CoreBroker::makeConnections(const std::string &file)
+{
+    if (hasTomlExtension(file))
+    {
+        makeConnectionsToml(this,file);
+    }
+    else
+    {
+        makeConnectionsJson(this,file);
+    }
 }
 
 void CoreBroker::dataLink (const std::string &publication, const std::string &input)
