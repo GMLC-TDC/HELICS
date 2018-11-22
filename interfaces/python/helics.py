@@ -168,8 +168,10 @@ helics_handle_option_connection_required = _helics.helics_handle_option_connecti
 helics_handle_option_connection_optional = _helics.helics_handle_option_connection_optional
 helics_handle_option_single_connection_only = _helics.helics_handle_option_single_connection_only
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
+helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
+helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
 helics_filtertype_custom = _helics.helics_filtertype_custom
 helics_filtertype_delay = _helics.helics_filtertype_delay
 helics_filtertype_random_delay = _helics.helics_filtertype_random_delay
@@ -1515,6 +1517,22 @@ def helicsPublicationGetUnits(pub: 'helics_publication') -> "char const *":
     """
     return _helics.helicsPublicationGetUnits(pub)
 
+def helicsInputGetInfo(inp: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetInfo(inp)
+helicsInputGetInfo = _helics.helicsInputGetInfo
+
+def helicsInputSetInfo(inp: 'helics_input', info: 'char const *') -> "void":
+    return _helics.helicsInputSetInfo(inp, info)
+helicsInputSetInfo = _helics.helicsInputSetInfo
+
+def helicsPublicationGetInfo(pub: 'helics_publication') -> "char const *":
+    return _helics.helicsPublicationGetInfo(pub)
+helicsPublicationGetInfo = _helics.helicsPublicationGetInfo
+
+def helicsPublicationSetInfo(pub: 'helics_publication', info: 'char const *') -> "void":
+    return _helics.helicsPublicationSetInfo(pub, info)
+helicsPublicationSetInfo = _helics.helicsPublicationSetInfo
+
 def helicsInputIsUpdated(ipt: 'helics_input') -> "helics_bool":
     return _helics.helicsInputIsUpdated(ipt)
 helicsInputIsUpdated = _helics.helicsInputIsUpdated
@@ -1706,6 +1724,14 @@ def helicsFederateGetEndpointCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetEndpointCount(fed)
 helicsFederateGetEndpointCount = _helics.helicsFederateGetEndpointCount
 
+def helicsEndpointGetInfo(end: 'helics_endpoint') -> "char const *":
+    return _helics.helicsEndpointGetInfo(end)
+helicsEndpointGetInfo = _helics.helicsEndpointGetInfo
+
+def helicsEndpointSetInfo(end: 'helics_endpoint', info: 'char const *') -> "void":
+    return _helics.helicsEndpointSetInfo(end, info)
+helicsEndpointSetInfo = _helics.helicsEndpointSetInfo
+
 def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterFilter(fed, type, name)
 helicsFederateRegisterFilter = _helics.helicsFederateRegisterFilter
@@ -1795,6 +1821,14 @@ def helicsFilterRemoveDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 
 
     """
     return _helics.helicsFilterRemoveDeliveryEndpoint(filt, deliveryEndpoint)
+
+def helicsFilterGetInfo(filt: 'helics_filter') -> "char const *":
+    return _helics.helicsFilterGetInfo(filt)
+helicsFilterGetInfo = _helics.helicsFilterGetInfo
+
+def helicsFilterSetInfo(filt: 'helics_filter', info: 'char const *') -> "void":
+    return _helics.helicsFilterSetInfo(filt, info)
+helicsFilterSetInfo = _helics.helicsFilterSetInfo
 # This file is compatible with both classic and new-style classes.
 
 
