@@ -29,7 +29,7 @@ inputDelay=0 #the input delay for external data to propagate to federates
 subscriptions=[
 {key="pub1",  type="double",required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="fedName:pub2", shortcut="pubshortcut"}
+{key="fedName:pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 #Publications used in the federate
@@ -38,11 +38,13 @@ key="pub1" # the name of the publication
  type="double" # the type assocaited with a publication (optional)
  unit="m"  # the units associated with a publication (optional)
  global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
-
+ info="this is an information string for use by the application"
+ 
 [[publications]]
 key="pub2" # the name of the publication
  type="double" # the type assocaited with a publication (optional)
  #no global=true implies this will have the federate name prepended like valueFed/pub2
+
 
 
 

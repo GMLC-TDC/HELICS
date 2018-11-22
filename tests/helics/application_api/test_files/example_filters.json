@@ -46,6 +46,7 @@
 	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+	"info":"this is an information string for use by the application",
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
 		"name":"delay",  //A delay filter just has a single property

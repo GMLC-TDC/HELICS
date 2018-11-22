@@ -160,6 +160,16 @@ extern "C"
     @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
     HELICS_EXPORT int helicsFederateGetEndpointCount (helics_federate fed);
 
+	/** get the data in the info field of an filter
+	@param inp the filter to query
+	@return a string with the info field string*/
+	HELICS_EXPORT const char *helicsEndpointGetInfo(helics_endpoint end);
+	/** set the data in the info field for an filter
+    @param inp the filter to query
+    @param info the string to set
+    @param err an error object to fill out in case of an error*/
+	HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

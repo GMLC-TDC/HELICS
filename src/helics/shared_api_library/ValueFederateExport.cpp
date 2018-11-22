@@ -1292,6 +1292,7 @@ const char *helicsInputGetType (helics_input inp)
     }
 }
 
+
 const char *helicsPublicationGetType (helics_publication pub)
 {
     auto pubObj = verifyPublication (pub, nullptr);
@@ -1400,6 +1401,75 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     catch (...)
     {
         return emptyStr.c_str ();
+    }
+}
+
+const char *helicsInputGetInfo(helics_input inp)
+{
+    auto inpObj = verifyInput(inp, nullptr);
+    if (inpObj == nullptr)
+    {
+        return emptyStr.c_str();
+    }
+    try
+    {
+        const std::string &info = inpObj->inputPtr->getInfo();
+        return info.c_str();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str();
+    }
+}
+
+void helicsInputSetInfo(helics_input inp, const char *info, helics_error *err)
+{
+    auto inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        inpObj->inputPtr->setInfo(AS_STRING(info));
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+    }
+}
+const char *helicsPublicationGetInfo(helics_publication pub)
+{
+    auto pubObj = verifyPublication(pub, nullptr);
+    if (pubObj == nullptr)
+    {
+        return emptyStr.c_str();
+    }
+    try
+    {
+        const std::string &info = pubObj->pubPtr->getInfo();
+        return info.c_str();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str();
+    }
+}
+
+void helicsPublicationSetInfo(helics_publication pub, const char *info, helics_error *err)
+{
+    auto pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        pubObj->pubPtr->setInfo(AS_STRING(info));
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
     }
 }
 

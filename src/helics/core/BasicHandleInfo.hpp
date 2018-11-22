@@ -60,11 +60,14 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
+    std::string interface_info;
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 
 	interface_handle getInterfaceHandle () const { return handle.handle; }
     global_federate_id_t getFederateId () const { return handle.fed_id; }
+
+    void setInfoField(std::string &info) {interface_info = info;}
 
 };
 }  // namespace helics

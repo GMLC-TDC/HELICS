@@ -60,6 +60,53 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     BOOST_CHECK (state == helics_state_finalize);
 }
 
+
+/**
+Test filter info fields
+*/
+BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
+{
+    auto broker = AddBroker (core_type, 2);
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "filter");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, helics_time_zero, "message");
+
+    auto fFed = GetFederateAt (0);
+    auto mFed = GetFederateAt (1);
+
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL, &err);
+
+    CE (helicsEndpointSetInfo(p1, "p1_test", &err));
+    CE (helicsEndpointSetInfo(p2, "p2_test", &err));
+
+    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter1", &err));
+    CE (helicsFilterAddSourceTarget (f1, "port1", &err));
+    CE (helicsFilterSetInfo (f1, "f1_test", &err));
+
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter2", &err));
+    CE (helicsFilterAddDestinationTarget (f2, "port2", &err));
+    CE (helicsFilterSetInfo (f2, "f2_test", &err));
+
+    CE (auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "", &err));
+    CE (helicsEndpointSetInfo (ep1, "ep1_test", &err));
+    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "c4", &err));
+    helicsFilterAddSourceTarget (f3, "filter0/fout", nullptr);
+    CE (helicsFilterSetInfo (f3, "f3_test", &err));
+
+    // Check endpoints
+    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(p1), "p1_test");
+    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(p2), "p2_test");
+    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(ep1), "ep1_test");
+
+    // Check filters
+    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f1), "f1_test");
+    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f2), "f2_test");
+    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f3), "f3_test");
+
+    CE (helicsFederateFinalize (mFed, &err));
+    CE (helicsFederateFinalize (fFed, &err));
+}
+
 BOOST_AUTO_TEST_CASE (core_filter_reg)
 {
     CE (auto core1 = helicsCreateCore ("test", "core1", "--autobroker", &err));

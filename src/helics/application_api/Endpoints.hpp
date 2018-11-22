@@ -175,7 +175,10 @@ class Endpoint
     const std::string &getType () const { return fed->getEndpointType (*this); }
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
-
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(handle); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
   private:
     friend class MessageFederateManager;
 };

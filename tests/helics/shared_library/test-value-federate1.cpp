@@ -839,4 +839,29 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     CE (helicsFederateFinalize (vFed, &err));
 }
 
+/** test info field for multiple publications */
+BOOST_DATA_TEST_CASE (test_info_field, bdata::make(core_types_single), core_type) {
+SetupTest (helicsCreateValueFederate, core_type.c_str (), 1, 1.0);
+auto vFed = GetFederateAt (0);
+
+// register the publications/subscriptions
+
+auto subid1 = helicsFederateRegisterSubscription (vFed, "sub1", "", &err);
+auto pubid1 = helicsFederateRegisterTypePublication(vFed, "pub1", "string", "", &err);
+auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed, "pub2", "string", "", &err);
+
+// Set info fields
+CE (helicsInputSetInfo(subid1, "sub1_test", &err));
+CE (helicsPublicationSetInfo(pubid1, "pub1_test", &err));
+CE (helicsPublicationSetInfo(pubid2, "pub2_test", &err));
+CE (helicsFederateEnterExecutingMode (vFed, &err));
+
+
+BOOST_CHECK_EQUAL (helicsInputGetInfo(subid1), "sub1_test");
+BOOST_CHECK_EQUAL (helicsPublicationGetInfo(pubid1), "pub1_test");
+BOOST_CHECK_EQUAL (helicsPublicationGetInfo(pubid2), "pub2_test");
+
+CE (helicsFederateFinalize (vFed, &err));
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

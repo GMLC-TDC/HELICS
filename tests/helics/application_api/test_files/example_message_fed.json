@@ -23,7 +23,8 @@
 {
 "name":"ept1", // the name of the publication
  "type":"genmessage", // the type assocaited with a endpoint endpoint types have limited usefullness at present (optional)
- "global":true //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ "global":true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ "info":"this is an information string for use by the application"
 },
 {
 "name":"ept2", // the name of the publication

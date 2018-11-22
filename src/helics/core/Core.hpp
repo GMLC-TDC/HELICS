@@ -663,6 +663,18 @@ class Core
     */
     virtual void setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> queryFunction) = 0;
+    /**
+     * TODO: tags
+     * @param handle
+     * @param info
+     */
+    virtual void setInterfaceInfo(interface_handle handle, std::string info) = 0;
+    /**
+     *  TODO: tags
+     * @param handle
+     * @return
+     */
+    virtual const std::string &getInterfaceInfo(interface_handle handle) const = 0;
 };
 
 }  // namespace helics
