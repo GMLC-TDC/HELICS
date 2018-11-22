@@ -157,6 +157,11 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
             {
                 epObj.setTargetDestination (defTarget);
             }
+
+            auto info = jsonGetOrDefault (ept, "info", std::string ());
+            if(!info.empty()){
+                setInfo(epObj.getHandle(), info);
+            }
         }
     }
 }
@@ -220,6 +225,12 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             if (!defTarget.empty ())
             {
                 epObj.setTargetDestination (defTarget);
+
+			}
+
+            auto info = tomlGetOrDefault (ept, "info", std::string ());
+            if(!info.empty()){
+                setInfo(epObj.getHandle(), info);
             }
         }
     }

@@ -152,6 +152,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             }
             auto type = jsonGetOrDefault (pub, "type", std::string ());
             auto units = jsonGetOrDefault (pub, "units", std::string ());
+            auto info = jsonGetOrDefault (pub, "info", std::string ());
             bool global = jsonGetOrDefault (pub, "global", false);
             if (global)
             {
@@ -165,6 +166,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             if (tol > 0.0)
             {
                 pubAct->setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInfo(pubAct->getHandle(), info);
             }
         }
     }
@@ -180,6 +184,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 continue;
             }
             auto units = jsonGetOrDefault (sub, "units", std::string ());
+            auto info = jsonGetOrDefault (sub, "info", std::string ());
             bool required = (sub.isMember ("optional")) ? !(sub["optional"].asBool ()) : true;
             if (sub.isMember ("required"))
             {
@@ -199,6 +204,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 subNew.setMinimumChange (tol);
             }
+            if(!info.empty()){
+                setInfo(subNew.getHandle(), info);
+            }
         }
     }
     if (doc.isMember ("inputs"))
@@ -215,6 +223,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             }
             auto type = jsonGetOrDefault (ipt, "type", std::string ());
             auto units = jsonGetOrDefault (ipt, "units", std::string ());
+            auto info = jsonGetOrDefault (ipt, "info", std::string ());
             bool global = jsonGetOrDefault (ipt, "global", false);
             if (global)
             {
@@ -228,6 +237,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             if (tol > 0.0)
             {
                 inp->setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInfo(inp->getHandle(), info);
             }
         }
     }
@@ -260,6 +272,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
             auto type = tomlGetOrDefault (pub, "type", std::string ());
             auto units = tomlGetOrDefault (pub, "units", std::string ());
+            auto info = tomlGetOrDefault (pub, "info", std::string ());
             bool global = tomlGetOrDefault (pub, "global", false);
             Publication *pubObj = nullptr;
             if (global)
@@ -274,6 +287,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             if (tol > 0.0)
             {
                 pubObj->setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInfo(pubObj->getHandle(), info);
             }
         }
     }
@@ -291,6 +307,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
             auto units = tomlGetOrDefault (sub, "units", std::string ());
             bool optional = tomlGetOrDefault (sub, "optional", false);
+            auto info = tomlGetOrDefault (sub, "info", std::string ());
             bool required = tomlGetOrDefault (sub, "required", !optional);
             id = &registerSubscription (key, units);
             if (required)
@@ -307,6 +324,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             if (tol > 0.0)
             {
                 id->setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInfo(id->getHandle(), info);
             }
         }
     }
@@ -325,6 +345,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
             auto type = tomlGetOrDefault (ipt, "type", std::string ());
             auto units = tomlGetOrDefault (ipt, "units", std::string ());
+            auto info = tomlGetOrDefault (ipt, "info", std::string ());
             bool global = tomlGetOrDefault (ipt, "global", false);
             if (global)
             {
@@ -338,6 +359,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             if (tol > 0.0)
             {
                 id->setMinimumChange (tol);
+            }
+            if(!info.empty()){
+                setInfo(id->getHandle(), info);
             }
         }
     }

@@ -81,7 +81,7 @@ helics_federate_info helicsCreateFederateInfo ()
 /** this function is based on the lippencott function template
 http://cppsecrets.blogspot.com/2013/12/using-lippincott-function-for.html
 */
-constexpr char unknown_err_string[] = "unknown error";
+static constexpr char unknown_err_string[] = "unknown error";
 
 void helicsErrorHandler (helics_error *err) noexcept
 {

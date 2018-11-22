@@ -171,7 +171,10 @@ class Input
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
-
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(handle); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
@@ -496,5 +499,4 @@ const X &Input::getValueRef ()
 
     return getValueRefImpl<remove_cv_ref<X>> (lastValue);
 }
-
 }  // namespace helics

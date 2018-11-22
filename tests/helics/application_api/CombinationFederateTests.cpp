@@ -284,6 +284,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
 
+	BOOST_CHECK(!cFed.getPublication(1).getInfo().empty());
     cFed.disconnect ();
 }
 

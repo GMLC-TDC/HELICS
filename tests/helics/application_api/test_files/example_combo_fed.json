@@ -45,8 +45,9 @@
 },
 {
 "key":"pub2", // the name of the publication
- "type":"double" // the type assocaited with a publication (optional)
+ "type":"double", // the type assocaited with a publication (optional)
  //no global:true implies this will have the federate name prepended like comboFed/pub2
+ "info":{"field1":45,"field2":99}
 }
 ],
 //subscriptions used in the federate

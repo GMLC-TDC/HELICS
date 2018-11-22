@@ -176,6 +176,10 @@ class Publication
     const std::string &getType () const { return fed->getPublicationType (*this); }
     /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(handle); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
     /** add a target to the publication*/
     void addTarget (const std::string &target) { fed->addTarget (*this, target); }
 

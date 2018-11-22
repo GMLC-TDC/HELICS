@@ -454,3 +454,39 @@ void helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliver
         helicsErrorHandler (err);
     }
 }
+
+
+const char *helicsFilterGetInfo(helics_filter filt)
+{
+    auto filtObj = getFilterObj(filt, nullptr);
+    if (filtObj == nullptr)
+    {
+        return emptyStr.c_str();
+    }
+    try
+    {
+        const std::string &info = filtObj->filtPtr->getInfo();
+        return info.c_str();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str();
+    }
+}
+
+void helicsFilterSetInfo(helics_filter filt, const char *info, helics_error *err)
+{
+    auto filtObj = getFilterObj(filt, err);
+    if (filtObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        filtObj->filtPtr->setInfo(AS_STRING(info));
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
+    }
+}
