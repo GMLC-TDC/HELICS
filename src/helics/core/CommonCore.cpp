@@ -31,6 +31,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "fileConnections.hpp"
 #include "../common/fmt_format.h"
 
 namespace helics
@@ -1294,6 +1295,18 @@ FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
 void CommonCore::registerFrequentCommunicationsPair (const std::string & /*source*/, const std::string & /*dest*/)
 {
     // std::lock_guard<std::mutex> lock (_mutex);
+}
+
+void  CommonCore::makeConnections(const std::string &file)
+{
+    if (hasTomlExtension(file))
+    {
+        makeConnectionsToml(this, file);
+    }
+    else
+    {
+        makeConnectionsJson(this, file);
+    }
 }
 
 void CommonCore::dataLink (const std::string &source, const std::string &target)

@@ -534,6 +534,10 @@ class Core
      */
     virtual void registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) = 0;
 
+    /** load a file containing connection information
+    @param file a JSON or TOML file containing connection information*/
+    virtual void makeConnections(const std::string &file) = 0;
+
     /** create a data connection between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/

@@ -73,7 +73,7 @@ extern "C"
 
     /** send a message to the specified destination
     @param endpoint the endpoint to send the data from
-    @param dest the target destination (nullptr to use the default destination
+    @param dest the target destination (nullptr to use the default destination)
     @param data the data to send
     @param len the length of the data to send
     @return helics_ok if everything worked
