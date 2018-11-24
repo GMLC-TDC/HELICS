@@ -3,10 +3,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "IpcComms.h"
 #include "../../common/fmt_format.h"
 #include "../../flag-definitions.h"
 #include "../ActionMessage.hpp"
-#include "IpcComms.h"
 #include "IpcQueueHelper.h"
 #include <algorithm>
 #include <cctype>
@@ -25,11 +25,10 @@ namespace helics
 {
 namespace ipc
 {
-
-IpcComms::IpcComms()
+IpcComms::IpcComms ()
 {
-	//override the default value for this comm system
-	maxMessageCount_ = 256;
+    // override the default value for this comm system
+    maxMessageCount_ = 256;
 }
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
@@ -41,21 +40,21 @@ void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         return;
     }
-    //brokerPort = netInfo.brokerPort;
-    //PortNumber = netInfo.portNumber;
+    // brokerPort = netInfo.brokerPort;
+    // PortNumber = netInfo.portNumber;
     if (localTarget_.empty ())
     {
         if (serverMode)
         {
             localTarget_ = "_ipc_broker";
         }
-		else
-		{
+        else
+        {
             localTarget_ = name;
-		}
+        }
     }
-    
-    //if (PortNumber > 0)
+
+    // if (PortNumber > 0)
     //{
     //    autoPortNumber = false;
     //}
@@ -144,8 +143,7 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        logError("error changing states");
-		
+        logError ("error changing states");
     }
     setRxStatus (connection_status::terminated);
 }
@@ -163,7 +161,7 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
-            err.payload = fmt::format("Unable to open broker connection -> {}",brokerQueue.getError ());
+            err.payload = fmt::format ("Unable to open broker connection -> {}", brokerQueue.getError ());
             err.messageID = ERROR_CODE_CONNECTION_FAILURE;
             ActionCallback (std::move (err));
             setTxStatus (connection_status::error);
@@ -233,10 +231,13 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (newQueue));
+                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (newQueue));
                     }
                     continue;
                 }
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    continue;
                 case DISCONNECT:
                     goto DISCONNECT_TX_QUEUE;
                 }
@@ -316,8 +317,7 @@ void IpcComms::closeReceiver ()
     }
 }
 
-
-std::string IpcComms::getAddress() const { return localTarget_; }
+std::string IpcComms::getAddress () const { return localTarget_; }
 
 }  // namespace ipc
 }  // namespace helics

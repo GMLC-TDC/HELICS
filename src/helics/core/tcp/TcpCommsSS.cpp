@@ -373,6 +373,10 @@ void TcpCommsSS::queue_tx_function ()
                     }
                 }
                 break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     break;

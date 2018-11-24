@@ -242,6 +242,7 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
 bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
+	//lambda function that does the proper termination
     auto terminate = [&,this](connection_status status) -> bool {
         if (brokerConnection)
         {
@@ -411,6 +412,10 @@ void TcpComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     rxMessageQueue.push (cmd);
                     processed = true;

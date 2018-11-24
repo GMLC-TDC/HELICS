@@ -221,6 +221,10 @@ void TestComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+				case REMOVE_ROUTE:
+					routes.erase(route_id_t(cmd.getExtraData()));
+					processed = true;
+					break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     processed = true;
