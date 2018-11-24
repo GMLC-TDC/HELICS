@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "TcpCommsSS.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
-#include "TcpCommsSS.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -18,7 +18,10 @@ namespace helics
 namespace tcp
 {
 using boost::asio::ip::tcp;
-TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp,CommsInterface::thread_generation::single) {}
+TcpCommsSS::TcpCommsSS () noexcept
+    : NetworkCommsInterface (interface_type::tcp, CommsInterface::thread_generation::single)
+{
+}
 
 /** destructor*/
 TcpCommsSS::~TcpCommsSS () { disconnect (); }
@@ -490,8 +493,10 @@ CLOSE_TX_LOOP:
     }
     routes.clear ();
     brokerConnection = nullptr;
+    setTxStatus (connection_status::terminated);
     if (server)
     {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
         server->close ();
         server = nullptr;
     }
@@ -499,7 +504,6 @@ CLOSE_TX_LOOP:
     {
         setRxStatus (connection_status::terminated);
     }
-    setTxStatus (connection_status::terminated);
 }
 
 void TcpCommsSS::closeReceiver ()

@@ -57,6 +57,7 @@ class BasicBrokerInfo
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
     bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
+    bool _route_key = false;  //!< indicator that the broker has a unique route id
     std::string routeInfo;  //!< string describing the connection information for the route
     BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
@@ -202,6 +203,10 @@ class CoreBroker : public Broker, public BrokerBase
     @param[in] routeInfo  a string describing the connection info
     */
     virtual void addRoute (route_id_t route_id, const std::string &routeInfo) = 0;
+    /** remove or disconnect a route from use
+    @param route_id the identification of the route
+    */
+    virtual void removeRoute (route_id_t route_id) = 0;
 
   public:
     /**default constructor

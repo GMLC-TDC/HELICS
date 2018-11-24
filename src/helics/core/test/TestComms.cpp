@@ -267,7 +267,10 @@ void TestComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown route, message dropped");
+                    if (cmd.action () != CMD_DISCONNECT)
+                    {
+                        logWarning("unknown route, message dropped");
+                    }
                 }
             }
         }
