@@ -10,7 +10,7 @@
 "uninterruptible":false, //indicator that the federate should only return requested times
 "coreType":"test", //the type of the core "test","zmq","udp","icp","tcp","mpi"
 "coreName":"the name of the core",  //this matters most for icp and test cores, can be empty
-"coreInit":"1", // the initialization string for the core in the form of a command line arguments
+"coreInit":"--autobroker", // the initialization string for the core in the form of a command line arguments
 "maxIterations":10, //the maximum number of iterations for a time step
 "period":  1.0, //the period with which federate may return time
 "offset": 0.0, // the offset shift in the period
@@ -24,7 +24,8 @@
 "key":"pub1", // the name of the publication
  "type":"double", // the type assocaited with a publication (optional)
  "unit":"m",  // the units associated with a publication (optional)
- "global":true //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ "global":true, //set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ "info": "this is an information string for use by the application"
 },
 {
 "key":"pub2", // the name of the publication
@@ -41,7 +42,8 @@
 },
 {
 "key":"fedName/pub2", // the name of the publication to subscribe to
-"shortcut":"pubshortcut"  //a naming shortcut for the publication for later retrieval
+"shortcut":"pubshortcut",  //a naming shortcut for the publication for later retrieval
+"info": "this is an information string for use by the application"
 }
 ]
 

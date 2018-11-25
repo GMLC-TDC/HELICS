@@ -10,7 +10,7 @@
 "uninterruptible":false, //indicator that the federate should only return requested times
 "coreType":"test", //the type of the core "test","zmq","udp","icp","tcp","mpi"
 "coreName":"the name of the core",  //this matters most for icp and test cores, can be empty
-"coreInit":"1", // the initialization string for the core in the form of a command line arguments
+"coreInit":"--autobroker", // the initialization string for the core in the form of a command line arguments
 "maxIterations":10, //the maximum number of iterations for a time step
 "period":  1.0, //the period with which federate may return time
 "offset": 0.0, // the offset shift in the period
@@ -46,6 +46,7 @@
 	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+	"info":"this is an information string for use by the application",
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
 		"name":"delay",  //A delay filter just has a single property

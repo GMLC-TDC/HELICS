@@ -9,7 +9,7 @@ source_only=false  #indicator that the federate is only a source and is not expe
 uninterruptible=false #indicator that the federate should only return requested times
 coreType="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
 coreName="the name of the core"  #this matters most for icp and test cores, can be empty
-coreInit="1" # the initialization string for the core in the form of a command line arguments
+coreInit="--autobroker" # the initialization string for the core in the form of a command line arguments
 maxIterations=10 #the maximum number of iterations for a time step
 period=  1.0 #the period with which federate may return time
 offset= 0.0 # the offset shift in the period
@@ -23,6 +23,7 @@ inputDelay=0 #the input delay for external data to propagate to federates
 name="ept1" # the name of the publication
  type="genmessage" # the type assocaited with a endpoint endpoint types have limited usefullness at present (optional)
  global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ info="this is an information string for use by the application"
 
 [[endpoints]]
 name="ept2" # the name of the publication

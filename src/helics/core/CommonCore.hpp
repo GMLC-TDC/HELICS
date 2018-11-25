@@ -36,7 +36,7 @@ class BasicHandleInfo;
 class FilterCoordinator;
 class Logger;
 class FilterInfo;
-
+class TimeoutMonitor;
 enum class handle_type_t : char;
 
 /** base class implementing a standard interaction strategy between federates
@@ -124,6 +124,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
+    virtual void makeConnections(const std::string &file)override final;
     virtual void dataLink (const std::string &source, const std::string &target) override final;
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
     virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
@@ -166,12 +167,15 @@ class CommonCore : public Core, public BrokerBase
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (int msToWait = -1) const override final;
     /** unregister the core from any process find functions*/
     void unregister ();
     /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
      * class of some sort*/
     virtual void processDisconnect (bool skipUnregister = false) override final;
+
+    virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
+    virtual const std::string &getInterfaceInfo(interface_handle handle) const override final;
 
   private:
     /** implementation details of the connection process
@@ -239,6 +243,7 @@ class CommonCore : public Core, public BrokerBase
     std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
 
+	std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages ();
 
@@ -320,6 +325,8 @@ class CommonCore : public Core, public BrokerBase
     std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
     TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
+    /** wait for the core to be registered with the broker*/
+    bool waitCoreRegistration ();
     /** deliver a message to the appropriate location*/
     void deliverMessage (ActionMessage &message);
     /** function to deal with a source filters*/
@@ -373,6 +380,8 @@ class CommonCore : public Core, public BrokerBase
     bool checkAndProcessDisconnect ();
     /** send a disconnect message to time dependencies and child federates*/
     void sendDisconnect ();
+
+	friend class TimeoutMonitor;
 };
 
 }  // namespace helics

@@ -12,8 +12,8 @@ project (HELICS VERSION 2.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_BUILD alpha.2)
-set (HELICS_DATE "09-17-18")
+set (HELICS_VERSION_BUILD beta.1)
+set (HELICS_DATE "11-19-18")
 
 set(
   HELICS_VERSION_UNDERSCORE
@@ -133,11 +133,12 @@ if(BUILD_HELICS_SHARED_LIBS OR USE_POSITION_INDEPENDENT_CODE)
 endif()
 
 # -----------------------------------------------------------------------------
-# General project wide configuration
+# General project wide configuration for debug postfix
 # -----------------------------------------------------------------------------
-
-if(NOT CMAKE_DEBUG_POSTFIX)
-	set(CMAKE_DEBUG_POSTFIX d)
+if (NOT NO_DEBUG_POSFIX)
+	if(NOT CMAKE_DEBUG_POSTFIX)
+		set(CMAKE_DEBUG_POSTFIX d)
+	endif()
 endif()
 
 # add a baseline library for underlying dependencies and flags

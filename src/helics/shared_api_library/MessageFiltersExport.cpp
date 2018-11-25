@@ -329,8 +329,6 @@ const char *helicsFilterGetName (helics_filter filt)
     }
 }
 
-static constexpr char invalidPropertyString[] = "the specified property is invalid";
-
 void helicsFilterSet (helics_filter filt, const char *prop, double val, helics_error *err)
 {
     auto filter = getFilter (filt,err);
@@ -454,5 +452,41 @@ void helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliver
     catch (...)
     {
         helicsErrorHandler (err);
+    }
+}
+
+
+const char *helicsFilterGetInfo(helics_filter filt)
+{
+    auto filtObj = getFilterObj(filt, nullptr);
+    if (filtObj == nullptr)
+    {
+        return emptyStr.c_str();
+    }
+    try
+    {
+        const std::string &info = filtObj->filtPtr->getInfo();
+        return info.c_str();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str();
+    }
+}
+
+void helicsFilterSetInfo(helics_filter filt, const char *info, helics_error *err)
+{
+    auto filtObj = getFilterObj(filt, err);
+    if (filtObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        filtObj->filtPtr->setInfo(AS_STRING(info));
+    }
+    catch (...)
+    {
+        helicsErrorHandler(err);
     }
 }

@@ -9,8 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 
-#include "../core/CoreFederateInfo.hpp"
-#include "../flag-definitions.h"
+#include "../helics_enums.h"
+#include "FederateInfo.hpp"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -35,44 +35,13 @@ class FilterFederateManager;
 class Filter;
 class CloningFilter;
 
-/** data class defining federate properties and information
- */
-class FederateInfo : public CoreFederateInfo
-{
-  public:
-    char separator = '/';  //!< separator for global name of localFederates
-    core_type coreType = core_type::ZMQ;  //!< the type of the core
-    std::string defName;  //!< a default name to use for a federate
-    std::string coreName;  //!< the name of the core
-    std::string coreInitString;  //!< an initialization string for the core API object
-
-    /** default constructor*/
-    FederateInfo () = default;
-    /** construct from the name and type*/
-    FederateInfo (core_type cType) : coreType (cType){};
-    /** load a federateInfo object from command line arguments
-    @param argc the number of arguments
-    @param argv an array of char * pointers to the arguments
-    */
-    FederateInfo (int argc, const char *const *argv);
-    /** load a federateInfo object from command line arguments
-    @param argc the number of arguments
-    @param argv an array of char * pointers to the arguments
-    */
-    void loadInfoFromArgs (int argc, const char *const *argv);
-};
-
-/** generate a FederateInfo object from a config file (JSON, TOML)
- */
-FederateInfo loadFederateInfo (const std::string &configString);
-
 /** base class for a federate in the application API
  */
 class Federate
 {
   public:
     /** the allowable states of the federate*/
-    enum class op_states : char
+    enum class states : char
     {
         startup = 0,  //!< when created the federate is in startup state
         initialization = 1,  //!< entered after the enterInitializingMode call has returned
@@ -87,7 +56,7 @@ class Federate
     };
 
   protected:
-    std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
+    std::atomic<states> state{states::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
     federate_id_t fedID;  //!< the federate ID of the object for use in the core
@@ -97,7 +66,7 @@ class Federate
   private:
     std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
-    std::unique_ptr<FilterFederateManager> fManager; //!< class for managing filter operations
+    std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
   public:
     /**constructor taking a federate information structure
@@ -161,7 +130,8 @@ class Federate
     iteration_result enterExecutingModeComplete ();
     /** terminate the simulation
     @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence, no commands that interact with the core may be called after completion of this function */
+    asynchronous call sequence, no commands that interact with the core may be called after completion of this
+    function */
     void finalize ();
 
     /** disconnect a simulation from the core (will also call finalize before disconnecting if necessary)*/
@@ -331,8 +301,8 @@ class Federate
     @param outputType the outputType of the filter which the filter produces
     */
     CloningFilter &registerGlobalCloningFilter (const std::string &filterName,
-                                         const std::string &inputType = std::string (),
-                                         const std::string &outputType = std::string ());
+                                                const std::string &inputType = std::string (),
+                                                const std::string &outputType = std::string ());
 
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
@@ -352,8 +322,8 @@ class Federate
     @param outputType the outputType of the filter which the filter produces
     */
     CloningFilter &registerCloningFilter (const std::string &filterName,
-                                       const std::string &inputType = std::string (),
-                                       const std::string &outputType = std::string ());
+                                          const std::string &inputType = std::string (),
+                                          const std::string &outputType = std::string ());
 
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
@@ -409,9 +379,9 @@ class Federate
   @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
     const Filter &getFilter (int index) const;
 
-	 /** get the id of a source filter from the name of the endpoint
-   @param[in] filterName the name of the filter
-   @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    /** get the id of a source filter from the name of the endpoint
+  @param[in] filterName the name of the filter
+  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
     Filter &getFilter (const std::string &filterName);
 
     /** get the id of a source filter from the name of the endpoint
@@ -420,7 +390,7 @@ class Federate
     Filter &getFilter (int index);
 
     /** @brief register a operator for the specified filter
-    @details 
+    @details
     The FilterOperator gets called when there is a message to filter, There is no order or state to this
     messages can come in any order.
     @param[in] filter the identifier for the filter to trigger
@@ -456,7 +426,7 @@ class Federate
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
-    op_states getCurrentState () const { return state; }
+    states getCurrentState () const { return state; }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
@@ -468,7 +438,10 @@ class Federate
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
 
-  private:
+    void setInfo(interface_handle handle, const std::string& info);
+    std::string const &getInfo(interface_handle handle);
+
+private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces

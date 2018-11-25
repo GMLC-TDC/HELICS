@@ -60,8 +60,9 @@ class Broker
     setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 
     /** waits in the current thread until the broker is disconnected
+	@return true if the disconnect was successful false if it timed out
      */
-    virtual void waitForDisconnect (int msToWait = -1) const = 0;
+    virtual bool waitForDisconnect (int msToWait = -1) const = 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", or the name of a specific object
@@ -72,7 +73,9 @@ class Broker
       the query is answered so use with caution
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
-
+    /** load a file containing connection information 
+    @param file a JSON or TOML file containing connection information*/
+    virtual void makeConnections(const std::string &file) = 0;
     /** create a data Link between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/

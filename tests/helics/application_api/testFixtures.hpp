@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include <iostream>
 #include <memory>
 #include <stdexcept>
 
@@ -41,6 +42,7 @@ struct FederateTestFixture
     {
         ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
+
         if (!broker->isConnected ())
         {
             broker->disconnect ();
@@ -82,7 +84,7 @@ struct FederateTestFixture
         helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
         if (time_delta != helics::timeZero)
         {
-            fi.setTimeProperty (TIME_DELTA_PROPERTY, time_delta);
+            fi.setTimeProperty (helics_property_time_delta, time_delta);
         }
 
         std::vector<std::shared_ptr<FedType>> federates_added;

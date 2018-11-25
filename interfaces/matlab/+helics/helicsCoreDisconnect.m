@@ -14,5 +14,5 @@ function varargout = helicsCoreDisconnect(varargin)
     %-------
     %a helics_status enumeration indicating any error condition
     %
-  [varargout{1:nargout}] = helicsMEX(60, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(54, varargin{:});
 end

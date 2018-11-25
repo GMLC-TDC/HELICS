@@ -21,34 +21,34 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/asio/steady_timer.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+#include "loggingHelper.hpp"
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-static inline std::string genId ()
+static inline std::string genId (size_t seed)
 {
-    std::string nm = std::string (23, ' ');
-    auto seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
-    seed += std::hash<std::thread::id> {} (std::this_thread::get_id ());
-    std::mt19937 rng (seed);  // random-number engine used (Mersenne-Twister in this case)
+    std::string nm = std::string (24, '-');
+    if (seed == 0)
+    {
+        seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        seed += std::hash<std::thread::id> {} (std::this_thread::get_id());
+    }
+    std::mt19937 rng (static_cast<unsigned int>(seed));  // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
-    nm[5] = '-';
-    nm[11] = '-';
-    nm[17] = '-';
-
-    for (int ii = 0; ii < 23; ii++)
+    for (int ii = 1; ii < 24; ii++)
     {
-        if ((ii != 5) && (ii != 11) && (ii != 17))
+        if ((ii != 6) && (ii != 12) && (ii != 18))
         {
             nm[ii] = chars[uni (rng)];
         }
     }
 #ifdef _WIN32
-    std::string pid_str = std::to_string (GetCurrentProcessId ());
+    std::string pid_str = std::to_string (GetCurrentProcessId ())+nm;
 #else
-    std::string pid_str = std::to_string (getpid ());
+    std::string pid_str = std::to_string (getpid ())+nm;
 #endif
-    return pid_str + "-" + nm;
+    return pid_str;
 }
 
 namespace helics
@@ -79,8 +79,8 @@ void BrokerBase::joinAllThreads ()
 
 static const ArgDescriptors extraArgs{
   {"name,n", "name of the broker/core"},
-  {"federates", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-  {"minfed", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"federates,f", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
+  {"minfed,m", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
   {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
   {"logfile", "the file to log message to"},
   {"loglevel", ArgDescriptor::arg_type_t::int_type,
@@ -90,7 +90,7 @@ static const ArgDescriptors extraArgs{
   {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
   {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
   {"minbrokers", ArgDescriptor::arg_type_t::int_type,
-   "the minimum number of core/brokers that need to be connected (ignored in cores)"},
+   "the minimum number of cores/brokers that need to be connected (ignored in cores)"},
   {"identifier", "name of the core/broker"},
   {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then "
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
@@ -112,18 +112,8 @@ void BrokerBase::displayHelp ()
 void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     variable_map vm;
-    argumentParser (argc, argv, vm, extraArgs, "min");
-    if (vm.count ("min") > 0)
-    {
-        try
-        {
-            minFederateCount = std::stod (vm["min"].as<std::string> ());
-        }
-        catch (const std::invalid_argument &ia)
-        {
-            std::cerr << vm["min"].as<std::string> () << " is not a valid minimum federate count\n";
-        }
-    }
+    argumentParser (argc, argv, vm, extraArgs);
+   
     if (vm.count ("minfed") > 0)
     {
         minFederateCount = vm["minfed"].as<int> ();
@@ -193,7 +183,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         if (identifier.empty ())
         {
-            identifier = genId ();
+            identifier = genId (reinterpret_cast<size_t>(this));
         }
     }
 
@@ -206,6 +196,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
         loggingObj->openFile (logFile);
     }
     loggingObj->startLogging (maxLogLevel, maxLogLevel);
+    mainLoopIsRunning.store (true);
     queueProcessingThread = std::thread (&BrokerBase::queueProcessingLoop, this);
 }
 
@@ -234,7 +225,7 @@ bool BrokerBase::sendToLogger (global_federate_id_t federateID,
     return false;
 }
 
-void BrokerBase::generateNewIdentifier () { identifier = genId (); }
+void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
@@ -354,10 +345,15 @@ bool BrokerBase::tryReconnect () { return false; }
 //#define DISABLE_TICK
 void BrokerBase::queueProcessingLoop ()
 {
+	if (haltOperations)
+	{
+        mainLoopIsRunning.store (false);
+        return;
+	}
     std::vector<ActionMessage> dumpMessages;
-    mainLoopIsRunning.store (true);
+    
     auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = AsioServiceManager::runServiceLoop ();
+    auto serviceLoop = serv->startServiceLoop();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);
 
@@ -374,7 +370,6 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
         ticktimer.async_wait (timerCallback);
     }
-  
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -388,7 +383,13 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     };
-
+	if (haltOperations)
+	{
+        haltTimer (active, ticktimer);
+        serviceLoop = nullptr;
+        mainLoopIsRunning.store (false);
+        return;
+	}
     while (true)
     {
         auto command = actionQueue.pop ();
@@ -396,9 +397,14 @@ void BrokerBase::queueProcessingLoop ()
         {
             dumpMessages.push_back (command);
         }
+        if (command.action() == CMD_IGNORE)
+        {
+            continue;
+        }
         auto ret = commandProcessor (command);
         if (ret == CMD_IGNORE)
         {
+            ++messagesSinceLastTick;
             continue;
         }
         switch (ret)
@@ -407,12 +413,12 @@ void BrokerBase::queueProcessingLoop ()
             if (checkActionFlag (command, error_flag))
             {
                 serviceLoop = nullptr;
-                serviceLoop = AsioServiceManager::runServiceLoop ();
+                serviceLoop = serv->startServiceLoop ();
             }
             if (messagesSinceLastTick == 0)
             {
 #ifndef DISABLE_TICK
-                //   std::cout << "sending tick " << std::endl;
+                   
                 processCommand (std::move (command));
 #endif
             }
@@ -430,6 +436,19 @@ void BrokerBase::queueProcessingLoop ()
             serviceLoop = nullptr;
             mainLoopIsRunning.store (false);
             logDump ();
+            {
+
+                auto tcmd = actionQueue.try_pop();
+                while (tcmd)
+                {
+					if (!isDisconnectCommand(*tcmd))
+					{
+                        LOG_TRACE (global_broker_id_local, identifier,
+                                     std::string ("TI unprocessed command ") + prettyPrintString (*tcmd));
+					}
+                    tcmd = actionQueue.try_pop();
+                }
+            }
             return;  // immediate return
         case CMD_STOP:
             haltTimer (active, ticktimer);
@@ -440,6 +459,15 @@ void BrokerBase::queueProcessingLoop ()
                 mainLoopIsRunning.store (false);
                 logDump ();
                 processDisconnect ();
+            }
+            auto tcmd = actionQueue.try_pop();
+            while (tcmd)
+            {
+                if (!isDisconnectCommand (*tcmd))
+                {
+                    LOG_TRACE(global_broker_id_local, identifier, std::string("STOPPED unprocessed command ") + prettyPrintString(*tcmd));
+                }
+                tcmd = actionQueue.try_pop();
             }
             return;
         }

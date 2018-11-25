@@ -33,11 +33,11 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
 
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
 
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 // BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type)
@@ -52,7 +52,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztyp
     auto pubid3 = vFed1->registerPublication ("pub3", "double", "V");
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
 
     auto sv = vFed1->getPublicationKey (pubid);
     auto sv2 = vFed1->getPublicationKey (pubid2);
@@ -69,7 +69,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztyp
     BOOST_CHECK (vFed1->getPublication ("fed0/pub1").getHandle () == pubid.getHandle ());
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type)
@@ -83,7 +83,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     helics::Publication pubid3 (vFed1.get (), "pub3", helics::helicsType<double> (), "V");
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
 
     auto sv = pubid.getKey ();
     auto sv2 = pubid2.getKey ();
@@ -100,7 +100,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     BOOST_CHECK (vFed1->getPublication ("fed0/pub1").getHandle () == pubid.getHandle ());
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type)
@@ -114,7 +114,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     auto &subid3 = vFed1->registerSubscription ("sub3", "V");
     vFed1->enterExecutingMode ();
 
-    // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::op_states::execution);
+    // BOOST_CHECK (vFed->getCurrentState () == helics::Federate::states::execution);
 
     auto &sv = vFed1->getTarget (subid);
     auto &sv2 = vFed1->getTarget (subid2);
@@ -134,7 +134,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
 
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
     helics::cleanupHelicsLibrary ();
 }
 
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     // enter execution
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::execution);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
     // check subscriptions
     auto sv = vFed1->getTarget (subid);
     auto sv2 = vFed1->getTarget (subid2);
@@ -183,7 +183,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::op_states::finalize);
+    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
     helics::cleanupHelicsLibrary ();
 }
 
@@ -196,7 +196,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -210,14 +210,14 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     // publish a second string
     vFed1->publish (pubid, "string2");
     // make sure the value is still what we expect
-    s=vFed1->getString(subid);
+    s = vFed1->getString (subid);
 
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     gtime = vFed1->requestTime (2.0);
     // make sure the value was updated
     BOOST_CHECK_EQUAL (gtime, 2.0);
-    s=vFed1->getString(subid);
+    s = vFed1->getString (subid);
 
     BOOST_CHECK_EQUAL (s, "string2");
 }
@@ -348,7 +348,7 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), c
     vFed1->publish (pubid2, 20.0);
     vFed1->publish (pubid3, 30.0);
     vFed1->requestTime (2.0);
-    auto v1 = vFed1->getDouble(sub1);
+    auto v1 = vFed1->getDouble (sub1);
     auto v2 = vFed1->getDouble (sub2);
     auto v3 = vFed1->getDouble (sub3);
 
@@ -369,8 +369,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto subid = vFed2->registerSubscription ("pub1");
-    vFed1->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
-    vFed2->setTimeProperty (TIME_DELTA_PROPERTY, 1.0);
+    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     BOOST_CHECK (!vFed1->isAsyncOperationCompleted ());
@@ -389,7 +389,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (f1time, 1.0);
     // get the value
     std::string s = vFed2->getString (subid);
-    
+
     // make sure the string is what we expect
     BOOST_CHECK_EQUAL (s, "string1");
     // publish a second string
@@ -414,13 +414,77 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     vFed2->finalize ();
 }
 
+
+/** test info field for multiple publications */
+BOOST_DATA_TEST_CASE (test_info_field, bdata::make(core_types_single), core_type) {
+    SetupTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto pubid1 = vFed1->registerPublication<std::string>("pub1");
+    auto pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+    pubid1.setInfo(std::string("test1"));
+    pubid2.setInfo(std::string("test2"));
+    vFed1->enterExecutingMode();
+
+    BOOST_CHECK (vFed1->getCurrentState() == helics::Federate::states::execution);
+
+    auto info1 = vFed1->getInfo(pubid1.getHandle());
+    auto info2 = vFed1->getInfo(pubid2.getHandle());
+    BOOST_CHECK_EQUAL (info1, "test1");
+    BOOST_CHECK_EQUAL (info2, "test2");
+
+    vFed1->finalize();
+}
+
+/** test the pub/sub info field*/
+BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make(core_types_single), core_type) {
+    SetupTest<helics::ValueFederate>(core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto pubid1 = vFed1->registerPublicationIndexed<double>("pub1", 0);
+    pubid1.setInfo(std::string("pub_test1"));
+
+    auto sub1 = vFed1->registerSubscriptionIndexed("pub1", 0);
+    auto sub2 = vFed1->registerSubscriptionIndexed("pub1", 1);
+    auto sub3 = vFed1->registerSubscriptionIndexed("pub1", 2);
+
+    sub1.setInfo(std::string("sub_test1"));
+    sub2.setInfo(std::string("sub_test2"));
+    sub3.setInfo(std::string("sub_test3"));
+
+    vFed1->enterExecutingMode();
+
+
+    // Check all values can be accessed and returned through the federate.
+    auto info1 = vFed1->getInfo(pubid1.getHandle());
+    auto info2 = vFed1->getInfo(sub1.getHandle());
+    auto info3 = vFed1->getInfo(sub2.getHandle());
+    auto info4 = vFed1->getInfo(sub3.getHandle());
+
+    BOOST_CHECK_EQUAL (info1, "pub_test1");
+    BOOST_CHECK_EQUAL (info2, "sub_test1");
+    BOOST_CHECK_EQUAL (info3, "sub_test2");
+    BOOST_CHECK_EQUAL (info4, "sub_test3");
+
+    // Check all values can be accessed and returned directly from their subscriptions.
+    auto sub_info2 = sub1.getInfo();
+    auto sub_info3 = sub2.getInfo();
+    auto sub_info4 = sub3.getInfo();
+
+    BOOST_CHECK_EQUAL (sub_info2, "sub_test1");
+    BOOST_CHECK_EQUAL (sub_info3, "sub_test2");
+    BOOST_CHECK_EQUAL (sub_info4, "sub_test3");
+
+    vFed1->finalize();
+}
+
 /** test the default constructor and move constructor and move assignment*/
 BOOST_AUTO_TEST_CASE (test_move_calls)
 {
     helics::ValueFederate vFed;
 
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreInitString = "3";
+    fi.coreInitString = "-f 3 --autobroker";
     vFed = helics::ValueFederate ("test1", fi);
     BOOST_CHECK_EQUAL (vFed.getName (), "test1");
 
@@ -443,9 +507,14 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
 
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
     auto pub2name = vFed.getPublicationKey (vFed.getPublication (1));
     BOOST_CHECK_EQUAL (key, "fedName/pub2");
-    vFed.disconnect ();
+	//test the info from a file
+	BOOST_CHECK_EQUAL(vFed.getPublication(0).getInfo(), "this is an information string for use by the application");
+	vFed.disconnect ();
+
+
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load_toml)
@@ -461,8 +530,13 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     auto key = vFed.getTarget (id);
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
 
+	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
+
     auto pub2name = vFed.getPublicationKey (vFed.getPublication (1));
     BOOST_CHECK_EQUAL (key, "fedName:pub2");
+
+	//test the info from a file
+	BOOST_CHECK_EQUAL(vFed.getPublication(0).getInfo(), "this is an information string for use by the application");
     vFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

@@ -189,7 +189,7 @@ std::string ActionMessage::packetize () const
     // don't forget to flush the stream to finish writing into the buffer
     s.flush ();
     // now generate a length header
-    auto sz = static_cast<int32_t> (data.size ());
+    auto sz = static_cast<uint32_t> (data.size ());
     data[1] = static_cast<char> (((sz >> 16) & 0xFF));
     data[2] = static_cast<char> (((sz >> 8) & 0xFF));
     data[3] = static_cast<char> (sz & 0xFF);
@@ -376,13 +376,14 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
-// consts can cause seg faults
+// consts can cause seg faults someday will change to frozen::  once we can use all of C++17
 
 static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
+{ action_message_def::action_t::cmd_user_disconnect, "disconnect from user" },
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -447,6 +448,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_reg_input, "reg_input"},
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
+  {action_message_def::action_t::cmd_resend, "reg_resend"},
   {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
   {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
   {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
@@ -478,7 +480,9 @@ static constexpr std::pair<int, const char *> errorStrings[] = {
   // priority commands
   {-5, "lost connection with server"},
   {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"}};
+  {6, "duplicate federate name detected"},
+{ 7, "duplicate broker name detected" }
+};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -499,6 +503,11 @@ const char *commandErrorString (int errorcode)
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
+	if (ret == unknownStr)
+	{
+        ret += " " + std::to_string (static_cast<int> (command.action ()));
+        return ret;
+	}
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -567,7 +576,7 @@ int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
 {
     if (m.action () == CMD_MULTI_MESSAGE)
     {
-        m.setString (++m.counter, newMessage.to_string ());
+        m.setString (m.counter++, newMessage.to_string ());
         return m.counter;
     }
     return (-1);

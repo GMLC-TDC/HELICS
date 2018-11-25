@@ -139,9 +139,9 @@ class ActionMessage
 
     void setString (int index, const std::string &str);
     /** get the source global_handle*/
-    global_handle getSource () const { return global_handle (source_id, source_handle); }
+    global_handle getSource() const { return global_handle{ source_id, source_handle }; }
     /** get the global destination handle*/
-    global_handle getDest () const { return global_handle (dest_id, dest_handle); }
+    global_handle getDest() const { return global_handle{ dest_id, dest_handle }; }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
     {
@@ -288,8 +288,19 @@ inline bool isDependencyCommand (const ActionMessage &command) noexcept
 /** check if a command is a disconnect command*/
 inline bool isDisconnectCommand (const ActionMessage &command) noexcept
 {
-    return ((command.action () == CMD_DISCONNECT) || (command.action () == CMD_PRIORITY_DISCONNECT) ||
-            (command.action () == CMD_TERMINATE_IMMEDIATELY));
+    switch (command.action ())
+    {
+    case CMD_DISCONNECT:
+    case CMD_DISCONNECT_CHECK:
+    case CMD_DISCONNECT_NAME:
+    case CMD_USER_DISCONNECT:
+    case CMD_PRIORITY_DISCONNECT:
+    case CMD_TERMINATE_IMMEDIATELY:
+    case CMD_STOP:
+        return true;
+    default:
+        return false;
+    }
 }
 
 /** check if a command is a valid command*/
@@ -307,7 +318,7 @@ std::string prettyPrintString (const ActionMessage &command);
  */
 std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 
-/** append a message to multi message container 
+/** append a message to multi message container
 @param m the message to add the extra message to
 @param newMessage the message to append
 @return the integer location of the message in the stringData section*/

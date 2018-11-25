@@ -5,29 +5,29 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <functional>
 #include <map>
 #include <memory>
 #include <thread>
 #include <unordered_map>
-#include <array>
 
-#include "helics_includes/any.hpp"
 #include "../common/AirLock.hpp"
 #include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
+#include "helics_includes/any.hpp"
 
+#include "../common/TriggerVariable.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
-#include "UnknownHandleManager.hpp"
 #include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
-#include "../common/TriggerVariable.hpp"
+#include "UnknownHandleManager.hpp"
 
 namespace helics
 {
@@ -58,12 +58,12 @@ class BasicBrokerInfo
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
     bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
     std::string routeInfo;  //!< string describing the connection information for the route
-    BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
+    explicit BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
 
 class TimeCoordinator;
 class Logger;
-
+class TimeoutMonitor;
 
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
@@ -76,6 +76,7 @@ class CoreBroker : public Broker, public BrokerBase
   private:
 	  std::atomic<bool> _isRoot{ false };  //!< set to true if this object is a root broker
 	  bool isRootc=false;
+    int routeCount = 1;  //!< counter for creating new routes;
     DualMappedVector<BasicFedInfo, std::string, global_federate_id_t> _federates;  //!< container for all federates
     DualMappedVector<BasicBrokerInfo, std::string, global_broker_id_t>
       _brokers;  //!< container for all the broker information
@@ -85,7 +86,8 @@ class CoreBroker : public Broker, public BrokerBase
     UnknownHandleManager unknownHandles; //!< structure containing unknown targeted handles
     std::vector<std::pair<std::string, global_federate_id_t>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::unordered_map<global_federate_id_t, federate_id_t> global_id_translation;  //!< map to translate global ids to local ones
+    std::unordered_map<global_federate_id_t, federate_id_t>
+      global_id_translation;  //!< map to translate global ids to local ones
     std::unordered_map<global_federate_id_t, route_id_t>
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, route_id_t>
@@ -101,6 +103,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
 	TriggerVariable disconnection; //!< controller for the disconnection process
+    std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
 	std::atomic<uint16_t> nextAirLock{ 0 }; //!< the index of the next airlock to use
 	std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
@@ -167,7 +170,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (int msToWait = -1) const override final;
 
   private:
     /** implementation details of the connection process
@@ -226,11 +229,14 @@ class CoreBroker : public Broker, public BrokerBase
     virtual const std::string &getAddress () const override final;
     virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
+    virtual void makeConnections(const std::string &file) override final;
     virtual void dataLink (const std::string &publication, const std::string &input) override final;
 
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
 
-    virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+    virtual void
+    addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
@@ -257,7 +263,7 @@ class CoreBroker : public Broker, public BrokerBase
 
     const BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid) const;
 
-    BasicBrokerInfo *getBrokerById (global_broker_id_t fedid);
+    BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid);
 
     void addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m);
     void addPublication (ActionMessage &m);
@@ -280,7 +286,8 @@ class CoreBroker : public Broker, public BrokerBase
     std::string generateFederationSummary () const;
     /** label the broker and all children as disconnected*/
 	void labelAsDisconnected (global_broker_id_t broker);
+
+    friend class TimeoutMonitor;
 };
 
 }  // namespace helics
-

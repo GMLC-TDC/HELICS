@@ -154,6 +154,7 @@ class BrokerBase
   public:
     /** close all the threads*/
     void joinAllThreads ();
+    friend class TimeoutMonitor;
 };
 
 }  // namespace helics

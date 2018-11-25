@@ -6,8 +6,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "ForwardingTimeCoordinator.hpp"
 #include "../common/fmt_format.h"
-#include "../flag-definitions.h"
 #include "flagOperations.hpp"
+#include "helics_definitions.hpp"
 #include <algorithm>
 #include <set>
 namespace helics
@@ -28,8 +28,6 @@ void ForwardingTimeCoordinator::disconnect ()
 {
     if (sendMessageFunction)
     {
-        ActionMessage bye (CMD_DISCONNECT);
-        bye.source_id = source_id;
         std::set<global_federate_id_t> connections (dependents.begin (), dependents.end ());
         for (auto dep : dependencies)
         {
@@ -38,10 +36,17 @@ void ForwardingTimeCoordinator::disconnect ()
                 connections.insert (dep.fedID);
             }
         }
-        for (auto fed : connections)
+        if (connections.empty ())
         {
-            bye.dest_id = fed;
-            if (fed == source_id)
+            return;
+        }
+        ActionMessage bye (CMD_DISCONNECT);
+
+        bye.source_id = source_id;
+        if (connections.size () == 1)
+        {
+            bye.dest_id = *connections.begin ();
+            if (bye.dest_id == source_id)
             {
                 processTimeMessage (bye);
             }
@@ -50,10 +55,30 @@ void ForwardingTimeCoordinator::disconnect ()
                 sendMessageFunction (bye);
             }
         }
+        else
+        {
+            ActionMessage multi (CMD_MULTI_MESSAGE);
+            for (auto fed : connections)
+            {
+                bye.dest_id = fed;
+                if (fed == source_id)
+                {
+                    processTimeMessage (bye);
+                }
+                else
+                {
+                    appendMessage (multi, bye);
+                }
+            }
+            sendMessageFunction (multi);
+        }
     }
 }
 
-static inline bool isBroker (global_federate_id_t id) { return ((id.baseValue() == 1) || (id.baseValue() >= 0x7000'0000)); }
+static inline bool isBroker (global_federate_id_t id)
+{
+    return ((id.baseValue () == 1) || (id.baseValue () >= 0x7000'0000));
+}
 
 class minTimeSet
 {
@@ -360,12 +385,12 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
                 auto di = getDependencyInfo (dep);
                 if (di != nullptr)
                 {
-					if (di->Tnext > msg.actionTime)
-					{
+                    if (di->Tnext > msg.actionTime)
+                    {
                         continue;
-					}
-				}
-                
+                    }
+                }
+
                 msg.dest_id = dep;
                 sendMessageFunction (msg);
             }
@@ -383,7 +408,7 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-    if ((cmd.action () == CMD_DISCONNECT)||(cmd.action()==CMD_BROADCAST_DISCONNECT))
+    if ((cmd.action () == CMD_DISCONNECT) || (cmd.action () == CMD_BROADCAST_DISCONNECT))
     {
         removeDependent (cmd.source_id);
     }

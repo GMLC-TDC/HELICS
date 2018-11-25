@@ -139,14 +139,12 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         sock.send (str.data (), str.size ());
         return 0;
     }
-    else
-    {
+
         ActionCallback (std::move (M));
         ActionMessage resp (CMD_PRIORITY_ACK);
         auto str = resp.to_string ();
         sock.send (str.data (), str.size ());
         return 0;
-    }
 }
 
 void ZmqComms::queue_rx_function ()
@@ -234,7 +232,7 @@ void ZmqComms::queue_rx_function ()
         pullSocket.close ();
         repSocket.close ();
         disconnecting = true;
-        logError (std::string ("Unable to bind zmq reply socket giving up ") +
+        logError (std::string ("Unable to bind zmq pull socket giving up ") +
                   makePortAddress (localTarget_, PortNumber));
         setRxStatus (connection_status::error);
         return;
@@ -371,13 +369,13 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         controlSocket.send (msg);
                         return 0;
                     }
-                    else if (rxcmd.messageID == DISCONNECT)
+                    if (rxcmd.messageID == DISCONNECT)
                     {
                         controlSocket.send (msg);
                         setTxStatus (connection_status::terminated);
                         return (-3);
                     }
-                    else if (rxcmd.messageID == DISCONNECT_ERROR)
+                    if (rxcmd.messageID == DISCONNECT_ERROR)
                     {
                         controlSocket.send (msg);
                         setTxStatus (connection_status::error);
@@ -464,7 +462,7 @@ void ZmqComms::queue_tx_function ()
             {
                 switch (cmd.messageID)
                 {
-                case RECONNECT:
+                case RECONNECT_TRANSMITTER:
                     setTxStatus (connection_status::connected);
                     break;
                 case NEW_ROUTE:

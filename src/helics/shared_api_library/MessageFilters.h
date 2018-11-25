@@ -143,6 +143,16 @@ HELICS_EXPORT void helicsFilterRemoveTarget (helics_filter filt, const char *des
 /** remove a delivery destination from a cloning filter*/
 HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint (helics_filter filt, const char *deliveryEndpoint, helics_error *err);
 
+/** get the data in the info field of an filter
+@param inp the filter to query
+@return a string with the info field string*/
+HELICS_EXPORT const char *helicsFilterGetInfo(helics_filter filt);
+/** set the data in the info field for an filter
+@param inp the filter to query
+@param info the string to set
+@param err an error object to fill out in case of an error*/
+HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char *info, helics_error *err);
+
 /**@}*/
 #ifdef __cplusplus
 } /* end of extern "C" { */

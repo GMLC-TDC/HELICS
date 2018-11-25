@@ -21,6 +21,7 @@ class Endpoint
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     std::string targetDest;  //!< a predefined target destination
     std::string actualName;  //!< the name of the federate
+    bool disableAssign = false;  //!< disable assignment for the object
   public:
     /** default constructor*/
     Endpoint () = default;
@@ -174,7 +175,10 @@ class Endpoint
     const std::string &getType () const { return fed->getEndpointType (*this); }
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
-
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(handle); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
   private:
     friend class MessageFederateManager;
 };
