@@ -16,6 +16,7 @@ using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (IpcQueue_tests, *utf::label ("ci"))
 
+/*
 BOOST_AUTO_TEST_CASE (creation_test)
 {
     std::unique_ptr<unsigned char[]> memblock (new unsigned char[10192]);
@@ -231,8 +232,10 @@ BOOST_AUTO_TEST_CASE(priority_push_wait)
 	queue.pushPriority(data.data(), 390);
 	def.wait();
 }
+*/
 /** test with single consumer/single producer*/
 
+/*
 BOOST_AUTO_TEST_CASE(multithreaded_tests)
 {
     std::unique_ptr<unsigned char[]> memblock(new unsigned char[1048576]);
@@ -279,8 +282,9 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests)
     auto V = res.get();
     BOOST_CHECK_EQUAL(V, 1'010'000);
 }
-
+*/
 /** test with multiple consumer/single producer*/
+/*
 BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 {
 	std::unique_ptr<unsigned char[]> memblock(new unsigned char[1048576]);
@@ -329,7 +333,6 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests2)
 	BOOST_CHECK_EQUAL(V1 + V2 + V3, 1'010'000);
 }
 
-/** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 {
 	std::unique_ptr<unsigned char[]> memblock(new unsigned char[1048576]);
@@ -383,7 +386,6 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3)
 	BOOST_CHECK_EQUAL(V1 + V2 + V3, 3'010'000);
 }
 
-/** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop)
 {
 	std::unique_ptr<unsigned char[]> memblock(new unsigned char[1048576]);
@@ -451,7 +453,6 @@ BOOST_AUTO_TEST_CASE(push_full_mem)
 
 
 
-/** test with multiple producer/multiple consumer*/
 BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop_mem)
 {
 	std::unique_ptr<unsigned char[]> memblock(new unsigned char[1048576]);
@@ -502,5 +503,5 @@ BOOST_AUTO_TEST_CASE(multithreaded_tests3_pop_mem)
 	BOOST_CHECK_EQUAL(V1 + V2 + V3, 3'000'003);
 
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END ()

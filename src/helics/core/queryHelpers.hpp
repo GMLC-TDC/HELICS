@@ -9,53 +9,48 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <type_traits>
 
 template <typename X, typename Proc>
-std::string generateStringVector(const X & data, Proc generator)
+std::string generateStringVector (const X &data, Proc generator)
 {
-    static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value, "generator output must be convertible to std::string");
-    std::string ret;
-    ret.push_back('[');
+    static_assert (std::is_convertible<decltype (generator (*(data.begin ()))), std::string>::value,
+                   "generator output must be convertible to std::string");
+    std::string ret (1, '[');
+    for (auto &ele : data)
     {
-        for (auto &ele :data)
-        {
-            ret.append(generator(ele));
-            ret.push_back(';');
-        }
+        ret.append (generator (ele));
+        ret.push_back (';');
     }
-    if (ret.size() > 1)
+    if (ret.size () > 1)
     {
-        ret.back() = ']';
+        ret.back () = ']';
     }
     else
     {
-        ret.push_back(']');
+        ret.push_back (']');
     }
     return ret;
 }
 
 template <typename X, typename Proc, typename validator>
-std::string generateStringVector_if(const X & data, Proc generator, validator valid)
+std::string generateStringVector_if (const X &data, Proc generator, validator valid)
 {
-    static_assert(std::is_convertible<decltype(generator(*(data.begin()))), std::string>::value, "generator output must be convertible to std::string");
-    std::string ret;
-    ret.push_back('[');
+    static_assert (std::is_convertible<decltype (generator (*(data.begin ()))), std::string>::value,
+                   "generator output must be convertible to std::string");
+    std::string ret (1, '[');
+    for (auto &ele : data)
     {
-        for (auto &ele : data)
+        if (valid (ele))
         {
-            if (valid(ele))
-            {
-                ret.append(generator(ele));
-                ret.push_back(';');
-            }
-
+            ret.append (generator (ele));
+            ret.push_back (';');
         }
     }
-    if (ret.size() > 1)
+    if (ret.size () > 1)
     {
-        ret.back() = ']';
+        ret.back () = ']';
     }
     else
     {
-        ret.push_back(']');
+        ret.push_back (']');
     }
     return ret;
 }

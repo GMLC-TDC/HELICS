@@ -1,0 +1,204 @@
+/*
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
+*/
+
+/*defines left in this code as it is used in the shared library*/
+#ifndef _HELICS_ENUMS_
+#define _HELICS_ENUMS_
+#pragma once
+/** @file
+@details base helics enumerations for C and C++ API's
+*/
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
+    typedef enum
+    {
+        helics_core_type_default = 0,
+        helics_core_type_zmq = 1, /*!< use the Zero MQ networking protocol */
+        helics_core_type_mpi = 2, /*!< use MPI for operation on a parallel cluster */
+        helics_core_type_test = 3, /*!< use the Test core if all federates are in the same process */
+        /** interprocess uses memory mapped files to transfer data (for use when all federates are
+        on the same machine */
+        helics_core_type_interprocess = 4,
+        helics_core_type_ipc = 5,
+        helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
+        helics_core_type_udp = 7, /** use UDP packets to send the data */
+        helics_core_type_zmq_test =
+          10, /*!< test code for different type of ZMQ core usually for high fed count on the same system*/
+        helics_core_type_nng = 9, /*!< for using the nanomsg communications */
+        helics_core_type_tcp_ss =
+          11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
+        helics_core_type_http = 12 /*!< a core type using http for communication*/
+    } helics_core_type;
+
+    typedef enum
+    {
+        /** a sequence of characters*/
+        helics_data_type_string = 0,
+        /** a double precision floating point number*/
+        helics_data_type_double = 1,
+        /** a 64 bit integer*/
+        helics_data_type_int = 2,
+        /** a pair of doubles representing a complex number*/
+        helics_data_type_complex = 3,
+        /** an array of doubles*/
+        helics_data_type_vector = 4,
+        /** a complex vector object*/
+        helics_data_type_complex_vector = 5,
+        /** a named point consisting of a string and a double*/
+        helics_data_type_named_point = 6,
+
+        /** a boolean data type*/
+        helics_data_type_boolean = 7,
+
+        /** time data type*/
+        helics_data_type_time = 8,
+
+        /** raw data type*/
+        helics_data_type_raw = 25,
+        helics_data_type_any = 25262
+    } helics_data_type;
+
+/** single character data type  this is intentionally the same as string*/
+#define helics_data_type_char helics_data_type_string
+
+    typedef enum
+    {
+        /** flag indicating that a federate is observe only*/
+        helics_flag_observer = 0,
+        /** flag indicating that a federate can only return requested times*/
+        helics_flag_uninterruptible = 1,
+        /** flag indicating that a federate can be interrupted*/
+        helics_flag_interruptible = 2,
+        /** flag indicating that a federate/interface is a signal generator only*/
+        helics_flag_source_only = 4,
+        /** flag indicating a federate/interface should only transmit values if they have changed(binary
+           equivalence)*/
+        helics_flag_only_transmit_on_change = 6,
+        /** flag indicating a federate/interface should only trigger an update if a value has changed (binary
+         * equivalence)*/
+        helics_flag_only_update_on_change = 8,
+        /** flag indicating a federate should only grant time if all other federates have already passed the
+         * requested time*/
+        helics_flag_wait_for_current_time_update = 10,
+        /** flag indicating that a federate has rollback capability*/
+        helics_flag_rollback = 12,
+        /** flag indicating that a federate performs forward computation and does internal rollback*/
+        helics_flag_forward_compute = 14,
+        /** flag indicating that a federate needs to run in real time*/
+        helics_flag_realtime = 16,
+        /** flag indicating that the federate will only interact on a single thread*/
+        helics_flag_single_thread_federate = 27,
+        /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
+        helics_flag_delay_init_entry = 45,
+        /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
+        helics_flag_enable_init_entry = 47,
+        /** used to not display warnings on mismatched requested times*/
+        helics_flag_ignore_time_mismatch_warnings = 67
+    } helics_federate_flags;
+
+    /* log level definitions*/
+    typedef enum
+    {
+        /** don't print anything except a few catastrophic errors*/
+        helics_log_level_no_print = -1,
+        /** only print error level indicators*/
+        helics_log_level_error = 0,
+        /** only print warnings and errors*/
+        helics_log_level_warning = 1,
+        /** warning errors and summary level information*/
+        helics_log_level_summary = 2,
+        /** summary+ notices about federate and broker connections*/
+        helics_log_level_connections = 3,
+        /** connections+ interface definitions*/
+        helics_log_level_interfaces = 4,
+        /** interfaces + timing message*/
+        helics_log_level_timing = 5,
+        /** timing+ data transfer notices*/
+        helics_log_level_data = 6,
+        /** all internal messages*/
+        helics_log_level_trace = 7
+    } helics_log_levels;
+
+    /** enumeration of return values from the C interface functions
+     */
+    typedef enum
+    {
+
+        helics_ok = 0, /*!< the function executed successfully */
+        helics_error_registration_failure = (-1), /*!< registration has failed*/
+        helics_error_connection_failure = (-2), /*!< the operation to connect has failed*/
+        helics_error_invalid_object = (-3), /*!< indicator that the object used was not a valid object */
+        helics_error_invalid_argument = (-4), /*!< the parameter passed was invalid and unable to be used*/
+        helics_error_discard = (-5), /*!< the input was discarded and not used for some reason */
+        helics_error_system_failure =
+          (-6), /*!< the federate has terminated unexpectedly and the call cannot be completed*/
+        helics_warning = -8, /*!< the function issued a warning of some kind */
+        helics_error_invalid_state_transition =
+          (-9), /*!< error issued when an invalid state transition occurred */
+        helics_error_invalid_function_call =
+          (-10), /*!< the call made was invalid in the present state of the calling object*/
+        helics_error_execution_failure = (-14), /*!< the function execution has failed*/
+        helics_error_other = -101, /*!< the function produced a helics error of some other type */
+        other_error_type = -203 /*!< a non helics error was produced*/
+    } helics_error_types;
+
+    typedef enum
+    {
+        /** the property controlling the minimum time delta for a federate*/
+        helics_property_time_delta = 137,
+        helics_property_time_period = 140,
+        helics_property_time_offset = 141,
+        helics_property_time_rt_lag = 143,
+        helics_property_time_rt_lead = 144,
+        helics_property_time_rt_tolerance = 145,
+        helics_property_time_input_delay = 148,
+        helics_property_time_output_delay = 150,
+        helics_property_int_max_iterations = 259,
+        helics_property_int_log_level = 271
+    } helics_properties;
+
+    typedef enum
+    {
+        /** specify that a connection is required for an interface*/
+        helics_handle_option_connection_required = 397,
+        /** specify that a connection is NOT required for an interface*/
+        helics_handle_option_connection_optional = 402,
+        /** specify that only a single connection is allowed for an interface*/
+        helics_handle_option_single_connection_only = 407,
+        /** specify that multiple connections are allowed for an interface*/
+        helics_handle_option_multiple_connections_allowed = 409,
+        /** specify that the last data should be buffered and send on subscriptions after init*/
+        helics_handle_option_buffer_data = 411,
+        /** specify that an interface will only transmit on change(only applicable to publications)*/
+        helics_handle_option_only_transmit_on_change = 6,
+        /** specify that an interface will only update if the value has actually changed*/
+        helics_handle_option_only_update_on_change = 8,
+        /** specify that an interface does not participate in determining time interrupts*/
+        helics_handle_option_ignore_interrupts = 475
+    } helics_handle_options;
+
+    /** enumeration of the predefined filter types*/
+    typedef enum
+    {
+        helics_filtertype_custom = 0,
+        helics_filtertype_delay = 1,
+        helics_filtertype_random_delay = 2,
+        helics_filtertype_random_drop = 3,
+        helics_filtertype_reroute = 4,
+        helics_filtertype_clone = 5,
+        helics_filtertype_firewall = 6
+
+    } helics_filter_type_t;
+
+#ifdef __cplusplus
+} /* end of extern "C" { */
+#endif
+#endif

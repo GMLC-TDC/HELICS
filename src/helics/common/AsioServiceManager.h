@@ -29,7 +29,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/asio/io_service.hpp>
 
 /** class defining a (potential) singleton ASIO io_service manager for all boost::asio usage*/
-class AsioServiceManager: public std::enable_shared_from_this<AsioServiceManager>
+class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManager>
 {
   private:
     static std::map<std::string, std::shared_ptr<AsioServiceManager>>
@@ -41,7 +41,7 @@ class AsioServiceManager: public std::enable_shared_from_this<AsioServiceManager
       nullwork;  //!< pointer to an object used to keep a service running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{false};
-    std::mutex runningLoopLock;  //!< lock protecting the nullwork object the return future
+    std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
     AsioServiceManager (const std::string &serviceName);
@@ -52,7 +52,13 @@ class AsioServiceManager: public std::enable_shared_from_this<AsioServiceManager
       public:
         explicit servicer (std::shared_ptr<AsioServiceManager> manager) : serviceManager (std::move (manager)) {}
         /** this object halts the serviceLoop when deleted*/
-        ~servicer () { serviceManager->haltServiceLoop (); }
+        ~servicer ()
+        {
+            if (serviceManager)
+            {
+                serviceManager->haltServiceLoop ();
+            }
+        }
 
       private:
         std::shared_ptr<AsioServiceManager> serviceManager;  //!< a pointer to the service manager
@@ -100,7 +106,8 @@ class AsioServiceManager: public std::enable_shared_from_this<AsioServiceManager
     /** run a single thread for the service manager to execute asynchronous services in
     @details will run a single thread for the io_service,  it will not stop the thread until either the service
     manager is closed or the haltServiceLoop function is called and there is no more work
-    @param in the name of the service  This function can be called as a static function on a particularly named service
+    @param in the name of the service  This function can be called as a static function on a particularly named
+    service
     */
     static LoopHandle runServiceLoop (const std::string &serviceName = std::string{});
 

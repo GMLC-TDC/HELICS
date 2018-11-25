@@ -37,7 +37,7 @@ static inline std::string genId (size_t seed)
     std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
     for (int ii = 1; ii < 24; ii++)
-        {
+    {
         if ((ii != 6) && (ii != 12) && (ii != 18))
         {
             nm[ii] = chars[uni (rng)];
@@ -165,15 +165,15 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     {
         auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
         timeout = time_out.toCount (timeUnits::ms);
-		if (networkTimeout < 0)
-		{
+        if (networkTimeout < 0)
+        {
             networkTimeout = timeout;
-		}
+        }
     }
-	if (networkTimeout < 0)
-	{
+    if (networkTimeout < 0)
+    {
         networkTimeout = 4000;
-	}
+    }
     if (vm.count ("tick") > 0)
     {
         auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);
@@ -328,7 +328,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
             catch (std::exception &e)
             {
                 std::cout << "exception caught from addActionMessage" << std::endl;
-        }
+            }
         }
         else
         {
@@ -367,8 +367,8 @@ void BrokerBase::queueProcessingLoop ()
             tickTimer = 500;
         }
         active = std::make_pair (true, true);
-    ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
-    ticktimer.async_wait (timerCallback);
+        ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+        ticktimer.async_wait (timerCallback);
     }
     global_broker_id_local = global_broker_id.load ();
     int messagesSinceLastTick = 0;
@@ -412,6 +412,7 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TICK:
             if (checkActionFlag (command, error_flag))
             {
+                serviceLoop = nullptr;
                 serviceLoop = serv->startServiceLoop ();
             }
             if (messagesSinceLastTick == 0)
@@ -500,19 +501,19 @@ action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &comman
             }
         }
         break;
-        default:
-            if (!haltOperations)
+    default:
+        if (!haltOperations)
+        {
+            if (isPriorityCommand (command))
             {
-                if (isPriorityCommand (command))
-                {
-                    processPriorityCommand (std::move (command));
-                }
-                else
-                {
-                    processCommand (std::move (command));
-                }
+                processPriorityCommand (std::move (command));
+            }
+            else
+            {
+                processCommand (std::move (command));
             }
         }
+    }
     return CMD_IGNORE;
 }
 

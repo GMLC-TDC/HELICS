@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE (echo_test_delay_period)
 
     fi.coreName = "ecore3";
     fi.coreInitString = "-f 2 --autobroker";
-    fi.setTimeProperty(PERIOD_PROPERTY, 1.1);
+    fi.setTimeProperty(helics_property_time_period, 1.1);
     helics::apps::Echo echo1 ("echo1",fi);
-    fi.setTimeProperty(PERIOD_PROPERTY, 0);
+    fi.setTimeProperty(helics_property_time_period, 0);
 
     echo1.addEndpoint ("test");
     echo1.setEchoDelay (1.2);

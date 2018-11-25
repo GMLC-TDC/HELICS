@@ -34,7 +34,7 @@ class BasicHandleInfo
 {
   public:
     /** default constructor*/
-    BasicHandleInfo () noexcept : handle(global_federate_id_t(),interface_handle()),type_in (type), type_out (units){};
+      BasicHandleInfo() noexcept : handle{ global_federate_id_t{}, interface_handle{} }, type_in(type), type_out(units) {};
     /** construct from the data*/
     BasicHandleInfo (global_federate_id_t federate_id_t,
                      interface_handle handle_id,
@@ -42,11 +42,13 @@ class BasicHandleInfo
                      const std::string &key_name,
                      const std::string &type_name,
                      const std::string &unit_name)
-        : handle (federate_id_t, handle_id), handle_type (type_of_handle), key (key_name), type (type_name),
+        : handle{ federate_id_t, handle_id }, handle_type(type_of_handle), key(key_name), type(type_name),
           units (unit_name), type_in (type),
           type_out (units)
 
     {
+        /* NOTE:: all current cases already have std::string they are passing into the function and most are short,so we 
+        are taking by reference to avoid a copy/move  and just have a copy*/
     }
 
     const global_handle handle;  //!< the global federate id for the creator of the handle
@@ -58,11 +60,14 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
+    std::string interface_info;
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
 
 	interface_handle getInterfaceHandle () const { return handle.handle; }
     global_federate_id_t getFederateId () const { return handle.fed_id; }
+
+    void setInfoField(std::string &info) {interface_info = info;}
 
 };
 }  // namespace helics

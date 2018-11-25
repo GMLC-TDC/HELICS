@@ -124,6 +124,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
+    virtual void makeConnections(const std::string &file)override final;
     virtual void dataLink (const std::string &source, const std::string &target) override final;
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
     virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
@@ -172,6 +173,9 @@ class CommonCore : public Core, public BrokerBase
     /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
      * class of some sort*/
     virtual void processDisconnect (bool skipUnregister = false) override final;
+
+    virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
+    virtual const std::string &getInterfaceInfo(interface_handle handle) const override final;
 
   private:
     /** implementation details of the connection process

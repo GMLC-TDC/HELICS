@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/apps/BrokerApp.hpp"
 #include "helics/common/argParser.h"
+#include "helics/core/helics_definitions.hpp"
 #include <iostream>
 #include <thread>
 
@@ -57,14 +58,14 @@ int main (int argc, char *argv[])
     {
         myendpoint = vm["source"].as<std::string> ();
     }
-    fi.setIntegerProperty (LOG_LEVEL_PROPERTY, 5);
+    fi.setIntegerProperty (helics::defs::properties::log_level, 5);
     helics::apps::BrokerApp brk;
     if (vm.count ("startbroker") > 0)
     {
         brk = helics::apps::BrokerApp (fi.coreType, vm["startbroker"].as<std::string> ());
     }
 
-    auto cFed = std::make_unique<helics::CombinationFederate> (std::string(),fi);
+    auto cFed = std::make_unique<helics::CombinationFederate> (std::string (), fi);
     auto name = cFed->getName ();
     std::cout << " registering endpoint '" << myendpoint << "' for " << name << '\n';
 

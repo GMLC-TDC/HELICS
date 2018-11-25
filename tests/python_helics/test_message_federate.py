@@ -4,7 +4,7 @@ import helics as h
 
 @pt.fixture
 def mFed():
-    initstring = "1 --name=mainbroker"
+    initstring = "-f 1 --name=mainbroker"
     fedinitstring = "--broker=mainbroker --federates=1"
     deltat = 0.01
 
@@ -36,9 +36,9 @@ def mFed():
     # setTimedelta routine is a multiplier for the default timedelta.
 
     # Set one second message interval #
-    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_time_property_time_delta, deltat)
+    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
 
-    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_int_property_log_level, 1)
+    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 1)
 
 
     mFed = h.helicsCreateMessageFederate("TestA Federate", fedinfo)
@@ -87,7 +87,7 @@ def test_message_federate_send(mFed):
     epid1 = h.helicsFederateRegisterEndpoint(mFed, "ep1", None)
     epid2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "ep2", "random")
 
-    h.helicsFederateSetTimeProperty(mFed, h.helics_time_property_time_delta, 1.0)
+    h.helicsFederateSetTimeProperty(mFed, h.helics_property_time_delta, 1.0)
     h.helicsFederateEnterExecutingMode(mFed)
 
     data = "random-data"
@@ -114,4 +114,3 @@ def test_message_federate_send(mFed):
     assert message.original_source == 'TestA Federate/ep1'
     assert message.source == 'TestA Federate/ep1'
     assert message.time == 1.0
-

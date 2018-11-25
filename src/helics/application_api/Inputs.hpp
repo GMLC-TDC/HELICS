@@ -25,6 +25,7 @@ class Input
     helics_type_t type = helics_type_t::helicsUnknown;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
+    bool disableAssign = false;  //!< disable assignment for the object
     size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference
@@ -171,7 +172,10 @@ class Input
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
-
+    /** get the interface information field of the publication*/
+    const std::string &getInfo () const { return fed->getInfo(handle); }
+    /** set the interface information field of the publication*/
+    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
@@ -496,5 +500,4 @@ const X &Input::getValueRef ()
 
     return getValueRefImpl<remove_cv_ref<X>> (lastValue);
 }
-
 }  // namespace helics

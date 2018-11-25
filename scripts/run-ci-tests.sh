@@ -22,7 +22,7 @@ do
         --tsan)
             echo "Tests using thread sanitizer"
             CTEST_OPTIONS+=" --verbose"
-			export TSAN_OPTIONS=second_deadlock_stack=1
+            export TSAN_OPTIONS=second_deadlock_stack=1
             ;;
         --ubsan)
             echo "Tests using undefined behavior sanitizer"
@@ -68,15 +68,23 @@ else
     if [[ "$TEST_CONFIG_GIVEN" == "true" ]]; then
         test_label=$(tr '[:upper:]' '[:lower:]' <<< $TEST_CONFIG)
         case "${test_label}" in
+	    # Recognize aliases/case-insensitive versions of some values for TEST_CONFIG
             *daily*)
 	        TEST_CONFIG="Daily"
 		;;
             *coverage*)
                 TEST_CONFIG="Coverage"
                 ;;
-            *)
+            *continuous*)
                 TEST_CONFIG="Continuous"
 		CTEST_OPTIONS+=" --timeout 220"
+                ;;
+            *ci*)
+                TEST_CONFIG="Continuous"
+		CTEST_OPTIONS+=" --timeout 220"
+                ;;
+            *)
+                # Use whatever user gave for TEST_CONFIG
                 ;;
         esac
 

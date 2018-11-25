@@ -343,11 +343,8 @@ bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
         connected.waitActivation ();
         return isConnected ();
     }
-    else
-    {
         connected.wait_forActivation (timeOut);
         return isConnected ();
-    }
 }
 
 TcpAcceptor::TcpAcceptor (boost::asio::io_service &io_service, tcp::endpoint &ep)
@@ -450,12 +447,10 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         });
         return true;
     }
-    else
-    {
+
         std::cout << "acceptor is already active" << std::endl;
         conn->close ();
         return false;
-    }
 }
 
 /** close the acceptor*/
@@ -552,7 +547,7 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
     }
     else if (address == "localhost")
     {
-        endpoints.push_back (boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
+        endpoints.emplace_back (boost::asio::ip::tcp::v4 (), portNum);
     }
     else
     {
@@ -608,7 +603,7 @@ TcpServer::TcpServer (boost::asio::io_service &io_service,
 TcpServer::TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize)
     : ioserv (io_service), bufferSize (nominalBufferSize)
 {
-    endpoints.push_back (boost::asio::ip::tcp::endpoint (boost::asio::ip::tcp::v4 (), portNum));
+    endpoints.emplace_back (boost::asio::ip::tcp::v4 (), portNum);
     initialConnect ();
 }
 

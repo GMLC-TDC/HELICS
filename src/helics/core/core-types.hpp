@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
+#include "../helics_enums.h"
 #include "federate_id.hpp"
 #include <string>
 
@@ -27,37 +28,38 @@ enum federate_state_t
 /** the type of the cores that are available */
 enum class core_type : int
 {
-    DEFAULT = 0,  //!< pick a core type depending on compile configuration usually either ZMQ if available or UDP
-    ZMQ = 1,  //!< use the Zero MQ networking protocol
-    MPI = 2,  //!< use MPI for operation on a parallel cluster
-    TEST = 3,  //!< use the Test core if all federates are in the same process
-    INTERPROCESS = 4,  //!< interprocess uses memory mapped files to transfer data (for use when all federates are
-                       //!< on the same machine
-    IPC = 5,  //!< same as INTERPROCESS
-    TCP = 6,  //!< use a generic TCP protocol message stream to send messages
-	TCP_SS=11, //!< a single socket version of the TCP core for more easily handling firewalls
-    UDP = 7,  //!< use UDP packets to send the data
-    NNG = 9, //!< reserved for future Nanomsg implementation 
-    ZMQ_TEST=10, //!< test code for different type of ZMQ core
-    HTTP = 14,   //!< core/broker using web traffic
+    DEFAULT = helics_core_type_default,  //!< pick a core type depending on compile configuration usually either
+                                         //!< ZMQ if available or UDP
+    ZMQ = helics_core_type_zmq,  //!< use the Zero MQ networking protocol
+    MPI = helics_core_type_mpi,  //!< use MPI for operation on a parallel cluster
+    TEST = helics_core_type_test,  //!< use the Test core if all federates are in the same process
+    INTERPROCESS = helics_core_type_interprocess,  //!< interprocess uses memory mapped files to transfer data (for
+                                                   //!< use when all federates are on the same machine
+    IPC = helics_core_type_ipc,  //!< same as INTERPROCESS
+    TCP = helics_core_type_tcp,  //!< use a generic TCP protocol message stream to send messages
+    TCP_SS =
+      helics_core_type_tcp_ss,  //!< a single socket version of the TCP core for more easily handling firewalls
+    UDP = helics_core_type_udp,  //!< use UDP packets to send the data
+    NNG = helics_core_type_nng,  //!< reserved for future Nanomsg implementation
+    ZMQ_TEST = helics_core_type_zmq_test,  //!< test code for different type of ZMQ core
+    HTTP = helics_core_type_http,  //!< core/broker using web traffic
     UNRECOGNIZED = 22,  //!< unknown
 
 };
 
-
 /** enumeration of the possible message processing results*/
 enum class message_processing_result : signed char
 {
-    
+
     continue_processing = -2,  //!< the current loop should continue
-    delay_message = -1, //!< delay the current message and continue processing
+    delay_message = -1,  //!< delay the current message and continue processing
     next_step = 0,  //!< indicator that the iterations have completed
     iterating = 2,  //!< indicator that the iterations need to continue
     halted = 3,  //!< indicator that the simulation has been halted
     error = 7,  //!< indicator that an error has occurred
 };
 
-inline bool returnableResult(message_processing_result result)
+inline bool returnableResult (message_processing_result result)
 {
     return (result >= message_processing_result::next_step);
 }
@@ -82,7 +84,6 @@ enum class iteration_request : signed char
 #define NO_ITERATION helics::iteration_request::no_iterations
 #define FORCE_ITERATION helics::iteration_request::force_iteration
 #define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
-
 
 /**generate a string based on the core type*/
 std::string to_string (core_type type);
