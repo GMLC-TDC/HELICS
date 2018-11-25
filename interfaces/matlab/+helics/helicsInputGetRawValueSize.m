@@ -1,3 +1,3 @@
 function varargout = helicsInputGetRawValueSize(varargin)
-  [varargout{1:nargout}] = helicsMEX(151, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(152, varargin{:});
 end

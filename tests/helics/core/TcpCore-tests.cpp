@@ -419,8 +419,9 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
+    comm3.disconnect();
     comm2.disconnect ();
-    comm3.disconnect ();
+    
     std::this_thread::sleep_for (100ms);
 }
 

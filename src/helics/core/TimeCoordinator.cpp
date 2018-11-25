@@ -4,10 +4,10 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../common/fmt_format.h"
-#include "../flag-definitions.h"
 #include "TimeCoordinator.hpp"
+#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
+#include "helics_definitions.hpp"
 #include <algorithm>
 #include <set>
 
@@ -55,7 +55,6 @@ void TimeCoordinator::disconnect ()
 {
     if (sendMessageFunction)
     {
-       
         std::set<global_federate_id_t> connections (dependents.begin (), dependents.end ());
         for (auto dep : dependencies)
         {
@@ -64,43 +63,42 @@ void TimeCoordinator::disconnect ()
                 connections.insert (dep.fedID);
             }
         }
-        if (connections.empty())
+        if (connections.empty ())
         {
             return;
         }
-        ActionMessage bye(CMD_DISCONNECT);
+        ActionMessage bye (CMD_DISCONNECT);
 
         bye.source_id = source_id;
-        if (connections.size() == 1)
+        if (connections.size () == 1)
         {
-            bye.dest_id = *connections.begin();
+            bye.dest_id = *connections.begin ();
             if (bye.dest_id == source_id)
             {
-                processTimeMessage(bye);
+                processTimeMessage (bye);
             }
             else
             {
-                sendMessageFunction(bye);
+                sendMessageFunction (bye);
             }
         }
         else
         {
-            ActionMessage multi(CMD_MULTI_MESSAGE);
+            ActionMessage multi (CMD_MULTI_MESSAGE);
             for (auto fed : connections)
             {
                 bye.dest_id = fed;
                 if (fed == source_id)
                 {
-                    processTimeMessage(bye);
+                    processTimeMessage (bye);
                 }
                 else
                 {
-                    appendMessage(multi, bye);
+                    appendMessage (multi, bye);
                 }
             }
-            sendMessageFunction(multi);
+            sendMessageFunction (multi);
         }
-        
     }
 }
 
@@ -119,7 +117,6 @@ void TimeCoordinator::timeRequest (Time nextTime,
     }
     else
     {
-		
         time_next = getNextPossibleTime ();
         if (nextTime < time_next)
         {
@@ -131,9 +128,9 @@ void TimeCoordinator::timeRequest (Time nextTime,
         }
     }
     time_requested = nextTime;
-    time_value = (newValueTime>time_next)?newValueTime:time_next;
-    time_message = (newMessageTime>time_next)?newMessageTime:time_next;
-    time_exec = std::min({time_value, time_message,time_requested});
+    time_value = (newValueTime > time_next) ? newValueTime : time_next;
+    time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
+    time_exec = std::min ({time_value, time_message, time_requested});
     dependencies.resetDependentEvents (time_granted);
     updateTimeFactors ();
 
@@ -666,7 +663,7 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
         // this command requires removing dependents as well as dealing with dependency processing
         removeDependent (global_federate_id_t (cmd.source_id));
         break;
-		
+
     default:
         break;
     }
@@ -793,23 +790,23 @@ void TimeCoordinator::setTimeProperty (int timeProperty, Time propertyVal)
 {
     switch (timeProperty)
     {
-    case OUTPUT_DELAY_PROPERTY:
+    case defs::properties::output_delay:
         info.outputDelay = propertyVal;
         break;
-    case INPUT_DELAY_PROPERTY:
+    case defs::properties::input_delay:
         info.inputDelay = propertyVal;
         break;
-    case TIME_DELTA_PROPERTY:
+    case defs::properties::time_delta:
         info.timeDelta = propertyVal;
         if (info.timeDelta <= timeZero)
         {
             info.timeDelta = timeEpsilon;
         }
         break;
-    case PERIOD_PROPERTY:
+    case defs::properties::period:
         info.period = propertyVal;
         break;
-    case OFFSET_PROPERTY:
+    case defs::properties::offset:
         info.offset = propertyVal;
         break;
     }
@@ -818,7 +815,7 @@ void TimeCoordinator::setTimeProperty (int timeProperty, Time propertyVal)
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setIntegerProperty (int intProperty, int propertyVal)
 {
-    if (intProperty == MAX_ITERATIONS_PROPERTY)
+    if (intProperty == defs::properties::max_iterations)
     {
         info.maxIterations = propertyVal;
     }
@@ -829,10 +826,10 @@ void TimeCoordinator::setOptionFlag (int optionFlag, bool value)
 {
     switch (optionFlag)
     {
-    case HELICS_UNINTERRUPTIBLE_FLAG:
+    case defs::flags::uninterruptible:
         info.uninterruptible = value;
         break;
-    case HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+    case defs::flags::wait_for_current_time_update:
         info.wait_for_current_time_updates = value;
         break;
     default:
@@ -844,15 +841,15 @@ Time TimeCoordinator::getTimeProperty (int timeProperty) const
 {
     switch (timeProperty)
     {
-    case OUTPUT_DELAY_PROPERTY:
+    case defs::properties::output_delay:
         return info.outputDelay;
-    case INPUT_DELAY_PROPERTY:
+    case defs::properties::input_delay:
         return info.inputDelay;
-    case TIME_DELTA_PROPERTY:
+    case defs::properties::time_delta:
         return info.timeDelta;
-    case PERIOD_PROPERTY:
+    case defs::properties::period:
         return info.period;
-    case OFFSET_PROPERTY:
+    case defs::properties::offset:
         return info.offset;
     default:
         return Time::minVal ();
@@ -864,7 +861,7 @@ int TimeCoordinator::getIntegerProperty (int intProperty) const
 {
     switch (intProperty)
     {
-    case MAX_ITERATIONS_PROPERTY:
+    case defs::properties::max_iterations:
         return info.maxIterations;
     default:
         // TODO: make this something consistent
@@ -877,11 +874,11 @@ bool TimeCoordinator::getOptionFlag (int optionFlag) const
 {
     switch (optionFlag)
     {
-    case HELICS_UNINTERRUPTIBLE_FLAG:
+    case defs::flags::uninterruptible:
         return info.uninterruptible;
-    case HELICS_INTERRUPTIBLE_FLAG:
+    case defs::flags::interruptible:
         return !info.uninterruptible;
-    case HELICS_WAIT_FOR_CURRENT_TIME_UPDATE_FLAG:
+    case defs::flags::wait_for_current_time_update:
         return info.wait_for_current_time_updates;
     default:
         throw (std::invalid_argument ("flag not recognized"));

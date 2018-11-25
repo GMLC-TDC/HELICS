@@ -13,9 +13,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "fileConnections.hpp"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
+#include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <fstream>
@@ -136,6 +138,18 @@ uint16_t CoreBroker::getNextAirlockIndex ()
         }
     }
     return index;
+}
+
+void  CoreBroker::makeConnections(const std::string &file)
+{
+    if (hasTomlExtension(file))
+    {
+        makeConnectionsToml(this,file);
+    }
+    else
+    {
+        makeConnectionsJson(this,file);
+    }
 }
 
 void CoreBroker::dataLink (const std::string &publication, const std::string &input)
@@ -1101,7 +1115,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
 {
     switch (cmd.messageID)
     {
-    case HELICS_ENABLE_INIT_ENTRY:
+    case defs::flags::enable_init_entry:
         /*if (delayInitCounter <= 1)
         {
             delayInitCounter = 0;
@@ -1124,7 +1138,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
         }
         break;
         */
-    case LOG_LEVEL_PROPERTY:
+    case defs::properties::log_level:
         setLogLevel (cmd.counter);
         break;
     case UPDATE_LOGGING_CALLBACK:
@@ -1357,7 +1371,7 @@ void CoreBroker::addPublication (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate publication names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1382,7 +1396,7 @@ void CoreBroker::addInput (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate input names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1408,7 +1422,7 @@ void CoreBroker::addEndpoint (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate endpoint names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1446,7 +1460,7 @@ void CoreBroker::addFilter (ActionMessage &m)
     {
         ActionMessage eret (CMD_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
-        eret.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+        eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate filter names (" + m.name + ")";
         routeMessage (eret);
         return;
@@ -1868,7 +1882,7 @@ void CoreBroker::setLoggingLevel (int logLevel)
 {
     ActionMessage cmd (CMD_BROKER_CONFIGURE);
     cmd.dest_id = global_broker_id.load ();
-    cmd.messageID = LOG_LEVEL_PROPERTY;
+    cmd.messageID = defs::properties::log_level;
     cmd.counter = logLevel;
     addActionMessage (cmd);
 }

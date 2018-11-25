@@ -6,7 +6,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CommonCore.hpp"
 #include "../common/logger.h"
 #include "../common/stringToCmdLine.h"
-#include "../flag-definitions.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -20,6 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
+#include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>
@@ -31,6 +31,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "fileConnections.hpp"
 #include "../common/fmt_format.h"
 
 namespace helics
@@ -91,7 +92,7 @@ bool CommonCore::connect ()
         }
         else
         {
-            LOG_WARNING (global_broker_id.load(), getIdentifier(), "multiple connect calls");
+            LOG_WARNING (global_broker_id.load (), getIdentifier (), "multiple connect calls");
             while (brokerState == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (100));
@@ -378,7 +379,7 @@ bool CommonCore::allDisconnected () const
 void CommonCore::setCoreReadyToInit ()
 {
     // use the flag mechanics that do the same thing
-    setFlagOption (local_core_id, HELICS_ENABLE_INIT_ENTRY);
+    setFlagOption (local_core_id, defs::flags::enable_init_entry);
 }
 
 /** this function will generate an appropriate exception for the error
@@ -390,17 +391,17 @@ static void generateFederateException (const FederateState *fed)
     {
     case 0:
         return;
-    case ERROR_CODE_INVALID_ARGUMENT:
+    case defs::errors::invalid_argument:
         throw (InvalidParameter (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_FUNCTION_CALL:
+    case defs::errors::invalid_function_call:
         throw (InvalidFunctionCall (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_OBJECT:
+    case defs::errors::invalid_object:
         throw (InvalidIdentifier (fed->lastErrorString ()));
-    case ERROR_CODE_INVALID_STATE_TRANSITION:
+    case defs::errors::invalid_state_transition:
         throw (InvalidFunctionCall (fed->lastErrorString ()));
-    case ERROR_CODE_CONNECTION_FAILURE:
+    case defs::errors::connection_failure:
         throw (ConnectionFailure (fed->lastErrorString ()));
-    case ERROR_CODE_REGISTRATION_FAILURE:
+    case defs::errors::registration_failure:
         throw (RegistrationFailure (fed->lastErrorString ()));
     default:
         throw (HelicsException (fed->lastErrorString ()));
@@ -599,13 +600,13 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_EXECUTING:
         break;
     case HELICS_FINISHED:
-        return iteration_time (Time::maxVal (), iteration_result::halted);
+        return iteration_time{Time::maxVal (), iteration_result::halted};
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
-        return iteration_time (timeZero, iteration_result::error);
+        return iteration_time{timeZero, iteration_result::error};
     case HELICS_NONE:
     case HELICS_ERROR:
-        return iteration_time (Time::maxVal (), iteration_result::error);
+        return iteration_time{Time::maxVal (), iteration_result::error};
     }
 
     // limit the iterations
@@ -640,7 +641,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t intValue)
+void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t propertyValue)
 {
     if (federateID == local_core_id)
     {
@@ -652,22 +653,19 @@ void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property,
         ActionMessage cmd (CMD_CORE_CONFIGURE);
         cmd.dest_id = global_broker_id.load ();
         cmd.messageID = property;
-        cmd.counter = intValue;
+        cmd.counter = propertyValue;
         addActionMessage (cmd);
         return;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
-        }
-        ActionMessage cmd (CMD_FED_CONFIGURE_INT);
-        cmd.messageID = property;
-        cmd.counter = intValue;
-        fed->setProperties (cmd);
+        throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
     }
+    ActionMessage cmd (CMD_FED_CONFIGURE_INT);
+    cmd.messageID = property;
+    cmd.counter = propertyValue;
+    fed->setProperties (cmd);
 }
 
 void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Time time)
@@ -704,22 +702,19 @@ int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t proper
     {
         return 0;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
-        }
-        return fed->getTimeProperty (property);
+        throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
+    return fed->getIntegerProperty (property);
 }
 
 void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool flagValue)
 {
     if (federateID == local_core_id)
     {
-        if (flag == HELICS_DELAY_INIT_ENTRY)
+        if (flag == defs::flags::delay_init_entry)
         {
             if (flagValue)
             {
@@ -728,7 +723,7 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
             else
             {
                 ActionMessage cmd (CMD_CORE_CONFIGURE);
-                cmd.messageID = HELICS_DELAY_INIT_ENTRY;
+                cmd.messageID = defs::flags::delay_init_entry;
                 if (flagValue)
                 {
                     setActionFlag (cmd, indicator_flag);
@@ -736,10 +731,10 @@ void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool fla
                 addActionMessage (cmd);
             }
         }
-        else if (flag == HELICS_ENABLE_INIT_ENTRY)
+        else if (flag == defs::flags::enable_init_entry)
         {
             ActionMessage cmd (CMD_CORE_CONFIGURE);
-            cmd.messageID = HELICS_ENABLE_INIT_ENTRY;
+            cmd.messageID = defs::flags::enable_init_entry;
             if (flagValue)
             {
                 setActionFlag (cmd, indicator_flag);
@@ -769,15 +764,12 @@ bool CommonCore::getFlagOption (federate_id_t federateID, int32_t flag) const
     {
         return false;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
-        }
-        return fed->getOptionFlag (flag);
+        throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
+    return fed->getOptionFlag (flag);
 }
 
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
@@ -1180,10 +1172,7 @@ CommonCore::registerFilter (const std::string &filterName, const std::string &ty
         {
             throw (RegistrationFailure ("core is terminated no further registration possible"));
         }
-        else
-        {
-            throw (RegistrationFailure ("registration timeout exceeded"));
-        }
+        throw (RegistrationFailure ("registration timeout exceeded"));
     }
     auto brkid = global_broker_id.load ();
 
@@ -1224,10 +1213,7 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
         {
             throw (RegistrationFailure ("core is terminated no further registration possible"));
         }
-        else
-        {
-            throw (RegistrationFailure ("registration timeout exceeded"));
-        }
+        throw (RegistrationFailure ("registration timeout exceeded"));
     }
     auto brkid = global_broker_id.load ();
 
@@ -1256,7 +1242,7 @@ interface_handle CommonCore::getFilter (const std::string &name) const
     {
         return filt->getInterfaceHandle ();
     }
-    return interface_handle ();
+    return interface_handle{};
 }
 
 FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
@@ -1294,6 +1280,18 @@ FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
 void CommonCore::registerFrequentCommunicationsPair (const std::string & /*source*/, const std::string & /*dest*/)
 {
     // std::lock_guard<std::mutex> lock (_mutex);
+}
+
+void  CommonCore::makeConnections(const std::string &file)
+{
+    if (hasTomlExtension(file))
+    {
+        makeConnectionsToml(this, file);
+    }
+    else
+    {
+        makeConnectionsJson(this, file);
+    }
 }
 
 void CommonCore::dataLink (const std::string &source, const std::string &target)
@@ -1644,7 +1642,7 @@ void CommonCore::setLoggingLevel (int logLevel)
 {
     ActionMessage cmd (CMD_CORE_CONFIGURE);
     cmd.dest_id = global_broker_id.load ();
-    cmd.messageID = LOG_LEVEL_PROPERTY;
+    cmd.messageID = defs::properties::log_level;
     cmd.counter = logLevel;
     addActionMessage (cmd);
 }
@@ -1805,17 +1803,15 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::publication);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handle_type == handle_type_t::publication); });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::endpoint);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handle_type == handle_type_t::endpoint); });
     }
     if (queryStr == "dependson")
     {
@@ -2238,22 +2234,20 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_RESEND:
         LOG_WARNING_SIMPLE ("got resend");
-		if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
-		{
-            if ((global_broker_id.load() == parent_broker_id)
-				|| (!(global_broker_id.load().isValid())))
-			{
+        if (command.messageID == static_cast<int32_t> (CMD_REG_BROKER))
+        {
+            if ((global_broker_id.load () == parent_broker_id) || (!(global_broker_id.load ().isValid ())))
+            {
                 LOG_WARNING_SIMPLE ("resending broker reg");
-				 ActionMessage m (CMD_REG_BROKER);
-            m.source_id = global_federate_id_t ();
-            m.name = getIdentifier ();
-            m.setStringData (getAddress ());
-            setActionFlag (m, core_flag);
-            m.counter = 1;
-            transmit (parent_route_id, m);
-			}
-           
-		}
+                ActionMessage m (CMD_REG_BROKER);
+                m.source_id = global_federate_id_t ();
+                m.name = getIdentifier ();
+                m.setStringData (getAddress ());
+                setActionFlag (m, core_flag);
+                m.counter = 1;
+                transmit (parent_route_id, m);
+            }
+        }
         break;
     case CMD_CHECK_CONNECTIONS:
     {
@@ -2918,7 +2912,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     err.dest_id = command.source_id;
                     err.source_id = command.dest_id;
                     err.source_handle = command.dest_handle;
-                    err.messageID = ERROR_CODE_REGISTRATION_FAILURE;
+                    err.messageID = defs::errors::registration_failure;
                     err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
                     return;
@@ -2984,7 +2978,7 @@ void CommonCore::checkDependencies ()
     {
         if (fed->hasEndpoints)
         {
-            if (fed->getOptionFlag (HELICS_OBSERVER_FLAG))
+            if (fed->getOptionFlag (defs::flags::observer))
             {
                 timeCoord->removeDependency (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENT);
@@ -2994,7 +2988,7 @@ void CommonCore::checkDependencies ()
                 fed->addAction (rmdep);
                 isobs = true;
             }
-            else if (fed->getOptionFlag (HELICS_SOURCE_ONLY_FLAG))
+            else if (fed->getOptionFlag (defs::flags::source_only))
             {
                 timeCoord->removeDependent (fed->global_id);
                 ActionMessage rmdep (CMD_REMOVE_DEPENDENCY);
@@ -3179,7 +3173,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
 {
     switch (cmd.messageID)
     {
-    case HELICS_ENABLE_INIT_ENTRY:
+    case defs::flags::enable_init_entry:
         if (delayInitCounter <= 1)
         {
             delayInitCounter = 0;
@@ -3201,7 +3195,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             --delayInitCounter;
         }
         break;
-    case LOG_LEVEL_PROPERTY:
+    case defs::properties::log_level:
         setLogLevel (cmd.counter);
         break;
     case UPDATE_LOGGING_CALLBACK:
@@ -3304,7 +3298,8 @@ bool CommonCore::waitCoreRegistration ()
         if (sleepcnt > 6)
         {
             LOG_WARNING (parent_broker_id, identifier,
-                         fmt::format("broker state={}, broker id={}, sleepcnt={}",static_cast<int>(brokerState.load()),brkid.baseValue(),sleepcnt));
+                         fmt::format ("broker state={}, broker id={}, sleepcnt={}",
+                                      static_cast<int> (brokerState.load ()), brkid.baseValue (), sleepcnt));
         }
         if (brokerState.load () <= broker_state_t::initialized)
         {
@@ -3319,13 +3314,12 @@ bool CommonCore::waitCoreRegistration ()
             LOG_WARNING (parent_broker_id, identifier,
                          "now waiting for the core to finish registration before proceeding");
         }
-		if (sleepcnt == 20)
-		{
-            LOG_WARNING (parent_broker_id, identifier,
-                         "resending reg message");
+        if (sleepcnt == 20)
+        {
+            LOG_WARNING (parent_broker_id, identifier, "resending reg message");
             ActionMessage M (CMD_RESEND);
-            M.messageID = static_cast<int32_t>(CMD_REG_BROKER);
-		}
+            M.messageID = static_cast<int32_t> (CMD_REG_BROKER);
+        }
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_broker_id.load ();
         ++sleepcnt;
@@ -3842,4 +3836,17 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     }
 }
 
+    const std::string &CommonCore::getInterfaceInfo(interface_handle handle) const
+    {
+        auto handleInfo = getHandleInfo (handle);
+        if (handleInfo != nullptr)
+        {
+            return handleInfo->interface_info;
+        }
+        return emptyStr;
+    }
+
+    void CommonCore::setInterfaceInfo(helics::interface_handle handle, std::string info) {
+        handles.modify ([&](auto &hdls) { hdls.getHandleInfo (handle.baseValue ())->interface_info = info; });
+    }
 }  // namespace helics

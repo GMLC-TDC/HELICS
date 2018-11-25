@@ -142,14 +142,12 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         sock.send (str.data (), str.size ());
         return 0;
     }
-    else
-    {
+
         ActionCallback (std::move (M));
         ActionMessage resp (CMD_PRIORITY_ACK);
         auto str = resp.to_string ();
         sock.send (str.data (), str.size ());
         return 0;
-    }
 }
 
 void ZmqComms::queue_rx_function ()
@@ -373,13 +371,13 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         controlSocket.send (msg);
                         return 0;
                     }
-                    else if (rxcmd.messageID == DISCONNECT)
+                    if (rxcmd.messageID == DISCONNECT)
                     {
                         controlSocket.send (msg);
                         setTxStatus (connection_status::terminated);
                         return (-3);
                     }
-                    else if (rxcmd.messageID == DISCONNECT_ERROR)
+                    if (rxcmd.messageID == DISCONNECT_ERROR)
                     {
                         controlSocket.send (msg);
                         setTxStatus (connection_status::error);

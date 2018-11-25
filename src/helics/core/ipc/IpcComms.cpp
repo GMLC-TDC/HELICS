@@ -5,8 +5,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "IpcComms.h"
 #include "../../common/fmt_format.h"
-#include "../../flag-definitions.h"
 #include "../ActionMessage.hpp"
+#include "../helics_definitions.hpp"
 #include "IpcQueueHelper.h"
 #include <algorithm>
 #include <cctype>
@@ -69,7 +69,7 @@ void IpcComms::queue_rx_function ()
     {
         disconnecting = true;
         ActionMessage err (CMD_ERROR);
-        err.messageID = ERROR_CODE_CONNECTION_FAILURE;
+        err.messageID = defs::errors::connection_failure;
         err.payload = rxQueue.getError ();
         ActionCallback (std::move (err));
         setRxStatus (connection_status::error);  // the connection has failed
@@ -93,7 +93,7 @@ void IpcComms::queue_rx_function ()
             {
                 disconnecting = true;
                 ActionMessage err (CMD_ERROR);
-                err.messageID = ERROR_CODE_CONNECTION_FAILURE;
+                err.messageID = defs::errors::connection_failure;
                 err.payload = rxQueue.getError ();
                 ActionCallback (std::move (err));
                 setRxStatus (connection_status::error);  // the connection has failed
@@ -162,7 +162,7 @@ void IpcComms::queue_tx_function ()
         {
             ActionMessage err (CMD_ERROR);
             err.payload = fmt::format ("Unable to open broker connection -> {}", brokerQueue.getError ());
-            err.messageID = ERROR_CODE_CONNECTION_FAILURE;
+            err.messageID = defs::errors::connection_failure;
             ActionCallback (std::move (err));
             setTxStatus (connection_status::error);
             return;
@@ -173,7 +173,7 @@ void IpcComms::queue_tx_function ()
     if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
     {
         ActionMessage err (CMD_ERROR);
-        err.messageID = ERROR_CODE_CONNECTION_FAILURE;
+        err.messageID = defs::errors::connection_failure;
         err.payload = "Unable to link with receiver";
         ActionCallback (std::move (err));
         setTxStatus (connection_status::error);
@@ -204,7 +204,7 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
-            err.messageID = ERROR_CODE_CONNECTION_FAILURE;
+            err.messageID = defs::errors::connection_failure;
             err.payload = fmt::format ("Unable to open receiver connection -> {}", rxQueue.getError ());
             ActionCallback (std::move (err));
             setRxStatus (connection_status::error);

@@ -9,9 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/MessageFilters.h"
 #include "../shared_api_library/helics.h"
-#include "helicsExceptions.hpp"
 #include "Filter.hpp"
 #include "config.hpp"
+#include "helicsExceptions.hpp"
 #include <complex>
 
 #include <string>
@@ -24,7 +24,7 @@ class FederateInfo
   public:
     FederateInfo () { fi = helicsCreateFederateInfo (); }
 
-    FederateInfo ( const std::string &coretype)
+    FederateInfo (const std::string &coretype)
     {
         fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
@@ -32,11 +32,11 @@ class FederateInfo
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
-    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (),NULL); }
+    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (), NULL); }
 
     void setCoreInitString (const std::string &coreInit)
     {
-        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (),NULL);
+        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), NULL);
     }
 
     void setCoreTypeFromString (const std::string &coretype)
@@ -44,27 +44,31 @@ class FederateInfo
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
 
-    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype,NULL); }
+    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype, NULL); }
 
-    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value,NULL); }
+    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value, NULL); }
 
-    void setTimeProperty (int timeProperty, helics_time_t timeValue) { helicsFederateInfoSetTimeProperty (fi,timeProperty, timeValue,NULL); }
+    void setTimeProperty (int timeProperty, helics_time timeValue)
+    {
+        helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, NULL);
+    }
 
-    
-    void setIntegerProperty (int integerProperty, int intValue) { helicsFederateInfoSetIntegerProperty (fi,integerProperty, intValue,NULL); }
+    void setIntegerProperty (int integerProperty, int propertyValue)
+    {
+        helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, NULL);
+    }
 
-    helics_federate_info_t getInfo () { return fi; }
+    helics_federate_info getInfo () { return fi; }
 
   private:
-    helics_federate_info_t fi;
+    helics_federate_info fi;
 };
-
 
 typedef struct
 {
   public:
-    helics_time_t grantedTime;  //!< the time of the granted step
-    helics_iteration_status status;  //!< the convergence state
+    helics_time grantedTime;  //!< the time of the granted step
+    helics_iteration_result status;  //!< the convergence state
     /** default constructor*/
 } helics_iteration_time;
 
@@ -72,7 +76,7 @@ class Federate
 {
   public:
     // Default constructor, not meant to be used
-      Federate() : fed(NULL), exec_async_iterate(false) {};
+    Federate () : fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
@@ -98,10 +102,11 @@ class Federate
         return *this;
     }
 #endif
-    virtual ~Federate() {
+    virtual ~Federate ()
+    {
         if (fed != NULL)
         {
-            helicsFederateFree(fed);
+            helicsFederateFree (fed);
         }
     }
 
@@ -109,27 +114,32 @@ class Federate
 
     helics_federate baseObject () const { return fed; }
 
-    void setFlag (int flag, bool value) { helicsFederateSetFlagOption (fed, flag, value?helics_true:helics_false, hThrowOnError ()); }
+    void setFlag (int flag, bool value)
+    {
+        helicsFederateSetFlagOption (fed, flag, value ? helics_true : helics_false, hThrowOnError ());
+    }
 
-    void setTimeProperty (int tProperty, helics_time_t timeValue)
+    void setTimeProperty (int tProperty, helics_time timeValue)
     {
         helicsFederateSetTimeProperty (fed, tProperty, timeValue, hThrowOnError ());
     }
-
 
     void setIntegerProperty (int intProperty, int value)
     {
         helicsFederateSetIntegerProperty (fed, intProperty, value, hThrowOnError ());
     }
 
-	 bool getFlag (int flag) const { return (helicsFederateGetFlagOption (fed, flag,hThrowOnError())!=helics_false); }
-
-   helics_time_t getTimeProperty (int tProperty) const
+    bool getFlag (int flag) const
     {
-        return helicsFederateGetTimeProperty (fed, tProperty,hThrowOnError ());
+        return (helicsFederateGetFlagOption (fed, flag, hThrowOnError ()) != helics_false);
     }
 
-	void registerInterfaces (const std::string &configFile)
+    helics_time getTimeProperty (int tProperty) const
+    {
+        return helicsFederateGetTimeProperty (fed, tProperty, hThrowOnError ());
+    }
+
+    void registerInterfaces (const std::string &configFile)
     {
         helicsFederateRegisterInterfaces (fed, configFile.c_str (), hThrowOnError ());
     }
@@ -138,34 +148,25 @@ class Federate
         return helicsFederateGetIntegerProperty (fed, intProperty, hThrowOnError ());
     }
 
-    federate_state getState() const
-    {
-        return helicsFederateGetState(fed, NULL);
-    }
+    helics_federate_state getState () const { return helicsFederateGetState (fed, NULL); }
 
-    void enterInitializingMode ()
-    { helicsFederateEnterInitializingMode (fed, hThrowOnError ());
-    }
+    void enterInitializingMode () { helicsFederateEnterInitializingMode (fed, hThrowOnError ()); }
 
-    void enterInitializingModeAsync ()
-    { helicsFederateEnterInitializingModeAsync (fed, hThrowOnError ());
-    }
+    void enterInitializingModeAsync () { helicsFederateEnterInitializingModeAsync (fed, hThrowOnError ()); }
 
     bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateIsAsyncOperationCompleted (fed,NULL) > 0;
+        return helicsFederateIsAsyncOperationCompleted (fed, NULL) > 0;
     }
 
-    void enterInitializingModeComplete ()
-    {
-        helicsFederateEnterInitializingModeComplete (fed, hThrowOnError ());
-    }
+    void enterInitializingModeComplete () { helicsFederateEnterInitializingModeComplete (fed, hThrowOnError ()); }
 
-    helics_iteration_status enterExecutingMode (helics_iteration_request iterate = no_iteration)
+    helics_iteration_result
+    enterExecutingMode (helics_iteration_request iterate = helics_iteration_request_no_iteration)
     {
-        helics_iteration_status out_iterate = next_step;
-        if (iterate == no_iteration)
+        helics_iteration_result out_iterate = helics_iteration_result_next_step;
+        if (iterate == helics_iteration_request_no_iteration)
         {
             helicsFederateEnterExecutingMode (fed, hThrowOnError ());
         }
@@ -176,9 +177,9 @@ class Federate
         return out_iterate;
     }
 
-    void enterExecutingModeAsync (helics_iteration_request iterate = no_iteration)
+    void enterExecutingModeAsync (helics_iteration_request iterate = helics_iteration_request_no_iteration)
     {
-        if (iterate == no_iteration)
+        if (iterate == helics_iteration_request_no_iteration)
         {
             helicsFederateEnterExecutingModeAsync (fed, hThrowOnError ());
             exec_async_iterate = false;
@@ -190,9 +191,9 @@ class Federate
         }
     }
 
-    helics_iteration_status enterExecutingModeComplete ()
+    helics_iteration_result enterExecutingModeComplete ()
     {
-        helics_iteration_status out_iterate = next_step;
+        helics_iteration_result out_iterate = helics_iteration_result_next_step;
         if (exec_async_iterate)
         {
             out_iterate = helicsFederateEnterExecutingModeIterativeComplete (fed, hThrowOnError ());
@@ -206,17 +207,11 @@ class Federate
 
     void finalize () { helicsFederateFinalize (fed, hThrowOnError ()); }
 
-    helics_time_t requestTime (helics_time_t time)
-    {
-        return helicsFederateRequestTime (fed, time, hThrowOnError ());
-    }
+    helics_time requestTime (helics_time time) { return helicsFederateRequestTime (fed, time, hThrowOnError ()); }
 
-	 helics_time_t requestNextStep ()
-    { 
-		 return helicsFederateRequestNextStep (fed, hThrowOnError ());
-    }
+    helics_time requestNextStep () { return helicsFederateRequestNextStep (fed, hThrowOnError ()); }
 
-    helics_iteration_time requestTimeIterative (helics_time_t time, helics_iteration_request iterate)
+    helics_iteration_time requestTimeIterative (helics_time time, helics_iteration_request iterate)
     {
         helics_iteration_time itTime;
         itTime.grantedTime =
@@ -224,18 +219,14 @@ class Federate
         return itTime;
     }
 
-    void requestTimeAsync (helics_time_t time)
-    { helicsFederateRequestTimeAsync (fed, time, hThrowOnError ());
-    }
+    void requestTimeAsync (helics_time time) { helicsFederateRequestTimeAsync (fed, time, hThrowOnError ()); }
 
-    void requestTimeIterativeAsync (helics_time_t time, helics_iteration_request iterate)
+    void requestTimeIterativeAsync (helics_time time, helics_iteration_request iterate)
     {
         helicsFederateRequestTimeIterativeAsync (fed, time, iterate, hThrowOnError ());
     }
 
-    helics_time_t requestTimeComplete ()
-    { return helicsFederateRequestTimeComplete (fed, hThrowOnError ());
-    }
+    helics_time requestTimeComplete () { return helicsFederateRequestTimeComplete (fed, hThrowOnError ()); }
 
     helics_iteration_time requestTimeIterativeComplete ()
     {
@@ -244,10 +235,7 @@ class Federate
         return itTime;
     }
 
-    const char *getName () const
-    {
-        return helicsFederateGetName (fed);
-    }
+    const char *getName () const { return helicsFederateGetName (fed); }
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
     the federation and the specific string being queried
@@ -267,12 +255,10 @@ class Federate
         return result;
     }
 
-    Filter registerFilter (helics_filter_type_t type,
-                                 const std::string &name = std::string ())
+    Filter registerFilter (helics_filter_type_t type, const std::string &name = std::string ())
     {
         return Filter (helicsFederateRegisterFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
-
 
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -283,16 +269,14 @@ class Federate
     */
     CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
     {
-        return CloningFilter (helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str (),
-                              hThrowOnError ()));
+        return CloningFilter (
+          helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
 
-    Filter registerGlobalFilter(helics_filter_type_t type,
-        const std::string &name = std::string())
+    Filter registerGlobalFilter (helics_filter_type_t type, const std::string &name = std::string ())
     {
-        return Filter(helicsFederateRegisterGlobalFilter(fed, type, name.c_str(), hThrowOnError()));
+        return Filter (helicsFederateRegisterGlobalFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
-
 
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
@@ -301,20 +285,21 @@ class Federate
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
-    CloningFilter registerGlobalCloningFilter(const std::string &deliveryEndpoint)
+    CloningFilter registerGlobalCloningFilter (const std::string &deliveryEndpoint)
     {
-        return CloningFilter(helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint.c_str(),
-            hThrowOnError()));
+        return CloningFilter (
+          helicsFederateRegisterGlobalCloningFilter (fed, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
 
-	Filter getFilter (const std::string &name)
+    Filter getFilter (const std::string &name)
     {
-        return Filter (helicsFederateGetFilter (fed, name.c_str (),hThrowOnError()));
+        return Filter (helicsFederateGetFilter (fed, name.c_str (), hThrowOnError ()));
     }
     Filter getSubscription (int index)
     {
         return Filter (helicsFederateGetFilterByIndex (fed, index, hThrowOnError ()));
     }
+
   protected:
     helics_federate fed;
     bool exec_async_iterate;

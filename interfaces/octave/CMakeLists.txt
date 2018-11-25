@@ -29,7 +29,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
     DEPENDS
-      ${CMAKE_SOURCE_DIR}/interfaces/helics.i ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i
+      ${CMAKE_SOURCE_DIR}/interfaces/helics.i ${CMAKE_CURRENT_SOURCE_DIR}/helicsOctave.i ${CMAKE_CURRENT_SOURCE_DIR}/octave_maps.i
       ${SHARED_LIB_HEADERS}
   )
 

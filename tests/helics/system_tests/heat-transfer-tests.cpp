@@ -53,7 +53,7 @@ class HeatUnitBlock
         std::string name = "heatUnit_(" + std::to_string (x) + "," + std::to_string (y) + ")";
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.setTimeProperty (TIME_DELTA_PROPERTY, deltaTime);
+        fi.setTimeProperty (helics_property_time_delta, deltaTime);
         vFed = std::make_unique<helics::ValueFederate> (name, fi);
         pub = &vFed->registerPublicationIndexed<double> ("temp", x, y);
         if (x - 1 < 0)
@@ -195,8 +195,8 @@ class observer
         std::string name = "observer";
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.setFlagOption (HELICS_OBSERVER_FLAG);
-        fi.setTimeProperty (TIME_DELTA_PROPERTY, 10.0);
+        fi.setFlagOption (helics_flag_observer);
+        fi.setTimeProperty (helics_property_time_delta, 10.0);
         vFed = std::make_unique<helics::ValueFederate> (name, fi);
         vSub = helics::VectorSubscription2d<double> (vFed.get (), subName, 0, m_count, 0, 1, 0.0);
         initialized = true;

@@ -5,41 +5,42 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "FederateState.hpp"
 
-#include "../flag-definitions.h"
 #include "EndpointInfo.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
+#include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>
 #include <chrono>
 #include <thread>
 
+
 #include "MessageTimer.hpp"
 #include "helics/helics-config.h"
-#include "../common/fmt_format.h"
 
+#include "../common/fmt_format.h"
 static const std::string emptyStr;
-#define LOG_ERROR(message) logMessage (HELICS_LOG_LEVEL_ERROR, emptyStr, message)
-#define LOG_WARNING(message) logMessage (HELICS_LOG_LEVEL_WARNING, emptyStr, message)
+#define LOG_ERROR(message) logMessage (helics_log_level_error, emptyStr, message)
+#define LOG_WARNING(message) logMessage (helics_log_level_warning, emptyStr, message)
 
 #ifdef ENABLE_LOGGING
 
 #define LOG_SUMMARY(message)                                                                                      \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= HELICS_LOG_LEVEL_SUMMARY)                                                                        \
+        if (logLevel >= helics_log_level_summary)                                                                 \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_SUMMARY, emptyStr, message);                                                     \
+            logMessage (Hhelics_log_level_summary, emptyStr, message);                                            \
         }                                                                                                         \
     } while (false)
 
 #define LOG_INTERFACES(message)                                                                                   \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= HELICS_LOG_LEVEL_INTERFACES)                                                                     \
+        if (logLevel >= helics_log_level_interfaces)                                                              \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_INTERFACES, emptyStr, message);                                                  \
+            logMessage (helics_log_level_interfaces, emptyStr, message);                                          \
         }                                                                                                         \
     } while (false)
 
@@ -47,18 +48,18 @@ static const std::string emptyStr;
 #define LOG_TIMING(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= HELICS_LOG_LEVEL_TIMING)                                                                         \
+        if (logLevel >= helics_log_level_timing)                                                                  \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_TIMING, emptyStr, message);                                                      \
+            logMessage (helics_log_level_timing, emptyStr, message);                                              \
         }                                                                                                         \
     } while (false)
 
 #define LOG_DATA(message)                                                                                         \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= HELICS_LOG_LEVEL_DATA)                                                                           \
+        if (logLevel >= helics_log_level_data)                                                                    \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_DATA, emptyStr, message);                                                        \
+            logMessage (helics_log_level_data, emptyStr, message);                                                \
         }                                                                                                         \
     } while (false)
 #else
@@ -70,9 +71,9 @@ static const std::string emptyStr;
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
-        if (logLevel >= HELICS_LOG_LEVEL_TRACE)                                                                          \
+        if (logLevel >= helics_log_level_trace)                                                                   \
         {                                                                                                         \
-            logMessage (HELICS_LOG_LEVEL_TRACE, emptyStr, message);                                                       \
+            logMessage (helics_log_level_trace, emptyStr, message);                                               \
         }                                                                                                         \
     } while (false)
 #else
@@ -172,12 +173,12 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     }
     while (!processing.test_and_set ())
     {
-        ; //spin
+        ;  // spin
     }
     // this function could be called externally in a multi-threaded context
     auto pub = interfaceInformation.getPublication (pub_id);
     auto res = pub->CheckSetValue (data, len);
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return res;
 }
 
@@ -261,14 +262,13 @@ void FederateState::addAction (const ActionMessage &action)
     }
 }
 
-
-stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/) 
+stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/)
 {
     return stx::nullopt;
 }
 
-    void FederateState::addAction (ActionMessage && action)
-    {
+void FederateState::addAction (ActionMessage &&action)
+{
     if (action.action () != CMD_IGNORE)
     {
         queue.push (std::move (action));
@@ -277,14 +277,14 @@ stx::optional<ActionMessage> FederateState::processPostTerminationAction (const 
 
 iteration_result FederateState::waitSetup ()
 {
-    if (!processing.test_and_set())
+    if (!processing.test_and_set ())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -293,7 +293,7 @@ iteration_result FederateState::waitSetup ()
     {
     case HELICS_CREATED:
     {  // we are still in the created state
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         return waitSetup ();
     }
     case HELICS_ERROR:
@@ -307,16 +307,16 @@ iteration_result FederateState::waitSetup ()
         break;
     }
 
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return ret;
 }
 
 iteration_result FederateState::enterInitializingMode ()
 {
-    if (!processing.test_and_set())
+    if (!processing.test_and_set ())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         if (ret == message_processing_result::next_step)
         {
             time_granted = initialTime;
@@ -325,7 +325,7 @@ iteration_result FederateState::enterInitializingMode ()
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -340,20 +340,20 @@ iteration_result FederateState::enterInitializingMode ()
         break;
     case HELICS_CREATED:
     {
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         return enterInitializingMode ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
     }
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return ret;
 }
 
 iteration_result FederateState::enterExecutingMode (iteration_request iterate)
 {
-    if (!processing.test_and_set())
+    if (!processing.test_and_set ())
     {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec (CMD_EXEC_REQUEST);
@@ -399,7 +399,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             break;
         }
 
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         if ((realtime) && (ret == message_processing_result::next_step))
         {
             if (!mTimer)
@@ -413,7 +413,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
     // done but it isn't really an error so we need to deal with it.
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -435,13 +435,13 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         ret = iteration_result::next_step;
         break;
     }
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return ret;
 }
 
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
-    if (!processing.test_and_set())
+    if (!processing.test_and_set ())
     {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime ();
         events.clear ();  // clear the event queue
@@ -550,22 +550,21 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
             }
         }
 
-        processing.clear(std::memory_order_release);
-        if ((retTime.grantedTime > nextTime)
-            &&(nextTime>lastTime))
-		{
-			if (!ignore_time_mismatch_warnings)
-			{
+        processing.clear (std::memory_order_release);
+        if ((retTime.grantedTime > nextTime) && (nextTime > lastTime))
+        {
+            if (!ignore_time_mismatch_warnings)
+            {
                 LOG_WARNING (fmt::format ("Time mismatch detected granted time >requested time {} vs {}",
                                           static_cast<double> (retTime.grantedTime),
                                           static_cast<double> (nextTime)));
-			}
-		}
+            }
+        }
         return retTime;
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
         std::this_thread::sleep_for (50ms);
     }
@@ -579,7 +578,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         ret = iteration_result::error;
     }
     iteration_time retTime = {time_granted, ret};
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return retTime;
 }
 
@@ -624,29 +623,26 @@ void FederateState::fillEventVectorNextIteration (Time currentTime)
 
 iteration_result FederateState::genericUnspecifiedQueueProcess ()
 {
-    if (!processing.test_and_set())
+    if (!processing.test_and_set ())
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-        processing.clear(std::memory_order_release);
+        processing.clear (std::memory_order_release);
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
         std::this_thread::sleep_for (50ms);
     }
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
     return iteration_result::next_step;
 }
 
 const std::vector<interface_handle> emptyHandles;
 
-const std::vector<interface_handle> &FederateState::getEvents () const
-{
-    return events;
-}
+const std::vector<interface_handle> &FederateState::getEvents () const { return events; }
 
 message_processing_result FederateState::processDelayQueue ()
 {
@@ -969,10 +965,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         timeCoord->processTimeMessage (cmd);
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-		if (!ignore_time_mismatch_warnings)
-		{
+        if (!ignore_time_mismatch_warnings)
+        {
             LOG_WARNING (fmt::format ("forced Granted Time={}", time_granted));
-		}
+        }
         timeGranted_mode = true;
         return message_processing_result::next_step;
     }
@@ -1012,10 +1008,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         if (cmd.payload.empty ())
         {
             errorString = commandErrorString (cmd.messageID);
-			if(errorString == "unknown")
-			{
+            if (errorString == "unknown")
+            {
                 errorString += " code:" + std::to_string (cmd.messageID);
-			}
+            }
         }
         else
         {
@@ -1042,8 +1038,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto pubI = interfaceInformation.getPublication (cmd.dest_handle);
         if (pubI != nullptr)
         {
-            pubI->subscribers.emplace_back (cmd.source_id,
-                                            cmd.source_handle);
+            pubI->subscribers.emplace_back (cmd.source_id, cmd.source_handle);
             addDependent (cmd.source_id);
         }
     }
@@ -1100,28 +1095,28 @@ void FederateState::setProperties (const ActionMessage &cmd)
         switch (cmd.action ())
         {
         case CMD_FED_CONFIGURE_FLAG:
-            while (processing.test_and_set())
+            while (processing.test_and_set ())
             {
-                ; //spin
+                ;  // spin
             }
             setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
-            processing.clear(std::memory_order_release);
+            processing.clear (std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_TIME:
-            while (processing.test_and_set())
+            while (processing.test_and_set ())
             {
-                ; //spin
+                ;  // spin
             }
             setTimeProperty (cmd.messageID, cmd.actionTime);
-            processing.clear(std::memory_order_release);
+            processing.clear (std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_INT:
-            while (processing.test_and_set())
+            while (processing.test_and_set ())
             {
-                ; //spin
+                ;  // spin
             }
             setIntegerProperty (cmd.messageID, cmd.counter);
-            processing.clear(std::memory_order_release);
+            processing.clear (std::memory_order_release);
             break;
         default:
             break;
@@ -1146,13 +1141,13 @@ void FederateState::setTimeProperty (int timeProperty, Time propertyVal)
 {
     switch (timeProperty)
     {
-    case RT_LAG_PROPERTY:
+    case defs::properties::rt_lag:
         rt_lag = propertyVal;
         break;
-    case RT_LEAD_PROPERTY:
+    case defs::properties::rt_lead:
         rt_lead = propertyVal;
         break;
-    case RT_TOLERANCE_PROPERTY:
+    case defs::properties::rt_tolerance:
         rt_lag = propertyVal;
         rt_lead = propertyVal;
         break;
@@ -1167,7 +1162,7 @@ void FederateState::setIntegerProperty (int intProperty, int propertyVal)
 {
     switch (intProperty)
     {
-    case LOG_LEVEL_PROPERTY:
+    case defs::properties::log_level:
         logLevel = propertyVal;
         break;
     default:
@@ -1180,13 +1175,13 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
 {
     switch (optionFlag)
     {
-    case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
+    case defs::flags::only_transmit_on_change:
         only_transmit_on_change = value;
         break;
-    case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
+    case defs::flags::only_update_on_change:
         interfaceInformation.setChangeUpdateFlag (value);
         break;
-    case HELICS_REALTIME_FLAG:
+    case defs::flags::realtime:
         if (value)
         {
             if (state < HELICS_EXECUTING)
@@ -1200,7 +1195,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         }
 
         break;
-    case HELICS_SOURCE_ONLY_FLAG:
+    case defs::flags::source_only:
         if (state == HELICS_CREATED)
         {
             source_only = value;
@@ -1210,7 +1205,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
             }
         }
         break;
-    case HELICS_OBSERVER_FLAG:
+    case defs::flags::observer:
         if (state == HELICS_CREATED)
         {
             observer = value;
@@ -1220,7 +1215,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
             }
         }
         break;
-    case HELICS_IGNORE_TIME_MISMATCH_WARNINGS:
+    case defs::flags::ignore_time_mismatch_warnings:
         ignore_time_mismatch_warnings = value;
         break;
     default:
@@ -1234,10 +1229,10 @@ Time FederateState::getTimeProperty (int timeProperty) const
 {
     switch (timeProperty)
     {
-    case RT_LAG_PROPERTY:
-    case RT_TOLERANCE_PROPERTY:
+    case defs::properties::rt_lag:
+    case defs::properties::rt_tolerance:
         return rt_lag;
-    case RT_LEAD_PROPERTY:
+    case defs::properties::rt_lead:
         return rt_lead;
     default:
         return timeCoord->getTimeProperty (timeProperty);
@@ -1249,15 +1244,15 @@ bool FederateState::getOptionFlag (int optionFlag) const
 {
     switch (optionFlag)
     {
-    case HELICS_ONLY_TRANSMIT_ON_CHANGE_FLAG:
+    case defs::flags::only_transmit_on_change:
         return only_transmit_on_change;
-    case HELICS_ONLY_UPDATE_ON_CHANGE_FLAG:
+    case defs::flags::only_update_on_change:
         return interfaceInformation.getChangeUpdateFlag ();
-    case HELICS_REALTIME_FLAG:
+    case defs::flags::realtime:
         return realtime;
-    case HELICS_OBSERVER_FLAG:
+    case defs::flags::observer:
         return observer;
-    case HELICS_SOURCE_ONLY_FLAG:
+    case defs::flags::source_only:
         return source_only;
     default:
         return timeCoord->getOptionFlag (optionFlag);
@@ -1269,7 +1264,7 @@ int FederateState::getIntegerProperty (int intProperty) const
 {
     switch (intProperty)
     {
-    case LOG_LEVEL_PROPERTY:
+    case defs::properties::log_level:
         return logLevel;
     default:
         return timeCoord->getIntegerProperty (intProperty);
@@ -1327,12 +1322,12 @@ Time FederateState::nextMessageTime () const
 
 void FederateState::setCoreObject (CommonCore *parent)
 {
-    while (processing.test_and_set())
+    while (processing.test_and_set ())
     {
-        ; //spin
+        ;  // spin
     }
     parent_ = parent;
-    processing.clear(std::memory_order_release);
+    processing.clear (std::memory_order_release);
 }
 
 void FederateState::logMessage (int level, const std::string &logMessageSource, const std::string &message) const
@@ -1341,7 +1336,7 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     {
         loggerFunction (level,
                         (logMessageSource.empty ()) ?
-                          fmt::format ("{} ({})", name, global_id.load ().baseValue ()):
+                          fmt::format ("{} ({})", name, global_id.load ().baseValue ()) :
                           logMessageSource,
                         message);
     }

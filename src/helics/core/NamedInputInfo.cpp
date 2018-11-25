@@ -226,7 +226,7 @@ bool NamedInputInfo::updateData (dataRecord &&update, int index)
         current_data[index] = std::move (update);
         return true;
     }
-    else if (current_data[index].time == update.time)
+    if (current_data[index].time == update.time)
     {  // this is for bookkeeping purposes should still return false
         current_data[index].iteration = update.iteration;
     }

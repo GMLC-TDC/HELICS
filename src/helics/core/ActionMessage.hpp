@@ -139,9 +139,9 @@ class ActionMessage
 
     void setString (int index, const std::string &str);
     /** get the source global_handle*/
-    global_handle getSource () const { return global_handle (source_id, source_handle); }
+    global_handle getSource() const { return global_handle{ source_id, source_handle }; }
     /** get the global destination handle*/
-    global_handle getDest () const { return global_handle (dest_id, dest_handle); }
+    global_handle getDest() const { return global_handle{ dest_id, dest_handle }; }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
     {

@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../flag-definitions.h"
+#include "../helics_enums.h"
 #include <cstdint>
 namespace helics
 {
