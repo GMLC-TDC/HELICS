@@ -1035,8 +1035,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (isRootc)
         {
-            sendToLogger (global_federate_id_t (command.source_id), HELICS_LOG_LEVEL_ERROR, std::string (),
-                          command.payload);
+            sendToLogger (command.source_id, log_level::error, std::string (), command.payload);
         }
         else
         {
