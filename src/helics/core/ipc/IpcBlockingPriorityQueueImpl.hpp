@@ -5,10 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "helics_includes/optional.hpp"
 #include <chrono>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include "helics/common/CircularBuffer.hpp"
@@ -29,20 +26,23 @@ operations require a swap, however in high usage the two locks will reduce conte
     {
       private:
         boost::interprocess::interprocess_mutex m_pushLock;  //!< lock for operations on the pushElements vector
-        common::StackQueueRaw pushData;
+		const int queueSize;
+		const int prioritySize;
+		common::StackQueueRaw pushData;
         boost::interprocess::interprocess_mutex
           m_pullLock;  //!< lock for elements on the pullData and priority structure
         common::StackQueueRaw pullData;
         mutable boost::interprocess::interprocess_mutex m_conditionLock;  //!< lock for the empty and full Flag
         bool queueEmptyFlag{true};  //!< flag indicating the queue is empty
         bool queueFullFlag{false};
+
         // the condition variable should be keyed of the conditionLock
         boost::interprocess::interprocess_condition
           condition_empty;  //!< condition variable for notification of new data
         boost::interprocess::interprocess_condition
           condition_full;  //!< condition variable for notification of available space
         unsigned char *dataBlock_;
-        size_t dataSize;
+        const size_t dataSize;
         common::CircularBufferRaw priorityData;
 
       public:
@@ -60,10 +60,24 @@ operations require a swap, however in high usage the two locks will reduce conte
         val the value to push on the queue
         */
         void push (const unsigned char *data, int size);
+
+		/** push a data block
+		val the value to push on the queue
+		*/
+		int push(std::chrono::milliseconds timeout, const unsigned char *data, int size);
+
         /** push an element onto the queue
         val the value to push on the queue
         */
         void pushPriority (const unsigned char *data, int size);
+		/** push an element onto the queue
+		@param timeout the time to wait
+		@param data the data to put into the queue
+		@param size the number of bytes of data to store
+		@return size if successful, 0 if not
+		@throws invalid_argument if the size is greater than the capacity
+		*/
+		int pushPriority(std::chrono::milliseconds timeout, const unsigned char *data, int size);
         /** push a data block
         val the value to push on the queue
         */
@@ -75,11 +89,15 @@ operations require a swap, however in high usage the two locks will reduce conte
         bool try_pushPriority (const unsigned char *data, int size);
 
         /** try to pop an object from the queue
-        @return an optional containing the value if successful the optional will be empty if there is no
-        element in the queue
+		@details this function does not block,  will return 0 if no data could be popped
+        @return an integer with the size of the popped value,
         */
         int try_pop (unsigned char *data, int maxSize);
 
+		/** pop an object from the queue
+		@details this function will block,  will return 0 if the data does not fit into the max size
+		@return an integer with the size of the popped value,
+		*/
         int pop (unsigned char *data, int maxSize);
 
         /** blocking call to wait on an object from the stack with timeout*/

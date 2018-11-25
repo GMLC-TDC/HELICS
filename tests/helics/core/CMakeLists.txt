@@ -17,12 +17,14 @@ set(
   FederateState-tests.cpp
   ActionMessage-tests.cpp
   # CoreBroker-tests.cpp
-  CoreFactory-tests.cpp MessageTimerTests.cpp
+  CoreFactory-tests.cpp 
+  MessageTimerTests.cpp
   # CommonCore-tests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
   IPCcore_tests.cpp
   IpcQueueTests.cpp
+  IpcQueueImplTests.cpp
   data-block-tests.cpp
   UdpCore-tests.cpp
   ForwardingTimeCoordinatorTests.cpp

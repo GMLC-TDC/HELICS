@@ -5,9 +5,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "helics_includes/optional.hpp"
 #include <chrono>
 #include <vector>
+#include <cstdint>
 
 namespace helics
 {

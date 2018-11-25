@@ -31,7 +31,7 @@ void StackQueueRaw::swap (StackQueueRaw &other) noexcept
 
 bool StackQueueRaw::isSpaceAvailable (int sz) const
 {
-    return (dataSize - (next - origin) - (dataCount + 1) * sizeof (dataIndex)) >= sz;
+    return (dataSize - (next - origin) - (dataCount + 1) * static_cast<int>(sizeof (dataIndex))) >= sz;
 }
 
 bool StackQueueRaw::push (const unsigned char *block, int blockSize)

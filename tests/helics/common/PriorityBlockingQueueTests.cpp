@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests2)
         sq.push (ii);
     }
     auto prod1 = [&]() {
-        for (int64_t ii = 10'000; ii < 2'010'000; ++ii)
+        for (int64_t ii = 10'000; ii < 1'010'000; ++ii)
         {
             sq.push (ii);
         }
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE (multithreaded_tests2)
     auto V2 = res2.get ();
     auto V3 = res3.get ();
 
-    BOOST_CHECK_EQUAL (V1 + V2 + V3, 2'010'000);
+    BOOST_CHECK_EQUAL (V1 + V2 + V3, 1'010'000);
 }
 
 /** test with multiple producer/multiple consumer*/
