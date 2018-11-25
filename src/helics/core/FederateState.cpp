@@ -15,7 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <chrono>
 #include <thread>
 
-
 #include "MessageTimer.hpp"
 #include "helics/helics-config.h"
 
@@ -112,7 +111,7 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
 FederateState::~FederateState () = default;
 
 // define the allowable state transitions for a federate
-void FederateState::setState (federate_state_t newState)
+void FederateState::setState (federate_state newState)
 {
     if (state == newState)
     {
@@ -137,7 +136,7 @@ void FederateState::setState (federate_state_t newState)
         state.compare_exchange_strong (reqState, newState);
         break;
     }
-    case HELICS_NONE:
+    case HELICS_UNKNOWN:
     default:
         break;
     }
@@ -161,7 +160,7 @@ void FederateState::reInit ()
     delayQueues.clear ();
     // TODO:: this needs to reset a bunch of stuff as well as check a few things
 }
-federate_state_t FederateState::getState () const { return state; }
+federate_state FederateState::getState () const { return state; }
 
 int32_t FederateState::getCurrentIteration () const { return timeCoord->getCurrentIteration (); }
 

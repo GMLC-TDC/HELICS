@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
 {
     // Check setting of name, initial state, and info by the constructor
     BOOST_CHECK_EQUAL (fs->getIdentifier (), "fed_name");
-    BOOST_CHECK_EQUAL (fs->getState (), helics::federate_state_t::HELICS_CREATED);
+    BOOST_CHECK_EQUAL (fs->getState (), helics::federate_state::HELICS_CREATED);
 
     BOOST_CHECK_EQUAL (fs->getTimeProperty (helics::defs::properties::time_delta), helics::Time::epsilon ());
     BOOST_CHECK_EQUAL (fs->getTimeProperty (helics::defs::properties::output_delay), helics::Time::zeroVal ());
@@ -181,16 +181,16 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
     auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitializingMode (); });
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_CREATED);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::next_step);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
     fs->addAction (cmd);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_INITIALIZING);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_INITIALIZING);
     auto fs_process2 =
       std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
 
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     auto state = fs_process2.get ();
 
     BOOST_CHECK (state == iteration_result::halted);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_FINISHED);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_FINISHED);
 
     // Return to created state
     fs->reset ();
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs_process.wait ();
     BOOST_CHECK (fs_process.get () == iteration_result::error);
     BOOST_CHECK_EQUAL (fs->global_id.load (), fed22);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_ERROR);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_ERROR);
 
     // Return to initializing state
     fs->reInit ();
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs_process2 =
       std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
     auto st = fs->getState ();
-    BOOST_CHECK ((st == federate_state_t::HELICS_INITIALIZING) || (st == federate_state_t::HELICS_EXECUTING));
+    BOOST_CHECK ((st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
     fs->addAction (cmd);
     auto res = fs_process2.get ();
     if (res != iteration_result::error)
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     }
 
     BOOST_CHECK (res == iteration_result::error);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state_t::HELICS_ERROR);
+    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_ERROR);
 
     fs->reset ();
 

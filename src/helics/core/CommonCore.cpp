@@ -31,8 +31,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "fileConnections.hpp"
 #include "../common/fmt_format.h"
+#include "fileConnections.hpp"
 
 namespace helics
 {
@@ -604,7 +604,7 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
         return iteration_time{timeZero, iteration_result::error};
-    case HELICS_NONE:
+    case HELICS_UNKNOWN:
     case HELICS_ERROR:
         return iteration_time{Time::maxVal (), iteration_result::error};
     }
@@ -1282,15 +1282,15 @@ void CommonCore::registerFrequentCommunicationsPair (const std::string & /*sourc
     // std::lock_guard<std::mutex> lock (_mutex);
 }
 
-void  CommonCore::makeConnections(const std::string &file)
+void CommonCore::makeConnections (const std::string &file)
 {
-    if (hasTomlExtension(file))
+    if (hasTomlExtension (file))
     {
-        makeConnectionsToml(this, file);
+        makeConnectionsToml (this, file);
     }
     else
     {
-        makeConnectionsJson(this, file);
+        makeConnectionsJson (this, file);
     }
 }
 
@@ -1803,15 +1803,17 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handle_type == handle_type_t::publication); });
+        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
+                                        [](const auto &handle) {
+                                            return (handle.handle_type == handle_type_t::publication);
+                                        });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handle_type == handle_type_t::endpoint); });
+        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
+                                        [](const auto &handle) {
+                                            return (handle.handle_type == handle_type_t::endpoint);
+                                        });
     }
     if (queryStr == "dependson")
     {
@@ -3353,7 +3355,7 @@ void CommonCore::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto &fed : loopFederates)
     {
-        if (fed->getState () != federate_state_t::HELICS_FINISHED)
+        if (fed->getState () != federate_state::HELICS_FINISHED)
         {
             fed->addAction (bye);
         }
@@ -3412,7 +3414,7 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (cmd);
             }
@@ -3444,7 +3446,7 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
         auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (cmd);
             }
@@ -3481,7 +3483,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id_t dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (std::move (cmd));
             }
@@ -3514,7 +3516,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (std::move (cmd));
             }
@@ -3836,17 +3838,18 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
     }
 }
 
-    const std::string &CommonCore::getInterfaceInfo(interface_handle handle) const
+const std::string &CommonCore::getInterfaceInfo (interface_handle handle) const
+{
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo != nullptr)
     {
-        auto handleInfo = getHandleInfo (handle);
-        if (handleInfo != nullptr)
-        {
-            return handleInfo->interface_info;
-        }
-        return emptyStr;
+        return handleInfo->interface_info;
     }
+    return emptyStr;
+}
 
-    void CommonCore::setInterfaceInfo(helics::interface_handle handle, std::string info) {
-        handles.modify ([&](auto &hdls) { hdls.getHandleInfo (handle.baseValue ())->interface_info = info; });
-    }
+void CommonCore::setInterfaceInfo (helics::interface_handle handle, std::string info)
+{
+    handles.modify ([&](auto &hdls) { hdls.getHandleInfo (handle.baseValue ())->interface_info = info; });
+}
 }  // namespace helics
