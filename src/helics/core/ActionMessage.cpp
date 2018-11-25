@@ -189,7 +189,7 @@ std::string ActionMessage::packetize () const
     // don't forget to flush the stream to finish writing into the buffer
     s.flush ();
     // now generate a length header
-    auto sz = static_cast<int32_t> (data.size ());
+    auto sz = static_cast<uint32_t> (data.size ());
     data[1] = static_cast<char> (((sz >> 16) & 0xFF));
     data[2] = static_cast<char> (((sz >> 8) & 0xFF));
     data[3] = static_cast<char> (sz & 0xFF);
@@ -376,7 +376,7 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
-// consts can cause seg faults
+// consts can cause seg faults someday will change to frozen::  once we can use all of C++17
 
 static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands

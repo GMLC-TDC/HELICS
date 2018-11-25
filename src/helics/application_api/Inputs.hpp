@@ -25,6 +25,7 @@ class Input
     helics_type_t type = helics_type_t::helicsUnknown;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
+    bool disableAssign = false;  //!< disable assignment for the object
     size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
     double delta = -1.0;  //!< the minimum difference

@@ -600,13 +600,13 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_EXECUTING:
         break;
     case HELICS_FINISHED:
-        return iteration_time (Time::maxVal (), iteration_result::halted);
+        return iteration_time{Time::maxVal (), iteration_result::halted};
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
-        return iteration_time (timeZero, iteration_result::error);
+        return iteration_time{timeZero, iteration_result::error};
     case HELICS_NONE:
     case HELICS_ERROR:
-        return iteration_time (Time::maxVal (), iteration_result::error);
+        return iteration_time{Time::maxVal (), iteration_result::error};
     }
 
     // limit the iterations
@@ -641,7 +641,7 @@ uint64_t CommonCore::getCurrentReiteration (federate_id_t federateID) const
     return fed->getCurrentIteration ();
 }
 
-void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t intValue)
+void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property, int16_t propertyValue)
 {
     if (federateID == local_core_id)
     {
@@ -653,22 +653,19 @@ void CommonCore::setIntegerProperty (federate_id_t federateID, int32_t property,
         ActionMessage cmd (CMD_CORE_CONFIGURE);
         cmd.dest_id = global_broker_id.load ();
         cmd.messageID = property;
-        cmd.counter = intValue;
+        cmd.counter = propertyValue;
         addActionMessage (cmd);
         return;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
-        }
-        ActionMessage cmd (CMD_FED_CONFIGURE_INT);
-        cmd.messageID = property;
-        cmd.counter = intValue;
-        fed->setProperties (cmd);
+        throw (InvalidIdentifier ("federateID not valid (getMaximumIterations)"));
     }
+    ActionMessage cmd (CMD_FED_CONFIGURE_INT);
+    cmd.messageID = property;
+    cmd.counter = propertyValue;
+    fed->setProperties (cmd);
 }
 
 void CommonCore::setTimeProperty (federate_id_t federateID, int32_t property, Time time)
@@ -705,15 +702,12 @@ int16_t CommonCore::getIntegerProperty (federate_id_t federateID, int32_t proper
     {
         return 0;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
-        }
-        return fed->getTimeProperty (property);
+        throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
+    return fed->getIntegerProperty (property);
 }
 
 void CommonCore::setFlagOption (federate_id_t federateID, int32_t flag, bool flagValue)
@@ -770,15 +764,12 @@ bool CommonCore::getFlagOption (federate_id_t federateID, int32_t flag) const
     {
         return false;
     }
-    else
+    auto fed = getFederateAt (federateID);
+    if (fed == nullptr)
     {
-        auto fed = getFederateAt (federateID);
-        if (fed == nullptr)
-        {
-            throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
-        }
-        return fed->getOptionFlag (flag);
+        throw (InvalidIdentifier ("federateID not valid (setTimeDelta)"));
     }
+    return fed->getOptionFlag (flag);
 }
 
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
@@ -1181,10 +1172,7 @@ CommonCore::registerFilter (const std::string &filterName, const std::string &ty
         {
             throw (RegistrationFailure ("core is terminated no further registration possible"));
         }
-        else
-        {
-            throw (RegistrationFailure ("registration timeout exceeded"));
-        }
+        throw (RegistrationFailure ("registration timeout exceeded"));
     }
     auto brkid = global_broker_id.load ();
 
@@ -1225,10 +1213,7 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
         {
             throw (RegistrationFailure ("core is terminated no further registration possible"));
         }
-        else
-        {
-            throw (RegistrationFailure ("registration timeout exceeded"));
-        }
+        throw (RegistrationFailure ("registration timeout exceeded"));
     }
     auto brkid = global_broker_id.load ();
 
@@ -1257,7 +1242,7 @@ interface_handle CommonCore::getFilter (const std::string &name) const
     {
         return filt->getInterfaceHandle ();
     }
-    return interface_handle ();
+    return interface_handle{};
 }
 
 FilterInfo *CommonCore::createFilter (global_broker_id_t dest,
@@ -1818,17 +1803,15 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::publication);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handle_type == handle_type_t::publication); });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::endpoint);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handle_type == handle_type_t::endpoint); });
     }
     if (queryStr == "dependson")
     {

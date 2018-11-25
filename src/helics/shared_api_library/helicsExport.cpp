@@ -907,21 +907,21 @@ void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
     }
 }
 
-void helicsFederateDestroy (helics_federate fed, helics_error *err)
+void helicsFederateDestroy (helics_federate fed)
 {
-    helicsFederateFinalize (fed, err);
+    helicsFederateFinalize (fed, nullptr);
     helicsFederateFree (fed);
 }
 
-void helicsBrokerDestroy (helics_broker broker, helics_error *err)
+void helicsBrokerDestroy (helics_broker broker)
 {
-    helicsBrokerDisconnect (broker, err);
+    helicsBrokerDisconnect (broker, nullptr);
     helicsBrokerFree (broker);
 }
 
-void helicsCoreDestroy (helics_core core, helics_error *err)
+void helicsCoreDestroy (helics_core core)
 {
-    helicsCoreDisconnect (core, err);
+    helicsCoreDisconnect (core, nullptr);
     helicsCoreFree (core);
 }
 

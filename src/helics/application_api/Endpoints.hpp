@@ -21,6 +21,7 @@ class Endpoint
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     std::string targetDest;  //!< a predefined target destination
     std::string actualName;  //!< the name of the federate
+    bool disableAssign = false;  //!< disable assignment for the object
   public:
     /** default constructor*/
     Endpoint () = default;

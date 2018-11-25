@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_SUITE (messageTimer_tests)
 using namespace helics;
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
+BOOST_AUTO_TEST_CASE (basic_test, *utf::label ("ci"))
 {
     std::mutex mlock;
     ActionMessage M;
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label("ci"))
     BOOST_CHECK (M.action () == CMD_IGNORE);
     localLock.unlock ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    localLock.lock();
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_PROTOCOL);
 }
 
@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE (basic_test_update)
     auto res = mtimer->addTimeToTimer (index, std::chrono::milliseconds (300));
     BOOST_CHECK (res);
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
-    localLock.lock();
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_IGNORE);
-    localLock.unlock();
+    localLock.unlock ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    localLock.lock();
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_PROTOCOL);
 }
 
@@ -194,8 +194,11 @@ BOOST_AUTO_TEST_CASE (basic_test_updatemessage)
 
     mtimer->updateTimer (index, ctime + std::chrono::milliseconds (700), CMD_BROKER_ACK);
     std::this_thread::sleep_for (std::chrono::milliseconds (400));
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_IGNORE);
+    localLock.unlock ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_BROKER_ACK);
 }
 
@@ -218,6 +221,7 @@ BOOST_AUTO_TEST_CASE (basic_test_updatemessage2)
 
     mtimer->updateMessage (index, CMD_BROKER_ACK);
     std::this_thread::sleep_for (std::chrono::milliseconds (400));
+    localLock.lock ();
     BOOST_CHECK (M.action () == CMD_BROKER_ACK);
 }
 

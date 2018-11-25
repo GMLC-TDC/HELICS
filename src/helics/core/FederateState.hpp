@@ -44,6 +44,9 @@ class FederateState
     /** constructor from name and information structure*/
     FederateState (const std::string &name_, const CoreFederateInfo &info_);
 	//the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
+    /** DISABLE_COPY_AND_ASSIGN */
+    FederateState(const FederateState &) = delete;
+    FederateState &operator= (const FederateState &) = delete;
     /** destructor*/
     ~FederateState ();
 
@@ -100,9 +103,6 @@ class FederateState
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     std::atomic_flag processing=ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
-    /** DISABLE_COPY_AND_ASSIGN */
-    FederateState (const FederateState &) = delete;
-    FederateState &operator= (const FederateState &) = delete;
 
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;

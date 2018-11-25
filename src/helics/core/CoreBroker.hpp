@@ -58,7 +58,7 @@ class BasicBrokerInfo
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
     bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
     std::string routeInfo;  //!< string describing the connection information for the route
-    BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
+    explicit BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
 
 class TimeCoordinator;
@@ -263,7 +263,7 @@ class CoreBroker : public Broker, public BrokerBase
 
     const BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid) const;
 
-    BasicBrokerInfo *getBrokerById (global_broker_id_t fedid);
+    BasicBrokerInfo *getBrokerById (global_broker_id_t brokerid);
 
     void addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m);
     void addPublication (ActionMessage &m);

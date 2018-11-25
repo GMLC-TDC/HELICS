@@ -9,7 +9,6 @@
 package com.java.helics;
 
 public class helicsJNI {
-
   public final static native int helics_core_type_default_get();
   public final static native int helics_core_type_zmq_get();
   public final static native int helics_core_type_mpi_get();
@@ -83,8 +82,10 @@ public class helicsJNI {
   public final static native int helics_handle_option_connection_optional_get();
   public final static native int helics_handle_option_single_connection_only_get();
   public final static native int helics_handle_option_multiple_connections_allowed_get();
+  public final static native int helics_handle_option_buffer_data_get();
   public final static native int helics_handle_option_only_transmit_on_change_get();
   public final static native int helics_handle_option_only_update_on_change_get();
+  public final static native int helics_handle_option_ignore_interrupts_get();
   public final static native int helics_filtertype_custom_get();
   public final static native int helics_filtertype_delay_get();
   public final static native int helics_filtertype_random_delay_get();
@@ -277,6 +278,10 @@ public class helicsJNI {
   public final static native String helicsPublicationGetKey(long jarg1);
   public final static native String helicsInputGetUnits(long jarg1);
   public final static native String helicsPublicationGetUnits(long jarg1);
+  public final static native String helicsInputGetInfo(long jarg1);
+  public final static native void helicsInputSetInfo(long jarg1, String jarg2);
+  public final static native String helicsPublicationGetInfo(long jarg1);
+  public final static native void helicsPublicationSetInfo(long jarg1, String jarg2);
   public final static native int helicsInputIsUpdated(long jarg1);
   public final static native double helicsInputLastUpdateTime(long jarg1);
   public final static native int helicsFederateGetPublicationCount(long jarg1);
@@ -299,6 +304,8 @@ public class helicsJNI {
   public final static native String helicsEndpointGetType(long jarg1);
   public final static native String helicsEndpointGetName(long jarg1);
   public final static native int helicsFederateGetEndpointCount(long jarg1);
+  public final static native String helicsEndpointGetInfo(long jarg1);
+  public final static native void helicsEndpointSetInfo(long jarg1, String jarg2);
   public final static native long helicsFederateRegisterFilter(long jarg1, int jarg2, String jarg3);
   public final static native long helicsFederateRegisterGlobalFilter(long jarg1, int jarg2, String jarg3);
   public final static native long helicsFederateRegisterCloningFilter(long jarg1, String jarg2);
@@ -315,4 +322,6 @@ public class helicsJNI {
   public final static native void helicsFilterAddDeliveryEndpoint(long jarg1, String jarg2);
   public final static native void helicsFilterRemoveTarget(long jarg1, String jarg2);
   public final static native void helicsFilterRemoveDeliveryEndpoint(long jarg1, String jarg2);
+  public final static native String helicsFilterGetInfo(long jarg1);
+  public final static native void helicsFilterSetInfo(long jarg1, String jarg2);
 }

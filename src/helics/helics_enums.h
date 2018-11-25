@@ -50,6 +50,7 @@ extern "C"
         helics_data_type_complex = 3,
         /** an array of doubles*/
         helics_data_type_vector = 4,
+        /** a complex vector object*/
         helics_data_type_complex_vector = 5,
         /** a named point consisting of a string and a double*/
         helics_data_type_named_point = 6,
@@ -106,14 +107,23 @@ extern "C"
     /* log level definitions*/
     typedef enum
     {
+        /** don't print anything except a few catastrophic errors*/
         helics_log_level_no_print = -1,
+        /** only print error level indicators*/
         helics_log_level_error = 0,
+        /** only print warnings and errors*/
         helics_log_level_warning = 1,
+        /** warning errors and summary level information*/
         helics_log_level_summary = 2,
+        /** summary+ notices about federate and broker connections*/
         helics_log_level_connections = 3,
+        /** connections+ interface definitions*/
         helics_log_level_interfaces = 4,
+        /** interfaces + timing message*/
         helics_log_level_timing = 5,
+        /** timing+ data transfer notices*/
         helics_log_level_data = 6,
+        /** all internal messages*/
         helics_log_level_trace = 7
     } helics_log_levels;
 
@@ -142,6 +152,7 @@ extern "C"
 
     typedef enum
     {
+        /** the property controlling the minimum time delta for a federate*/
         helics_property_time_delta = 137,
         helics_property_time_period = 140,
         helics_property_time_offset = 141,
@@ -156,12 +167,22 @@ extern "C"
 
     typedef enum
     {
+        /** specify that a connection is required for an interface*/
         helics_handle_option_connection_required = 397,
+        /** specify that a connection is NOT required for an interface*/
         helics_handle_option_connection_optional = 402,
+        /** specify that only a single connection is allowed for an interface*/
         helics_handle_option_single_connection_only = 407,
+        /** specify that multiple connections are allowed for an interface*/
         helics_handle_option_multiple_connections_allowed = 409,
+        /** specify that the last data should be buffered and send on subscriptions after init*/
+        helics_handle_option_buffer_data = 411,
+        /** specify that an interface will only transmit on change(only applicable to publications)*/
         helics_handle_option_only_transmit_on_change = 6,
-        helics_handle_option_only_update_on_change = 8
+        /** specify that an interface will only update if the value has actually changed*/
+        helics_handle_option_only_update_on_change = 8,
+        /** specify that an interface does not participate in determining time interrupts*/
+        helics_handle_option_ignore_interrupts = 475
     } helics_handle_options;
 
     /** enumeration of the predefined filter types*/

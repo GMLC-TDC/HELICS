@@ -135,9 +135,7 @@ helicsFederateRegisterTypePublication (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-
-helics_publication
-helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
+helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
@@ -1066,7 +1064,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
             if (actualLength != nullptr)
             {
                 *actualLength = maxStringLen;
-            }
+        }
         }
         else
         {
@@ -1074,7 +1072,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
             if (actualLength != nullptr)
             {
                 *actualLength = length + 1;
-            }
+        }
         }
 
         if (val != nullptr)
