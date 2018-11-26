@@ -7,30 +7,29 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-
-void InterfaceInfo::createPublication(interface_handle handle,
+void InterfaceInfo::createPublication (interface_handle handle,
                                        const std::string &key,
                                        const std::string &type,
                                        const std::string &units)
 {
-    publications.lock ()->insert (key, handle, global_handle(global_id, handle), key, type, units);
+    publications.lock ()->insert (key, handle, global_handle{global_id, handle}, key, type, units);
 }
 
-void InterfaceInfo::createInput(interface_handle handle,
-    const std::string &key,
-    const std::string &type,
-    const std::string &units)
+void InterfaceInfo::createInput (interface_handle handle,
+                                 const std::string &key,
+                                 const std::string &type,
+                                 const std::string &units)
 {
-    auto ciHandle = inputs.lock();
-    ciHandle->insert(key, handle, global_handle(global_id,handle), key, type, units);
-    ciHandle->back()->only_update_on_change = only_update_on_change;
+    auto ciHandle = inputs.lock ();
+    ciHandle->insert (key, handle, global_handle{global_id, handle}, key, type, units);
+    ciHandle->back ()->only_update_on_change = only_update_on_change;
 }
 
-void InterfaceInfo::createEndpoint(interface_handle handle,
-    const std::string &endpointName,
-    const std::string &type)
+void InterfaceInfo::createEndpoint (interface_handle handle,
+                                    const std::string &endpointName,
+                                    const std::string &type)
 {
-    endpoints.lock ()->insert (endpointName, handle, global_handle(global_id, handle), endpointName, type);
+    endpoints.lock ()->insert (endpointName, handle, global_handle{global_id, handle}, endpointName, type);
 }
 
 void InterfaceInfo::setChangeUpdateFlag (bool updateFlag)
@@ -65,28 +64,21 @@ PublicationInfo *InterfaceInfo::getPublication (interface_handle handle_)
     return publications.lock ()->find (handle_);
 }
 
-
-const NamedInputInfo *InterfaceInfo::getInput(const std::string &pubName) const
+const NamedInputInfo *InterfaceInfo::getInput (const std::string &pubName) const
 {
-    return inputs.lock_shared()->find(pubName);
+    return inputs.lock_shared ()->find (pubName);
 }
 
-const NamedInputInfo *InterfaceInfo::getInput(interface_handle handle_) const
+const NamedInputInfo *InterfaceInfo::getInput (interface_handle handle_) const
 {
-    return inputs.lock()->find(handle_);
+    return inputs.lock ()->find (handle_);
 }
 
-NamedInputInfo *InterfaceInfo::getInput(const std::string &pubName)
-{
-    return inputs.lock()->find(pubName);
-}
+NamedInputInfo *InterfaceInfo::getInput (const std::string &pubName) { return inputs.lock ()->find (pubName); }
 
-NamedInputInfo *InterfaceInfo::getInput(interface_handle handle_)
-{
-    return inputs.lock()->find(handle_);
-}
+NamedInputInfo *InterfaceInfo::getInput (interface_handle handle_) { return inputs.lock ()->find (handle_); }
 
-const EndpointInfo *InterfaceInfo::getEndpoint(const std::string &endpointName) const
+const EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName) const
 {
     return endpoints.lock_shared ()->find (endpointName);
 }
@@ -102,4 +94,4 @@ EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName)
 }
 
 EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle_) { return endpoints.lock ()->find (handle_); }
-}
+}  // namespace helics

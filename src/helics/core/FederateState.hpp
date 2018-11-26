@@ -80,9 +80,8 @@ class FederateState
     int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
-
+  private:
     bool iterating = false;  //!< the federate is iterating at a time step
-    bool hasEndpoints = false;  //!< the federate has endpoints
     bool timeGranted_mode =
       false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     // 1 byte free
@@ -166,6 +165,12 @@ class FederateState
     bool getOptionFlag (int optionFlag) const;
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
+    /** get the number of publications*/
+    int publicationCount () const;
+    /** get the number of endpoints*/
+    int endpointCount () const;
+    /** get the number of inputs*/
+    int inputCount () const;
 
   private:
     /** process the federate queue until returnable event

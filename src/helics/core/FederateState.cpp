@@ -1270,6 +1270,18 @@ int FederateState::getIntegerProperty (int intProperty) const
     }
 }
 
+int FederateState::publicationCount () const
+{
+    return static_cast<int> (interfaceInformation.getPublications ()->size ());
+}
+
+int FederateState::endpointCount () const
+{
+    return static_cast<int> (interfaceInformation.getEndpoints ()->size ());
+}
+
+int FederateState::inputCount () const { return static_cast<int> (interfaceInformation.getInputs ()->size ()); }
+
 std::vector<global_federate_id_t> FederateState::getDependencies () const { return timeCoord->getDependencies (); }
 
 std::vector<global_federate_id_t> FederateState::getDependents () const { return timeCoord->getDependents (); }

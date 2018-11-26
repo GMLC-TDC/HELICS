@@ -41,12 +41,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
-    BOOST_CHECK (fs->local_id == helics::federate_id_t ());
-    BOOST_CHECK (fs->global_id.load () == helics::global_federate_id_t ());
+    BOOST_CHECK (fs->local_id == helics::federate_id_t{});
+    BOOST_CHECK (fs->global_id.load () == helics::global_federate_id_t{});
     BOOST_CHECK_EQUAL (fs->init_requested, false);
-    // BOOST_CHECK_EQUAL(fs->processing, false);
-    BOOST_CHECK_EQUAL (fs->iterating, false);
-    BOOST_CHECK_EQUAL (fs->hasEndpoints, false);
+
     BOOST_CHECK_EQUAL (fs->getCurrentIteration (), 0);
     BOOST_CHECK_EQUAL (fs->grantedTime (), helics::Time::minVal ());
     // BOOST_CHECK_EQUAL(fs->time_requested, helics::Time::zeroVal());

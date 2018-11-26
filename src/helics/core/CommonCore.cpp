@@ -1130,7 +1130,6 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
 
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createEndpoint (id, name, type);
-    fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
@@ -2977,7 +2976,7 @@ void CommonCore::checkDependencies ()
     bool issource = false;
     for (auto &fed : loopFederates)
     {
-        if (fed->hasEndpoints)
+        if (fed->endpointCount () > 0)
         {
             if (fed->getOptionFlag (defs::flags::observer))
             {
