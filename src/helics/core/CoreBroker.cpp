@@ -13,10 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "fileConnections.hpp"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
+#include "fileConnections.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -140,15 +140,15 @@ uint16_t CoreBroker::getNextAirlockIndex ()
     return index;
 }
 
-void  CoreBroker::makeConnections(const std::string &file)
+void CoreBroker::makeConnections (const std::string &file)
 {
-    if (hasTomlExtension(file))
+    if (hasTomlExtension (file))
     {
-        makeConnectionsToml(this,file);
+        makeConnectionsToml (this, file);
     }
     else
     {
-        makeConnectionsJson(this,file);
+        makeConnectionsJson (this, file);
     }
 }
 
@@ -531,13 +531,13 @@ std::string CoreBroker::generateFederationSummary () const
     {
         switch (hand.handle_type)
         {
-        case handle_type_t::publication:
+        case handle_type::publication:
             ++pubs;
             break;
-        case handle_type_t::input:
+        case handle_type::input:
             ++ipts;
             break;
-        case handle_type_t::endpoint:
+        case handle_type::endpoint:
             ++epts;
             break;
         default:
@@ -1290,7 +1290,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                         // an anonymous publisher is adding an input
                         auto &apub =
                           handles.addHandle (global_federate_id_t (command.source_id),
-                                             interface_handle (command.source_handle), handle_type_t::publication,
+                                             interface_handle (command.source_handle), handle_type::publication,
                                              std::string (), command.getString (typeStringLoc),
                                              command.getString (unitStringLoc));
 
@@ -1308,7 +1308,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                         // an anonymous filter is adding and endpoint
                         auto &afilt =
                           handles.addHandle (global_federate_id_t (command.source_id),
-                                             interface_handle (command.source_handle), handle_type_t::filter,
+                                             interface_handle (command.source_handle), handle_type::filter,
                                              std::string (), command.getString (typeStringLoc),
                                              command.getString (typeOutStringLoc));
 
@@ -1355,7 +1355,7 @@ void CoreBroker::addPublication (ActionMessage &m)
         return;
     }
     auto &pub = handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
-                                   handle_type_t::publication, m.name, m.getString (0), m.getString (1));
+                                   handle_type::publication, m.name, m.getString (0), m.getString (1));
 
     addLocalInfo (pub, m);
     if (!isRootc)
@@ -1380,7 +1380,7 @@ void CoreBroker::addInput (ActionMessage &m)
         return;
     }
     auto &inp = handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
-                                   handle_type_t::input, m.name, m.getString (0), m.getString (1));
+                                   handle_type::input, m.name, m.getString (0), m.getString (1));
 
     addLocalInfo (inp, m);
     if (!isRootc)
@@ -1405,9 +1405,9 @@ void CoreBroker::addEndpoint (ActionMessage &m)
         routeMessage (eret);
         return;
     }
-    auto &ept = handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
-                                   handle_type_t::endpoint, m.name, m.getString (typeStringLoc),
-                                   m.getString (unitStringLoc));
+    auto &ept =
+      handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
+                         handle_type::endpoint, m.name, m.getString (typeStringLoc), m.getString (unitStringLoc));
 
     addLocalInfo (ept, m);
 
@@ -1444,9 +1444,9 @@ void CoreBroker::addFilter (ActionMessage &m)
         return;
     }
 
-    auto &filt = handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
-                                    handle_type_t::filter, m.name, m.getString (typeStringLoc),
-                                    m.getString (typeOutStringLoc));
+    auto &filt =
+      handles.addHandle (global_federate_id_t (m.source_id), interface_handle (m.source_handle),
+                         handle_type::filter, m.name, m.getString (typeStringLoc), m.getString (typeOutStringLoc));
     addLocalInfo (filt, m);
 
     if (!isRootc)
@@ -1990,27 +1990,25 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     if (request == "inputs")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handle_type == handle_type_t::input); });
+                                        [](auto &handle) { return (handle.handle_type == handle_type::input); });
     }
     if (request == "publications")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
                                         [](auto &handle) {
-                                            return (handle.handle_type == handle_type_t::publication);
+                                            return (handle.handle_type == handle_type::publication);
                                         });
     }
     if (request == "filters")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) {
-                                            return (handle.handle_type == handle_type_t::filter);
-                                        });
+                                        [](auto &handle) { return (handle.handle_type == handle_type::filter); });
     }
     if (request == "endpoints")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
                                         [](auto &handle) {
-                                            return (handle.handle_type == handle_type_t::endpoint);
+                                            return (handle.handle_type == handle_type::endpoint);
                                         });
     }
     if (request == "federate_map")

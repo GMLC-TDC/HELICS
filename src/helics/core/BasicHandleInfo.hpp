@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** define the type of the handle*/
-enum class handle_type_t : char
+enum class handle_type : char
 {
     unknown,
     publication,  //!< handle to output interface
@@ -38,7 +38,7 @@ class BasicHandleInfo
     /** construct from the data*/
     BasicHandleInfo (global_federate_id_t federate_id_t,
                      interface_handle handle_id,
-                     handle_type_t type_of_handle,
+                     handle_type type_of_handle,
                      const std::string &key_name,
                      const std::string &type_name,
                      const std::string &unit_name)
@@ -52,7 +52,7 @@ class BasicHandleInfo
 
     const global_handle handle;  //!< the global federate id for the creator of the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
-    const handle_type_t handle_type = handle_type_t::unknown;  //!< the type of the handle
+    const handle_type handle_type = handle_type::unknown;  //!< the type of the handle
     bool used = false;  //!< indicator that the handle is being used to link with another federate
     uint16_t flags = 0;  //!< flags corresponding to the flags used in ActionMessages +some extra ones
 

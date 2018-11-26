@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
-                                           handle_type_t what,
+                                           handle_type what,
                                            const std::string &key,
                                            const std::string &type,
                                            const std::string &units)
@@ -24,7 +24,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
 
 BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
                                            interface_handle local_id,
-                                           handle_type_t what,
+                                           handle_type what,
                                            const std::string &key,
                                            const std::string &type,
                                            const std::string &units)
@@ -100,29 +100,10 @@ void HandleManager::setHandleOption (int32_t index, int option, bool val)
     {
         switch (option)
         {
-        case helics_handle_option_only_update_on_change:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag1);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag1);
-            }
-            break;
-        case helics_handle_option_only_transmit_on_change:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag2);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag1);
-            }
-            break;
         case helics_handle_option_connection_required:
             if (val)
             {
+                clearActionFlag (handles[index], optional_flag);
                 setActionFlag (handles[index], required_flag);
             }
             else
@@ -134,20 +115,11 @@ void HandleManager::setHandleOption (int32_t index, int option, bool val)
             if (val)
             {
                 clearActionFlag (handles[index], required_flag);
+                setActionFlag (handles[index], optional_flag);
             }
             else
             {
-                setActionFlag (handles[index], required_flag);
-            }
-            break;
-        case helics_handle_option_single_connection_only:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag4);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag4);
+                clearActionFlag (handles[index], optional_flag);
             }
             break;
         }
@@ -167,7 +139,7 @@ bool HandleManager::getHandleOption (int32_t index, int option) const
         case helics_handle_option_connection_required:
             return checkActionFlag (handles[index], required_flag);
         case helics_handle_option_connection_optional:
-            return !checkActionFlag (handles[index], required_flag);
+            return checkActionFlag (handles[index], optional_flag);
         case helics_handle_option_single_connection_only:
             return checkActionFlag (handles[index], extra_flag4);
         default:
@@ -202,7 +174,7 @@ BasicHandleInfo *HandleManager::getEndpoint (int32_t index)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type_t::endpoint)
+        if (hand.handle_type == handle_type::endpoint)
         {
             return &hand;
         }
@@ -236,7 +208,7 @@ BasicHandleInfo *HandleManager::getPublication (int32_t index)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type_t::publication)
+        if (hand.handle_type == handle_type::publication)
         {
             return &hand;
         }
@@ -289,7 +261,7 @@ BasicHandleInfo *HandleManager::getFilter (int32_t index)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type_t::filter)
+        if (hand.handle_type == handle_type::filter)
         {
             return &hand;
         }
@@ -309,19 +281,19 @@ void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t inde
 {
     switch (handle.handle_type)
     {
-    case handle_type_t::endpoint:
+    case handle_type::endpoint:
         endpoints.emplace (handle.key, interface_handle (index));
         break;
-    case handle_type_t::publication:
+    case handle_type::publication:
         publications.emplace (handle.key, interface_handle (index));
         break;
-    case handle_type_t::filter:
+    case handle_type::filter:
         if (!handle.key.empty ())
         {
             filters.emplace (handle.key, interface_handle (index));
         }
         break;
-    case handle_type_t::input:
+    case handle_type::input:
         inputs.emplace (handle.key, interface_handle (index));
         break;
     default:
@@ -331,17 +303,17 @@ void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t inde
     unique_ids.emplace (static_cast<uint64_t> (handle.handle), index);
 }
 
-std::string HandleManager::generateName (handle_type_t what) const
+std::string HandleManager::generateName (handle_type what) const
 {
     switch (what)
     {
-    case handle_type_t::endpoint:
+    case handle_type::endpoint:
         return std::string ("_ept_") + std::to_string (handles.size ());
-    case handle_type_t::input:
+    case handle_type::input:
         return std::string ("_input_") + std::to_string (handles.size ());
-    case handle_type_t::publication:
+    case handle_type::publication:
         return std::string ("_pub_") + std::to_string (handles.size ());
-    case handle_type_t::filter:
+    case handle_type::filter:
         return std::string ("_filter_") + std::to_string (handles.size ());
     default:
         return std::string ("_handle_") + std::to_string (handles.size ());

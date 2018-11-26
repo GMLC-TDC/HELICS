@@ -774,7 +774,7 @@ bool CommonCore::getFlagOption (federate_id_t federateID, int32_t flag) const
 
 const BasicHandleInfo &CommonCore::createBasicHandle (global_federate_id_t global_federateId,
                                                       federate_id_t local_federateId,
-                                                      handle_type_t HandleType,
+                                                      handle_type HandleType,
                                                       const std::string &key,
                                                       const std::string &type,
                                                       const std::string &units,
@@ -805,7 +805,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     {
         throw (RegistrationFailure ("named Input already exists"));
     }
-    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::input, key, type, units);
+    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::input, key, type, units);
 
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createInput (id, key, type, units);
@@ -847,7 +847,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (RegistrationFailure ("Publication key already exists"));
     }
-    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type_t::publication, key, type, units);
+    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::publication, key, type, units);
 
     auto id = handle.handle.handle;
     fed->interfaces ().createPublication (id, key, type, units);
@@ -899,7 +899,7 @@ const std::string &CommonCore::getType (interface_handle handle) const
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-        if (handleInfo->handle_type == handle_type_t::input)
+        if (handleInfo->handle_type == handle_type::input)
         {
             auto fed = getFederateAt (handleInfo->local_fed_id);
             auto inpInfo = fed->interfaces ().getInput (handle);
@@ -923,10 +923,10 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
     {
         switch (handleInfo->handle_type)
         {
-        case handle_type_t::publication:
-        case handle_type_t::endpoint:
+        case handle_type::publication:
+        case handle_type::endpoint:
             return handleInfo->type;
-        case handle_type_t::filter:
+        case handle_type::filter:
             return handleInfo->type_out;
         default:
             return emptyStr;
@@ -970,10 +970,10 @@ void CommonCore::addDestinationTarget (interface_handle handle, const std::strin
     cmd.payload = dest;
     switch (handleInfo->handle_type)
     {
-    case handle_type_t::endpoint:
+    case handle_type::endpoint:
         cmd.setAction (CMD_ADD_NAMED_FILTER);
         break;
-    case handle_type_t::filter:
+    case handle_type::filter:
         cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
         if (handleInfo->key.empty ())
         {
@@ -983,14 +983,14 @@ void CommonCore::addDestinationTarget (interface_handle handle, const std::strin
             }
         }
         break;
-    case handle_type_t::publication:
+    case handle_type::publication:
         cmd.setAction (CMD_ADD_NAMED_INPUT);
         if (handleInfo->key.empty ())
         {
             cmd.setStringData (handleInfo->type, handleInfo->units);
         }
         break;
-    case handle_type_t::input:
+    case handle_type::input:
     default:
         throw (InvalidIdentifier ("inputs cannot have destination targets"));
     }
@@ -1011,10 +1011,10 @@ void CommonCore::addSourceTarget (interface_handle handle, const std::string &ta
     cmd.payload = targetName;
     switch (handleInfo->handle_type)
     {
-    case handle_type_t::endpoint:
+    case handle_type::endpoint:
         cmd.setAction (CMD_ADD_NAMED_FILTER);
         break;
-    case handle_type_t::filter:
+    case handle_type::filter:
         cmd.setAction (CMD_ADD_NAMED_ENDPOINT);
         if (handleInfo->key.empty ())
         {
@@ -1024,10 +1024,10 @@ void CommonCore::addSourceTarget (interface_handle handle, const std::string &ta
             }
         }
         break;
-    case handle_type_t::input:
+    case handle_type::input:
         cmd.setAction (CMD_ADD_NAMED_PUBLICATION);
         break;
-    case handle_type_t::publication:
+    case handle_type::publication:
     default:
         throw (InvalidIdentifier ("publications cannot have source targets"));
     }
@@ -1041,7 +1041,7 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
     {
         throw (InvalidIdentifier ("Handle not valid (setValue)"));
     }
-    if (handleInfo->handle_type != handle_type_t::publication)
+    if (handleInfo->handle_type != handle_type::publication)
     {
         throw (InvalidIdentifier ("handle does not point to a publication or control output"));
     }
@@ -1074,7 +1074,7 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-    if (handleInfo->handle_type == handle_type_t::input)
+    if (handleInfo->handle_type == handle_type::input)
     {
         return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ();
     }
@@ -1092,7 +1092,7 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interfa
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-    if (handleInfo->handle_type == handle_type_t::input)
+    if (handleInfo->handle_type == handle_type::input)
     {
         return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getAllData ();
     }
@@ -1126,7 +1126,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
         throw (RegistrationFailure ("endpoint name is already used"));
     }
     auto &handle =
-      createBasicHandle (fed->global_id, fed->local_id, handle_type_t::endpoint, name, type, std::string ());
+      createBasicHandle (fed->global_id, fed->local_id, handle_type::endpoint, name, type, std::string ());
 
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createEndpoint (id, name, type);
@@ -1176,8 +1176,7 @@ CommonCore::registerFilter (const std::string &filterName, const std::string &ty
     }
     auto brkid = global_broker_id.load ();
 
-    auto handle =
-      createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName, type_in, type_out);
+    auto handle = createBasicHandle (brkid, federate_id_t (), handle_type::filter, filterName, type_in, type_out);
     auto id = handle.getInterfaceHandle ();
 
     ActionMessage m (CMD_REG_FILTER);
@@ -1217,8 +1216,8 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
     }
     auto brkid = global_broker_id.load ();
 
-    auto &handle = createBasicHandle (brkid, federate_id_t (), handle_type_t::filter, filterName, type_in,
-                                      type_out, make_flags (clone_flag));
+    auto &handle = createBasicHandle (brkid, federate_id_t (), handle_type::filter, filterName, type_in, type_out,
+                                      make_flags (clone_flag));
 
     auto id = handle.getInterfaceHandle ();
 
@@ -1238,7 +1237,7 @@ interface_handle CommonCore::registerCloningFilter (const std::string &filterNam
 interface_handle CommonCore::getFilter (const std::string &name) const
 {
     auto filt = handles.read ([&name](auto &hand) { return hand.getFilter (name); });
-    if ((filt != nullptr) && (filt->handle_type == handle_type_t::filter))
+    if ((filt != nullptr) && (filt->handle_type == handle_type::filter))
     {
         return filt->getInterfaceHandle ();
     }
@@ -1343,7 +1342,7 @@ void CommonCore::send (interface_handle sourceHandle,
         throw (InvalidIdentifier ("handle is not valid"));
     }
 
-    if (hndl->handle_type != handle_type_t::endpoint)
+    if (hndl->handle_type != handle_type::endpoint)
     {
         throw (InvalidIdentifier ("handle does not point to an endpoint"));
     }
@@ -1371,7 +1370,7 @@ void CommonCore::sendEvent (Time time,
     {
         throw (InvalidIdentifier ("handle is not valid"));
     }
-    if (hndl->handle_type != handle_type_t::endpoint)
+    if (hndl->handle_type != handle_type::endpoint)
     {
         throw (InvalidIdentifier ("handle does not point to an endpoint"));
     }
@@ -1406,7 +1405,7 @@ void CommonCore::sendMessage (interface_handle sourceHandle, std::unique_ptr<Mes
     {
         throw (InvalidIdentifier ("handle is not valid"));
     }
-    if (hndl->handle_type != handle_type_t::endpoint)
+    if (hndl->handle_type != handle_type::endpoint)
     {
         throw (InvalidIdentifier ("handle does not point to an endpoint"));
     }
@@ -1711,7 +1710,7 @@ void CommonCore::setFilterOperator (interface_handle filter, std::shared_ptr<Fil
     {
         throw (InvalidIdentifier ("filter is not a valid handle"));
     }
-    if ((hndl->handle_type != handle_type_t::filter))
+    if ((hndl->handle_type != handle_type::filter))
     {
         throw (InvalidIdentifier ("filter identifier does not point a filter"));
     }
@@ -1805,14 +1804,14 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     {
         return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
                                         [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::publication);
+                                            return (handle.handle_type == handle_type::publication);
                                         });
     }
     if (queryStr == "endpoints")
     {
         return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
                                         [](const auto &handle) {
-                                            return (handle.handle_type == handle_type_t::endpoint);
+                                            return (handle.handle_type == handle_type::endpoint);
                                         });
     }
     if (queryStr == "dependson")
