@@ -14,9 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** these test cases test out the value converters
  */
 #include "../application_api/testFixtures.hpp"
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api.hpp"
 #include <future>
 
 namespace utf = boost::unit_test;
@@ -28,11 +26,11 @@ BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 BOOST_AUTO_TEST_CASE (duplicate_federate_names)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
-    fi.coreInitString = "2";
+    fi.coreInitString = "-f 2";
 
-    auto Fed = std::make_shared<helics::Federate> ("test1",fi);
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1",fi), helics::RegistrationFailure);
+    BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
     Fed->finalize ();
 }
 
@@ -58,7 +56,7 @@ BOOST_AUTO_TEST_CASE (already_init_broker)
     auto fed1 = GetFederateAs<helics::ValueFederate> (0);
 
     fed1->enterInitializingMode ();
-    helics::FederateInfo fi ( helics::core_type::TEST);
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreInitString = std::string ("--broker=") + broker->getIdentifier ();
     BOOST_CHECK_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
     broker->disconnect ();
@@ -72,7 +70,7 @@ BOOST_AUTO_TEST_CASE (already_init_core)
     auto fed1 = GetFederateAs<helics::ValueFederate> (0);
     fed1->enterExecutingMode ();
     // get the core pointer from fed2 and using the name of fed1 should be an error
-     BOOST_CHECK_THROW (helics::ValueFederate fed2 ("fed2", fed1->getCorePointer (), helics::FederateInfo()),
+    BOOST_CHECK_THROW (helics::ValueFederate fed2 ("fed2", fed1->getCorePointer (), helics::FederateInfo ()),
                        helics::RegistrationFailure);
     broker->disconnect ();
 }
@@ -132,14 +130,14 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
 
     auto fed1 = GetFederateAs<helics::ValueFederate> (0);
 
-	// all 3 of these should publish to the same thing
+    // all 3 of these should publish to the same thing
     auto &pubid = fed1->registerPublication ("testkey", "");
-    
+
     helics::Publication pub (fed1, "testkey", helics::helics_type_t::helicsDouble);
-	//copy constructor
+    // copy constructor
     helics::Publication pub2 (pubid);
 
-    auto &sub=fed1->registerSubscription(fed1->getPublicationKey (pubid));
+    auto &sub = fed1->registerSubscription (fed1->getPublicationKey (pubid));
     fed1->enterExecutingMode ();
     fed1->publish (pubid, 45.7);
     fed1->requestTime (1.0);
@@ -202,8 +200,9 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
 
     fed1->registerGlobalPublication ("t1", "");
-    fed2->registerSubscription ("abcd", "");
-	//TODO:: add required flag back
+    auto &i2 = fed2->registerSubscription ("abcd", "");
+    i2.setOption (helics::defs::options::connection_required, true);
+    // TODO:: add required flag back
     fed1->enterInitializingModeAsync ();
     BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
     fed1->finalize ();
@@ -214,9 +213,9 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (test_duplicate_broker_name, bdata::make (core_types_simple), core_type)
 {
-    auto broker = AddBroker (core_type, "1 --name=brk1");
+    auto broker = AddBroker (core_type, "--name=brk1");
     BOOST_CHECK (broker->isConnected ());
-    BOOST_CHECK_THROW (AddBroker (core_type, "1 --name=brk1 --timeout=500"), helics::RegistrationFailure);
+    BOOST_CHECK_THROW (AddBroker (core_type, "--name=brk1 --timeout=500"), helics::RegistrationFailure);
     broker->disconnect ();
     helics::cleanupHelicsLibrary ();
 }
@@ -226,8 +225,8 @@ const std::string networkCores[] = {"zmq", "tcp", "udp"};
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)
 {
-    auto broker = AddBroker (core_type, "1");
-    auto broker2 = AddBroker (core_type, "1 --timeout=500");
+    auto broker = AddBroker (core_type, "");
+    auto broker2 = AddBroker (core_type, "--timeout=500");
     BOOST_CHECK (!broker2->isConnected ());
     broker->disconnect ();
     helics::cleanupHelicsLibrary ();
@@ -236,13 +235,13 @@ BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores)
 /** test broker recovery*/
 BOOST_DATA_TEST_CASE (test_broker_recovery, bdata::make (networkCores), core_type)
 {
-    auto broker = AddBroker (core_type, "1");
+    auto broker = AddBroker (core_type, "");
     BOOST_REQUIRE (broker->isConnected ());
     auto res = std::async (std::launch::async, [&broker]() {
         std::this_thread::sleep_for (std::chrono::milliseconds (1400));
         broker->disconnect ();
     });
-    auto broker2 = AddBroker (core_type, "1 --timeout=2500");
+    auto broker2 = AddBroker (core_type, " --timeout=2500");
     BOOST_CHECK (!broker->isConnected ());
     BOOST_CHECK (broker2->isConnected ());
     broker2->disconnect ();

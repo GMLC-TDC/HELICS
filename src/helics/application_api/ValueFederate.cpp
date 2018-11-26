@@ -167,8 +167,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 pubAct->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(pubAct->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (pubAct->getHandle (), info);
             }
         }
     }
@@ -204,8 +205,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 subNew.setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(subNew.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (subNew.getHandle (), info);
             }
         }
     }
@@ -238,8 +240,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 inp->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(inp->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (inp->getHandle (), info);
             }
         }
     }
@@ -288,8 +291,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 pubObj->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(pubObj->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (pubObj->getHandle (), info);
             }
         }
     }
@@ -325,8 +329,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 id->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(id->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (id->getHandle (), info);
             }
         }
     }
@@ -360,8 +365,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 id->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(id->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (id->getHandle (), info);
             }
         }
     }
@@ -507,26 +513,6 @@ const std::string &ValueFederate::getPublicationType (const Publication &pub) co
 std::string ValueFederate::getPublicationType (const Input &inp) const
 {
     return coreObject->getType (inp.getHandle ());
-}
-
-void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
-{
-    vfManager->setPublicationOption (pub, option, option_value);
-}
-
-void ValueFederate::setInputOption (const Input &inp, int32_t option, bool option_value)
-{
-    vfManager->setInputOption (inp, option, option_value);
-}
-
-bool ValueFederate::getInputOption (const Input &inp, int32_t option) const
-{
-    return vfManager->getInputOption (inp, option);
-}
-
-bool ValueFederate::getPublicationOption (const Publication &pub, int32_t option) const
-{
-    return vfManager->getPublicationOption (pub, option);
 }
 
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)

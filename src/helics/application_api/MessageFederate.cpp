@@ -159,8 +159,9 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
             }
 
             auto info = jsonGetOrDefault (ept, "info", std::string ());
-            if(!info.empty()){
-                setInfo(epObj.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (epObj.getHandle (), info);
             }
         }
     }
@@ -225,12 +226,12 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
             if (!defTarget.empty ())
             {
                 epObj.setTargetDestination (defTarget);
-
-			}
+            }
 
             auto info = tomlGetOrDefault (ept, "info", std::string ());
-            if(!info.empty()){
-                setInfo(epObj.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (epObj.getHandle (), info);
             }
         }
     }
@@ -364,11 +365,6 @@ void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
 
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
-
-void MessageFederate::setEndpointOption (const Endpoint &ept, int32_t option, bool option_value)
-{
-    mfManager->setEndpointOption (ept, option, option_value);
-}
 
 void MessageFederate::addSourceFilter (const Endpoint &ept, const std::string &filterName)
 {

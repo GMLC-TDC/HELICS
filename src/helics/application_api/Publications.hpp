@@ -162,6 +162,8 @@ class Publication
     /** get the publication id that can be used to make the function calls from a Value Federate
      */
     interface_handle getHandle () const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
 
     /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
@@ -178,9 +180,15 @@ class Publication
     /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
+
+    void setOption (int option, bool value) { fed->setInterfaceOption (handle, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int option) const { return fed->getInterfaceOption (handle, option); }
+
     /** add a target to the publication*/
     void addTarget (const std::string &target) { fed->addTarget (*this, target); }
 

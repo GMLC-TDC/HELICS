@@ -398,9 +398,6 @@ class Federate
     */
     void setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op);
 
-    /** set a filter option */
-    void setFilterOption (const Filter &filt, int32_t option, bool option_value = true);
-
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);
@@ -437,11 +434,26 @@ class Federate
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
+    /** set the info field for an interface
+    @details the info field is a free field stored in the core, it can be used to identify any information about
+    the interface and its connections for a specific program it has no defined format or purpose.
+    @param handle the handle for an interface
+    @param info the string to use for the info field
+    */
+    void setInfo (interface_handle handle, const std::string &info);
+    /** get the info field for an interface
+    @details the info field is a free field stored in the core, it can be used to identify any information about
+    the interface and its connections for a specific program it has no defined format or purpose.
+    @param handle the handle for an interface
+    */
+    std::string const &getInfo (interface_handle handle);
 
-    void setInfo(interface_handle handle, const std::string& info);
-    std::string const &getInfo(interface_handle handle);
+    /** set an interface option */
+    void setInterfaceOption (interface_handle handle, int32_t option, bool option_value = true);
+    /** get the current value for an interface option*/
+    bool getInterfaceOption (interface_handle handle, int32_t option);
 
-private:
+  private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces

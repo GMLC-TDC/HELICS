@@ -68,6 +68,8 @@ class Filter
 
     /** get the underlying core handle for use with a core*/
     interface_handle getHandle () const { return id; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return id; }
     /** get the name for the filter*/
     const std::string &getName () const;
     /** get the specified input type of the filter*/
@@ -79,9 +81,9 @@ class Filter
     @param val the numerical value of the property
     */
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(id); }
+    const std::string &getInfo () const { return fed->getInfo (id); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(id, info); }
+    void setInfo (const std::string &info) { fed->setInfo (id, info); }
     virtual void set (const std::string &property, double val);
     /** set a string property on a filter
     @param property the name of the property of the filter to change
@@ -95,6 +97,10 @@ class Filter
 
     /** remove a sourceEndpoint to the list of endpoint to clone*/
     virtual void removeTarget (const std::string &sourceName);
+    void setOption (int32_t option, bool value) { fed->setInterfaceOption (id, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int32_t option) const { return fed->getInterfaceOption (id, option); }
 
   protected:
     /** set a filter operations object */

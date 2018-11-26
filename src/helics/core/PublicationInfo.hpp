@@ -40,7 +40,7 @@ class PublicationInfo
     bool has_update = false;  //!< indicator that the publication has updates
     bool only_update_on_change = false;
     bool required = false; //!< indicator that it is required to be output someplace
-
+	bool buffer_data = false;
     /** check the value if it is the same as the most recent data and if changed store it*/
     bool CheckSetValue (const char *checkData, uint64_t len);
 };

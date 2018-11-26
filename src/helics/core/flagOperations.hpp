@@ -22,7 +22,7 @@ enum operation_flags : uint16_t
     empty_flag = 6,  //!< flag indicating that the message is empty
     extra_flag1 = 7,  //!< extra flag
     forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
-    clone_flag = 9,  //!< flag indicating the filter is a clone filter
+    clone_flag = 9,  //!< flag indicating the filter is a clone filter or the data needs to be cloned
     extra_flag2 = 8,  //!< extra flag
     destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
     broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
@@ -51,7 +51,6 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
 {
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
-
 
 inline constexpr uint16_t make_flags (int flag) { return static_cast<uint16_t> (1) << (flag); }
 

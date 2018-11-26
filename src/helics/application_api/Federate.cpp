@@ -824,8 +824,9 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
             }
         }
     }
@@ -988,8 +989,9 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
             }
         }
     }
@@ -1158,17 +1160,21 @@ void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOper
     coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
 }
 
-void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_value)
+void Federate::setInterfaceOption (interface_handle handle, int32_t option, bool option_value)
 {
-    coreObject->setHandleOption (filt.getHandle (), option, option_value);
+    coreObject->setHandleOption (handle, option, option_value);
+}
+/** get the current value for an interface option*/
+bool Federate::getInterfaceOption (interface_handle handle, int32_t option)
+{
+    return coreObject->getHandleOption (handle, option);
 }
 
-void Federate::setInfo(interface_handle handle, const std::string& info) {
-    coreObject->setInterfaceInfo(handle, info);
+void Federate::setInfo (interface_handle handle, const std::string &info)
+{
+    coreObject->setInterfaceInfo (handle, info);
 }
 
-std::string const &Federate::getInfo(interface_handle handle) {
-    return coreObject->getInterfaceInfo(handle);
-}
+std::string const &Federate::getInfo (interface_handle handle) { return coreObject->getInterfaceInfo (handle); }
 
 }  // namespace helics

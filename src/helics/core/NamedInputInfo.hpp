@@ -50,9 +50,10 @@ class NamedInputInfo
     bool required = false;  //!< flag indicating that the subscription requires a matching publication
     bool has_target = false;  //!< flag indicating that the input has a source
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
+    bool not_interruptible = false;  // indicator that this handle
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
-    std::vector<std::pair<std::string, std::string>> source_types; //!< the type and units of the sources
+    std::vector<std::pair<std::string, std::string>> source_types;  //!< the type and units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
@@ -62,7 +63,7 @@ class NamedInputInfo
     /** get a particular data input*/
     std::shared_ptr<const data_block> getData (int index);
     /** get a the most recent data point*/
-    std::shared_ptr<const data_block> getData();
+    std::shared_ptr<const data_block> getData ();
     /** add a data block into the queue*/
     void addData (global_handle source_handle,
                   Time valueTime,
@@ -88,7 +89,8 @@ class NamedInputInfo
     /** get the event based on the event queue*/
     Time nextValueTime () const;
     /** add a new source target to the input*/
-	void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+    void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+
   private:
     bool updateData (dataRecord &&update, int index);
 };
