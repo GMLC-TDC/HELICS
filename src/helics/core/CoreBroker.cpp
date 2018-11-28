@@ -1709,7 +1709,10 @@ void CoreBroker::executeInitializationOperations ()
     }
     if (unknownHandles.hasUnknowns ())
     {
-        LOG_WARNING (parent_broker_id, getIdentifier (), "Some requested targets are unresolved");
+        if (unknownHandles.hasNonOptionalUnknowns ())
+        {
+            LOG_WARNING (parent_broker_id, getIdentifier (), "Some requested targets are unresolved");
+        }
     }
 }
 

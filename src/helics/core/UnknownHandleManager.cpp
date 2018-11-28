@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "UnknownHandleManager.hpp"
+#include "flagOperations.hpp"
 
 namespace helics
 {
@@ -34,19 +35,18 @@ void UnknownHandleManager::addDataLink (const std::string &source, const std::st
     unknown_links.emplace (source, target);
 }
 
-void UnknownHandleManager::addSourceFilterLink(const std::string &filter, const std::string &endpoint)
+void UnknownHandleManager::addSourceFilterLink (const std::string &filter, const std::string &endpoint)
 {
     unknown_src_filters.emplace (filter, endpoint);
 }
 
-void UnknownHandleManager::addDestinationFilterLink(const std::string &filter, const std::string &endpoint)
+void UnknownHandleManager::addDestinationFilterLink (const std::string &filter, const std::string &endpoint)
 {
     unknown_dest_filters.emplace (filter, endpoint);
 }
 
-static auto
-getTargets (const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo> &tmap,
-            const std::string &target)
+static auto getTargets (const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo> &tmap,
+                        const std::string &target)
 {
     std::vector<UnknownHandleManager::targetInfo> targets;
     auto rp = tmap.equal_range (target);
@@ -62,8 +62,7 @@ getTargets (const std::unordered_multimap<std::string, UnknownHandleManager::tar
     return targets;
 }
 
-static auto getTargets (const std::unordered_multimap<std::string, std::string> &tmap,
-                        const std::string &target)
+static auto getTargets (const std::unordered_multimap<std::string, std::string> &tmap, const std::string &target)
 {
     std::vector<std::string> targets;
     auto rp = tmap.equal_range (target);
@@ -79,8 +78,9 @@ static auto getTargets (const std::unordered_multimap<std::string, std::string> 
     return targets;
 }
 
-  /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForInputs (const std::string &newInput) const
+/** specify a found input*/
+std::vector<UnknownHandleManager::targetInfo>
+UnknownHandleManager::checkForInputs (const std::string &newInput) const
 {
     return getTargets (unknown_inputs, newInput);
 }
@@ -104,7 +104,8 @@ UnknownHandleManager::checkForEndpoints (const std::string &newEndpoint) const
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo> UnknownHandleManager::checkForFilters (const std::string &newFilter) const
+std::vector<UnknownHandleManager::targetInfo>
+UnknownHandleManager::checkForFilters (const std::string &newFilter) const
 {
     return getTargets (unknown_filters, newFilter);
 }
@@ -122,7 +123,92 @@ std::vector<std::string> UnknownHandleManager::checkForFilterDestTargets (const 
 bool UnknownHandleManager::hasUnknowns () const
 {
     return (!(unknown_publications.empty () && unknown_endpoints.empty () && unknown_inputs.empty () &&
-              unknown_filters.empty () && unknown_links.empty() && unknown_dest_filters.empty() && unknown_src_filters.empty()));
+              unknown_filters.empty () && unknown_links.empty () && unknown_dest_filters.empty () &&
+              unknown_src_filters.empty ()));
+}
+
+bool UnknownHandleManager::hasNonOptionalUnknowns () const
+{
+    if (!(unknown_links.empty () && unknown_dest_filters.empty () && unknown_src_filters.empty ()))
+    {
+        return true;
+    }
+    for (auto &upub : unknown_publications)
+    {
+        if ((upub.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    for (auto &uept : unknown_endpoints)
+    {
+        if ((uept.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    for (auto &uinp : unknown_inputs)
+    {
+        if ((uinp.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+
+    for (auto &ufilt : unknown_filters)
+    {
+        if ((ufilt.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool UnknownHandleManager::hasRequiredUnknowns () const
+{
+    if (!(unknown_links.empty () && unknown_dest_filters.empty () && unknown_src_filters.empty ()))
+    {
+        return true;
+    }
+    for (auto &upub : unknown_publications)
+    {
+        if ((upub.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    for (auto &uept : unknown_endpoints)
+    {
+        if ((uept.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    for (auto &uinp : unknown_inputs)
+    {
+        if ((uinp.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+
+    for (auto &ufilt : unknown_filters)
+    {
+        if ((ufilt.second.second & make_flags (optional_flag)) != 0)
+        {
+            continue;
+        }
+        return true;
+    }
+    return false;
 }
 
 /** specify a found input*/
@@ -141,9 +227,9 @@ void UnknownHandleManager::clearEndpoint (const std::string &newEndpoint)
 }
 
 /** specify a found input*/
-void UnknownHandleManager::clearFilter (const std::string &newFilter) 
-{ 
-	unknown_filters.erase (newFilter);
+void UnknownHandleManager::clearFilter (const std::string &newFilter)
+{
+    unknown_filters.erase (newFilter);
     unknown_src_filters.erase (newFilter);
     unknown_dest_filters.erase (newFilter);
 }

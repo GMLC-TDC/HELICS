@@ -1217,6 +1217,28 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
     case defs::flags::ignore_time_mismatch_warnings:
         ignore_time_mismatch_warnings = value;
         break;
+    case defs::options::buffer_data:
+        break;
+    case defs::flags::connections_required:
+        if (value)
+        {
+            interfaceFlags |= make_flags (required_flag);
+        }
+        else
+        {
+            interfaceFlags &= ~make_flags (required_flag);
+        }
+        break;
+    case defs::flags::connections_optional:
+        if (value)
+        {
+            interfaceFlags |= make_flags (optional_flag);
+        }
+        else
+        {
+            interfaceFlags &= ~make_flags (optional_flag);
+        }
+        break;
     default:
         timeCoord->setOptionFlag (optionFlag, value);
         break;
@@ -1253,6 +1275,10 @@ bool FederateState::getOptionFlag (int optionFlag) const
         return observer;
     case defs::flags::source_only:
         return source_only;
+    case defs::flags::connections_required:
+        return ((interfaceFlags.load () & make_flags (required_flag)) != 0);
+    case defs::flags::connections_optional:
+        return ((interfaceFlags.load () & make_flags (optional_flag)) != 0);
     default:
         return timeCoord->getOptionFlag (optionFlag);
     }

@@ -814,6 +814,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     ActionMessage m (CMD_REG_INPUT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
+    m.flags = fed->getInterfaceFlags ();
     m.name = key;
     m.setStringData (type, units);
 
@@ -856,6 +857,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
     m.name = key;
+    m.flags = fed->getInterfaceFlags ();
     m.setStringData (type, units);
 
     actionQueue.push (std::move (m));
@@ -1135,7 +1137,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     m.source_handle = id;
     m.name = name;
     m.setStringData (type);
-
+    m.flags = fed->getInterfaceFlags ();
     actionQueue.push (std::move (m));
 
     return id;

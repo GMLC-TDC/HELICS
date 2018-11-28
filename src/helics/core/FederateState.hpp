@@ -91,7 +91,8 @@ class FederateState
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
-
+    std::atomic<uint16_t> interfaceFlags =
+      0;  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id_t, std::deque<ActionMessage>>
       delayQueues;  //!< queue for delaying processing of messages for a time
 
@@ -163,6 +164,8 @@ class FederateState
     Time getTimeProperty (int timeProperty) const;
     /** get an option flag value*/
     bool getOptionFlag (int optionFlag) const;
+
+    uint16_t getInterfaceFlags () const { return interfaceFlags.load (); }
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
     /** get the number of publications*/

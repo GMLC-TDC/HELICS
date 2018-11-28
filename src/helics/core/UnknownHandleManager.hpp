@@ -56,10 +56,10 @@ class UnknownHandleManager
     /** specify a found Source Filter*/
     std::vector<targetInfo> checkForFilters (const std::string &newFilter) const;
 
-	/** specify found data links*/
+    /** specify found data links*/
     std::vector<std::string> checkForLinks (const std::string &newSource) const;
 
-	std::vector<std::string> checkForFilterSourceTargets (const std::string &newFilter) const;
+    std::vector<std::string> checkForFilterSourceTargets (const std::string &newFilter) const;
     std::vector<std::string> checkForFilterDestTargets (const std::string &newFilter) const;
     /** specify a found input*/
     void clearInput (const std::string &newInput);
@@ -73,6 +73,12 @@ class UnknownHandleManager
 
     /** check if there are any unknowns remaining*/
     bool hasUnknowns () const;
+
+    /** check if there are any unknowns remaining that do not specify that they are optional*/
+    bool hasNonOptionalUnknowns () const;
+
+    /** check if there are any unknowns remaining that specify they are required*/
+    bool hasRequiredUnknowns () const;
 };
 
 }  // namespace helics
