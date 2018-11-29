@@ -182,15 +182,23 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     {
         time_next = time_granted;
     }
-    if (time_minminDe < Time::maxVal ())
-    {
-        if (time_minminDe + info.inputDelay > time_next)
-        {
-            time_next = time_minminDe + info.inputDelay;
-            time_next = generateAllowedTime (time_next);
-        }
-    }
-    time_next = std::min (time_next, time_exec) + info.outputDelay;
+	if (info.uninterruptible)
+	{
+		time_next = time_requested;
+	}
+	else
+	{
+		if (time_minminDe < Time::maxVal())
+		{
+			if (time_minminDe + info.inputDelay > time_next)
+			{
+				time_next = time_minminDe + info.inputDelay;
+				time_next = generateAllowedTime(time_next);
+			}
+		}
+		time_next = std::min(time_next, time_exec) + info.outputDelay;
+	}
+    
 }
 
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
