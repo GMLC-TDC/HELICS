@@ -124,7 +124,7 @@ enum class action_t : int32_t
     cmd_add_named_publication = 106,  //!< command to add a named publication as a target
     cmd_add_named_endpoint = 107,  //!< command to add a named endpoint as a target
     cmd_remove_target = 120,  //!< cmd to remove a target from connection
-
+    cmd_close_interface = 133,  //!< cmd to close all communications from an interface
     cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
@@ -198,6 +198,7 @@ enum class action_t : int32_t
 #define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
 #define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
 #define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
+#define CMD_CLOSE_INTERFACE action_message_def::action_t::cmd_close_interface
 
 #define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
 #define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link

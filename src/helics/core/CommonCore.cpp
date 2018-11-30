@@ -948,14 +948,31 @@ bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const
       [handle, option](auto &hand) { return hand.getHandleOption (handle.baseValue (), option); });
 }
 
-void CommonCore::removeTarget (interface_handle handle, const std::string & /*targetToRemove*/)
+void CommonCore::closeHandle(interface_handle handle)
+{
+	auto handleInfo = getHandleInfo(handle);
+	if (handleInfo == nullptr)
+	{
+		throw (InvalidIdentifier("invalid handle"));
+	}
+	ActionMessage cmd(CMD_CLOSE_INTERFACE);
+	cmd.setSource(handleInfo->handle);
+	addActionMessage(cmd);
+}
+
+void CommonCore::removeTarget (interface_handle handle, const std::string & targetToRemove)
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo == nullptr)
     {
         throw (InvalidIdentifier ("invalid handle"));
     }
+	ActionMessage cmd(CMD_REMOVE_TARGET);
+	cmd.setSource(handleInfo->handle);
+	cmd.name = targetToRemove;
+	addActionMessage(std::move(cmd));
 }
+
 void CommonCore::addDestinationTarget (interface_handle handle, const std::string &dest)
 {
     auto handleInfo = getHandleInfo (handle);
