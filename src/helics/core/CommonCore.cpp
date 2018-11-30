@@ -2559,6 +2559,9 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ADD_PUBLISHER:
         addTargetToInterface (command);
         break;
+	case CMD_CLOSE_INTERFACE:
+		disconnectInterface(command.getSource());
+		break;
     case CMD_CORE_CONFIGURE:
         processCoreConfigureCommands (command);
         break;
@@ -2816,6 +2819,12 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
     default:
         break;
     }
+}
+
+
+void CommonCore::disconnectInterface(global_handle handle)
+{
+	auto *handleInfo=loopHandles.getHandleInfo(handle.handle.baseValue());
 }
 
 void CommonCore::addTargetToInterface (ActionMessage &command)

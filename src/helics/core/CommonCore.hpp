@@ -364,6 +364,8 @@ class CommonCore : public Core, public BrokerBase
 	void registerInterface(ActionMessage &command);
 	/** function to handle adding a target to an interface*/
 	void addTargetToInterface(ActionMessage &command);
+	/** function disconnect a single interface*/
+	void disconnectInterface(global_handle handle);
     /** organize filters
     @detsils organize the filter and report and potential warnings and errors
     */
