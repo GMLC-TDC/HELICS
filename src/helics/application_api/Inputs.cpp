@@ -130,7 +130,7 @@ bool Input::isUpdated ()
         if (fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
-            if (type == helics_type_t::helicsUnknown)
+            if (type == data_type::helicsUnknown)
             {
                 type = getTypeFromString (fed->getPublicationType (*this));
             }
@@ -252,13 +252,13 @@ char Input::getValueChar ()
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == helics_type_t::helicsUnknown)
+        if (type == data_type::helicsUnknown)
         {
             type = getTypeFromString (fed->getPublicationType (*this));
         }
 
-        if ((type == helics_type_t::helicsString) || (type == helics_type_t::helicsAny) ||
-            (type == helics_type_t::helicsCustom))
+        if ((type == data_type::helicsString) || (type == data_type::helicsAny) ||
+            (type == data_type::helicsCustom))
         {
             std::string out;
             valueExtract (dv, type, out);

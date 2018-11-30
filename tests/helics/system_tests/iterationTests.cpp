@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
 std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index, int total)
 {
     using namespace helics;
-    Publication pub (vfed, "pub", helics_type_t::helicsDouble);
+    Publication pub (vfed, "pub", data_type::helicsDouble);
     pub.setMinimumChange (0.001);
     std::string low_target = "fed";
     low_target += std::to_string ((index == 0) ? total - 1 : index - 1);
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsDouble);
 
     auto &sub1 = vFed2->registerSubscription ("pub1");
     vFed1->setTimeProperty (helics_property_time_delta, 1.0);
@@ -288,11 +288,11 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsInt);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsInt);
 
     auto &sub1 = vFed2->registerSubscription ("pub1");
 
-    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
+    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::data_type::helicsInt);
 
     auto &sub2 = vFed1->registerSubscription ("pub2");
     vFed1->setTimeProperty (helics_property_time_period, 1.0);

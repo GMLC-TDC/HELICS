@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test )
     BOOST_CHECK (gen);
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
-    src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 1.0);
+    src1.addPublication ("pub1", helics::data_type::helicsDouble, 1.0);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -82,11 +82,11 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
     BOOST_CHECK (gen2);
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
-    src1.addPublication ("pub1", "ramp", helics::helics_type_t::helicsDouble, 1.0);
+    src1.addPublication ("pub1", "ramp", helics::data_type::helicsDouble, 1.0);
     src1.setStartTime ("pub1", 1.0);
     gen2->set ("ramp", 0.6);
     gen2->set ("level", 2.0);
-    src1.addPublication ("pub2", "ramp2", helics::helics_type_t::helicsDouble, 2.0);
+    src1.addPublication ("pub2", "ramp2", helics::data_type::helicsDouble, 2.0);
     src1.setStartTime ("pub2", 3.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
     BOOST_CHECK (gen);
     gen->set ("freq", 0.5);
     gen->set ("amplitude", 1.0);
-    src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 0.5);
+    src1.addPublication ("pub1", helics::data_type::helicsDouble, 0.5);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");

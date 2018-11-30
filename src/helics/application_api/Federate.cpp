@@ -1163,6 +1163,12 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
+
+void Federate::closeInterface(interface_handle handle)
+{
+	coreObject->closeHandle(handle);
+}
+
 void Federate::setInfo(interface_handle handle, const std::string& info) {
     coreObject->setInterfaceInfo(handle, info);
 }

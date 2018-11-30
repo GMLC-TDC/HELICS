@@ -423,6 +423,9 @@ class Federate
     @param[in] configString  the location of the file or config String to load to generate the interfaces
     */
     void registerFilterInterfaces (const std::string &configString);
+	/** disconnect an interface from its targets and remove it from consideration
+	*/
+	void closeInterface(interface_handle handle);
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
@@ -437,8 +440,13 @@ class Federate
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
-
+	/** set the Info field for an interface 
+	@param handle  the handle to set the interface for
+	@param info a string with data to store in the interface field*/
     void setInfo(interface_handle handle, const std::string& info);
+	/** get the data currently stored for a particular interface handle
+	@param handle the handle to get the information for
+	@return a string with the data for the information*/
     std::string const &getInfo(interface_handle handle);
 
 private:

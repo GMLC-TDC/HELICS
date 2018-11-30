@@ -824,7 +824,7 @@ void Player::runTo (Time stopTime_input)
     }
 }
 
-void Player::addPublication (const std::string &key, helics_type_t type, const std::string &pubUnits)
+void Player::addPublication (const std::string &key, data_type type, const std::string &pubUnits)
 {
     // skip already existing publications
     if (pubids.find (key) != pubids.end ())
@@ -882,7 +882,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::helics_type_t::helicsCustom)
+        if (defType == helics::data_type::helicsCustom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;

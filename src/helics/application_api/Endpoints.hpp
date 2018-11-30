@@ -179,6 +179,7 @@ class Endpoint
     const std::string &getInfo () const { return fed->getInfo(handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+	void close() { fed->closeInterface(handle); }
   private:
     friend class MessageFederateManager;
 };

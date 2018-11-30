@@ -417,6 +417,10 @@ class Core
     */
     virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
+	/** close a handle from further connections
+	@param handle the handle to close
+	*/
+	virtual void closeHandle(interface_handle handle) = 0;
     /**
      * Publish specified data to the specified key.
      *

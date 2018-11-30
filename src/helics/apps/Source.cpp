@@ -301,7 +301,7 @@ void Source::runTo (Time stopTime_input)
 
 void Source::addPublication (const std::string &key,
                              const std::string &generator,
-                             helics_type_t type,
+                             data_type type,
                              Time period,
                              const std::string &units)
 {
