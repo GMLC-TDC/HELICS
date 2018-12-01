@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 {
     // fi = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
-    helicscpp::ValueFederate vFed (TEST_DIR "/test_files/example_value_fed.json");
+    helicscpp::ValueFederate vFed (TEST_DIR "/example_value_fed.json");
     BOOST_REQUIRE (vFed.baseObject () != nullptr);
     auto s = vFed.getName ();
     BOOST_CHECK_EQUAL (s, "valueFed");
