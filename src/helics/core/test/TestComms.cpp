@@ -221,6 +221,10 @@ void TestComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+				case REMOVE_ROUTE:
+					routes.erase(route_id_t(cmd.getExtraData()));
+					processed = true;
+					break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     processed = true;
@@ -263,7 +267,10 @@ void TestComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown route, message dropped");
+                    if (cmd.action () != CMD_DISCONNECT)
+                    {
+                        logWarning("unknown route, message dropped");
+                    }
                 }
             }
         }

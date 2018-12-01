@@ -18,16 +18,13 @@ namespace helics
 namespace udp
 {
 using boost::asio::ip::udp;
-UdpComms::UdpComms ():NetworkCommsInterface(interface_type::udp)
+UdpComms::UdpComms () : NetworkCommsInterface (interface_type::udp)
 {
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
 }
 
-int UdpComms::getDefaultBrokerPort() const
-{
-    return DEFAULT_UDP_BROKER_PORT_NUMBER;
-}
+int UdpComms::getDefaultBrokerPort () const { return DEFAULT_UDP_BROKER_PORT_NUMBER; }
 
 /** load network information into the comms object*/
 void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
@@ -40,18 +37,16 @@ void UdpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 
     promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
-    
+
     propertyUnLock ();
 }
 /** destructor*/
 UdpComms::~UdpComms () { disconnect (); }
 
-
 static inline auto udpnet (interface_networks net)
 {
     return (net != interface_networks::ipv6) ? udp::v4 () : udp::v6 ();
 }
-
 
 void UdpComms::queue_rx_function ()
 {
@@ -67,7 +62,7 @@ void UdpComms::queue_rx_function ()
     auto ioserv = AsioServiceManager::getServicePointer ();
     udp::socket socket (ioserv->getBaseService ());
     socket.open (udpnet (interfaceNetwork));
-    std::chrono::milliseconds t_cnt{ 0 };
+    std::chrono::milliseconds t_cnt{0};
     bool bindsuccess = false;
     while (!bindsuccess)
     {
@@ -110,13 +105,13 @@ void UdpComms::queue_rx_function ()
                 continue;
                     
             }
-            if (t_cnt == std::chrono::milliseconds(0))
+            if (t_cnt == std::chrono::milliseconds (0))
             {
                 logWarning (fmt::format ("bind error on UDP socket {} :{}",
                                          makePortAddress (localTarget_, PortNumber), error.what ()));
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (200));
-            t_cnt += std::chrono::milliseconds(200);
+            t_cnt += std::chrono::milliseconds (200);
             if (t_cnt > connectionTimeout)
             {
                 disconnecting = true;
@@ -235,7 +230,7 @@ void UdpComms::queue_tx_function ()
                 {
                     if (m.messageID == PORT_DEFINITIONS)
                     {
-                        loadPortDefinitions(m);
+                        loadPortDefinitions (m);
                         promisePort.set_value (PortNumber);
                     }
                     else if (m.messageID == DISCONNECT)
@@ -250,10 +245,10 @@ void UdpComms::queue_tx_function ()
         }
         catch (std::exception &e)
         {
-            logError(std::string("error connecting to broker ")+ e.what ());
+            logError (std::string ("error connecting to broker ") + e.what ());
             PortNumber = -1;
-            promisePort.set_value(-1);
-            setTxStatus(connection_status::error);
+            promisePort.set_value (-1);
+            setTxStatus (connection_status::error);
             return;
         }
     }
@@ -294,7 +289,7 @@ void UdpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         udp::resolver::query queryNew (udpnet (interfaceNetwork), interface, port);
 
-                        routes.emplace (route_id_t(cmd.getExtraData()), *resolver.resolve (queryNew));
+                        routes.emplace (route_id_t (cmd.getExtraData ()), *resolver.resolve (queryNew));
                     }
                     catch (std::exception &e)
                     {
@@ -303,6 +298,10 @@ void UdpComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
                     if (error)
@@ -335,7 +334,9 @@ void UdpComms::queue_tx_function ()
             }
             else
             {
-                logWarning (fmt::format("message directed to broker of comm system with no broker, message dropped {}",prettyPrintString(cmd)));
+                logWarning (
+                  fmt::format ("message directed to broker of comm system with no broker, message dropped {}",
+                               prettyPrintString (cmd)));
             }
         }
         else if (route_id == control_route)
@@ -355,8 +356,8 @@ void UdpComms::queue_tx_function ()
                 transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
                 if (error)
                 {
-                    logWarning (
-                      fmt::format ("transmit failure sending to route {}:{}", route_id.baseValue(), error.message ()));
+                    logWarning (fmt::format ("transmit failure sending to route {}:{}", route_id.baseValue (),
+                                             error.message ()));
                 }
             }
             else
@@ -371,7 +372,10 @@ void UdpComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown route, message dropped");
+                    if (cmd.action () != CMD_DISCONNECT)
+                    {
+                        logWarning ("unknown route, message dropped");
+                    }
                 }
             }
         }
