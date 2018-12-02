@@ -342,7 +342,7 @@ void helicsFederateInfoSetTimeProperty (helics_federate_info fi, int timePropert
     {
         return;
     }
-    hfi->setTimeProperty (timeProperty, propertyValue);
+    hfi->setProperty (timeProperty, propertyValue);
 }
 
 void helicsFederateInfoSetSeparator (helics_federate_info fi, char separator, helics_error *err)
@@ -362,7 +362,7 @@ void helicsFederateInfoSetIntegerProperty (helics_federate_info fi, int integerP
     {
         return;
     }
-    hfi->setIntegerProperty (integerProperty, propertyValue);
+    hfi->setProperty (integerProperty, propertyValue);
 }
 
 static constexpr char invalidCoreString[] = "core object is not valid";

@@ -33,9 +33,9 @@ class tcoptions
     Time period = timeZero;
     Time rtLag = timeZero;
     Time rtLead = timeZero;
-   // bool observer = false;
-    //bool realtime = false;
-    //bool source_only = false;
+    // bool observer = false;
+    // bool realtime = false;
+    // bool source_only = false;
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
     int maxIterations = 50;
@@ -87,13 +87,13 @@ class TimeCoordinator
     explicit TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_);
 
     /** set a timeProperty for a the coordinator*/
-	void setTimeProperty (int timeProperty, Time propertyVal);
+    void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
-    void setIntegerProperty (int intProperty, int propertyVal);
+    void setProperty (int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag (int optionFlag, bool value);
     /** get a time Property*/
-	Time getTimeProperty (int timeProperty) const;
+    Time getTimeProperty (int timeProperty) const;
     /** get an option flag value*/
     bool getOptionFlag (int optionFlag) const;
     /** get an option flag value*/

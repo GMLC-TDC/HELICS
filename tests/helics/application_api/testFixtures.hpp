@@ -84,7 +84,7 @@ struct FederateTestFixture
         helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
         if (time_delta != helics::timeZero)
         {
-            fi.setTimeProperty (helics_property_time_delta, time_delta);
+            fi.setProperty (helics_property_time_delta, time_delta);
         }
 
         std::vector<std::shared_ptr<FedType>> federates_added;
