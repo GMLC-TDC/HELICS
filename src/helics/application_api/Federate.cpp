@@ -380,6 +380,11 @@ iteration_result Federate::enterExecutingModeComplete ()
     return res;
 }
 
+void Federate::setProperty (int32_t option, double timeValue)
+{
+    coreObject->setTimeProperty (fedID, option, timeValue);
+}
+
 void Federate::setProperty (int32_t option, Time timeValue)
 {
     coreObject->setTimeProperty (fedID, option, timeValue);

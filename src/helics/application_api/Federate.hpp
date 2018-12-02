@@ -187,6 +187,12 @@ class Federate
     iteration_time requestTimeIterativeComplete ();
 
     /** set a time option for the federate
+    @param option the option to set
+    @param timeValue the value to be set
+    */
+    void setProperty (int32_t option, double timeValue);
+
+    /** set a time option for the federate
     @param[in] option the option to set
     @param[in] timeValue the value to be set
     */
