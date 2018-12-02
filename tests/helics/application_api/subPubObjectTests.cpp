@@ -133,7 +133,7 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
     auto pubObj = helics::make_publication<IX> (helics::GLOBAL, vFed.get (), std::string ("pub1"));
 
     auto &subObj = vFed->registerSubscription ("pub1");
-    vFed->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed->setProperty (helics_property_time_delta, 1.0);
     vFed->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubObj->publish (valtx);
