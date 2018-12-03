@@ -686,8 +686,8 @@ void Player::cleanUpPointList ()
 
 void Player::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         sortTags ();
         generatePublications ();
@@ -736,12 +736,12 @@ void Player::sendInformation (Time sendTime, int iteration)
 
 void Player::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
-    if (state < Federate::states::execution)
+    if (md < Federate::modes::executing)
     {
         sendInformation (-Time::epsilon ());
 

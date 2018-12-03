@@ -154,23 +154,20 @@ void CommonCore::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
-    while (!waitForDisconnect (200))
+    while (!waitForDisconnect (std::chrono::milliseconds(200)))
     {
         LOG_WARNING (global_broker_id.load (), getIdentifier (), "waiting on disconnect");
     }
 }
 
-bool CommonCore::waitForDisconnect (int msToWait) const
+bool CommonCore::waitForDisconnect (std::chrono::milliseconds msToWait) const
 {
-    if (msToWait <= 0)
+    if (msToWait <= std::chrono::milliseconds(0))
     {
         disconnection.wait ();
         return true;
     }
-    else
-    {
-        return disconnection.wait_for (std::chrono::milliseconds (msToWait));
-    }
+    return disconnection.wait_for (msToWait);
 }
 
 void CommonCore::unregister ()
@@ -938,14 +935,14 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
 void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)
 {
     handles.modify ([handle, option, option_value](auto &hand) {
-        return hand.setHandleOption (handle.baseValue (), option, option_value);
+        return hand.setHandleOption (handle, option, option_value);
     });
 }
 
 bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const
 {
     return handles.read (
-      [handle, option](auto &hand) { return hand.getHandleOption (handle.baseValue (), option); });
+      [handle, option](auto &hand) { return hand.getHandleOption (handle, option); });
 }
 
 void CommonCore::closeHandle(interface_handle handle)
@@ -955,9 +952,15 @@ void CommonCore::closeHandle(interface_handle handle)
 	{
 		throw (InvalidIdentifier("invalid handle"));
 	}
+	if (checkActionFlag(*handleInfo, disconnected_flag))
+	{
+		return;
+	}
 	ActionMessage cmd(CMD_CLOSE_INTERFACE);
 	cmd.setSource(handleInfo->handle);
 	addActionMessage(cmd);
+	handles.modify(
+		[handle](auto &hand) { setActionFlag(*hand.getHandleInfo(handle),disconnected_flag); });
 }
 
 void CommonCore::removeTarget (interface_handle handle, const std::string & targetToRemove)
@@ -2698,7 +2701,7 @@ void CommonCore::registerInterface (ActionMessage &command)
                 filtI->sourceTargets.emplace_back (command.source_id, command.source_handle);
                 timeCoord->addDependency (command.source_id);
             }
-            auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue ());
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
             if (filthandle != nullptr)
             {
                 filthandle->used = true;
@@ -2723,7 +2726,7 @@ void CommonCore::setAsUsed (BasicHandleInfo *hand)
         return;
     }
     hand->used = true;
-    handles.modify ([&](auto &handle) { handle.getHandleInfo (hand->handle.handle.baseValue ())->used = true; });
+    handles.modify ([&](auto &handle) { handle.getHandleInfo (hand->handle.handle)->used = true; });
 }
 void CommonCore::checkForNamedInterface (ActionMessage &command)
 {
@@ -2824,7 +2827,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
 
 void CommonCore::disconnectInterface(global_handle handle)
 {
-	auto *handleInfo=loopHandles.getHandleInfo(handle.handle.baseValue());
+	auto *handleInfo=loopHandles.getHandleInfo(handle.handle);
+	if (handleInfo != nullptr)
+	{
+
+	}
 }
 
 void CommonCore::addTargetToInterface (ActionMessage &command)
@@ -2867,7 +2874,7 @@ void CommonCore::addTargetToInterface (ActionMessage &command)
                 }
             }
 
-            auto filthandle = loopHandles.getFilter (command.dest_handle.baseValue ());
+            auto filthandle = loopHandles.getFilter (command.dest_handle);
             if (filthandle != nullptr)
             {
                 filthandle->used = true;
@@ -2927,7 +2934,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
 
         if (!FilterAlreadyPresent)
         {
-            auto endhandle = loopHandles.getEndpoint (command.dest_handle.baseValue ());
+            auto endhandle = loopHandles.getEndpoint (command.dest_handle);
             if (endhandle != nullptr)
             {
                 setActionFlag (*endhandle, has_dest_filter_flag);
@@ -2936,8 +2943,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
                     // duplicate non cloning destination filters are not allowed
                     ActionMessage err (CMD_ERROR);
                     err.dest_id = command.source_id;
-                    err.source_id = command.dest_id;
-                    err.source_handle = command.dest_handle;
+					err.setSource(command.getDest());
                     err.messageID = defs::errors::registration_failure;
                     err.payload = "Endpoint " + endhandle->key + " already has a destination filter";
                     routeMessage (std::move (err));
@@ -2987,7 +2993,7 @@ void CommonCore::processFilterInfo (ActionMessage &command)
             }
             filterInfo->allSourceFilters.push_back (newFilter);
             filterInfo->hasSourceFilters = true;
-            auto endhandle = loopHandles.getEndpoint (command.dest_handle.baseValue ());
+            auto endhandle = loopHandles.getEndpoint (command.dest_handle);
             if (endhandle != nullptr)
             {
                 setActionFlag (*endhandle, has_source_filter_flag);
@@ -3560,7 +3566,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
 // Checks for filter operations
 ActionMessage &CommonCore::processMessage (ActionMessage &m)
 {
-    auto handle = loopHandles.getEndpoint (m.source_handle.baseValue ());
+    auto handle = loopHandles.getEndpoint (m.source_handle);
     if (handle == nullptr)
     {
         return m;
@@ -3632,7 +3638,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
 
 void CommonCore::processDestFilterReturn (ActionMessage &command)
 {
-    auto handle = loopHandles.getEndpoint (command.dest_handle.baseValue ());
+    auto handle = loopHandles.getEndpoint (command.dest_handle);
     if (handle == nullptr)
     {
         return;
@@ -3690,7 +3696,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
 
 void CommonCore::processFilterReturn (ActionMessage &cmd)
 {
-    auto handle = loopHandles.getEndpoint (cmd.dest_handle.baseValue ());
+    auto handle = loopHandles.getEndpoint (cmd.dest_handle);
     if (handle == nullptr)
     {
         return;

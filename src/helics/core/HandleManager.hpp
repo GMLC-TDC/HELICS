@@ -50,34 +50,40 @@ class HandleManager
     void addHandle(const BasicHandleInfo &otherHandle);
     /** add a handle at the specified index*/
     void addHandleAtIndex(const BasicHandleInfo &otherHandle,int32_t index);
+	/** remove the information at the specified handle*/
+	void removeHandle(global_handle handle);
      /** get a handle by index*/
     BasicHandleInfo *getHandleInfo (int32_t index);
     /** get a const handle by index*/
     const BasicHandleInfo *getHandleInfo(int32_t index) const;
+	/** get a handle by index*/
+	BasicHandleInfo *getHandleInfo(interface_handle handle);
+	/** get a const handle by index*/
+	const BasicHandleInfo *getHandleInfo(interface_handle handle) const;
     /** find a handle from both the federate and local id*/
     BasicHandleInfo *findHandle (global_handle id);
 
-    void setHandleOption(int32_t index, int option, bool val);
+    void setHandleOption(interface_handle handle, int option, bool val);
 
-    bool getHandleOption(int32_t index, int option) const;
+    bool getHandleOption(interface_handle handle, int option) const;
     /** get an endpoint from its name*/
     BasicHandleInfo *getEndpoint (const std::string &name);
     /** get an endpoint from its name*/
     const BasicHandleInfo *getEndpoint(const std::string &name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    BasicHandleInfo *getEndpoint(int32_t index);
+    BasicHandleInfo *getEndpoint(interface_handle index);
     const BasicHandleInfo *getFilter(const std::string &name) const;
     BasicHandleInfo *getFilter(const std::string &name);
    // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
-    BasicHandleInfo *getFilter(int32_t index);
+    BasicHandleInfo *getFilter(interface_handle index);
     BasicHandleInfo *getPublication (const std::string &name);
     const BasicHandleInfo *getPublication(const std::string &name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
-    BasicHandleInfo *getPublication(int32_t index);
+    BasicHandleInfo *getPublication(interface_handle index);
     BasicHandleInfo *getInput(const std::string &name);
     const BasicHandleInfo *getInput(const std::string &name) const;
     federate_id_t getLocalFedID (interface_handle id_) const;

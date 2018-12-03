@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     // enter execution
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == Federate::states::execution);
+    BOOST_CHECK (vFed1->getCurrentMode () == Federate::modes::executing);
     // check subscriptions
     const auto &sv = subid1.getTarget ();
     const auto &sv2 = subid2.getTarget ();
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK_EQUAL (pubid3.getUnits (), "V");
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == Federate::states::finalize);
+    BOOST_CHECK (vFed1->getCurrentMode () == Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)

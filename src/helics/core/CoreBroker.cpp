@@ -1078,6 +1078,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ADD_NAMED_FILTER:
         checkForNamedInterface (command);
         break;
+	case CMD_CLOSE_INTERFACE:
+		disconnectInterface(command.getSource());
+		break;
     case CMD_BROKER_CONFIGURE:
         processBrokerConfigureCommands (command);
         break;
@@ -1474,6 +1477,12 @@ CoreBroker::CoreBroker (bool setAsRootBroker) noexcept
 {
 }
 
+
+void CoreBroker::disconnectInterface(global_handle handle)
+{
+	handles.removeHandle(handle);
+}
+
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name), timeoutMon (new TimeoutMonitor)
 {
 }
@@ -1564,16 +1573,16 @@ bool CoreBroker::isConnected () const
     return ((state == operating) || (state == connected));
 }
 
-bool CoreBroker::waitForDisconnect (int msToWait) const
+bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
 {
-    if (msToWait <= 0)
+    if (msToWait <= std::chrono::milliseconds(0))
     {
         disconnection.wait ();
         return true;
     }
     else
     {
-        return disconnection.wait_for (std::chrono::milliseconds (msToWait));
+        return disconnection.wait_for (msToWait);
     }
 }
 
@@ -1619,7 +1628,7 @@ void CoreBroker::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
-    while (!waitForDisconnect (200))
+    while (!waitForDisconnect (std::chrono::milliseconds(200)))
     {
         LOG_WARNING (global_broker_id.load (), getIdentifier (), "waiting on disconnect");
     }

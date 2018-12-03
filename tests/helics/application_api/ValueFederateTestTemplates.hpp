@@ -57,7 +57,7 @@ void runFederateTest (const std::string &core_type_str,
     BOOST_CHECK_EQUAL (val, testValue2);
 
     vFed->finalize ();
-    BOOST_CHECK (vFed->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (vFed->getCurrentMode () == helics::Federate::modes::finalize);
     helics::cleanupHelicsLibrary ();
 }
 

@@ -53,16 +53,16 @@ Echo::Echo (const std::string &name, const std::string &jsonString) : App (name,
 
 void Echo::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
-    if (state < Federate::states::execution)
+    if (md < Federate::modes::executing)
     {
         fed->enterExecutingMode ();
     }
-    else if (state == Federate::states::finalize)
+    else if (md == Federate::modes::finalize)
     {
         return;
     }

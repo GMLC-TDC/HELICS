@@ -170,7 +170,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-    virtual bool waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
 
   private:
     /** implementation details of the connection process
@@ -270,6 +270,9 @@ class CoreBroker : public Broker, public BrokerBase
     void addInput (ActionMessage &m);
     void addEndpoint (ActionMessage &m);
     void addFilter (ActionMessage &m);
+
+	/** function disconnect a single interface*/
+	void disconnectInterface(global_handle handle);
  //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing the federate/broker/Core Map*/
     void initializeFederateMap ();

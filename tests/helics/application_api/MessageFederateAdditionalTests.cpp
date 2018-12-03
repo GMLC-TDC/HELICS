@@ -30,12 +30,12 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     mFed1->finalize ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
@@ -48,7 +48,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto &sv = mFed1->getEndpointName (epid);
     auto &sv2 = mFed1->getEndpointName (epid2);
@@ -63,7 +63,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 // same as previous test case but using endpoint objects
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     helics::Endpoint epid2 (helics::GLOBAL, mFed1.get (), "ep2", "random");
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto const &sv = epid.getName ();
     auto const &sv2 = epid2.getName ();
@@ -90,7 +90,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_types_single), core_type)
@@ -114,7 +114,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     mFed1->sendMessage (epid, "ep2", data);
@@ -138,7 +138,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (core_types_single), core_type)
@@ -162,7 +162,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     ep1.send ("ep2", data);
@@ -184,7 +184,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (core_types_single), core_type)
@@ -208,7 +208,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     ep1.send ("ep2", data);
@@ -230,7 +230,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
@@ -255,8 +255,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data1 (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -309,8 +309,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 //#define ENABLE_OUTPUT

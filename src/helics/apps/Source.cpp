@@ -204,8 +204,8 @@ void Source::loadJsonFile (const std::string &jsonFile)
 
 void Source::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state != Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md != Federate::modes::startup)
     {
         return;
     }
@@ -256,14 +256,14 @@ void Source::initialize ()
 
 void Source::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
     Time nextRequestTime = Time::maxVal ();
     Time currentTime;
-    if (state != Federate::states::execution)
+    if (md != Federate::modes::executing)
     {
         // send stuff before timeZero
 
