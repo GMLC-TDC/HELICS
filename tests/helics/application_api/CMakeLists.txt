@@ -40,9 +40,8 @@ target_compile_definitions(
   application-api-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\""
 )
 target_compile_definitions(
-  application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
+  application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
-target_compile_definitions(application-api-tests PRIVATE "-DQUICK_TESTS_ONLY")
 
 add_test(
   NAME application-api-tests

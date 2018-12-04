@@ -28,7 +28,7 @@ target_link_libraries(helics_apps-tests helics_apps helics_test_base)
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_definitions(
-  helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
+  helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
 target_compile_definitions(
   helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\"

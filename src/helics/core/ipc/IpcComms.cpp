@@ -235,6 +235,9 @@ void IpcComms::queue_tx_function ()
                     }
                     continue;
                 }
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    continue;
                 case DISCONNECT:
                     goto DISCONNECT_TX_QUEUE;
                 }

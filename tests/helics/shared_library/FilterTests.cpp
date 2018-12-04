@@ -60,7 +60,6 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     BOOST_CHECK (state == helics_state_finalize);
 }
 
-
 /**
 Test filter info fields
 */
@@ -76,8 +75,8 @@ BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
     auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL, &err);
 
-    CE (helicsEndpointSetInfo(p1, "p1_test", &err));
-    CE (helicsEndpointSetInfo(p2, "p2_test", &err));
+    CE (helicsEndpointSetInfo (p1, "p1_test", &err));
+    CE (helicsEndpointSetInfo (p2, "p2_test", &err));
 
     CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter1", &err));
     CE (helicsFilterAddSourceTarget (f1, "port1", &err));
@@ -94,14 +93,14 @@ BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
     CE (helicsFilterSetInfo (f3, "f3_test", &err));
 
     // Check endpoints
-    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(p1), "p1_test");
-    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(p2), "p2_test");
-    BOOST_CHECK_EQUAL(helicsEndpointGetInfo(ep1), "ep1_test");
+    BOOST_CHECK_EQUAL (helicsEndpointGetInfo (p1), "p1_test");
+    BOOST_CHECK_EQUAL (helicsEndpointGetInfo (p2), "p2_test");
+    BOOST_CHECK_EQUAL (helicsEndpointGetInfo (ep1), "ep1_test");
 
     // Check filters
-    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f1), "f1_test");
-    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f2), "f2_test");
-    BOOST_CHECK_EQUAL(helicsFilterGetInfo(f3), "f3_test");
+    BOOST_CHECK_EQUAL (helicsFilterGetInfo (f1), "f1_test");
+    BOOST_CHECK_EQUAL (helicsFilterGetInfo (f2), "f2_test");
+    BOOST_CHECK_EQUAL (helicsFilterGetInfo (f3), "f3_test");
 
     CE (helicsFederateFinalize (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
@@ -531,7 +530,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    std::string filename = std::string (TEST_DIR) + "/test_files/example_filters.json";
+    std::string filename = std::string (TEST_DIR) + "/example_filters.json";
     auto mFed = helicsCreateMessageFederateFromConfig (filename.c_str (), &err);
 
     const char *name = helicsFederateGetName (mFed);

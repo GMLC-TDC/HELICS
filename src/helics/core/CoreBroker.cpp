@@ -302,10 +302,12 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             route_id_t newroute;
+            bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
                 newroute = route_id_t (routeCount++);
                 addRoute (newroute, command.getString (targetStringLoc));
+                route_created = true;
             }
             else
             {
@@ -317,16 +319,23 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badInit.name = command.name;
             badInit.messageID = 5;
             transmit (newroute, badInit);
+
+            if (route_created)
+            {
+                removeRoute (newroute);
+            }
             return;
         }
         auto inserted = _brokers.insert (command.name, nullptr, command.name);
         if (!inserted)
         {
             route_id_t newroute;
+            bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
                 newroute = route_id_t (routeCount++);
                 addRoute (newroute, command.getString (targetStringLoc));
+                route_created = true;
             }
             else
             {
@@ -338,6 +347,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badName.messageID = 7;
             badName.name = command.name;
             transmit (newroute, badName);
+            if (route_created)
+            {
+                removeRoute (newroute);
+            }
             return;
         }
         if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
@@ -347,6 +360,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             addRoute (_brokers.back ().route_id, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
             _brokers.back ()._nonLocal = false;
+            _brokers.back ()._route_key = true;
         }
         else
         {
@@ -586,15 +600,18 @@ void CoreBroker::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto &brk : _brokers)
     {
-        if (brk.parent == global_broker_id_local)
+        if (!brk._disconnected)
         {
-            routeMessage (bye, brk.global_id);
-            brk._disconnected = true;
-        }
-        if (hasTimeDependency)
-        {
-            timeCoord->removeDependency (brk.global_id);
-            timeCoord->removeDependent (brk.global_id);
+            if (brk.parent == global_broker_id_local)
+            {
+                routeMessage (bye, brk.global_id);
+                brk._disconnected = true;
+            }
+            if (hasTimeDependency)
+            {
+                timeCoord->removeDependency (brk.global_id);
+                timeCoord->removeDependent (brk.global_id);
+            }
         }
     }
     if (hasTimeDependency)
@@ -839,6 +856,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
+                if (brk->_route_key)
+                {
+                    removeRoute (brk->route_id);
+                }
             }
             if (hasTimeDependency)
             {
@@ -1097,28 +1118,28 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
     switch (cmd.messageID)
     {
     case defs::flags::enable_init_entry:
-    /*if (delayInitCounter <= 1)
-    {
-        delayInitCounter = 0;
-        if (allInitReady())
+        /*if (delayInitCounter <= 1)
         {
-            broker_state_t exp = connected;
-            if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
-            {  // make sure we only do this once
-                checkDependencies();
-                cmd.setAction(CMD_INIT);
-                cmd.source_id = global_broker_id_local;
-                cmd.dest_id = 0;
-                transmit(0, cmd);
+            delayInitCounter = 0;
+            if (allInitReady())
+            {
+                broker_state_t exp = connected;
+                if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
+                {  // make sure we only do this once
+                    checkDependencies();
+                    cmd.setAction(CMD_INIT);
+                    cmd.source_id = global_broker_id_local;
+                    cmd.dest_id = 0;
+                    transmit(0, cmd);
+                }
             }
         }
-    }
-    else
-    {
-        --delayInitCounter;
-    }
-    break;
-    */
+        else
+        {
+            --delayInitCounter;
+        }
+        break;
+        */
     case defs::properties::log_level:
         setLogLevel (cmd.counter);
         break;

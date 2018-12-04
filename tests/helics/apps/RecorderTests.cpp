@@ -131,7 +131,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
-    rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    rec1.loadFile (std::string (TEST_DIR) + file);
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
@@ -189,7 +189,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
-    rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    rec1.loadFile (std::string (TEST_DIR) + file);
 
     helics::CombinationFederate cfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
@@ -252,7 +252,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     std::this_thread::sleep_for (std::chrono::milliseconds (600));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+    std::string exampleFile = std::string (TEST_DIR) + file;
 
     StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
 
@@ -473,7 +473,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "d1");
     helics::Endpoint e2 (helics::GLOBAL, &mfed2, "d2");
 
-    rec1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    rec1.loadFile (std::string (TEST_DIR) + file);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();

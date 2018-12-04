@@ -497,7 +497,7 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    helics::ValueFederate vFed (std::string (TEST_DIR) + "/test_files/example_value_fed.json");
+    helics::ValueFederate vFed (std::string (TEST_DIR) + "/example_value_fed.json");
 
     BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
 
@@ -519,7 +519,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
 BOOST_AUTO_TEST_CASE (test_file_load_toml)
 {
-    helics::ValueFederate vFed (std::string (TEST_DIR) + "/test_files/example_value_fed.toml");
+    helics::ValueFederate vFed (std::string (TEST_DIR) + "/example_value_fed.toml");
 
     BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
 
