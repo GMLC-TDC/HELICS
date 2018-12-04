@@ -32,9 +32,9 @@ class ActionMessage
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t messageID = 0;  //!< 8 -- message ID for a variety of purposes
-    global_federate_id_t source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
+    global_federate_id source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
     interface_handle source_handle;  //!< 16 -- for local handle or local code
-    global_federate_id_t dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
+    global_federate_id dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
     interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
@@ -59,8 +59,8 @@ class ActionMessage
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction,
-                   global_federate_id_t sourceId,
-                   global_federate_id_t destId);
+                   global_federate_id sourceId,
+                   global_federate_id destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -174,9 +174,9 @@ class ActionMessage
         ar (messageAction, messageID);
         identififier_base_type sid, sh, did, dh;
         ar (sid, sh, did, dh);
-        source_id = global_federate_id_t (sid);
+        source_id = global_federate_id (sid);
         source_handle = interface_handle (sh);
-        dest_id = global_federate_id_t (did);
+        dest_id = global_federate_id (did);
         dest_handle = interface_handle (dh);
 
         ar (counter, flags);

@@ -34,15 +34,15 @@ class HandleManager
     /** default constructor*/
     HandleManager () = default;
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (global_federate_id_t fed_id,
-                                handle_type_t what,
+    BasicHandleInfo &addHandle (global_federate_id fed_id,
+                                handle_type what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
     /** add a handle to manage*/
-    BasicHandleInfo &addHandle (global_federate_id_t fed_id,
+    BasicHandleInfo &addHandle (global_federate_id fed_id,
                                 interface_handle local_id,
-                                handle_type_t what,
+                                handle_type what,
                                 const std::string &key,
                                 const std::string &type,
                                 const std::string &units);
@@ -98,7 +98,7 @@ class HandleManager
 
   private:
     void addSearchFields (const BasicHandleInfo &handle, int32_t index);
-    std::string generateName (handle_type_t what) const;
+    std::string generateName (handle_type what) const;
 };
 
 }  // namespace helics

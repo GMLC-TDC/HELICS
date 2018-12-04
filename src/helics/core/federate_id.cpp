@@ -22,13 +22,13 @@ std::ostream &operator<< (std::ostream &os, interface_handle handle)
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, global_broker_id_t id)
+std::ostream &operator<< (std::ostream &os, global_broker_id id)
 {
     os << id.baseValue ();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, global_federate_id_t id)
+std::ostream &operator<< (std::ostream &os, global_federate_id id)
 {
     os << id.baseValue ();
     return os;

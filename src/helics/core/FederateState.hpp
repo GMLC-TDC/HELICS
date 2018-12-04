@@ -55,7 +55,7 @@ class FederateState
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     federate_id_t local_id;  //!< id code for the local federate descriptor
-    std::atomic<global_federate_id_t> global_id;  //!< global id code, default to invalid
+    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
     std::atomic<federate_state_t> state{HELICS_CREATED};  //!< the current state of the federate
@@ -93,10 +93,10 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::map<global_federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
+    std::map<global_federate_id,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<interface_handle> events;  //!< list of value events to process
-    std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
+    std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
@@ -118,7 +118,7 @@ class FederateState
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay (global_federate_id_t id);
+    void addFederateToDelay (global_federate_id id);
 
   public:
     /** reset the federate to created state*/
@@ -203,9 +203,9 @@ class FederateState
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
-    void addDependency (global_federate_id_t fedToDependOn);
+    void addDependency (global_federate_id fedToDependOn);
     /** add a dependent federate*/
-    void addDependent (global_federate_id_t fedThatDependsOnThis);
+    void addDependent (global_federate_id fedThatDependsOnThis);
     /** specify the core object that manages this federate*/
   public:
     /** get the granted time of a federate*/
@@ -217,10 +217,10 @@ class FederateState
     const std::vector<interface_handle> &getEvents () const;
     /** get a vector of the federates this one depends on
      */
-    std::vector<global_federate_id_t> getDependencies() const;
+    std::vector<global_federate_id> getDependencies() const;
     /** get a vector to the global ids of dependent federates
      */
-    std::vector<global_federate_id_t> getDependents () const;
+    std::vector<global_federate_id> getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
     /** get the last error code*/

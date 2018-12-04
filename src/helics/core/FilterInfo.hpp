@@ -19,7 +19,7 @@ class FilterInfo
 {
   public:
     /** constructor from all fields*/
-    FilterInfo (global_broker_id_t core_id_,
+    FilterInfo (global_broker_id core_id_,
                 interface_handle handle_,
                 const std::string &key_,
                 const std::string &type_in_,
@@ -29,7 +29,7 @@ class FilterInfo
           outputType (type_out_), dest_filter (destFilter_)
     {
     }
-    const global_broker_id_t core_id;  //!< id of the core that manages the filter
+    const global_broker_id core_id;  //!< id of the core that manages the filter
     const interface_handle handle;  //!< id handle of the filter
 
     const std::string key;  //!< the identifier of the filter

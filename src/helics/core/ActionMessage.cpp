@@ -22,8 +22,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 }
 
 ActionMessage::ActionMessage (action_message_def::action_t startingAction,
-                              global_federate_id_t sourceId,
-                              global_federate_id_t destId)
+                              global_federate_id sourceId,
+                              global_federate_id destId)
     : ActionMessage (startingAction)
 {
     source_id = sourceId;
