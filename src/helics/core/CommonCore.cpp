@@ -285,7 +285,7 @@ bool CommonCore::isLocal (global_federate_id global_fedid) const
     return (loopFederates.find (global_fedid) != loopFederates.end ());
 }
 
-route_id_t CommonCore::getRoute (global_federate_id global_fedid) const
+route_id CommonCore::getRoute (global_federate_id global_fedid) const
 {
     auto fnd = routing_table.find (global_fedid);
     return (fnd != routing_table.end ()) ? fnd->second : parent_route_id;
@@ -2089,7 +2089,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     break;
     case CMD_REG_ROUTE:
         // TODO:: double check this
-        addRoute (route_id_t (command.getExtraData ()), command.payload);
+        addRoute (route_id (command.getExtraData ()), command.payload);
         break;
     case CMD_PRIORITY_DISCONNECT:
         checkAndProcessDisconnect ();

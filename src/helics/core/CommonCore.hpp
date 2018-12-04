@@ -198,19 +198,19 @@ class CommonCore : public Core, public BrokerBase
     /** transit an ActionMessage to another core or broker
     @param route_id the identifier for the route information to send the message to
     @param[in] cmd the actionMessage to send*/
-    virtual void transmit (route_id_t route_id, const ActionMessage &cmd) = 0;
+    virtual void transmit (route_id rid, const ActionMessage &cmd) = 0;
     /** transit an ActionMessage to another core or broker
     @param route_id the identifier for the route information to send the message to
     @param[in] cmd the actionMessage to send*/
-    virtual void transmit (route_id_t route_id, ActionMessage &&cmd) = 0;
+    virtual void transmit (route_id rid, ActionMessage &&cmd) = 0;
     /** add a route to whatever internal structure manages the routes
     @param route_id the identification of the route
     @param routeInfo a string containing the information necessary to connect*/
-    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) = 0;
+    virtual void addRoute (route_id rid, const std::string &routeInfo) = 0;
     /** remove or disconnect a route from use
     @param route_id the identification of the route
     */
-    virtual void removeRoute (route_id_t route_id) = 0;
+    virtual void removeRoute (route_id rid) = 0;
     /** get the federate Information from the federateID*/
     FederateState *getFederateAt (federate_id_t federateID) const;
     /** get the federate Information from the federateID*/
@@ -245,11 +245,11 @@ class CommonCore : public Core, public BrokerBase
 
   private:
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-    std::map<global_federate_id, route_id_t>
+    std::map<global_federate_id, route_id>
       routing_table;  //!< map for external routes  <global federate id, route id>
     SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delays for a certain time
-    std::unordered_map<std::string, route_id_t>
+    std::unordered_map<std::string, route_id>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
 
 	std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
@@ -357,7 +357,7 @@ class CommonCore : public Core, public BrokerBase
     /** get a route id for a non-local federate
     @param[in] global_id the federate global id
     @return parent_route if unknown, otherwise returns the route_id*/
-    route_id_t getRoute (global_federate_id global_id) const;
+    route_id getRoute (global_federate_id global_id) const;
     /** process a message for potential additions to the filter ordering
     @param command the message to process
     */

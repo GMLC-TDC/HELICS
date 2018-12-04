@@ -87,44 +87,44 @@ void CommsInterface::propertyUnLock ()
     operating.compare_exchange_strong (exp, false);
 }
 
-void CommsInterface::transmit (route_id_t route_id, const ActionMessage &cmd)
+void CommsInterface::transmit (route_id rid, const ActionMessage &cmd)
 {
     if (isPriorityCommand (cmd))
     {
-        txQueue.emplacePriority (route_id, cmd);
+        txQueue.emplacePriority (rid, cmd);
     }
     else
     {
-        txQueue.emplace (route_id, cmd);
+        txQueue.emplace (rid, cmd);
     }
 }
 
-void CommsInterface::transmit (route_id_t route_id, ActionMessage &&cmd)
+void CommsInterface::transmit (route_id rid, ActionMessage &&cmd)
 {
     if (isPriorityCommand (cmd))
     {
-        txQueue.emplacePriority (route_id, std::move (cmd));
+        txQueue.emplacePriority (rid, std::move (cmd));
     }
     else
     {
-        txQueue.emplace (route_id, std::move (cmd));
+        txQueue.emplace (rid, std::move (cmd));
     }
 }
 
-void CommsInterface::addRoute (route_id_t route_id, const std::string &routeInfo)
+void CommsInterface::addRoute (route_id rid, const std::string &routeInfo)
 {
     ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
     rt.messageID = NEW_ROUTE;
-    rt.setExtraData (route_id.baseValue ());
+    rt.setExtraData (rid.baseValue ());
     transmit (control_route, std::move (rt));
 }
 
-void CommsInterface::removeRoute (route_id_t route_id)
+void CommsInterface::removeRoute (route_id rid)
 {
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = REMOVE_ROUTE;
-    rt.setExtraData (route_id.baseValue ());
+    rt.setExtraData (rid.baseValue ());
     transmit (control_route, rt);
 }
 

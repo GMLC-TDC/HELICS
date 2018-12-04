@@ -89,6 +89,8 @@ class NamedInputInfo
     Time nextValueTime () const;
     /** add a new source target to the input*/
 	void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+	/** remove a source */
+	void removeSource(global_handle sourceToRemove);
   private:
     bool updateData (dataRecord &&update, int index);
 };

@@ -40,7 +40,7 @@ std::ostream &operator<< (std::ostream &os, global_handle id)
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, route_id_t id)
+std::ostream &operator<< (std::ostream &os, route_id id)
 {
     os << id.baseValue ();
     return os;

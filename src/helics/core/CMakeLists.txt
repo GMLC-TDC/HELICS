@@ -13,7 +13,7 @@ set(
 	PublicationInfo.cpp
 	NamedInputInfo.cpp
 	InterfaceInfo.cpp
-  # FilterInfo.cpp
+    FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp

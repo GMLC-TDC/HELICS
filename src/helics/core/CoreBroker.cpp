@@ -63,7 +63,7 @@ const std::string &CoreBroker::getAddress () const
     return address;
 }
 
-route_id_t CoreBroker::getRoute (global_federate_id fedid) const
+route_id CoreBroker::getRoute (global_federate_id fedid) const
 {
     if ((fedid == parent_broker_id) || (fedid == higher_broker_id))
     {
@@ -177,7 +177,7 @@ void CoreBroker::addDestinationFilterToEndpoint (const std::string &filter, cons
     addActionMessage (std::move (M));
 }
 
-route_id_t CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
+route_id CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 {
     auto &endpointName = mess.getString (targetStringLoc);
     auto eptInfo = handles.getEndpoint (endpointName);
@@ -248,7 +248,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             return;
         }
         _federates.insert (command.name, nullptr, command.name);
-        _federates.back ().route_id = getRoute (command.source_id);
+        _federates.back ().route = getRoute (command.source_id);
         _federates.back ().parent = command.source_id;
         if (!isRootc)
         {
@@ -270,7 +270,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _federates.addSearchTermForIndex (_federates.back ().global_id,
                                               _federates.back ().global_id.baseValue () -
                                                 global_federate_id_shift);
-            auto route_id = _federates.back ().route_id;
+            auto route_id = _federates.back ().route;
             auto global_fedid = _federates.back ().global_id;
 
             routing_table.emplace (global_fedid, route_id);
@@ -301,11 +301,11 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         }
         else  // we are initialized already
         {
-            route_id_t newroute;
+            route_id newroute;
             bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
-                newroute = route_id_t (routeCount++);
+                newroute = route_id (routeCount++);
                 addRoute (newroute, command.getString (targetStringLoc));
                 route_created = true;
             }
@@ -329,11 +329,11 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         auto inserted = _brokers.insert (command.name, nullptr, command.name);
         if (!inserted)
         {
-            route_id_t newroute;
+            route_id newroute;
             bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
-                newroute = route_id_t (routeCount++);
+				newroute = route_id{ routeCount++ };
                 addRoute (newroute, command.getString (targetStringLoc));
                 route_created = true;
             }
@@ -356,16 +356,16 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
         {
             // TODO:: this will need to be updated when we enable mesh routing
-            _brokers.back ().route_id = route_id_t (routeCount++);
-            addRoute (_brokers.back ().route_id, command.getString (targetStringLoc));
+			_brokers.back().route = route_id{ routeCount++ };
+            addRoute (_brokers.back ().route, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
             _brokers.back ()._nonLocal = false;
             _brokers.back ()._route_key = true;
         }
         else
         {
-            _brokers.back ().route_id = getRoute (command.source_id);
-            if (_brokers.back ().route_id == parent_route_id)
+            _brokers.back ().route = getRoute (command.source_id);
+            if (_brokers.back ().route == parent_route_id)
             {
                 std::cout << " invalid route to parent broker or reg broker" << std::endl;
             }
@@ -391,20 +391,20 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _brokers.back ().global_id = global_broker_id (
               static_cast<global_broker_id::base_type> (_brokers.size ()) - 1 + global_broker_id_shift);
             _brokers.addSearchTermForIndex (_brokers.back ().global_id, _brokers.size () - 1);
-            auto global_id = _brokers.back ().global_id;
-            auto route_id = _brokers.back ().route_id;
-            routing_table.emplace (global_id, route_id);
+            auto global_brkid = _brokers.back ().global_id;
+            auto route = _brokers.back ().route;
+            routing_table.emplace (global_brkid, route);
             // don't bother with the broker_table for root broker
 
             // sending the response message
             ActionMessage brokerReply (CMD_BROKER_ACK);
             brokerReply.source_id = global_broker_id_local;  // source is global root
-            brokerReply.dest_id = global_id;  // the new id
+            brokerReply.dest_id = global_brkid;  // the new id
             brokerReply.name = command.name;  // the identifier of the broker
-            transmit (route_id, brokerReply);
+            transmit (route, brokerReply);
             LOG_CONNECTIONS (global_broker_id_local, getIdentifier (),
                              fmt::format ("registering broker {}({}) on route {}", command.name,
-                                          global_id.baseValue (), route_id.baseValue ()));
+								 global_brkid.baseValue (), route.baseValue ()));
         }
     }
     break;
@@ -414,7 +414,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         if (fed != _federates.end ())
         {
             fed->global_id = global_federate_id (command.dest_id);
-            auto route = fed->route_id;
+            auto route = fed->route;
             _federates.addSearchTerm (global_federate_id (command.dest_id), fed->name);
             transmit (route, command);
             routing_table.emplace (fed->global_id, route);
@@ -423,9 +423,9 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         {
             // this means we haven't seen this federate before for some reason
             _federates.insert (command.name, global_federate_id (command.dest_id), command.name);
-            _federates.back ().route_id = getRoute (command.source_id);
+            _federates.back ().route = getRoute (command.source_id);
             _federates.back ().global_id = global_federate_id (command.dest_id);
-            routing_table.emplace (fed->global_id, _federates.back ().route_id);
+            routing_table.emplace (fed->global_id, _federates.back ().route);
             // it also means we don't forward it
         }
     }
@@ -466,7 +466,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                 return;
             }
             broker->global_id = global_broker_id (command.dest_id);
-            auto route = broker->route_id;
+            auto route = broker->route;
             _brokers.addSearchTerm (global_broker_id (command.dest_id), broker->name);
             routing_table.emplace (broker->global_id, route);
             command.source_id = global_broker_id_local;  // we want the intermediate broker to change the source_id
@@ -475,9 +475,9 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else
         {
             _brokers.insert (command.name, global_broker_id (command.dest_id), command.name);
-            _brokers.back ().route_id = getRoute (command.source_id);
+            _brokers.back ().route = getRoute (command.source_id);
             _brokers.back ().global_id = global_broker_id (command.dest_id);
-            routing_table.emplace (broker->global_id, _brokers.back ().route_id);
+            routing_table.emplace (broker->global_id, _brokers.back ().route);
         }
     }
     break;
@@ -718,7 +718,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         brokerState = broker_state_t::operating;
         for (auto &brk : _brokers)
         {
-            transmit (brk.route_id, command);
+            transmit (brk.route, command);
         }
         {
             timeCoord->enteringExecMode ();
@@ -858,7 +858,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
                 brk->_disconnected = true;
                 if (brk->_route_key)
                 {
-                    removeRoute (brk->route_id);
+                    removeRoute (brk->route);
                 }
             }
             if (hasTimeDependency)
@@ -921,7 +921,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
             {
                 if (!brk._nonLocal)
                 {
-                    transmit (brk.route_id, command);
+                    transmit (brk.route, command);
                 }
             }
         }
@@ -946,7 +946,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         {
             if (!brk._nonLocal)
             {
-                transmit (brk.route_id, command);
+                transmit (brk.route, command);
             }
         }
     }
@@ -1728,7 +1728,7 @@ void CoreBroker::executeInitializationOperations ()
         if (broker.parent == global_broker_id_local)
         {
             m.dest_id = broker.global_id;
-            transmit (broker.route_id, m);
+            transmit (broker.route, m);
         }
     }
     timeCoord->enteringExecMode ();
@@ -2146,7 +2146,7 @@ void CoreBroker::initializeFederateMap ()
             }
             queryReq.messageID = index;
             queryReq.dest_id = broker.global_id;
-            transmit (broker.route_id, queryReq);
+            transmit (broker.route, queryReq);
         }
     }
 }
@@ -2184,7 +2184,7 @@ void CoreBroker::initializeDependencyGraph ()
         }
         queryReq.messageID = index;
         queryReq.dest_id = broker.global_id;
-        transmit (broker.route_id, queryReq);
+        transmit (broker.route, queryReq);
     }
 
     base["dependents"] = Json_helics::arrayValue;
@@ -2232,7 +2232,7 @@ void CoreBroker::initializeDataFlowGraph ()
         }
         queryReq.messageID = index;
         queryReq.dest_id = broker.global_id;
-        transmit (broker.route_id, queryReq);
+        transmit (broker.route, queryReq);
     }
 
     base["dependents"] = Json_helics::arrayValue;
@@ -2293,18 +2293,18 @@ void CoreBroker::processQuery (const ActionMessage &m)
     }
     else
     {
-        route_id_t route = parent_route_id;
+        route_id route = parent_route_id;
         auto fed = _federates.find (target);
         if (fed != _federates.end ())
         {
-            route = fed->route_id;
+            route = fed->route;
         }
         else
         {
             auto broker = _brokers.find (target);
             if (broker != _brokers.end ())
             {
-                route = broker->route_id;
+                route = broker->route;
             }
         }
         if ((route == parent_route_id) && (isRootc))

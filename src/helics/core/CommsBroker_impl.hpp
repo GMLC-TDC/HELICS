@@ -91,27 +91,27 @@ bool CommsBroker<COMMS, BrokerT>::tryReconnect ()
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, const ActionMessage &cmd)
+void CommsBroker<COMMS, BrokerT>::transmit (route_id rid, const ActionMessage &cmd)
 {
-    comms->transmit (route_id, cmd);
+    comms->transmit (rid, cmd);
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::transmit (route_id_t route_id, ActionMessage &&cmd)
+void CommsBroker<COMMS, BrokerT>::transmit (route_id rid, ActionMessage &&cmd)
 {
-    comms->transmit (route_id, std::move (cmd));
+    comms->transmit (rid, std::move (cmd));
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::addRoute (route_id_t route_id, const std::string &routeInfo)
+void CommsBroker<COMMS, BrokerT>::addRoute (route_id rid, const std::string &routeInfo)
 {
-    comms->addRoute (route_id, routeInfo);
+    comms->addRoute (rid, routeInfo);
 }
 
 template <class COMMS, class BrokerT>
-void CommsBroker<COMMS, BrokerT>::removeRoute (route_id_t route_id)
+void CommsBroker<COMMS, BrokerT>::removeRoute (route_id rid)
 {
-    comms->removeRoute (route_id);
+    comms->removeRoute (rid);
 }
 
 }  // namespace helics

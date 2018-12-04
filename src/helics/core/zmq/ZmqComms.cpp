@@ -441,7 +441,7 @@ void ZmqComms::queue_tx_function ()
 
     zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
     brokerPushSocket.setsockopt (ZMQ_LINGER, 200);
-    std::map<route_id_t, zmq::socket_t> routes;  // for all the other possible routes
+    std::map<route_id, zmq::socket_t> routes;  // for all the other possible routes
     // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
 
     if (hasBroker)
@@ -453,14 +453,14 @@ void ZmqComms::queue_tx_function ()
     zmq::message_t msg;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (control_route == rid)
             {
                 switch (cmd.messageID)
                 {
@@ -476,7 +476,7 @@ void ZmqComms::queue_tx_function ()
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
-                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (zsock));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
@@ -487,7 +487,7 @@ void ZmqComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id_t (cmd.getExtraData ()));
+					routes.erase(route_id{ cmd.getExtraData() });
                     processed = true;
                     break;
                 case DISCONNECT:
@@ -500,7 +500,7 @@ void ZmqComms::queue_tx_function ()
             continue;
         }
         cmd.to_vector (buffer);
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
@@ -511,7 +511,7 @@ void ZmqComms::queue_tx_function ()
                 logWarning ("no route to broker for message");
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {  // send to rx thread loop
             try
             {
@@ -533,7 +533,7 @@ void ZmqComms::queue_tx_function ()
         }
         else
         {
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 rt_find->second.send (buffer.data (), buffer.size ());

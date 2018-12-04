@@ -94,6 +94,12 @@ void NamedInputInfo::addSource (global_handle newSource, const std::string &styp
     current_data.resize(input_sources.size());
 }
 
+
+void NamedInputInfo::removeSource(global_handle /*sourceToRemove*/)
+{
+	
+}
+
 bool NamedInputInfo::updateTimeUpTo (Time newTime)
 {
     int index = 0;

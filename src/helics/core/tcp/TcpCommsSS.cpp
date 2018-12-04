@@ -215,7 +215,7 @@ void TcpCommsSS::queue_tx_function ()
     auto cstring = cmessage.packetize ();
 
     std::vector<std::pair<std::string, TcpConnection::pointer>> made_connections;
-    std::map<std::string, route_id_t> established_routes;
+    std::map<std::string, route_id> established_routes;
     if (outgoingConnectionsAllowed)
     {
         for (const auto &conn : connections)
@@ -238,7 +238,7 @@ void TcpCommsSS::queue_tx_function ()
 
     TcpConnection::pointer brokerConnection;
 
-    std::map<route_id_t, TcpConnection::pointer> routes;  // for all the other possible routes
+    std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
@@ -291,14 +291,14 @@ void TcpCommsSS::queue_tx_function ()
     //  std::vector<ActionMessage> txlist;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (rid == control_route)
             {
                 processed = true;
                 switch (cmd.messageID)
@@ -332,9 +332,9 @@ void TcpCommsSS::queue_tx_function ()
                     {
                         if ((mc.second) && (cmd.payload == mc.first))
                         {
-                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (mc.second));
+							routes.emplace(route_id{ cmd.getExtraData() }, std::move(mc.second));
                             established = true;
-                            established_routes[mc.first] = route_id_t (cmd.getExtraData ());
+							established_routes[mc.first] = route_id{ cmd.getExtraData() };
                         }
                     }
                     if (!established)
@@ -345,11 +345,11 @@ void TcpCommsSS::queue_tx_function ()
                             established = true;
                             if (efind->second == parent_route_id)
                             {
-                                routes.emplace (route_id_t (cmd.getExtraData ()), brokerConnection);
+								routes.emplace(route_id{ cmd.getExtraData() }, brokerConnection);
                             }
-                            else
-                            {
-                                routes.emplace (route_id_t (cmd.getExtraData ()), routes[efind->second]);
+							else
+							{
+								routes.emplace(route_id{cmd.getExtraData()}, routes[efind->second]);
                             }
                         }
                     }
@@ -365,8 +365,8 @@ void TcpCommsSS::queue_tx_function ()
                                 new_connect->setErrorCall (errorCall);
                                 new_connect->send (cstring);
                                 new_connect->startReceive ();
-                                routes.emplace (route_id_t (cmd.getExtraData ()), std::move (new_connect));
-                                established_routes[cmd.payload] = route_id_t (cmd.getExtraData ());
+								routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
+								established_routes[cmd.payload] = route_id{ cmd.getExtraData() };
                             }
                         }
                         else
@@ -377,7 +377,7 @@ void TcpCommsSS::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id_t (cmd.getExtraData ()));
+					routes.erase(route_id{ cmd.getExtraData() });
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -396,7 +396,7 @@ void TcpCommsSS::queue_tx_function ()
             continue;
         }
 
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if ((hasBroker) && (brokerConnection))
             {
@@ -425,7 +425,7 @@ void TcpCommsSS::queue_tx_function ()
         else
         {
             //  txlist.push_back(cmd);
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 try
@@ -438,7 +438,7 @@ void TcpCommsSS::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue ()) +
+                            logError (std::string ("rt send ") + std::to_string (rid.baseValue ()) +
                                       "::" + se.what ());
                         }
                     }
@@ -458,7 +458,7 @@ void TcpCommsSS::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError (std::string ("broker send ") + std::to_string (route_id.baseValue ()) +
+                                logError (std::string ("broker send ") + std::to_string (rid.baseValue ()) +
                                           " ::" + se.what ());
                             }
                         }

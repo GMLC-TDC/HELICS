@@ -348,7 +348,7 @@ void TcpComms::queue_tx_function ()
     auto serviceLoop = ioserv->startServiceLoop ();
     TcpConnection::pointer brokerConnection;
 
-    std::map<route_id_t, TcpConnection::pointer> routes;  // for all the other possible routes
+    std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
@@ -379,14 +379,14 @@ void TcpComms::queue_tx_function ()
     //  std::vector<ActionMessage> txlist;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (rid == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -401,7 +401,7 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (new_connect));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -411,7 +411,7 @@ void TcpComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id_t (cmd.getExtraData ()));
+					routes.erase(route_id{ cmd.getExtraData() });
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -428,7 +428,7 @@ void TcpComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
@@ -454,14 +454,14 @@ void TcpComms::queue_tx_function ()
                 }
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {  // send to rx thread loop
             rxMessageQueue.push (cmd);
         }
         else
         {
             //  txlist.push_back(cmd);
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 try
@@ -474,7 +474,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue ()) +
+                            logError (std::string ("rt send ") + std::to_string (rid.baseValue ()) +
                                       "::" + se.what ());
                         }
                     }
@@ -494,7 +494,7 @@ void TcpComms::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError (std::string ("broker send") + std::to_string (route_id.baseValue ()) +
+                                logError (std::string ("broker send") + std::to_string (rid.baseValue ()) +
                                           " ::" + se.what ());
                             }
                         }

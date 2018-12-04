@@ -176,8 +176,8 @@ class global_handle
   public:
     global_federate_id fed_id = global_federate_id ();
     interface_handle handle = interface_handle ();
-    global_handle () = default;
-    global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
+    constexpr global_handle () = default;
+    constexpr global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
     explicit operator uint64_t () const
     {
         auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32;
@@ -200,33 +200,33 @@ class global_handle
  */
 std::ostream &operator<< (std::ostream &os, global_handle id);
 
-class route_id_t
+class route_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr route_id_t () = default;
+    constexpr route_id () = default;
 
-    constexpr explicit route_id_t (base_type val) noexcept : _id (val){};
+    constexpr explicit route_id (base_type val) noexcept : _id (val){};
 
     constexpr base_type baseValue () const { return _id; }
     /** equality operator*/
-    bool operator== (route_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (route_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (route_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (route_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (route_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (route_id id) const noexcept { return (_id < id._id); };
     bool isValid () const { return (_id != -1'295'148'000); }
 
   private:
     base_type _id = -1'295'148'000;  //!< the underlying index value
 };
 
-constexpr route_id_t parent_route_id (0);
+constexpr route_id parent_route_id (0);
 
 /** stream operator for a route_id
  */
-std::ostream &operator<< (std::ostream &os, route_id_t id);
+std::ostream &operator<< (std::ostream &os, route_id id);
 
 }  // namespace helics
 
@@ -277,13 +277,13 @@ struct hash<helics::global_broker_id>
 };
 
 template <>
-struct hash<helics::route_id_t>
+struct hash<helics::route_id>
 {
-    using argument_type = helics::route_id_t;
+    using argument_type = helics::route_id;
     using result_type = std::size_t;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<helics::route_id_t::base_type>{}(key.baseValue ());
+        return std::hash<helics::route_id::base_type>{}(key.baseValue ());
     }
 };
 
@@ -319,7 +319,7 @@ struct is_easily_hashable<helics::global_broker_id>
 };
 
 template <>
-struct is_easily_hashable<helics::route_id_t>
+struct is_easily_hashable<helics::route_id>
 {
     static constexpr bool value = true;
 };

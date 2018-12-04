@@ -99,7 +99,7 @@ void MpiComms::queue_tx_function ()
 
     auto &mpi_service = MpiService::getInstance ();
 
-    std::map<route_id_t, std::pair<int,int>> routes;  // for all the other possible routes
+    std::map<route_id, std::pair<int,int>> routes;  // for all the other possible routes
 
 	 std::pair<int, int> brokerLocation;
     if (!brokerTarget_.empty())
@@ -112,7 +112,7 @@ void MpiComms::queue_tx_function ()
 
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
         std::tie (route_id, cmd) = txQueue.pop ();
@@ -132,7 +132,7 @@ void MpiComms::queue_tx_function ()
                     routeLoc.second =
                       std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
 
-                    routes.emplace (route_id_t(cmd.getExtraData()), routeLoc);
+                    routes.emplace (route_id(cmd.getExtraData()), routeLoc);
                     processed = true;
                 }
                 break;

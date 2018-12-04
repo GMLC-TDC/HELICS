@@ -42,5 +42,7 @@ class FilterInfo
 
     std::vector<global_handle> sourceTargets;
     std::vector<global_handle> destTargets;
+	/** remove a target from interface with the filter*/
+	void removeTarget(global_handle targetToRemove);
 };
 }  // namespace helics
