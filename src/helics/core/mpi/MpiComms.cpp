@@ -57,7 +57,7 @@ void MpiComms::queue_rx_function ()
 
     while (true)
     {
-        auto M = rxMessageQueue.try_pop ();
+        auto M = rxMessageQueue.pop (std::chrono::milliseconds(2000));
 
         if (M)
         {
@@ -115,11 +115,11 @@ void MpiComms::queue_tx_function ()
         route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (control_route == rid)
             {
                 switch (cmd.messageID)
                 {
@@ -132,7 +132,7 @@ void MpiComms::queue_tx_function ()
                     routeLoc.second =
                       std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
 
-                    routes.emplace (route_id(cmd.getExtraData()), routeLoc);
+					routes.emplace(route_id{ cmd.getExtraData() }, routeLoc);
                     processed = true;
                 }
                 break;
@@ -147,7 +147,7 @@ void MpiComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
@@ -156,7 +156,7 @@ void MpiComms::queue_tx_function ()
                 mpi_service.sendMessage (brokerLocation, cmd.to_vector ());
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {  // send to rx thread loop
             // Send to ourself -- may need command line option to enable for openmpi
             // std::cout << "send msg to self" << prettyPrintString(cmd) << std::endl;
@@ -164,7 +164,7 @@ void MpiComms::queue_tx_function ()
         }
         else
         {
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 // Send using MPI to rank given by route

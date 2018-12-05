@@ -160,6 +160,7 @@ int ActionMessage::toByteArray (char *data, size_t buffer_size) const
 std::string ActionMessage::to_string () const
 {
     std::string data;
+	data.reserve(payload.size() + 77);
     boost::iostreams::back_insert_device<std::string> inserter (data);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
     archiver oa (s);
@@ -178,6 +179,7 @@ constexpr auto TAIL_CHAR2 = '\xFC';
 std::string ActionMessage::packetize () const
 {
     std::string data;
+	data.reserve(payload.size() + 85);
     data.push_back (LEADING_CHAR);
     data.resize (4);
     boost::iostreams::back_insert_device<std::string> inserter (data);
@@ -201,6 +203,7 @@ std::string ActionMessage::packetize () const
 std::vector<char> ActionMessage::to_vector () const
 {
     std::vector<char> data;
+	data.reserve(payload.size() + 77);
     boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
     archiver oa (s);
