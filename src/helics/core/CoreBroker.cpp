@@ -2347,10 +2347,14 @@ void CoreBroker::processQuery (const ActionMessage &m)
 		queryResp.dest_id = m.source_id;
 		queryResp.source_id = global_broker_id_local;
 		queryResp.messageID = m.messageID;
+		JsonMapBuilder globalSet;
+		auto jv = globalSet.getJValue();
 		for (auto &val : global_values)
 		{
-			//TODO:
+			
+			jv[val.first] = val.second;
 		}
+		queryResp.payload = globalSet.generate();
 		if (queryResp.dest_id == global_broker_id_local)
 		{
 			ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);

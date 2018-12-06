@@ -1010,6 +1010,17 @@ std::string Federate::query (const std::string &queryStr)
     {
         res = getName ();
     }
+	else if (queryStr == "corename")
+	{
+		if (coreObject)
+		{
+			res = coreObject->getIdentifier();
+		}
+		else
+		{
+			res = "#unknown";
+		}
+	}
     else
     {
         res = localQuery (queryStr);
@@ -1076,6 +1087,14 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
         return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }
     return false;
+}
+
+void Federate::setGlobal(const std::string &valueName, const std::string &value)
+{
+	if (coreObject)
+	{
+		coreObject->setGlobal(valueName, value);
+	}
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,

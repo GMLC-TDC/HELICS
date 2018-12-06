@@ -93,6 +93,7 @@ class CoreBroker : public Broker, public BrokerBase
       routing_table;  //!< map for external routes  <global federate id, route id>
     std::unordered_map<std::string, route_id_t>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
+	std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{ 1 }; //counter for active queries going to the local API
     DelayedObjects<std::string> ActiveQueries;  //!< holder for 
@@ -234,6 +235,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual const std::string &getAddress () const override final;
     virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query(const std::string &target, const std::string &queryStr) override final;
+	virtual void setGlobal(const std::string &valueName, const std::string &value) override final;
     virtual void makeConnections(const std::string &file) override final;
     virtual void dataLink (const std::string &publication, const std::string &input) override final;
 

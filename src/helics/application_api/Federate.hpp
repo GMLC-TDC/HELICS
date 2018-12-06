@@ -283,6 +283,12 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
+	void setGlobal(const std::string &valueName, const std::string &value);
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -437,8 +443,14 @@ class Federate
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
-
+	/** set the information field for an interface
+	@param handle the interface handle for any interface,  the interface handle can be created from 
+	any interface object automatically
+	@param info the information to store
+	*/
     void setInfo(interface_handle handle, const std::string& info);
+	/** retrieve the information field for a particular handle
+	*/
     std::string const &getInfo(interface_handle handle);
 
 private:
