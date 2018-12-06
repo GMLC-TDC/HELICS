@@ -646,10 +646,16 @@ class Core
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;
 
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
+	virtual void setGlobal(const std::string &valueName, const std::string &value) = 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
-    "federation",  "broker", "core", or the name of a specific object
-    query is a broken
+    "federation",  "broker", "core", or the name of a specific object/core/broker
+	target can also be "global" to query a global value stored in the broker
     @param target the specific target of the query
     @param queryStr the actual query
     @return a string containing the response to the query.  Query is a blocking call and will not return until the

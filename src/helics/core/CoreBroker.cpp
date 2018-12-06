@@ -529,6 +529,23 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (getRoute (command.dest_id), command);
         }
         break;
+	case CMD_SET_GLOBAL:
+		if (isRootc)
+		{
+			global_values[command.name] = command.getString(0);
+		}
+		else
+		{
+			if ((global_broker_id_local.isValid()) && (global_broker_id_local != parent_broker_id))
+			{
+				transmit(parent_route_id, command);
+			}
+			else
+			{
+				// delay the response if we are not fully registered yet
+				delayTransmitQueue.push(command);
+			}
+		}
     default:
         // must not have been a priority command
         break;
@@ -1965,6 +1982,22 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
     //  return "#invalid";
 }
 
+void CoreBroker::setGlobal(const std::string &valueName, const std::string &value)
+{
+	ActionMessage querycmd(CMD_SET_GLOBAL);
+	querycmd.source_id = global_broker_id.load();
+	querycmd.payload = valueName;
+	querycmd.setStringData(value);
+	if (!global_broker_id.load().isValid())
+	{
+		delayTransmitQueue.push(std::move(querycmd));
+	}
+	else
+	{
+		transmit(parent_route_id, querycmd);
+	}
+}
+
 std::string CoreBroker::generateQueryAnswer (const std::string &request)
 {
     if (request == "isinit")
@@ -2282,6 +2315,51 @@ void CoreBroker::processQuery (const ActionMessage &m)
     {
         processLocalQuery (m);
     }
+	else if (target == "global")
+	{
+		ActionMessage queryResp(CMD_QUERY_REPLY);
+		queryResp.dest_id = m.source_id;
+		queryResp.source_id = global_broker_id_local;
+		queryResp.messageID = m.messageID;
+
+		auto gfind = global_values.find(m.getString(0));
+		if (gfind != global_values.end())
+		{
+			queryResp.payload = gfind->second;
+		}
+		else
+		{
+			queryResp.payload = "#invalid";
+		}
+
+		if (queryResp.dest_id == global_broker_id_local)
+		{
+			ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+		}
+		else
+		{
+			transmit(getRoute(queryResp.dest_id), queryResp);
+		}
+	}
+	else if (target == "global_variables")
+	{
+		ActionMessage queryResp(CMD_QUERY_REPLY);
+		queryResp.dest_id = m.source_id;
+		queryResp.source_id = global_broker_id_local;
+		queryResp.messageID = m.messageID;
+		for (auto &val : global_values)
+		{
+			//TODO:
+		}
+		if (queryResp.dest_id == global_broker_id_local)
+		{
+			ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+		}
+		else
+		{
+			transmit(getRoute(queryResp.dest_id), queryResp);
+		}
+	}
     else
     {
         route_id_t route = parent_route_id;
@@ -2306,7 +2384,15 @@ void CoreBroker::processQuery (const ActionMessage &m)
             queryResp.messageID = m.messageID;
 
             queryResp.payload = "#invalid";
-            transmit (getRoute (queryResp.dest_id), queryResp);
+			if (queryResp.dest_id == global_broker_id_local)
+			{
+				ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+			}
+			else
+			{
+				transmit(getRoute(queryResp.dest_id), queryResp);
+			}
+            
         }
         else
         {
