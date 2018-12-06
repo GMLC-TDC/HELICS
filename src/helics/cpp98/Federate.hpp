@@ -48,12 +48,12 @@ class FederateInfo
 
     void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value, NULL); }
 
-    void setTimeProperty (int timeProperty, helics_time timeValue)
+    void setProperty (int timeProperty, helics_time timeValue)
     {
         helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, NULL);
     }
 
-    void setIntegerProperty (int integerProperty, int propertyValue)
+    void setProperty (int integerProperty, int propertyValue)
     {
         helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, NULL);
     }
