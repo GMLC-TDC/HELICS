@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeDependencies.hpp"
 #include <atomic>
 #include <functional>
+#include <deque>
 
 namespace helics
 {

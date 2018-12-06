@@ -5,14 +5,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ActionMessage.hpp"
 #include "flagOperations.hpp"
-#include <cereal/archives/portable_binary.hpp>
 #include <complex>
-//#include <cereal/archives/binary.hpp>
 #include "../common/fmt_format.h"
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
 
 #include <algorithm>
+#include <cstring>
 
 namespace helics
 {
@@ -132,42 +129,106 @@ void ActionMessage::setString (int index, const std::string &str)
         stringData[index] = str;
     }
 }
-using archiver = cereal::PortableBinaryOutputArchive;
 
-using retriever = cereal::PortableBinaryInputArchive;
+
+/** load the data from an archive*/
+template <class Archive>
+void load(Archive &ar)
+{
+	ar(messageAction, messageID);
+	identififier_base_type sid, sh, did, dh;
+	ar(sid, sh, did, dh);
+	source_id = global_federate_id_t(sid);
+	source_handle = interface_handle(sh);
+	dest_id = global_federate_id_t(did);
+	dest_handle = interface_handle(dh);
+
+	ar(counter, flags);
+	using timeBaseType = decltype ((actionTime.getBaseTimeCode()));
+	timeBaseType btc, Tebase, Tdeminbase, Tsobase;
+	ar(btc, Tebase, Tsobase, Tdeminbase, payload);
+
+	actionTime.setBaseTimeCode(btc);
+	Te.setBaseTimeCode(Tebase);
+	Tdemin.setBaseTimeCode(Tdeminbase);
+	Tso.setBaseTimeCode(Tsobase);
+	ar(stringData);
+}
 
 int ActionMessage::toByteArray (char *data, size_t buffer_size) const
 {
+	static const uint8_t littleEndian = is_little_endian();
+	
     if ((data == nullptr) || (buffer_size == 0))
     {
         return -1;
     }
-    boost::iostreams::basic_array_sink<char> sr (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s (sr);
-
-    archiver oa (s);
-    try
-    {
-        save (oa);
-        return static_cast<int> (boost::iostreams::seek (s, 0, std::ios_base::cur));
-    }
-    catch (const std::ios_base::failure &)
-    {
-        return -1;
-    }
+	char *dataStart = data;
+	//put the main string size in the first 4 bytes;
+	auto ssize = static_cast<uint32_t>(payload.size())&0x00FFFFFF;
+	*data = littleEndian;
+	data[1] = static_cast<uint8_t>(ssize >> 16);
+	data[2] = static_cast<uint8_t>((ssize >> 8) & 0xFF);
+	data[3] = static_cast<uint8_t>(ssize & 0xFF);
+	data+=sizeof(uint32_t);
+	*reinterpret_cast<action_message_def::action_t *>(data)=messageAction;
+	data += sizeof(action_message_def::action_t);
+	*reinterpret_cast<int32_t *>(data) = messageID;
+	data += sizeof(int32_t);
+	*reinterpret_cast<int32_t *>(data) = source_id.baseValue();
+	data += sizeof(int32_t);
+	*reinterpret_cast<int32_t *>(data) = source_handle.baseValue();
+	data += sizeof(int32_t);
+	*reinterpret_cast<int32_t *>(data) = dest_id.baseValue();
+	data += sizeof(int32_t);
+	*reinterpret_cast<int32_t *>(data) = dest_handle.baseValue();
+	data += sizeof(int32_t);
+	*reinterpret_cast<uint16_t *>(data) = counter;
+	data += sizeof(uint16_t);
+	*reinterpret_cast<uint16_t *>(data) = flags;
+	data += sizeof(uint16_t);
+	*reinterpret_cast<int64_t *>(data) = actionTime.getBaseTimeCode();
+	data += sizeof(int64_t);
+	
+	if (messageAction == CMD_TIME_REQUEST)
+	{
+		*reinterpret_cast<int64_t *>(data) = Te.getBaseTimeCode();
+		data += sizeof(int64_t);
+		*reinterpret_cast<int64_t *>(data) = Tdemin.getBaseTimeCode();
+		data += sizeof(int64_t);
+		*reinterpret_cast<int64_t *>(data) = Tso.getBaseTimeCode();
+		data += sizeof(int64_t);
+	}
+	if (ssize > 0)
+	{
+		std::memcpy(data, payload.data(), ssize);
+		data += ssize;
+	}
+	
+	if (stringData.empty())
+	{
+		*data = 0;
+		++data;
+	}
+	else
+	{
+		for (auto &str:stringData)
+		{
+			*reinterpret_cast<uint32_t *>(data) = static_cast<uint32_t>(str.size());
+			data += sizeof(uint32_t);
+			memcpy(data, str.data(), str.size());
+			data += str.size();
+		}
+	}
+	return static_cast<int>(data - dataStart);
 }
 
 std::string ActionMessage::to_string () const
 {
     std::string data;
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+	auto sz = serializedByteCount();
+	data.resize(sz+1);
+	toByteArray(&(data[0]), sz + 1);
     return data;
 }
 
@@ -178,21 +239,16 @@ constexpr auto TAIL_CHAR2 = '\xFC';
 std::string ActionMessage::packetize () const
 {
     std::string data;
-    data.push_back (LEADING_CHAR);
-    data.resize (4);
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
+	auto sz = serializedByteCount();
+	data.resize(sz + 4);
+	toByteArray(&(data[4]), sz + 1);
 
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    data[0]= LEADING_CHAR;
     // now generate a length header
-    auto sz = static_cast<uint32_t> (data.size ());
-    data[1] = static_cast<char> (((sz >> 16) & 0xFF));
-    data[2] = static_cast<char> (((sz >> 8) & 0xFF));
-    data[3] = static_cast<char> (sz & 0xFF);
+    auto dsz = static_cast<uint32_t> (data.size ());
+    data[1] = static_cast<char> (((dsz >> 16) & 0xFF));
+    data[2] = static_cast<char> (((dsz >> 8) & 0xFF));
+    data[3] = static_cast<char> (dsz & 0xFF);
     data.push_back (TAIL_CHAR1);
     data.push_back (TAIL_CHAR2);
     return data;
@@ -201,65 +257,142 @@ std::string ActionMessage::packetize () const
 std::vector<char> ActionMessage::to_vector () const
 {
     std::vector<char> data;
-    boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
-    return data;
+	auto sz = serializedByteCount();
+	data.resize(sz + 1);
+	toByteArray(data.data(), sz + 1);
+	return data;
 }
 
 void ActionMessage::to_vector (std::vector<char> &data) const
 {
-    data.clear ();
-    boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+	auto sz = serializedByteCount();
+	data.resize(sz + 1);
+	toByteArray(data.data(), sz + 1);
 }
 
 void ActionMessage::to_string (std::string &data) const
 {
-    data.clear ();
-
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+	auto sz = serializedByteCount();
+	data.resize(sz + 1);
+	toByteArray(&(data[0]), sz + 1);
 }
 
-void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
+template <std::size_t DataSize>
+inline void swap_bytes(std::uint8_t * data)
 {
+	for (std::size_t i = 0, end = DataSize / 2; i < end; ++i)
+		std::swap(data[i], data[DataSize - i - 1]);
+}
+
+
+int ActionMessage::fromByteArray (const char *data, size_t buffer_size)
+{
+	static const uint8_t littleEndian = is_little_endian();
+
     if (data[0] == LEADING_CHAR)
     {
         auto res = depacketize (data, buffer_size);
         if (res > 0)
         {
-            return;
+            return static_cast<int>(res);
         }
     }
-    boost::iostreams::basic_array_source<char> device (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
-    retriever ia (s);
-    try
-    {
-        load (ia);
-    }
-    catch (const cereal::Exception &ce)
-    {
-        messageAction = CMD_INVALID;
-    }
+	int sz = 256*256*data[1] + 256 * data[2] + data[3];
+	bool swap = (data[0] != littleEndian);
+	data += sizeof(uint32_t);
+	messageAction=*reinterpret_cast<const action_message_def::action_t *>(data);
+	if (swap)
+	{
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&messageAction));
+	}
+	data += sizeof(action_message_def::action_t);
+	messageID=*reinterpret_cast<const int32_t *>(data);
+	data += sizeof(int32_t);
+	source_id=global_federate_id_t(*reinterpret_cast<const int32_t *>(data));
+	data += sizeof(int32_t);
+	source_handle=interface_handle(*reinterpret_cast<const int32_t *>(data));
+	data += sizeof(int32_t);
+	dest_id=global_federate_id_t(*reinterpret_cast<const int32_t *>(data));
+	data += sizeof(int32_t);
+	dest_handle=interface_handle(*reinterpret_cast<const int32_t *>(data));
+	data += sizeof(int32_t);
+	counter=*reinterpret_cast<const uint16_t *>(data);
+	data += sizeof(uint16_t);
+	flags=*reinterpret_cast<const uint16_t *>(data);
+	data += sizeof(uint16_t);
+	actionTime.setBaseTimeCode(*reinterpret_cast<const int64_t *>(data));
+	data += sizeof(int64_t);
+
+	if (messageAction == CMD_TIME_REQUEST)
+	{
+		Te.setBaseTimeCode(*reinterpret_cast<const int64_t *>(data));
+		data += sizeof(int64_t);
+		Tdemin.setBaseTimeCode(*reinterpret_cast<const int64_t *>(data));
+		data += sizeof(int64_t);
+		Tso.setBaseTimeCode(*reinterpret_cast<const int64_t *>(data));
+		data += sizeof(int64_t);
+	}
+	else
+	{
+		Te = timeZero;
+		Tdemin = timeZero;
+		Tso = timeZero;
+	}
+	if (sz > 0)
+	{
+		payload.assign(data, sz);
+		data += sz;
+	}
+	int stringCount = *data;
+	++data;
+	if (stringCount != 0)
+	{
+		stringData.resize(stringCount);
+		
+		for (int ii = 0; ii<stringCount; ++ii)
+		{
+			auto ssize = *reinterpret_cast<const uint32_t *>(data);
+			data += 4;
+			if (swap)
+			{
+				swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&ssize));
+			}
+			stringData[ii].assign(data, ssize);
+			data += ssize;
+		}
+	}
+	else
+	{
+		stringData.clear();
+		
+	}
+	
+	if (swap)
+	{
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&messageID));
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&source_id));
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&source_handle));
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&dest_id));
+		swap_bytes<4>(reinterpret_cast<std::uint8_t *>(&dest_handle));
+		swap_bytes<2>(reinterpret_cast<std::uint8_t *>(&counter));
+		swap_bytes<2>(reinterpret_cast<std::uint8_t *>(&flags));
+		auto timecode = actionTime.getBaseTimeCode();
+		swap_bytes<8>(reinterpret_cast<std::uint8_t *>(&timecode));
+		actionTime.setBaseTimeCode(timecode);
+		if (messageAction == CMD_TIME_REQUEST)
+		{
+			timecode = Te.getBaseTimeCode();
+			swap_bytes<8>(reinterpret_cast<std::uint8_t *>(&timecode));
+			Te.setBaseTimeCode(timecode);
+			timecode = Tdemin.getBaseTimeCode();
+			swap_bytes<8>(reinterpret_cast<std::uint8_t *>(&timecode));
+			Tdemin.setBaseTimeCode(timecode);
+			timecode = Tso.getBaseTimeCode();
+			swap_bytes<8>(reinterpret_cast<std::uint8_t *>(&timecode));
+			Tso.setBaseTimeCode(timecode);
+		}
+	}
+	return serializedByteCount();
 }
 
 size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
@@ -289,19 +422,10 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     {
         return 0;
     }
-    boost::iostreams::basic_array_source<char> device (data + 4, message_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
-    retriever ia (s);
-    try
-    {
-        load (ia);
-        return message_size + 2;
-    }
-    catch (const cereal::Exception &ce)
-    {
-        messageAction = CMD_INVALID;
-        return 0;
-    }
+   
+	int bytesUsed=fromByteArray(data + 4, message_size - 4);
+	return (bytesUsed > 0) ? message_size + 2 : 0;
+	
 }
 
 void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }

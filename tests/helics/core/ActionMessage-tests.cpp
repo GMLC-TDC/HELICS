@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/flagOperations.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include <cstdio>
+#include <set>
 
 namespace utf = boost::unit_test;
 

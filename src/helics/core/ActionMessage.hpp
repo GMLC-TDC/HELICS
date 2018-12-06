@@ -8,8 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ActionMessageDefintions.hpp"
 #include "Core.hpp"
 #include "core-types.hpp"
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
 #include <memory>
 #include <string>
 
@@ -24,6 +22,15 @@ constexpr int typeStringLoc = 0;
 constexpr int typeOutStringLoc = 1;
 
 constexpr int32_t cmd_info_basis = 65536;
+
+/** check for little endian*/
+inline std::uint8_t is_little_endian()
+{
+	static std::int32_t test = 1;
+	return *reinterpret_cast<std::int8_t*>(&test) == 1;
+};
+
+
 /** class defining the primary message object used in HELICS */
 class ActionMessage
 {
@@ -40,12 +47,12 @@ class ActionMessage
     uint16_t flags = 0;  //!<  28 set of messageFlags
     // 4 byte gap
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
-    Time Te = timeZero;  //!< 48 event time
-    Time Tdemin = timeZero;  //!< 56 min dependent event time
-    Time Tso = timeZero;  //!< 64 the second order dependent time
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
+	Time Te = timeZero;  //!< 48 event time
+	Time Tdemin = timeZero;  //!< 56 min dependent event time
+	Time Tso = timeZero;  //!< 64 the second order dependent time
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:
@@ -149,50 +156,30 @@ class ActionMessage
         std::swap (source_handle, dest_handle);
     }
     /** set some extra piece of data if the full destination is not used*/
-    void setExtraData (int32_t data) { dest_handle = interface_handle (data); }
+	void setExtraData(int32_t data) { dest_handle = interface_handle{ data }; }
     /** get the extra piece of integer data*/
     int32_t getExtraData () const { return dest_handle.baseValue (); }
-    /** save the data to an archive*/
-    template <class Archive>
-    void save (Archive &ar) const
-    {
-        ar (messageAction, messageID, source_id.baseValue (), source_handle.baseValue (), dest_id.baseValue (),
-            dest_handle.baseValue ());
-        ar (counter, flags);
-
-        auto btc = actionTime.getBaseTimeCode ();
-        auto Tebase = Te.getBaseTimeCode ();
-        auto Tdeminbase = Tdemin.getBaseTimeCode ();
-        auto Tsobase = Tso.getBaseTimeCode ();
-        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
-        ar (stringData);
-    }
-    /** load the data from an archive*/
-    template <class Archive>
-    void load (Archive &ar)
-    {
-        ar (messageAction, messageID);
-        identififier_base_type sid, sh, did, dh;
-        ar (sid, sh, did, dh);
-        source_id = global_federate_id_t (sid);
-        source_handle = interface_handle (sh);
-        dest_id = global_federate_id_t (did);
-        dest_handle = interface_handle (dh);
-
-        ar (counter, flags);
-        using timeBaseType = decltype ((actionTime.getBaseTimeCode ()));
-        timeBaseType btc, Tebase, Tdeminbase, Tsobase;
-        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
-
-        actionTime.setBaseTimeCode (btc);
-        Te.setBaseTimeCode (Tebase);
-        Tdemin.setBaseTimeCode (Tdeminbase);
-        Tso.setBaseTimeCode (Tsobase);
-        ar (stringData);
-    }
+   
 
     // functions that convert to and from a byte stream
 
+	int serializedByteCount() const
+	{
+		int size = 41;
+		size += static_cast<int>(payload.size());
+		if (messageAction == CMD_TIME_REQUEST)
+		{
+			size += 24;
+		}
+		if (!stringData.empty())
+		{
+			for (auto &str : stringData)
+			{
+				size += static_cast<int>(str.size());
+			}
+		}
+		return size;
+	}
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
     @param[in] buffer_size-- the size of the buffer
@@ -211,7 +198,7 @@ class ActionMessage
     /** convert a command to a byte vector*/
     std::vector<char> to_vector () const;
     /** generate a command from a raw data stream*/
-    void fromByteArray (const char *data, size_t buffer_size);
+    int fromByteArray (const char *data, size_t buffer_size);
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
