@@ -23,14 +23,6 @@ constexpr int typeOutStringLoc = 1;
 
 constexpr int32_t cmd_info_basis = 65536;
 
-/** check for little endian*/
-inline std::uint8_t is_little_endian()
-{
-	static std::int32_t test = 1;
-	return *reinterpret_cast<std::int8_t*>(&test) == 1;
-};
-
-
 /** class defining the primary message object used in HELICS */
 class ActionMessage
 {
@@ -45,14 +37,14 @@ class ActionMessage
     interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
-    // 4 byte gap
+    uint32_t sequenceID;  //!< a sequence number for ordering
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
-	Time Te = timeZero;  //!< 48 event time
-	Time Tdemin = timeZero;  //!< 56 min dependent event time
-	Time Tso = timeZero;  //!< 64 the second order dependent time
+    Time Te = timeZero;  //!< 48 event time
+    Time Tdemin = timeZero;  //!< 56 min dependent event time
+    Time Tso = timeZero;  //!< 64 the second order dependent time
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:
@@ -146,9 +138,9 @@ class ActionMessage
 
     void setString (int index, const std::string &str);
     /** get the source global_handle*/
-    global_handle getSource() const { return global_handle{ source_id, source_handle }; }
+    global_handle getSource () const { return global_handle{source_id, source_handle}; }
     /** get the global destination handle*/
-    global_handle getDest() const { return global_handle{ dest_id, dest_handle }; }
+    global_handle getDest () const { return global_handle{dest_id, dest_handle}; }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
     {
@@ -156,30 +148,30 @@ class ActionMessage
         std::swap (source_handle, dest_handle);
     }
     /** set some extra piece of data if the full destination is not used*/
-	void setExtraData(int32_t data) { dest_handle = interface_handle{ data }; }
+    void setExtraData (int32_t data) { dest_handle = interface_handle{data}; }
     /** get the extra piece of integer data*/
     int32_t getExtraData () const { return dest_handle.baseValue (); }
-   
 
     // functions that convert to and from a byte stream
 
-	int serializedByteCount() const
-	{
-		int size = 41;
-		size += static_cast<int>(payload.size());
-		if (messageAction == CMD_TIME_REQUEST)
-		{
-			size += 24;
-		}
-		if (!stringData.empty())
-		{
-			for (auto &str : stringData)
-			{
-				size += static_cast<int>(str.size());
-			}
-		}
-		return size;
-	}
+    int serializedByteCount () const
+    {
+        int size = 45;
+        size += static_cast<int> (payload.size ());
+        if (messageAction == CMD_TIME_REQUEST)
+        {
+            size += 24;
+        }
+        if (!stringData.empty ())
+        {
+            for (auto &str : stringData)
+            {
+                // 4(to store the length)+length of the string
+                size += static_cast<int> (str.size ()) + 4;
+            }
+        }
+        return size;
+    }
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
     @param[in] buffer_size-- the size of the buffer
@@ -193,6 +185,7 @@ class ActionMessage
     /** packetize the message with a simple header and tail sequence
      */
     std::string packetize () const;
+    void packetize (std::string &data) const;
     /** covert to a byte vector using a reference*/
     void to_vector (std::vector<char> &data) const;
     /** convert a command to a byte vector*/
