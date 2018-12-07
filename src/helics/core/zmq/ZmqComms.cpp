@@ -37,7 +37,7 @@ static bool bindzmqSocket (zmq::socket_t &socket,
         {
             if (tcount == milliseconds (0))
             {
-                //std::cerr << "zmq binding error on socket sleeping then will try again \n";
+                // std::cerr << "zmq binding error on socket sleeping then will try again \n";
             }
             if (tcount > timeout)
             {
@@ -108,7 +108,8 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
     if (!isValidCommand (M))
     {
-		logError("invalid command received");
+        logError ("invalid command received");
+        ActionMessage Q (static_cast<char *> (msg.data ()), msg.size ());
         return 0;
     }
     if (isProtocolCommand (M))
@@ -143,11 +144,11 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         return 0;
     }
 
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-        sock.send (str.data (), str.size ());
-        return 0;
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
+    sock.send (str.data (), str.size ());
+    return 0;
 }
 
 void ZmqComms::queue_rx_function ()
@@ -193,7 +194,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.messageID == NAME_NOT_FOUND)
             {
-				logError(std::string("broker name ") + brokerName_ + " does not match broker connection");
+                logError (std::string ("broker name ") + brokerName_ + " does not match broker connection");
                 disconnecting = true;
                 setRxStatus (connection_status::error);
                 return;
@@ -526,7 +527,7 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    logError(e.what ());
+                    logError (e.what ());
                 }
             }
             continue;

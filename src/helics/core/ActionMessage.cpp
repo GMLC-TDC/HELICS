@@ -301,7 +301,8 @@ int ActionMessage::fromByteArray (const char *data, size_t buffer_size)
             return static_cast<int> (res);
         }
     }
-    int sz = 256 * 256 * data[1] + 256 * data[2] + data[3];
+    int sz = 256 * 256 * (static_cast<uint8_t> (data[1])) + 256 * static_cast<uint8_t> (data[2]) +
+             static_cast<uint8_t> (data[3]);
     tsize += sz;
     if (buffer_size < tsize)
     {

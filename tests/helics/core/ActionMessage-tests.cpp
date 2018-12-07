@@ -275,7 +275,36 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
-    cmd.payload = "hello world";
+    cmd.payload = std::string (5000, 'a');
+
+    cmd.setStringData ("target", "source as a very long string test .........", "original_source");
+
+    auto cmdString = cmd.to_string ();
+
+    helics::ActionMessage cmd2 (cmdString);
+    BOOST_CHECK (cmd.action () == cmd2.action ());
+    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
+    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
+    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
+    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
+    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
+    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
+    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
+    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+}
+
+BOOST_AUTO_TEST_CASE (conversion_test2)
+{
+    helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id_t (1);
+    cmd.source_handle = interface_handle (2);
+    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_handle = interface_handle (4);
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
+    setActionFlag (cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = std::string (500000, 'j');
 
     cmd.setStringData ("target", "source as a very long string test .........", "original_source");
 
