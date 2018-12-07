@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../ActionMessage.hpp"
 #include "MpiService.h"
 #include <iostream>
+#include <map>
 #include <memory>
 
 namespace helics
