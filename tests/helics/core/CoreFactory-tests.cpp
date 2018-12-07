@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label ("ci"))
 
 #if HELICS_HAVE_ZEROMQ
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
@@ -93,8 +93,6 @@ BOOST_AUTO_TEST_CASE (tcpCore_test)
 }
 #endif
 
-
-
 #ifndef DISABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 {
@@ -106,7 +104,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_test)
     core = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE (tcpCore_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP_SS), false);
 }
