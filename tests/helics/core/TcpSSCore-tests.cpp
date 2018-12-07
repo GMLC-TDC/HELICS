@@ -88,10 +88,10 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
     comm.loadTargetInfo (host, host);
 
     auto srv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = srv->startServiceLoop();
+    auto serviceLoop = srv->startServiceLoop ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
-    
+
     std::vector<char> data (1024);
     server->setDataCall (
       [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -101,9 +101,9 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
           return data_Size;
       });
     BOOST_REQUIRE (server->isReady ());
-    auto res=server->start ();
-    BOOST_CHECK(res);
-    std::this_thread::sleep_for(100ms);
+    auto res = server->start ();
+    BOOST_CHECK (res);
+    std::this_thread::sleep_for (100ms);
     comm.setCallback ([](helics::ActionMessage /*m*/) {});
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
 
     BOOST_CHECK_GT (len, 50);
     helics::ActionMessage rM;
-    auto loc=rM.depacketize(data.data(), len);
-    if ((counter == 1) && (loc < len))
+    auto loc = rM.depacketize (data.data (), len);
+    if ((counter == 1) && (loc < static_cast<int> (len.load ())))
     {
-        rM.depacketize(data.data() + loc, len - loc);
+        rM.depacketize (data.data () + loc, static_cast<int> (len.load () - loc));
     }
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     server->close ();
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_rx_test)
     comm.loadTargetInfo (host, "");
     std::mutex actguard;
     auto srv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = srv->startServiceLoop();
+    auto serviceLoop = srv->startServiceLoop ();
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock (actguard);
@@ -194,8 +194,8 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_through)
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
-    auto srv = AsioServiceManager::getServicePointer();
-    auto serviceLoop = srv->startServiceLoop();
+    auto srv = AsioServiceManager::getServicePointer ();
+    auto serviceLoop = srv->startServiceLoop ();
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm;
@@ -256,8 +256,8 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm, comm2, comm3;
-    auto srv = AsioServiceManager::getServicePointer();
-    auto serviceLoop = srv->startServiceLoop();
+    auto srv = AsioServiceManager::getServicePointer ();
+    auto serviceLoop = srv->startServiceLoop ();
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string ());
     comm3.loadTargetInfo (host, host);
@@ -332,10 +332,9 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter, 1);
     BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    
     comm.disconnect ();
     comm3.disconnect ();
-    comm2.disconnect();
+    comm2.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
@@ -348,8 +347,8 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer();
-    auto serviceLoop = srv->startServiceLoop();
+    auto srv = AsioServiceManager::getServicePointer ();
+    auto serviceLoop = srv->startServiceLoop ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), "localhost", TCP_BROKER_PORT);
     std::vector<char> data (1024);
@@ -361,10 +360,10 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
           ++counter;
           return len.load ();
       });
-    auto started=server->start ();
+    auto started = server->start ();
 
-    BOOST_CHECK(started);
-    std::this_thread::sleep_for(100ms);
+    BOOST_CHECK (started);
+    std::this_thread::sleep_for (100ms);
     bool connected = core->connect ();
     BOOST_CHECK (connected);
 
@@ -385,10 +384,10 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
         BOOST_CHECK_GT (len, 32);
         helics::ActionMessage rM;
         helics::ActionMessage rM2;
-        auto used = rM.depacketize (data.data (), len);
-        if (used < len)
+        auto used = rM.depacketize (data.data (), static_cast<int> (len.load ()));
+        if (used < static_cast<int> (len.load ()))
         {
-            auto use2 = rM2.depacketize (data.data () + used, len - used);
+            auto use2 = rM2.depacketize (data.data () + used, static_cast<int> (len.load () - used));
             if (use2 == 0)
             {
                 while (counter != 2)
@@ -401,7 +400,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
                     }
                 }
             }
-            rM2.depacketize (data.data () + used, len - used);
+            rM2.depacketize (data.data () + used, static_cast<int> (len.load () - used));
         }
         else
         {
@@ -414,7 +413,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
                     break;
                 }
             }
-            rM2.depacketize (data.data () + used, len - used);
+            rM2.depacketize (data.data () + used, static_cast<int> (len.load () - used));
         }
         BOOST_CHECK_EQUAL (rM.name, "core1");
         BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
