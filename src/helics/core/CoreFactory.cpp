@@ -17,8 +17,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "test/TestCore.h"
 #include "ipc/IpcCore.h"
+#include "test/TestCore.h"
 #include "udp/UdpCore.h"
 
 #ifndef DISABLE_TCP_CORE
@@ -26,6 +26,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 
 #include <cassert>
+#include <cstring>
 
 namespace helics
 {
@@ -119,16 +120,16 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
     case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
-        if (name.empty())
+        if (name.empty ())
         {
-            core = std::make_shared<tcp::TcpCoreSS>();
+            core = std::make_shared<tcp::TcpCoreSS> ();
         }
         else
         {
-            core = std::make_shared<tcp::TcpCoreSS>(name);
+            core = std::make_shared<tcp::TcpCoreSS> (name);
         }
 #else
-        throw (HelicsException("TCP single socket core is not available"));
+        throw (HelicsException ("TCP single socket core is not available"));
 #endif
         break;
     default:
@@ -141,7 +142,7 @@ namespace CoreFactory
 {
 std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
 {
-    auto core = makeCore (type, std::string());
+    auto core = makeCore (type, std::string ());
     core->initialize (initializationString);
     registerCore (core);
 

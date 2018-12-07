@@ -370,12 +370,12 @@ BOOST_AUTO_TEST_CASE (check_conversions)
     auto testBuffer1 = std::make_unique<char[]> (cmdStr.size () + 20);
     auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2);  // make a too small buffer
 
-    auto res = cmd.toByteArray (testBuffer1.get (), cmdStr.size () + 20);
+    auto res = cmd.toByteArray (testBuffer1.get (), static_cast<int> (cmdStr.size () + 20));
     BOOST_CHECK_EQUAL (res, cmdStr.size ());
     // just check to make sure the same string was written
     BOOST_CHECK_EQUAL (cmdStr, std::string (testBuffer1.get (), res));
     // this should return -1
-    res = cmd.toByteArray (testBuffer2.get (), cmdStr.size () >> 2);
+    res = cmd.toByteArray (testBuffer2.get (), static_cast<int> (cmdStr.size () >> 2));
     BOOST_CHECK_EQUAL (res, -1);
 }
 
@@ -398,7 +398,7 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     auto cmdString = cmd.packetize ();
     BOOST_CHECK_GE (cmdStringNormal.size () + 6, cmdString.size ());
     helics::ActionMessage cmd2;
-    auto res = cmd2.depacketize (cmdString.data (), cmdString.size ());
+    auto res = cmd2.depacketize (cmdString.data (), static_cast<int> (cmdString.size ()));
     BOOST_CHECK_EQUAL (res, cmdString.size ());
     BOOST_CHECK (cmd.action () == cmd2.action ());
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);

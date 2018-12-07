@@ -30,16 +30,16 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction,
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
     : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
       source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
-      counter (act.counter), flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
-      payload (std::move (act.payload)), name (payload), stringData (std::move (act.stringData))
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), payload (std::move (act.payload)),
+      name (payload), Te (act.Te), Tdemin (act.Tdemin), Tso (act.Tso), stringData (std::move (act.stringData))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
     : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
       source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
-      counter (act.counter), flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
-      payload (act.payload), name (payload), stringData (act.stringData)
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), payload (act.payload), name (payload),
+      Te (act.Te), Tdemin (act.Tdemin), Tso (act.Tso), stringData (act.stringData)
 
 {
 }
@@ -56,7 +56,10 @@ ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { fro
 
 ActionMessage::ActionMessage (const std::vector<char> &bytes) : ActionMessage () { from_vector (bytes); }
 
-ActionMessage::ActionMessage (const char *data, size_t size) : ActionMessage () { fromByteArray (data, size); }
+ActionMessage::ActionMessage (const char *data, size_t size) : ActionMessage ()
+{
+    fromByteArray (data, static_cast<int> (size));
+}
 
 ActionMessage::~ActionMessage () = default;
 
@@ -73,6 +76,7 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
+    Tso = act.Tso;
     payload = act.payload;
     stringData = act.stringData;
     return *this;
@@ -91,6 +95,7 @@ ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
+    Tso = act.Tso;
     payload = std::move (act.payload);
     stringData = std::move (act.stringData);
     return *this;
@@ -139,9 +144,9 @@ static inline std::uint8_t is_little_endian ()
 {
     static std::int32_t test = 1;
     return *reinterpret_cast<std::int8_t *> (&test) == 1;
-};
+}
 
-int ActionMessage::toByteArray (char *data, size_t buffer_size) const
+int ActionMessage::toByteArray (char *data, int buffer_size) const
 {
     static const uint8_t littleEndian = is_little_endian ();
 
@@ -149,7 +154,7 @@ int ActionMessage::toByteArray (char *data, size_t buffer_size) const
     {
         return -1;
     }
-    if (buffer_size < serializedByteCount ())
+    if (static_cast<int> (buffer_size) < serializedByteCount ())
     {
         return -1;
     }
@@ -284,7 +289,7 @@ inline void swap_bytes (std::uint8_t *data)
         std::swap (data[i], data[DataSize - i - 1]);
 }
 
-int ActionMessage::fromByteArray (const char *data, size_t buffer_size)
+int ActionMessage::fromByteArray (const char *data, int buffer_size)
 {
     int tsize = 45;
     static const uint8_t littleEndian = is_little_endian ();
@@ -425,7 +430,7 @@ int ActionMessage::fromByteArray (const char *data, size_t buffer_size)
     return tsize;
 }
 
-size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
+int ActionMessage::depacketize (const char *data, int buffer_size)
 {
     if (data[0] != LEADING_CHAR)
     {
@@ -435,7 +440,7 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     {
         return 0;
     }
-    size_t message_size = static_cast<unsigned char> (data[1]);
+    int message_size = static_cast<unsigned char> (data[1]);
     message_size <<= 8;
     message_size += static_cast<unsigned char> (data[2]);
     message_size <<= 8;
@@ -457,9 +462,15 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     return (bytesUsed > 0) ? message_size + 2 : 0;
 }
 
-void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }
+void ActionMessage::from_string (const std::string &data)
+{
+    fromByteArray (data.data (), static_cast<int> (data.size ()));
+}
 
-void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray (data.data (), data.size ()); }
+void ActionMessage::from_vector (const std::vector<char> &data)
+{
+    fromByteArray (data.data (), static_cast<int> (data.size ()));
+}
 
 std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
