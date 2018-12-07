@@ -8,15 +8,15 @@ only_update_on_change=false #indicator that the federate should only indicate up
 only_transmit_on_change=false  #indicator that the federate should only publish if the value changed
 source_only=false  #indicator that the federate is only a source and is not expected to receive anything
 uninterruptible=false #indicator that the federate should only return requested times
-coreType="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
-coreName="the name of the core" #this matters most for icp and test cores, can be empty
-coreInit="1 --autobroker" # the initialization string for the core in the form of a command line arguments
-maxIterations=10 #the maximum number of iterations for a time step
+coretype="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
+corename="the name of the core" #this matters most for icp and test cores, can be empty
+coreinit="1 --autobroker" # the initialization string for the core in the form of a command line arguments
+max_iterations=10 #the maximum number of iterations for a time step
 period=  1.0 #the period with which federate may return time
 offset= 0.0 # the offset shift in the period
-timeDelta=0.0 # the minimum time between subsequent return times
-outputDelay=0 #the propagation delay for federates to send data
-inputDelay=0 #the input delay for external data to propagate to federates
+time_delta=0.0 # the minimum time between subsequent return times
+output_delay=0 #the propagation delay for federates to send data
+input_delay=0 #the input delay for external data to propagate to federates
 separator=":" # set the character separator for local interfaces
 
 #endpoints used in the federate not really necessary to define endpoints for a filer

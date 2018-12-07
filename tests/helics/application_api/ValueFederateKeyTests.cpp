@@ -321,7 +321,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_file,
 
     auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
     std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    auto testFile = std::string (TEST_DIR) + "/test_files/" + file_name;
+    auto testFile = std::string (TEST_DIR) + file_name;
     broker->makeConnections (testFile);
     // register the publications
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
@@ -450,7 +450,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_file,
 
     auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
     std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    auto testFile = std::string (TEST_DIR) + "/test_files/" + file_name;
+    auto testFile = std::string (TEST_DIR) + file_name;
     core->makeConnections (testFile);
     core = nullptr;
     // register the publications

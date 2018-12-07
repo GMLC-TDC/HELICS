@@ -63,7 +63,7 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-  shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
+  shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
 add_test(
@@ -80,7 +80,7 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-  shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
+  shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
 add_test(
@@ -89,9 +89,7 @@ add_test(
 )
 
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Daily)
-# Setting a different label, because the test fixture for the C++ shared library tests
-# doesn't work push_back for vector causes a segfault for unknown reasons (Boost UTF
-# related?)
+
 set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Coverage Daily)
 
 # Tests used for Continuous Integration builds

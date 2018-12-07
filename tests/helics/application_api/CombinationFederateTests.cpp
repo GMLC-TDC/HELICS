@@ -273,7 +273,7 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/test_files/example_combo_fed.json");
+    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/example_combo_fed.json");
 
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
 BOOST_AUTO_TEST_CASE (test_file_load_toml)
 {
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/test_files/example_combo_fed.toml");
+    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/example_combo_fed.toml");
 
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 

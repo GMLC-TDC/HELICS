@@ -469,7 +469,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_message_fed.json");
 
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
@@ -482,7 +482,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
 
 BOOST_AUTO_TEST_CASE (test_file_load_toml)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.toml");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_message_fed.toml");
 
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
@@ -495,7 +495,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
 
 BOOST_AUTO_TEST_CASE (test_file_load_filter)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_filters.json");
 
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
 
 BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.toml");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_filters.toml");
 
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 

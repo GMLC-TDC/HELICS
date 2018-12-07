@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE (echo_test_fileload)
     fi.coreName = "ecore4-file";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Echo echo1 ("echo1", fi);
-    echo1.loadFile (std::string (TEST_DIR) + "/test_files/echo_example.json");
+    echo1.loadFile (std::string (TEST_DIR) + "/echo_example.json");
 
     helics::MessageFederate mfed ("source", fi);
     helics::Endpoint ep1 (&mfed, "src");
