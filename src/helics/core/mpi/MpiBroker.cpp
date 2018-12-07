@@ -4,9 +4,9 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MpiBroker.h"
-#include "MpiComms.h"
-
 #include "../../common/argParser.h"
+#include "MpiComms.h"
+#include <iostream>
 
 #include <mpi.h>
 
@@ -87,19 +87,16 @@ bool MpiBroker::brokerConnect ()
     {
         setAsRoot ();
     }
-	else
-	{
+    else
+    {
         comms->setBrokerAddress (brokerAddress);
-	}
-    
+    }
+
     comms->setName (getIdentifier ());
 
-   return comms->connect ();
+    return comms->connect ();
 }
 
-std::string MpiBroker::generateLocalAddressString () const
-{
-    return comms->getAddress ();
-}
+std::string MpiBroker::generateLocalAddressString () const { return comms->getAddress (); }
 }  // namespace mpi
 }  // namespace helics
