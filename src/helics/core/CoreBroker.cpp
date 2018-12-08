@@ -2325,33 +2325,24 @@ void CoreBroker::processQuery (const ActionMessage &m)
         {
             queryResp.payload = gfind->second;
         }
+        else if (m.payload == "list")
+        {
+            queryResp.payload = generateStringVector (global_values, [](const auto &gv) { return gv.first; });
+        }
+        else if (m.payload == "all")
+        {
+            JsonMapBuilder globalSet;
+            auto &jv = globalSet.getJValue ();
+            for (auto &val : global_values)
+            {
+                jv[val.first] = val.second;
+            }
+            queryResp.payload = globalSet.generate ();
+        }
         else
         {
             queryResp.payload = "#invalid";
         }
-
-        if (queryResp.dest_id == global_broker_id_local)
-        {
-            ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);
-        }
-        else
-        {
-            transmit (getRoute (queryResp.dest_id), queryResp);
-        }
-    }
-    else if (target == "global_variables")
-    {
-        ActionMessage queryResp (CMD_QUERY_REPLY);
-        queryResp.dest_id = m.source_id;
-        queryResp.source_id = global_broker_id_local;
-        queryResp.messageID = m.messageID;
-        JsonMapBuilder globalSet;
-        auto jv = globalSet.getJValue ();
-        for (auto &val : global_values)
-        {
-            jv[val.first] = val.second;
-        }
-        queryResp.payload = globalSet.generate ();
         if (queryResp.dest_id == global_broker_id_local)
         {
             ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);

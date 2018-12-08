@@ -824,8 +824,27 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
+            }
+        }
+    }
+    if (doc.isMember ("globals"))
+    {
+        if (doc["globals"].isArray ())
+        {
+            for (auto &val : doc["globals"])
+            {
+                setGlobal (val[0].asString (), val[1].asString ());
+            }
+        }
+        else
+        {
+            auto members = doc["globals"].getMemberNames ();
+            for (auto &val : members)
+            {
+                setGlobal (val, doc["globals"][val].asString ());
             }
         }
     }
@@ -988,9 +1007,26 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
             }
+        }
+    }
+    auto globals = doc.find ("globals");
+    if (globals != nullptr)
+    {
+        if (globals->is<toml::Array> ())
+        {
+            for (auto &val : globals->as<toml::Array> ())
+            {
+                setGlobal (val.as<toml::Array> ()[0].as<std::string> (),
+                           val.as<toml::Array> ()[1].as<std::string> ());
+            }
+        }
+        else
+        {
+            // TODO:: add loop around getting the different variables in a toml file
         }
     }
 }
@@ -1010,17 +1046,17 @@ std::string Federate::query (const std::string &queryStr)
     {
         res = getName ();
     }
-	else if (queryStr == "corename")
-	{
-		if (coreObject)
-		{
-			res = coreObject->getIdentifier();
-		}
-		else
-		{
-			res = "#unknown";
-		}
-	}
+    else if (queryStr == "corename")
+    {
+        if (coreObject)
+        {
+            res = coreObject->getIdentifier ();
+        }
+        else
+        {
+            res = "#unknown";
+        }
+    }
     else
     {
         res = localQuery (queryStr);
@@ -1089,12 +1125,12 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
     return false;
 }
 
-void Federate::setGlobal(const std::string &valueName, const std::string &value)
+void Federate::setGlobal (const std::string &valueName, const std::string &value)
 {
-	if (coreObject)
-	{
-		coreObject->setGlobal(valueName, value);
-	}
+    if (coreObject)
+    {
+        coreObject->setGlobal (valueName, value);
+    }
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,
@@ -1182,12 +1218,11 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
-void Federate::setInfo(interface_handle handle, const std::string& info) {
-    coreObject->setInterfaceInfo(handle, info);
+void Federate::setInfo (interface_handle handle, const std::string &info)
+{
+    coreObject->setInterfaceInfo (handle, info);
 }
 
-std::string const &Federate::getInfo(interface_handle handle) {
-    return coreObject->getInterfaceInfo(handle);
-}
+std::string const &Federate::getInfo (interface_handle handle) { return coreObject->getInterfaceInfo (handle); }
 
 }  // namespace helics

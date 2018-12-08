@@ -113,9 +113,10 @@ void makeConnectionsToml (brkX *brk, const std::string &file)
     {
         if (globals->is<toml::Array> ())
         {
-            for (auto &val : globals->get<toml::Array> ())
+            for (auto &val : globals->as<toml::Array> ())
             {
-                brk->setGlobal (val[0].as<std::string> (), val[1].as<std::string> ());
+                brk->setGlobal (val.as<toml::Array> ()[0].as<std::string> (),
+                                val.as<toml::Array> ()[1].as<std::string> ());
             }
         }
         else
