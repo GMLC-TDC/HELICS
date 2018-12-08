@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
 
     BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
-    BOOST_CHECK_EQUAL (mFed.query ("global", "globa2"), "this is another global value");
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global2"), "this is another global value");
     mFed.disconnect ();
 }
 
