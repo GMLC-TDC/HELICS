@@ -20,20 +20,20 @@ std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData ()
     return out;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
+std::shared_ptr<const data_block> NamedInputInfo::getData (int index)
 {
-    if (isValidIndex(index, current_data))
+    if (isValidIndex (index, current_data))
     {
         return current_data[index].data;
     }
     return nullptr;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData()
+std::shared_ptr<const data_block> NamedInputInfo::getData ()
 {
     int ind = 0;
     int mxind = -1;
-    Time mxTime = Time::minVal();
+    Time mxTime = Time::minVal ();
     for (auto &cd : current_data)
     {
         if (cd.time > mxTime)
@@ -43,7 +43,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData()
         }
         ++ind;
     }
-    if (mxind>=0)
+    if (mxind >= 0)
     {
         return current_data[mxind].data;
     }
@@ -86,18 +86,22 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits) 
-{ 
+void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits)
+{
     input_sources.push_back (newSource);
     source_types.emplace_back (stype, sunits);
-    data_queues.resize(input_sources.size());
-    current_data.resize(input_sources.size());
+    data_queues.resize (input_sources.size ());
+    current_data.resize (input_sources.size ());
 }
 
+void NamedInputInfo::removeSource (global_handle /*sourceToRemove*/) {}
 
-void NamedInputInfo::removeSource(global_handle /*sourceToRemove*/)
+void NamedInputInfo::clearFutureData ()
 {
-	
+    for (auto &vec : data_queues)
+    {
+        vec.clear ();
+    }
 }
 
 bool NamedInputInfo::updateTimeUpTo (Time newTime)

@@ -45,6 +45,8 @@ void EndpointInfo::addMessage (std::unique_ptr<Message> message)
     std::stable_sort (handle->begin (), handle->end (), msgSorter);
 }
 
+void EndpointInfo::clearQueue () { message_queue.lock ()->clear (); }
+
 int32_t EndpointInfo::queueSize (Time maxTime) const
 {
     auto handle = message_queue.lock_shared ();

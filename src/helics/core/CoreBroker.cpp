@@ -13,10 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "fileConnections.hpp"
 #include "../common/logger.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
+#include "fileConnections.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -140,15 +140,15 @@ uint16_t CoreBroker::getNextAirlockIndex ()
     return index;
 }
 
-void  CoreBroker::makeConnections(const std::string &file)
+void CoreBroker::makeConnections (const std::string &file)
 {
-    if (hasTomlExtension(file))
+    if (hasTomlExtension (file))
     {
-        makeConnectionsToml(this,file);
+        makeConnectionsToml (this, file);
     }
     else
     {
-        makeConnectionsJson(this,file);
+        makeConnectionsJson (this, file);
     }
 }
 
@@ -333,7 +333,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
-				newroute = route_id{ routeCount++ };
+                newroute = route_id{routeCount++};
                 addRoute (newroute, command.getString (targetStringLoc));
                 route_created = true;
             }
@@ -356,7 +356,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
         {
             // TODO:: this will need to be updated when we enable mesh routing
-			_brokers.back().route = route_id{ routeCount++ };
+            _brokers.back ().route = route_id{routeCount++};
             addRoute (_brokers.back ().route, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
             _brokers.back ()._nonLocal = false;
@@ -404,7 +404,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (route, brokerReply);
             LOG_CONNECTIONS (global_broker_id_local, getIdentifier (),
                              fmt::format ("registering broker {}({}) on route {}", command.name,
-								 global_brkid.baseValue (), route.baseValue ()));
+                                          global_brkid.baseValue (), route.baseValue ()));
         }
     }
     break;
@@ -1074,6 +1074,14 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         addFilter (command);
         break;
+    case CMD_CLOSE_INTERFACE:
+        if ((!isRootc) && (command.dest_id != parent_broker_id))
+        {
+            routeMessage (command);
+            break;
+        }
+        handles.removeHandle (command.getSource ());
+        break;
     case CMD_ADD_DEPENDENCY:
     case CMD_REMOVE_DEPENDENCY:
     case CMD_ADD_DEPENDENT:
@@ -1099,9 +1107,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ADD_NAMED_FILTER:
         checkForNamedInterface (command);
         break;
-	case CMD_CLOSE_INTERFACE:
-		disconnectInterface(command.getSource());
-		break;
     case CMD_BROKER_CONFIGURE:
         processBrokerConfigureCommands (command);
         break;
@@ -1429,9 +1434,9 @@ void CoreBroker::addEndpoint (ActionMessage &m)
         routeMessage (eret);
         return;
     }
-    auto &ept = handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
-                                   handle_type::endpoint, m.name, m.getString (typeStringLoc),
-                                   m.getString (unitStringLoc));
+    auto &ept =
+      handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
+                         handle_type::endpoint, m.name, m.getString (typeStringLoc), m.getString (unitStringLoc));
 
     addLocalInfo (ept, m);
 
@@ -1468,9 +1473,9 @@ void CoreBroker::addFilter (ActionMessage &m)
         return;
     }
 
-    auto &filt = handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
-                                    handle_type::filter, m.name, m.getString (typeStringLoc),
-                                    m.getString (typeOutStringLoc));
+    auto &filt =
+      handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle), handle_type::filter,
+                         m.name, m.getString (typeStringLoc), m.getString (typeOutStringLoc));
     addLocalInfo (filt, m);
 
     if (!isRootc)
@@ -1496,12 +1501,6 @@ void CoreBroker::addFilter (ActionMessage &m)
 CoreBroker::CoreBroker (bool setAsRootBroker) noexcept
     : _isRoot (setAsRootBroker), isRootc (setAsRootBroker), timeoutMon (new TimeoutMonitor)
 {
-}
-
-
-void CoreBroker::disconnectInterface(global_handle handle)
-{
-	handles.removeHandle(handle);
 }
 
 CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_name), timeoutMon (new TimeoutMonitor)
@@ -1596,7 +1595,7 @@ bool CoreBroker::isConnected () const
 
 bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
 {
-    if (msToWait <= std::chrono::milliseconds(0))
+    if (msToWait <= std::chrono::milliseconds (0))
     {
         disconnection.wait ();
         return true;
@@ -1649,7 +1648,7 @@ void CoreBroker::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
-    while (!waitForDisconnect (std::chrono::milliseconds(200)))
+    while (!waitForDisconnect (std::chrono::milliseconds (200)))
     {
         LOG_WARNING (global_id.load (), getIdentifier (), "waiting on disconnect");
     }
@@ -2032,9 +2031,7 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     if (request == "filters")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) {
-                                            return (handle.handle_type == handle_type::filter);
-                                        });
+                                        [](auto &handle) { return (handle.handle_type == handle_type::filter); });
     }
     if (request == "endpoints")
     {

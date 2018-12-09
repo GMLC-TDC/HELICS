@@ -79,6 +79,63 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
+BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_types), core_type)
+{
+    auto broker = AddBroker (core_type, 2);
+
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate> (0);
+    auto mFed = GetFederateAs<helics::MessageFederate> (1);
+
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
+    auto &p3 = mFed->registerGlobalEndpoint ("port3");
+
+    auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
+    Filt.addSourceTarget ("port1");
+    Filt.setString ("newdestination", "port3");
+
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
+
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    helics::data_block data (500, 'a');
+    mFed->sendMessage (p1, "port2", data);
+
+    mFed->requestTimeAsync (1.0);
+    fFed->requestTime (1.0);
+    mFed->requestTimeComplete ();
+
+    BOOST_CHECK (!mFed->hasMessage (p2));
+    BOOST_REQUIRE (mFed->hasMessage (p3));
+
+    auto m2 = mFed->getMessage (p3);
+    BOOST_CHECK_EQUAL (m2->source, "port1");
+    BOOST_CHECK_EQUAL (m2->original_dest, "port2");
+    BOOST_CHECK_EQUAL (m2->dest, "port3");
+    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+
+    Filt.close ();
+    mFed->sendMessage (p1, "port2", data);
+
+    fFed->requestTimeAsync (2.0);
+    mFed->requestTime (2.0);
+    fFed->requestTimeComplete ();
+
+    BOOST_CHECK (mFed->hasMessage (p2));
+    BOOST_CHECK (!mFed->hasMessage (p3));
+
+    m2 = mFed->getMessage (p2);
+    BOOST_CHECK_EQUAL (m2->dest, "port2");
+    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    mFed->finalize ();
+    fFed->finalize ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+}
+
 /**
 Test rerouter filter under condition
 This test case sets reroute filter on a source endpoint with a condition parameter.
@@ -514,36 +571,36 @@ BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), core_typ
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    p1.setInfo("p1_info");
-    p2.setInfo("p2_info");
+    p1.setInfo ("p1_info");
+    p2.setInfo ("p2_info");
 
     auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    f1.setInfo("f1_info");
+    f1.setInfo ("f1_info");
     auto &f2 = fFed->registerFilter ("filter2");
     fFed->addDestinationTarget (f2, "port2");
-    f2.setInfo("f2_info");
+    f2.setInfo ("f2_info");
     auto &ep1 = fFed->registerEndpoint ("fout");
-    ep1.setInfo("ep1_info");
+    ep1.setInfo ("ep1_info");
     auto &f3 = fFed->registerFilter ();
     fFed->addSourceTarget (f3, "filter0/fout");
-    f3.setInfo("f3_info");
+    f3.setInfo ("f3_info");
 
     // Test Endpoint info field
-    BOOST_CHECK_EQUAL("p1_info", p1.getInfo());
-    BOOST_CHECK_EQUAL("p2_info", p2.getInfo());
-    BOOST_CHECK_EQUAL("ep1_info", ep1.getInfo());
-    BOOST_CHECK_EQUAL("p1_info", mFed->getInfo(p1.getHandle()));
-    BOOST_CHECK_EQUAL("p2_info", mFed->getInfo(p2.getHandle()));
-    BOOST_CHECK_EQUAL("ep1_info", fFed->getInfo(ep1.getHandle()));
+    BOOST_CHECK_EQUAL ("p1_info", p1.getInfo ());
+    BOOST_CHECK_EQUAL ("p2_info", p2.getInfo ());
+    BOOST_CHECK_EQUAL ("ep1_info", ep1.getInfo ());
+    BOOST_CHECK_EQUAL ("p1_info", mFed->getInfo (p1.getHandle ()));
+    BOOST_CHECK_EQUAL ("p2_info", mFed->getInfo (p2.getHandle ()));
+    BOOST_CHECK_EQUAL ("ep1_info", fFed->getInfo (ep1.getHandle ()));
 
     // Test Filter info field
-    BOOST_CHECK_EQUAL("f1_info", f1.getInfo());
-    BOOST_CHECK_EQUAL("f2_info", f2.getInfo());
-    BOOST_CHECK_EQUAL("f3_info", f3.getInfo());
-    BOOST_CHECK_EQUAL("f1_info", fFed->getInfo(f1.getHandle()));
-    BOOST_CHECK_EQUAL("f2_info", fFed->getInfo(f2.getHandle()));
-    BOOST_CHECK_EQUAL("f3_info", fFed->getInfo(f3.getHandle()));
+    BOOST_CHECK_EQUAL ("f1_info", f1.getInfo ());
+    BOOST_CHECK_EQUAL ("f2_info", f2.getInfo ());
+    BOOST_CHECK_EQUAL ("f3_info", f3.getInfo ());
+    BOOST_CHECK_EQUAL ("f1_info", fFed->getInfo (f1.getHandle ()));
+    BOOST_CHECK_EQUAL ("f2_info", fFed->getInfo (f2.getHandle ()));
+    BOOST_CHECK_EQUAL ("f3_info", fFed->getInfo (f3.getHandle ()));
 
     mFed->finalize ();
     fFed->finalize ();

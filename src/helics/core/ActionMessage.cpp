@@ -160,7 +160,7 @@ int ActionMessage::toByteArray (char *data, size_t buffer_size) const
 std::string ActionMessage::to_string () const
 {
     std::string data;
-	data.reserve(payload.size() + 77);
+    data.reserve (payload.size () + 77);
     boost::iostreams::back_insert_device<std::string> inserter (data);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
     archiver oa (s);
@@ -179,7 +179,7 @@ constexpr auto TAIL_CHAR2 = '\xFC';
 std::string ActionMessage::packetize () const
 {
     std::string data;
-	data.reserve(payload.size() + 85);
+    data.reserve (payload.size () + 85);
     data.push_back (LEADING_CHAR);
     data.resize (4);
     boost::iostreams::back_insert_device<std::string> inserter (data);
@@ -203,7 +203,7 @@ std::string ActionMessage::packetize () const
 std::vector<char> ActionMessage::to_vector () const
 {
     std::vector<char> data;
-	data.reserve(payload.size() + 77);
+    data.reserve (payload.size () + 77);
     boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
     archiver oa (s);
@@ -386,7 +386,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
-{ action_message_def::action_t::cmd_user_disconnect, "disconnect from user" },
+  {action_message_def::action_t::cmd_user_disconnect, "disconnect from user"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -457,7 +457,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
   {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
   {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
-  {action_message_def::action_t::cmd_remove_target, "remove_target"},
+  {action_message_def::action_t::cmd_close_interface, "close_interface"},
   {action_message_def::action_t::cmd_multi_message, "multi message"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
@@ -475,7 +475,7 @@ const char *actionMessageType (action_message_def::action_t action)
     if (res != pptr + actEnd)
     {
         return res->second;
-    }  
+    }
     return static_cast<const char *> (unknownStr);
 }
 
@@ -484,8 +484,7 @@ static constexpr std::pair<int, const char *> errorStrings[] = {
   {-5, "lost connection with server"},
   {5, "already in initialization mode"},
   {6, "duplicate federate name detected"},
-{ 7, "duplicate broker name detected" }
-};
+  {7, "duplicate broker name detected"}};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -506,11 +505,11 @@ const char *commandErrorString (int errorcode)
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
-	if (ret == unknownStr)
-	{
+    if (ret == unknownStr)
+    {
         ret += " " + std::to_string (static_cast<int> (command.action ()));
         return ret;
-	}
+    }
     switch (command.action ())
     {
     case CMD_REG_FED:

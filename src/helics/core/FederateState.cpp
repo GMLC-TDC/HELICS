@@ -15,7 +15,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <chrono>
 #include <thread>
 
-
 #include "MessageTimer.hpp"
 #include "helics/helics-config.h"
 
@@ -262,17 +261,74 @@ void FederateState::addAction (const ActionMessage &action)
     }
 }
 
-stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/)
-{
-    return stx::nullopt;
-}
-
 void FederateState::addAction (ActionMessage &&action)
 {
     if (action.action () != CMD_IGNORE)
     {
         queue.push (std::move (action));
     }
+}
+
+void FederateState::closeInterface (interface_handle handle, handle_type type)
+{
+    while (!processing.test_and_set ())
+    {
+        ;  // spin
+    }
+    // this function could be called externally in a multi-threaded context
+    switch (type)
+    {
+    case handle_type::publication:
+    {
+        auto pub = interfaceInformation.getPublication (handle);
+        if (pub != nullptr)
+        {
+            ActionMessage rem (CMD_REMOVE_PUBLICATION);
+            rem.setSource (pub->id);
+            for (auto &sub : pub->subscribers)
+            {
+                rem.setDestination (sub);
+                routeMessage (rem);
+            }
+            pub->subscribers.clear ();
+        }
+    }
+    break;
+    case handle_type::endpoint:
+    {
+        auto ept = interfaceInformation.getEndpoint (handle);
+        if (ept != nullptr)
+        {
+            ept->clearQueue ();
+        }
+    }
+    break;
+    case handle_type::input:
+    {
+        auto ipt = interfaceInformation.getInput (handle);
+        if (ipt != nullptr)
+        {
+            ActionMessage rem (CMD_REMOVE_SUBSCRIBER);
+            rem.setSource (ipt->id);
+            for (auto &pub : ipt->input_sources)
+            {
+                rem.setDestination (pub);
+                routeMessage (rem);
+            }
+            ipt->input_sources.clear ();
+            ipt->clearFutureData ();
+        }
+    }
+    break;
+    default:
+        break;
+    }
+    processing.clear (std::memory_order_release);
+}
+
+stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/)
+{
+    return stx::nullopt;
 }
 
 iteration_result FederateState::waitSetup ()
@@ -1055,50 +1111,26 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
 
         break;
-	case CMD_CLOSE_INTERFACE:
-	{
-		auto type = static_cast<handle_type>(cmd.messageID);
-		switch (type)
-		{
-		case handle_type::input:
-		{
-			auto inpI = interfaceInformation.getInput(cmd.dest_handle);
-			if (inpI != nullptr)
-			{
-				ActionMessage rm(CMD_REMOVE_TARGET);
-				rm.setSource(cmd.getDest());
-
-				for (auto &source : inpI->input_sources)
-				{
-					rm.setDestination(source);
-					routeMessage(rm);
-				}
-				inpI->input_sources.clear();
-			}
-		}
-		break;
-		case handle_type::publication:
-		{
-			auto pubI = interfaceInformation.getPublication(cmd.dest_handle);
-			if (pubI != nullptr)
-			{
-				ActionMessage rm(CMD_REMOVE_TARGET);
-				rm.setSource(cmd.getDest());
-
-				for (auto &sub : pubI->subscribers)
-				{
-					rm.setDestination(sub);
-					routeMessage(rm);
-				}
-				pubI->subscribers.clear();
-			}
-		}
-		break;
-		case handle_type::endpoint:
-			break;
-		}
-		break;
-	}
+    case CMD_REMOVE_PUBLICATION:
+    {
+        auto subI = interfaceInformation.getInput (cmd.dest_handle);
+        if (subI != nullptr)
+        {
+            subI->removeSource (cmd.getSource ());
+        }
+        break;
+    }
+    case CMD_REMOVE_SUBSCRIBER:
+    {
+        auto pubI = interfaceInformation.getPublication (cmd.dest_handle);
+        if (pubI != nullptr)
+        {
+            pubI->removeSubscriber (cmd.getSource ());
+        }
+    }
+    break;
+    case CMD_REMOVE_ENDPOINT:
+        break;
     case CMD_FED_ACK:
         if (state != HELICS_CREATED)
         {
@@ -1318,10 +1350,7 @@ std::vector<global_federate_id> FederateState::getDependencies () const { return
 
 std::vector<global_federate_id> FederateState::getDependents () const { return timeCoord->getDependents (); }
 
-void FederateState::addDependency (global_federate_id fedToDependOn)
-{
-    timeCoord->addDependency (fedToDependOn);
-}
+void FederateState::addDependency (global_federate_id fedToDependOn) { timeCoord->addDependency (fedToDependOn); }
 
 void FederateState::addDependent (global_federate_id fedThatDependsOnThis)
 {

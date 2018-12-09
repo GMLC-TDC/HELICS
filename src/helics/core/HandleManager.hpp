@@ -4,12 +4,12 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
+#include "BasicHandleInfo.hpp"
 #include "Core.hpp"
 #include "helics-time.hpp"
-#include <unordered_map>
 #include <deque>
+#include <unordered_map>
 #include <utility>
-#include "BasicHandleInfo.hpp"
 namespace helics
 {
 /** class for managing a coordinating the different types of handles used in helics
@@ -18,12 +18,14 @@ namespace helics
 class HandleManager
 {
   private:
-      /** use deque here as there are several use cases which use two properties of a deque vs vector
-      namely that references are not invalidated by emplace back, which is unlike a vector
-      and that the memory growth is a stable and not subject to large copy operations
-      this allows much more stable growth to bigger sizes if need be since we don't need contiguous memory,
-      just iterators, so these properties outweigh the slight decrease in overall performance, otherwise we would need two classes that do basicall
-      the same thing just with different container types so using deque reduce the amount of the code to maintain as well*/
+    /** use deque here as there are several use cases which use two properties of a deque vs vector
+    namely that references are not invalidated by emplace back, which is unlike a vector
+    and that the memory growth is a stable and not subject to large copy operations
+    this allows much more stable growth to bigger sizes if need be since we don't need contiguous memory,
+    just iterators, so these properties outweigh the slight decrease in overall performance, otherwise we would
+    need two classes that do basically
+    the same thing just with different container types so using deque reduce the amount of the code to maintain as
+    well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
     std::unordered_map<std::string, interface_handle> publications;  //!< map of all local publications
     std::unordered_map<std::string, interface_handle> endpoints;  //!< map of all local endpoints
@@ -47,45 +49,45 @@ class HandleManager
                                 const std::string &type,
                                 const std::string &units);
 
-    void addHandle(const BasicHandleInfo &otherHandle);
+    void addHandle (const BasicHandleInfo &otherHandle);
     /** add a handle at the specified index*/
-    void addHandleAtIndex(const BasicHandleInfo &otherHandle,int32_t index);
-	/** remove the information at the specified handle*/
-	void removeHandle(global_handle handle);
-     /** get a handle by index*/
+    void addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_t index);
+    /** remove the information at the specified handle*/
+    void removeHandle (global_handle handle);
+    /** get a handle by index*/
     BasicHandleInfo *getHandleInfo (int32_t index);
     /** get a const handle by index*/
-    const BasicHandleInfo *getHandleInfo(int32_t index) const;
-	/** get a handle by index*/
-	BasicHandleInfo *getHandleInfo(interface_handle handle);
-	/** get a const handle by index*/
-	const BasicHandleInfo *getHandleInfo(interface_handle handle) const;
+    const BasicHandleInfo *getHandleInfo (int32_t index) const;
+    /** get a handle by index*/
+    BasicHandleInfo *getHandleInfo (interface_handle handle);
+    /** get a const handle by index*/
+    const BasicHandleInfo *getHandleInfo (interface_handle handle) const;
     /** find a handle from both the federate and local id*/
     BasicHandleInfo *findHandle (global_handle id);
 
-    void setHandleOption(interface_handle handle, int option, bool val);
+    void setHandleOption (interface_handle handle, int option, bool val);
 
-    bool getHandleOption(interface_handle handle, int option) const;
+    bool getHandleOption (interface_handle handle, int option) const;
     /** get an endpoint from its name*/
     BasicHandleInfo *getEndpoint (const std::string &name);
     /** get an endpoint from its name*/
-    const BasicHandleInfo *getEndpoint(const std::string &name) const;
+    const BasicHandleInfo *getEndpoint (const std::string &name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    BasicHandleInfo *getEndpoint(interface_handle index);
-    const BasicHandleInfo *getFilter(const std::string &name) const;
-    BasicHandleInfo *getFilter(const std::string &name);
-   // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
+    BasicHandleInfo *getEndpoint (interface_handle index);
+    const BasicHandleInfo *getFilter (const std::string &name) const;
+    BasicHandleInfo *getFilter (const std::string &name);
+    // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
-    BasicHandleInfo *getFilter(interface_handle index);
+    BasicHandleInfo *getFilter (interface_handle index);
     BasicHandleInfo *getPublication (const std::string &name);
-    const BasicHandleInfo *getPublication(const std::string &name) const;
+    const BasicHandleInfo *getPublication (const std::string &name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
-    BasicHandleInfo *getPublication(interface_handle index);
-    BasicHandleInfo *getInput(const std::string &name);
-    const BasicHandleInfo *getInput(const std::string &name) const;
+    BasicHandleInfo *getPublication (interface_handle index);
+    BasicHandleInfo *getInput (const std::string &name);
+    const BasicHandleInfo *getInput (const std::string &name) const;
     federate_id_t getLocalFedID (interface_handle id_) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }

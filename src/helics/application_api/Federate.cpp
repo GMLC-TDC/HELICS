@@ -303,7 +303,7 @@ iteration_result Federate::enterExecutingMode (iteration_request iterate)
         requestTimeComplete ();
         break;
     case modes::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
-                                          // this fashion
+                                         // this fashion
     default:
         throw (InvalidFunctionCall ("cannot transition from current state to execution state"));
         break;
@@ -433,6 +433,10 @@ void Federate::finalize ()
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
+    if (fManager)
+    {
+        fManager->closeAllFilters ();
+    }
     currentMode = modes::finalize;
 }
 
@@ -824,8 +828,9 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
             }
         }
     }
@@ -988,8 +993,9 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
             }
         }
     }
@@ -1163,18 +1169,13 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
+void Federate::closeInterface (interface_handle handle) { coreObject->closeHandle (handle); }
 
-void Federate::closeInterface(interface_handle handle)
+void Federate::setInfo (interface_handle handle, const std::string &info)
 {
-	coreObject->closeHandle(handle);
+    coreObject->setInterfaceInfo (handle, info);
 }
 
-void Federate::setInfo(interface_handle handle, const std::string& info) {
-    coreObject->setInterfaceInfo(handle, info);
-}
-
-std::string const &Federate::getInfo(interface_handle handle) {
-    return coreObject->getInterfaceInfo(handle);
-}
+std::string const &Federate::getInfo (interface_handle handle) { return coreObject->getInterfaceInfo (handle); }
 
 }  // namespace helics

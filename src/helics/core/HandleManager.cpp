@@ -43,41 +43,39 @@ void HandleManager::addHandle (const BasicHandleInfo &otherHandle)
     addSearchFields (handles.back (), index);
 }
 
-
-void HandleManager::removeHandle(global_handle handle)
+void HandleManager::removeHandle (global_handle handle)
 {
-	auto key = static_cast<uint64_t> (handle);
-	auto fnd = unique_ids.find(key);
-	if (fnd == unique_ids.end())
-	{
-		return;
-		
-	}
-	auto index = fnd->second;
-	auto &info=handles[index];
-	unique_ids.erase(fnd);
-	if (!info.key.empty())
-	{
-		switch (info.handle_type)
-		{
-		case handle_type::endpoint:
-			endpoints.erase(info.key);
-			break;
-		case handle_type::publication:
-			publications.erase(info.key);
-			break;
-		case handle_type::filter:
-			filters.erase(info.key);
-			break;
-		case handle_type::input:
-			inputs.erase(info.key);
-			break;
-		default:
-			break;
-		}
-	}
-	//construct a blank at the previous index
-	new(&(handles[index])) BasicHandleInfo;
+    auto key = static_cast<uint64_t> (handle);
+    auto fnd = unique_ids.find (key);
+    if (fnd == unique_ids.end ())
+    {
+        return;
+    }
+    auto index = fnd->second;
+    auto &info = handles[index];
+    unique_ids.erase (fnd);
+    if (!info.key.empty ())
+    {
+        switch (info.handle_type)
+        {
+        case handle_type::endpoint:
+            endpoints.erase (info.key);
+            break;
+        case handle_type::publication:
+            publications.erase (info.key);
+            break;
+        case handle_type::filter:
+            filters.erase (info.key);
+            break;
+        case handle_type::input:
+            inputs.erase (info.key);
+            break;
+        default:
+            break;
+        }
+    }
+    // construct a blank at the previous index
+    new (&(handles[index])) BasicHandleInfo;
 }
 
 void HandleManager::addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_t index)
@@ -120,24 +118,24 @@ const BasicHandleInfo *HandleManager::getHandleInfo (int32_t index) const
     return nullptr;
 }
 
-BasicHandleInfo *HandleManager::getHandleInfo(interface_handle handle)
+BasicHandleInfo *HandleManager::getHandleInfo (interface_handle handle)
 {
-	if (isValidIndex(handle.baseValue(), handles))
-	{
-		return &handles[handle.baseValue()];
-	}
+    if (isValidIndex (handle.baseValue (), handles))
+    {
+        return &handles[handle.baseValue ()];
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
-const BasicHandleInfo *HandleManager::getHandleInfo(interface_handle handle) const
+const BasicHandleInfo *HandleManager::getHandleInfo (interface_handle handle) const
 {
-	if (isValidIndex(handle.baseValue(), handles))
-	{
-		return &handles[handle.baseValue()];
-	}
+    if (isValidIndex (handle.baseValue (), handles))
+    {
+        return &handles[handle.baseValue ()];
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
@@ -153,7 +151,7 @@ BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
 
 void HandleManager::setHandleOption (interface_handle handle, int option, bool val)
 {
-	auto index = handle.baseValue();
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         switch (option)
@@ -214,7 +212,7 @@ void HandleManager::setHandleOption (interface_handle handle, int option, bool v
 
 bool HandleManager::getHandleOption (interface_handle handle, int option) const
 {
-	auto index = handle.baseValue();
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         switch (option)
@@ -258,7 +256,7 @@ const BasicHandleInfo *HandleManager::getEndpoint (const std::string &name) cons
 
 BasicHandleInfo *HandleManager::getEndpoint (interface_handle handle)
 {
-	auto index = handle.baseValue();
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
@@ -293,7 +291,7 @@ const BasicHandleInfo *HandleManager::getPublication (const std::string &name) c
 
 BasicHandleInfo *HandleManager::getPublication (interface_handle handle)
 {
-	auto index = handle.baseValue();
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
@@ -347,7 +345,7 @@ const BasicHandleInfo *HandleManager::getFilter (const std::string &name) const
 }
 BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
 {
-	auto index = handle.baseValue();
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
