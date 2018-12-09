@@ -547,9 +547,10 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    if (cmd.action () != CMD_DISCONNECT)
+                    if (!isDisconnectCommand (cmd))
                     {
-                        logWarning ("unknown route and no broker, dropping message");
+                        logWarning (std::string ("unknown route and no broker, dropping message ") +
+                                    prettyPrintString (cmd));
                     }
                 }
             }
