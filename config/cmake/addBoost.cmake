@@ -36,6 +36,7 @@ mark_as_advanced(USE_BOOST_STATIC_LIBS)
 if (MSVC)
 
 set (boost_versions
+boost_1_69_0
 boost_1_68_0
 boost_1_67_0
 boost_1_66_0
@@ -97,7 +98,11 @@ endif(MSVC)
 HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
-	set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)
+	set(BOOST_REQUIRED_LIBRARIES program_options filesystem system date_time timer chrono)
+	if (BUILD_TESTING)
+		message(STATUS "adding unit testing")
+		list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
+	endif()
 endif()
 
 # Minimum version of Boost required for building HELICS

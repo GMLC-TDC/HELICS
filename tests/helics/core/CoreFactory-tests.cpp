@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label ("ci"))
 
 #if HELICS_HAVE_ZEROMQ
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE (TestCore_test)
     core->disconnect ();
     core = nullptr;
 }
-
+#ifndef DISABLE_IPC_CORE
 BOOST_AUTO_TEST_CASE (InterprocessCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::INTERPROCESS), true);
@@ -75,7 +75,13 @@ BOOST_AUTO_TEST_CASE (InterprocessCore_test)
     core2->disconnect ();
     core2 = nullptr;
 }
-
+#else
+BOOST_AUTO_TEST_CASE (InterprocessCore_test)
+{
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::INTERPROCESS), false);
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::IPC), false);
+}
+#endif
 #ifndef DISABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpCore_test)
 {
@@ -93,8 +99,6 @@ BOOST_AUTO_TEST_CASE (tcpCore_test)
 }
 #endif
 
-
-
 #ifndef DISABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 {
@@ -106,12 +110,13 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_test)
     core = nullptr;
 }
 #else
-BOOST_AUTO_TEST_CASE (tcpCore_test)
+BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP_SS), false);
 }
 #endif
 
+#ifndef DISABLE_UDP_CORE
 BOOST_AUTO_TEST_CASE (udpCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::UDP), true);
@@ -126,5 +131,11 @@ BOOST_AUTO_TEST_CASE (udpCore_test)
     core2->disconnect ();
     core2 = nullptr;
 }
+#else
+BOOST_AUTO_TEST_CASE (udpCore_test)
+{
+    BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::UDP), false);
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END ()
