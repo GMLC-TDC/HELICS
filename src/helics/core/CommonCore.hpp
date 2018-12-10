@@ -26,6 +26,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <thread>
 #include <utility>
+#include <set>
 
 namespace helics
 {
