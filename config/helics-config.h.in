@@ -12,10 +12,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #cmakedefine01 HELICS_HAVE_ZEROMQ
 
 #cmakedefine DISABLE_TCP_CORE
-#cmakedefine DISABLE_IPC_CORE
-#cmakedefine DISABLE_UDP_CORE
-#cmakedefine DISABLE_TEST_CORE
-
 
 #cmakedefine ENABLE_LOGGING
 #cmakedefine ENABLE_TRACE_LOGGING
