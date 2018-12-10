@@ -21,9 +21,7 @@ set(
   MessageTimerTests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
-  IPCcore_tests.cpp
   data-block-tests.cpp
-  UdpCore-tests.cpp
   ForwardingTimeCoordinatorTests.cpp
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
@@ -35,6 +33,14 @@ endif(HELICS_HAVE_ZEROMQ)
 
 if(NOT DISABLE_TCP_CORE)
   list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
+endif()
+
+if(NOT DISABLE_UDP_CORE)
+  list(APPEND core_test_sources UdpCore-tests.cpp)
+endif()
+
+if(NOT DISABLE_IPC_CORE)
+  list(APPEND core_test_sources  IPCcore_tests.cpp)
 endif()
 
 if(MPI_ENABLE)

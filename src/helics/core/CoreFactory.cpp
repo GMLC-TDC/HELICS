@@ -17,9 +17,17 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
+#ifndef DISABLE_TEST_CORE
 #include "test/TestCore.h"
+#endif
+
+#ifndef DISABLE_IPC_CORE
 #include "ipc/IpcCore.h"
+#endif
+
+#ifndef DISABLE_UDP_CORE
 #include "udp/UdpCore.h"
+#endif
 
 #ifndef DISABLE_TCP_CORE
 #include "tcp/TcpCore.h"
@@ -37,8 +45,32 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #if HELICS_HAVE_ZEROMQ
         type = core_type::ZMQ;
 #else
+#ifndef DISABLE_TCP_CORE
+        type = core_type::TCP;
+#else
+#ifndef DISABLE_UDP_CORE
         type = core_type::UDP;
-#endif
+#else
+#ifdef HELICS_HAVE_MPI
+        type = core_type::MPI;
+#else
+#ifndef DISABLE_UDP_CORE
+        type = core_type::UDP;
+#else
+#ifndef DISABLE_IPC_CORE
+        type = core_type::IPC;
+#else
+#ifndef DISABLE_TEST_CORE
+        type = core_type::TEST;
+#else
+        type = core_type::UNRECOGNIZED;
+#endif  // DISABLE_TEST_CORE
+#endif  // DISABLE_IPC_CORE
+#endif  // DISABLE_UDP_CORE
+#endif  // HELICS_HAVE_MPI
+#endif  // DISABLE_UDP_CORE
+#endif  // DISABLE_TCP_CORE
+#endif  // HELICS_HAVE_ZEROMQ
     }
 
     switch (type)
@@ -73,6 +105,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TEST:
+#ifndef DISABLE_TEST_CORE
         if (name.empty ())
         {
             core = std::make_shared<testcore::TestCore> ();
@@ -82,8 +115,12 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<testcore::TestCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("TEST core is not available"));
+#endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
+#ifndef DISABLE_IPC_CORE
         if (name.empty ())
         {
             core = std::make_shared<ipc::IpcCore> ();
@@ -93,7 +130,11 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<ipc::IpcCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("IPC core is not available"));
+#endif
     case core_type::UDP:
+#ifndef DISABLE_UDP_CORE
         if (name.empty ())
         {
             core = std::make_shared<udp::UdpCore> ();
@@ -103,6 +144,9 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<udp::UdpCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("UDP core is not available"));
+#endif
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
         if (name.empty ())
@@ -119,16 +163,16 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
     case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
-        if (name.empty())
+        if (name.empty ())
         {
-            core = std::make_shared<tcp::TcpCoreSS>();
+            core = std::make_shared<tcp::TcpCoreSS> ();
         }
         else
         {
-            core = std::make_shared<tcp::TcpCoreSS>(name);
+            core = std::make_shared<tcp::TcpCoreSS> (name);
         }
 #else
-        throw (HelicsException("TCP single socket core is not available"));
+        throw (HelicsException ("TCP single socket core is not available"));
 #endif
         break;
     default:
@@ -141,7 +185,7 @@ namespace CoreFactory
 {
 std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
 {
-    auto core = makeCore (type, std::string());
+    auto core = makeCore (type, std::string ());
     core->initialize (initializationString);
     registerCore (core);
 
@@ -285,12 +329,24 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
             break;
 #endif
         case core_type::TEST:
+#ifndef DISABLE_TEST_CORE
             return (dynamic_cast<testcore::TestCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
+#ifndef DISABLE_IPC_CORE
             return (dynamic_cast<ipc::IpcCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::UDP:
+#ifndef DISABLE_UDP_CORE
             return (dynamic_cast<udp::UdpCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpCore *> (ptr.get ()) != nullptr);
