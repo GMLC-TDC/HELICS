@@ -87,6 +87,10 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+if(MSYS AND USE_LIBCXX)
+  target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
+endif()
+
 install(
   FILES ${public_application_api_headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
