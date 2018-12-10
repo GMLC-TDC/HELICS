@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
     auto &pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 27.0);
 
@@ -183,8 +183,8 @@ BOOST_AUTO_TEST_CASE (time_iteration_test)
     auto pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_period, 1.0);
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     vFed1->publish (pubid, 27.0);
 
@@ -214,8 +214,8 @@ BOOST_AUTO_TEST_CASE (time_iteration_test_2fed)
 
     auto subid = vFed2->registerSubscription ("pub1");
 
-    vFed1->setTimeProperty (helics_property_time_period, 1.0);
-    vFed2->setTimeProperty (helics_property_time_period, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1);
+    vFed2->setProperty (helics_property_time_period, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -250,10 +250,10 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsDouble);
 
     auto &sub1 = vFed2->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed1->setTimeProperty (helics_property_time_period, 1.0);
-    vFed2->setTimeProperty (helics_property_time_period, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1.0);
+    vFed2->setProperty (helics_property_time_period, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -295,8 +295,8 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::helics_type_t::helicsInt);
 
     auto &sub2 = vFed1->registerSubscription ("pub2");
-    vFed1->setTimeProperty (helics_property_time_period, 1.0);
-    vFed2->setTimeProperty (helics_property_time_period, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1.0);
+    vFed2->setProperty (helics_property_time_period, 1.0);
     // vFed1->setLoggingLevel(5);
     // vFed2->setLoggingLevel(5);
     vFed1->enterInitializingModeAsync ();

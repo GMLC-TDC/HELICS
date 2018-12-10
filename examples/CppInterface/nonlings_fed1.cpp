@@ -42,8 +42,8 @@ int main (int /*argc*/, char ** /*argv*/)
 
     /* Federate init string */
     fi.setCoreInitString (fedinitstring);
-    fi.setTimeProperty (helics_property_time_delta, deltat);
-    fi.setIntegerProperty (helics_property_int_max_iterations, 100);
+    fi.setProperty (helics_property_time_delta, deltat);
+    fi.setProperty (helics_property_int_max_iterations, 100);
 
     // fi.setLoggingLevel(5);
 

@@ -136,7 +136,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::delay, fFed.get ());
+    auto &Filt = helics::make_filter (helics::filter_types::delay, fFed.get ());
     Filt.addSourceTarget ("port1");
     Filt.set ("delay", 2.5);
 
@@ -314,7 +314,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto f1 = helics::make_filter (helics::defined_filter_types::delay, fFed->getCorePointer ().get (), "filter1");
+    auto f1 = helics::make_filter (helics::filter_types::delay, fFed->getCorePointer ().get (), "filter1");
     f1->addDestinationTarget ("port2");
     f1->set ("delay", 2.5);
 
@@ -672,11 +672,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &f1 = helics::make_filter (helics::defined_filter_types::delay, fFed.get (), "filter1");
+    auto &f1 = helics::make_filter (helics::filter_types::delay, fFed.get (), "filter1");
     f1.addSourceTarget ("port1");
     f1.set ("delay", 1.25);
 
-    auto &f2 = helics::make_filter (helics::defined_filter_types::delay, fFed.get (), "filter2");
+    auto &f2 = helics::make_filter (helics::filter_types::delay, fFed.get (), "filter2");
     f2.addSourceTarget ("port1");
     f2.set ("delay", 1.25);
 

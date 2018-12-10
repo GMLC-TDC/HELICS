@@ -187,10 +187,16 @@ class Federate
     iteration_time requestTimeIterativeComplete ();
 
     /** set a time option for the federate
+    @param option the option to set
+    @param timeValue the value to be set
+    */
+    void setProperty (int32_t option, double timeValue);
+
+    /** set a time option for the federate
     @param[in] option the option to set
     @param[in] timeValue the value to be set
     */
-    void setTimeProperty (int32_t option, Time timeValue);
+    void setProperty (int32_t option, Time timeValue);
 
     /** set a flag for the federate
     @param[in] flag an index into the flag /ref flag-definitions.h
@@ -201,7 +207,7 @@ class Federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
-    void setIntegerProperty (int32_t option, int32_t optionValue);
+    void setProperty (int32_t option, int32_t optionValue);
 
     /** get the value of a time option for the federate
     @param[in] option the option to get
@@ -438,10 +444,10 @@ class Federate
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
 
-    void setInfo(interface_handle handle, const std::string& info);
-    std::string const &getInfo(interface_handle handle);
+    void setInfo (interface_handle handle, const std::string &info);
+    std::string const &getInfo (interface_handle handle);
 
-private:
+  private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces

@@ -16,7 +16,7 @@ class FilterOperations;
 class Federate;
 
 /** a set of common defined filters*/
-enum class defined_filter_types
+enum class filter_types
 {
     custom = helics_filtertype_custom,
     delay = helics_filtertype_delay,
@@ -32,7 +32,7 @@ enum class defined_filter_types
 #define EMPTY_STRING std::string ()
 
 /** get the filter type from a string*/
-defined_filter_types filterTypeFromString (const std::string &filterType) noexcept;
+filter_types filterTypeFromString (const std::string &filterType) noexcept;
 
 /** class for managing a particular filter*/
 class Filter
@@ -79,9 +79,9 @@ class Filter
     @param val the numerical value of the property
     */
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(id); }
+    const std::string &getInfo () const { return fed->getInfo (id); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(id, info); }
+    void setInfo (const std::string &info) { fed->setInfo (id, info); }
     virtual void set (const std::string &property, double val);
     /** set a string property on a filter
     @param property the name of the property of the filter to change
@@ -99,7 +99,7 @@ class Filter
   protected:
     /** set a filter operations object */
     void setFilterOperations (std::shared_ptr<FilterOperations> filterOps);
-    friend void addOperations (Filter *filt, defined_filter_types type, Core *cptr);
+    friend void addOperations (Filter *filt, filter_types type, Core *cptr);
 };
 
 /** class used to clone message for delivery to other endpoints*/
@@ -141,7 +141,7 @@ filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-Filter &make_filter (defined_filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
+Filter &make_filter (filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -152,7 +152,7 @@ filter
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
 Filter &make_filter (interface_visibility locality,
-                     defined_filter_types type,
+                     filter_types type,
                      Federate *fed,
                      const std::string &name = EMPTY_STRING);
 
@@ -163,7 +163,7 @@ Filter &make_filter (interface_visibility locality,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_filter (defined_filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
+std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -173,7 +173,7 @@ filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-CloningFilter &make_cloning_filter (defined_filter_types type,
+CloningFilter &make_cloning_filter (filter_types type,
                                     Federate *fed,
                                     const std::string &delivery,
                                     const std::string &name = EMPTY_STRING);
@@ -187,7 +187,7 @@ filter
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
 CloningFilter &make_cloning_filter (interface_visibility locality,
-                                    defined_filter_types type,
+                                    filter_types type,
                                     Federate *fed,
                                     const std::string &delivery,
                                     const std::string &name = EMPTY_STRING);
@@ -199,7 +199,7 @@ CloningFilter &make_cloning_filter (interface_visibility locality,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<CloningFilter> make_cloning_filter (defined_filter_types type,
+std::unique_ptr<CloningFilter> make_cloning_filter (filter_types type,
                                                     Core *cr,
                                                     const std::string &delivery,
                                                     const std::string &name = EMPTY_STRING);

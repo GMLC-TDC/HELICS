@@ -3,10 +3,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "FilterFederateManager.hpp"
 #include "../core/Core.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Federate.hpp"
-#include "FilterFederateManager.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include <cassert>
 
@@ -50,12 +50,12 @@ CloningFilter &FilterFederateManager::registerCloningFilter (const std::string &
     throw (RegistrationFailure ("Unable to register Filter"));
 }
 
-Filter &FilterFederateManager::registerFilter (defined_filter_types type, const std::string &name)
+Filter &FilterFederateManager::registerFilter (filter_types type, const std::string &name)
 {
     return make_filter (type, fed, name);
 }
 
-CloningFilter &FilterFederateManager::registerCloningFilter (defined_filter_types type, const std::string &name)
+CloningFilter &FilterFederateManager::registerCloningFilter (filter_types type, const std::string &name)
 {
     return make_cloning_filter (type, fed, std::string (), name);
 }
