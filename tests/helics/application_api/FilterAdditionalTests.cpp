@@ -45,7 +45,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
     auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::reroute, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("newdestination", "port3");
 
@@ -219,7 +219,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_drop, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     double drop_prob = 0.75;
     Filt.set ("dropprob", drop_prob);
@@ -338,7 +338,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_drop, fFed.get (), "filter1");
     Filt.addDestinationTarget ("port2");
     double drop_prob = 0.25;
     Filt.set ("dropprob", drop_prob);
@@ -456,7 +456,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_delay, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_delay, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("distribution", "binomial");
 
@@ -514,36 +514,36 @@ BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), core_typ
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    p1.setInfo("p1_info");
-    p2.setInfo("p2_info");
+    p1.setInfo ("p1_info");
+    p2.setInfo ("p2_info");
 
     auto &f1 = fFed->registerFilter ("filter1");
     fFed->addSourceTarget (f1, "port1");
-    f1.setInfo("f1_info");
+    f1.setInfo ("f1_info");
     auto &f2 = fFed->registerFilter ("filter2");
     fFed->addDestinationTarget (f2, "port2");
-    f2.setInfo("f2_info");
+    f2.setInfo ("f2_info");
     auto &ep1 = fFed->registerEndpoint ("fout");
-    ep1.setInfo("ep1_info");
+    ep1.setInfo ("ep1_info");
     auto &f3 = fFed->registerFilter ();
     fFed->addSourceTarget (f3, "filter0/fout");
-    f3.setInfo("f3_info");
+    f3.setInfo ("f3_info");
 
     // Test Endpoint info field
-    BOOST_CHECK_EQUAL("p1_info", p1.getInfo());
-    BOOST_CHECK_EQUAL("p2_info", p2.getInfo());
-    BOOST_CHECK_EQUAL("ep1_info", ep1.getInfo());
-    BOOST_CHECK_EQUAL("p1_info", mFed->getInfo(p1.getHandle()));
-    BOOST_CHECK_EQUAL("p2_info", mFed->getInfo(p2.getHandle()));
-    BOOST_CHECK_EQUAL("ep1_info", fFed->getInfo(ep1.getHandle()));
+    BOOST_CHECK_EQUAL ("p1_info", p1.getInfo ());
+    BOOST_CHECK_EQUAL ("p2_info", p2.getInfo ());
+    BOOST_CHECK_EQUAL ("ep1_info", ep1.getInfo ());
+    BOOST_CHECK_EQUAL ("p1_info", mFed->getInfo (p1.getHandle ()));
+    BOOST_CHECK_EQUAL ("p2_info", mFed->getInfo (p2.getHandle ()));
+    BOOST_CHECK_EQUAL ("ep1_info", fFed->getInfo (ep1.getHandle ()));
 
     // Test Filter info field
-    BOOST_CHECK_EQUAL("f1_info", f1.getInfo());
-    BOOST_CHECK_EQUAL("f2_info", f2.getInfo());
-    BOOST_CHECK_EQUAL("f3_info", f3.getInfo());
-    BOOST_CHECK_EQUAL("f1_info", fFed->getInfo(f1.getHandle()));
-    BOOST_CHECK_EQUAL("f2_info", fFed->getInfo(f2.getHandle()));
-    BOOST_CHECK_EQUAL("f3_info", fFed->getInfo(f3.getHandle()));
+    BOOST_CHECK_EQUAL ("f1_info", f1.getInfo ());
+    BOOST_CHECK_EQUAL ("f2_info", f2.getInfo ());
+    BOOST_CHECK_EQUAL ("f3_info", f3.getInfo ());
+    BOOST_CHECK_EQUAL ("f1_info", fFed->getInfo (f1.getHandle ()));
+    BOOST_CHECK_EQUAL ("f2_info", fFed->getInfo (f2.getHandle ()));
+    BOOST_CHECK_EQUAL ("f3_info", fFed->getInfo (f3.getHandle ()));
 
     mFed->finalize ();
     fFed->finalize ();

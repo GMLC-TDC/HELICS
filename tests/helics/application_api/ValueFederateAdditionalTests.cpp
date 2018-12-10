@@ -196,7 +196,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -369,8 +369,8 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto subid = vFed2->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
     vFed1->enterExecutingModeAsync ();
     BOOST_CHECK (!vFed1->isAsyncOperationCompleted ());

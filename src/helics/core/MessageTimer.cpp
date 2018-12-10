@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "MessageTimer.hpp"
+#include <iostream>
 
 namespace helics
 {

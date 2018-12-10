@@ -17,6 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
+
 #ifndef DISABLE_TEST_CORE
 #include "test/TestCore.h"
 #endif
@@ -34,6 +35,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 
 #include <cassert>
+#include <cstring>
 
 namespace helics
 {

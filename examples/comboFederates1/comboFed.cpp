@@ -58,7 +58,7 @@ int main (int argc, char *argv[])
     {
         myendpoint = vm["source"].as<std::string> ();
     }
-    fi.setIntegerProperty (helics::defs::properties::log_level, 5);
+    fi.setProperty (helics::defs::properties::log_level, 5);
     helics::apps::BrokerApp brk;
     if (vm.count ("startbroker") > 0)
     {

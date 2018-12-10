@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <fstream>
+#include <iostream>
 
 namespace helics
 {

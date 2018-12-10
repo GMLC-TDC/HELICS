@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "MpiService.h"
+#include <iostream>
 
 namespace helics
 {
@@ -113,11 +114,11 @@ void MpiService::serviceLoop ()
 
 std::string MpiService::addMpiComms (MpiComms *comm)
 {
-    std::unique_lock<std::mutex> dataLock(mpiDataLock);
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     comms.push_back (comm);
     comms_connected++;
-    auto tag = comms.size() - 1;
-    dataLock.unlock();
+    auto tag = comms.size () - 1;
+    dataLock.unlock ();
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service)
         ;
@@ -128,7 +129,7 @@ std::string MpiService::addMpiComms (MpiComms *comm)
 
 void MpiService::removeMpiComms (MpiComms *comm)
 {
-    std::unique_lock<std::mutex> dataLock(mpiDataLock);
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -142,7 +143,7 @@ void MpiService::removeMpiComms (MpiComms *comm)
 
 std::string MpiService::getAddress (MpiComms *comm)
 {
-    std::unique_lock<std::mutex> dataLock(mpiDataLock);
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -170,7 +171,7 @@ int MpiService::getRank ()
 
 int MpiService::getTag (MpiComms *comm)
 {
-    std::unique_lock<std::mutex> dataLock(mpiDataLock);
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -221,7 +222,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
-    std::lock_guard<std::mutex> mpilock(mpiDataLock);
+    std::lock_guard<std::mutex> mpilock (mpiDataLock);
 
     for (unsigned int i = 0; i < comms.size (); i++)
     {
@@ -250,8 +251,8 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Post an asynchronous receive
                 MPI_Request req;
-                MPI_Irecv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
-                           mpiCommunicator, &req);
+                MPI_Irecv (buffer.data (), static_cast<int> (buffer.size ()), MPI_CHAR, status.MPI_SOURCE,
+                           status.MPI_TAG, mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
                 int message_received = false;
@@ -276,27 +277,23 @@ void MpiService::sendAndReceiveMessages ()
     auto sendMsg = txMessageQueue.try_pop ();
     while (sendMsg)
     {
-       // std::vector<char> msg;
-        //std::string address;
-        //std::tie (address, msg) = sendMsg.value ();
+        // std::vector<char> msg;
+        // std::string address;
+        // std::tie (address, msg) = sendMsg.value ();
 
         MPI_Request req;
-        auto sendRequestData = std::pair<MPI_Request,std::vector<char>> (req, std::move(sendMsg->second));
+        auto sendRequestData = std::pair<MPI_Request, std::vector<char>> (req, std::move (sendMsg->second));
 
-       
         int destRank = sendMsg->first.first;
         int destTag = sendMsg->first.second;
 
         if (destRank != commRank)
         {
-            send_requests.push_back (std::move(sendRequestData));
+            send_requests.push_back (std::move (sendRequestData));
             auto &sreq = send_requests.back ();
             // Send the message using asynchronous send
-            MPI_Isend (sreq.second.data (), static_cast<int> (sreq.second.size ()), MPI_CHAR,
-                       destRank,
-                       destTag,
+            MPI_Isend (sreq.second.data (), static_cast<int> (sreq.second.size ()), MPI_CHAR, destRank, destTag,
                        mpiCommunicator, &sreq.first);
-            
         }
         else
         {
@@ -340,8 +337,8 @@ void MpiService::drainRemainingMessages ()
             buffer.resize (recv_size);
 
             // Receive the message
-            MPI_Recv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
-                      mpiCommunicator, &status);
+            MPI_Recv (buffer.data (), static_cast<int> (buffer.size ()), MPI_CHAR, status.MPI_SOURCE,
+                      status.MPI_TAG, mpiCommunicator, &status);
         }
     }
 }

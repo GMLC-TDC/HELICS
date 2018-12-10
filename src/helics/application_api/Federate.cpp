@@ -380,12 +380,17 @@ iteration_result Federate::enterExecutingModeComplete ()
     return res;
 }
 
-void Federate::setTimeProperty (int32_t option, Time timeValue)
+void Federate::setProperty (int32_t option, double timeValue)
 {
     coreObject->setTimeProperty (fedID, option, timeValue);
 }
 
-void Federate::setIntegerProperty (int32_t option, int32_t optionValue)
+void Federate::setProperty (int32_t option, Time timeValue)
+{
+    coreObject->setTimeProperty (fedID, option, timeValue);
+}
+
+void Federate::setProperty (int32_t option, int32_t optionValue)
 {
     coreObject->setIntegerProperty (fedID, option, optionValue);
 }
@@ -655,7 +660,7 @@ static Filter &generateFilter (Federate *fed,
                                bool global,
                                bool cloning,
                                const std::string &name,
-                               defined_filter_types operation,
+                               filter_types operation,
                                const std::string &inputType,
                                const std::string &outputType)
 {
@@ -712,7 +717,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
@@ -885,7 +890,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;

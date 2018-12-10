@@ -7,6 +7,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 //#include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "MpiService.h"
+#include <iostream>
+#include <map>
 #include <memory>
 
 namespace helics
@@ -20,19 +22,16 @@ MpiComms::MpiComms ()
     std::cout << "MpiComms() - commAddress = " << localTarget_ << std::endl;
 }
 
-
 /** destructor*/
 MpiComms::~MpiComms () { disconnect (); }
 
-
 void MpiComms::setBrokerAddress (const std::string &address)
-{ 
-	if (propertyLock())
-	{
+{
+    if (propertyLock ())
+    {
         brokerTarget_ = address;
         propertyUnLock ();
-	}
-	
+    }
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -53,7 +52,7 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
 
 void MpiComms::queue_rx_function ()
 {
-   setRxStatus(connection_status::connected);
+    setRxStatus (connection_status::connected);
 
     while (true)
     {
@@ -63,7 +62,7 @@ void MpiComms::queue_rx_function ()
         {
             if (!isValidCommand (M.value ()))
             {
-                logError("invalid command received");
+                logError ("invalid command received");
                 continue;
             }
 
@@ -90,19 +89,19 @@ void MpiComms::queue_rx_function ()
 CLOSE_RX_LOOP:
     std::cout << "Shutdown RX Loop for " << localTarget_ << std::endl;
     shutdown = true;
-    setRxStatus(connection_status::terminated);
+    setRxStatus (connection_status::terminated);
 }
 
 void MpiComms::queue_tx_function ()
 {
-    setTxStatus( connection_status::connected);
+    setTxStatus (connection_status::connected);
 
     auto &mpi_service = MpiService::getInstance ();
 
-    std::map<route_id_t, std::pair<int,int>> routes;  // for all the other possible routes
+    std::map<route_id_t, std::pair<int, int>> routes;  // for all the other possible routes
 
-	 std::pair<int, int> brokerLocation;
-    if (!brokerTarget_.empty())
+    std::pair<int, int> brokerLocation;
+    if (!brokerTarget_.empty ())
     {
         hasBroker = true;
         auto addr_delim_pos = brokerTarget_.find (":");
@@ -129,10 +128,9 @@ void MpiComms::queue_tx_function ()
                     std::pair<int, int> routeLoc;
                     auto addr_delim_pos = cmd.payload.find (":");
                     routeLoc.first = std::stoi (cmd.payload.substr (0, addr_delim_pos));
-                    routeLoc.second =
-                      std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
+                    routeLoc.second = std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
 
-                    routes.emplace (route_id_t(cmd.getExtraData()), routeLoc);
+                    routes.emplace (route_id_t (cmd.getExtraData ()), routeLoc);
                     processed = true;
                 }
                 break;
@@ -185,11 +183,11 @@ void MpiComms::queue_tx_function ()
 CLOSE_TX_LOOP:
     std::cout << "Shutdown TX Loop for " << localTarget_ << std::endl;
     routes.clear ();
-    if (getRxStatus() == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         shutdown = true;
     }
-    setTxStatus(connection_status::terminated);
+    setTxStatus (connection_status::terminated);
     mpi_service.removeMpiComms (this);
 }
 

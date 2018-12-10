@@ -7,7 +7,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "CommsInterface.hpp"
 #include "helics/helics-config.h"
-
+#include <map>
+#include <set>
 
 namespace helics
 {
