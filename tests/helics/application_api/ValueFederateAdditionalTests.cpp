@@ -513,6 +513,9 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     // test the info from a file
     BOOST_CHECK_EQUAL (vFed.getPublication (0).getInfo (),
                        "this is an information string for use by the application");
+
+    BOOST_CHECK_EQUAL (vFed.query ("global", "global1"), "this is a global1 value");
+    BOOST_CHECK_EQUAL (vFed.query ("global", "global2"), "this is another global value");
     vFed.disconnect ();
 }
 
@@ -537,6 +540,8 @@ BOOST_AUTO_TEST_CASE (test_file_load_toml)
     // test the info from a file
     BOOST_CHECK_EQUAL (vFed.getPublication (0).getInfo (),
                        "this is an information string for use by the application");
+    BOOST_CHECK_EQUAL (vFed.query ("global", "global1"), "this is a global1 value");
+    BOOST_CHECK_EQUAL (vFed.query ("global", "global2"), "this is another global value");
     vFed.disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

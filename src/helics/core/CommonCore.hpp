@@ -168,7 +168,7 @@ class CommonCore : public Core, public BrokerBase
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> queryFunction) override;
-
+	virtual void setGlobal(const std::string &valueName, const std::string &value) override;
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;

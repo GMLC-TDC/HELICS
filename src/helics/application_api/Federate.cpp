@@ -835,6 +835,24 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
         }
     }
+    if (doc.isMember ("globals"))
+    {
+        if (doc["globals"].isArray ())
+        {
+            for (auto &val : doc["globals"])
+            {
+                setGlobal (val[0].asString (), val[1].asString ());
+            }
+        }
+        else
+        {
+            auto members = doc["globals"].getMemberNames ();
+            for (auto &val : members)
+            {
+                setGlobal (val, doc["globals"][val].asString ());
+            }
+        }
+    }
 }
 
 void Federate::registerFilterInterfacesToml (const std::string &tomlString)
@@ -1000,6 +1018,22 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
         }
     }
+    auto globals = doc.find ("globals");
+    if (globals != nullptr)
+    {
+        if (globals->is<toml::Array> ())
+        {
+            for (auto &val : globals->as<toml::Array> ())
+            {
+                setGlobal (val.as<toml::Array> ()[0].as<std::string> (),
+                           val.as<toml::Array> ()[1].as<std::string> ());
+            }
+        }
+        else
+        {
+            // TODO:: add loop around getting the different variables in a toml file
+        }
+    }
 }
 
 Filter &Federate::getFilter (int index) { return fManager->getFilter (index); }
@@ -1016,6 +1050,17 @@ std::string Federate::query (const std::string &queryStr)
     if (queryStr == "name")
     {
         res = getName ();
+    }
+    else if (queryStr == "corename")
+    {
+        if (coreObject)
+        {
+            res = coreObject->getIdentifier ();
+        }
+        else
+        {
+            res = "#unknown";
+        }
     }
     else
     {
@@ -1083,6 +1128,14 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
         return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }
     return false;
+}
+
+void Federate::setGlobal (const std::string &valueName, const std::string &value)
+{
+    if (coreObject)
+    {
+        coreObject->setGlobal (valueName, value);
+    }
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,

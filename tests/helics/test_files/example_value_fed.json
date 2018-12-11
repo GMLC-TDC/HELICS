@@ -45,7 +45,8 @@
 "shortcut":"pubshortcut",  //a naming shortcut for the publication for later retrieval
 "info": "this is an information string for use by the application"
 }
-]
+],
 
+"globals":[["global1","this is a global1 value"],["global2","this is another global value"]]
 }
 

@@ -35,7 +35,13 @@
  "subscriptions":"fed2/sub1"  //subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
  //the message will be raw data so it would have to be translated to be useful. this can also be a json array to subscribe to multiple publications
 }
-]
+],
+
+//these are global values that can be accessed from anywhere
+"globals":{
+  "global1":"this is a global1 value",
+  "global2":"this is another global value"
+}
 
 }
 

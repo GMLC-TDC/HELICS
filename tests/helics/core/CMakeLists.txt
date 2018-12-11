@@ -16,10 +16,9 @@ set(
   InfoClass-tests.cpp
   FederateState-tests.cpp
   ActionMessage-tests.cpp
-  # CoreBroker-tests.cpp
+  BrokerClassTests.cpp
   CoreFactory-tests.cpp 
   MessageTimerTests.cpp
-  # CommonCore-tests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
   data-block-tests.cpp

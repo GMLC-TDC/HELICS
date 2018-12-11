@@ -477,6 +477,9 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
     BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
+
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global2"), "this is another global value");
     mFed.disconnect ();
 }
 
