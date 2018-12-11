@@ -561,7 +561,7 @@ std::string CoreBroker::generateFederationSummary () const
     int filt = 0;
     for (auto &hand : handles)
     {
-        switch (hand.handle_type)
+        switch (hand.handleType)
         {
         case handle_type::publication:
             ++pubs;
@@ -2144,26 +2144,24 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     if (request == "inputs")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handle_type == handle_type::input); });
+                                        [](auto &handle) { return (handle.handleType == handle_type::input); });
     }
     if (request == "publications")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
                                         [](auto &handle) {
-                                            return (handle.handle_type == handle_type::publication);
+                                            return (handle.handleType == handle_type::publication);
                                         });
     }
     if (request == "filters")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handle_type == handle_type::filter); });
+                                        [](auto &handle) { return (handle.handleType == handle_type::filter); });
     }
     if (request == "endpoints")
     {
         return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) {
-                                            return (handle.handle_type == handle_type::endpoint);
-                                        });
+                                        [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map")
     {

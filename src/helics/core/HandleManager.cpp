@@ -56,7 +56,7 @@ void HandleManager::removeHandle (global_handle handle)
     unique_ids.erase (fnd);
     if (!info.key.empty ())
     {
-        switch (info.handle_type)
+        switch (info.handleType)
         {
         case handle_type::endpoint:
             endpoints.erase (info.key);
@@ -260,7 +260,7 @@ BasicHandleInfo *HandleManager::getEndpoint (interface_handle handle)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::endpoint)
+        if (hand.handleType == handle_type::endpoint)
         {
             return &hand;
         }
@@ -295,7 +295,7 @@ BasicHandleInfo *HandleManager::getPublication (interface_handle handle)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::publication)
+        if (hand.handleType == handle_type::publication)
         {
             return &hand;
         }
@@ -349,7 +349,7 @@ BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::filter)
+        if (hand.handleType == handle_type::filter)
         {
             return &hand;
         }
@@ -367,7 +367,7 @@ federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)
 {
-    switch (handle.handle_type)
+    switch (handle.handleType)
     {
     case handle_type::endpoint:
         endpoints.emplace (handle.key, interface_handle (index));

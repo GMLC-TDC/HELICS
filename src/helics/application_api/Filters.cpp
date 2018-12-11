@@ -222,8 +222,8 @@ CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName)
     }
 }
 
-CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle)
-    : Filter (ffed, filtName, handle)
+CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName, interface_handle ihandle)
+    : Filter (ffed, filtName, ihandle)
 {
 }
 
