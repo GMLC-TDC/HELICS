@@ -78,7 +78,7 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -141,8 +141,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     auto &epid = mFed1->registerEndpoint ("ep1");
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    mFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
+    mFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
@@ -200,8 +200,8 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
 
     auto &subid = cFed2->registerSubscription ("pub1");
 
-    cFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    cFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    cFed1->setProperty (helics_property_time_delta, 1.0);
+    cFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutingMode (); });
     cFed2->enterExecutingMode ();

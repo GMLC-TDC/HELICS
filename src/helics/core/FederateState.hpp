@@ -155,9 +155,9 @@ class FederateState
     void setProperties (const ActionMessage &cmd);
 
     /** set a timeProperty for a the coordinator*/
-    void setTimeProperty (int timeProperty, Time propertyVal);
+    void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
-    void setIntegerProperty (int intProperty, int propertyVal);
+    void setProperty (int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag (int optionFlag, bool value);
     /** get a time Property*/

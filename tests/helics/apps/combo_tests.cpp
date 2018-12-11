@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     fi.coreName = "ccore2";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::CombinationFederate mfed ("block1", fi);
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     fi.coreName = "ccore3";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::CombinationFederate mfed ("block1", fi);
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "ccore4";
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "ccore5";
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary1,
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "ccore6";
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile_binary.txt";
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary2,
     fi.coreType = helics::core_type::TEST;
     fi.coreName = "ccore7";
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
     auto filename = boost::filesystem::temp_directory_path () / "savefile_binary.json";

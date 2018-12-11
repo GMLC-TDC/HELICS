@@ -51,14 +51,14 @@ class FilterFederateManager
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    Filter &registerFilter (defined_filter_types type, const std::string &name);
+    Filter &registerFilter (filter_types type, const std::string &name);
 
     /** register a cloningFilter
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    CloningFilter &registerCloningFilter (defined_filter_types type, const std::string &name);
+    CloningFilter &registerCloningFilter (filter_types type, const std::string &name);
 
     /** get a registered Filter
     @param[in] name the publication id

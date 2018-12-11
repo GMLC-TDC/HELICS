@@ -187,10 +187,16 @@ class Federate
     iteration_time requestTimeIterativeComplete ();
 
     /** set a time option for the federate
+    @param option the option to set
+    @param timeValue the value to be set
+    */
+    void setProperty (int32_t option, double timeValue);
+
+    /** set a time option for the federate
     @param[in] option the option to set
     @param[in] timeValue the value to be set
     */
-    void setTimeProperty (int32_t option, Time timeValue);
+    void setProperty (int32_t option, Time timeValue);
 
     /** set a flag for the federate
     @param[in] flag an index into the flag /ref flag-definitions.h
@@ -201,7 +207,7 @@ class Federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
-    void setIntegerProperty (int32_t option, int32_t optionValue);
+    void setProperty (int32_t option, int32_t optionValue);
 
     /** get the value of a time option for the federate
     @param[in] option the option to get
@@ -283,6 +289,12 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
+	void setGlobal(const std::string &valueName, const std::string &value);
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -440,16 +452,18 @@ class Federate
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
-	/** set the Info field for an interface 
-	@param handle  the handle to set the interface for
-	@param info a string with data to store in the interface field*/
+	/** set the information field for an interface
+	@param handle the interface handle for any interface,  the interface handle can be created from 
+	any interface object automatically
+	@param info the information to store
+	*/
     void setInfo(interface_handle handle, const std::string& info);
 	/** get the data currently stored for a particular interface handle
 	@param handle the handle to get the information for
 	@return a string with the data for the information*/
     std::string const &getInfo(interface_handle handle);
 
-private:
+  private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces

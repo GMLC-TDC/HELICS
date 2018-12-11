@@ -5,9 +5,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/core/flagOperations.hpp"
 #include "helics/core/ActionMessage.hpp"
+#include "helics/core/flagOperations.hpp"
 #include <cstdio>
+#include <set>
 
 namespace utf = boost::unit_test;
 
@@ -30,10 +31,10 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
     */
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
-    m.source_handle = interface_handle(4);
-    m.source_id = global_federate_id(232324);
-    m.dest_id = global_federate_id(22552215);
-    m.dest_handle = interface_handle(2322342);
+    m.source_handle = interface_handle{4};
+    m.source_id = global_federate_id{232324};
+    m.dest_id = global_federate_id{22552215};
+    m.dest_handle = interface_handle{2322342};
 
     std::string data;
     m.to_string (data);
@@ -72,6 +73,46 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     m.setString (sourceStringLoc, "this is a long source string to test");
     m.setString (origSourceStringLoc, "this is a longer alternate source string to test");
     m.setString (targetStringLoc, "this is a target");
+
+    std::string data;
+    m.to_string (data);
+
+    ActionMessage fr;
+    fr.from_string (data);
+    BOOST_CHECK (m.action () == fr.action ());
+    BOOST_CHECK_EQUAL (m.payload, fr.payload);
+    BOOST_CHECK_EQUAL (m.source_handle, fr.source_handle);
+    BOOST_CHECK_EQUAL (m.source_id, fr.source_id);
+    BOOST_CHECK_EQUAL (m.dest_handle, fr.dest_handle);
+    BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
+    BOOST_CHECK (m.actionTime == fr.actionTime);
+
+    BOOST_CHECK (m.getStringData () == fr.getStringData ());
+}
+
+BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info2)
+{
+    helics::ActionMessage m (CMD_TIME_REQUEST);
+    /*
+    auto b = sizeof(m);
+    BOOST_CHECK_LT(b, 64);
+    if (b > 64)
+    {
+    printf("sizeof(extraInfo)=%d\n", static_cast<int>(sizeof(std::unique_ptr<ActionMessage::AdditionalInfo>)));
+    printf("payload %d\n", static_cast<int>(reinterpret_cast<char *>(&(m.extraInfo)) - reinterpret_cast<char
+    *>(&m)));
+    }
+    */
+    m.actionTime = 47.2342;
+    m.payload = "this is a string that is sufficiently long";
+    m.source_handle = interface_handle{4};
+    m.source_id = global_federate_id{232324};
+    m.dest_id = global_federate_id{22552215};
+    m.dest_handle = interface_handle{2322342};
+
+    m.setString (sourceStringLoc, "this is a long source string to test");
+    m.setString (origSourceStringLoc, "this is a longer alternate source string to test");
+    m.setString (targetStringLoc, "this is a target");
     m.Tdemin = 2342532.2342;
     m.Tso = 54.7814;
     m.Te = Time::epsilon ();
@@ -101,9 +142,9 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     helics::ActionMessage cmd;
     BOOST_CHECK (cmd.action () == helics::CMD_IGNORE);
     BOOST_CHECK_EQUAL (cmd.source_id, parent_broker_id);
-    BOOST_CHECK (!cmd.source_handle.isValid());
+    BOOST_CHECK (!cmd.source_handle.isValid ());
     BOOST_CHECK_EQUAL (cmd.dest_id, parent_broker_id);
-    BOOST_CHECK (!cmd.dest_handle.isValid());
+    BOOST_CHECK (!cmd.dest_handle.isValid ());
     BOOST_CHECK_EQUAL (cmd.counter, 0);
     BOOST_CHECK_EQUAL (cmd.flags, 0);
     BOOST_CHECK_EQUAL (cmd.actionTime, helics::Time::zeroVal ());
@@ -122,10 +163,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
 BOOST_AUTO_TEST_CASE (copy_constructor_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
-    cmd.source_id = global_federate_id(1);
-    cmd.source_handle = interface_handle(2);
-    cmd.dest_id = global_federate_id(3);
-    cmd.dest_handle = interface_handle(4);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
@@ -137,10 +178,10 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
     // Check operator= override
     helics::ActionMessage cmd_copy (cmd);
     BOOST_CHECK (cmd_copy.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_copy.source_id.baseValue(), 1);
-    BOOST_CHECK_EQUAL (cmd_copy.source_handle.baseValue(), 2);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_id.baseValue(), 3);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_handle.baseValue(), 4);
+    BOOST_CHECK_EQUAL (cmd_copy.source_id.baseValue (), 1);
+    BOOST_CHECK_EQUAL (cmd_copy.source_handle.baseValue (), 2);
+    BOOST_CHECK_EQUAL (cmd_copy.dest_id.baseValue (), 3);
+    BOOST_CHECK_EQUAL (cmd_copy.dest_handle.baseValue (), 4);
     BOOST_CHECK_EQUAL (cmd_copy.flags, 0x1a2F);
     BOOST_CHECK_EQUAL (cmd_copy.actionTime, helics::Time::maxVal ());
     BOOST_CHECK_EQUAL (cmd_copy.payload, "hello world");
@@ -173,10 +214,10 @@ BOOST_AUTO_TEST_CASE (assignment_test)
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
     BOOST_CHECK (cmd_assign.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_assign.source_id.baseValue(), 1);
-    BOOST_CHECK_EQUAL (cmd_assign.source_handle.baseValue(), 2);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_id.baseValue(), 3);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_handle.baseValue(), 4);
+    BOOST_CHECK_EQUAL (cmd_assign.source_id.baseValue (), 1);
+    BOOST_CHECK_EQUAL (cmd_assign.source_handle.baseValue (), 2);
+    BOOST_CHECK_EQUAL (cmd_assign.dest_id.baseValue (), 3);
+    BOOST_CHECK_EQUAL (cmd_assign.dest_handle.baseValue (), 4);
     BOOST_CHECK (checkActionFlag (cmd_assign, iteration_requested_flag));
     BOOST_CHECK (checkActionFlag (cmd_assign, required_flag));
     BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
@@ -234,10 +275,8 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
-    cmd.payload = "hello world";
+    cmd.payload = std::string (5000, 'a');
 
-    cmd.Te = 0.89;
-    cmd.Tdemin = 5.55;
     cmd.setStringData ("target", "source as a very long string test .........", "original_source");
 
     auto cmdString = cmd.to_string ();
@@ -251,26 +290,51 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
     BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
     BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
-    BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
-    BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
+    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+}
+
+BOOST_AUTO_TEST_CASE (conversion_test2)
+{
+    helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
+    setActionFlag (cmd, iteration_requested_flag);
+    setActionFlag (cmd, required_flag);
+    setActionFlag (cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = std::string (500000, 'j');
+
+    cmd.setStringData ("target", "source as a very long string test .........", "original_source");
+
+    auto cmdString = cmd.to_string ();
+
+    helics::ActionMessage cmd2 (cmdString);
+    BOOST_CHECK (cmd.action () == cmd2.action ());
+    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
+    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
+    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
+    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
+    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
+    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
+    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
     BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
 }
 
 BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = global_federate_id (1);
-    cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id (3);
-    cmd.dest_handle = interface_handle (4);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
-    cmd.Te = 0.89;
-    cmd.Tdemin = 5.55;
     cmd.setStringData ("target", "source as a very long string test .........", "original_source");
 
     auto msg = helics::createMessageFromCommand (cmd);
@@ -306,12 +370,12 @@ BOOST_AUTO_TEST_CASE (check_conversions)
     auto testBuffer1 = std::make_unique<char[]> (cmdStr.size () + 20);
     auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2);  // make a too small buffer
 
-    auto res = cmd.toByteArray (testBuffer1.get (), cmdStr.size () + 20);
+    auto res = cmd.toByteArray (testBuffer1.get (), static_cast<int> (cmdStr.size () + 20));
     BOOST_CHECK_EQUAL (res, cmdStr.size ());
     // just check to make sure the same string was written
     BOOST_CHECK_EQUAL (cmdStr, std::string (testBuffer1.get (), res));
     // this should return -1
-    res = cmd.toByteArray (testBuffer2.get (), cmdStr.size () >> 2);
+    res = cmd.toByteArray (testBuffer2.get (), static_cast<int> (cmdStr.size () >> 2));
     BOOST_CHECK_EQUAL (res, -1);
 }
 
@@ -329,14 +393,12 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.actionTime = 45.7;
     cmd.payload = "hello world";
 
-    cmd.Te = 0.89;
-    cmd.Tdemin = 5.55;
     cmd.setStringData ("target", "source as a very long string test .........", "original_source");
     auto cmdStringNormal = cmd.to_string ();
     auto cmdString = cmd.packetize ();
     BOOST_CHECK_GE (cmdStringNormal.size () + 6, cmdString.size ());
     helics::ActionMessage cmd2;
-    auto res = cmd2.depacketize (cmdString.data (), cmdString.size ());
+    auto res = cmd2.depacketize (cmdString.data (), static_cast<int> (cmdString.size ()));
     BOOST_CHECK_EQUAL (res, cmdString.size ());
     BOOST_CHECK (cmd.action () == cmd2.action ());
     BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
@@ -346,8 +408,6 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
     BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
     BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
-    BOOST_CHECK_EQUAL (cmd.Te, cmd2.Te);
-    BOOST_CHECK_EQUAL (cmd.Tdemin, cmd2.Tdemin);
     BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
 }
 

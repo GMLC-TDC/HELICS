@@ -380,12 +380,17 @@ iteration_result Federate::enterExecutingModeComplete ()
     return res;
 }
 
-void Federate::setTimeProperty (int32_t option, Time timeValue)
+void Federate::setProperty (int32_t option, double timeValue)
 {
     coreObject->setTimeProperty (fedID, option, timeValue);
 }
 
-void Federate::setIntegerProperty (int32_t option, int32_t optionValue)
+void Federate::setProperty (int32_t option, Time timeValue)
+{
+    coreObject->setTimeProperty (fedID, option, timeValue);
+}
+
+void Federate::setProperty (int32_t option, int32_t optionValue)
 {
     coreObject->setIntegerProperty (fedID, option, optionValue);
 }
@@ -659,7 +664,7 @@ static Filter &generateFilter (Federate *fed,
                                bool global,
                                bool cloning,
                                const std::string &name,
-                               defined_filter_types operation,
+                               filter_types operation,
                                const std::string &inputType,
                                const std::string &outputType)
 {
@@ -716,7 +721,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
@@ -834,6 +839,24 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
         }
     }
+    if (doc.isMember ("globals"))
+    {
+        if (doc["globals"].isArray ())
+        {
+            for (auto &val : doc["globals"])
+            {
+                setGlobal (val[0].asString (), val[1].asString ());
+            }
+        }
+        else
+        {
+            auto members = doc["globals"].getMemberNames ();
+            for (auto &val : members)
+            {
+                setGlobal (val, doc["globals"][val].asString ());
+            }
+        }
+    }
 }
 
 void Federate::registerFilterInterfacesToml (const std::string &tomlString)
@@ -871,7 +894,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
@@ -999,6 +1022,22 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
         }
     }
+    auto globals = doc.find ("globals");
+    if (globals != nullptr)
+    {
+        if (globals->is<toml::Array> ())
+        {
+            for (auto &val : globals->as<toml::Array> ())
+            {
+                setGlobal (val.as<toml::Array> ()[0].as<std::string> (),
+                           val.as<toml::Array> ()[1].as<std::string> ());
+            }
+        }
+        else
+        {
+            // TODO:: add loop around getting the different variables in a toml file
+        }
+    }
 }
 
 Filter &Federate::getFilter (int index) { return fManager->getFilter (index); }
@@ -1015,6 +1054,17 @@ std::string Federate::query (const std::string &queryStr)
     if (queryStr == "name")
     {
         res = getName ();
+    }
+    else if (queryStr == "corename")
+    {
+        if (coreObject)
+        {
+            res = coreObject->getIdentifier ();
+        }
+    else
+    {
+            res = "#unknown";
+        }
     }
     else
     {
@@ -1082,6 +1132,14 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
         return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }
     return false;
+}
+
+void Federate::setGlobal (const std::string &valueName, const std::string &value)
+{
+    if (coreObject)
+    {
+        coreObject->setGlobal (valueName, value);
+    }
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,

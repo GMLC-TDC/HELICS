@@ -45,7 +45,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
     auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::reroute, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("newdestination", "port3");
 
@@ -93,7 +93,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_ty
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
     auto &p3 = mFed->registerGlobalEndpoint ("port3");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::reroute, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::reroute, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("newdestination", "port3");
 
@@ -276,7 +276,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_drop, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     double drop_prob = 0.75;
     Filt.set ("dropprob", drop_prob);
@@ -395,7 +395,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_drop, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_drop, fFed.get (), "filter1");
     Filt.addDestinationTarget ("port2");
     double drop_prob = 0.25;
     Filt.set ("dropprob", drop_prob);
@@ -513,7 +513,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
-    auto &Filt = helics::make_filter (helics::defined_filter_types::random_delay, fFed.get (), "filter1");
+    auto &Filt = helics::make_filter (helics::filter_types::random_delay, fFed.get (), "filter1");
     Filt.addSourceTarget ("port1");
     Filt.setString ("distribution", "binomial");
 

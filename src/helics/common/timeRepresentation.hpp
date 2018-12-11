@@ -21,9 +21,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <iosfwd>
 #include <limits>
 #include <type_traits>
-#include <iosfwd>
 #ifdef __cpp_lib_chrono
 #define CHRONO_CONSTEXPR constexpr
 #else
@@ -65,12 +65,12 @@ inline constexpr double pow2 (unsigned int exponent)
     return (exponent == 0) ? 1.0 : (2.0 * pow2 (exponent - 1));
 }
 /** generate a quick rounding operation as constexpr
-@details doesn't deal with very large numbers appropriately so 
+@details doesn't deal with very large numbers appropriately so
 assumes the numbers given are normal and within the type specified*/
 template <typename ITYPE>
-inline constexpr ITYPE quick_round(double val)
+inline constexpr ITYPE quick_round (double val)
 {
-    return static_cast<ITYPE>((val>=0.0)?(val+0.5):(val-0.5));
+    return static_cast<ITYPE> ((val >= 0.0) ? (val + 0.5) : (val - 0.5));
 }
 /** prototype class for representing time
 @details implements time as a count of 1/2^N seconds
@@ -316,7 +316,7 @@ class TimeRepresentation
 #endif
   public:
     /** default constructor*/
-    TimeRepresentation ()=default;
+    TimeRepresentation () = default;
 
   private:
 /** explicit means to generate a constexpr TimeRepresentation at time 0, negTime and maxTime and min time delta*/
@@ -350,13 +350,9 @@ class TimeRepresentation
 #ifdef _DEBUG
     /** normal time constructor from a double representation of seconds*/
     constexpr TimeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)), dtime_ (t) {}
-    TimeRepresentation(std::int64_t count, timeUnits units) noexcept
-        : timecode_(Tconv::fromCount(count, units)) {
-        DOUBLETIME
-    };
-    TimeRepresentation (
-            std::chrono::nanoseconds nsTime) noexcept
-        : timecode_ (Tconv::convert (nsTime))
+    TimeRepresentation (std::int64_t count, timeUnits units) noexcept
+        : timecode_ (Tconv::fromCount (count, units)){DOUBLETIME};
+    TimeRepresentation (std::chrono::nanoseconds nsTime) noexcept : timecode_ (Tconv::convert (nsTime))
     {
         DOUBLETIME
     }
@@ -411,7 +407,7 @@ class TimeRepresentation
         return *this;
     }
     /** direct conversion to chrono nanoseconds*/
-    std::chrono::nanoseconds to_ns() const
+    std::chrono::nanoseconds to_ns () const
     {
         return std::chrono::nanoseconds (Tconv::toCount (timecode_, timeUnits::ns));
     }

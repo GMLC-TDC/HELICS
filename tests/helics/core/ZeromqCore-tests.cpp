@@ -20,6 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/common/GuardedTypes.hpp"
 //#include "boost/process.hpp"
 #include <future>
+#include <iostream>
 
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;

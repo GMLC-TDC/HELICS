@@ -88,7 +88,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsString);
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish ("string1");
@@ -121,8 +121,8 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
                                 helics::Publication &pubid,
                                 helics::Input &subid)
 {
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
     bool correct = true;
 
@@ -486,7 +486,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     auto &pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 1.0);
 
@@ -619,7 +619,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_close, bdata::make (core_ty
     auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -665,8 +665,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto &subid = vFed2->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
     bool correct = true;
 

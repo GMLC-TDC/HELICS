@@ -110,7 +110,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     mFed1->setMessageNotificationCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
@@ -158,7 +158,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
@@ -204,7 +204,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
@@ -248,8 +248,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed1->setMessageNotificationCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
     mFed2->setMessageNotificationCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    mFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
+    mFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
@@ -346,7 +346,7 @@ class PingPongFed
         helics::FederateInfo fi (coreType);
         fi.coreName = "pptest";
         fi.coreInitString = "-f 3";
-        fi.setTimeProperty (helics_property_time_delta, delta);
+        fi.setProperty (helics_property_time_delta, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";
 #endif
@@ -477,6 +477,9 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
     BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
+
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global2"), "this is another global value");
     mFed.disconnect ();
 }
 

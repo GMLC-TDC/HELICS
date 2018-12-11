@@ -100,7 +100,7 @@ size_t TcpCommsSS::dataReceive (std::shared_ptr<TcpConnection> connection, const
     while (used_total < bytes_received)
     {
         ActionMessage m;
-        auto used = m.depacketize (data + used_total, bytes_received - used_total);
+        auto used = m.depacketize (data + used_total, static_cast<int> (bytes_received - used_total));
         if (used == 0)
         {
             break;

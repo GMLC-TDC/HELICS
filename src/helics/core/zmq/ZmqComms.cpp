@@ -37,7 +37,7 @@ static bool bindzmqSocket (zmq::socket_t &socket,
         {
             if (tcount == milliseconds (0))
             {
-                std::cerr << "zmq binding error on socket sleeping then will try again \n";
+                // std::cerr << "zmq binding error on socket sleeping then will try again \n";
             }
             if (tcount > timeout)
             {
@@ -108,7 +108,8 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
     if (!isValidCommand (M))
     {
-        std::cerr << "invalid command received" << std::endl;
+        logError ("invalid command received");
+        ActionMessage Q (static_cast<char *> (msg.data ()), msg.size ());
         return 0;
     }
     if (isProtocolCommand (M))
@@ -193,7 +194,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.messageID == NAME_NOT_FOUND)
             {
-                std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
+                logError (std::string ("broker name ") + brokerName_ + " does not match broker connection");
                 disconnecting = true;
                 setRxStatus (connection_status::error);
                 return;
@@ -526,7 +527,7 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    std::cerr << e.what () << '\n';
+                    logError (e.what ());
                 }
             }
             continue;
@@ -548,7 +549,8 @@ void ZmqComms::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
+                        logWarning (std::string ("unknown route and no broker, dropping message ") +
+                                    prettyPrintString (cmd));
                     }
                 }
             }
