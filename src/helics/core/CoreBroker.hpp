@@ -252,8 +252,10 @@ class CoreBroker : public Broker, public BrokerBase
 
     void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
-
+    /** run a check for a named interface*/
     void checkForNamedInterface (ActionMessage &command);
+    /** remove a named target from an interface*/
+    void removeNamedTarget (ActionMessage &command);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
     /** answer a query or route the message the appropriate location*/

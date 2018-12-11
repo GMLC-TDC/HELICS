@@ -1107,6 +1107,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_ADD_NAMED_FILTER:
         checkForNamedInterface (command);
         break;
+    case CMD_REMOVE_NAMED_ENDPOINT:
+    case CMD_REMOVE_NAMED_PUBLICATION:
+    case CMD_REMOVE_NAMED_INPUT:
+    case CMD_REMOVE_NAMED_FILTER:
+        removeNamedTarget (command);
+        break;
     case CMD_BROKER_CONFIGURE:
         processBrokerConfigureCommands (command);
         break;
@@ -1353,6 +1359,93 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                              "unknown command in interface addition code section\n");
                 break;
             }
+        }
+        else
+        {
+            routeMessage (command);
+        }
+    }
+}
+
+void CoreBroker::removeNamedTarget (ActionMessage &command)
+{
+    bool foundInterface = false;
+    switch (command.action ())
+    {
+    case CMD_REMOVE_NAMED_PUBLICATION:
+    {
+        auto pub = handles.getPublication (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_REMOVE_SUBSCRIBER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_REMOVE_PUBLICATION);
+            command.swapSourceDest ();
+            routeMessage (command);
+            foundInterface = true;
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_INPUT:
+    {
+        auto inp = handles.getInput (command.name);
+        if (inp != nullptr)
+        {
+            command.setAction (CMD_REMOVE_PUBLICATION);
+            command.setDestination (inp->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_REMOVE_SUBSCRIBER);
+            command.swapSourceDest ();
+            routeMessage (command);
+            foundInterface = true;
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_FILTER:
+    {
+        auto filt = handles.getFilter (command.name);
+        if (filt != nullptr)
+        {
+            command.setAction (CMD_REMOVE_ENDPOINT);
+            command.setDestination (filt->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_REMOVE_FILTER);
+            command.swapSourceDest ();
+            routeMessage (command);
+            foundInterface = true;
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_ENDPOINT:
+    {
+        auto ept = handles.getEndpoint (command.name);
+        if (ept != nullptr)
+        {
+            command.setAction (CMD_REMOVE_FILTER);
+            command.setDestination (ept->handle);
+            command.name.clear ();
+            routeMessage (command);
+            command.setAction (CMD_ADD_ENDPOINT);
+            command.swapSourceDest ();
+            routeMessage (command);
+
+            foundInterface = true;
+        }
+    }
+    break;
+    default:
+        break;
+    }
+    if (!foundInterface)
+    {
+        if (isRootc)
+        {
+            LOG_WARNING (global_broker_id_local, getIdentifier (),
+                         fmt::format ("attempt to remove unrecognized target {} ", command.name));
         }
         else
         {

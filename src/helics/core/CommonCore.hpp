@@ -365,6 +365,8 @@ class CommonCore : public Core, public BrokerBase
     void processFilterInfo (ActionMessage &command);
     /** function to check for a named interface*/
     void checkForNamedInterface (ActionMessage &command);
+    /** function to remove a named target*/
+    void removeNamedTarget (ActionMessage &command);
     /** indicate that a handle interface is used and if the used status has changed make sure it is indicated
     in all the needed places*/
     void setAsUsed (BasicHandleInfo *hand);

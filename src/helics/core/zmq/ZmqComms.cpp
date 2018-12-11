@@ -143,11 +143,11 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         return 0;
     }
 
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-        sock.send (str.data (), str.size ());
-        return 0;
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
+    sock.send (str.data (), str.size ());
+    return 0;
 }
 
 void ZmqComms::queue_rx_function ()
@@ -476,7 +476,7 @@ void ZmqComms::queue_tx_function ()
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
-						routes.emplace(route_id{ cmd.getExtraData() }, std::move(zsock));
+                        routes.emplace (route_id{cmd.getExtraData ()}, std::move (zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
@@ -487,7 +487,7 @@ void ZmqComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case DISCONNECT:
@@ -546,9 +546,9 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    if (cmd.action () != CMD_DISCONNECT)
+                    if (!isDisconnectCommand (cmd))
                     {
-                        logWarning ("unknown route and no broker, dropping message");
+                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
                     }
                 }
             }

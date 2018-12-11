@@ -502,7 +502,11 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown message destination message dropped");
+					if (!isDisconnectCommand(cmd))
+					{
+                        logWarning (std::string ("unknown message destination message dropped ") +
+                                    prettyPrintString (cmd));
+                    }
                 }
             }
         }

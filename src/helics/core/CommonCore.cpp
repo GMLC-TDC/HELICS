@@ -2597,13 +2597,13 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_REMOVE_NAMED_PUBLICATION:
     case CMD_REMOVE_NAMED_INPUT:
     case CMD_REMOVE_NAMED_FILTER:
-    case CMD_REMOVE_PUBLICATION:
-    case CMD_REMOVE_SUBSCRIBER:
-        routeMessage (command);
+		removeNamedTarget(command);
         break;
+	case CMD_REMOVE_PUBLICATION:
+	case CMD_REMOVE_SUBSCRIBER:
     case CMD_REMOVE_FILTER:
     case CMD_REMOVE_ENDPOINT:
-        processFilterInfo (command);
+        removeTargetFromInterface (command);
         break;
     case CMD_CLOSE_INTERFACE:
         disconnectInterface (command);
@@ -2855,6 +2855,91 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_ENDPOINT);
             command.swapSourceDest ();
             addTargetToInterface (command);
+        }
+        else
+        {
+            routeMessage (std::move (command));
+        }
+    }
+    break;
+    default:
+        break;
+    }
+}
+
+void CommonCore::removeNamedTarget (ActionMessage &command)
+{
+    switch (command.action ())
+    {
+    case CMD_REMOVE_NAMED_PUBLICATION:
+    {
+        auto pub = loopHandles.getPublication (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_REMOVE_SUBSCRIBER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            removeTargetFromInterface (command);
+            command.setAction (CMD_REMOVE_PUBLICATION);
+            command.swapSourceDest ();
+            removeTargetFromInterface (command);
+        }
+        else
+        {
+            routeMessage (std::move (command));
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_INPUT:
+    {
+        auto inp = loopHandles.getInput (command.name);
+        if (inp != nullptr)
+        {
+            command.setAction (CMD_REMOVE_PUBLICATION);
+            command.setDestination (inp->handle);
+            command.name.clear ();
+            removeTargetFromInterface (command);
+            command.setAction (CMD_REMOVE_SUBSCRIBER);
+            command.swapSourceDest ();
+            removeTargetFromInterface (command);
+        }
+        else
+        {
+            routeMessage (std::move (command));
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_FILTER:
+    {
+        auto filt = loopHandles.getFilter (command.name);
+        if (filt != nullptr)
+        {
+            command.setAction (CMD_REMOVE_ENDPOINT);
+            command.setDestination (filt->handle);
+            command.name.clear ();
+            removeTargetFromInterface (command);
+            command.setAction (CMD_REMOVE_FILTER);
+            command.swapSourceDest ();
+            removeTargetFromInterface (command);
+        }
+        else
+        {
+            routeMessage (std::move (command));
+        }
+    }
+    break;
+    case CMD_REMOVE_NAMED_ENDPOINT:
+    {
+        auto pub = loopHandles.getEndpoint (command.name);
+        if (pub != nullptr)
+        {
+            command.setAction (CMD_REMOVE_FILTER);
+            command.setDestination (pub->handle);
+            command.name.clear ();
+            removeTargetFromInterface (command);
+            command.setAction (CMD_REMOVE_ENDPOINT);
+            command.swapSourceDest ();
+            removeTargetFromInterface (command);
         }
         else
         {

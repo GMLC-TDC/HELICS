@@ -96,14 +96,13 @@ void UdpComms::queue_rx_function ()
                 if (!bindsuccess)
                 {
                     disconnecting = true;
-                    logError(fmt::format("unable to bind socket {} :{}",
-                        makePortAddress(localTarget_, PortNumber), error.what()));
-                    socket.close();
-                    setRxStatus(connection_status::error);
+                    logError (fmt::format ("unable to bind socket {} :{}",
+                                           makePortAddress (localTarget_, PortNumber), error.what ()));
+                    socket.close ();
+                    setRxStatus (connection_status::error);
                     return;
                 }
                 continue;
-                    
             }
             if (t_cnt == std::chrono::milliseconds (0))
             {
@@ -289,7 +288,7 @@ void UdpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         udp::resolver::query queryNew (udpnet (interfaceNetwork), interface, port);
 
-						routes.emplace(route_id{ cmd.getExtraData() }, *resolver.resolve(queryNew));
+                        routes.emplace (route_id{cmd.getExtraData ()}, *resolver.resolve (queryNew));
                     }
                     catch (std::exception &e)
                     {
@@ -299,7 +298,7 @@ void UdpComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -356,8 +355,8 @@ void UdpComms::queue_tx_function ()
                 transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
                 if (error)
                 {
-                    logWarning (fmt::format ("transmit failure sending to route {}:{}", rid.baseValue (),
-                                             error.message ()));
+                    logWarning (
+                      fmt::format ("transmit failure sending to route {}:{}", rid.baseValue (), error.message ()));
                 }
             }
             else
@@ -372,9 +371,9 @@ void UdpComms::queue_tx_function ()
                 }
                 else
                 {
-                    if (cmd.action () != CMD_DISCONNECT)
+                    if (!isDisconnectCommand (cmd))
                     {
-                        logWarning ("unknown route, message dropped");
+                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
                     }
                 }
             }

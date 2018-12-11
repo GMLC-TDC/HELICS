@@ -332,9 +332,9 @@ void TcpCommsSS::queue_tx_function ()
                     {
                         if ((mc.second) && (cmd.payload == mc.first))
                         {
-							routes.emplace(route_id{ cmd.getExtraData() }, std::move(mc.second));
+                            routes.emplace (route_id{cmd.getExtraData ()}, std::move (mc.second));
                             established = true;
-							established_routes[mc.first] = route_id{ cmd.getExtraData() };
+                            established_routes[mc.first] = route_id{cmd.getExtraData ()};
                         }
                     }
                     if (!established)
@@ -345,11 +345,11 @@ void TcpCommsSS::queue_tx_function ()
                             established = true;
                             if (efind->second == parent_route_id)
                             {
-								routes.emplace(route_id{ cmd.getExtraData() }, brokerConnection);
+                                routes.emplace (route_id{cmd.getExtraData ()}, brokerConnection);
                             }
-							else
-							{
-								routes.emplace(route_id{cmd.getExtraData()}, routes[efind->second]);
+                            else
+                            {
+                                routes.emplace (route_id{cmd.getExtraData ()}, routes[efind->second]);
                             }
                         }
                     }
@@ -365,8 +365,8 @@ void TcpCommsSS::queue_tx_function ()
                                 new_connect->setErrorCall (errorCall);
                                 new_connect->send (cstring);
                                 new_connect->startReceive ();
-								routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
-								established_routes[cmd.payload] = route_id{ cmd.getExtraData() };
+                                routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
+                                established_routes[cmd.payload] = route_id{cmd.getExtraData ()};
                             }
                         }
                         else
@@ -377,7 +377,7 @@ void TcpCommsSS::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -466,7 +466,11 @@ void TcpCommsSS::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown message destination message dropped");
+                    if (!isDisconnectCommand (cmd))
+                    {
+                        logWarning (std::string ("unknown message destination message dropped ") +
+                                    prettyPrintString (cmd));
+                    }
                 }
             }
         }
