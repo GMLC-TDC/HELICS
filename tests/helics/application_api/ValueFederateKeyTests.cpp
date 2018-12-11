@@ -187,8 +187,9 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
     {
         correct = false;
     }
-    vFed1->finalize ();
+    vFed1->finalizeAsync ();
     vFed2->finalize ();
+    vFed1->finalizeComplete ();
     return correct;
 }
 

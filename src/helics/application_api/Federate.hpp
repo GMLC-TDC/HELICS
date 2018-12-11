@@ -52,7 +52,8 @@ class Federate
         pending_init = 5,  //!< indicator that the federate is pending entry to initialization state
         pending_exec = 6,  //!< state pending EnterExecution State
         pending_time = 7,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time = 8  //!< state that the federate is pending an iterative time request
+        pending_iterative_time = 8,  //!< state that the federate is pending an iterative time request
+        pending_finalize = 9  //!< state that the federate is pending a finalize call
     };
 
   protected:
@@ -129,10 +130,14 @@ class Federate
     */
     iteration_result enterExecutingModeComplete ();
     /** terminate the simulation
-    @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence, no commands that interact with the core may be called after completion of this
-    function */
+    @details call is will block until the finalize has been acknowledged, no commands that interact with the core
+    may be called after this function function */
     void finalize ();
+    /** terminate the simulation in a non-blocking call
+    @details finalizeComplete must be called after this call to complete the finalize procedure*/
+    void finalizeAsync ();
+    /** complete the asynchronous terminate pair*/
+    void finalizeComplete ();
 
     /** disconnect a simulation from the core (will also call finalize before disconnecting if necessary)*/
     virtual void disconnect ();
@@ -438,10 +443,10 @@ class Federate
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
 
-    void setInfo(interface_handle handle, const std::string& info);
-    std::string const &getInfo(interface_handle handle);
+    void setInfo (interface_handle handle, const std::string &info);
+    std::string const &getInfo (interface_handle handle);
 
-private:
+  private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param[in] configString  the location of the file or config String to load to generate the interfaces

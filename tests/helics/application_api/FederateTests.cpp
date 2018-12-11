@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     res = Fed->requestTime (3.0);
     BOOST_CHECK_EQUAL (res, 3.0);
     brk->disconnect ();
-    std::this_thread::sleep_for (std::chrono::seconds (2));
+    std::this_thread::sleep_for (std::chrono::seconds (1));
     auto cptr = Fed->getCorePointer ();
     BOOST_CHECK (!cptr->isConnected ());
     res = Fed->requestTime (4.0);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--broker=b1 --tick=100 --timeout=2000";
+    fi.coreInitString = "--broker=b1 --tick=100 --timeout=1000";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--tick=100 --timeout=2000";
+    fi.coreInitString = "--tick=100 --timeout=1000";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }

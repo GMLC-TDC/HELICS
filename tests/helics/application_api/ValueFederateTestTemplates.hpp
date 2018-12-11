@@ -258,8 +258,9 @@ void runDualFederateTest (const std::string &core_type_str,
     // make sure the value was updated
     subid.getValue (val);
     BOOST_CHECK_EQUAL (val, testValue2);
-    fedA->finalize ();
+    fedA->finalizeAsync ();
     fedB->finalize ();
+    fedA->finalizeComplete ();
     helics::cleanupHelicsLibrary ();
 }
 
@@ -314,8 +315,9 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     // make sure the value was updated
     subid.getValue (val);
     BOOST_CHECK (val == testValue2);
-    fedA->finalize ();
+    fedA->finalizeAsync ();
     fedB->finalize ();
+    fedA->finalizeComplete ();
     helics::cleanupHelicsLibrary ();
 }
 
@@ -377,8 +379,9 @@ void runDualFederateTestObj (const std::string &core_type_str,
     // make sure the value was updated
     subid.getValue (val);
     BOOST_CHECK_EQUAL (val, testValue2);
-    fedA->finalize ();
+    fedA->finalizeAsync ();
     fedB->finalize ();
+    fedA->finalizeComplete ();
     helics::cleanupHelicsLibrary ();
 }
 
@@ -439,7 +442,8 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
     // make sure the value was updated
     subid.getValue (val);
     BOOST_CHECK (val == testValue2);
-    fedA->finalize ();
+    fedA->finalizeAsync ();
     fedB->finalize ();
+    fedA->finalizeComplete ();
     helics::cleanupHelicsLibrary ();
 }
