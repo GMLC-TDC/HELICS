@@ -178,14 +178,16 @@ class Publication
     /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
     /** add a target to the publication*/
     void addTarget (const std::string &target) { fed->addTarget (*this, target); }
-	/** close a input during an active simulation
-	@details it is not necessary to call this function unless you are continuing the simulation after the close*/
-	void close() { fed->closeInterface(handle); }
+    /** remove a named input from sending data*/
+    void removeTarget (const std::string &targetToRemove) { fed->removeTarget (*this, targetToRemove); }
+    /** close a input during an active simulation
+    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    void close () { fed->closeInterface (handle); }
     /** send a value for publication
     @param[in] val the value to publish*/
     void publish (double val);
@@ -222,8 +224,9 @@ class Publication
 
     /** publish anything not previously covered*/
     template <class X>
-    std::enable_if_t<((typeCategory<X>::value == nonConvertibleType) && (!std::is_convertible<X, std::string>::value) &&
-                      (!std::is_same<X, defV>::value) && (!std::is_convertible<X, Time>::value)),
+    std::enable_if_t<((typeCategory<X>::value == nonConvertibleType) &&
+                      (!std::is_convertible<X, std::string>::value) && (!std::is_same<X, defV>::value) &&
+                      (!std::is_convertible<X, Time>::value)),
                      void>
     publish (const X &val)
     {

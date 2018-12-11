@@ -92,10 +92,7 @@ class Input
     }
 
     template <class FedPtr>
-    Input (FedPtr &valueFed,
-           const std::string &name,
-           data_type defType,
-           const std::string &units = std::string ())
+    Input (FedPtr &valueFed, const std::string &name, data_type defType, const std::string &units = std::string ())
         : Input (valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -171,11 +168,14 @@ class Input
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
+    /** subscribe to a named publication*/
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
+    /** remove a named subscription*/
+    void removeTarget (const std::string &targetToRemove) { fed->removeTarget (*this, targetToRemove); }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
@@ -331,9 +331,10 @@ class Input
     size_t getStringSize ();
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize ();
-	/** close a input during an active simulation
-	@details it is not necessary to call this function unless you are continuing the simulation after the close*/
-	void close() { fed->closeInterface(handle); }
+    /** close a input during an active simulation
+    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    void close () { fed->closeInterface (handle); }
+
   private:
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();

@@ -52,6 +52,7 @@ class NamedInputInfo
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
+    std::vector<Time> deactivated;
     std::vector<std::pair<std::string, std::string>> source_types;  //!< the type and units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
@@ -90,7 +91,7 @@ class NamedInputInfo
     /** add a new source target to the input*/
     void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
     /** remove a source */
-    void removeSource (global_handle sourceToRemove);
+    void removeSource (global_handle sourceToRemove, Time minTime);
     /** clear all non-current data*/
     void clearFutureData ();
 

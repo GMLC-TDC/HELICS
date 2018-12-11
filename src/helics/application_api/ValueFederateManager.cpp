@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ValueFederateManager.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "ValueFederateManager.hpp"
 
 namespace helics
 {
@@ -120,6 +120,27 @@ void ValueFederateManager::addTarget (const Input &inp, const std::string &targe
     inputTargets.emplace (inp.handle, target);
 }
 
+void ValueFederateManager::removeTarget (const Publication &pub, const std::string &target)
+{
+    // TODO:: erase from targetID's
+    coreObject->removeTarget (pub.handle, target);
+}
+
+void ValueFederateManager::removeTarget (const Input &inp, const std::string &target)
+{
+    auto rng = inputTargets.equal_range (inp.handle);
+    for (auto el = rng.first; el != rng.second; ++el)
+    {
+        if (el->second == target)
+        {
+            coreObject->removeTarget (inp.handle, target);
+            inputTargets.erase (el);
+            break;
+        }
+    }
+    // TODO:: erase from targetID's
+}
+
 void ValueFederateManager::setDefaultValue (const Input &inp, const data_view &block)
 {
     if (inp.isValid ())
@@ -199,10 +220,10 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
-	if (handles.empty())
-	{
+    if (handles.empty ())
+    {
         return;
-	}
+    }
     // lock the data updates
     auto inpHandle = inputs.lock ();
     auto allCall = allCallback.load ();

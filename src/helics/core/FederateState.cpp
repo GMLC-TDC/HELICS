@@ -1116,7 +1116,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->removeSource (cmd.getSource ());
+            subI->removeSource (cmd.getSource (), time_granted);
         }
         break;
     }
