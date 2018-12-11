@@ -1998,6 +1998,22 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     return ret;
 }
 
+void CommonCore::setGlobal(const std::string &valueName, const std::string &value)
+{
+	ActionMessage querycmd(CMD_SET_GLOBAL);
+	querycmd.source_id = global_broker_id.load();
+	querycmd.payload = valueName;
+	querycmd.setStringData(value);
+	if (!global_broker_id.load().isValid())
+	{
+		delayTransmitQueue.push(std::move(querycmd));
+	}
+	else
+	{
+		transmit(parent_route_id, querycmd);
+	}
+}
+
 void CommonCore::processPriorityCommand (ActionMessage &&command)
 {
     // deal with a few types of message immediately

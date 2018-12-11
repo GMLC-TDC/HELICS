@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
     fi.coreName = "cdelay";
     fi.coreInitString = std::string ("-f 1 --broker=") + broker->getIdentifier ();
     fi.setFlagOption (helics::defs::flags::realtime);
-    fi.setTimeProperty (helics::defs::properties::rt_lead, 0.1);
-    fi.setTimeProperty (helics::defs::properties::period, 0.5);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
 
     helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
     fi.coreName = "adelay";
     fi.coreInitString = std::string ("-f 2 --broker=") + broker->getIdentifier ();
     fi.setFlagOption (helics::defs::flags::realtime);
-    fi.setTimeProperty (helics::defs::properties::rt_lag, 0.1);
-    fi.setTimeProperty (helics::defs::properties::rt_lead, 0.1);
-    fi.setTimeProperty (helics::defs::properties::period, 0.5);
+    fi.setProperty (helics::defs::properties::rt_lag, 0.1);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
     fi.setFlagOption (helics::defs::flags::realtime, false);
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
@@ -125,10 +125,10 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
     fi.coreName = "ctrig";
     fi.coreInitString = std::string ("-f 2 --broker=") + broker->getIdentifier ();
     fi.setFlagOption (helics::defs::flags::realtime);
-    fi.setTimeProperty (helics::defs::properties::rt_lag, 0.1);
-    fi.setTimeProperty (helics::defs::properties::rt_lead, 0.1);
-    fi.setTimeProperty (helics::defs::properties::period, 0.5);
-    fi.setIntegerProperty (helics::defs::properties::log_level, 0);
+    fi.setProperty (helics::defs::properties::rt_lag, 0.1);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
+    fi.setProperty (helics::defs::properties::log_level, 0);
 
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
     fi.setFlagOption (helics::defs::flags::realtime, false);

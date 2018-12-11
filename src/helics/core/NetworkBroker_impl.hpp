@@ -7,6 +7,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../core/core-types.hpp"
 #include "NetworkBroker.hpp"
+#include <iostream>
+
 namespace helics
 {
 constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",      "interprocess",

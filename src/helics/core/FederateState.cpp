@@ -96,11 +96,11 @@ FederateState::FederateState (const std::string &name_, const CoreFederateInfo &
     timeCoord = std::make_unique<TimeCoordinator> ([this](const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
-        setTimeProperty (prop.first, prop.second);
+        setProperty (prop.first, prop.second);
     }
     for (const auto &prop : info_.intProps)
     {
-        setIntegerProperty (prop.first, prop.second);
+        setProperty (prop.first, prop.second);
     }
     for (const auto &prop : info_.flagProps)
     {
@@ -1104,10 +1104,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
         break;
     case CMD_FED_CONFIGURE_TIME:
-        setTimeProperty (cmd.messageID, cmd.actionTime);
+        setProperty (cmd.messageID, cmd.actionTime);
         break;
     case CMD_FED_CONFIGURE_INT:
-        setIntegerProperty (cmd.messageID, cmd.counter);
+        setProperty (cmd.messageID, cmd.counter);
         break;
     case CMD_FED_CONFIGURE_FLAG:
         setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
@@ -1135,7 +1135,7 @@ void FederateState::setProperties (const ActionMessage &cmd)
             {
                 ;  // spin
             }
-            setTimeProperty (cmd.messageID, cmd.actionTime);
+            setProperty (cmd.messageID, cmd.actionTime);
             processing.clear (std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_INT:
@@ -1143,7 +1143,7 @@ void FederateState::setProperties (const ActionMessage &cmd)
             {
                 ;  // spin
             }
-            setIntegerProperty (cmd.messageID, cmd.counter);
+            setProperty (cmd.messageID, cmd.counter);
             processing.clear (std::memory_order_release);
             break;
         default:
@@ -1165,7 +1165,7 @@ void FederateState::setProperties (const ActionMessage &cmd)
     }
 }
 
-void FederateState::setTimeProperty (int timeProperty, Time propertyVal)
+void FederateState::setProperty (int timeProperty, Time propertyVal)
 {
     switch (timeProperty)
     {
@@ -1180,21 +1180,31 @@ void FederateState::setTimeProperty (int timeProperty, Time propertyVal)
         rt_lead = propertyVal;
         break;
     default:
-        timeCoord->setTimeProperty (timeProperty, propertyVal);
+        timeCoord->setProperty (timeProperty, propertyVal);
         break;
     }
 }
 
 /** set a timeProperty for a the coordinator*/
-void FederateState::setIntegerProperty (int intProperty, int propertyVal)
+void FederateState::setProperty (int intProperty, int propertyVal)
 {
     switch (intProperty)
     {
     case defs::properties::log_level:
         logLevel = propertyVal;
         break;
+    case defs::properties::rt_lag:
+        rt_lag = helics::Time (static_cast<double> (propertyVal));
+        break;
+    case defs::properties::rt_lead:
+        rt_lead = helics::Time (static_cast<double> (propertyVal));
+        break;
+    case defs::properties::rt_tolerance:
+        rt_lag = helics::Time (static_cast<double> (propertyVal));
+        rt_lead = rt_lag;
+        break;
     default:
-        timeCoord->setIntegerProperty (intProperty, propertyVal);
+        timeCoord->setProperty (intProperty, propertyVal);
     }
 }
 

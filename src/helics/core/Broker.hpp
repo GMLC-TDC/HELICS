@@ -73,6 +73,15 @@ class Broker
       the query is answered so use with caution
     */
     virtual std::string query (const std::string &target, const std::string &queryStr) = 0;
+
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	globals can be queried with a target of "global" and queryStr of the value to Query
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
+	virtual void setGlobal(const std::string &valueName, const std::string &value) = 0;
+
     /** load a file containing connection information 
     @param file a JSON or TOML file containing connection information*/
     virtual void makeConnections(const std::string &file) = 0;

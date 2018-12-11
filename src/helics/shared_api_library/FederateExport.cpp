@@ -771,7 +771,7 @@ void helicsFederateSetTimeProperty (helics_federate fed, int timeProperty, helic
     }
     try
     {
-        fedObj->setTimeProperty (timeProperty, time);
+        fedObj->setProperty (timeProperty, time);
     }
     catch (...)
     {
@@ -805,7 +805,7 @@ void helicsFederateSetIntegerProperty (helics_federate fed, int intProperty, int
     }
     try
     {
-        fedObj->setIntegerProperty (intProperty, propVal);
+        fedObj->setProperty (intProperty, propVal);
     }
     catch (...)
     {

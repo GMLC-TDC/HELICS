@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "CommsInterface.hpp"
 #include "NetworkBrokerData.hpp"
+#include <iostream>
 
 namespace helics
 {

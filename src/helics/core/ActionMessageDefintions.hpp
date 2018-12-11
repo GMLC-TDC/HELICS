@@ -12,7 +12,7 @@ namespace helics
 /** namespace for message definitions*/
 namespace action_message_def
 {
-const int32_t cmd_info_basis = 0x10000000;
+constexpr int32_t cmd_info_basis = 0x10000000;
 
 /** enumeration of globally recognized commands
 @details they are explicitly numbered for debugging and to ensure the enumeration is constant
@@ -30,6 +30,7 @@ enum class action_t : int32_t
     cmd_reg_fed = -105,  //!< register a federate
     cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
     cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
+	cmd_set_global = -cmd_info_basis-55,  //!< set a global value
     cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
@@ -250,6 +251,7 @@ enum class action_t : int32_t
 #define CMD_QUERY action_message_def::action_t::cmd_query
 #define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
+#define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
 
 #define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
 
