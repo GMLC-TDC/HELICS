@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -98,7 +98,7 @@ endif(MSVC)
 HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
-	set(BOOST_REQUIRED_LIBRARIES program_options filesystem system date_time timer chrono)
+	set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
 	if (BUILD_TESTING)
 		message(STATUS "adding unit testing")
 		list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
