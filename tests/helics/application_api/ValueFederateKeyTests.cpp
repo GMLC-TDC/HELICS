@@ -713,8 +713,6 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed2->setProperty (helics_property_time_delta, 1.0);
 
-    bool correct = true;
-
     auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
     vFed2->enterExecutingMode ();
     f1finish.wait ();
@@ -724,16 +722,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     auto gtime = vFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    if (gtime != 1.0)
-    {
-        correct = false;
-    }
     gtime = f1time.get ();
     BOOST_CHECK_EQUAL (gtime, 1.0);
-    if (gtime != 1.0)
-    {
-        correct = false;
-    }
     // get the value
     std::string s = vFed2->getString (subid);
 
