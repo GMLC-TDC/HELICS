@@ -27,7 +27,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstring>
 #include <fstream>
 #include <functional>
-#include <boost/filesystem.hpp>
 
 #include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"

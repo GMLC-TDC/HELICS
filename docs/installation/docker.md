@@ -16,10 +16,10 @@ Python support.
 FROM ubuntu:18.04 as builder
 
 RUN apt update && apt install -y \
-  libboost-dev libboost-chrono-dev \
-  libboost-date-time-dev libboost-filesystem-dev \
+  libboost-dev \
+  libboost-filesystem-dev \
   libboost-program-options-dev \
-  libboost-test-dev libboost-timer-dev \
+  libboost-test-dev \
   libzmq5-dev python3-dev \
   build-essential swig cmake git
 
@@ -40,9 +40,8 @@ RUN make -j8 && make install
 FROM ubuntu:18.04
 
 RUN apt update && apt install -y --no-install-recommends \
-  libboost-chrono1.65.1 libboost-date-time1.65.1 \
   libboost-filesystem1.65.1 libboost-program-options1.65.1 \
-  libboost-test1.65.1 libboost-timer1.65.1 libzmq5
+  libboost-test1.65.1 libzmq5
 
 COPY --from=builder /helics /usr/local/
 

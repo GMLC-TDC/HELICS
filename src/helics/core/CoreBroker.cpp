@@ -10,7 +10,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/argParser.h"
 #include "../common/fmt_format.h"
-#include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/logger.h"
@@ -20,7 +19,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
-#include <fstream>
 #include <iostream>
 
 namespace helics

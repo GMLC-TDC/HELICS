@@ -206,6 +206,9 @@ target_compile_definitions(
   helics_core PRIVATE
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
 )
+target_compile_definitions(
+  helics_core PRIVATE BOOST_DATE_TIME_NO_LIB
+)
 target_compile_options(
   helics_core
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
