@@ -52,7 +52,9 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     auto f1_c = helicsFederateGetFilterByIndex (fFed, 2, &err);
     tmp = helicsFilterGetName (f1_c);
     BOOST_CHECK_EQUAL (tmp, "filter0/c4");
-
+    CE (helicsFederateEnterExecutingModeAsync (fFed, &err));
+    CE (helicsFederateEnterExecutingMode (mFed, &err));
+    CE (helicsFederateEnterExecutingModeComplete (fFed, &err));
     CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
     CE (helicsFederateFinalizeComplete (mFed, &err));
@@ -102,6 +104,10 @@ BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (helicsFilterGetInfo (f1), "f1_test");
     BOOST_CHECK_EQUAL (helicsFilterGetInfo (f2), "f2_test");
     BOOST_CHECK_EQUAL (helicsFilterGetInfo (f3), "f3_test");
+
+    CE (helicsFederateEnterExecutingModeAsync (fFed, &err));
+    CE (helicsFederateEnterExecutingMode (mFed, &err));
+    CE (helicsFederateEnterExecutingModeComplete (fFed, &err));
 
     CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
