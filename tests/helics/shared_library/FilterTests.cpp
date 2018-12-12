@@ -53,8 +53,9 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     tmp = helicsFilterGetName (f1_c);
     BOOST_CHECK_EQUAL (tmp, "filter0/c4");
 
-    CE (helicsFederateFinalize (mFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
 
     CE (helics_federate_state state = helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
@@ -102,8 +103,9 @@ BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (helicsFilterGetInfo (f2), "f2_test");
     BOOST_CHECK_EQUAL (helicsFilterGetInfo (f3), "f3_test");
 
-    CE (helicsFederateFinalize (mFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
 }
 
 BOOST_AUTO_TEST_CASE (core_filter_reg)
@@ -192,8 +194,9 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
 
     CE (helicsFederateRequestTime (mFed, 3.0, &err));
     CE (helicsFederateRequestTimeComplete (fFed, &err));
-    CE (helicsFederateFinalize (mFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
     CE (state = helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
 }
@@ -272,9 +275,11 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
 
     CE (helicsFederateRequestTimeComplete (fFed, &err));
     CE (helicsFederateRequestTimeComplete (fFed2, &err));
-    CE (helicsFederateFinalize (mFed, &err));
-    CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
+    CE (helicsFederateFinalizeAsync (fFed, &err));
     CE (helicsFederateFinalize (fFed2, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
+    CE (helicsFederateFinalizeComplete (fFed, &err));
     CE (state = helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
 }
@@ -343,8 +348,9 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     BOOST_CHECK (!helicsEndpointHasMessage (p1));
     CE (helicsFederateRequestTime (mFed, 4.0, &err));
     BOOST_CHECK (helicsEndpointHasMessage (p1));
-    CE (helicsFederateFinalize (mFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
     CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
     CE (state = helicsFederateGetState (fFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
 }
@@ -411,9 +417,11 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
         BOOST_CHECK_EQUAL (m2.length, static_cast<int64_t> (data.size ()));
     }
 
-    CE (helicsFederateFinalize (sFed, &err));
-    CE (helicsFederateFinalize (dFed, &err));
+    CE (helicsFederateFinalizeAsync (sFed, &err));
+    CE (helicsFederateFinalizeAsync (dFed, &err));
     CE (helicsFederateFinalize (dcFed, &err));
+    CE (helicsFederateFinalizeComplete (sFed, &err));
+    CE (helicsFederateFinalizeComplete (dFed, &err));
     CE (state = helicsFederateGetState (sFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
 }
@@ -520,10 +528,13 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
         }
     }
 
-    CE (helicsFederateFinalize (sFed, &err));
-    CE (helicsFederateFinalize (sFed2, &err));
-    CE (helicsFederateFinalize (dFed, &err));
+    CE (helicsFederateFinalizeAsync (sFed, &err));
+    CE (helicsFederateFinalizeAsync (sFed2, &err));
+    CE (helicsFederateFinalizeAsync (dFed, &err));
     CE (helicsFederateFinalize (dcFed, &err));
+    CE (helicsFederateFinalizeComplete (sFed, &err));
+    CE (helicsFederateFinalizeComplete (sFed2, &err));
+    CE (helicsFederateFinalizeComplete (dFed, &err));
     CE (state = helicsFederateGetState (sFed, &err));
     BOOST_CHECK (state == helics_state_finalize);
 }
