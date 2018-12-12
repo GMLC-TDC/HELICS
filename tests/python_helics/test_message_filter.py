@@ -117,12 +117,12 @@ def test_message_filter_function(broker):
     f1 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_custom, "filter1")
     h.helicsFilterAddSourceTarget(f1, "port1")
     f2 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_delay, "filter2")
-    h.helicsFilterAddSourceTarget(f1, "port2")
+    h.helicsFilterAddSourceTarget(f1, "port1")
     h.helicsFederateRegisterEndpoint(fFed,'fout','');
     f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filtertype_random_delay, 'filter3');
-    h.helicsFilterAddSourceTarget(f3,'fed2/fout');
+    h.helicsFilterAddSourceTarget(f3,'filter/fout');
 
-    # h.helicsFilterSet(f1, "delay", 2.5)
+    h.helicsFilterSet(f2, "delay", 2.5)
     h.helicsFederateEnterExecutingModeAsync(fFed)
     h.helicsFederateEnterExecutingMode(mFed)
     h.helicsFederateEnterExecutingModeComplete(fFed)
