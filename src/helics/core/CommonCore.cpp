@@ -602,6 +602,7 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_EXECUTING:
         break;
     case HELICS_FINISHED:
+    case HELICS_TERMINATING:
         return iteration_time{Time::maxVal (), iteration_result::halted};
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
@@ -1998,20 +1999,20 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     return ret;
 }
 
-void CommonCore::setGlobal(const std::string &valueName, const std::string &value)
+void CommonCore::setGlobal (const std::string &valueName, const std::string &value)
 {
-	ActionMessage querycmd(CMD_SET_GLOBAL);
-	querycmd.source_id = global_broker_id.load();
-	querycmd.payload = valueName;
-	querycmd.setStringData(value);
-	if (!global_broker_id.load().isValid())
-	{
-		delayTransmitQueue.push(std::move(querycmd));
-	}
-	else
-	{
-		transmit(parent_route_id, querycmd);
-	}
+    ActionMessage querycmd (CMD_SET_GLOBAL);
+    querycmd.source_id = global_broker_id.load ();
+    querycmd.payload = valueName;
+    querycmd.setStringData (value);
+    if (!global_broker_id.load ().isValid ())
+    {
+        delayTransmitQueue.push (std::move (querycmd));
+    }
+    else
+    {
+        transmit (parent_route_id, querycmd);
+    }
 }
 
 void CommonCore::processPriorityCommand (ActionMessage &&command)
