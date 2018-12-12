@@ -5,10 +5,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
+#include "../common/MapTraits.hpp"
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
-#include "../common/MapTraits.hpp"
 
 namespace helics
 {
@@ -174,8 +174,8 @@ std::ostream &operator<< (std::ostream &os, global_federate_id id);
 class global_handle
 {
   public:
-    global_federate_id fed_id = global_federate_id ();
-    interface_handle handle = interface_handle ();
+    global_federate_id fed_id = global_federate_id{};
+    interface_handle handle = interface_handle{};
     constexpr global_handle () = default;
     constexpr global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
     explicit operator uint64_t () const
@@ -294,11 +294,11 @@ struct hash<helics::global_handle>
     using result_type = std::size_t;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<uint64_t>{}(static_cast<uint64_t>(key));
+        return std::hash<uint64_t>{}(static_cast<uint64_t> (key));
     }
 };
 
-} //namespace std
+}  // namespace std
 
 template <>
 struct is_easily_hashable<helics::global_federate_id>
