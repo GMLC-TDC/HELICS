@@ -1112,6 +1112,8 @@ Filter &Federate::getFilter (const std::string &filterName)
     return filt;
 }
 
+int Federate::getFilterCount () const { return fManager->getFilterCount (); }
+
 void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
 {
     coreObject->setFilterOperator (filt.getHandle (), std::move (mo));

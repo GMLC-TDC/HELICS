@@ -139,11 +139,12 @@ void ValueFederate::registerValueInterfaces (const std::string &configString)
         registerValueInterfacesJson (configString);
     }
 }
+static const std::string emptyStr;
 
 template <class Inp, class Obj>
 static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 {
-    bool optional = getOrDefault (data, "optional", false);
+    // bool optional = getOrDefault (data, "optional", false);
     bool required = getOrDefault (data, "required", false);
 
     if (required)
@@ -166,7 +167,6 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     addTargets (data, "targets", [&objUpdate](const std::string &target) { objUpdate.addTarget (target); });
 }
 
-static const std::string emptyStr;
 void ValueFederate::registerValueInterfacesJson (const std::string &configString)
 {
     auto doc = loadJson (configString);
