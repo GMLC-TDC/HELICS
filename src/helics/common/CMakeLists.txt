@@ -34,6 +34,7 @@ set(
   TripWire.hpp
   fmt_format.h
   fmt_ostream.h
+  addTargets.hpp
 )
 
 set(

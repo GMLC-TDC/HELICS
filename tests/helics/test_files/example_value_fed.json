@@ -37,7 +37,6 @@
 "subscriptions":[
 {
 "key":"pub1", // the key of the publication
- "type":"double", // the type assocaited with a publication (optional)
  "required":true //set to true to make helics issue a warning if the publication is not found
 },
 {
@@ -46,6 +45,11 @@
 "info": "this is an information string for use by the application"
 }
 ],
+
+"inputs":[
+{"key":"ipt1",  "type":"double","required":true, "target":"pub1"},
+]  //specify an input with a target multiple targets could be specified like "targets":["pub1","pub2","pub3"]
+
 
 "globals":[["global1","this is a global1 value"],["global2","this is another global value"]]
 }

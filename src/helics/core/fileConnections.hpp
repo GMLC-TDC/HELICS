@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "Broker.hpp"
 #include "Core.hpp"
 #include "core-exceptions.hpp"
@@ -44,25 +45,16 @@ void makeConnectionsToml (brkX *brk, const std::string &file)
             else
             {
                 std::string pub = tomlGetOrDefault (conn, "publication", std::string ());
-                if (conn.has ("targets"))
+                if (!pub.empty ())
                 {
-                    auto targets = conn.findChild ("targets");
-                    if (targets->is<toml::Array> ())
-                    {
-                        auto &targetArray = targets->as<toml::Array> ();
-                        for (const auto &target : targetArray)
-                        {
-                            brk->dataLink (pub, target.as<std::string> ());
-                        }
-                    }
-                    else
-                    {
-                        brk->dataLink (pub, targets->as<std::string> ());
-                    }
+                    addTargets (conn, "targets",
+                                [brk, &pub](const std::string &target) { brk->dataLink (pub, target); });
                 }
-                if (conn.has ("target"))
+                else
                 {
-                    brk->dataLink (pub, conn.get<std::string> ("target"));
+                    std::string ipt = tomlGetOrDefault (conn, "input", std::string ());
+                    addTargets (conn, "targets",
+                                [brk, &ipt](const std::string &target) { brk->dataLink (target, ipt); });
                 }
             }
         }
@@ -81,29 +73,19 @@ void makeConnectionsToml (brkX *brk, const std::string &file)
             else
             {
                 std::string fname = tomlGetOrDefault (filt, "filter", std::string ());
-                if (filt.has ("endpoints"))
+                if (!fname.empty ())
                 {
-                    auto &targetArray = filt.get<toml::Array> ("endpoints");
-                    for (const auto &target : targetArray)
-                    {
-                        brk->addSourceFilterToEndpoint (fname, target.as<std::string> ());
-                    }
-                }
-                if (filt.has ("source_endpoints"))
-                {
-                    auto &targetArray = filt.get<toml::Array> ("source_endpoints");
-                    for (const auto &target : targetArray)
-                    {
-                        brk->addSourceFilterToEndpoint (fname, target.as<std::string> ());
-                    }
-                }
-                if (filt.has ("dest_endpoints"))
-                {
-                    auto &targetArray = filt.get<toml::Array> ("dest_endpoints");
-                    for (const auto &target : targetArray)
-                    {
-                        brk->addDestinationFilterToEndpoint (fname, target.as<std::string> ());
-                    }
+                    auto asrc = [brk, &fname](const std::string &ept) {
+                        brk->addSourceFilterToEndpoint (fname, ept);
+                    };
+                    addTargets (filt, "endpoints", asrc);
+                    addTargets (filt, "source_endpoints", asrc);
+                    addTargets (filt, "sourceEndpoints", asrc);
+                    auto adst = [brk, &fname](const std::string &ept) {
+                        brk->addDestinationFilterToEndpoint (fname, ept);
+                    };
+                    addTargets (filt, "dest_endpoints", adst);
+                    addTargets (filt, "destEndpoints", adst);
                 }
             }
         }
@@ -152,23 +134,16 @@ void makeConnectionsJson (brkX *brk, const std::string &file)
             else
             {
                 std::string pub = jsonGetOrDefault (conn, "publication", std::string ());
-                if (conn.isMember ("targets"))
+                if (!pub.empty ())
                 {
-                    if (conn["targets"].isArray ())
-                    {
-                        for (const auto &target : conn["targets"])
-                        {
-                            brk->dataLink (pub, target.asString ());
-                        }
-                    }
-                    else
-                    {
-                        brk->dataLink (pub, conn["targets"].asString ());
-                    }
+                    addTargets (conn, "targets",
+                                [brk, &pub](const std::string &target) { brk->dataLink (pub, target); });
                 }
-                if (conn.isMember ("target"))
+                else
                 {
-                    brk->dataLink (pub, conn["target"].asString ());
+                    std::string ipt = jsonGetOrDefault (conn, "input", std::string ());
+                    addTargets (conn, "targets",
+                                [brk, &ipt](const std::string &target) { brk->dataLink (target, ipt); });
                 }
             }
         }
@@ -184,26 +159,19 @@ void makeConnectionsJson (brkX *brk, const std::string &file)
             else
             {
                 std::string fname = jsonGetOrDefault (filt, "filter", std::string ());
-                if (filt.isMember ("endpoints"))
+                if (!fname.empty ())
                 {
-                    for (const auto &target : filt["endpoints"])
-                    {
-                        brk->addSourceFilterToEndpoint (fname, target.asString ());
-                    }
-                }
-                if (filt.isMember ("source_endpoints"))
-                {
-                    for (const auto &target : filt["source_endpoints"])
-                    {
-                        brk->addSourceFilterToEndpoint (fname, target.asString ());
-                    }
-                }
-                if (filt.isMember ("dest_endpoints"))
-                {
-                    for (const auto &target : filt["dest_endpoints"])
-                    {
-                        brk->addDestinationFilterToEndpoint (fname, target.asString ());
-                    }
+                    auto asrc = [brk, &fname](const std::string &ept) {
+                        brk->addSourceFilterToEndpoint (fname, ept);
+                    };
+                    addTargets (filt, "endpoints", asrc);
+                    addTargets (filt, "source_endpoints", asrc);
+                    addTargets (filt, "sourceEndpoints", asrc);
+                    auto adst = [brk, &fname](const std::string &ept) {
+                        brk->addDestinationFilterToEndpoint (fname, ept);
+                    };
+                    addTargets (filt, "dest_endpoints", adst);
+                    addTargets (filt, "destEndpoints", adst);
                 }
             }
         }

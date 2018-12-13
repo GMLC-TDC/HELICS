@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "Publications.hpp"
@@ -167,9 +168,12 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 pubAct->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(pubAct->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (pubAct->getHandle (), info);
             }
+
+            addTargets (pub, "targets", [pubAct](const std::string &target) { pubAct->addTarget (target); });
         }
     }
     if (doc.isMember ("subscriptions"))
@@ -204,9 +208,11 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 subNew.setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(subNew.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (subNew.getHandle (), info);
             }
+            addTargets (sub, "targets", [&subNew](const std::string &target) { subNew.addTarget (target); });
         }
     }
     if (doc.isMember ("inputs"))
@@ -238,9 +244,11 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             {
                 inp->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(inp->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (inp->getHandle (), info);
             }
+            addTargets (ipt, "targets", [inp](const std::string &target) { inp->addTarget (target); });
         }
     }
 }
@@ -288,9 +296,11 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 pubObj->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(pubObj->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (pubObj->getHandle (), info);
             }
+            addTargets (pub, "targets", [pubObj](const std::string &target) { pubObj->addTarget (target); });
         }
     }
     auto subs = doc.find ("subscriptions");
@@ -325,9 +335,11 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 id->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(id->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (id->getHandle (), info);
             }
+            addTargets (sub, "targets", [id](const std::string &target) { id->addTarget (target); });
         }
     }
     auto ipts = doc.find ("inputs");
@@ -360,9 +372,11 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 id->setMinimumChange (tol);
             }
-            if(!info.empty()){
-                setInfo(id->getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (id->getHandle (), info);
             }
+            addTargets (ipt, "targets", [id](const std::string &target) { id->addTarget (target); });
         }
     }
 }

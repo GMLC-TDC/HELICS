@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
@@ -725,70 +726,19 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
 
-            if (filt.isMember ("targets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addSourceTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets.asString ());
-                }
-            }
+            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
+            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
+            addTargets (filt, "targets", asrc);
+            addTargets (filt, "sourcetargets", asrc);
+            addTargets (filt, "desttargets", adest);
+            addTargets (filt, "sourceTargets", asrc);
+            addTargets (filt, "destTargets", adest);
 
-            if (filt.isMember ("sourcetargets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addSourceTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets.asString ());
-                }
-            }
-
-            if (filt.isMember ("desttargets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addDestinationTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addDestinationTarget (targets.asString ());
-                }
-            }
             if (cloningflag)
             {
-                if (filt.isMember ("delivery"))
-                {
-                    auto targets = filt["targets"];
-                    if (targets.isArray ())
-                    {
-                        for (const auto &target : targets)
-                        {
-                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.asString ());
-                        }
-                    }
-                    else
-                    {
-                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets.asString ());
-                    }
-                }
+                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                    static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
+                });
             }
             if (filt.isMember ("properties"))
             {
@@ -898,73 +848,19 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
 
-            auto targets = filt.find ("targets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addSourceTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets->as<std::string> ());
-                }
-            }
+            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
+            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
+            addTargets (filt, "targets", asrc);
+            addTargets (filt, "sourcetargets", asrc);
+            addTargets (filt, "desttargets", adest);
+            addTargets (filt, "sourceTargets", asrc);
+            addTargets (filt, "destTargets", adest);
 
-            targets = filt.find ("sourcetargets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addSourceTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets->as<std::string> ());
-                }
-            }
-            targets = filt.find ("desttargets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addDestinationTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addDestinationTarget (targets->as<std::string> ());
-                }
-            }
             if (cloningflag)
             {
-                targets = filt.find ("delivery");
-                if (targets != nullptr)
-                {
-                    if (targets->is<toml::Array> ())
-                    {
-                        auto &targetArray = targets->as<toml::Array> ();
-                        for (const auto &target : targetArray)
-                        {
-                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.as<std::string> ());
-                        }
-                    }
-                    else
-                    {
-                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets->as<std::string> ());
-                    }
-                }
+                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                    static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
+                });
             }
             auto props = filt.find ("properties");
             if (props != nullptr)
