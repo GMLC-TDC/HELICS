@@ -29,12 +29,12 @@ input_delay=0 #the input delay for external data to propagate to federates
 subscriptions=[
 {key="pub1",  required=true},
   # shortcut is a naming shortcut for the publication for later retrieval
-{key="fedName:pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+{key="fedName/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[
-{key="ipt1",  type="double",required=true, target="pub1"},
-]  //specify an input with a target 
+{key="ipt2",  type="double",required=true, target="pub1"}
+]  #specify an input with a target 
 
 #global values that can be read from anywhere in the federation
  globals=[

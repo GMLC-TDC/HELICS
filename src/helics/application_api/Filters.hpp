@@ -93,7 +93,7 @@ class Filter
     /** add a destination endpoint to the list of endpoints to clone*/
     virtual void addDestinationTarget (const std::string &destinationName);
     /** alias for addSourceTarget*/
-    void addTarget (const std::string &name) { addSourceTarget (name); }
+    void addTarget (const std::string &target) { addSourceTarget (target); }
 
     /** remove a sourceEndpoint to the list of endpoint to clone*/
     virtual void removeTarget (const std::string &sourceName);

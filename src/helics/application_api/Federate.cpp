@@ -927,7 +927,10 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         }
         else
         {
-            // TODO:: add loop around getting the different variables in a toml file
+            for (const auto &val : globals->as<toml::Table> ())
+            {
+                setGlobal (val.first, val.second.as<std::string> ());
+            }
         }
     }
 }

@@ -494,13 +494,15 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
+static const std::vector<std::string> config_files{"example_value_fed.json", "example_value_fed.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load, boost::unit_test::data::make (config_files), file)
 {
-    helics::ValueFederate vFed (std::string (TEST_DIR) + "/example_value_fed.json");
+    helics::ValueFederate vFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
 
-    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 3);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
     auto &id = vFed.getInput ("pubshortcut");
 
@@ -514,34 +516,11 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (vFed.getPublication (0).getInfo (),
                        "this is an information string for use by the application");
 
+    BOOST_CHECK_EQUAL (vFed.getInput (2).getName (), "valueFed/ipt2");
+
     BOOST_CHECK_EQUAL (vFed.query ("global", "global1"), "this is a global1 value");
     BOOST_CHECK_EQUAL (vFed.query ("global", "global2"), "this is another global value");
     vFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load_toml)
-{
-    helics::ValueFederate vFed (std::string (TEST_DIR) + "/example_value_fed.toml");
-
-    BOOST_CHECK_EQUAL (vFed.getName (), "valueFed");
-
-    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
-    BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
-
-    auto id = vFed.getInput ("pubshortcut");
-    auto key = vFed.getTarget (id);
-    BOOST_CHECK_EQUAL (key, "fedName:pub2");
-
-    BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
-
-    auto pub2name = vFed.getPublicationKey (vFed.getPublication (1));
-    BOOST_CHECK_EQUAL (key, "fedName:pub2");
-
-    // test the info from a file
-    BOOST_CHECK_EQUAL (vFed.getPublication (0).getInfo (),
-                       "this is an information string for use by the application");
-    BOOST_CHECK_EQUAL (vFed.query ("global", "global1"), "this is a global1 value");
-    BOOST_CHECK_EQUAL (vFed.query ("global", "global2"), "this is another global value");
-    vFed.disconnect ();
-}
 BOOST_AUTO_TEST_SUITE_END ()

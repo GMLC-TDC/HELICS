@@ -103,7 +103,10 @@ void makeConnectionsToml (brkX *brk, const std::string &file)
         }
         else
         {
-            // TODO:: add loop around getting the different variables in a toml file
+            for (const auto &val : globals->as<toml::Table> ())
+            {
+                brk->setGlobal (val.first, val.second.as<std::string> ());
+            }
         }
     }
 }
