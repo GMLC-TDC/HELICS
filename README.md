@@ -27,7 +27,7 @@
   <tr>
   <td>Coverage</td>
   <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/HELICS_2_0"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/HELICS_2_0/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
   <tr>
   <td>Gitter</td>
