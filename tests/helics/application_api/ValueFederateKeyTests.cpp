@@ -88,7 +88,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish ("string1");
@@ -121,8 +121,8 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
                                 helics::Publication &pubid,
                                 helics::Input &subid)
 {
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
     bool correct = true;
 
@@ -302,43 +302,49 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_direct, bdata::ma
     BOOST_CHECK (res);
 }
 
-static const std::vector<std::string> simple_connection_files{ "example_connections1.json", "example_connections2.json",
-"example_connections1.toml","example_connections2.toml","example_connections3.toml","example_connections4.toml" };
+static const std::vector<std::string> simple_connection_files{"example_connections1.json",
+                                                              "example_connections2.json",
+                                                              "example_connections1.toml",
+                                                              "example_connections2.toml",
+                                                              "example_connections3.toml",
+                                                              "example_connections4.toml"};
 
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_broker_link_file, bdata::make(simple_connection_files), file_name)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_file,
+                      bdata::make (simple_connection_files),
+                      file_name)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     auto &broker = brokers[0];
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    auto testFile = std::string(TEST_DIR) + "/test_files/" + file_name;
-    broker->makeConnections(testFile);
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    auto testFile = std::string (TEST_DIR) + file_name;
+    broker->makeConnections (testFile);
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_broker_link_json_string)
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_broker_link_json_string)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     auto &broker = brokers[0];
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    broker->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    broker->makeConnections ("{\"connections\":[[\"pub1\", \"inp1\"]]}");
 
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link, bdata::make (core_types_all), core_type)
@@ -432,41 +438,43 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_direct2, bdata::mak
     BOOST_CHECK (res);
 }
 
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_core_link_file, bdata::make(simple_connection_files), file_name)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_file,
+                      bdata::make (simple_connection_files),
+                      file_name)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    auto core = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer ();
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    auto testFile=std::string(TEST_DIR) + "/test_files/"+file_name;
-    core->makeConnections(testFile);
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    auto testFile = std::string (TEST_DIR) + file_name;
+    core->makeConnections (testFile);
     core = nullptr;
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_core_link_json_string)
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_core_link_json_string)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    auto core = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer ();
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    core->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    core->makeConnections ("{\"connections\":[[\"pub1\", \"inp1\"]]}");
     core = nullptr;
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types_single), core_type)
@@ -478,7 +486,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     auto &pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 1.0);
 

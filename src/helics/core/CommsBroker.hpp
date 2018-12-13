@@ -5,10 +5,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
+#include "ActionMessage.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
-#include "ActionMessage.hpp"
 
 namespace helics
 {
@@ -37,12 +37,15 @@ class CommsBroker : public BrokerT
     virtual void brokerDisconnect () override;
     virtual bool tryReconnect () override;
     /** disconnect the comm object*/
-    void commDisconnect();
+    void commDisconnect ();
     void loadComms ();
+
   public:
     virtual void transmit (route_id_t route_id, const ActionMessage &cmd) override;
     virtual void transmit (route_id_t route_id, ActionMessage &&cmd) override;
 
     virtual void addRoute (route_id_t route_id, const std::string &routeInfo) override;
+
+    virtual void removeRoute (route_id_t route_id) override;
 };
 }  // namespace helics

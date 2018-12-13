@@ -15,15 +15,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-//BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
-BOOST_AUTO_TEST_SUITE (source_tests, *utf::label("ci"))
+// BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
+BOOST_AUTO_TEST_SUITE (source_tests, *utf::label ("ci"))
 
-BOOST_AUTO_TEST_CASE (simple_source_test )
+BOOST_AUTO_TEST_CASE (simple_source_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "score-source";
     fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1 ("player1",fi);
+    helics::apps::Source src1 ("player1", fi);
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto gen = src1.getGenerator (index);
     BOOST_CHECK (gen);
@@ -191,8 +191,8 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "scorep";
     fi.coreInitString = "-f 2 --autobroker";
-    helics::apps::Source src1 ("source1",fi);
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test.json");
+    helics::apps::Source src1 ("source1", fi);
+    src1.loadFile (std::string (TEST_DIR) + "/simple_source_test.json");
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -236,8 +236,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test2_file)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
 
-
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test2.json");
+    src1.loadFile (std::string (TEST_DIR) + "/simple_source_test2.json");
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
@@ -287,9 +286,9 @@ BOOST_AUTO_TEST_CASE (sine_source_test_file)
     fi.coreName = "score1";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Source src1 ("player1", fi);
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_sine_source.json");
+    src1.loadFile (std::string (TEST_DIR) + "/simple_sine_source.json");
 
-    helics::ValueFederate vfed ("block1",fi);
+    helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);

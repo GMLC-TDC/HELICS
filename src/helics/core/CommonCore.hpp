@@ -26,6 +26,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdint>
 #include <thread>
 #include <utility>
+#include <set>
 
 namespace helics
 {
@@ -167,7 +168,7 @@ class CommonCore : public Core, public BrokerBase
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (federate_id_t federateID,
                                    std::function<std::string (const std::string &)> queryFunction) override;
-
+	virtual void setGlobal(const std::string &valueName, const std::string &value) override;
     virtual bool connect () override final;
     virtual bool isConnected () const override final;
     virtual void disconnect () override final;
@@ -206,6 +207,10 @@ class CommonCore : public Core, public BrokerBase
     @param route_id the identification of the route
     @param routeInfo a string containing the information necessary to connect*/
     virtual void addRoute (route_id_t route_id, const std::string &routeInfo) = 0;
+    /** remove or disconnect a route from use
+    @param route_id the identification of the route
+    */
+    virtual void removeRoute (route_id_t route_id) = 0;
     /** get the federate Information from the federateID*/
     FederateState *getFederateAt (federate_id_t federateID) const;
     /** get the federate Information from the federateID*/

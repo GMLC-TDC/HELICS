@@ -222,15 +222,14 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         if (vm.count (tprop) > 0)
         {
-            setTimeProperty (propStringsTranslations.at (tprop),
-                             loadTimeFromString (vm[tprop].as<std::string> ()));
+            setProperty (propStringsTranslations.at (tprop), loadTimeFromString (vm[tprop].as<std::string> ()));
         }
     }
     for (auto &iprop : validIntProperties)
     {
         if (vm.count (iprop) > 0)
         {
-            setTimeProperty (propStringsTranslations.at (iprop), vm[iprop].as<int> ());
+            setProperty (propStringsTranslations.at (iprop), vm[iprop].as<int> ());
         }
     }
 
@@ -296,11 +295,11 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     };
 
     std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
-        fi.setTimeProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
-        fi.setIntegerProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     for (auto &prop : validTimeProperties)
@@ -413,11 +412,11 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     };
 
     std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
-        fi.setTimeProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
-        fi.setIntegerProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     for (auto &prop : validTimeProperties)

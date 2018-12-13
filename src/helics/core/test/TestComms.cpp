@@ -20,6 +20,7 @@ namespace testcore
 {
 TestComms::TestComms () : CommsInterface (CommsInterface::thread_generation::single) {}
 
+using namespace std::chrono;
 /** destructor*/
 TestComms::~TestComms () { disconnect (); }
 
@@ -86,7 +87,7 @@ void TestComms::queue_tx_function ()
 
     if (!brokerName_.empty ())
     {
-        std::chrono::milliseconds totalSleep (0);
+        milliseconds totalSleep (0);
         while (!tbroker)
         {
 
@@ -108,20 +109,20 @@ void TestComms::queue_tx_function ()
                         setRxStatus(connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                    totalSleep += std::chrono::milliseconds(200);
+                    std::this_thread::sleep_for(milliseconds(200));
+                    totalSleep += milliseconds(200);
                 }
             }
             else
             {
                 if (!tbroker->isOpenToNewFederates())
                 {
-                    std::cerr << "broker is not open to new federates " << brokerName_ << std::endl;
+					logError("broker is not open to new federates " + brokerName_);
                     tbroker = nullptr;
                     broker = nullptr;
-                    BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(200));
-                    totalSleep += std::chrono::milliseconds(200);
-                    if (totalSleep > std::chrono::milliseconds(connectionTimeout))
+                    BrokerFactory::cleanUpBrokers(milliseconds(200));
+                    totalSleep += milliseconds(200);
+                    if (totalSleep > milliseconds(connectionTimeout))
                     {
                         setTxStatus(connection_status::error);
                         setRxStatus(connection_status::error);
@@ -133,7 +134,7 @@ void TestComms::queue_tx_function ()
     }
     else if (!serverMode)
     {
-        std::chrono::milliseconds totalSleep(0);
+        milliseconds totalSleep(0);
         while (!tbroker)
         {
             auto broker = BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
@@ -154,8 +155,8 @@ void TestComms::queue_tx_function ()
                         setRxStatus(connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                    totalSleep += std::chrono::milliseconds(200);
+                    std::this_thread::sleep_for(milliseconds(200));
+                    totalSleep += milliseconds(200);
                 }
             }
         }
@@ -221,6 +222,10 @@ void TestComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+				case REMOVE_ROUTE:
+					routes.erase(route_id_t(cmd.getExtraData()));
+					processed = true;
+					break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     processed = true;
@@ -263,7 +268,10 @@ void TestComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown route, message dropped");
+                    if (cmd.action () != CMD_DISCONNECT)
+                    {
+                        logWarning("unknown route, message dropped");
+                    }
                 }
             }
         }

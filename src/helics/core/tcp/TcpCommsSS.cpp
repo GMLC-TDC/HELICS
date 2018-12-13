@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "TcpCommsSS.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
-#include "TcpCommsSS.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
@@ -18,7 +18,10 @@ namespace helics
 namespace tcp
 {
 using boost::asio::ip::tcp;
-TcpCommsSS::TcpCommsSS () noexcept : NetworkCommsInterface (interface_type::tcp,CommsInterface::thread_generation::single) {}
+TcpCommsSS::TcpCommsSS () noexcept
+    : NetworkCommsInterface (interface_type::tcp, CommsInterface::thread_generation::single)
+{
+}
 
 /** destructor*/
 TcpCommsSS::~TcpCommsSS () { disconnect (); }
@@ -97,7 +100,7 @@ size_t TcpCommsSS::dataReceive (std::shared_ptr<TcpConnection> connection, const
     while (used_total < bytes_received)
     {
         ActionMessage m;
-        auto used = m.depacketize (data + used_total, bytes_received - used_total);
+        auto used = m.depacketize (data + used_total, static_cast<int> (bytes_received - used_total));
         if (used == 0)
         {
             break;
@@ -373,6 +376,10 @@ void TcpCommsSS::queue_tx_function ()
                     }
                 }
                 break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     break;
@@ -486,8 +493,10 @@ CLOSE_TX_LOOP:
     }
     routes.clear ();
     brokerConnection = nullptr;
+    setTxStatus (connection_status::terminated);
     if (server)
     {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
         server->close ();
         server = nullptr;
     }
@@ -495,7 +504,6 @@ CLOSE_TX_LOOP:
     {
         setRxStatus (connection_status::terminated);
     }
-    setTxStatus (connection_status::terminated);
 }
 
 void TcpCommsSS::closeReceiver ()

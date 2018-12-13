@@ -154,7 +154,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
-    trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    trace1.loadFile (std::string (TEST_DIR) + file);
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::helics_type_t::helicsDouble);
@@ -198,7 +198,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     fi.coreInitString = " - f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
-    trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    trace1.loadFile (std::string (TEST_DIR) + file);
 
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
@@ -250,7 +250,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     std::this_thread::sleep_for (300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+    std::string exampleFile = std::string (TEST_DIR) + file;
 
     StringToCmdLine cmdArg ("--name=rec --core=ipc " + exampleFile);
 
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     fi.coreName = "tcore-dep";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -467,7 +467,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     };
     trace1.setClonedMessageCallback (cb);
 
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -541,7 +541,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
-    fi.setTimeProperty (helics_property_time_period, 1.0);
+    fi.setProperty (helics_property_time_period, 1.0);
 
     helics::MessageFederate mfed ("block1", fi);
 
@@ -549,7 +549,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     helics::Endpoint &e1 = mfed.registerGlobalEndpoint ("d1");
     helics::Endpoint &e2 = mfed2.registerGlobalEndpoint ("d2");
 
-    trace1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    trace1.loadFile (std::string (TEST_DIR) + file);
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
@@ -611,7 +611,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     std::this_thread::sleep_for (300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+    std::string exampleFile = std::string (TEST_DIR) + file;
 
     std::string cmdArg ("--name=tracer --core=ipc --stop=5 " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");

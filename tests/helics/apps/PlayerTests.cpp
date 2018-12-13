@@ -17,7 +17,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (player_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (player_tests, *utf::label ("ci"))
 
 BOOST_AUTO_TEST_CASE (simple_player_test)
 {
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 
     fi.coreName = "pcore1";
     fi.coreInitString = "-f2 --autobroker";
-    helics::apps::Player play1 ("player1",fi);
+    helics::apps::Player play1 ("player1", fi);
 
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, "pub1", 0.5);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     play1.addPoint (3.0, "pub1", 0.8);
 
     helics::ValueFederate vfed ("block1", fi);
-    auto &sub1=vfed.registerSubscription( "pub1");
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
     play1.addPublication ("pub1", helics::helics_type_t::helicsDouble);
     play1.addPoint (1.0, "pub1", "v[3.0,4.0]");
     play1.addPoint (2.0, "pub1", "0.7");
-    play1.addPoint (3.0, "pub1", std::complex<double>(0.0,0.8));
+    play1.addPoint (3.0, "pub1", std::complex<double> (0.0, 0.8));
     play1.addPoint (4.0, "pub1", "c[3.0+0j, 0.0-4.0j]");
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
     val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 0.8);
 
-	retTime = vfed.requestTime (5);
+    retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 4.0);
     val = sub1.getValue<double> ();
     BOOST_CHECK_EQUAL (val, 5.0);
@@ -191,18 +191,18 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
 }
 
 static const std::vector<std::string> simple_files{"example1.player", "example2.player", "example3.player",
-                                            "example4.player", "example5.json", "example5.player"};
+                                                   "example4.player", "example5.json",   "example5.player"};
 
 BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "pcore5"+file;
+    fi.coreName = "pcore5" + file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-    play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    play1.loadFile (std::string (TEST_DIR) + file);
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -247,9 +247,8 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
     fi.coreName.push_back (indx++);
     fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
-    play1.loadFile (std::string (TEST_DIR) + "/test_files/example_comments.player");
+    play1.loadFile (std::string (TEST_DIR) + "/example_comments.player");
 
-	
     BOOST_CHECK_EQUAL (play1.pointCount (), 7);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -289,10 +288,10 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
 
 BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for (std::chrono::milliseconds (300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+    std::string exampleFile = std::string (TEST_DIR) + file;
 
     StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
 
@@ -301,7 +300,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "--broker=ipc_broker";
 
-    helics::ValueFederate vfed ("obj",fi);
+    helics::ValueFederate vfed ("obj", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
@@ -335,14 +334,15 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     vfed.finalize ();
     fut.get ();
     brk = nullptr;
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
 
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    exeTestRunner playerExe (std::string(HELICS_INSTALL_LOC),std::string (HELICS_BUILD_LOC) + "/apps/", "helics_player");
+    std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    exeTestRunner playerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
+                             "helics_player");
 
     exeTestRunner brokerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
                              "helics_broker");
@@ -350,13 +350,13 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     BOOST_REQUIRE (playerExe.isActive ());
     BOOST_REQUIRE (brokerExe.isActive ());
     auto res = brokerExe.runAsync ("-f 2 --type=zmq --name=zmq_broker");
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/" + file;
+    std::string exampleFile = std::string (TEST_DIR) + file;
     auto res2 = playerExe.runCaptureOutputAsync ("--name=player --core=zmq " + exampleFile);
 
     helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
 
-    helics::ValueFederate vfed ("fed",fi);
+    helics::ValueFederate vfed ("fed", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
     vfed.enterExecutingMode ();
@@ -390,7 +390,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     auto out2 = res2.get ();
     res.get ();
     // out = 0;
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
 #endif
 
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
     fi.coreName = "pcore7";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
-    play1.loadFile (std::string (TEST_DIR) + "/test_files/example6.json");
+    play1.loadFile (std::string (TEST_DIR) + "/example6.json");
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -572,21 +572,20 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
 }
 
 static const std::vector<std::string> simple_message_files{"example_message1.player", "example_message2.player",
-                                                    "example_message3.json"};
+                                                           "example_message3.json"};
 
 BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::make (simple_message_files), file)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "pcore11"+file;
+    fi.coreName = "pcore11" + file;
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-
-    helics::MessageFederate mfed ("block1",fi);
+    helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
-    play1.loadFile (std::string (TEST_DIR) + "/test_files/" + file);
+    play1.loadFile (std::string (TEST_DIR) + file);
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     mfed.enterExecutingMode ();
 
@@ -626,17 +625,17 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE(player_test_help)
+BOOST_AUTO_TEST_CASE (player_test_help)
 {
-    StringToCmdLine cmdArg("--version --quiet"); 
-    helics::apps::Player play1(cmdArg.getArgCount(),cmdArg.getArgV());
+    StringToCmdLine cmdArg ("--version --quiet");
+    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
-    BOOST_CHECK(!play1.isActive());
+    BOOST_CHECK (!play1.isActive ());
 
-    StringToCmdLine cmdArg2("-? --quiet");
-    helics::apps::Player play2(cmdArg2.getArgCount(), cmdArg2.getArgV());
+    StringToCmdLine cmdArg2 ("-? --quiet");
+    helics::apps::Player play2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
 
-    BOOST_CHECK(!play2.isActive());
+    BOOST_CHECK (!play2.isActive ());
 }
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 /*
@@ -647,7 +646,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "helics_broker");
 
     auto res = brokerExe.runAsync ("1 --type=ipc --name=ipc_broker");
-    std::string exampleFile = std::string (TEST_DIR) + "/test_files/example1.Player";
+    std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";
     auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --core=ipc " + exampleFile);
 
     auto val = res2.get ();

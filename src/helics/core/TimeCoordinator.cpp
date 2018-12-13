@@ -131,6 +131,10 @@ void TimeCoordinator::timeRequest (Time nextTime,
     time_value = (newValueTime > time_next) ? newValueTime : time_next;
     time_message = (newMessageTime > time_next) ? newMessageTime : time_next;
     time_exec = std::min ({time_value, time_message, time_requested});
+    if (info.uninterruptible)
+    {
+        time_exec = time_requested;
+    }
     dependencies.resetDependentEvents (time_granted);
     updateTimeFactors ();
 
@@ -143,20 +147,28 @@ void TimeCoordinator::timeRequest (Time nextTime,
 bool TimeCoordinator::updateNextExecutionTime ()
 {
     auto cexec = time_exec;
-    time_exec = std::min (time_message, time_value);
-    if (time_exec < Time::maxVal ())
+    if (info.uninterruptible)
     {
-        time_exec += info.inputDelay;
+        time_exec = time_requested;
     }
-    time_exec = std::min (time_requested, time_exec);
-    if (time_exec <= time_granted)
+    else
     {
-        time_exec = (iterating) ? time_granted : getNextPossibleTime ();
+        time_exec = std::min (time_message, time_value);
+        if (time_exec < Time::maxVal ())
+        {
+            time_exec += info.inputDelay;
+        }
+        time_exec = std::min (time_requested, time_exec);
+        if (time_exec <= time_granted)
+        {
+            time_exec = (iterating) ? time_granted : getNextPossibleTime ();
+        }
+        if ((time_exec - time_granted) > 0.0)
+        {
+            time_exec = generateAllowedTime (time_exec);
+        }
     }
-    if ((time_exec - time_granted) > 0.0)
-    {
-        time_exec = generateAllowedTime (time_exec);
-    }
+
     return (time_exec != cexec);
 }
 
@@ -170,15 +182,22 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     {
         time_next = time_granted;
     }
-    if (time_minminDe < Time::maxVal ())
+    if (info.uninterruptible)
     {
-        if (time_minminDe + info.inputDelay > time_next)
-        {
-            time_next = time_minminDe + info.inputDelay;
-            time_next = generateAllowedTime (time_next);
-        }
+        time_next = time_requested;
     }
-    time_next = std::min (time_next, time_exec) + info.outputDelay;
+    else
+    {
+        if (time_minminDe < Time::maxVal ())
+        {
+            if (time_minminDe + info.inputDelay > time_next)
+            {
+                time_next = time_minminDe + info.inputDelay;
+                time_next = generateAllowedTime (time_next);
+            }
+        }
+        time_next = std::min (time_next, time_exec) + info.outputDelay;
+    }
 }
 
 void TimeCoordinator::updateValueTime (Time valueUpdateTime)
@@ -786,7 +805,7 @@ void TimeCoordinator::processDependencyUpdateMessage (const ActionMessage &cmd)
 }
 
 /** set a timeProperty for a the coordinator*/
-void TimeCoordinator::setTimeProperty (int timeProperty, Time propertyVal)
+void TimeCoordinator::setProperty (int timeProperty, Time propertyVal)
 {
     switch (timeProperty)
     {
@@ -813,11 +832,15 @@ void TimeCoordinator::setTimeProperty (int timeProperty, Time propertyVal)
 }
 
 /** set a timeProperty for a the coordinator*/
-void TimeCoordinator::setIntegerProperty (int intProperty, int propertyVal)
+void TimeCoordinator::setProperty (int intProperty, int propertyVal)
 {
     if (intProperty == defs::properties::max_iterations)
     {
         info.maxIterations = propertyVal;
+    }
+    else
+    {
+        setProperty (intProperty, Time (static_cast<double> (propertyVal)));
     }
 }
 
@@ -890,10 +913,10 @@ void TimeCoordinator::processConfigUpdateMessage (const ActionMessage &cmd)
     switch (cmd.action ())
     {
     case CMD_FED_CONFIGURE_TIME:
-        setTimeProperty (cmd.messageID, cmd.actionTime);
+        setProperty (cmd.messageID, cmd.actionTime);
         break;
     case CMD_FED_CONFIGURE_INT:
-        setIntegerProperty (cmd.messageID, cmd.counter);
+        setProperty (cmd.messageID, cmd.counter);
         break;
     case CMD_FED_CONFIGURE_FLAG:
         setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));

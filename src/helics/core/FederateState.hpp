@@ -95,7 +95,6 @@ class FederateState
       0;  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id_t, std::deque<ActionMessage>>
       delayQueues;  //!< queue for delaying processing of messages for a time
-
     std::vector<interface_handle> events;  //!< list of value events to process
     std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
     std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
@@ -155,9 +154,9 @@ class FederateState
     void setProperties (const ActionMessage &cmd);
 
     /** set a timeProperty for a the coordinator*/
-    void setTimeProperty (int timeProperty, Time propertyVal);
+    void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
-    void setIntegerProperty (int intProperty, int propertyVal);
+    void setProperty (int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag (int optionFlag, bool value);
     /** get a time Property*/

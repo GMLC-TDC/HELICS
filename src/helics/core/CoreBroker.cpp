@@ -21,6 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 #include <fstream>
+#include <iostream>
 
 namespace helics
 {
@@ -302,10 +303,12 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         else  // we are initialized already
         {
             route_id_t newroute;
+            bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
                 newroute = route_id_t (routeCount++);
                 addRoute (newroute, command.getString (targetStringLoc));
+                route_created = true;
             }
             else
             {
@@ -317,16 +320,23 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badInit.name = command.name;
             badInit.messageID = 5;
             transmit (newroute, badInit);
+
+            if (route_created)
+            {
+                removeRoute (newroute);
+            }
             return;
         }
         auto inserted = _brokers.insert (command.name, nullptr, command.name);
         if (!inserted)
         {
             route_id_t newroute;
+            bool route_created = false;
             if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
             {
                 newroute = route_id_t (routeCount++);
                 addRoute (newroute, command.getString (targetStringLoc));
+                route_created = true;
             }
             else
             {
@@ -338,6 +348,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             badName.messageID = 7;
             badName.name = command.name;
             transmit (newroute, badName);
+            if (route_created)
+            {
+                removeRoute (newroute);
+            }
             return;
         }
         if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
@@ -347,6 +361,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             addRoute (_brokers.back ().route_id, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
             _brokers.back ()._nonLocal = false;
+            _brokers.back ()._route_key = true;
         }
         else
         {
@@ -515,6 +530,23 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             transmit (getRoute (command.dest_id), command);
         }
         break;
+    case CMD_SET_GLOBAL:
+        if (isRootc)
+        {
+            global_values[command.name] = command.getString (0);
+        }
+        else
+        {
+            if ((global_broker_id_local.isValid ()) && (global_broker_id_local != parent_broker_id))
+            {
+                transmit (parent_route_id, command);
+            }
+            else
+            {
+                // delay the response if we are not fully registered yet
+                delayTransmitQueue.push (command);
+            }
+        }
     default:
         // must not have been a priority command
         break;
@@ -586,15 +618,18 @@ void CoreBroker::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto &brk : _brokers)
     {
-        if (brk.parent == global_broker_id_local)
+        if (!brk._disconnected)
         {
-            routeMessage (bye, brk.global_id);
-            brk._disconnected = true;
-        }
-        if (hasTimeDependency)
-        {
-            timeCoord->removeDependency (brk.global_id);
-            timeCoord->removeDependent (brk.global_id);
+            if (brk.parent == global_broker_id_local)
+            {
+                routeMessage (bye, brk.global_id);
+                brk._disconnected = true;
+            }
+            if (hasTimeDependency)
+            {
+                timeCoord->removeDependency (brk.global_id);
+                timeCoord->removeDependent (brk.global_id);
+            }
         }
     }
     if (hasTimeDependency)
@@ -839,6 +874,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
+                if (brk->_route_key)
+                {
+                    removeRoute (brk->route_id);
+                }
             }
             if (hasTimeDependency)
             {
@@ -1094,28 +1133,28 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
     switch (cmd.messageID)
     {
     case defs::flags::enable_init_entry:
-    /*if (delayInitCounter <= 1)
-    {
-        delayInitCounter = 0;
-        if (allInitReady())
+        /*if (delayInitCounter <= 1)
         {
-            broker_state_t exp = connected;
-            if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
-            {  // make sure we only do this once
-                checkDependencies();
-                cmd.setAction(CMD_INIT);
-                cmd.source_id = global_broker_id_local;
-                cmd.dest_id = 0;
-                transmit(0, cmd);
+            delayInitCounter = 0;
+            if (allInitReady())
+            {
+                broker_state_t exp = connected;
+                if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing))
+                {  // make sure we only do this once
+                    checkDependencies();
+                    cmd.setAction(CMD_INIT);
+                    cmd.source_id = global_broker_id_local;
+                    cmd.dest_id = 0;
+                    transmit(0, cmd);
+                }
             }
         }
-    }
-    else
-    {
-        --delayInitCounter;
-    }
-    break;
-    */
+        else
+        {
+            --delayInitCounter;
+        }
+        break;
+        */
     case defs::properties::log_level:
         setLogLevel (cmd.counter);
         break;
@@ -1625,9 +1664,28 @@ void CoreBroker::disconnect ()
     }
 }
 
+void CoreBroker::transmitToParent (ActionMessage &&cmd)
+{
+    if (isRoot ())
+    {
+        addActionMessage (std::move (cmd));
+    }
+    else
+    {
+        if (!global_broker_id.load ().isValid ())
+        {
+            delayTransmitQueue.push (std::move (cmd));
+        }
+        else
+        {
+            transmit (parent_route_id, std::move (cmd));
+        }
+    }
+}
+
 void CoreBroker::routeMessage (ActionMessage &cmd, global_federate_id_t dest)
 {
-    if (dest == global_federate_id_t ())
+    if (dest == global_federate_id_t{})
     {
         return;
     }
@@ -1909,15 +1967,8 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         querycmd.messageID = index;
         querycmd.payload = queryStr;
         auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
-        if (!gid.isValid ())
-        {
-            // TODO:: this has potential for deadlock
-            delayTransmitQueue.push (std::move (querycmd));
-        }
-        else
-        {
-            transmit (parent_route_id, std::move (querycmd));
-        }
+        transmitToParent (std::move (querycmd));
+
         auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
@@ -1931,20 +1982,22 @@ std::string CoreBroker::query (const std::string &target, const std::string &que
         querycmd.payload = queryStr;
         querycmd.setStringData (target);
         auto queryResult = ActiveQueries.getFuture (querycmd.messageID);
-        if (!gid.isValid ())
-        {
-            delayTransmitQueue.push (std::move (querycmd));
-        }
-        else
-        {
-            transmit (parent_route_id, std::move (querycmd));
-        }
+        transmitToParent (std::move (querycmd));
 
         auto ret = queryResult.get ();
         ActiveQueries.finishedWithValue (index);
         return ret;
     }
     //  return "#invalid";
+}
+
+void CoreBroker::setGlobal (const std::string &valueName, const std::string &value)
+{
+    ActionMessage querycmd (CMD_SET_GLOBAL);
+    querycmd.source_id = global_broker_id.load ();
+    querycmd.payload = valueName;
+    querycmd.setStringData (value);
+    transmitToParent (std::move (querycmd));
 }
 
 std::string CoreBroker::generateQueryAnswer (const std::string &request)
@@ -2262,6 +2315,45 @@ void CoreBroker::processQuery (const ActionMessage &m)
     {
         processLocalQuery (m);
     }
+    else if (target == "global")
+    {
+        ActionMessage queryResp (CMD_QUERY_REPLY);
+        queryResp.dest_id = m.source_id;
+        queryResp.source_id = global_broker_id_local;
+        queryResp.messageID = m.messageID;
+
+        auto gfind = global_values.find (m.payload);
+        if (gfind != global_values.end ())
+        {
+            queryResp.payload = gfind->second;
+        }
+        else if (m.payload == "list")
+        {
+            queryResp.payload = generateStringVector (global_values, [](const auto &gv) { return gv.first; });
+        }
+        else if (m.payload == "all")
+        {
+            JsonMapBuilder globalSet;
+            auto &jv = globalSet.getJValue ();
+            for (auto &val : global_values)
+            {
+                jv[val.first] = val.second;
+            }
+            queryResp.payload = globalSet.generate ();
+        }
+        else
+        {
+            queryResp.payload = "#invalid";
+        }
+        if (queryResp.dest_id == global_broker_id_local)
+        {
+            ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);
+        }
+        else
+        {
+            transmit (getRoute (queryResp.dest_id), queryResp);
+        }
+    }
     else
     {
         route_id_t route = parent_route_id;
@@ -2286,7 +2378,14 @@ void CoreBroker::processQuery (const ActionMessage &m)
             queryResp.messageID = m.messageID;
 
             queryResp.payload = "#invalid";
-            transmit (getRoute (queryResp.dest_id), queryResp);
+            if (queryResp.dest_id == global_broker_id_local)
+            {
+                ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);
+            }
+            else
+            {
+                transmit (getRoute (queryResp.dest_id), queryResp);
+            }
         }
         else
         {
