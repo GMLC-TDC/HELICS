@@ -701,14 +701,14 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
     {
         for (const auto &filt : doc["filters"])
         {
-            std::string key = jsonGetOrDefault (filt, "name", std::string ());
-            std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
-            std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
-            auto info = jsonGetOrDefault (filt, "info", std::string ());
-            bool cloningflag = jsonGetOrDefault (filt, "cloning", false);
+            std::string key = getOrDefault (filt, "name", std::string ());
+            std::string inputType = getOrDefault (filt, "inputType", std::string ());
+            std::string outputType = getOrDefault (filt, "outputType", std::string ());
+            auto info = getOrDefault (filt, "info", std::string ());
+            bool cloningflag = getOrDefault (filt, "cloning", false);
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation = jsonGetOrDefault (filt, "operation", std::string ("custom"));
+            std::string operation = getOrDefault (filt, "operation", std::string ("custom"));
 
             auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))
@@ -823,14 +823,14 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         auto &filtArray = filts->as<toml::Array> ();
         for (const auto &filt : filtArray)
         {
-            std::string key = tomlGetOrDefault (filt, "name", std::string ());
-            bool cloningflag = tomlGetOrDefault (filt, "cloning", false);
-            std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
-            std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
-            auto info = tomlGetOrDefault (filt, "info", std::string ());
+            std::string key = getOrDefault (filt, "name", std::string ());
+            bool cloningflag = getOrDefault (filt, "cloning", false);
+            std::string inputType = getOrDefault (filt, "inputType", std::string ());
+            std::string outputType = getOrDefault (filt, "outputType", std::string ());
+            auto info = getOrDefault (filt, "info", std::string ());
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation = tomlGetOrDefault (filt, "operation", std::string ("custom"));
+            std::string operation = getOrDefault (filt, "operation", std::string ("custom"));
 
             auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))

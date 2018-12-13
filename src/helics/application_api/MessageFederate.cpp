@@ -117,26 +117,25 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         for (const auto &ept : doc["endpoints"])
         {
             auto eptName = getKey (ept);
-            auto type = jsonGetOrDefault (ept, "type", std::string ());
-            bool global = jsonGetOrDefault (ept, "global", false);
+            auto type = getOrDefault (ept, "type", std::string ());
+            bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
 
             addTargets (ept, "knownDestinations",
                         [&epObj, this](const std::string &dest) { registerKnownCommunicationPath (epObj, dest); });
             addTargets (ept, "subscriptions", [&epObj, this](const std::string &sub) { subscribe (epObj, sub); });
             addTargets (ept, "filters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "sourceFilters",
-                        [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
+            addTargets (ept, "sourceFilters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
             addTargets (ept, "destFilters",
                         [&epObj](const std::string &filt) { epObj.addDestinationFilter (filt); });
-            auto defTarget = jsonGetOrDefault (ept, "target", std::string ());
-            jsonReplaceIfMember (ept, "destination", defTarget);
+            auto defTarget = getOrDefault (ept, "target", std::string ());
+            replaceIfMember (ept, "destination", defTarget);
             if (!defTarget.empty ())
             {
                 epObj.setTargetDestination (defTarget);
             }
 
-            auto info = jsonGetOrDefault (ept, "info", std::string ());
+            auto info = getOrDefault (ept, "info", std::string ());
             if (!info.empty ())
             {
                 setInfo (epObj.getHandle (), info);
@@ -164,27 +163,26 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         for (auto &ept : eptArray)
         {
             auto key = getKey (ept);
-            auto type = tomlGetOrDefault (ept, "type", std::string ());
-            bool global = tomlGetOrDefault (ept, "global", false);
+            auto type = getOrDefault (ept, "type", std::string ());
+            bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
 
             addTargets (ept, "knownDestinations",
                         [&epObj, this](const std::string &dest) { registerKnownCommunicationPath (epObj, dest); });
             addTargets (ept, "subscriptions", [&epObj, this](const std::string &sub) { subscribe (epObj, sub); });
             addTargets (ept, "filters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "sourceFilters",
-                        [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
+            addTargets (ept, "sourceFilters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
             addTargets (ept, "destFilters",
                         [&epObj](const std::string &filt) { epObj.addDestinationFilter (filt); });
 
-            auto defTarget = tomlGetOrDefault (ept, "target", std::string ());
-            tomlReplaceIfMember (ept, "destination", defTarget);
+            auto defTarget = getOrDefault (ept, "target", std::string ());
+            replaceIfMember (ept, "destination", defTarget);
             if (!defTarget.empty ())
             {
                 epObj.setTargetDestination (defTarget);
             }
 
-            auto info = tomlGetOrDefault (ept, "info", std::string ());
+            auto info = getOrDefault (ept, "info", std::string ());
             if (!info.empty ())
             {
                 setInfo (epObj.getHandle (), info);
@@ -224,9 +222,6 @@ bool MessageFederate::hasMessage (const Endpoint &ept) const
     return false;
 }
 
-/**
- * Returns the number of pending receives for the specified destination endpoint.
- */
 uint64_t MessageFederate::pendingMessages (const Endpoint &ept) const
 {
     if (state >= states::initialization)
@@ -235,11 +230,7 @@ uint64_t MessageFederate::pendingMessages (const Endpoint &ept) const
     }
     return 0;
 }
-/**
-* Returns the number of pending receives for the specified destination endpoint.
-@details this function is not preferred in multithreaded contexts due to the required locking
-prefer to just use getMessage until it returns an invalid Message.
-*/
+
 uint64_t MessageFederate::pendingMessages () const
 {
     if (state >= states::initialization)

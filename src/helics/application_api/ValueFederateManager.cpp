@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ValueFederateManager.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "ValueFederateManager.hpp"
 
 namespace helics
 {
@@ -93,7 +93,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
     }
 }
 
-void ValueFederateManager::addShortcut (const Input &inp, const std::string &shortcutName)
+void ValueFederateManager::addAlias (const Input &inp, const std::string &shortcutName)
 {
     if (inp.isValid ())
     {
@@ -103,7 +103,20 @@ void ValueFederateManager::addShortcut (const Input &inp, const std::string &sho
     }
     else
     {
-        throw (InvalidIdentifier ("input id is invalid"));
+        throw (InvalidIdentifier ("input is invalid"));
+    }
+}
+
+void ValueFederateManager::addAlias (const Publication &pub, const std::string &shortcutName)
+{
+    if (pub.isValid ())
+    {
+        auto pubHandle = publications.lock ();
+        pubHandle->addSearchTerm (shortcutName, pub.handle);
+    }
+    else
+    {
+        throw (InvalidIdentifier ("publication is invalid"));
     }
 }
 
@@ -199,10 +212,10 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
-	if (handles.empty())
-	{
+    if (handles.empty ())
+    {
         return;
-	}
+    }
     // lock the data updates
     auto inpHandle = inputs.lock ();
     auto allCall = allCallback.load ();

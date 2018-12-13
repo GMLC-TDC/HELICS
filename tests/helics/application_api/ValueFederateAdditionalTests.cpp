@@ -122,7 +122,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     BOOST_CHECK_EQUAL (sv2, "sub2");
     auto &sub3name = vFed1->getTarget (subid3);
 
-    vFed1->addShortcut (subid, "Shortcut");
+    vFed1->addAlias (subid, "Shortcut");
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
     BOOST_CHECK_EQUAL (vFed1->getInputUnits (subid3), "V");
