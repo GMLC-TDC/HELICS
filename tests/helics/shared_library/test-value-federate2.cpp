@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_REQUIRE (vFed != nullptr);
     const char *s = helicsFederateGetName (vFed);
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed), 2);
+    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (vFed), 3);
     BOOST_CHECK_EQUAL (helicsFederateGetPublicationCount (vFed), 2);
     //	 helics::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     CE (helicsFederateFinalize (vFed, &err));
