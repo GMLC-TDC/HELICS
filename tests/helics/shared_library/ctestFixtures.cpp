@@ -101,7 +101,7 @@ FederateTestFixture::~FederateTestFixture ()
 
     for (auto &broker : brokers)
     {
-        if (!helicsBrokerIsValid (broker))
+        if (helicsBrokerIsValid (broker) == helics_false)
         {
             continue;
         }

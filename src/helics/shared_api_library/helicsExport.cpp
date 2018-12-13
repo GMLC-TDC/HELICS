@@ -930,6 +930,7 @@ void helicsCoreFree (helics_core core)
     auto coreObj = helics::getCoreObject (core, nullptr);
     if (coreObj != nullptr)
     {
+        coreObj->valid = 0;
         getMasterHolder ()->clearCore (coreObj->index);
     }
     helics::CoreFactory::cleanUpCores ();
@@ -940,6 +941,7 @@ void helicsBrokerFree (helics_broker broker)
     auto brokerObj = helics::getBrokerObject (broker, nullptr);
     if (brokerObj != nullptr)
     {
+        brokerObj->valid = 0;
         getMasterHolder ()->clearBroker (brokerObj->index);
     }
     helics::BrokerFactory::cleanUpBrokers ();
@@ -950,6 +952,7 @@ void helicsFederateFree (helics_federate fed)
     auto fedObj = helics::getFedObject (fed, nullptr);
     if (fedObj != nullptr)
     {
+        fedObj->valid = 0;
         getMasterHolder ()->clearFed (fedObj->index);
     }
 
@@ -1229,6 +1232,7 @@ void MasterObjectHolder::clearBroker (int index)
     auto broker = brokers.lock ();
     if ((index < static_cast<int> (broker->size ())) && (index >= 0))
     {
+        (*broker)[index]->valid = 0;
         (*broker)[index] = nullptr;
         if (broker->size () > 10)
         {
@@ -1245,6 +1249,7 @@ void MasterObjectHolder::clearCore (int index)
     auto core = cores.lock ();
     if ((index < static_cast<int> (core->size ())) && (index >= 0))
     {
+        (*core)[index]->valid = 0;
         (*core)[index] = nullptr;
         if (core->size () > 10)
         {
@@ -1261,6 +1266,7 @@ void MasterObjectHolder::clearFed (int index)
     auto fed = feds.lock ();
     if ((index < static_cast<int> (fed->size ())) && (index >= 0))
     {
+        (*fed)[index]->valid = 0;
         (*fed)[index] = nullptr;
         if (fed->size () > 10)
         {
