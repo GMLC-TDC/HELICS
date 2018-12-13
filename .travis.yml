@@ -77,7 +77,7 @@ jobs:
       os: osx
       compiler: clang
       env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode8
 
@@ -135,6 +135,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
+        - DISABLE_INTERFACES="Python,Java"
         - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
@@ -144,6 +145,7 @@ jobs:
         - USE_SWIG=true 
         - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
+        - DISABLE_INTERFACES="Python,Java"
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
@@ -191,6 +193,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
         - CCACHE_CPP2=yes
         - CI_TEST_CONFIG="TSAN"
+        - DISABLE_INTERFACES="Python,Java"
         - RUN_TSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
@@ -209,6 +212,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
         - CCACHE_CPP2=yes
+        - DISABLE_INTERFACES="Python,Java"
         - RUN_UBSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
@@ -232,9 +236,12 @@ install:
   - export BOOST_USE_STATIC=true
   - source scripts/install-ci-dependencies.sh
 
+  - SHELLNOCASEMATCH=$(shopt -p nocasematch; true)
+  - shopt -s nocasematch
   - OPTION_FLAGS_ARR=()
-  - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DBUILD_PYTHON_INTERFACE=ON" "-DBUILD_JAVA_INTERFACE=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
-  - OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
+  - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
+  - if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then OPTION_FLAGS_ARR+=("-DBUILD_JAVA_INTERFACE=ON") ; fi
+  - if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON" "-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}") ; fi
   - OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON -DUSE_BOOST_STATIC_LIBS=ON")
 
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON") ; fi
@@ -261,7 +268,8 @@ install:
   - if [[ "$CTEST_VERBOSE" ]]; then TEST_FLAGS_ARR+=("--ctest-verbose") ; fi
   - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
   - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
-
+  - $SHELLNOCASEMATCH
+  
 script:
   - mkdir -p build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
