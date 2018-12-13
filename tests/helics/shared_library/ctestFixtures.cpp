@@ -101,6 +101,10 @@ FederateTestFixture::~FederateTestFixture ()
 
     for (auto &broker : brokers)
     {
+        if (helicsBrokerIsValid (broker) == helics_false)
+        {
+            continue;
+        }
         helics_bool res;
         if (ctype.compare (0, 3, "tcp") == 0)
         {

@@ -72,7 +72,15 @@ class ValueFederateManager
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (const Input &inp, const std::string &shortcutName);
+    void addAlias (const Input &inp, const std::string &shortcutName);
+
+    /** add a alias/shortcut for locating a publication
+    @details primarily for use in looking up an id from a different location
+    creates a local shortcut for referring to a subscription which may have a long actual name
+    @param[in] the subscription identifier
+    @param[in] shortcutName the name of the shortcut
+    */
+    void addAlias (const Publication &pub, const std::string &shortcutName);
     /** add a destination target to a publication
    @param id the identifier of the input
    target the name of the input to send the data to

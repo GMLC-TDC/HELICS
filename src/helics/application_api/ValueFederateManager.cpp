@@ -93,7 +93,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
     }
 }
 
-void ValueFederateManager::addShortcut (const Input &inp, const std::string &shortcutName)
+void ValueFederateManager::addAlias (const Input &inp, const std::string &shortcutName)
 {
     if (inp.isValid ())
     {
@@ -103,7 +103,20 @@ void ValueFederateManager::addShortcut (const Input &inp, const std::string &sho
     }
     else
     {
-        throw (InvalidIdentifier ("input id is invalid"));
+        throw (InvalidIdentifier ("input is invalid"));
+    }
+}
+
+void ValueFederateManager::addAlias (const Publication &pub, const std::string &shortcutName)
+{
+    if (pub.isValid ())
+    {
+        auto pubHandle = publications.lock ();
+        pubHandle->addSearchTerm (shortcutName, pub.handle);
+    }
+    else
+    {
+        throw (InvalidIdentifier ("publication is invalid"));
     }
 }
 

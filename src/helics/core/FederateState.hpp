@@ -97,8 +97,6 @@ class FederateState
       delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<interface_handle> events;  //!< list of value events to process
     std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
-    std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
-      message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing

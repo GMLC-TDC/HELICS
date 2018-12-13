@@ -410,6 +410,11 @@ class Federate
     */
     void setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op);
 
+    /** set a filter option */
+    void setFilterOption (const Filter &filt, int32_t option, bool option_value = true);
+    /** get the number of filters registered through this federate*/
+    int getFilterCount () const;
+
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime (Time newTime, Time oldTime);

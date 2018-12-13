@@ -5,20 +5,28 @@
 #
 
 set(
-  c_shared_library_test_sources ctestFixtures.cpp shared-library-tests.cpp
+  c_shared_library_test_sources 
+  ctestFixtures.cpp 
+  shared-library-tests.cpp
   # data_viewTests.cpp
-  test-value-federate1.cpp test-value-federate2.cpp
+  test-value-federate1.cpp 
+  test-value-federate2.cpp
   # ValueFederateTests2.cpp
-  FilterTests.cpp test-message-federate.cpp
+  FilterTests.cpp 
+  test-message-federate.cpp
   # test-message-federate_cpp.cpp
   # FederateTests.cpp
   TimingTests.cpp
   # iterationTests.cpp
-  QueryTests.cpp badInputTests.cpp
+  QueryTests.cpp 
+  badInputTests.cpp
+  comboConfigTests.cpp
 )
 
 set(
-  cpp_shared_library_test_sources cpptestFixtures.cpp cppshared-library-tests.cpp
+  cpp_shared_library_test_sources 
+  cpptestFixtures.cpp 
+  cppshared-library-tests.cpp
   # test-value-federate1_cpp.cpp
   test-value-federate2_cpp.cpp
   # FilterTests_cpp.cpp

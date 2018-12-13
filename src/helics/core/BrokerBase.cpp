@@ -13,14 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
-#include "helics/helics-config.h"
-#include "helicsVersion.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
 #include <boost/asio/steady_timer.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "loggingHelper.hpp"
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

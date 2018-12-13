@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_REQUIRE (vFed.baseObject () != nullptr);
     auto s = vFed.getName ();
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (vFed.getInputCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 3);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
     //	 helicscpp::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     vFed.finalize ();

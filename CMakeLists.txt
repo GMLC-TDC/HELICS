@@ -275,9 +275,6 @@ set(
   program_options
   filesystem
   system
-  date_time
-  timer
-  chrono
 )
 if (BUILD_TESTING)
 	list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
