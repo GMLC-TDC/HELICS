@@ -1266,9 +1266,9 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
         return;
     }
     bool used = false;
-    switch (cmd.counter)
+    switch (static_cast<char> (cmd.counter))
     {
-    case 0:
+    case 'i':
         used = interfaceInformation.setInputProperty (cmd.dest_handle, cmd.messageID,
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
@@ -1277,7 +1277,7 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                       interfaceInformation.getInput (cmd.dest_handle)->key));
         }
         break;
-    case 1:
+    case 'p':
         used = interfaceInformation.setPublicationProperty (cmd.dest_handle, cmd.messageID,
                                                             checkActionFlag (cmd, indicator_flag));
         if (!used)
@@ -1286,7 +1286,7 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                       interfaceInformation.getPublication (cmd.dest_handle)->key));
         }
         break;
-    case 2:
+    case 'e':
         used = interfaceInformation.setInputProperty (cmd.dest_handle, cmd.messageID,
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)

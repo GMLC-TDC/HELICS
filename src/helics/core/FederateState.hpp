@@ -91,8 +91,8 @@ class FederateState
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
-    std::atomic<uint16_t> interfaceFlags =
-      0;  //!< current defaults for operational flags of interfaces for this federate
+    std::atomic<uint16_t> interfaceFlags{
+      0};  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id, std::deque<ActionMessage>>
       delayQueues;  //!< queue for delaying processing of messages for a time
     std::vector<interface_handle> events;  //!< list of value events to process
