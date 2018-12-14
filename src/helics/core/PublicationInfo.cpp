@@ -11,9 +11,15 @@ bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)
 {
     if ((len != data.length ()) || (stx::string_view (data) != stx::string_view (dataToCheck, len)))
     {
-        data = std::string (dataToCheck, len);
+        data.assign(dataToCheck, len);
         return true;
     }
     return false;
 }
+
+void PublicationInfo::removeSubscriber(global_handle subscriberToRemove)
+{
+	subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove), subscribers.end());
+}
+
 }  // namespace helics

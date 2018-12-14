@@ -173,18 +173,18 @@ void TestComms::queue_tx_function ()
     }
 
     setTxStatus (connection_status::connected);
-    std::map<route_id_t, std::shared_ptr<BrokerBase>> routes;
+    std::map<route_id, std::shared_ptr<BrokerBase>> routes;
 
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (rid == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -198,7 +198,7 @@ void TestComms::queue_tx_function ()
                         auto tcore = std::dynamic_pointer_cast<CommonCore> (core);
                         if (tcore)
                         {
-                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (tcore));
+                            routes.emplace (route_id{cmd.getExtraData ()}, std::move (tcore));
                             foundRoute = true;
                         }
                     }
@@ -209,7 +209,7 @@ void TestComms::queue_tx_function ()
                         auto cbrk = std::dynamic_pointer_cast<CoreBroker> (brk);
                         if (cbrk)
                         {
-                            routes.emplace (route_id_t (cmd.getExtraData ()), std::move (cbrk));
+                            routes.emplace (route_id{cmd.getExtraData ()}, std::move (cbrk));
                             foundRoute = true;
                         }
                     }
@@ -221,7 +221,7 @@ void TestComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -238,7 +238,7 @@ void TestComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (tbroker)
             {
@@ -253,7 +253,7 @@ void TestComms::queue_tx_function ()
         }
         else
         {
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 rt_find->second->addActionMessage (std::move (cmd));

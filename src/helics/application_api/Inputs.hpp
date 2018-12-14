@@ -22,7 +22,7 @@ class Input
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
 
-    helics_type_t type = helics_type_t::helicsUnknown;  //!< the underlying type the publication is using
+    data_type type = data_type::helicsUnknown;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
     bool disableAssign = false;  //!< disable assignment for the object
@@ -85,17 +85,14 @@ class Input
 
     Input (ValueFederate *valueFed,
            const std::string &name,
-           helics_type_t defType,
+           data_type defType,
            const std::string &units = std::string ())
         : Input (valueFed, name, typeNameStringRef (defType), units)
     {
     }
 
     template <class FedPtr>
-    Input (FedPtr &valueFed,
-           const std::string &name,
-           helics_type_t defType,
-           const std::string &units = std::string ())
+    Input (FedPtr &valueFed, const std::string &name, data_type defType, const std::string &units = std::string ())
         : Input (valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -120,7 +117,7 @@ class Input
     Input (interface_visibility locality,
            ValueFederate *valueFed,
            const std::string &name,
-           helics_type_t defType,
+           data_type defType,
            const std::string &units = std::string ())
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
@@ -130,7 +127,7 @@ class Input
     Input (interface_visibility locality,
            FedPtr &valueFed,
            const std::string &name,
-           helics_type_t defType,
+           data_type defType,
            const std::string &units = std::string ())
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
@@ -171,11 +168,14 @@ class Input
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
+    /** subscribe to a named publication*/
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
+    /** remove a named subscription*/
+    void removeTarget (const std::string &targetToRemove) { fed->removeTarget (*this, targetToRemove); }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
@@ -189,7 +189,7 @@ class Input
     void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
         static_assert (
-          helicsType<X> () != helics_type_t::helicsCustom,
+          helicsType<X> () != data_type::helicsCustom,
           "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
           "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move (callback);
@@ -251,50 +251,50 @@ class Input
     /** deal with the callback from the application API*/
     void handleCallback (Time time);
     template <class X>
-    void getValue_impl (std::integral_constant<int, 0> /*V*/, X &out);
+    void getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &out);
 
     /** handle special case for character return data*/
-    void getValue_impl (std::integral_constant<int, 0> /*V*/, char &out) { out = getValueChar (); }
+    void getValue_impl (std::integral_constant<int, primaryType> /*V*/, char &out) { out = getValueChar (); }
 
     /** handle special case for character return data*/
-    void getValue_impl (std::integral_constant<int, 1> /*V*/, char &out) { out = getValueChar (); }
+    void getValue_impl (std::integral_constant<int, convertibleType> /*V*/, char &out) { out = getValueChar (); }
 
     template <class X>
-    void getValue_impl (std::integral_constant<int, 1> /*V*/, X &out)
+    void getValue_impl (std::integral_constant<int, convertibleType> /*V*/, X &out)
     {
         std::conditional_t<std::is_integral<X>::value,
                            std::conditional_t<std::is_same<X, char>::value, char, int64_t>, double>
           gval;
-        getValue_impl (std::integral_constant<int, 0> (), gval);
+        getValue_impl (std::integral_constant<int, primaryType> (), gval);
         out = static_cast<X> (gval);
     }
 
     template <class X>
-    void getValue_impl (std::integral_constant<int, 2> /*V*/, X &out)
+    void getValue_impl (std::integral_constant<int, nonConvertibleType> /*V*/, X &out)
     {
         ValueConverter<X>::interpret (fed->getValueRaw (*this), out);
     }
 
     template <class X>
-    X getValue_impl (std::integral_constant<int, 0> /*V*/)
+    X getValue_impl (std::integral_constant<int, primaryType> /*V*/)
     {
         X val;
-        getValue_impl (std::integral_constant<int, 0> (), val);
+        getValue_impl (std::integral_constant<int, primaryType> (), val);
         return val;
     }
 
     template <class X>
-    X getValue_impl (std::integral_constant<int, 1> /*V*/)
+    X getValue_impl (std::integral_constant<int, convertibleType> /*V*/)
     {
         std::conditional_t<std::is_integral<X>::value,
                            std::conditional_t<std::is_same<X, char>::value, char, int64_t>, double>
           gval;
-        getValue_impl (std::integral_constant<int, 0> (), gval);
+        getValue_impl (std::integral_constant<int, primaryType> (), gval);
         return static_cast<X> (gval);
     }
 
     template <class X>
-    X getValue_impl (std::integral_constant<int, 2> /*V*/)
+    X getValue_impl (std::integral_constant<int, nonConvertibleType> /*V*/)
     {
         return ValueConverter<X>::interpret (fed->getValueRaw (*this));
     }
@@ -331,6 +331,9 @@ class Input
     size_t getStringSize ();
     /** get the number of elements in the data if it were a vector*/
     size_t getVectorSize ();
+    /** close a input during an active simulation
+    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    void close () { fed->closeInterface (handle); }
 
   private:
     /** helper class for getting a character since that is a bit odd*/
@@ -350,7 +353,7 @@ class InputT : public Input
       changeDetectionOperator;  //!< callback function for change detection
     // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
-      std::conditional_t<((helicsType<X> () != helics_type_t::helicsCustom) || (isConvertableType<X> ())),
+      std::conditional_t<((helicsType<X> () != data_type::helicsCustom) || (isConvertableType<X> ())),
                          std::true_type,
                          std::false_type>;
 
@@ -410,12 +413,12 @@ class InputT : public Input
 };
 
 template <class X>
-void Input::getValue_impl (std::integral_constant<int, 0> /*V*/, X &out)
+void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &out)
 {
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == helics_type_t::helicsUnknown)
+        if (type == data_type::helicsUnknown)
         {
             type = getTypeFromString (fed->getPublicationType (*this));
         }
@@ -461,7 +464,7 @@ inline const std::string &getValueRefImpl (defV &val)
     }
     else
     {
-        valueConvert (val, helics_type_t::helicsString);
+        valueConvert (val, data_type::helicsString);
         return mpark::get<std::string> (val);
     }
 }
@@ -469,12 +472,12 @@ inline const std::string &getValueRefImpl (defV &val)
 template <class X>
 const X &Input::getValueRef ()
 {
-    static_assert (std::is_same<typeCategory<X>, std::integral_constant<int, 0>>::value,
+    static_assert (std::is_same<typeCategory<X>, std::integral_constant<int, primaryType>>::value,
                    "calling getValue By ref must be with a primary type");
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == helics_type_t::helicsUnknown)
+        if (type == data_type::helicsUnknown)
         {
             type = getTypeFromString (fed->getPublicationType (*this));
         }

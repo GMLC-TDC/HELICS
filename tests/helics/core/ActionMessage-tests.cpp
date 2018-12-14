@@ -31,10 +31,10 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
     */
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
-    m.source_handle = interface_handle (4);
-    m.source_id = global_federate_id_t (232324);
-    m.dest_id = global_federate_id_t (22552215);
-    m.dest_handle = interface_handle (2322342);
+    m.source_handle = interface_handle{4};
+    m.source_id = global_federate_id{232324};
+    m.dest_id = global_federate_id{22552215};
+    m.dest_handle = interface_handle{2322342};
 
     std::string data;
     m.to_string (data);
@@ -66,8 +66,8 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
     m.source_handle = interface_handle (4);
-    m.source_id = global_federate_id_t (232324);
-    m.dest_id = global_federate_id_t (22552215);
+    m.source_id = global_federate_id (232324);
+    m.dest_id = global_federate_id (22552215);
     m.dest_handle = interface_handle (2322342);
 
     m.setString (sourceStringLoc, "this is a long source string to test");
@@ -105,10 +105,10 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info2)
     */
     m.actionTime = 47.2342;
     m.payload = "this is a string that is sufficiently long";
-    m.source_handle = interface_handle (4);
-    m.source_id = global_federate_id_t (232324);
-    m.dest_id = global_federate_id_t (22552215);
-    m.dest_handle = interface_handle (2322342);
+    m.source_handle = interface_handle{4};
+    m.source_id = global_federate_id{232324};
+    m.dest_id = global_federate_id{22552215};
+    m.dest_handle = interface_handle{2322342};
 
     m.setString (sourceStringLoc, "this is a long source string to test");
     m.setString (origSourceStringLoc, "this is a longer alternate source string to test");
@@ -163,10 +163,10 @@ BOOST_AUTO_TEST_CASE (constructor_test)
 BOOST_AUTO_TEST_CASE (copy_constructor_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
-    cmd.source_id = global_federate_id_t (1);
-    cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
-    cmd.dest_handle = interface_handle (4);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     cmd.flags = 0x1a2F;  // this has no significance
     cmd.actionTime = helics::Time::maxVal ();
     cmd.payload = "hello world";
@@ -197,9 +197,9 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
 BOOST_AUTO_TEST_CASE (assignment_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
-    cmd.source_id = global_federate_id_t (1);
+    cmd.source_id = global_federate_id (1);
     cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_id = global_federate_id (3);
     cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
@@ -267,9 +267,9 @@ BOOST_AUTO_TEST_CASE (comparison_test)
 BOOST_AUTO_TEST_CASE (conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = global_federate_id_t (1);
+    cmd.source_id = global_federate_id (1);
     cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_id = global_federate_id (3);
     cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
@@ -296,10 +296,10 @@ BOOST_AUTO_TEST_CASE (conversion_test)
 BOOST_AUTO_TEST_CASE (conversion_test2)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = global_federate_id_t (1);
-    cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
-    cmd.dest_handle = interface_handle (4);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
@@ -325,10 +325,10 @@ BOOST_AUTO_TEST_CASE (conversion_test2)
 BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = global_federate_id_t (1);
-    cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
-    cmd.dest_handle = interface_handle (4);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);
     setActionFlag (cmd, error_flag);
@@ -383,9 +383,9 @@ BOOST_AUTO_TEST_CASE (check_conversions)
 BOOST_AUTO_TEST_CASE (check_packetization)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
-    cmd.source_id = global_federate_id_t (1);
+    cmd.source_id = global_federate_id (1);
     cmd.source_handle = interface_handle (2);
-    cmd.dest_id = global_federate_id_t (3);
+    cmd.dest_id = global_federate_id (3);
     cmd.dest_handle = interface_handle (4);
     setActionFlag (cmd, iteration_requested_flag);
     setActionFlag (cmd, required_flag);

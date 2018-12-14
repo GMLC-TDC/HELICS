@@ -99,8 +99,8 @@ void addOperations (Filter *filt, filter_types type, Core *cptr)
 
 Filter::Filter (Federate *ffed, const std::string &filtName) : Filter (ffed->registerFilter (filtName)) {}
 
-Filter::Filter (Federate *ffed, const std::string &filtName, interface_handle handle)
-    : fed (ffed), id (handle), name (filtName)
+Filter::Filter (Federate *ffed, const std::string &filtName, interface_handle ihandle)
+    : fed (ffed), handle (ihandle), name (filtName)
 {
     if (ffed != nullptr)
     {
@@ -128,7 +128,7 @@ Filter::Filter (Core *cr, const std::string &filtName) : corePtr (cr), name (fil
 {
     if (corePtr != nullptr)
     {
-        id = corePtr->registerFilter (filtName, std::string (), std::string ());
+        handle = corePtr->registerFilter (filtName, std::string (), std::string ());
         fed = nullptr;
     }
 }
@@ -137,7 +137,7 @@ void Filter::setOperator (std::shared_ptr<FilterOperator> mo)
 {
     if (corePtr != nullptr)
     {
-        corePtr->setFilterOperator (id, std::move (mo));
+        corePtr->setFilterOperator (handle, std::move (mo));
     }
 }
 
@@ -148,11 +148,11 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
     {
         if (filtOp)
         {
-            corePtr->setFilterOperator (id, filtOp->getOperator ());
+            corePtr->setFilterOperator (handle, filtOp->getOperator ());
         }
         else
         {
-            corePtr->setFilterOperator (id, nullptr);
+            corePtr->setFilterOperator (handle, nullptr);
         }
     }
 }
@@ -163,7 +163,7 @@ const std::string &Filter::getName () const
 {
     if (corePtr != nullptr)
     {
-        return corePtr->getHandleName (id);
+        return corePtr->getHandleName (handle);
     }
     return emptyStr;
 }
@@ -172,7 +172,7 @@ const std::string &Filter::getInputType () const
 {
     if (corePtr != nullptr)
     {
-        return corePtr->getType (id);
+        return corePtr->getType (handle);
     }
     return emptyStr;
 }
@@ -181,7 +181,7 @@ const std::string &Filter::getOutputType () const
 {
     if (corePtr != nullptr)
     {
-        return corePtr->getOutputType (id);
+        return corePtr->getOutputType (handle);
     }
     return emptyStr;
 }
@@ -207,7 +207,7 @@ CloningFilter::CloningFilter (Core *cr, const std::string &filtName)
     corePtr = cr;
     if (corePtr != nullptr)
     {
-        id = corePtr->registerCloningFilter (filtName, std::string (), std::string ());
+        handle = corePtr->registerCloningFilter (filtName, std::string (), std::string ());
         name = filtName;
     }
     setFilterOperations (std::make_shared<CloneFilterOperation> (cr));
@@ -222,8 +222,8 @@ CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName)
     }
 }
 
-CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle)
-    : Filter (ffed, filtName, handle)
+CloningFilter::CloningFilter (Federate *ffed, const std::string &filtName, interface_handle ihandle)
+    : Filter (ffed, filtName, ihandle)
 {
 }
 
@@ -248,13 +248,13 @@ CloningFilter::CloningFilter (interface_visibility locality, Federate *ffed, con
 void Filter::addSourceTarget (const std::string &sourceName)
 {
     // sourceEndpoints.push_back (sourceName);
-    corePtr->addSourceTarget (id, sourceName);
+    corePtr->addSourceTarget (handle, sourceName);
 }
 
 void Filter::addDestinationTarget (const std::string &destinationName)
 {
     // destEndpoints.push_back (destinationName);
-    corePtr->addDestinationTarget (id, destinationName);
+    corePtr->addDestinationTarget (handle, destinationName);
 }
 
 void CloningFilter::addDeliveryEndpoint (const std::string &endpoint)
@@ -262,7 +262,7 @@ void CloningFilter::addDeliveryEndpoint (const std::string &endpoint)
     Filter::setString ("add delivery", endpoint);
 }
 
-void Filter::removeTarget (const std::string &sourceName) { corePtr->removeTarget (id, sourceName); }
+void Filter::removeTarget (const std::string &sourceName) { corePtr->removeTarget (handle, sourceName); }
 
 void CloningFilter::removeDeliveryEndpoint (const std::string &endpoint)
 {

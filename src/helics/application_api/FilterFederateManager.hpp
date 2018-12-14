@@ -70,6 +70,8 @@ class FilterFederateManager
 
     /** get the number of registered filters in the federate*/
     int getFilterCount () const;
+    /** close all filters*/
+    void closeAllFilters ();
 
   private:
     Core *coreObject = nullptr;

@@ -41,11 +41,11 @@ class CommsBroker : public BrokerT
     void loadComms ();
 
   public:
-    virtual void transmit (route_id_t route_id, const ActionMessage &cmd) override;
-    virtual void transmit (route_id_t route_id, ActionMessage &&cmd) override;
+    virtual void transmit (route_id rid, const ActionMessage &cmd) override;
+    virtual void transmit (route_id rid, ActionMessage &&cmd) override;
 
-    virtual void addRoute (route_id_t route_id, const std::string &routeInfo) override;
+    virtual void addRoute (route_id rid, const std::string &routeInfo) override;
 
-    virtual void removeRoute (route_id_t route_id) override;
+    virtual void removeRoute (route_id rid) override;
 };
 }  // namespace helics

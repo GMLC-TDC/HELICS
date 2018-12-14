@@ -22,7 +22,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 using namespace helics;
 
-helics_type_t getType (const std::string &typeString)
+data_type getType (const std::string &typeString)
 {
     auto tstr = typeString;
     // trim the string
@@ -30,7 +30,7 @@ helics_type_t getType (const std::string &typeString)
     tstr.erase (0, tstr.find_first_not_of (" \t\n\0"));
     if (tstr.empty ())
     {
-        return helics_type_t::helicsCustom;
+        return data_type::helicsCustom;
     }
     if (tstr.size () == 1)
     {
@@ -38,26 +38,26 @@ helics_type_t getType (const std::string &typeString)
         {
         case 'a':
         case 'A':
-            return helics_type_t::helicsAny;
+            return data_type::helicsAny;
         case 's':
         case 'S':
-            return helics_type_t::helicsString;
+            return data_type::helicsString;
         case 'd':
         case 'D':
         case 'f':
         case 'F':
-            return helics_type_t::helicsDouble;
+            return data_type::helicsDouble;
         case 'i':
         case 'I':
-            return helics_type_t::helicsInt;
+            return data_type::helicsInt;
         case 'c':
         case 'C':
-            return helics_type_t::helicsComplex;
+            return data_type::helicsComplex;
         case 'v':
         case 'V':
-            return helics_type_t::helicsVector;
+            return data_type::helicsVector;
         default:
-            return helics_type_t::helicsCustom;
+            return data_type::helicsCustom;
         }
     }
 
@@ -66,23 +66,23 @@ helics_type_t getType (const std::string &typeString)
     return getTypeFromString (tstr);
 }
 
-char typeCharacter (helics_type_t type)
+char typeCharacter (data_type type)
 {
     switch (type)
     {
-    case helics_type_t::helicsString:
+    case data_type::helicsString:
         return 's';
-    case helics_type_t::helicsDouble:
+    case data_type::helicsDouble:
         return 'd';
-    case helics_type_t::helicsInt:
+    case data_type::helicsInt:
         return 'i';
-    case helics_type_t::helicsComplex:
+    case data_type::helicsComplex:
         return 'c';
-    case helics_type_t::helicsVector:
+    case data_type::helicsVector:
         return 'v';
-    case helics_type_t::helicsAny:
+    case data_type::helicsAny:
         return 'a';
-    case helics_type_t::helicsCustom:
+    case data_type::helicsCustom:
     default:
         return 'u';
     }

@@ -80,7 +80,7 @@ class Core
     /** waits in the current thread until the core is disconnected
     @return true if the disconnect was successful
      */
-    virtual bool waitForDisconnect (int msToWait = -1) const = 0;
+    virtual bool waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const = 0;
 
     /** check if the core is ready to accept new federates
      */
@@ -417,6 +417,10 @@ class Core
     */
     virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
+	/** close a handle from further connections
+	@param handle the handle to close
+	*/
+	virtual void closeHandle(interface_handle handle) = 0;
     /**
      * Publish specified data to the specified key.
      *

@@ -19,8 +19,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 }
 
 ActionMessage::ActionMessage (action_message_def::action_t startingAction,
-                              global_federate_id_t sourceId,
-                              global_federate_id_t destId)
+                              global_federate_id sourceId,
+                              global_federate_id destId)
     : ActionMessage (startingAction)
 {
     source_id = sourceId;
@@ -324,13 +324,13 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
     data += sizeof (action_message_def::action_t);
     messageID = *reinterpret_cast<const int32_t *> (data);
     data += sizeof (int32_t);
-    source_id = global_federate_id_t (*reinterpret_cast<const int32_t *> (data));
+    source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
     data += sizeof (int32_t);
-    source_handle = interface_handle (*reinterpret_cast<const int32_t *> (data));
+    source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
     data += sizeof (int32_t);
-    dest_id = global_federate_id_t (*reinterpret_cast<const int32_t *> (data));
+    dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
     data += sizeof (int32_t);
-    dest_handle = interface_handle (*reinterpret_cast<const int32_t *> (data));
+    dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
     data += sizeof (int32_t);
     counter = *reinterpret_cast<const uint16_t *> (data);
     data += sizeof (uint16_t);
@@ -607,18 +607,26 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
   {action_message_def::action_t::cmd_add_publisher, "add publisher"},
+  {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
   {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
   {action_message_def::action_t::cmd_add_filter, "add_filter"},
+  {action_message_def::action_t::cmd_remove_filter, "remove filter"},
   {action_message_def::action_t::cmd_reg_input, "reg_input"},
   {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
+  {action_message_def::action_t::cmd_remove_subscriber, "remove subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
   {action_message_def::action_t::cmd_resend, "reg_resend"},
   {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
+  {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
   {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
   {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
   {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
   {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
-  {action_message_def::action_t::cmd_remove_target, "remove_target"},
+  {action_message_def::action_t::cmd_remove_named_endpoint, "remove_named_endpoint"},
+  {action_message_def::action_t::cmd_remove_named_input, "remove_named_input"},
+  {action_message_def::action_t::cmd_remove_named_publication, "remove_named_publication"},
+  {action_message_def::action_t::cmd_remove_named_filter, "remove_named_filter"},
+  {action_message_def::action_t::cmd_close_interface, "close_interface"},
   {action_message_def::action_t::cmd_multi_message, "multi message"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},

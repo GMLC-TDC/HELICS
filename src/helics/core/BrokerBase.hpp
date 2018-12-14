@@ -26,9 +26,9 @@ class ForwardingTimeCoordinator;
 class BrokerBase
 {
   protected:
-      std::atomic<global_broker_id_t> global_broker_id{ parent_broker_id };  //!< the unique identifier for the broker(core or broker)
-      global_broker_id_t global_broker_id_local;  //!< meant to be the same as global_broker_id but not atomically protected
-    global_broker_id_t higher_broker_id{ 0 };  //!< the id code of the broker 1 level about this broker
+      std::atomic<global_broker_id> global_id{ parent_broker_id };  //!< the unique identifier for the broker(core or broker)
+      global_broker_id global_broker_id_local;  //!< meant to be the same as global_id but not atomically protected
+    global_broker_id higher_broker_id{ 0 };  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
@@ -142,7 +142,7 @@ class BrokerBase
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger (global_federate_id_t federateID,
+    virtual bool sendToLogger (global_federate_id federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const;

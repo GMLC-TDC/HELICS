@@ -11,8 +11,8 @@ namespace helics
 class FederateInfo;
 }
 
-helics::helics_type_t getType (const std::string &typeString);
+helics::data_type getType (const std::string &typeString);
 
-char typeCharacter (helics::helics_type_t type);
+char typeCharacter (helics::data_type type);
 
 bool isBinaryData(helics::data_block &data);

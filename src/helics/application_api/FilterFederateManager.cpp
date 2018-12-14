@@ -65,9 +65,9 @@ static Filter invalidFiltNC{};
 
 Filter &FilterFederateManager::getFilter (const std::string &name)
 {
-    auto sharedFilt = filters.lock ();
-    auto filt = sharedFilt->find (name);
-    return (filt != sharedFilt.end ()) ? (**filt) : invalidFiltNC;
+    auto filts = filters.lock ();
+    auto filt = filts->find (name);
+    return (filt != filts.end ()) ? (**filt) : invalidFiltNC;
 }
 const Filter &FilterFederateManager::getFilter (const std::string &name) const
 {
@@ -98,4 +98,15 @@ const Filter &FilterFederateManager::getFilter (int index) const
 
 int FilterFederateManager::getFilterCount () const { return static_cast<int> (filters.lock_shared ()->size ()); }
 
+void FilterFederateManager::closeAllFilters ()
+{
+    if (coreObject)
+    {
+        auto filts = filters.lock ();
+        for (auto &filt : filts)
+        {
+            coreObject->closeHandle (filt->getHandle ());
+        }
+    }
+}
 }  // namespace helics

@@ -190,8 +190,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::executing);
 
     helicscpp::data_block data (500, 'a');
     helicscpp::data_block data2 (400, 'b');
@@ -226,8 +226,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::finalize);
 }
 
 
@@ -248,8 +248,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::executing);
 
     helicscpp::data_block data1 (500, 'a');
     helicscpp::data_block data2 (400, 'b');
@@ -301,8 +301,8 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::finalize);
 }
 //#define ENABLE_OUTPUT
 //trivial Federate that sends Messages and echoes a ping with a pong
@@ -477,8 +477,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::executing);
 
     helicscpp::data_block data (500, 'a');
     helicscpp::data_block data2 (400, 'b');
@@ -517,8 +517,8 @@ BOOST_DATA_TEST_CASE (test_time_interruptions, bdata::make (core_types), core_ty
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helicscpp::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helicscpp::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helicscpp::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helicscpp::Federate::modes::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (test_file_load)

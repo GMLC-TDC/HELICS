@@ -319,9 +319,19 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param inp the input object to add a named publication
-    target the name of the input to send the data to
+    target the name of the publication to get data from
     */
     void addTarget (const Input &inp, const std::string &target);
+    /** remove a destination target from a publication
+    @param pub the publication object to add a target to
+    target the name of the input to remove
+    */
+    void removeTarget (const Publication &pub, const std::string &target);
+    /** remove a publication from an input/subscription
+    @param inp the input object to add a named publication
+    target the name of the publication to remove
+    */
+    void removeTarget (const Input &inp, const std::string &target);
     /** register an optional subscription
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param[in] target the name of the target
