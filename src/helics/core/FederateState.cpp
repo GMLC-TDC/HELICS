@@ -122,6 +122,7 @@ void FederateState::setState (federate_state_t newState)
     case HELICS_ERROR:
     case HELICS_FINISHED:
     case HELICS_CREATED:
+    case HELICS_TERMINATING:
         state = newState;
         break;
     case HELICS_INITIALIZING:
@@ -639,6 +640,23 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
     return iteration_result::next_step;
 }
 
+void FederateState::finalize ()
+{
+    if ((state == federate_state_t::HELICS_FINISHED) || (state == federate_state_t::HELICS_ERROR))
+    {
+        return;
+    }
+    iteration_result ret = iteration_result::next_step;
+    while (ret != iteration_result::halted)
+    {
+        ret = genericUnspecifiedQueueProcess ();
+        if (ret == iteration_result::error)
+        {
+            break;
+        }
+    }
+}
+
 const std::vector<interface_handle> emptyHandles;
 
 const std::vector<interface_handle> &FederateState::getEvents () const { return events; }
@@ -857,20 +875,31 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         LOG_TIMING ("Terminating");
         timeCoord->disconnect ();
         return message_processing_result::halted;
+    case CMD_DISCONNECT_FED_ACK:
+        if ((cmd.dest_id == global_id.load ()) && (cmd.source_id == parent_broker_id))
+        {
+            if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING))
+            {
+                timeCoord->disconnect ();
+            }
+            setState (HELICS_FINISHED);
+            return message_processing_result::halted;
+        }
+        break;
+    case CMD_DISCONNECT_FED:
     case CMD_DISCONNECT:
         if (cmd.source_id == global_id.load ())
         {
-            if (state != HELICS_FINISHED)
+            if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING))
             {
-                setState (HELICS_FINISHED);
                 timeCoord->disconnect ();
                 cmd.dest_id = parent_broker_id;
+                setState (HELICS_TERMINATING);
                 if (parent_ != nullptr)
                 {
                     parent_->addActionMessage (cmd);
                 }
             }
-            return message_processing_result::halted;
         }
         else
         {

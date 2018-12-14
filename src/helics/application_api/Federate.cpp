@@ -232,6 +232,8 @@ bool Federate::isAsyncOperationCompleted () const
     case states::pending_iterative_time:
         return (asyncInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
                 std::future_status::ready);
+    case states::pending_finalize:
+        return (asyncInfo->finalizeFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     default:
         return false;
     }
@@ -434,11 +436,59 @@ void Federate::finalize ()
     case states::error:
         return;
         // do nothing
+    case states::pending_finalize:
+        finalizeComplete ();
+        return;
     default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
     state = states::finalize;
+}
+
+void Federate::finalizeAsync ()
+{
+    switch (state)
+    {
+    case states::pending_init:
+        enterInitializingModeComplete ();
+        break;
+    case states::pending_exec:
+        enterExecutingModeComplete ();
+        break;
+    case states::pending_time:
+        requestTimeComplete ();
+        break;
+    case states::pending_iterative_time:
+        requestTimeIterativeComplete ();
+        break;
+    case states::finalize:
+    case states::error:
+    case states::pending_finalize:
+        return;
+        // do nothing
+    default:
+        break;
+    }
+    auto finalizeFunc = [this]() { return coreObject->finalize (fedID); };
+    auto asyncInfo = asyncCallInfo->lock ();
+    state = states::pending_finalize;
+    asyncInfo->finalizeFuture = std::async (std::launch::async, finalizeFunc);
+}
+
+/** complete the asynchronous terminate pair*/
+void Federate::finalizeComplete ()
+{
+    if (state == states::pending_finalize)
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        asyncInfo->finalizeFuture.get ();
+        state = states::finalize;
+    }
+    else
+    {
+        finalize ();
+    }
 }
 
 void Federate::disconnect ()
@@ -1057,8 +1107,8 @@ std::string Federate::query (const std::string &queryStr)
         {
             res = coreObject->getIdentifier ();
         }
-        else
-        {
+    else
+    {
             res = "#unknown";
         }
     }

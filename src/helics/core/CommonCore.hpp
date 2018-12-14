@@ -127,7 +127,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
-    virtual void makeConnections(const std::string &file)override final;
+    virtual void makeConnections (const std::string &file) override final;
     virtual void dataLink (const std::string &source, const std::string &target) override final;
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
     virtual void
@@ -179,8 +179,8 @@ class CommonCore : public Core, public BrokerBase
      * class of some sort*/
     virtual void processDisconnect (bool skipUnregister = false) override final;
 
-    virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
-    virtual const std::string &getInterfaceInfo(interface_handle handle) const override final;
+    virtual void setInterfaceInfo (interface_handle handle, std::string info) override final;
+    virtual const std::string &getInterfaceInfo (interface_handle handle) const override final;
 
   private:
     /** implementation details of the connection process
@@ -226,9 +226,10 @@ class CommonCore : public Core, public BrokerBase
     FilterCoordinator *getFilterCoordinator (interface_handle id_);
     /** check if all federates managed by the core are ready to enter initialization state*/
     bool allInitReady () const;
-    /** check if all federates have said good-bye*/
+    /** check if all connections are disconnected (feds and time dependencies)*/
     bool allDisconnected () const;
-
+    /** check if all federates have said good-bye*/
+    bool allFedDisconnected () const;
     virtual bool sendToLogger (global_federate_id_t federateID,
                                int logLevel,
                                const std::string &name,

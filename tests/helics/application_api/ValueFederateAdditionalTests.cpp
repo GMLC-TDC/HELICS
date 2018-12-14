@@ -410,8 +410,9 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 
     s = subid.getValue<std::string> ();
     BOOST_CHECK_EQUAL (s, "string2");
-    vFed1->finalize ();
+    vFed1->finalizeAsync ();
     vFed2->finalize ();
+    vFed1->finalizeComplete ();
 }
 
 /** test info field for multiple publications */

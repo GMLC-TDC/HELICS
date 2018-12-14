@@ -249,6 +249,9 @@ class FederateState
     with no specific end in mind
     */
     iteration_result genericUnspecifiedQueueProcess ();
+    /** function to process the queue until a disconnect_fed_ack is received*/
+    void finalize ();
+
     /** add an action message to the queue*/
     void addAction (const ActionMessage &action);
     /** move a message to the queue*/
