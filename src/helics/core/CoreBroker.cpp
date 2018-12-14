@@ -873,10 +873,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
-                if (brk->_route_key)
-                {
-                    removeRoute (brk->route);
-                }
             }
             if (hasTimeDependency)
             {
