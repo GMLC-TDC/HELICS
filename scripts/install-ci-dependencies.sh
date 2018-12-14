@@ -165,9 +165,9 @@ if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     brew install python3
     echo "brew upgrade python"
     brew upgrade python
-    export PATH="/usr/local/bin:$(brew --prefix)/opt/python/libexec/bin:${PATH}"
-    pip3 install --user --upgrade pytest
-    /usr/local/bin/python3 -m pip install --user --upgrade pytest
+    /usr/local/opt/python/libexec/bin/pip3 -m pip install --user --upgrade pytest
+    export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
+    echo $PATH
 else
     if hash pyenv; then
         if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
