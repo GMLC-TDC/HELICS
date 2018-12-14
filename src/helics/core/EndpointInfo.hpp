@@ -19,14 +19,12 @@ class EndpointInfo
 {
   public:
     /** constructor from all data*/
-    EndpointInfo (global_handle id_,
-                  const std::string &key_,
-                  const std::string &type_)
-        :  id (id_), key (key_), type (type_)
+    EndpointInfo (global_handle id_, const std::string &key_, const std::string &type_)
+        : id (id_), key (key_), type (type_)
     {
     }
 
-	const global_handle id;  //!< identifier for the handle
+    const global_handle id;  //!< identifier for the handle
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
@@ -41,5 +39,7 @@ class EndpointInfo
     void addMessage (std::unique_ptr<Message> message);
     /** get the timestamp of the first message in the queue*/
     Time firstMessageTime () const;
+    /** clear all the message queues*/
+    void clearQueue ();
 };
 }  // namespace helics

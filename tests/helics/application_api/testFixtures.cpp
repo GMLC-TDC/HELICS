@@ -146,7 +146,7 @@ FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
     {
-        if (fed && fed->getCurrentState () != helics::Federate::states::finalize)
+        if (fed && fed->getCurrentMode () != helics::Federate::modes::finalize)
         {
             fed->finalize ();
         }
@@ -156,11 +156,11 @@ FederateTestFixture::~FederateTestFixture ()
     {
         if (ctype.compare (0, 3, "tcp") == 0)
         {
-            broker->waitForDisconnect (2000);
+            broker->waitForDisconnect (std::chrono::milliseconds(2000));
         }
         else
         {
-            broker->waitForDisconnect (2000);
+            broker->waitForDisconnect (std::chrono::milliseconds(2000));
         }
 
         if (broker->isConnected ())
@@ -177,7 +177,7 @@ void FederateTestFixture::FullDisconnect ()
 {
     for (auto &fed : federates)
     {
-        if (fed && fed->getCurrentState () != helics::Federate::states::finalize)
+        if (fed && fed->getCurrentMode () != helics::Federate::modes::finalize)
         {
             fed->finalize ();
         }

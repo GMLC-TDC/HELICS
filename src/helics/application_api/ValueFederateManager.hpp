@@ -92,6 +92,18 @@ class ValueFederateManager
     */
     void addTarget (const Input &inp, const std::string &target);
 
+	/** remove a destination target from a publication
+	@param id the identifier of the input
+	target the name of the input to remove
+	*/
+	void removeTarget(const Publication &pub, const std::string &target);
+	/** remove a source target from an input/subscription
+	@param id the identifier of the publication
+	target the name of the publication to remove
+	*/
+	void removeTarget(const Input &inp, const std::string &target);
+
+
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param[in] id the subscription identifier

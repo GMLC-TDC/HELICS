@@ -13,7 +13,7 @@ set(
 	PublicationInfo.cpp
 	NamedInputInfo.cpp
 	InterfaceInfo.cpp
-  # FilterInfo.cpp
+    FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp
@@ -28,6 +28,7 @@ set(
 	NetworkBrokerData.cpp
 	helics-time.cpp
 	HandleManager.cpp
+	FilterCoordinator.cpp
 	UnknownHandleManager.cpp
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
@@ -114,9 +115,9 @@ set(
 	NamedInputInfo.hpp
 	EndpointInfo.hpp
 	flagOperations.hpp
-	FilterInfo.hpp
 	BasicHandleInfo.hpp
-	FilterFunctions.hpp
+	FilterInfo.hpp
+	FilterCoordinator.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
 	UnknownHandleManager.hpp

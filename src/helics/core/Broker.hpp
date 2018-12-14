@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <functional>
 #include <string>
+#include <chrono>
 
 namespace helics
 {
@@ -60,9 +61,10 @@ class Broker
     setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 
     /** waits in the current thread until the broker is disconnected
+	@param msToWait  the timeout to wait for disconnect 
 	@return true if the disconnect was successful false if it timed out
      */
-    virtual bool waitForDisconnect (int msToWait = -1) const = 0;
+    virtual bool waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const = 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
     "federation",  "broker", or the name of a specific object

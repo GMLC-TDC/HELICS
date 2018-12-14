@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
+BasicHandleInfo &HandleManager::addHandle (global_federate_id fed_id,
                                            handle_type what,
                                            const std::string &key,
                                            const std::string &type,
@@ -22,7 +22,7 @@ BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
     return handles.back ();
 }
 
-BasicHandleInfo &HandleManager::addHandle (global_federate_id_t fed_id,
+BasicHandleInfo &HandleManager::addHandle (global_federate_id fed_id,
                                            interface_handle local_id,
                                            handle_type what,
                                            const std::string &key,
@@ -41,6 +41,41 @@ void HandleManager::addHandle (const BasicHandleInfo &otherHandle)
     auto index = static_cast<int32_t> (handles.size ());
     handles.push_back (otherHandle);
     addSearchFields (handles.back (), index);
+}
+
+void HandleManager::removeHandle (global_handle handle)
+{
+    auto key = static_cast<uint64_t> (handle);
+    auto fnd = unique_ids.find (key);
+    if (fnd == unique_ids.end ())
+    {
+        return;
+    }
+    auto index = fnd->second;
+    auto &info = handles[index];
+    unique_ids.erase (fnd);
+    if (!info.key.empty ())
+    {
+        switch (info.handleType)
+        {
+        case handle_type::endpoint:
+            endpoints.erase (info.key);
+            break;
+        case handle_type::publication:
+            publications.erase (info.key);
+            break;
+        case handle_type::filter:
+            filters.erase (info.key);
+            break;
+        case handle_type::input:
+            inputs.erase (info.key);
+            break;
+        default:
+            break;
+        }
+    }
+    // construct a blank at the previous index
+    new (&(handles[index])) BasicHandleInfo;
 }
 
 void HandleManager::addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_t index)
@@ -83,6 +118,26 @@ const BasicHandleInfo *HandleManager::getHandleInfo (int32_t index) const
     return nullptr;
 }
 
+BasicHandleInfo *HandleManager::getHandleInfo (interface_handle handle)
+{
+    if (isValidIndex (handle.baseValue (), handles))
+    {
+        return &handles[handle.baseValue ()];
+    }
+
+    return nullptr;
+}
+
+const BasicHandleInfo *HandleManager::getHandleInfo (interface_handle handle) const
+{
+    if (isValidIndex (handle.baseValue (), handles))
+    {
+        return &handles[handle.baseValue ()];
+    }
+
+    return nullptr;
+}
+
 BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
 {
     auto key = static_cast<uint64_t> (fed_id);
@@ -94,8 +149,9 @@ BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
     return nullptr;
 }
 
-void HandleManager::setHandleOption (int32_t index, int option, bool val)
+void HandleManager::setHandleOption (interface_handle handle, int option, bool val)
 {
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         switch (option)
@@ -126,8 +182,9 @@ void HandleManager::setHandleOption (int32_t index, int option, bool val)
     }
 }
 
-bool HandleManager::getHandleOption (int32_t index, int option) const
+bool HandleManager::getHandleOption (interface_handle handle, int option) const
 {
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         switch (option)
@@ -169,12 +226,13 @@ const BasicHandleInfo *HandleManager::getEndpoint (const std::string &name) cons
     return nullptr;
 }
 
-BasicHandleInfo *HandleManager::getEndpoint (int32_t index)
+BasicHandleInfo *HandleManager::getEndpoint (interface_handle handle)
 {
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::endpoint)
+        if (hand.handleType == handle_type::endpoint)
         {
             return &hand;
         }
@@ -203,12 +261,13 @@ const BasicHandleInfo *HandleManager::getPublication (const std::string &name) c
     return nullptr;
 }
 
-BasicHandleInfo *HandleManager::getPublication (int32_t index)
+BasicHandleInfo *HandleManager::getPublication (interface_handle handle)
 {
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::publication)
+        if (hand.handleType == handle_type::publication)
         {
             return &hand;
         }
@@ -256,12 +315,13 @@ const BasicHandleInfo *HandleManager::getFilter (const std::string &name) const
     }
     return &(handles[ar.first->second.baseValue ()]);
 }
-BasicHandleInfo *HandleManager::getFilter (int32_t index)
+BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
 {
+    auto index = handle.baseValue ();
     if (isValidIndex (index, handles))
     {
         auto &hand = handles[index];
-        if (hand.handle_type == handle_type::filter)
+        if (hand.handleType == handle_type::filter)
         {
             return &hand;
         }
@@ -279,7 +339,7 @@ federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)
 {
-    switch (handle.handle_type)
+    switch (handle.handleType)
     {
     case handle_type::endpoint:
         endpoints.emplace (handle.key, interface_handle (index));

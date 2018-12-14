@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -460,10 +460,10 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     auto vFed3 = GetFederateAs<helics::ValueFederate> (2);
     helics::Publication sender1 (helics::interface_visibility::global, vFed1, "pub1",
-                                 helics::helics_type_t::helicsDouble);
+                                 helics::data_type::helicsDouble);
     auto &receiver1 = vFed2->registerSubscription ("pub1");
     helics::Publication sender2 (helics::interface_visibility::global, vFed3, "pub2",
-                                 helics::helics_type_t::helicsDouble);
+                                 helics::data_type::helicsDouble);
     auto &receiver2 = vFed2->registerSubscription ("pub2");
     vFed1->enterExecutingModeAsync ();
     vFed3->enterExecutingModeAsync ();

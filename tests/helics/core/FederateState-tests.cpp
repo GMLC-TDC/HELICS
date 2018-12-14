@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
     BOOST_CHECK (fs->local_id == helics::federate_id_t{});
-    BOOST_CHECK (fs->global_id.load () == helics::global_federate_id_t{});
+    BOOST_CHECK (fs->global_id.load () == helics::global_federate_id{});
     BOOST_CHECK_EQUAL (fs->init_requested, false);
 
     BOOST_CHECK_EQUAL (fs->getCurrentIteration (), 0);
@@ -192,9 +192,9 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     auto fs_process2 =
       std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
 
-    fs->global_id = global_federate_id_t (0);  // if it doesn't match the id in the command, this will hang
+    fs->global_id = global_federate_id (0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait ();
-    fs->global_id = helics::global_federate_id_t ();
+    fs->global_id = helics::global_federate_id ();
     auto state = fs_process2.get ();
 
     BOOST_CHECK (state == iteration_result::halted);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test CMD_FED_ACK message when no error
     cmd.setAction (helics::CMD_FED_ACK);
-    global_federate_id_t fed22 (22);
+    global_federate_id fed22 (22);
     cmd.dest_id = fed22;
     cmd.name = "fed_name";
     clearActionFlag (cmd, error_flag);
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
-    cmd.dest_id = global_federate_id_t (23);
+    cmd.dest_id = global_federate_id (23);
     setActionFlag (cmd, error_flag);
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);

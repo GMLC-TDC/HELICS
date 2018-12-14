@@ -197,8 +197,8 @@ void App::loadConfigOptions (const Json_helics::Value &element)
 }
 void App::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         fed->enterInitializingMode ();
     }

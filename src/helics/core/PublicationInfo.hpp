@@ -23,11 +23,11 @@ class PublicationInfo
 {
   public:
     /** constructor from the basic information*/
-    PublicationInfo (global_handle id_,
-                     const std::string &key_,
-                     const std::string &type_,
-                     const std::string &units_)
-        : id (id_), key (key_), type (type_), units (units_)
+    PublicationInfo (global_handle pid, 
+                     const std::string &pkey,
+                     const std::string &ptype,
+                     const std::string &punits)
+        :  id (pid), key (pkey), type (ptype), units (punits)
     {
     }
     const global_handle id;  //!< the identifier for the containing federate
@@ -41,7 +41,9 @@ class PublicationInfo
     bool required = false;  //!< indicator that it is required to be output someplace
     bool buffer_data = false;
     bool single_destination = false;  //!< indicator that the publication should only have a single destination
-    /** check the value if it is the same as the most recent data and if changed store it*/
+    /** check the value if it is the same as the most recent data and if changed, store it*/
     bool CheckSetValue (const char *checkData, uint64_t len);
+	/** remove a subscriber*/
+	void removeSubscriber(global_handle subscriberToRemove);
 };
 }  // namespace helics

@@ -93,22 +93,22 @@ constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr federate_id_t local_core_id (-259);
 
-class global_broker_id_t
+class global_broker_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr global_broker_id_t () = default;
+    constexpr global_broker_id () = default;
 
-    constexpr explicit global_broker_id_t (base_type val) noexcept : _id (val){};
+    constexpr explicit global_broker_id (base_type val) noexcept : _id (val){};
 
     constexpr base_type baseValue () const { return _id; }
     /** equality operator*/
-    bool operator== (global_broker_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (global_broker_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (global_broker_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_broker_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (global_broker_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (global_broker_id id) const noexcept { return (_id < id._id); };
 
     bool isFederate () const { return ((_id >= global_federate_id_shift) && (_id < global_broker_id_shift)); }
     bool isBroker () const { return (_id >= global_broker_id_shift); }
@@ -117,46 +117,46 @@ class global_broker_id_t
 
   private:
     base_type _id = -2'010'000'000;  //!< the underlying index value
-    friend class global_federate_id_t;  // for allowing comparison operators to work well
+    friend class global_federate_id;  // for allowing comparison operators to work well
 };
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
-constexpr global_broker_id_t parent_broker_id (0);
+constexpr global_broker_id parent_broker_id (0);
 
 /** stream operator for a federate_id
  */
-std::ostream &operator<< (std::ostream &os, global_broker_id_t id);
+std::ostream &operator<< (std::ostream &os, global_broker_id id);
 
-class global_federate_id_t
+class global_federate_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr global_federate_id_t () = default;
+    constexpr global_federate_id () = default;
 
-    constexpr explicit global_federate_id_t (base_type val) noexcept : _id (val){};
-    /** implicit conversion from global_broker_id_t*/
-    constexpr global_federate_id_t (global_broker_id_t id) noexcept : _id (id._id){};
+    constexpr explicit global_federate_id (base_type val) noexcept : _id (val){};
+    /** implicit conversion from global_id*/
+    constexpr global_federate_id (global_broker_id id) noexcept : _id (id._id){};
 
-    constexpr operator global_broker_id_t () const noexcept { return global_broker_id_t (_id); };
+    constexpr operator global_broker_id () const noexcept { return global_broker_id (_id); };
     /** conversion to the base_type*/
     constexpr base_type baseValue () const { return _id; };
     /** equality operator*/
-    bool operator== (global_federate_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (global_federate_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (global_federate_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_federate_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (global_federate_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (global_federate_id id) const noexcept { return (_id < id._id); };
     /** greater than operator for sorting*/
-    bool operator> (global_federate_id_t id) const noexcept { return (_id > id._id); };
+    bool operator> (global_federate_id id) const noexcept { return (_id > id._id); };
     /** equality operator*/
-    bool operator== (global_broker_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (global_broker_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (global_broker_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_broker_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (global_broker_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (global_broker_id id) const noexcept { return (_id < id._id); };
     /** greater than operator for sorting*/
-    bool operator> (global_broker_id_t id) const noexcept { return (_id > id._id); };
+    bool operator> (global_broker_id id) const noexcept { return (_id > id._id); };
     bool isFederate () const { return ((_id >= global_federate_id_shift) && (_id < global_broker_id_shift)); }
     bool isBroker () const { return (_id >= global_broker_id_shift); }
     bool isValid () const { return (_id != -2'010'000'000); }
@@ -168,16 +168,16 @@ class global_federate_id_t
 
 /** stream operator for a federate_id
  */
-std::ostream &operator<< (std::ostream &os, global_federate_id_t id);
+std::ostream &operator<< (std::ostream &os, global_federate_id id);
 
 /** class merging a global id and handle together */
 class global_handle
 {
   public:
-    global_federate_id_t fed_id = global_federate_id_t{};
+    global_federate_id fed_id = global_federate_id{};
     interface_handle handle = interface_handle{};
-    global_handle () = default;
-    global_handle (global_federate_id_t fed, interface_handle hand) : fed_id (fed), handle (hand){};
+    constexpr global_handle () = default;
+    constexpr global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
     explicit operator uint64_t () const
     {
         auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32;
@@ -200,33 +200,33 @@ class global_handle
  */
 std::ostream &operator<< (std::ostream &os, global_handle id);
 
-class route_id_t
+class route_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr route_id_t () = default;
+    constexpr route_id () = default;
 
-    constexpr explicit route_id_t (base_type val) noexcept : _id (val){};
+    constexpr explicit route_id (base_type val) noexcept : _id (val){};
 
     constexpr base_type baseValue () const { return _id; }
     /** equality operator*/
-    bool operator== (route_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (route_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (route_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (route_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (route_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (route_id id) const noexcept { return (_id < id._id); };
     bool isValid () const { return (_id != -1'295'148'000); }
 
   private:
     base_type _id = -1'295'148'000;  //!< the underlying index value
 };
 
-constexpr route_id_t parent_route_id (0);
+constexpr route_id parent_route_id (0);
 
 /** stream operator for a route_id
  */
-std::ostream &operator<< (std::ostream &os, route_id_t id);
+std::ostream &operator<< (std::ostream &os, route_id id);
 
 }  // namespace helics
 
@@ -255,35 +255,35 @@ struct hash<helics::interface_handle>
 };
 
 template <>
-struct hash<helics::global_federate_id_t>
+struct hash<helics::global_federate_id>
 {
-    using argument_type = helics::global_federate_id_t;
+    using argument_type = helics::global_federate_id;
     using result_type = std::size_t;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<helics::global_federate_id_t::base_type>{}(key.baseValue ());
+        return std::hash<helics::global_federate_id::base_type>{}(key.baseValue ());
     }
 };
 
 template <>
-struct hash<helics::global_broker_id_t>
+struct hash<helics::global_broker_id>
 {
-    using argument_type = helics::global_broker_id_t;
+    using argument_type = helics::global_broker_id;
     using result_type = std::size_t;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<helics::global_broker_id_t::base_type>{}(key.baseValue ());
+        return std::hash<helics::global_broker_id::base_type>{}(key.baseValue ());
     }
 };
 
 template <>
-struct hash<helics::route_id_t>
+struct hash<helics::route_id>
 {
-    using argument_type = helics::route_id_t;
+    using argument_type = helics::route_id;
     using result_type = std::size_t;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<helics::route_id_t::base_type>{}(key.baseValue ());
+        return std::hash<helics::route_id::base_type>{}(key.baseValue ());
     }
 };
 
@@ -301,7 +301,7 @@ struct hash<helics::global_handle>
 }  // namespace std
 
 template <>
-struct is_easily_hashable<helics::global_federate_id_t>
+struct is_easily_hashable<helics::global_federate_id>
 {
     static constexpr bool value = true;
 };
@@ -313,13 +313,13 @@ struct is_easily_hashable<helics::federate_id_t>
 };
 
 template <>
-struct is_easily_hashable<helics::global_broker_id_t>
+struct is_easily_hashable<helics::global_broker_id>
 {
     static constexpr bool value = true;
 };
 
 template <>
-struct is_easily_hashable<helics::route_id_t>
+struct is_easily_hashable<helics::route_id>
 {
     static constexpr bool value = true;
 };

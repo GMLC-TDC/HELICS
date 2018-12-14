@@ -755,17 +755,17 @@ helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error
     }
 }
 
-static const std::map<helics::Federate::states, helics_federate_state> stateEnumConversions{
-  {helics::Federate::states::error, helics_federate_state::helics_state_error},
-  {helics::Federate::states::startup, helics_federate_state::helics_state_startup},
-  {helics::Federate::states::execution, helics_federate_state::helics_state_execution},
-  {helics::Federate::states::finalize, helics_federate_state::helics_state_finalize},
-  {helics::Federate::states::pending_exec, helics_federate_state::helics_state_pending_exec},
-  {helics::Federate::states::pending_init, helics_federate_state::helics_state_pending_init},
-  {helics::Federate::states::pending_iterative_time, helics_federate_state::helics_state_pending_iterative_time},
-  {helics::Federate::states::pending_time, helics_federate_state::helics_state_pending_time},
-  {helics::Federate::states::pending_finalize, helics_federate_state::helics_state_pending_finalize},
-  {helics::Federate::states::initialization, helics_federate_state::helics_state_initialization}};
+static const std::map<helics::Federate::modes, helics_federate_state> modeEnumConversions{
+  {helics::Federate::modes::error, helics_federate_state::helics_state_error},
+  {helics::Federate::modes::startup, helics_federate_state::helics_state_startup},
+  {helics::Federate::modes::executing, helics_federate_state::helics_state_execution},
+  {helics::Federate::modes::finalize, helics_federate_state::helics_state_finalize},
+  {helics::Federate::modes::pending_exec, helics_federate_state::helics_state_pending_exec},
+  {helics::Federate::modes::pending_init, helics_federate_state::helics_state_pending_init},
+  {helics::Federate::modes::pending_iterative_time, helics_federate_state::helics_state_pending_iterative_time},
+  {helics::Federate::modes::pending_time, helics_federate_state::helics_state_pending_time},
+  {helics::Federate::modes::initializing, helics_federate_state::helics_state_initialization},
+  {helics::Federate::modes::pending_finalize, helics_federate_state::helics_state_pending_finalize}};
 
 helics_federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
 {
@@ -776,8 +776,8 @@ helics_federate_state helicsFederateGetState (helics_federate fed, helics_error 
     }
     try
     {
-        auto FedState = fedObj->getCurrentState ();
-        return stateEnumConversions.at (FedState);
+        auto FedMode = fedObj->getCurrentMode ();
+        return modeEnumConversions.at (FedMode);
     }
     catch (...)
     {

@@ -193,9 +193,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter2, 2);
     BOOST_CHECK (act2.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (helics::route_id_t(3), localLocB);
+    comm2.addRoute (helics::route_id(3), localLocB);
     std::this_thread::sleep_for(100ms);
-    comm2.transmit (helics::route_id_t(3), helics::CMD_ACK);
+    comm2.transmit (helics::route_id(3), helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter3 != 1)
@@ -210,9 +210,9 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     BOOST_REQUIRE_EQUAL (counter3, 1);
     BOOST_CHECK (act3.lock()->action () == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.addRoute (helics::route_id_t( 4), localLoc);
+    comm2.addRoute (helics::route_id( 4), localLoc);
     std::this_thread::sleep_for (200ms);
-    comm2.transmit (helics::route_id_t(4), helics::CMD_ACK);
+    comm2.transmit (helics::route_id(4), helics::CMD_ACK);
 
     std::this_thread::sleep_for (100ms);
     if (counter.load () != 1)

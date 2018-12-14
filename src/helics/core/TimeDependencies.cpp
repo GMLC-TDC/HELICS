@@ -51,7 +51,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             Tdemin = Te;
         }
         forwardEvent = Time::maxVal ();
-        minFed = global_federate_id_t(m.source_handle.baseValue());
+        minFed = global_federate_id(m.source_handle.baseValue());
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -60,7 +60,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
-        minFed = global_federate_id_t(m.source_handle.baseValue());
+        minFed = global_federate_id(m.source_handle.baseValue());
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -70,7 +70,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
-        minFed = global_federate_id_t();
+        minFed = global_federate_id();
         break;
     case CMD_SEND_MESSAGE:
         if (time_state == time_state_t::time_granted)
@@ -116,7 +116,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
 // comparison helper lambda for comparing dependencies
 static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
 
-bool TimeDependencies::isDependency (global_federate_id_t ofed) const
+bool TimeDependencies::isDependency (global_federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if (res == dependencies.end ())
@@ -126,7 +126,7 @@ bool TimeDependencies::isDependency (global_federate_id_t ofed) const
     return (res->fedID == ofed);
 }
 
-const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t ofed) const
+const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
     if ((res == dependencies.cend ()) || (res->fedID != ofed))
@@ -137,7 +137,7 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t 
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed)
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if ((res == dependencies.end ()) || (res->fedID != ofed))
@@ -148,7 +148,7 @@ DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id_t ofed)
     return &(*res);
 }
 
-bool TimeDependencies::addDependency (global_federate_id_t id)
+bool TimeDependencies::addDependency (global_federate_id id)
 
 {
     if (dependencies.empty ())
@@ -173,7 +173,7 @@ bool TimeDependencies::addDependency (global_federate_id_t id)
     return true;
 }
 
-void TimeDependencies::removeDependency (global_federate_id_t id)
+void TimeDependencies::removeDependency (global_federate_id id)
 {
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);
     if (dep != dependencies.end ())
@@ -189,7 +189,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
 {
     auto dependency_id = (m.action () != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-    auto depInfo = getDependencyInfo (global_federate_id_t(dependency_id));
+    auto depInfo = getDependencyInfo (global_federate_id(dependency_id));
     if (depInfo == nullptr)
     {
         return false;

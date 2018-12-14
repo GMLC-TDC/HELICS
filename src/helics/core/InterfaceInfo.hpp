@@ -52,7 +52,7 @@ class InterfaceInfo
     auto cgetPublications () const { return publications.lock_shared (); }
     auto cgetInputs () const { return inputs.lock_shared (); }
     /** set the global id of the federate for use in the interfaces*/
-    void setGlobalId (global_federate_id_t newglobalId) { global_id = newglobalId; }
+    void setGlobalId (global_federate_id newglobalId) { global_id = newglobalId; }
     /** set the change update flag which controls when a subscription is updated*/
     void setChangeUpdateFlag (bool updateFlag);
     /** get the current value of the change update flag*/
@@ -65,7 +65,7 @@ class InterfaceInfo
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues ();
 
   private:
-    std::atomic<global_federate_id_t> global_id;
+        std::atomic<global_federate_id> global_id;
     bool only_update_on_change{
       false};  //!< flag indicating that subscriptions values should only be updated on change
     shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, interface_handle>>

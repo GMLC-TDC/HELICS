@@ -13,11 +13,11 @@ namespace helics
 /** define the type of the handle*/
 enum class handle_type : char
 {
-    unknown,
-    publication,  //!< handle to output interface
-    input,  //!< handle to a input interface
-    endpoint,  //!< handle to an endpoint
-    filter,  //!< handle to a filter
+    unknown = 'u',
+    publication = 'p',  //!< handle to output interface
+    input = 'i',  //!< handle to a input interface
+    endpoint = 'e',  //!< handle to an endpoint
+    filter = 'f',  //!< handle to a filter
 };
 
 /** define extra flag definitions*/
@@ -36,13 +36,13 @@ class BasicHandleInfo
     /** default constructor*/
     BasicHandleInfo () noexcept : type_in (type), type_out (units){};
     /** construct from the data*/
-    BasicHandleInfo (global_federate_id_t federate_id_t,
+    BasicHandleInfo (global_federate_id federate_id_t,
                      interface_handle handle_id,
                      handle_type type_of_handle,
                      const std::string &key_name,
                      const std::string &type_name,
                      const std::string &unit_name)
-        : handle{federate_id_t, handle_id}, handle_type (type_of_handle), key (key_name), type (type_name),
+        : handle{federate_id_t, handle_id}, handleType (type_of_handle), key (key_name), type (type_name),
           units (unit_name), type_in (type), type_out (units)
 
     {
@@ -52,7 +52,7 @@ class BasicHandleInfo
 
     const global_handle handle = global_handle{};  //!< the global federate id for the creator of the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
-    const handle_type handle_type = handle_type::unknown;  //!< the type of the handle
+    const handle_type handleType = handle_type::unknown;  //!< the type of the handle
     bool used = false;  //!< indicator that the handle is being used to link with another federate
     uint16_t flags = 0;  //!< flags corresponding to the flags used in ActionMessages +some extra ones
 
@@ -64,7 +64,7 @@ class BasicHandleInfo
     const std::string &type_out;  //!< the output type of a filter
 
     interface_handle getInterfaceHandle () const { return handle.handle; }
-    global_federate_id_t getFederateId () const { return handle.fed_id; }
+    global_federate_id getFederateId () const { return handle.fed_id; }
 
     void setInfoField (std::string &info) { interface_info = info; }
 };

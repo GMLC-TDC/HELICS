@@ -40,12 +40,12 @@ class CloningFilter;
 class Federate
 {
   public:
-    /** the allowable states of the federate*/
-    enum class states : char
+    /** the allowable operation modes of the federate*/
+    enum class modes : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization = 1,  //!< entered after the enterInitializingMode call has returned
-        execution = 2,  //!< entered after the enterExectuationState call has returned
+        initializing = 1,  //!< entered after the enterInitializingMode call has returned
+        executing = 2,  //!< entered after the enterExectuationState call has returned
         finalize = 3,  //!< the federate has finished executing normally final values may be retrieved
         error = 4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
@@ -57,7 +57,7 @@ class Federate
     };
 
   protected:
-    std::atomic<states> state{states::startup};  //!< the current state of the simulation
+    std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
     federate_id_t fedID;  //!< the federate ID of the object for use in the core
@@ -299,7 +299,7 @@ class Federate
 	@param valueName the name of the global to set
 	@param value the value of the global
 	*/
-	void setGlobal(const std::string &valueName, const std::string &value);
+    void setGlobal (const std::string &valueName, const std::string &value);
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
@@ -442,10 +442,13 @@ class Federate
     @param[in] configString  the location of the file or config String to load to generate the interfaces
     */
     void registerFilterInterfaces (const std::string &configString);
+    /** disconnect an interface from its targets and remove it from consideration
+     */
+    void closeInterface (interface_handle handle);
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
-    states getCurrentState () const { return state; }
+    modes getCurrentMode () const { return currentMode.load (); }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
@@ -456,18 +459,15 @@ class Federate
     // interface for filter objects
     /** get a count of the number of filter objects stored in the federate*/
     int filterCount () const;
-    /** set the info field for an interface
-    @details the info field is a free field stored in the core, it can be used to identify any information about
-    the interface and its connections for a specific program it has no defined format or purpose.
-    @param handle the handle for an interface
-    @param info the string to use for the info field
+    /** set the information field for an interface
+    @param handle the interface handle for any interface,  the interface handle can be created from
+    any interface object automatically
+    @param info the information to store
     */
     void setInfo (interface_handle handle, const std::string &info);
-    /** get the info field for an interface
-    @details the info field is a free field stored in the core, it can be used to identify any information about
-    the interface and its connections for a specific program it has no defined format or purpose.
-    @param handle the handle for an interface
-    */
+    /** get the data currently stored for a particular interface handle
+    @param handle the handle to get the information for
+    @return a string with the data for the information*/
     std::string const &getInfo (interface_handle handle);
 
     /** set an interface option */

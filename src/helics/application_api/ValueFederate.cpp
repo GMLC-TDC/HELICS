@@ -112,6 +112,15 @@ void ValueFederate::addAlias (const Input &inp, const std::string &shortcutName)
 {
     vfManager->addAlias (inp, shortcutName);
 }
+void ValueFederate::removeTarget (const Publication &pub, const std::string &target)
+{
+    vfManager->removeTarget (pub, target);
+}
+
+void ValueFederate::removeTarget (const Input &inp, const std::string &target)
+{
+    vfManager->removeTarget (inp, target);
+}
 
 void ValueFederate::addAlias (const Publication &pub, const std::string &shortcutName)
 {
@@ -356,7 +365,7 @@ const std::string &ValueFederate::getString (Input &inp) { return inp.getValueRe
 
 void ValueFederate::publishRaw (const Publication &pub, data_view block)
 {
-    if ((state == states::execution) || (state == states::initialization))
+    if ((currentMode == modes::executing) || (currentMode == modes::initializing))
     {
         vfManager->publish (pub, block);
     }

@@ -65,6 +65,10 @@ void NamedInputInfo::addData (global_handle source_id,
     {
         if (input_sources[index] == source_id)
         {
+            if (valueTime > deactivated[index])
+            {
+                return;
+            }
             found = true;
             break;
         }
@@ -92,7 +96,31 @@ void NamedInputInfo::addSource (global_handle newSource, const std::string &styp
     source_types.emplace_back (stype, sunits);
     data_queues.resize (input_sources.size ());
     current_data.resize (input_sources.size ());
+    deactivated.push_back (Time::maxVal ());
     has_target = true;
+}
+
+void NamedInputInfo::removeSource (global_handle sourceToRemove, Time minTime)
+{
+    for (size_t ii = 0; ii < input_sources.size (); ++ii)
+    {
+        if (input_sources[ii] == sourceToRemove)
+        {
+            while ((!data_queues[ii].empty ()) && (data_queues[ii].back ().time > minTime))
+            {
+                data_queues[ii].pop_back ();
+            }
+            deactivated[ii] = minTime;
+        }
+    }
+}
+
+void NamedInputInfo::clearFutureData ()
+{
+    for (auto &vec : data_queues)
+    {
+        vec.clear ();
+    }
 }
 
 bool NamedInputInfo::updateTimeUpTo (Time newTime)

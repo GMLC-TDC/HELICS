@@ -931,7 +931,7 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (msToWait);
+    brk->waitForDisconnect (std::chrono::milliseconds(msToWait));
     if (brk->isConnected ())
     {
         return helics_false;
