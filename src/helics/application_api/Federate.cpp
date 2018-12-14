@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
 #include "Filters.hpp"
 
 #include "../common/GuardedTypes.hpp"
@@ -18,7 +19,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 
 #include "FilterFederateManager.hpp"
-
 #include <cassert>
 #include <iostream>
 
@@ -693,6 +693,46 @@ static Filter &generateFilter (Federate *fed,
     }
 }
 
+const std::string emptyStr;
+
+template <class Inp>
+static void loadOptions (Federate *fed, const Inp &data, Filter &filt)
+{
+    addTargets (data, "flags", [&filt](const std::string &target) {
+        if (target.front () != '-')
+        {
+            filt.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            filt.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        filt.setOption (defs::options::connection_optional, optional);
+    }
+    bool required = getOrDefault (data, "required", false);
+    if (required)
+    {
+        filt.setOption (defs::options::connection_required, required);
+    }
+
+    auto info = getOrDefault (data, "info", emptyStr);
+    if (!info.empty ())
+    {
+        fed->setInfo (filt.getHandle (), info);
+    }
+    auto asrc = [&filt](const std::string &target) { filt.addSourceTarget (target); };
+    auto adest = [&filt](const std::string &target) { filt.addDestinationTarget (target); };
+    addTargets (data, "targets", asrc);
+    addTargets (data, "sourcetargets", asrc);
+    addTargets (data, "desttargets", adest);
+    addTargets (data, "sourceTargets", asrc);
+    addTargets (data, "destTargets", adest);
+}
+
 void Federate::registerFilterInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
@@ -701,10 +741,9 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
     {
         for (const auto &filt : doc["filters"])
         {
-            std::string key = getOrDefault (filt, "name", std::string ());
-            std::string inputType = getOrDefault (filt, "inputType", std::string ());
-            std::string outputType = getOrDefault (filt, "outputType", std::string ());
-            auto info = getOrDefault (filt, "info", std::string ());
+            std::string key = getOrDefault (filt, "name", emptyStr);
+            std::string inputType = getOrDefault (filt, "inputType", emptyStr);
+            std::string outputType = getOrDefault (filt, "outputType", emptyStr);
             bool cloningflag = getOrDefault (filt, "cloning", false);
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
@@ -725,21 +764,14 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                 }
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
-
-            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
-            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
-            addTargets (filt, "targets", asrc);
-            addTargets (filt, "sourcetargets", asrc);
-            addTargets (filt, "desttargets", adest);
-            addTargets (filt, "sourceTargets", asrc);
-            addTargets (filt, "destTargets", adest);
-
+            loadOptions (this, filt, filter);
             if (cloningflag)
             {
                 addTargets (filt, "delivery", [&filter](const std::string &target) {
                     static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
                 });
             }
+
             if (filt.isMember ("properties"))
             {
                 auto props = filt["properties"];
@@ -778,10 +810,6 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                         filter.setString (props["name"].asString (), props["value"].asString ());
                     }
                 }
-            }
-            if (!info.empty ())
-            {
-                setInfo (filter.getHandle (), info);
             }
         }
     }
@@ -823,11 +851,10 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         auto &filtArray = filts->as<toml::Array> ();
         for (const auto &filt : filtArray)
         {
-            std::string key = getOrDefault (filt, "name", std::string ());
+            std::string key = getOrDefault (filt, "name", emptyStr);
             bool cloningflag = getOrDefault (filt, "cloning", false);
-            std::string inputType = getOrDefault (filt, "inputType", std::string ());
-            std::string outputType = getOrDefault (filt, "outputType", std::string ());
-            auto info = getOrDefault (filt, "info", std::string ());
+            std::string inputType = getOrDefault (filt, "inputType", emptyStr);
+            std::string outputType = getOrDefault (filt, "outputType", emptyStr);
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
             std::string operation = getOrDefault (filt, "operation", std::string ("custom"));
@@ -848,13 +875,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
 
-            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
-            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
-            addTargets (filt, "targets", asrc);
-            addTargets (filt, "sourcetargets", asrc);
-            addTargets (filt, "desttargets", adest);
-            addTargets (filt, "sourceTargets", asrc);
-            addTargets (filt, "destTargets", adest);
+            loadOptions (this, filt, filter);
 
             if (cloningflag)
             {
@@ -908,10 +929,6 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     }
                 }
             }
-            if (!info.empty ())
-            {
-                setInfo (filter.getHandle (), info);
-            }
         }
     }
     auto globals = doc.find ("globals");
@@ -956,8 +973,8 @@ std::string Federate::query (const std::string &queryStr)
         {
             res = coreObject->getIdentifier ();
         }
-    else
-    {
+        else
+        {
             res = "#unknown";
         }
     }

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
 #include "Publications.hpp"
 #include "ValueFederateManager.hpp"
 
@@ -144,12 +145,25 @@ static const std::string emptyStr;
 template <class Inp, class Obj>
 static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 {
-    // bool optional = getOrDefault (data, "optional", false);
+    addTargets (data, "flags", [&objUpdate](const std::string &target) {
+        if (target.front () != '-')
+        {
+            objUpdate.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            objUpdate.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        objUpdate.setOption (defs::options::connection_optional, optional);
+    }
     bool required = getOrDefault (data, "required", false);
-
     if (required)
     {
-        // TODO add setOPTION call
+        objUpdate.setOption (defs::options::connection_required, required);
     }
     callIfMember (data, "shortcut", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
     callIfMember (data, "alias", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
@@ -195,8 +209,8 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 pubAct = &registerPublication (key, type, units);
             }
             loadOptions (this, pub, *pubAct);
-            }
-            }
+        }
+    }
     if (doc.isMember ("subscriptions"))
     {
         auto subs = doc["subscriptions"];
@@ -214,8 +228,8 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
             subNew.addTarget (key);
 
             loadOptions (this, sub, subNew);
-            }
-            }
+        }
+    }
     if (doc.isMember ("inputs"))
     {
         auto ipts = doc["inputs"];
@@ -240,8 +254,8 @@ void ValueFederate::registerValueInterfacesJson (const std::string &configString
                 inp = &registerInput (key, type, units);
             }
             loadOptions (this, ipt, *inp);
-            }
-            }
+        }
+    }
 }
 
 void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
@@ -282,8 +296,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
                 pubObj = &registerPublication (key, type, units);
             }
             loadOptions (this, pub, *pubObj);
-            }
-            }
+        }
+    }
     auto subs = doc.find ("subscriptions");
     if (subs != nullptr)
     {
@@ -303,8 +317,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             id->addTarget (key);
 
             loadOptions (this, sub, *id);
-            }
-            }
+        }
+    }
     auto ipts = doc.find ("inputs");
     if (ipts != nullptr)
     {
@@ -330,8 +344,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
                 id = &registerInput (key, type, units);
             }
             loadOptions (this, ipt, *id);
-            }
-            }
+        }
+    }
 }
 
 data_view ValueFederate::getValueRaw (const Input &inp) { return vfManager->getValue (inp); }

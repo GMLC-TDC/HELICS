@@ -99,7 +99,38 @@ static const std::set<std::string> validIntProperties{"max_iterations", "logleve
 static const std::set<std::string> validFlagOptions{
   "interruptible",         "uninterruptible",         "observer",        "source_only", "sourceonly",
   "only_update_on_change", "only_transmit_on_change", "forward_compute", "realtime",    "delayed_update",
-  "wait_for_current_time"};
+  "wait_for_current_time",
+};
+
+static const std::map<std::string, int> optionStringsTranslations{
+  {"buffer", helics_handle_option_buffer_data},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"bufferdata", helics_handle_option_buffer_data},
+  {"optional", helics_handle_option_connection_optional},
+  {"connectionoptional", helics_handle_option_connection_optional},
+  {"connection_optional", helics_handle_option_connection_optional},
+  {"required", helics_handle_option_connection_required},
+  {"connectionrequired", helics_handle_option_connection_required},
+  {"connection_required", helics_handle_option_connection_required},
+  {"ignore_interrupts", helics_handle_option_ignore_interrupts},
+  {"ignoreinterrupts", helics_handle_option_ignore_interrupts},
+  {"nointerrupts", helics_handle_option_ignore_interrupts},
+  {"no_interrupts", helics_handle_option_ignore_interrupts},
+  {"uninterruptible", helics_handle_option_ignore_interrupts},
+  {"multiple", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections_allowed", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnections", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnectionsallowed", helics_handle_option_multiple_connections_allowed},
+  {"single", helics_handle_option_single_connection_only},
+  {"single_connection", helics_handle_option_single_connection_only},
+  {"single_connection_only", helics_handle_option_single_connection_only},
+  {"singleconnection", helics_handle_option_single_connection_only},
+  {"singleconnectionsonly", helics_handle_option_single_connection_only},
+  {"only_transmit_on_change", helics_handle_option_only_transmit_on_change},
+  {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
+  {"only_update_on_change", helics_handle_option_only_update_on_change},
+  {"onlyupdateonchange", helics_handle_option_only_update_on_change}};
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
@@ -141,6 +172,34 @@ int getPropertyIndex (std::string val)
     makeLowerCase (val);
     fnd = propStringsTranslations.find (val);
     if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = propStringsTranslations.find (val);
+    if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    return -1;
+}
+
+int getOptionIndex (std::string val)
+{
+    auto fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    makeLowerCase (val);
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
     {
         return fnd->second;
     }
