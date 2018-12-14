@@ -165,13 +165,7 @@ if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     brew install python3
     echo "brew upgrade python"
     brew upgrade python
-    export PATH="/usr/local/bin:${PATH}"
-    xcode-select --install
-    brew uninstall python3
-    brew install python3
-    ls -l /usr/local/bin
-    ls -l /usr/local/bin/pip
-    ls -l /usr/local/bin/pip3
+    export PATH="/usr/local/bin:$(brew --prefix)/opt/python/libexec/bin:${PATH}"
     /usr/local/bin/python3 -m pip install --user --upgrade pytest
 else
     if hash pyenv; then
