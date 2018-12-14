@@ -35,11 +35,11 @@ BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label ("ci"))
     auto name = std::string (core->getFederateName (Fed->getID ()));
 
     BOOST_CHECK_EQUAL (name, Fed->getName ());
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
     Fed = nullptr;  // force the destructor
 }
 
@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE (federate_time_step_tests, *utf::label ("ci"))
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
 
     auto res = Fed->requestTime (1.0);
     BOOST_CHECK_EQUAL (res, 1.0);
@@ -75,11 +75,11 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
 
     auto res = Fed->requestTime (1.0);
     BOOST_CHECK_EQUAL (res, 1.0);
@@ -89,19 +89,19 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     res = Fed->requestTime (3.0);
     BOOST_CHECK_EQUAL (res, 3.0);
     brk->disconnect ();
-    std::this_thread::sleep_for (std::chrono::seconds (2));
+    std::this_thread::sleep_for (std::chrono::seconds (1));
     auto cptr = Fed->getCorePointer ();
     BOOST_CHECK (!cptr->isConnected ());
     res = Fed->requestTime (4.0);
     BOOST_CHECK_EQUAL (res, helics::Time::maxVal ());
-    BOOST_CHECK (Fed->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 // TODO PT:: make this work for all test types
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--broker=b1 --tick=100 --timeout=2000";
+    fi.coreInitString = "--broker=b1 --tick=100 --timeout=1000";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--tick=100 --timeout=2000";
+    fi.coreInitString = "--tick=100 --timeout=1000";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
@@ -124,8 +124,8 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::startup);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
     BOOST_CHECK (Fed1->getID () != Fed2->getID ());
 
@@ -133,14 +133,14 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::initialization);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
     f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
     auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
@@ -175,21 +175,21 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::startup);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
     auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::initialization);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
     f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
     auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
@@ -222,8 +222,8 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label ("ci"
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::startup);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::startup);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
     BOOST_CHECK_NE (Fed1->getID (), Fed2->getID ());
 
@@ -232,14 +232,14 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label ("ci"
 
     Fed1->enterInitializingModeComplete ();
 
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::initialization);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::initialization);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
     Fed1->enterExecutingModeAsync ();
     Fed2->enterExecutingMode ();
     Fed1->enterExecutingModeComplete ();
-    BOOST_CHECK (Fed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (Fed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
     Fed1->requestTimeAsync (1.0);
     auto f2step = Fed2->requestTime (1.0);

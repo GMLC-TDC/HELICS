@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE (vectorNorm_tests)
 
 BOOST_AUTO_TEST_CASE (string_type_tests)
 {
-    BOOST_CHECK (helicsType<std::string> () == helics_type_t::helicsString);
-    // BOOST_CHECK(helicsType<char *>() == helics_type_t::helicsString);
+    BOOST_CHECK (helicsType<std::string> () == data_type::helicsString);
+    // BOOST_CHECK(helicsType<char *>() == data_type::helicsString);
 }
 
 BOOST_AUTO_TEST_CASE (string_converstion_tests)
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE (string_converstion_tests)
 
 BOOST_AUTO_TEST_CASE (double_type_tests)
 {
-    BOOST_CHECK (helicsType<double> () == helics_type_t::helicsDouble);
-    BOOST_CHECK (helicsType<float> () == helics_type_t::helicsCustom);
+    BOOST_CHECK (helicsType<double> () == data_type::helicsDouble);
+    BOOST_CHECK (helicsType<float> () == data_type::helicsCustom);
     BOOST_CHECK (isConvertableType<float> () == true);
     BOOST_CHECK (isConvertableType<double> () == false);
 }
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE (double_conversion_tests)
 
 BOOST_AUTO_TEST_CASE (integer_type_tests)
 {
-    BOOST_CHECK (helicsType<int64_t> () == helics_type_t::helicsInt);
-    BOOST_CHECK (helicsType<int> () == helics_type_t::helicsCustom);
+    BOOST_CHECK (helicsType<int64_t> () == data_type::helicsInt);
+    BOOST_CHECK (helicsType<int> () == data_type::helicsCustom);
     BOOST_CHECK (isConvertableType<int> () == true);
     BOOST_CHECK (isConvertableType<int64_t> () == false);
 
@@ -116,25 +116,25 @@ BOOST_AUTO_TEST_CASE (integer_type_tests)
 
 BOOST_AUTO_TEST_CASE (namedType_tests)
 {
-    BOOST_CHECK (getTypeFromString ("int") == helics_type_t::helicsInt);
-    BOOST_CHECK (getTypeFromString ("INT") == helics_type_t::helicsInt);
-    BOOST_CHECK (getTypeFromString ("char") == helics_type_t::helicsString);
-    BOOST_CHECK (getTypeFromString (typeid(int).name()) == helics_type_t::helicsInt);
-    BOOST_CHECK (getTypeFromString (typeid(float).name()) == helics_type_t::helicsDouble);
-    BOOST_CHECK (getTypeFromString (typeid(std::string).name()) == helics_type_t::helicsString);
-    BOOST_CHECK (getTypeFromString (typeid (char *).name ()) == helics_type_t::helicsString);
-    BOOST_CHECK (getTypeFromString (typeid (const char *).name ()) == helics_type_t::helicsString);
-    BOOST_CHECK (getTypeFromString (typeid (double).name ()) == helics_type_t::helicsDouble);
-    BOOST_CHECK (getTypeFromString (typeid (bool).name ()) == helics_type_t::helicsBool);
-    BOOST_CHECK (getTypeFromString (typeid (int64_t).name ()) == helics_type_t::helicsInt);
-    BOOST_CHECK (getTypeFromString (typeid (char).name ()) == helics_type_t::helicsString);
-    BOOST_CHECK (getTypeFromString (typeid (std::complex<double>).name ()) == helics_type_t::helicsComplex);
-    BOOST_CHECK (getTypeFromString ("COMPLEX") == helics_type_t::helicsComplex);
-    BOOST_CHECK (getTypeFromString ("map") == helics_type_t::helicsCustom);
-    BOOST_CHECK (getTypeFromString ("any") == helics_type_t::helicsAny);
-    BOOST_CHECK (getTypeFromString ("") == helics_type_t::helicsAny);
-    BOOST_CHECK (getTypeFromString (typeid (std::vector<std::complex<double>>).name ()) == helics_type_t::helicsComplexVector);
-    BOOST_CHECK (getTypeFromString (typeid (Time).name ()) == helics_type_t::helicsTime);
+    BOOST_CHECK (getTypeFromString ("int") == data_type::helicsInt);
+    BOOST_CHECK (getTypeFromString ("INT") == data_type::helicsInt);
+    BOOST_CHECK (getTypeFromString ("char") == data_type::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid(int).name()) == data_type::helicsInt);
+    BOOST_CHECK (getTypeFromString (typeid(float).name()) == data_type::helicsDouble);
+    BOOST_CHECK (getTypeFromString (typeid(std::string).name()) == data_type::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (char *).name ()) == data_type::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (const char *).name ()) == data_type::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (double).name ()) == data_type::helicsDouble);
+    BOOST_CHECK (getTypeFromString (typeid (bool).name ()) == data_type::helicsBool);
+    BOOST_CHECK (getTypeFromString (typeid (int64_t).name ()) == data_type::helicsInt);
+    BOOST_CHECK (getTypeFromString (typeid (char).name ()) == data_type::helicsString);
+    BOOST_CHECK (getTypeFromString (typeid (std::complex<double>).name ()) == data_type::helicsComplex);
+    BOOST_CHECK (getTypeFromString ("COMPLEX") == data_type::helicsComplex);
+    BOOST_CHECK (getTypeFromString ("map") == data_type::helicsCustom);
+    BOOST_CHECK (getTypeFromString ("any") == data_type::helicsAny);
+    BOOST_CHECK (getTypeFromString ("") == data_type::helicsAny);
+    BOOST_CHECK (getTypeFromString (typeid (std::vector<std::complex<double>>).name ()) == data_type::helicsComplexVector);
+    BOOST_CHECK (getTypeFromString (typeid (Time).name ()) == data_type::helicsTime);
 }
 
 BOOST_AUTO_TEST_CASE (integer_conversion_tests)
@@ -156,8 +156,8 @@ BOOST_AUTO_TEST_CASE (integer_conversion_tests)
 
 BOOST_AUTO_TEST_CASE (namedpoint_type_tests)
 {
-    BOOST_CHECK (helicsType<named_point> () == helics_type_t::helicsNamedPoint);
-    // BOOST_CHECK(helicsType<char *>() == helics_type_t::helicsString);
+    BOOST_CHECK (helicsType<named_point> () == data_type::helicsNamedPoint);
+    // BOOST_CHECK(helicsType<char *>() == data_type::helicsString);
 }
 
 BOOST_AUTO_TEST_CASE (namedpoint_conversion_tests)

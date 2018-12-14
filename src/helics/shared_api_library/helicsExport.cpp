@@ -727,6 +727,26 @@ void helicsCoreDataLink (helics_core core, const char *source, const char *targe
     cr->dataLink (source, target);
 }
 
+static constexpr char invalidGlobalString[] = "Global name cannot be null";
+void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    if (valueName == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidGlobalString;
+        }
+        return;
+    }
+    brk->setGlobal (valueName, AS_STRING (value));
+}
+
 void helicsBrokerAddSourceFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
 {
     auto brk = getBroker (broker, err);
@@ -813,6 +833,26 @@ helics_bool helicsCoreIsConnected (helics_core core)
     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
+
+void helicsCoreSetGlobal(helics_core core, const char *valueName, const char *value, helics_error *err)
+{
+	auto cr = getCore(core, err);
+	if (cr == nullptr)
+	{
+		return;
+	}
+	if (valueName == nullptr)
+	{
+		if (err != nullptr)
+		{
+			err->error_code = helics_error_invalid_argument;
+			err->message = invalidGlobalString;
+		}
+		return;
+	}
+	cr->setGlobal(valueName, AS_STRING(value));
+}
+
 const char *helicsBrokerGetIdentifier (helics_broker broker)
 {
     auto brk = getBroker (broker, nullptr);
@@ -883,7 +923,7 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (msToWait);
+    brk->waitForDisconnect (std::chrono::milliseconds(msToWait));
     if (brk->isConnected ())
     {
         return helics_false;

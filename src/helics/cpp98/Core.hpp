@@ -105,6 +105,11 @@ class Core
     {
         return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
+    /** set a global federation value*/
+    void setGlobal (const std::string &valueName, const std::string &value)
+    {
+        helicsCoreSetGlobal (core, valueName.c_str (), value.c_str (), hThrowOnError ());
+    }
 
   protected:
     helics_core core;

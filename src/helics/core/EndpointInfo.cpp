@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -45,6 +44,8 @@ void EndpointInfo::addMessage (std::unique_ptr<Message> message)
     handle->push_back (std::move (message));
     std::stable_sort (handle->begin (), handle->end (), msgSorter);
 }
+
+void EndpointInfo::clearQueue () { message_queue.lock ()->clear (); }
 
 int32_t EndpointInfo::queueSize (Time maxTime) const
 {

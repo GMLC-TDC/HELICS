@@ -168,8 +168,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_type
     BOOST_REQUIRE_EQUAL (M2.length, 500);
 
     BOOST_CHECK_EQUAL (M2.data[245], 'a');
-    CE (helicsFederateFinalize (mFed1, &err));
+    CE (helicsFederateFinalizeAsync (mFed1, &err));
     CE (helicsFederateFinalize (mFed2, &err));
+    CE (helicsFederateFinalizeComplete (mFed1, &err));
     CE (mFed1State = helicsFederateGetState (mFed1, &err));
     BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
     CE (mFed2State = helicsFederateGetState (mFed2, &err));

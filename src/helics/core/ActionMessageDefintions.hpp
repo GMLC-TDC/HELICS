@@ -43,6 +43,11 @@ enum class action_t : int32_t
     cmd_disconnect_check = 5,  //!< check for a disconnect
     cmd_disconnect_fed = 6,  //!< disconnect a federate
     cmd_broadcast_disconnect = 7,  //!< a broadcast disconnect message
+    cmd_disconnect_core = 8,  //!< disconnect a core
+    cmd_disconnect_broker = 9,  //!< disconnect a broker
+    cmd_disconnect_fed_ack = 1006,  //!< federate disconnect ack
+    cmd_disconnect_core_ack = 1008,  //!< ack for core disconnect
+    cmd_disconnect_broker_ack = 1009,  //!< ack for broker disconnect
     cmd_check_connections = 297,  //!< command to check for any connections
     cmd_ping = 298,  //!< request for an Echo response
     cmd_ping_reply = 299,  //!< response to a ping request
@@ -75,7 +80,7 @@ enum class action_t : int32_t
     cmd_error = 10000,  //!< indicate an error with a federate
     cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
     cmd_send_route = 75,  //!< command to define a route information
-    cmd_search_dependency = 134,  //!< command to add a dependency by name
+    cmd_search_dependency = 1464,  //!< command to add a dependency by name
     cmd_add_dependency = 140,  //!< command to send a federate dependency information
     cmd_remove_dependency = 141,  //!< command to remove a dependency
     cmd_add_dependent = 144,  //!< command to add a dependent to a federate
@@ -124,8 +129,17 @@ enum class action_t : int32_t
     cmd_add_named_filter = 105,  //!< command to add named filter as a target
     cmd_add_named_publication = 106,  //!< command to add a named publication as a target
     cmd_add_named_endpoint = 107,  //!< command to add a named endpoint as a target
-    cmd_remove_target = 120,  //!< cmd to remove a target from connection
+    cmd_remove_named_input = 124,  //!< cmd to remove a target from connection by name
+    cmd_remove_named_filter = 125,  //!< cmd to remove a filter from connection by name
+    cmd_remove_named_publication = 126,  //!< cmd to remove a publication from connection by name
+    cmd_remove_named_endpoint = 127,  //!< cmd to remove an endpoint
 
+    cmd_remove_subscriber = 134,  //!< cmd to remove a target from connection
+    cmd_remove_filter = 135,  //!< cmd to remove a filter from connection
+    cmd_remove_publication = 136,  //!< cmd to remove a publication from connection
+    cmd_remove_endpoint = 137,  //!< cmd to remove an endpoint
+
+    cmd_close_interface = 133,  //!< cmd to close all communications from an interface
     cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
 
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
@@ -147,6 +161,13 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
 #define CMD_DISCONNECT_FED action_message_def::action_t::cmd_disconnect_fed
 #define CMD_BROADCAST_DISCONNECT action_message_def::action_t::cmd_broadcast_disconnect
+
+#define CMD_DISCONNECT_CORE action_message_def::action_t::cmd_disconnect_core
+#define CMD_DISCONNECT_BROKER action_message_def::action_t::cmd_disconnect_broker
+#define CMD_DISCONNECT_FED_ACK action_message_def::action_t::cmd_disconnect_fed_ack
+#define CMD_DISCONNECT_CORE_ACK action_message_def::action_t::cmd_disconnect_core_ack
+#define CMD_DISCONNECT_BROKER_ACK action_message_def::action_t::cmd_disconnect_broker_ack
+
 #define CMD_CHECK_CONNECTIONS action_message_def::action_t::cmd_check_connections
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
@@ -200,9 +221,22 @@ enum class action_t : int32_t
 #define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
 #define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
 
+#define CMD_REMOVE_NAMED_ENDPOINT action_message_def::action_t::cmd_remove_named_endpoint
+#define CMD_REMOVE_NAMED_FILTER action_message_def::action_t::cmd_remove_named_filter
+#define CMD_REMOVE_NAMED_PUBLICATION action_message_def::action_t::cmd_remove_named_publication
+#define CMD_REMOVE_NAMED_INPUT action_message_def::action_t::cmd_remove_named_input
+
+#define CMD_REMOVE_ENDPOINT action_message_def::action_t::cmd_remove_endpoint
+#define CMD_REMOVE_FILTER action_message_def::action_t::cmd_remove_filter
+#define CMD_REMOVE_PUBLICATION action_message_def::action_t::cmd_remove_publication
+#define CMD_REMOVE_SUBSCRIBER action_message_def::action_t::cmd_remove_subscriber
+
+#define CMD_CLOSE_INTERFACE action_message_def::action_t::cmd_close_interface
+
 #define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
 #define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link
 
+#define CMD_REMOVE_NAMED_TARGET action_message_def::action_t::cmd_remove_named_target
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
 
 #define CMD_REG_ENDPOINT action_message_def::action_t::cmd_reg_end

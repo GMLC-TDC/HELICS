@@ -20,6 +20,7 @@ enum federate_state_t
     HELICS_CREATED, /*!> state upon creation, all registration calls are allowed*/
     HELICS_INITIALIZING,  //!< the federation has entered initialization state and initial values can be published
     HELICS_EXECUTING,  //!< the federation has entered execution state and it now advancing in time
+    HELICS_TERMINATING,  //!< the federate is in the process of shutting down
     HELICS_ERROR,  //!< the federation has encountered an error
     HELICS_FINISHED,  //!< the federation has finished its execution
     HELICS_NONE,  //!< unknown state

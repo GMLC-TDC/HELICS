@@ -181,21 +181,21 @@ bool MultiBroker::tryReconnect()
 }
 
 
-void MultiBroker::transmit(route_id_t route_id, const ActionMessage &cmd)
+void MultiBroker::transmit(route_id rid, const ActionMessage &cmd)
 {
-	masterComm->transmit(route_id, cmd);
+	masterComm->transmit(rid, cmd);
 }
 
 
-void MultiBroker::transmit(route_id_t route_id, ActionMessage &&cmd)
+void MultiBroker::transmit(route_id rid, ActionMessage &&cmd)
 {
-	masterComm->transmit(route_id, std::move(cmd));
+	masterComm->transmit(rid, std::move(cmd));
 }
 
 
-void MultiBroker::addRoute(route_id_t route_id, const std::string &routeInfo)
+void MultiBroker::addRoute(route_id rid, const std::string &routeInfo)
 {
-	masterComm->addRoute(route_id, routeInfo);
+	masterComm->addRoute(rid, routeInfo);
 }
 
 }  // namespace helics

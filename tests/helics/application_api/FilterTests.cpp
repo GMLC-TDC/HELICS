@@ -46,10 +46,10 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
     auto &f3 = fFed->registerFilter ();
     fFed->addSourceTarget (f3, "filter0/fout");
     BOOST_CHECK (f3.getHandle () != f2.getHandle ());
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
-
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
     FullDisconnect ();
 }
 
@@ -79,7 +79,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -115,9 +115,10 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
 
     mFed->requestTime (3.0);
     fFed->requestTimeComplete ();
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /** test a filter operator
@@ -144,7 +145,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -174,9 +175,10 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
 
     mFed->requestTime (3.0);
     fFed->requestTimeComplete ();
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /** test a remove dest filter operator
@@ -206,7 +208,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -236,9 +238,10 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), co
 
     mFed->requestTime (3.0);
     fFed->requestTimeComplete ();
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /** test a remote dest filter operator
@@ -267,7 +270,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     mFed2->enterExecutingMode ();
     mFed1->enterExecutingModeComplete ();
 
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed1->sendMessage (p1, "port2", data);
 
@@ -293,9 +296,10 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
 
     mFed2->requestTime (3.0);
     mFed1->requestTimeComplete ();
-    mFed1->finalize ();
+    mFed1->finalizeAsync ();
     mFed2->finalize ();
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);
+    mFed1->finalizeComplete ();
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /** test a remove dest filter operator
@@ -322,7 +326,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -354,9 +358,10 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core
     fFed->requestTimeComplete ();
     auto filterCore = fFed->getCorePointer ();
     auto mCore = mFed->getCorePointer ();
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
     helics::cleanupHelicsLibrary ();
     BOOST_CHECK (!filterCore->isConnected ());
     BOOST_CHECK (!mCore->isConnected ());
@@ -384,7 +389,7 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     fFed2->enterExecutingModeComplete ();
 
     auto &p2Name = mFed->getEndpointName (p2);
-    BOOST_CHECK (fFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, p2Name, data);
 
@@ -437,11 +442,13 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     fFed2->requestTimeComplete ();
     auto filterCore = fFed1->getCorePointer ();
     auto mCore = mFed->getCorePointer ();
-    mFed->finalize ();
-    fFed1->finalize ();
+    mFed->finalizeAsync ();
+    fFed1->finalizeAsync ();
     fFed2->finalize ();
-    BOOST_CHECK (fFed1->getCurrentState () == helics::Federate::states::finalize);
-    if (fFed1->getCurrentState () != helics::Federate::states::finalize)
+    mFed->finalizeComplete ();
+    fFed1->finalizeComplete ();
+    BOOST_CHECK (fFed1->getCurrentMode () == helics::Federate::modes::finalize);
+    if (fFed1->getCurrentMode () != helics::Federate::modes::finalize)
     {
         correct = false;
     }
@@ -686,7 +693,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     fFed->enterExecutingModeComplete ();
     fFed2->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -725,10 +732,12 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     fFed2->requestTimeComplete ();
     auto filterCore = fFed->getCorePointer ();
     auto mCore = mFed->getCorePointer ();
-    mFed->finalize ();
-    fFed->finalize ();
+    mFed->finalizeAsync ();
+    fFed->finalizeAsync ();
     fFed2->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    mFed->finalizeComplete ();
+    fFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
     helics::cleanupHelicsLibrary ();
     BOOST_CHECK (!filterCore->isConnected ());
     BOOST_CHECK (!mCore->isConnected ());
@@ -763,7 +772,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -794,9 +803,84 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
     BOOST_CHECK (!mFed->hasMessage (p1));
     mFed->requestTime (4.0);
     BOOST_CHECK (mFed->hasMessage (p1));
+    mFed->finalizeAsync ();
+    fFed->finalize ();
+    mFed->finalizeComplete ();
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+}
+
+BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_types_single), core_type)
+{
+    auto broker = AddBroker (core_type, 2);
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate> (0);
+    auto mFed = GetFederateAs<helics::MessageFederate> (1);
+    BOOST_REQUIRE (fFed);
+    BOOST_REQUIRE (mFed);
+
+    auto &p1 = mFed->registerGlobalEndpoint ("port1");
+    auto &p2 = mFed->registerGlobalEndpoint ("port2");
+
+    auto &f1 = fFed->registerFilter ("filter1");
+    fFed->addSourceTarget (f1, "port1");
+    fFed->addSourceTarget (f1, "port2");
+    BOOST_CHECK (f1.getHandle ().isValid ());
+    auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
+    fFed->setFilterOperator (f1, timeOperator);
+
+    fFed->enterExecutingModeAsync ();
+    mFed->enterExecutingMode ();
+    fFed->enterExecutingModeComplete ();
+
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    helics::data_block data (500, 'a');
+    mFed->sendMessage (p1, "port2", data);
+
+    mFed->requestTimeAsync (1.0);
+    fFed->requestTime (1.0);
+    mFed->requestTimeComplete ();
+
+    auto res = mFed->hasMessage ();
+    BOOST_CHECK (!res);
+    mFed->sendMessage (p2, "port1", data);
+    mFed->requestTimeAsync (2.0);
+    fFed->requestTime (2.0);
+    mFed->requestTimeComplete ();
+    BOOST_REQUIRE (!mFed->hasMessage (p2));
+
+    std::this_thread::yield ();
+    mFed->requestTime (3.0);
+
+    BOOST_REQUIRE (mFed->hasMessage (p2));
+
+    auto m2 = mFed->getMessage (p2);
+    BOOST_CHECK_EQUAL (m2->source, "port1");
+    BOOST_CHECK_EQUAL (m2->original_source, "port1");
+    BOOST_CHECK_EQUAL (m2->dest, "port2");
+    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    BOOST_CHECK_EQUAL (m2->time, 2.5);
+
+    BOOST_CHECK (!mFed->hasMessage (p1));
+    mFed->requestTime (4.0);
+    BOOST_CHECK (mFed->hasMessage (p1));
+    f1.removeTarget ("port1");
+    mFed->requestTimeAsync (5.0);
+    fFed->requestTime (5.0);
+    mFed->requestTimeComplete ();
+    mFed->sendMessage (p1, "port2", data);
+
+    mFed->requestTimeAsync (6.0);
+    fFed->requestTime (6.0);
+    mFed->requestTimeComplete ();
+    // now the message hasn't been delayed
+    BOOST_CHECK (mFed->hasMessage (p2));
+
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (message_clone_test)
@@ -824,7 +908,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     sFed->enterExecutingModeComplete ();
     dcFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (sFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (sFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     sFed->sendMessage (p1, "dest", data);
 
@@ -860,10 +944,12 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
         BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
     }
 
-    sFed->finalize ();
-    dFed->finalize ();
+    sFed->finalizeAsync ();
+    dFed->finalizeAsync ();
     dcFed->finalize ();
-    BOOST_CHECK (sFed->getCurrentState () == helics::Federate::states::finalize);
+    sFed->finalizeComplete ();
+    dFed->finalizeComplete ();
+    BOOST_CHECK (sFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_AUTO_TEST_CASE (message_multi_clone_test)
@@ -896,7 +982,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
     sFed2->enterExecutingModeComplete ();
     dcFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (sFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (sFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
     sFed->sendMessage (p1, "dest", data);
@@ -962,11 +1048,14 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
         }
     }
 
-    sFed->finalize ();
-    sFed2->finalize ();
-    dFed->finalize ();
+    sFed->finalizeAsync ();
+    sFed2->finalizeAsync ();
+    dFed->finalizeAsync ();
     dcFed->finalize ();
-    BOOST_CHECK (sFed->getCurrentState () == helics::Federate::states::finalize);
+    sFed->finalizeComplete ();
+    sFed2->finalizeComplete ();
+    dFed->finalizeComplete ();
+    BOOST_CHECK (sFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /** test whether a core termination when it should
@@ -995,14 +1084,14 @@ BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_2), 
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
-    fFed->finalize ();
+    fFed->finalizeAsync ();
     auto res = mFed->hasMessage ();
     BOOST_CHECK (!res);
 
@@ -1025,12 +1114,13 @@ BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_2), 
     mFed->requestTime (6.0);
     BOOST_CHECK (mFed->hasMessage (p2));
     mFed->finalize ();
+    fFed->finalizeComplete ();
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     if (c2->isConnected ())
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (400));
     }
     BOOST_CHECK (!c2->isConnected ());
-    BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 BOOST_AUTO_TEST_SUITE_END ()

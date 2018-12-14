@@ -133,6 +133,27 @@ void ValueFederateManager::addTarget (const Input &inp, const std::string &targe
     inputTargets.emplace (inp.handle, target);
 }
 
+void ValueFederateManager::removeTarget (const Publication &pub, const std::string &target)
+{
+    // TODO:: erase from targetID's
+    coreObject->removeTarget (pub.handle, target);
+}
+
+void ValueFederateManager::removeTarget (const Input &inp, const std::string &target)
+{
+    auto rng = inputTargets.equal_range (inp.handle);
+    for (auto el = rng.first; el != rng.second; ++el)
+    {
+        if (el->second == target)
+        {
+            coreObject->removeTarget (inp.handle, target);
+            inputTargets.erase (el);
+            break;
+        }
+    }
+    // TODO:: erase from targetID's
+}
+
 void ValueFederateManager::setDefaultValue (const Input &inp, const data_view &block)
 {
     if (inp.isValid ())
