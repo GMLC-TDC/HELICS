@@ -28,7 +28,7 @@ static const ArgDescriptors InfoArgs{
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
   {"core,c"s, "type of the core to connect to"s},
-  {"type"s, "type of the core to connect to"s},
+  {"type,t"s, "type of the core to connect to"s},
   {"coretype"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
