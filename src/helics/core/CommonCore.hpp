@@ -226,9 +226,10 @@ class CommonCore : public Core, public BrokerBase
     FilterCoordinator *getFilterCoordinator (interface_handle id_);
     /** check if all federates managed by the core are ready to enter initialization state*/
     bool allInitReady () const;
-    /** check if all federates have said good-bye*/
+    /** check if all connections are disconnected (feds and time dependencies)*/
     bool allDisconnected () const;
-
+    /** check if all federates have said good-bye*/
+    bool allFedDisconnected () const;
     virtual bool sendToLogger (global_federate_id_t federateID,
                                int logLevel,
                                const std::string &name,

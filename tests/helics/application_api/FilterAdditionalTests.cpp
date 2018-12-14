@@ -74,8 +74,9 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     mFed->requestTime (2.0);
     fFed->requestTimeComplete ();
 
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -130,8 +131,9 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
     mFed->requestTime (2.0);
     fFed->requestTimeComplete ();
 
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -196,8 +198,9 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
         BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
     }
 
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -256,8 +259,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
 
     BOOST_CHECK_GE (pest, drop_prob - ebar);
     BOOST_CHECK_LE (pest, drop_prob + ebar);
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -315,8 +319,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
 
     BOOST_CHECK_GE (pest, prob - ebar);
     BOOST_CHECK_LE (pest, prob + ebar);
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -377,8 +382,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
 
     BOOST_CHECK_GE (pest, drop_prob - ebar);
     BOOST_CHECK_LE (pest, drop_prob + ebar);
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
 }
 
 /**
@@ -434,8 +440,9 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
 
     BOOST_CHECK_GE (pest, prob - ebar);
     BOOST_CHECK_LE (pest, prob + ebar);
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
 }
 
 /**
@@ -494,8 +501,9 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     BOOST_CHECK_EQUAL (count, 1);
     BOOST_CHECK (actual_delay <= 4);
 
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentState () == helics::Federate::states::finalize);
 }
 
@@ -545,8 +553,9 @@ BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), core_typ
     BOOST_CHECK_EQUAL ("f2_info", fFed->getInfo (f2.getHandle ()));
     BOOST_CHECK_EQUAL ("f3_info", fFed->getInfo (f3.getHandle ()));
 
-    mFed->finalize ();
+    mFed->finalizeAsync ();
     fFed->finalize ();
+    mFed->finalizeComplete ();
 }
 
 BOOST_AUTO_TEST_CASE (test_empty) {}

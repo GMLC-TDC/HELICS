@@ -90,42 +90,41 @@ void TestComms::queue_tx_function ()
         milliseconds totalSleep (0);
         while (!tbroker)
         {
-
-            auto broker = BrokerFactory::findBroker(brokerName_);
+            auto broker = BrokerFactory::findBroker (brokerName_);
             tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
             if (!tbroker)
             {
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                        BrokerFactory::create(core_type::TEST, brokerName_, brokerInitString_));
-                    tbroker->connect();
+                      BrokerFactory::create (core_type::TEST, brokerName_, brokerInitString_));
+                    tbroker->connect ();
                 }
                 else
                 {
                     if (totalSleep > connectionTimeout)
                     {
-                        setTxStatus(connection_status::error);
-                        setRxStatus(connection_status::error);
+                        setTxStatus (connection_status::error);
+                        setRxStatus (connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(milliseconds(200));
-                    totalSleep += milliseconds(200);
+                    std::this_thread::sleep_for (milliseconds (200));
+                    totalSleep += milliseconds (200);
                 }
             }
             else
             {
-                if (!tbroker->isOpenToNewFederates())
+                if (!tbroker->isOpenToNewFederates ())
                 {
-					logError("broker is not open to new federates " + brokerName_);
+                    logError ("broker is not open to new federates " + brokerName_);
                     tbroker = nullptr;
                     broker = nullptr;
-                    BrokerFactory::cleanUpBrokers(milliseconds(200));
-                    totalSleep += milliseconds(200);
-                    if (totalSleep > milliseconds(connectionTimeout))
+                    BrokerFactory::cleanUpBrokers (milliseconds (200));
+                    totalSleep += milliseconds (200);
+                    if (totalSleep > milliseconds (connectionTimeout))
                     {
-                        setTxStatus(connection_status::error);
-                        setRxStatus(connection_status::error);
+                        setTxStatus (connection_status::error);
+                        setRxStatus (connection_status::error);
                         return;
                     }
                 }
@@ -134,46 +133,45 @@ void TestComms::queue_tx_function ()
     }
     else if (!serverMode)
     {
-        milliseconds totalSleep(0);
+        milliseconds totalSleep (0);
         while (!tbroker)
         {
-            auto broker = BrokerFactory::findJoinableBrokerOfType(core_type::TEST);
+            auto broker = BrokerFactory::findJoinableBrokerOfType (core_type::TEST);
             tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
             if (!tbroker)
             {
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                        BrokerFactory::create(core_type::TEST, "", brokerInitString_));
-                    tbroker->connect();
+                      BrokerFactory::create (core_type::TEST, "", brokerInitString_));
+                    tbroker->connect ();
                 }
                 else
                 {
                     if (totalSleep > connectionTimeout)
                     {
-                        setTxStatus(connection_status::error);
-                        setRxStatus(connection_status::error);
+                        setTxStatus (connection_status::error);
+                        setRxStatus (connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(milliseconds(200));
-                    totalSleep += milliseconds(200);
+                    std::this_thread::sleep_for (milliseconds (200));
+                    totalSleep += milliseconds (200);
                 }
             }
         }
-        
     }
     if (tbroker)
     {
-        if (tbroker->getIdentifier() == localTarget_)
+        if (tbroker->getIdentifier () == localTarget_)
         {
-            logError("broker == target");
+            logError ("broker == target");
         }
-		if (!tbroker->isOpenToNewFederates())
-		{
+        if (!tbroker->isOpenToNewFederates ())
+        {
             logError ("broker is not open to new federates");
-		}
+        }
     }
-    
+
     setTxStatus (connection_status::connected);
     std::map<route_id_t, std::shared_ptr<BrokerBase>> routes;
 
@@ -215,17 +213,17 @@ void TestComms::queue_tx_function ()
                             foundRoute = true;
                         }
                     }
-					if (!foundRoute)
-					{
-                        logError (std::string("unable to establish Route to ")+newroute);
-					}
+                    if (!foundRoute)
+                    {
+                        logError (std::string ("unable to establish Route to ") + newroute);
+                    }
                     processed = true;
                 }
                 break;
-				case REMOVE_ROUTE:
-					routes.erase(route_id_t(cmd.getExtraData()));
-					processed = true;
-					break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     setRxStatus (connection_status::terminated);
                     processed = true;
@@ -268,9 +266,9 @@ void TestComms::queue_tx_function ()
                 }
                 else
                 {
-                    if (cmd.action () != CMD_DISCONNECT)
+                    if (!isDisconnectCommand (cmd))
                     {
-                        logWarning("unknown route, message dropped");
+                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
                     }
                 }
             }

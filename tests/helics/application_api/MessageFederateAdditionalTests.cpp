@@ -306,8 +306,9 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
 
     BOOST_CHECK_EQUAL (e1cnt, 0);
     BOOST_CHECK_EQUAL (e2cnt, 4);
-    mFed1->finalize ();
+    mFed1->finalizeAsync ();
     mFed2->finalize ();
+    mFed1->finalizeComplete ();
 
     BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
     BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);

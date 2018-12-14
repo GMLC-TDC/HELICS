@@ -6,8 +6,7 @@
 
 # Generate SWIG wrapper for MATLAB
 if(NOT MATLAB_GENERATE_ONLY)
-  set(Matlab_FIND_COMPONENTS "MAIN_PROGRAM")
-  find_package(MATLAB)
+  find_package(Matlab COMPONENTS MAIN_PROGRAM)
 endif()
 
 if(ENABLE_SWIG AND SWIG_EXECUTABLE)

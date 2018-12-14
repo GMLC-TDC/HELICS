@@ -351,6 +351,13 @@ extern "C"
     */
     HELICS_EXPORT int helicsGetPropertyIndex (const char *val);
 
+    /** get an option index for use in helicsPublicationSetOption, helicsInputSetOption, helicsFilterSetOption,
+    and the corresponding get functions
+    @param val a string with the option name
+    @return an int with the option index
+    */
+    HELICS_EXPORT int helicsGetOptionIndex (const char *val);
+
     /** set a flag in the info structure
     @details valid flags are available  flag-definitions.h
     @param fi the federate info object to alter
@@ -399,6 +406,11 @@ extern "C"
     /** finalize the federate this halts all communication in the federate and disconnects it from the core
      */
     HELICS_EXPORT void helicsFederateFinalize (helics_federate fed, helics_error *err);
+    /** finalize the federate in an async call*/
+    HELICS_EXPORT void helicsFederateFinalizeAsync (helics_federate fed, helics_error *err);
+    /** complete the asynchronous finalize call*/
+    HELICS_EXPORT void helicsFederateFinalizeComplete (helics_federate fed, helics_error *err);
+
     /** release the memory associated withe a federate*/
     HELICS_EXPORT void helicsFederateFree (helics_federate fed);
 
@@ -614,6 +626,28 @@ extern "C"
     @return void object indicating success or error
     */
     HELICS_EXPORT helics_time helicsFederateGetCurrentTime (helics_federate fed, helics_error *err);
+    /** set a federation global value
+    @details this overwrites any previous value for this name
+    @param fed the federate to set the global through
+    @param valueName the name of the global to set
+    @param value the value of the global
+    */
+    HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
+
+    /** set a federation global value
+    @details this overwrites any previous value for this name
+    @param valueName the name of the global to set
+    @param value the value of the global
+    */
+    HELICS_EXPORT void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *value, helics_error *err);
+
+    /** set a federation global value
+    @details this overwrites any previous value for this name
+    @param valueName the name of the global to set
+    @param value the value of the global
+    */
+    HELICS_EXPORT void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err);
+
     /** create a query object
     @details a query object consists of a target and query string
     */

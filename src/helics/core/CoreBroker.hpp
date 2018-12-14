@@ -58,6 +58,7 @@ class BasicBrokerInfo
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
     bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
     bool _route_key = false;  //!< indicator that the broker has a unique route id
+    bool _sent_disconnect_ack = false;  //!< indicator that the disconnect ack has been sent
     std::string routeInfo;  //!< string describing the connection information for the route
     explicit BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };

@@ -207,6 +207,10 @@ class Federate
 
     void finalize () { helicsFederateFinalize (fed, hThrowOnError ()); }
 
+    void finalizeAsync () { helicsFederateFinalizeAsync (fed, hThrowOnError ()); }
+
+    void finalizeComplete () { helicsFederateFinalizeComplete (fed, hThrowOnError ()); }
+
     helics_time requestTime (helics_time time) { return helicsFederateRequestTime (fed, time, hThrowOnError ()); }
 
     helics_time requestNextStep () { return helicsFederateRequestNextStep (fed, hThrowOnError ()); }
@@ -298,6 +302,12 @@ class Federate
     Filter getSubscription (int index)
     {
         return Filter (helicsFederateGetFilterByIndex (fed, index, hThrowOnError ()));
+    }
+
+    /** set a global federation value*/
+    void setGlobal (const std::string &valueName, const std::string &value)
+    {
+        helicsFederateSetGlobal (fed, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
 
   protected:

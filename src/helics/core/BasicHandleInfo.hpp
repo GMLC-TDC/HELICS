@@ -50,7 +50,7 @@ class BasicHandleInfo
         short,so we are taking by reference to avoid a copy then move  and just have a copy*/
     }
 
-    const global_handle handle;  //!< the global federate id for the creator of the handle
+    const global_handle handle = global_handle{};  //!< the global federate id for the creator of the handle
     federate_id_t local_fed_id;  //!< the local federate id of the handle
     const handle_type handle_type = handle_type::unknown;  //!< the type of the handle
     bool used = false;  //!< indicator that the handle is being used to link with another federate

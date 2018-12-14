@@ -855,6 +855,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         FALLTHROUGH
         /* FALLTHROUGH */
     case CMD_DISCONNECT:
+    case CMD_DISCONNECT_CORE:
     {
         if ((command.dest_id == parent_broker_id) || (command.dest_id == global_broker_id_local))
         {
@@ -872,10 +873,6 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
-                if (brk->_route_key)
-                {
-                    removeRoute (brk->route_id);
-                }
             }
             if (hasTimeDependency)
             {
@@ -906,7 +903,31 @@ void CoreBroker::processCommand (ActionMessage &&command)
                     dis.source_id = global_broker_id_local;
                     transmit (parent_route_id, dis);
                 }
-                addActionMessage (CMD_STOP);
+                else
+                {
+                    if (brk != nullptr)
+                    {
+                        ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                        dis.source_id = global_broker_id_local;
+                        dis.dest_id = brk->global_id;
+                        transmit (brk->route_id, dis);
+                        brk->_sent_disconnect_ack = true;
+                        removeRoute (brk->route_id);
+                    }
+                    addActionMessage (CMD_STOP);
+                }
+            }
+            else
+            {
+                if (brk != nullptr)
+                {
+                    ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                    dis.source_id = global_broker_id_local;
+                    dis.dest_id = brk->global_id;
+                    transmit (brk->route_id, dis);
+                    brk->_sent_disconnect_ack = true;
+                    removeRoute (brk->route_id);
+                }
             }
         }
         else
@@ -915,6 +936,24 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
     }
     break;
+    case CMD_DISCONNECT_BROKER_ACK:
+        if ((command.dest_id == global_broker_id_local) && (command.source_id == higher_broker_id))
+        {
+            for (auto &brk : _brokers)
+            {
+                if (!brk._sent_disconnect_ack)
+                {
+                    ActionMessage dis ((brk._core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                    dis.source_id = global_broker_id_local;
+                    dis.dest_id = brk.global_id;
+                    transmit (brk.route_id, dis);
+                    brk._sent_disconnect_ack = true;
+                    removeRoute (brk.route_id);
+                }
+            }
+            addActionMessage (CMD_STOP);
+        }
+        break;
     case CMD_USER_DISCONNECT:
         sendDisconnect ();
         addActionMessage (CMD_STOP);
