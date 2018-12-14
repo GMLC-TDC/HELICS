@@ -28,10 +28,10 @@ MpiComms::~MpiComms () { disconnect (); }
 void MpiComms::setBrokerAddress (const std::string &address)
 {
     if (propertyLock ())
-	{
+    {
         brokerTarget_ = address;
         propertyUnLock ();
-	}
+    }
 }
 
 int MpiComms::processIncomingMessage (ActionMessage &M)
@@ -56,7 +56,7 @@ void MpiComms::queue_rx_function ()
 
     while (true)
     {
-        auto M = rxMessageQueue.pop (std::chrono::milliseconds(2000));
+        auto M = rxMessageQueue.pop (std::chrono::milliseconds (2000));
 
         if (M)
         {
@@ -98,9 +98,9 @@ void MpiComms::queue_tx_function ()
 
     auto &mpi_service = MpiService::getInstance ();
 
-    std::map<route_id, std::pair<int,int>> routes;  // for all the other possible routes
+    std::map<route_id, std::pair<int, int>> routes;  // for all the other possible routes
 
-	 std::pair<int, int> brokerLocation;
+    std::pair<int, int> brokerLocation;
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
@@ -130,12 +130,12 @@ void MpiComms::queue_tx_function ()
                     routeLoc.first = std::stoi (cmd.payload.substr (0, addr_delim_pos));
                     routeLoc.second = std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
 
-					routes.emplace(route_id{ cmd.getExtraData() }, routeLoc);
+                    routes.emplace (route_id{cmd.getExtraData ()}, routeLoc);
                     processed = true;
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id_t (cmd.getExtraData ()));
+                    routes.erase (route_id (cmd.getExtraData ()));
                     processed = true;
                     break;
                 case DISCONNECT:
