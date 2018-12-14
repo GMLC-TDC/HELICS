@@ -255,7 +255,7 @@ class Federate
         return result;
     }
 
-    Filter registerFilter (helics_filter_type_t type, const std::string &name = std::string ())
+    Filter registerFilter (helics_filter_type type, const std::string &name = std::string ())
     {
         return Filter (helicsFederateRegisterFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
@@ -273,7 +273,7 @@ class Federate
           helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
 
-    Filter registerGlobalFilter (helics_filter_type_t type, const std::string &name = std::string ())
+    Filter registerGlobalFilter (helics_filter_type type, const std::string &name = std::string ())
     {
         return Filter (helicsFederateRegisterGlobalFilter (fed, type, name.c_str (), hThrowOnError ()));
     }

@@ -150,7 +150,8 @@ class FederateState
    the action Message should be CMD_FED_CONFIGURE
    */
     void setProperties (const ActionMessage &cmd);
-
+    /** set a property on a specific interface*/
+    void setInterfaceProperty (const ActionMessage &cmd);
     /** set a timeProperty for a the coordinator*/
     void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
@@ -212,7 +213,9 @@ class FederateState
     void addDependency (global_federate_id_t fedToDependOn);
     /** add a dependent federate*/
     void addDependent (global_federate_id_t fedThatDependsOnThis);
-    /** specify the core object that manages this federate*/
+    /** check the interfaces for any issues*/
+    int checkInterfaces ();
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }

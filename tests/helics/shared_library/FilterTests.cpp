@@ -116,11 +116,11 @@ BOOST_AUTO_TEST_CASE (core_filter_reg)
 
     BOOST_CHECK_EQUAL (core1IdentifierString, "core1");
 
-    CE (auto sourceFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type_t::helics_filtertype_delay,
+    CE (auto sourceFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type::helics_filtertype_delay,
                                                        "core1SourceFilter", &err));
 
     CE (helicsFilterAddSourceTarget (sourceFilter1, "ep1", &err));
-    CE (auto destinationFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type_t::helics_filtertype_delay,
+    CE (auto destinationFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type::helics_filtertype_delay,
                                                             "core1DestinationFilter", &err));
 
     helicsFilterAddDestinationTarget (destinationFilter1, "ep2", &err);

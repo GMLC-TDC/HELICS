@@ -57,6 +57,12 @@ class InterfaceInfo
     void setChangeUpdateFlag (bool updateFlag);
     /** get the current value of the change update flag*/
     bool getChangeUpdateFlag () const { return only_update_on_change; }
+    /** set a property on a specific interface*/
+    bool setInputProperty (interface_handle id, int option, bool value);
+    bool setPublicationProperty (interface_handle id, int option, bool value);
+    bool setEndpointProperty (interface_handle id, int option, bool value);
+    /** check the interfaces for specific issues*/
+    std::vector<std::pair<int, std::string>> checkInterfacesForIssues ();
 
   private:
     std::atomic<global_federate_id_t> global_id;

@@ -783,6 +783,11 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             setState (HELICS_INITIALIZING);
             LOG_TIMING ("Granting Initialization");
             timeGranted_mode = true;
+            int pcode = checkInterfaces ();
+            if (pcode != 0)
+            {
+                return message_processing_result::error;
+            }
             return message_processing_result::next_step;
         }
         break;
@@ -1083,6 +1088,9 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_FED_CONFIGURE_FLAG:
         setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
         break;
+    case CMD_INTERFACE_CONFIGURE:
+        setInterfaceProperty (cmd);
+        break;
     }
     return message_processing_result::continue_processing;
 }
@@ -1098,7 +1106,8 @@ void FederateState::setProperties (const ActionMessage &cmd)
             {
                 ;  // spin
             }
-            setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
+            if (cmd.dest_handle.isValid ())
+                setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
             processing.clear (std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_TIME:
@@ -1117,6 +1126,14 @@ void FederateState::setProperties (const ActionMessage &cmd)
             setProperty (cmd.messageID, cmd.counter);
             processing.clear (std::memory_order_release);
             break;
+        case CMD_INTERFACE_CONFIGURE:
+            while (processing.test_and_set ())
+            {
+                ;  // spin
+            }
+            setInterfaceProperty (cmd);
+            processing.clear (std::memory_order_release);
+            break;
         default:
             break;
         }
@@ -1128,11 +1145,53 @@ void FederateState::setProperties (const ActionMessage &cmd)
         case CMD_FED_CONFIGURE_FLAG:
         case CMD_FED_CONFIGURE_TIME:
         case CMD_FED_CONFIGURE_INT:
+        case CMD_INTERFACE_CONFIGURE:
             addAction (cmd);
             break;
         default:
             break;
         }
+    }
+}
+
+void FederateState::setInterfaceProperty (const ActionMessage &cmd)
+{
+    if (cmd.action () != CMD_INTERFACE_CONFIGURE)
+    {
+        return;
+    }
+    bool used = false;
+    switch (cmd.counter)
+    {
+    case 0:
+        used = interfaceInformation.setInputProperty (cmd.dest_handle, cmd.messageID,
+                                                      checkActionFlag (cmd, indicator_flag));
+        if (!used)
+        {
+            LOG_WARNING (fmt::format ("property {} not used on input {}", cmd.messageID,
+                                      interfaceInformation.getInput (cmd.dest_handle)->key));
+        }
+        break;
+    case 1:
+        used = interfaceInformation.setPublicationProperty (cmd.dest_handle, cmd.messageID,
+                                                            checkActionFlag (cmd, indicator_flag));
+        if (!used)
+        {
+            LOG_WARNING (fmt::format ("property {} not used on publication {}", cmd.messageID,
+                                      interfaceInformation.getPublication (cmd.dest_handle)->key));
+        }
+        break;
+    case 2:
+        used = interfaceInformation.setInputProperty (cmd.dest_handle, cmd.messageID,
+                                                      checkActionFlag (cmd, indicator_flag));
+        if (!used)
+        {
+            LOG_WARNING (fmt::format ("property {} not used on endpoint {}", cmd.messageID,
+                                      interfaceInformation.getEndpoint (cmd.dest_handle)->key));
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -1332,6 +1391,21 @@ void FederateState::addDependent (global_federate_id_t fedThatDependsOnThis)
     timeCoord->addDependent (fedThatDependsOnThis);
 }
 
+int FederateState::checkInterfaces ()
+{
+    auto issues = interfaceInformation.checkInterfacesForIssues ();
+    if (issues.empty ())
+    {
+        return 0;
+    }
+    errorCode = issues.front ().first;
+    errorString = issues.front ().second;
+    for (auto &issue : issues)
+    {
+        LOG_WARNING (fmt::format ("error code {} {}", issue.first, issue.second));
+    }
+    return errorCode;
+}
 Time FederateState::nextValueTime () const
 {
     auto firstValueTime = Time::maxVal ();

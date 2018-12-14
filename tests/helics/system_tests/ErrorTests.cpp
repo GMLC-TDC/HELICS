@@ -26,7 +26,7 @@ BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 BOOST_AUTO_TEST_CASE (duplicate_federate_names)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
-    fi.coreInitString = "-f 2";
+    fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (duplicate_federate_names)
 
 BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
 {
-    auto broker = AddBroker ("test", 3);
+    auto broker = AddBroker ("test", 2);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE (already_init_broker)
 
     fed1->enterInitializingMode ();
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreInitString = std::string ("--broker=") + broker->getIdentifier ();
+    fi.coreInitString = std::string ("--timeout=1s --broker=") + broker->getIdentifier ();
     BOOST_CHECK_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
     broker->disconnect ();
 }
@@ -202,9 +202,9 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     fed1->registerGlobalPublication ("t1", "");
     auto &i2 = fed2->registerSubscription ("abcd", "");
     i2.setOption (helics::defs::options::connection_required, true);
-    // TODO:: add required flag back
+    
     fed1->enterInitializingModeAsync ();
-    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
+    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();

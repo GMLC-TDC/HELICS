@@ -938,9 +938,53 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
 
 void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)
 {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        return;
+    }
     handles.modify ([handle, option, option_value](auto &hand) {
         return hand.setHandleOption (handle.baseValue (), option, option_value);
     });
+
+    ActionMessage fcn (CMD_INTERFACE_CONFIGURE);
+    fcn.dest_handle = handle;
+    fcn.messageID = option;
+    switch (handleInfo->handle_type)
+    {
+    case handle_type::input:
+        fcn.counter = 0;
+        break;
+    case handle_type::publication:
+        fcn.counter = 1;
+        break;
+    case handle_type::endpoint:
+        fcn.counter = 2;
+        break;
+    case handle_type::filter:
+        fcn.counter = 3;
+        break;
+    case handle_type::unknown:
+        return;
+    }
+
+    if (option_value)
+    {
+        setActionFlag (fcn, indicator_flag);
+    }
+    if (handleInfo->handle_type != handle_type::filter)
+    {
+        auto fed = getHandleFederate (handle);
+        if (fed != nullptr)
+        {
+            fcn.dest_id = fed->global_id;
+            fed->setProperties (fcn);
+        }
+    }
+    else
+    {
+        // must be for filter
+    }
 }
 
 bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const
@@ -1995,20 +2039,20 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     return ret;
 }
 
-void CommonCore::setGlobal(const std::string &valueName, const std::string &value)
+void CommonCore::setGlobal (const std::string &valueName, const std::string &value)
 {
-	ActionMessage querycmd(CMD_SET_GLOBAL);
-	querycmd.source_id = global_broker_id.load();
-	querycmd.payload = valueName;
-	querycmd.setStringData(value);
-	if (!global_broker_id.load().isValid())
-	{
-		delayTransmitQueue.push(std::move(querycmd));
-	}
-	else
-	{
-		transmit(parent_route_id, querycmd);
-	}
+    ActionMessage querycmd (CMD_SET_GLOBAL);
+    querycmd.source_id = global_broker_id.load ();
+    querycmd.payload = valueName;
+    querycmd.setStringData (value);
+    if (!global_broker_id.load ().isValid ())
+    {
+        delayTransmitQueue.push (std::move (querycmd));
+    }
+    else
+    {
+        transmit (parent_route_id, querycmd);
+    }
 }
 
 void CommonCore::processPriorityCommand (ActionMessage &&command)

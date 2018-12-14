@@ -97,7 +97,8 @@ enum options : int
     handle_only_transmit_on_change = helics_handle_option_only_transmit_on_change,
     handle_only_update_on_change = helics_handle_option_only_update_on_change,
     buffer_data = helics_handle_option_buffer_data,
-    ignore_interrupts = helics_handle_option_ignore_interrupts
+    ignore_interrupts = helics_handle_option_ignore_interrupts,
+    strict_type_checking = helics_handle_option_strict_type_checking
 };
 
 }  // namespace defs

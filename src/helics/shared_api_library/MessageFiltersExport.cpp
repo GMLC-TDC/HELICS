@@ -55,7 +55,7 @@ static inline void coreAddFilter (helics_core core, std::unique_ptr<helics::Filt
     coreObj->filters.push_back (std::move (filt));
 }
 
-helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type type, const char *name, helics_error *err)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed, err);
@@ -80,7 +80,7 @@ helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_t
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_filter_type type, const char *name, helics_error *err)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed, err);
@@ -106,7 +106,7 @@ helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_fi
     return nullptr;
 }
 
-helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type type, const char *name, helics_error *err)
 {
     auto core = getCoreSharedPtr (cr, err);
     if (!core)
