@@ -396,6 +396,40 @@ void helicsFederateFinalize (helics_federate fed, helics_error *err)
     }
 }
 
+void helicsFederateFinalizeAsync (helics_federate fed, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->finalizeAsync ();
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateFinalizeComplete (helics_federate fed, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->finalizeComplete ();
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 /* initialization, execution, and time requests */
 void helicsFederateEnterInitializingMode (helics_federate fed, helics_error *err)
 {
@@ -730,8 +764,8 @@ static const std::map<helics::Federate::modes, helics_federate_state> modeEnumCo
   {helics::Federate::modes::pending_init, helics_federate_state::helics_state_pending_init},
   {helics::Federate::modes::pending_iterative_time, helics_federate_state::helics_state_pending_iterative_time},
   {helics::Federate::modes::pending_time, helics_federate_state::helics_state_pending_time},
+  {helics::Federate::modes::pending_finalize, helics_federate_state::helics_state_pending_finalize},
   {helics::Federate::modes::initializing, helics_federate_state::helics_state_initialization}};
-
 helics_federate_state helicsFederateGetState (helics_federate fed, helics_error *err)
 {
     auto fedObj = getFed (fed, err);
@@ -925,4 +959,24 @@ helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed, hel
         helicsErrorHandler (err);
         return helics_time_invalid;
     }
+}
+
+static constexpr char invalidGlobalString[] = "Global name cannot be null";
+void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    if (valueName == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidGlobalString;
+        }
+        return;
+    }
+    fedObj->setGlobal (valueName, AS_STRING (value));
 }

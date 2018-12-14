@@ -232,6 +232,8 @@ bool Federate::isAsyncOperationCompleted () const
     case modes::pending_iterative_time:
         return (asyncInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
                 std::future_status::ready);
+    case modes::pending_finalize:
+        return (asyncInfo->finalizeFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     default:
         return false;
     }
@@ -434,6 +436,9 @@ void Federate::finalize ()
     case modes::error:
         return;
         // do nothing
+    case modes::pending_finalize:
+        finalizeComplete ();
+        return;
     default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
@@ -443,6 +448,51 @@ void Federate::finalize ()
         fManager->closeAllFilters ();
     }
     currentMode = modes::finalize;
+}
+
+void Federate::finalizeAsync ()
+{
+    switch (currentMode)
+    {
+    case modes::pending_init:
+        enterInitializingModeComplete ();
+        break;
+    case modes::pending_exec:
+        enterExecutingModeComplete ();
+        break;
+    case modes::pending_time:
+        requestTimeComplete ();
+        break;
+    case modes::pending_iterative_time:
+        requestTimeIterativeComplete ();
+        break;
+    case modes::finalize:
+    case modes::error:
+    case modes::pending_finalize:
+        return;
+        // do nothing
+    default:
+        break;
+    }
+    auto finalizeFunc = [this]() { return coreObject->finalize (fedID); };
+    auto asyncInfo = asyncCallInfo->lock ();
+    currentMode = modes::pending_finalize;
+    asyncInfo->finalizeFuture = std::async (std::launch::async, finalizeFunc);
+}
+
+/** complete the asynchronous terminate pair*/
+void Federate::finalizeComplete ()
+{
+    if (currentMode == modes::pending_finalize)
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        asyncInfo->finalizeFuture.get ();
+        currentMode = modes::finalize;
+    }
+    else
+    {
+        finalize ();
+    }
 }
 
 void Federate::disconnect ()
@@ -1061,8 +1111,8 @@ std::string Federate::query (const std::string &queryStr)
         {
             res = coreObject->getIdentifier ();
         }
-    else
-    {
+        else
+        {
             res = "#unknown";
         }
     }

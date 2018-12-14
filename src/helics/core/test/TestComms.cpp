@@ -108,20 +108,20 @@ void TestComms::queue_tx_function ()
                         setRxStatus (connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(milliseconds(200));
-                    totalSleep += milliseconds(200);
+                    std::this_thread::sleep_for (milliseconds (200));
+                    totalSleep += milliseconds (200);
                 }
             }
             else
             {
                 if (!tbroker->isOpenToNewFederates ())
                 {
-					logError("broker is not open to new federates " + brokerName_);
+                    logError ("broker is not open to new federates " + brokerName_);
                     tbroker = nullptr;
                     broker = nullptr;
-                    BrokerFactory::cleanUpBrokers(milliseconds(200));
-                    totalSleep += milliseconds(200);
-                    if (totalSleep > milliseconds(connectionTimeout))
+                    BrokerFactory::cleanUpBrokers (milliseconds (200));
+                    totalSleep += milliseconds (200);
+                    if (totalSleep > milliseconds (connectionTimeout))
                     {
                         setTxStatus (connection_status::error);
                         setRxStatus (connection_status::error);
@@ -133,7 +133,7 @@ void TestComms::queue_tx_function ()
     }
     else if (!serverMode)
     {
-        milliseconds totalSleep(0);
+        milliseconds totalSleep (0);
         while (!tbroker)
         {
             auto broker = BrokerFactory::findJoinableBrokerOfType (core_type::TEST);
@@ -154,8 +154,8 @@ void TestComms::queue_tx_function ()
                         setRxStatus (connection_status::error);
                         return;
                     }
-                    std::this_thread::sleep_for(milliseconds(200));
-                    totalSleep += milliseconds(200);
+                    std::this_thread::sleep_for (milliseconds (200));
+                    totalSleep += milliseconds (200);
                 }
             }
         }
@@ -268,7 +268,7 @@ void TestComms::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown route message dropped ") + prettyPrintString (cmd));
+                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
                     }
                 }
             }

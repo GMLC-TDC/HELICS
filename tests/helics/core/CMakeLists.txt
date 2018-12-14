@@ -51,6 +51,9 @@ add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_definitions(
+  core-tests PRIVATE BOOST_DATE_TIME_NO_LIB
+)
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
