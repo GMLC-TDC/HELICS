@@ -223,6 +223,11 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode8
+      
+    - stage: trigger dependent repositories
+      before_install:
+      install:
+      script: echo Trigger builds here!
 
 branches:
   except:
