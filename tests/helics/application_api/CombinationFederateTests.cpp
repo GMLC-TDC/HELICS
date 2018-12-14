@@ -271,9 +271,11 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     BOOST_CHECK (cFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
+static constexpr const char *combo_config_files[] = {"example_combo_fed.json", "example_combo_fed.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load, bdata::make (combo_config_files), file)
 {
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/example_combo_fed.json");
+    helics::CombinationFederate cFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 
@@ -288,19 +290,4 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     cFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load_toml)
-{
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/example_combo_fed.toml");
-
-    BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
-
-    BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
-    auto &id = cFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
-
-    BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
-    BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
-
-    cFed.disconnect ();
-}
 BOOST_AUTO_TEST_SUITE_END ()

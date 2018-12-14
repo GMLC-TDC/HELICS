@@ -6,14 +6,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../common/DualMappedVector.hpp"
+#include "../common/GuardedTypes.hpp"
 #include "../common/MappedVector.hpp"
 #include "../core/Core.hpp"
+#include "Inputs.hpp"
+#include "Publications.hpp"
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <atomic>
-#include "../common/GuardedTypes.hpp"
-#include "Inputs.hpp"
-#include "Publications.hpp"
 
 namespace helics
 {
@@ -46,8 +46,7 @@ struct input_info
     std::string pubtype;  //!< the listed type of the corresponding publication
     interface_handle coreID;  //!< Handle from the core
     input_id_t id;  //!< the id used as the identifier
-    
-    
+
     std::function<void(Input &, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
     input_info (const std::string &n_name, const std::string &n_type, const std::string &n_units)
@@ -61,14 +60,11 @@ class ValueFederateManager
     ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id);
     ~ValueFederateManager ();
 
-      Publication &
-    registerPublication (const std::string &key, const std::string &type, const std::string &units);
+    Publication &registerPublication (const std::string &key, const std::string &type, const std::string &units);
     /** register a subscription
     @details call is only valid in startup mode
     */
-    Input &
-    registerInput (const std::string &key, const std::string &type, const std::string &units);
-
+    Input &registerInput (const std::string &key, const std::string &type, const std::string &units);
 
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location
@@ -76,7 +72,15 @@ class ValueFederateManager
     @param[in] the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (const Input &inp, const std::string &shortcutName);
+    void addAlias (const Input &inp, const std::string &shortcutName);
+
+    /** add a alias/shortcut for locating a publication
+    @details primarily for use in looking up an id from a different location
+    creates a local shortcut for referring to a subscription which may have a long actual name
+    @param[in] the subscription identifier
+    @param[in] shortcutName the name of the shortcut
+    */
+    void addAlias (const Publication &pub, const std::string &shortcutName);
     /** add a destination target to a publication
    @param id the identifier of the input
    target the name of the input to send the data to
@@ -131,7 +135,7 @@ class ValueFederateManager
     /** transition from initialize to execution State*/
     void initializeToExecuteStateTransition ();
     /** generate results for a local query */
-    std::string localQuery(const std::string &queryStr) const;
+    std::string localQuery (const std::string &queryStr) const;
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since updated
     */
@@ -141,17 +145,17 @@ class ValueFederateManager
     const std::string &getTarget (const Input &inp) const;
 
     /** get an Input from Its Name
-	@param name the identifier or shortcut of the input
+    @param name the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
     Input &getInput (const std::string &name);
     const Input &getInput (const std::string &name) const;
     /** get an input by index*/
     Input &getInput (int index);
     const Input &getInput (int index) const;
-	 /** get the id of a subscription
-	 @param key the target of a subscription
-   @return ivalid_input_id if name is not a recognized*/
-    const Input & getSubscription (const std::string &key) const;
+    /** get the id of a subscription
+    @param key the target of a subscription
+  @return ivalid_input_id if name is not a recognized*/
+    const Input &getSubscription (const std::string &key) const;
     Input &getSubscription (const std::string &key);
 
     /** get a publication based on its key
@@ -160,14 +164,14 @@ class ValueFederateManager
     Publication &getPublication (const std::string &key);
     const Publication &getPublication (const std::string &key) const;
 
-	Publication &getPublication (int index);
+    Publication &getPublication (int index);
     const Publication &getPublication (int index) const;
 
     /** set a publication option */
     void setPublicationOption (const Publication &pub, int32_t option, bool option_value);
 
     /** get a handle option*/
-    void setInputOption(const Input &inp, int32_t option, bool option_value);
+    void setInputOption (const Input &inp, int32_t option, bool option_value);
     /** get an option values for an input*/
     bool getInputOption (const Input &inp, int32_t option) const;
     /** get an option values for a publication*/
@@ -193,21 +197,18 @@ class ValueFederateManager
     int getInputCount () const;
 
   private:
-    shared_guarded_m<
-      DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
-      inputs;
-    shared_guarded_m<
-      DualMappedVector<Publication, std::string, interface_handle,  reference_stability::stable>>
+    shared_guarded_m<DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>> inputs;
+    shared_guarded_m<DualMappedVector<Publication, std::string, interface_handle, reference_stability::stable>>
       publications;
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
-    ValueFederate *fed; //!< pointer back to the value Federate for creation of the Publication/Inputs
+    ValueFederate *fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
     federate_id_t fedID;  //!< the federation ID from the core API
-    atomic_guarded<std::function<void(Input &, Time)>> allCallback; //!< the global callback function
+    atomic_guarded<std::function<void(Input &, Time)>> allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
       inputData;  //!< the storage for the message queues and other unique Endpoint information
     std::multimap<std::string, interface_handle> targetIDs;  //!< container for the target identifications
-    std::multimap<interface_handle, std::string> inputTargets; //!< container for the specified input targets
+    std::multimap<interface_handle, std::string> inputTargets;  //!< container for the specified input targets
   private:
     void getUpdateFromCore (interface_handle handle);
 };

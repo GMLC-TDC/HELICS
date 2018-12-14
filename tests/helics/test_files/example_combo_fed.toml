@@ -45,6 +45,7 @@ name="ept2" # the name of the publication
 [[publications]]
 name="pub2" # the name of the publication (can be key or name)
  type="double" # the type assocaited with a publication (optional)
+ info='{"field1":45,"field2":99}'  #literal info field
  #no global=true implies this will have the federate name prepended like comboFed/pub2
 
 #subscriptions used in the federate

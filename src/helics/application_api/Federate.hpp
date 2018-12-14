@@ -417,6 +417,8 @@ class Federate
 
     /** set a filter option */
     void setFilterOption (const Filter &filt, int32_t option, bool option_value = true);
+    /** get the number of filters registered through this federate*/
+    int getFilterCount () const;
 
   protected:
     /** function to deal with any operations that need to occur on a time update*/

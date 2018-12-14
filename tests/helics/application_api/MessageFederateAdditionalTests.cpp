@@ -468,9 +468,11 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (p3.pongs, 2);
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
+static constexpr const char *config_files[] = {"example_message_fed.json", "example_message_fed.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_message_fed.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
@@ -484,48 +486,16 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     mFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load_toml)
+static constexpr const char *filter_config_files[] = {"example_filters.json", "example_filters.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), file)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_message_fed.toml");
-
-    BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
-
-    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
-    auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-    BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
-    mFed.disconnect ();
-}
-
-BOOST_AUTO_TEST_CASE (test_file_load_filter)
-{
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_filters.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
     auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-
-    BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
-
-    auto filt = &mFed.getFilter (2);
-
-    auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
-    BOOST_CHECK (cloneFilt != nullptr);
-
-    BOOST_CHECK_EQUAL (mFed.getFilter (0).getInfo (), "this is an information string for use by the application");
-    mFed.disconnect ();
-}
-
-BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
-{
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/example_filters.toml");
-
-    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
-
-    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
-    auto &id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (mFed.filterCount (), 3);

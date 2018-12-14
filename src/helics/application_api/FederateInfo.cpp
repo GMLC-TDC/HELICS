@@ -304,27 +304,27 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
 
     for (auto &prop : validTimeProperties)
     {
-        jsonCallIfMember (doc, prop, timeCall);
+        callIfMember (doc, prop, timeCall);
     }
 
     for (auto &prop : validIntProperties)
     {
-        jsonCallIfMember (doc, prop, intCall);
+        callIfMember (doc, prop, intCall);
     }
 
     for (auto &prop : validFlagOptions)
     {
-        jsonCallIfMember (doc, prop, flagCall);
+        callIfMember (doc, prop, flagCall);
     }
     if (doc.isMember ("flags"))
     {
         loadFlags (fi, doc["flags"].asString ());
     }
 
-    jsonReplaceIfMember (doc, "broker", fi.broker);
-    fi.brokerPort = jsonGetOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
-    jsonReplaceIfMember (doc, "localport", fi.localport);
-    jsonReplaceIfMember (doc, "autobroker", fi.autobroker);
+    replaceIfMember (doc, "broker", fi.broker);
+    fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
+    replaceIfMember (doc, "localport", fi.localport);
+    replaceIfMember (doc, "autobroker", fi.autobroker);
     if (doc.isMember ("port"))
     {
         if (fi.localport.empty ())
@@ -387,11 +387,11 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    jsonReplaceIfMember (doc, "name", fi.defName);
-    jsonReplaceIfMember (doc, "coreName", fi.coreName);
-    jsonReplaceIfMember (doc, "coreInit", fi.coreInitString);
-    jsonReplaceIfMember (doc, "coreinit", fi.coreInitString);
-    jsonReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
+    replaceIfMember (doc, "name", fi.defName);
+    replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "coreInit", fi.coreInitString);
+    replaceIfMember (doc, "coreinit", fi.coreInitString);
+    replaceIfMember (doc, "coreinitstring", fi.coreInitString);
     return fi;
 }
 
@@ -421,26 +421,26 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
 
     for (auto &prop : validTimeProperties)
     {
-        tomlCallIfMember (doc, prop, timeCall);
+        callIfMember (doc, prop, timeCall);
     }
 
     for (auto &prop : validIntProperties)
     {
-        tomlCallIfMember (doc, prop, intCall);
+        callIfMember (doc, prop, intCall);
     }
 
     for (auto &prop : validFlagOptions)
     {
-        tomlCallIfMember (doc, prop, flagCall);
+        callIfMember (doc, prop, flagCall);
     }
     if (isMember (doc, "flags"))
     {
         loadFlags (fi, doc["flags"].as<std::string> ());
     }
-    tomlReplaceIfMember (doc, "autobroker", fi.autobroker);
-    tomlReplaceIfMember (doc, "broker", fi.broker);
-    fi.brokerPort = tomlGetOrDefault (doc, "brokerport", fi.brokerPort);
-    tomlReplaceIfMember (doc, "localport", fi.localport);
+    replaceIfMember (doc, "autobroker", fi.autobroker);
+    replaceIfMember (doc, "broker", fi.broker);
+    fi.brokerPort = getOrDefault (doc, "brokerport", fi.brokerPort);
+    replaceIfMember (doc, "localport", fi.localport);
     if (isMember (doc, "port"))
     {
         if (fi.localport.empty ())
@@ -503,11 +503,11 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    tomlReplaceIfMember (doc, "name", fi.defName);
-    tomlReplaceIfMember (doc, "coreName", fi.coreName);
-    tomlReplaceIfMember (doc, "coreInit", fi.coreInitString);
-    tomlReplaceIfMember (doc, "coreinit", fi.coreInitString);
-    tomlReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
+    replaceIfMember (doc, "name", fi.defName);
+    replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "coreInit", fi.coreInitString);
+    replaceIfMember (doc, "coreinit", fi.coreInitString);
+    replaceIfMember (doc, "coreinitstring", fi.coreInitString);
 
     return fi;
 }

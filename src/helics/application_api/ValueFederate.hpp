@@ -235,11 +235,19 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     }
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
-    creates a local shortcut for referring to a subscription which may have a long actual name
+    creates a local shortcut for referring to a input which may not have another name
     @param[in] inp the input object
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (const Input &inp, const std::string &shortcutName);
+    void addAlias (const Input &inp, const std::string &shortcutName);
+
+    /** add a shortcut for locating a publication
+    @details primarily for use in looking up an id from a different location
+    creates a local shortcut for referring to a publication which may not have another name
+    @param[in] pub the publication object
+    @param[in] shortcutName the name of the shortcut
+    */
+    void addAlias (const Publication &pub, const std::string &shortcutName);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications

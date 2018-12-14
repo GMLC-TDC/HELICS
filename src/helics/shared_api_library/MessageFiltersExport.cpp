@@ -241,6 +241,16 @@ helics_filter helicsFederateGetFilter (helics_federate fed, const char *name, he
     }
 }
 
+int helicsFederateGetFilterCount (helics_federate fed)
+{
+    auto fedObj = getFed (fed, nullptr);
+    if (fedObj == nullptr)
+    {
+        return 0;
+    }
+    return fedObj->getFilterCount ();
+}
+
 helics_filter helicsFederateGetFilterByIndex (helics_federate fed, int index, helics_error *err)
 {
     if (index < 0)
