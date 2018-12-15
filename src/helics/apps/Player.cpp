@@ -699,7 +699,7 @@ void Player::initialize ()
 
 void Player::sendInformation (Time sendTime, int iteration)
 {
-    if (!points.empty ())
+    if (isValidIndex(pointIndex,points))
     {
         while (points[pointIndex].time < sendTime)
         {
@@ -710,17 +710,20 @@ void Player::sendInformation (Time sendTime, int iteration)
                 break;
             }
         }
-        while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
+        if (isValidIndex(pointIndex, points))
         {
-            publications[points[pointIndex].index].publish (points[pointIndex].value);
-            ++pointIndex;
-            if (pointIndex >= points.size ())
+            while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
             {
-                break;
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
             }
         }
     }
-    if (!messages.empty ())
+    if (isValidIndex(messageIndex, messages))
     {
         while (messages[messageIndex].sendTime <= sendTime)
         {
@@ -752,7 +755,7 @@ void Player::runTo (Time stopTime_input)
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex,points))
         {
             while (points[pointIndex].time <= ctime)
             {
@@ -763,7 +766,7 @@ void Player::runTo (Time stopTime_input)
                 }
             }
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
@@ -784,12 +787,12 @@ void Player::runTo (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex, points))
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
             nextIteration = points[pointIndex].iteration;
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
