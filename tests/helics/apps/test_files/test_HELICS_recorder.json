@@ -1,0 +1,22 @@
+{
+  "endpoints": [
+    {
+      "name": "ep1",
+      "global": true
+    },
+    {
+      "name": "ep2",
+      "global": true
+    }
+  ],
+  "subscriptions": [
+    {
+      "key": "fed1/totalLoad",
+      "type": "complex"
+    },
+    {
+      "key": "fed1/coolingIsOn",
+      "type": "int"
+    }
+  ]
+}

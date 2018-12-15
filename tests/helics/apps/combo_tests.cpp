@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <cstdio>
 
 #include "exeTestHelper.h"
+#include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/apps/Player.hpp"
@@ -270,4 +271,50 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary2,
     play1.finalize ();
     boost::filesystem::remove (filename);
 }
+
+BOOST_AUTO_TEST_CASE (check_combination_file_load)
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = "ccore_combo";
+    fi.coreInitString = "-f 3 --autobroker";
+
+    helics::apps::Player play1 ("play1", fi);
+    play1.loadFile (TEST_DIR "test_HELICS_player.json");
+
+    helics::apps::Recorder rec1 ("rec1", fi);
+    rec1.loadFile (TEST_DIR "test_HELICS_recorder.json");
+
+    helics::CombinationFederate fed ("", TEST_DIR "federate_config.json");
+    auto fut_rec = std::async (std::launch::async, [&rec1]() { rec1.run (); });
+    auto fut_play = std::async (std::launch::async, [&play1]() { play1.run (); });
+    fed.enterExecutingMode ();
+    auto tm = fed.getCurrentTime ();
+    while (tm < 1300.0)
+    {
+        tm = fed.requestNextStep ();
+        if (tm == 120.0)
+        {
+            fed.getEndpoint (0).send ("73.4");
+        }
+        if (tm == 730.0)
+        {
+            fed.getEndpoint (1).send ("on");
+        }
+        if (tm == 230.0)
+        {
+            fed.getPublication (0).publish (34.6);
+        }
+        if (tm == 640.0)
+        {
+            fed.getPublication (1).publish (1);
+        }
+    }
+    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3);
+    fed.finalize ();
+    fut_play.get ();
+    fut_rec.get ();
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

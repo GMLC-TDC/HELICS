@@ -117,7 +117,8 @@ void ValueFederate::removeTarget (const Input &inp, const std::string &target)
     vfManager->removeTarget (inp, target);
 }
 
-void ValueFederate::addAlias (const Input &inp, const std::string &shortcutName){
+void ValueFederate::addAlias (const Input &inp, const std::string &shortcutName)
+{
     vfManager->addAlias (inp, shortcutName);
 }
 
@@ -464,25 +465,25 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
 
 const std::string &ValueFederate::getInputUnits (const Input &inp) const
 {
-    return coreObject->getUnits (inp.getHandle ());
+    return (coreObject) ? coreObject->getUnits (inp.getHandle ()) : emptyStr;
 }
 const std::string &ValueFederate::getPublicationUnits (const Publication &pub) const
 {
-    return coreObject->getUnits (pub.getHandle ());
+    return (coreObject) ? coreObject->getUnits (pub.getHandle ()) : emptyStr;
 }
 
 const std::string &ValueFederate::getInputType (const Input &inp) const
 {
-    return coreObject->getType (inp.getHandle ());
+    return (coreObject) ? coreObject->getType (inp.getHandle ()) : emptyStr;
 }
 const std::string &ValueFederate::getPublicationType (const Publication &pub) const
 {
-    return coreObject->getType (pub.getHandle ());
+    return (coreObject) ? coreObject->getType (pub.getHandle ()) : emptyStr;
 }
 
-std::string ValueFederate::getPublicationType (const Input &inp) const
+const std::string &ValueFederate::getPublicationType (const Input &inp) const
 {
-    return coreObject->getType (inp.getHandle ());
+    return (coreObject) ? coreObject->getType (inp.getHandle ()) : emptyStr;
 }
 
 void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)

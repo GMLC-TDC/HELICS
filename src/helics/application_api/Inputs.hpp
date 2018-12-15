@@ -163,7 +163,10 @@ class Input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getName () const { return actualName; }
     /** get the type of the input*/
-    const std::string &getType () const { return fed->getInputType (*this); }
+    const std::string &getType () const
+    {
+        return (type == data_type::helicsUnknown) ? fed->getPublicationType (*this) : typeNameStringRef (type);
+    }
     /** get the units associated with a input*/
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
     /** get an associated target*/

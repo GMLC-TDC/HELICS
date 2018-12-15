@@ -376,7 +376,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    if (doc.isMember ("coretype"))
+    else if (doc.isMember ("coretype"))
     {
         try
         {
@@ -387,8 +387,20 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
+    else if (doc.isMember ("type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].asString ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
     replaceIfMember (doc, "name", fi.defName);
     replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
     replaceIfMember (doc, "coreInit", fi.coreInitString);
     replaceIfMember (doc, "coreinit", fi.coreInitString);
     replaceIfMember (doc, "coreinitstring", fi.coreInitString);
@@ -503,8 +515,20 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
             std::cerr << "Unrecognized core type\n";
         }
     }
+    else if (isMember (doc, "type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].as<std::string> ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
     replaceIfMember (doc, "name", fi.defName);
     replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
     replaceIfMember (doc, "coreInit", fi.coreInitString);
     replaceIfMember (doc, "coreinit", fi.coreInitString);
     replaceIfMember (doc, "coreinitstring", fi.coreInitString);
