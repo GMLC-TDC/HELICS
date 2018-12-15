@@ -24,9 +24,6 @@ sudo apt-get install libboost-dev
 sudo apt-get install libboost-program-options-dev
 sudo apt-get install libboost-test-dev
 sudo apt-get install libboost-filesystem-dev
-sudo apt-get install libboost-date-time-dev
-sudo apt-get install libboost-timer-dev
-sudo apt-get install libboost-chrono-dev
 sudo apt-get install libzmq5-dev
 ```
 

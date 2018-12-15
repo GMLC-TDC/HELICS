@@ -11,7 +11,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <algorithm>
 #include <cctype>
 #include <memory>
-#include "boost/date_time/posix_time/posix_time.hpp"
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -152,7 +151,7 @@ void IpcComms::queue_tx_function ()
 {
     sendToQueue brokerQueue;  //!< the queue of the broker
     sendToQueue rxQueue;
-    std::map<route_id_t, sendToQueue> routes;  //!< table of the routes to other brokers
+    std::map<route_id, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
     if (!brokerTarget_.empty ())
@@ -216,12 +215,12 @@ void IpcComms::queue_tx_function ()
     bool IPCoperating = false;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (rid == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -231,10 +230,13 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (newQueue));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(newQueue));
                     }
                     continue;
                 }
+                case REMOVE_ROUTE:
+					routes.erase(route_id{ cmd.getExtraData() });
+                    continue;
                 case DISCONNECT:
                     goto DISCONNECT_TX_QUEUE;
                 }
@@ -251,20 +253,20 @@ void IpcComms::queue_tx_function ()
         }
         std::string buffer = cmd.to_string ();
         int priority = isPriorityCommand (cmd) ? 3 : 1;
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
                 brokerQueue.sendMessage (cmd, priority);
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {
             rxQueue.sendMessage (cmd, priority);
         }
         else
         {
-            auto routeFnd = routes.find (route_id);
+            auto routeFnd = routes.find (rid);
             if (routeFnd != routes.end ())
             {
                 routeFnd->second.sendMessage (cmd, priority);

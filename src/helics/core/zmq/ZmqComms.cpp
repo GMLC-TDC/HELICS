@@ -3,12 +3,12 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ZmqComms.h"
 #include "../../common/zmqContextManager.h"
 #include "../../common/zmqHelper.h"
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
-#include "ZmqComms.h"
 #include "ZmqRequestSets.h"
 //#include <boost/asio.hpp>
 //#include <csignal>
@@ -18,11 +18,14 @@ static const int DEFAULT_BROKER_PORT_NUMBER = 23404;
 
 using namespace std::chrono;
 /** bind a zmq socket, with a timeout and timeout period*/
-static bool
-bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, milliseconds timeout, milliseconds period = milliseconds(200))
+static bool bindzmqSocket (zmq::socket_t &socket,
+                           const std::string &address,
+                           int port,
+                           milliseconds timeout,
+                           milliseconds period = milliseconds (200))
 {
     bool bindsuccess = false;
-    milliseconds tcount{ 0 };
+    milliseconds tcount{0};
     while (!bindsuccess)
     {
         try
@@ -32,9 +35,9 @@ bindzmqSocket (zmq::socket_t &socket, const std::string &address, int port, mill
         }
         catch (const zmq::error_t &)
         {
-            if (tcount == milliseconds(0))
+            if (tcount == milliseconds (0))
             {
-                std::cerr << "zmq binding error on socket sleeping then will try again \n";
+                // std::cerr << "zmq binding error on socket sleeping then will try again \n";
             }
             if (tcount > timeout)
             {
@@ -58,13 +61,13 @@ void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         return;
     }
-    if (!brokerTarget_.empty())
+    if (!brokerTarget_.empty ())
     {
-        insertProtocol(brokerTarget_, interface_type::tcp);
+        insertProtocol (brokerTarget_, interface_type::tcp);
     }
-    if (!localTarget_.empty())
+    if (!localTarget_.empty ())
     {
-        insertProtocol(localTarget_, interface_type::tcp);
+        insertProtocol (localTarget_, interface_type::tcp);
     }
     if (localTarget_ == "tcp://localhost")
     {
@@ -105,7 +108,8 @@ int ZmqComms::processIncomingMessage (zmq::message_t &msg)
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
     if (!isValidCommand (M))
     {
-        std::cerr << "invalid command received" << std::endl;
+        logError ("invalid command received");
+        ActionMessage Q (static_cast<char *> (msg.data ()), msg.size ());
         return 0;
     }
     if (isProtocolCommand (M))
@@ -140,16 +144,15 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         return 0;
     }
 
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-        sock.send (str.data (), str.size ());
-        return 0;
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
+    sock.send (str.data (), str.size ());
+    return 0;
 }
 
 void ZmqComms::queue_rx_function ()
 {
-    
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.setsockopt (ZMQ_LINGER, 200);
@@ -191,7 +194,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.messageID == NAME_NOT_FOUND)
             {
-                std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
+                logError (std::string ("broker name ") + brokerName_ + " does not match broker connection");
                 disconnecting = true;
                 setRxStatus (connection_status::error);
                 return;
@@ -291,7 +294,7 @@ void ZmqComms::queue_rx_function ()
                     continue;
                 }
             }
-		}
+        }
         if (requestDisconnect.load (std::memory_order::memory_order_acquire))
         {
             break;
@@ -336,7 +339,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         {
             while (PortNumber < 0)
             {
-                ActionMessage getPorts = generatePortRequest ((serverMode)?2:1);
+                ActionMessage getPorts = generatePortRequest ((serverMode) ? 2 : 1);
                 auto str = getPorts.to_string ();
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
@@ -400,7 +403,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             PortNumber = DEFAULT_BROKER_PORT_NUMBER;
             ActionMessage setPorts (CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;
-            setPorts.setExtraData(PortNumber);
+            setPorts.setExtraData (PortNumber);
             auto str = setPorts.to_string ();
             controlSocket.send (str);
         }
@@ -411,7 +414,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
 void ZmqComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    if (!brokerTarget_.empty())
+    if (!brokerTarget_.empty ())
     {
         hasBroker = true;
     }
@@ -439,7 +442,7 @@ void ZmqComms::queue_tx_function ()
 
     zmq::socket_t brokerPushSocket (ctx->getContext (), ZMQ_PUSH);
     brokerPushSocket.setsockopt (ZMQ_LINGER, 200);
-    std::map<route_id_t, zmq::socket_t> routes;  // for all the other possible routes
+    std::map<route_id, zmq::socket_t> routes;  // for all the other possible routes
     // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority routes
 
     if (hasBroker)
@@ -451,14 +454,14 @@ void ZmqComms::queue_tx_function ()
     zmq::message_t msg;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (control_route == rid)
             {
                 switch (cmd.messageID)
                 {
@@ -474,7 +477,7 @@ void ZmqComms::queue_tx_function ()
                         auto zsock = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
                         zsock.setsockopt (ZMQ_LINGER, 100);
                         zsock.connect (makePortAddress (interfaceAndPort.first, interfaceAndPort.second));
-                        routes.emplace (route_id_t(cmd.getExtraData()), std::move (zsock));
+                        routes.emplace (route_id{cmd.getExtraData ()}, std::move (zsock));
                     }
                     catch (const zmq::error_t &e)
                     {
@@ -484,6 +487,10 @@ void ZmqComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+                case REMOVE_ROUTE:
+                    routes.erase (route_id{cmd.getExtraData ()});
+                    processed = true;
+                    break;
                 case DISCONNECT:
                     goto CLOSE_TX_LOOP;  // break out of loop
                 }
@@ -494,7 +501,7 @@ void ZmqComms::queue_tx_function ()
             continue;
         }
         cmd.to_vector (buffer);
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
@@ -505,7 +512,7 @@ void ZmqComms::queue_tx_function ()
                 logWarning ("no route to broker for message");
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {  // send to rx thread loop
             try
             {
@@ -520,14 +527,14 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    std::cerr << e.what () << '\n';
+                    logError (e.what ());
                 }
             }
             continue;
         }
         else
         {
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 rt_find->second.send (buffer.data (), buffer.size ());
@@ -540,7 +547,11 @@ void ZmqComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown route and no broker, dropping message");
+                    if (!isDisconnectCommand (cmd))
+                    {
+                        logWarning (std::string ("unknown route and no broker, dropping message ") +
+                                    prettyPrintString (cmd));
+                    }
                 }
             }
         }
@@ -551,14 +562,14 @@ CLOSE_TX_LOOP:
     routes.clear ();
     if (getRxStatus () == connection_status::connected)
     {
-		try
-		{
+        try
+        {
             controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
-		}
+        }
         catch (const zmq::error_t &)
-		{
-			//this probably just means it got closed simultaneously which would be unusual but not impossible
-		}
+        {
+            // this probably just means it got closed simultaneously which would be unusual but not impossible
+        }
     }
 
     controlSocket.close ();

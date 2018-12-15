@@ -13,7 +13,7 @@ set(
 	PublicationInfo.cpp
 	NamedInputInfo.cpp
 	InterfaceInfo.cpp
-  # FilterInfo.cpp
+    FilterInfo.cpp
 	EndpointInfo.cpp
 	ActionMessage.cpp
 	CoreBroker.cpp
@@ -28,6 +28,7 @@ set(
 	NetworkBrokerData.cpp
 	helics-time.cpp
 	HandleManager.cpp
+	FilterCoordinator.cpp
 	UnknownHandleManager.cpp
 	MessageTimer.cpp
 	JsonMapBuilder.cpp
@@ -115,9 +116,9 @@ set(
 	NamedInputInfo.hpp
 	EndpointInfo.hpp
 	flagOperations.hpp
-	FilterInfo.hpp
 	BasicHandleInfo.hpp
-	FilterFunctions.hpp
+	FilterInfo.hpp
+	FilterCoordinator.hpp
 	NetworkBrokerData.hpp
 	HandleManager.hpp
 	UnknownHandleManager.hpp
@@ -155,23 +156,31 @@ set(
 	tcp/TcpCommsCommon.h
 )
 
+if(NOT DISABLE_TEST_CORE)
 list(
   APPEND
     SRC_FILES
     ${TESTCORE_SOURCE_FILES}
-    ${UDP_SOURCE_FILES}
-    ${IPC_SOURCE_FILES}
 )
 list(
   APPEND
     INCLUDE_FILES
     ${TESTCORE_HEADER_FILES}
-    ${UDP_HEADER_FILES}
-    ${IPC_HEADER_FILES}
 )
+endif()
+
+if(NOT DISABLE_UDP_CORE)
+  list(APPEND SRC_FILES ${UDP_SOURCE_FILES})
+  list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES})
+endif()
+
+if(NOT DISABLE_IPC_CORE)
+  list(APPEND SRC_FILES ${IPC_SOURCE_FILES})
+  list(APPEND INCLUDE_FILES ${IPC_HEADER_FILES})
+endif()
 
 if(NOT DISABLE_TCP_CORE)
-		list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
+  list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
   list(APPEND INCLUDE_FILES ${TCP_HEADER_FILES})
 endif()
 
@@ -198,6 +207,9 @@ target_include_directories(
 target_compile_definitions(
   helics_core PRIVATE
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
+)
+target_compile_definitions(
+  helics_core PRIVATE BOOST_DATE_TIME_NO_LIB
 )
 target_compile_options(
   helics_core

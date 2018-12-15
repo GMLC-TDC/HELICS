@@ -21,9 +21,7 @@ if(!MSVC)
   target_compile_options(nonlings_fed2_cpp PRIVATE -pedantic -Werror)
 endif()
 
-set_target_properties(nonlings_fed1_cpp PROPERTIES FOLDER examples)
-
-set_target_properties(nonlings_fed2_cpp PROPERTIES FOLDER examples)
+set_target_properties(nonlings_fed1_cpp nonlings_fed2_cpp PROPERTIES FOLDER examples)
 
 if(BUILD_HELICS_TESTS AND NOT MSVC)
   add_test(

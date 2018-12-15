@@ -158,7 +158,7 @@ helics_publication helicsFederateRegisterPublication (helics_federate fed, const
     try
     {
         auto pub = std::make_unique<helics::PublicationObject> ();
-        pub->pubPtr = &(fedObj->registerPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+        pub->pubPtr = &(fedObj->registerPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                      AS_STRING (units)));
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
@@ -223,7 +223,7 @@ helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, h
     {
         auto pub = std::make_unique<helics::PublicationObject> ();
         pub->pubPtr =
-          &(fedObj->registerGlobalPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+          &(fedObj->registerGlobalPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                AS_STRING (units)));
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
@@ -288,7 +288,7 @@ helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, 
     try
     {
         auto inp = std::make_unique<helics::InputObject> ();
-        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                  AS_STRING (units)));
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());
@@ -354,7 +354,7 @@ helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char 
     try
     {
         auto inp = std::make_unique<helics::InputObject> ();
-        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                  AS_STRING (units)));
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());

@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
 	// all 3 of these should publish to the same thing
     auto &pubid = fed1->registerPublication ("testkey", "");
     
-    helics::Publication pub (fed1, "testkey", helics::helics_type_t::helicsDouble);
+    helics::Publication pub (fed1, "testkey", helics::data_type::helicsDouble);
 	//copy constructor
     helics::Publication pub2 (pubid);
 

@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../NetworkBroker_impl.hpp"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
+#include <iostream>
 
 namespace helics
 {

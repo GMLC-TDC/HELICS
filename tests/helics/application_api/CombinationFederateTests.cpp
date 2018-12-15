@@ -31,11 +31,11 @@ BOOST_DATA_TEST_CASE (combo_federate_initialize_tests, bdata::make (core_types_s
 
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core_types_single), core_type)
@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     auto &pubid3 = vFed1->registerPublication ("pub3", "double", "V");
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto &sv = vFed1->getPublicationKey (pubid);
     auto &sv2 = vFed1->getPublicationKey (pubid2);
@@ -66,7 +66,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     BOOST_CHECK (vFed1->getPublication ("fed0/pub1").getHandle () == pubid.getHandle ());
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_single), core_type)
@@ -78,7 +78,7 @@ BOOST_DATA_TEST_CASE (combo_federate_single_transfer, bdata::make (core_types_si
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
@@ -114,7 +114,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto &sv = mFed1->getEndpointName (epid);
     auto &sv2 = mFed1->getEndpointName (epid2);
@@ -129,7 +129,7 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_types), core_type)
@@ -141,15 +141,15 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     auto &epid = mFed1->registerEndpoint ("ep1");
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    mFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
+    mFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -182,8 +182,8 @@ BOOST_DATA_TEST_CASE (combination_federate_send_receive_2fed, bdata::make (core_
     mFed1->finalize ();
     mFed2->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core_types), core_type)
@@ -200,8 +200,8 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
 
     auto &subid = cFed2->registerSubscription ("pub1");
 
-    cFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    cFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    cFed1->setProperty (helics_property_time_delta, 1.0);
+    cFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutingMode (); });
     cFed2->enterExecutingMode ();
@@ -209,8 +209,8 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     // publish string1 at time=0.0;
     cFed1->publish (pubid, "string1");
 
-    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (cFed1->getCurrentMode () == helics::Federate::modes::executing);
+    BOOST_CHECK (cFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -267,13 +267,15 @@ BOOST_DATA_TEST_CASE (combination_federate_multimode_transfer, bdata::make (core
     cFed1->finalize ();
     cFed2->finalize ();
 
-    BOOST_CHECK (cFed1->getCurrentState () == helics::Federate::states::finalize);
-    BOOST_CHECK (cFed2->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (cFed1->getCurrentMode () == helics::Federate::modes::finalize);
+    BOOST_CHECK (cFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
+static constexpr const char *combo_config_files[] = {"example_combo_fed.json", "example_combo_fed.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load, bdata::make (combo_config_files), file)
 {
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/test_files/example_combo_fed.json");
+    helics::CombinationFederate cFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
 
@@ -284,23 +286,8 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
 
-	BOOST_CHECK(!cFed.getPublication(1).getInfo().empty());
+    BOOST_CHECK (!cFed.getPublication (1).getInfo ().empty ());
     cFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load_toml)
-{
-    helics::CombinationFederate cFed (std::string (TEST_DIR) + "/test_files/example_combo_fed.toml");
-
-    BOOST_CHECK_EQUAL (cFed.getName (), "comboFed");
-
-    BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
-    auto &id = cFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
-
-    BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
-    BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);
-
-    cFed.disconnect ();
-}
 BOOST_AUTO_TEST_SUITE_END ()

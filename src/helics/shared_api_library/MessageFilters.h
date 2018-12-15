@@ -82,6 +82,13 @@ through other functions
 */
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter (helics_core core, const char *deliveryEndpoint, helics_error *err);
 
+
+/** get a the number of filters registered through a federate
+@param fed the federate object to use to get the filter
+@return a count of the number of filters registered through a federate
+*/
+HELICS_EXPORT int helicsFederateGetFilterCount (helics_federate fed);
+
 /** get a filter by its name typically already created via registerInterfaces file or something of that nature
 @param fed the federate object to use to get the filter
 @param name the name of the filter

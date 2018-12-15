@@ -98,7 +98,7 @@ struct FederateTestFixture_cpp
         helicscpp::FederateInfo fi;
 
         fi.setCoreTypeFromString (core_type_name);
-        fi.setTimeProperty (helics_property_time_delta, time_delta);
+        fi.setProperty (helics_property_time_delta, time_delta);
         std::vector<std::shared_ptr<helicscpp::Federate>> federates_added;
         switch (setup)
         {

@@ -107,11 +107,11 @@ void Publication::publish (char val)
 {
     switch (pubType)
     {
-    case helics_type_t::helicsBool:
+    case data_type::helicsBool:
         publish (!((val == '0') || (val == 'f') || (val == 0) || (val == 'F') || (val == '-')));
         break;
-    case helics_type_t::helicsString:
-    case helics_type_t::helicsNamedPoint:
+    case data_type::helicsString:
+    case data_type::helicsNamedPoint:
         publish (std::string (1,val));
         break;
     default:
@@ -351,7 +351,7 @@ void Publication::publish (const char *name, double val)
     }
 }
 
-data_block typeConvert (helics_type_t type, const defV &val)
+data_block typeConvert (data_type type, const defV &val)
 {
     switch (val.index ())
     {

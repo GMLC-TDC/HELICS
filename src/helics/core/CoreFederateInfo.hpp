@@ -19,9 +19,12 @@ class CoreFederateInfo
     std::vector<std::pair<int, bool>> flagProps;
 
   public:
-    void setIntegerProperty (int propId, int propVal) { intProps.emplace_back (propId, propVal); }
-    void setTimeProperty (int propId, Time propVal) {timeProps.emplace_back (propId, propVal); }
-    void setFlagOption(int flagId, bool propVal=true) { flagProps.emplace_back (flagId, propVal); }
+    /** double overload to time and needs to be there since a literal double will convert to int more easily than
+    to Time*/
+    void setProperty (int propId, double propVal) { timeProps.emplace_back (propId, propVal); }
+    void setProperty (int propId, int propVal) { intProps.emplace_back (propId, propVal); }
+    void setProperty (int propId, Time propVal) { timeProps.emplace_back (propId, propVal); }
+    void setFlagOption (int flagId, bool propVal = true) { flagProps.emplace_back (flagId, propVal); }
 };
 
 }  // namespace helics

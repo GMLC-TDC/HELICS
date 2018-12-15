@@ -7,7 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 //#include <iostream>
 #include "helics/helics-config.h"
 #include <helics/application_api/Federate.hpp>
-#include <iostream>
+//#include <iostream>
 #ifndef BOOST_STATIC
 #define BOOST_TEST_DYN_LINK
 #endif
@@ -22,9 +22,9 @@ struct globalTestConfig
     globalTestConfig () = default;
     ~globalTestConfig ()
     {
-         std::cout << "cleaning up" << std::endl;
+        //    std::cout << "cleaning up" << std::endl;
         helics::cleanupHelicsLibrary ();
-        std::cout << "finished cleaning up" << std::endl;
+        //     std::cout << "finished cleaning up" << std::endl;
     }
 };
 

@@ -8,8 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ActionMessageDefintions.hpp"
 #include "Core.hpp"
 #include "core-types.hpp"
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
 #include <memory>
 #include <string>
 
@@ -24,6 +22,7 @@ constexpr int typeStringLoc = 0;
 constexpr int typeOutStringLoc = 1;
 
 constexpr int32_t cmd_info_basis = 65536;
+
 /** class defining the primary message object used in HELICS */
 class ActionMessage
 {
@@ -32,20 +31,20 @@ class ActionMessage
     action_message_def::action_t messageAction = CMD_IGNORE;  // 4 -- command
   public:
     int32_t messageID = 0;  //!< 8 -- message ID for a variety of purposes
-    global_federate_id_t source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
+    global_federate_id source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
     interface_handle source_handle;  //!< 16 -- for local handle or local code
-    global_federate_id_t dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
+    global_federate_id dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
     interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
-    // 4 byte gap
+    uint32_t sequenceID;  //!< a sequence number for ordering
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
-    Time Te = timeZero;  //!< 48 event time
-    Time Tdemin = timeZero;  //!< 56 min dependent event time
-    Time Tso = timeZero;  //!< 64 the second order dependent time
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
+    Time Te = timeZero;  //!< 48 event time
+    Time Tdemin = timeZero;  //!< 56 min dependent event time
+    Time Tso = timeZero;  //!< 64 the second order dependent time
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:
@@ -59,8 +58,8 @@ class ActionMessage
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction,
-                   global_federate_id_t sourceId,
-                   global_federate_id_t destId);
+                   global_federate_id sourceId,
+                   global_federate_id destId);
     /** move constructor*/
     ActionMessage (ActionMessage &&act) noexcept;
     /** build an action message from a message*/
@@ -139,9 +138,9 @@ class ActionMessage
 
     void setString (int index, const std::string &str);
     /** get the source global_handle*/
-    global_handle getSource() const { return global_handle{ source_id, source_handle }; }
+    global_handle getSource () const { return global_handle{source_id, source_handle}; }
     /** get the global destination handle*/
-    global_handle getDest() const { return global_handle{ dest_id, dest_handle }; }
+    global_handle getDest () const { return global_handle{dest_id, dest_handle}; }
     /** swap the source and destination*/
     void swapSourceDest () noexcept
     {
@@ -149,56 +148,36 @@ class ActionMessage
         std::swap (source_handle, dest_handle);
     }
     /** set some extra piece of data if the full destination is not used*/
-    void setExtraData (int32_t data) { dest_handle = interface_handle (data); }
+    void setExtraData (int32_t data) { dest_handle = interface_handle{data}; }
     /** get the extra piece of integer data*/
     int32_t getExtraData () const { return dest_handle.baseValue (); }
-    /** save the data to an archive*/
-    template <class Archive>
-    void save (Archive &ar) const
-    {
-        ar (messageAction, messageID, source_id.baseValue (), source_handle.baseValue (), dest_id.baseValue (),
-            dest_handle.baseValue ());
-        ar (counter, flags);
-
-        auto btc = actionTime.getBaseTimeCode ();
-        auto Tebase = Te.getBaseTimeCode ();
-        auto Tdeminbase = Tdemin.getBaseTimeCode ();
-        auto Tsobase = Tso.getBaseTimeCode ();
-        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
-        ar (stringData);
-    }
-    /** load the data from an archive*/
-    template <class Archive>
-    void load (Archive &ar)
-    {
-        ar (messageAction, messageID);
-        identififier_base_type sid, sh, did, dh;
-        ar (sid, sh, did, dh);
-        source_id = global_federate_id_t (sid);
-        source_handle = interface_handle (sh);
-        dest_id = global_federate_id_t (did);
-        dest_handle = interface_handle (dh);
-
-        ar (counter, flags);
-        using timeBaseType = decltype ((actionTime.getBaseTimeCode ()));
-        timeBaseType btc, Tebase, Tdeminbase, Tsobase;
-        ar (btc, Tebase, Tsobase, Tdeminbase, payload);
-
-        actionTime.setBaseTimeCode (btc);
-        Te.setBaseTimeCode (Tebase);
-        Tdemin.setBaseTimeCode (Tdeminbase);
-        Tso.setBaseTimeCode (Tsobase);
-        ar (stringData);
-    }
 
     // functions that convert to and from a byte stream
 
+    int serializedByteCount () const
+    {
+        int size = 45;
+        size += static_cast<int> (payload.size ());
+        if (messageAction == CMD_TIME_REQUEST)
+        {
+            size += 24;
+    }
+        if (!stringData.empty ())
+    {
+            for (auto &str : stringData)
+            {
+                // 4(to store the length)+length of the string
+                size += static_cast<int> (str.size ()) + 4;
+    }
+        }
+        return size;
+    }
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
     @param[in] buffer_size-- the size of the buffer
     @return the size of the buffer actually used
     */
-    int toByteArray (char *data, size_t buffer_size) const;
+    int toByteArray (char *data, int buffer_size) const;
     /** convert to a string using a reference*/
     void to_string (std::string &data) const;
     /** convert to a byte string*/
@@ -206,16 +185,17 @@ class ActionMessage
     /** packetize the message with a simple header and tail sequence
      */
     std::string packetize () const;
+    void packetize (std::string &data) const;
     /** covert to a byte vector using a reference*/
     void to_vector (std::vector<char> &data) const;
     /** convert a command to a byte vector*/
     std::vector<char> to_vector () const;
     /** generate a command from a raw data stream*/
-    void fromByteArray (const char *data, size_t buffer_size);
+    int fromByteArray (const char *data, int buffer_size);
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
-    size_t depacketize (const char *data, size_t buffer_size);
+    int depacketize (const char *data, int buffer_size);
     /** read a command from a string*/
     void from_string (const std::string &data);
     /** read a command from a char vector*/
@@ -296,6 +276,8 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_USER_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
     case CMD_TERMINATE_IMMEDIATELY:
+    case CMD_REMOVE_FILTER:
+    case CMD_REMOVE_ENDPOINT:
     case CMD_STOP:
         return true;
     default:

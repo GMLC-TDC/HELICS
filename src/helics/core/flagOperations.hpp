@@ -25,7 +25,7 @@ enum operation_flags : uint16_t
     clone_flag = 9,  //!< flag indicating the filter is a clone filter
     extra_flag2 = 8,  //!< extra flag
     destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
-    broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
+    disconnected_flag = 12,  //!< flag indicating that a broker the time constraint
     extra_flag3 = 13,  //!< extra flag
     extra_flag4 = 14,  //!< extra flag
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless

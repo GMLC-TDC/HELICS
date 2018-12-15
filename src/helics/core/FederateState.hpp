@@ -43,9 +43,9 @@ class FederateState
   public:
     /** constructor from name and information structure*/
     FederateState (const std::string &name_, const CoreFederateInfo &info_);
-	//the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
+    // the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
     /** DISABLE_COPY_AND_ASSIGN */
-    FederateState(const FederateState &) = delete;
+    FederateState (const FederateState &) = delete;
     FederateState &operator= (const FederateState &) = delete;
     /** destructor*/
     ~FederateState ();
@@ -55,7 +55,7 @@ class FederateState
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
     federate_id_t local_id;  //!< id code for the local federate descriptor
-    std::atomic<global_federate_id_t> global_id;  //!< global id code, default to invalid
+    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
     std::atomic<federate_state_t> state{HELICS_CREATED};  //!< the current state of the federate
@@ -63,8 +63,8 @@ class FederateState
       false};  //!< flag indicating that values should only be transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
-    bool source_only{false}; //!< flag indicating the federate is a source_only
-    bool ignore_time_mismatch_warnings{false}; //!< flag indicating that time mismatches should be ignored
+    bool source_only{false};  //!< flag indicating the federate is a source_only
+    bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -93,17 +93,17 @@ class FederateState
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
 
-    std::map<global_federate_id_t,std::deque<ActionMessage>> delayQueues;  //!< queue for delaying processing of messages for a time
+    std::map<global_federate_id, std::deque<ActionMessage>>
+      delayQueues;  //!< queue for delaying processing of messages for a time
 
     std::vector<interface_handle> events;  //!< list of value events to process
-    std::vector<global_federate_id_t> delayedFederates;  //!< list of federates to delay messages from
+    std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
       message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    std::atomic_flag processing=ATOMIC_FLAG_INIT;  //!< the federate is processing
+    std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
-
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
@@ -118,7 +118,7 @@ class FederateState
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay (global_federate_id_t id);
+    void addFederateToDelay (global_federate_id id);
 
   public:
     /** reset the federate to created state*/
@@ -154,10 +154,10 @@ class FederateState
    */
     void setProperties (const ActionMessage &cmd);
 
-	/** set a timeProperty for a the coordinator*/
-    void setTimeProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
-    void setIntegerProperty (int intProperty, int propertyVal);
+    void setProperty (int timeProperty, Time propertyVal);
+    /** set a timeProperty for a the coordinator*/
+    void setProperty (int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag (int optionFlag, bool value);
     /** get a time Property*/
@@ -166,6 +166,7 @@ class FederateState
     bool getOptionFlag (int optionFlag) const;
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
+
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -203,9 +204,9 @@ class FederateState
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
-    void addDependency (global_federate_id_t fedToDependOn);
+    void addDependency (global_federate_id fedToDependOn);
     /** add a dependent federate*/
-    void addDependent (global_federate_id_t fedThatDependsOnThis);
+    void addDependent (global_federate_id fedThatDependsOnThis);
     /** specify the core object that manages this federate*/
   public:
     /** get the granted time of a federate*/
@@ -217,10 +218,10 @@ class FederateState
     const std::vector<interface_handle> &getEvents () const;
     /** get a vector of the federates this one depends on
      */
-    std::vector<global_federate_id_t> getDependencies() const;
+    std::vector<global_federate_id> getDependencies () const;
     /** get a vector to the global ids of dependent federates
      */
-    std::vector<global_federate_id_t> getDependents () const;
+    std::vector<global_federate_id> getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
     /** get the last error code*/
@@ -248,12 +249,15 @@ class FederateState
     with no specific end in mind
     */
     iteration_result genericUnspecifiedQueueProcess ();
+    /** function to process the queue until a disconnect_fed_ack is received*/
+    void finalize ();
+
     /** add an action message to the queue*/
     void addAction (const ActionMessage &action);
     /** move a message to the queue*/
     void addAction (ActionMessage &&action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
-	stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
+    stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
     @param logMessageSource- the name of the object that sent the message
@@ -290,5 +294,7 @@ class FederateState
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
+    /** close an interface*/
+    void closeInterface (interface_handle handle, handle_type type);
 };
 }  // namespace helics

@@ -102,7 +102,7 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication (const std::string &key,const std::string &generator, helics_type_t type, Time period, const std::string &units = std::string());
+    void addPublication (const std::string &key,const std::string &generator, data_type type, Time period, const std::string &units = std::string());
 
     /** add a publication to a source
     @param key the key of the publication to add
@@ -110,7 +110,7 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication(const std::string &key, helics_type_t type, Time period, const std::string &units = std::string())
+    void addPublication(const std::string &key, data_type type, Time period, const std::string &units = std::string())
     {
         addPublication(key, std::string(), type, period, units);
     }

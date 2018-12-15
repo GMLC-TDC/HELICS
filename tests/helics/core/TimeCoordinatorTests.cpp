@@ -14,8 +14,8 @@ namespace utf = boost::unit_test;
 BOOST_AUTO_TEST_SUITE (timeCoord_tests, *utf::label("ci"))
 using namespace helics;
 
-static constexpr global_federate_id_t fed2 (2);
-static constexpr global_federate_id_t fed3 (3);
+static constexpr global_federate_id fed2 (2);
+static constexpr global_federate_id fed3 (3);
 BOOST_AUTO_TEST_CASE (dependency_tests)
 {
     TimeCoordinator ftc;
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE (dependency_test_message)
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id_t(10);
+    remDep.source_id = global_federate_id(10);
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE (dependent_test_message)
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id_t(10);
+    remDep.source_id = global_federate_id(10);
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependents();
     BOOST_CHECK (deps.size () == 1);

@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/GuardedTypes.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "helics/helics-config.h"
@@ -104,7 +105,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
 
     if (!coreObject)
     {
-        state = states::error;
+        currentMode = modes::error;
         return;
     }
     /** make sure the core is connected */
@@ -119,7 +120,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     fedID = coreObject->registerFederate (name, fi);
     if (!fedID.isValid ())
     {
-        state = states::error;
+        currentMode = modes::error;
         return;
     }
     separator_ = fi.separator;
@@ -146,8 +147,8 @@ Federate::Federate () noexcept
 
 Federate::Federate (Federate &&fed) noexcept
 {
-    auto tstate = fed.state.load ();
-    state.store (tstate);
+    auto tmode = fed.currentMode.load ();
+    currentMode.store (tmode);
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
@@ -159,8 +160,8 @@ Federate::Federate (Federate &&fed) noexcept
 
 Federate &Federate::operator= (Federate &&fed) noexcept
 {
-    auto tstate = fed.state.load ();
-    state.store (tstate);
+    auto tstate = fed.currentMode.load ();
+    currentMode.store (tstate);
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
@@ -181,57 +182,59 @@ Federate::~Federate ()
 
 void Federate::enterInitializingMode ()
 {
-    auto currentState = state.load ();
-    if (currentState == states::startup)
+    auto cm = currentMode.load ();
+    if (cm == modes::startup)
     {
         coreObject->enterInitializingMode (fedID);
-        state = states::initialization;
+        currentMode = modes::initializing;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
-    else if (currentState == states::pending_init)
+    else if (cm == modes::pending_init)
     {
         enterInitializingModeComplete ();
     }
-    else if (currentState != states::initialization)  // if we are already in initialization do nothing
+    else if (cm != modes::initializing)  // if we are already in initialization do nothing
     {
-        throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
+        throw (InvalidFunctionCall ("cannot transition from current mode to initializing mode"));
     }
 }
 
 void Federate::enterInitializingModeAsync ()
 {
     auto asyncInfo = asyncCallInfo->lock ();
-    if (state == states::startup)
+    if (currentMode == modes::startup)
     {
-        state = states::pending_init;
+        currentMode = modes::pending_init;
         asyncInfo->initFuture =
           std::async (std::launch::async, [this]() { coreObject->enterInitializingMode (fedID); });
     }
-    else if (state == states::pending_init)
+    else if (currentMode == modes::pending_init)
     {
         return;
     }
-    else if (state != states::initialization)  // if we are already in initialization do nothing
+    else if (currentMode != modes::initializing)  // if we are already in initialization do nothing
     {
-        throw (InvalidFunctionCall ("cannot transition from current state to initialization state"));
+        throw (InvalidFunctionCall ("cannot transition from current mode to initializing mode"));
     }
 }
 
 bool Federate::isAsyncOperationCompleted () const
 {
     auto asyncInfo = asyncCallInfo->lock_shared ();
-    switch (state)
+    switch (currentMode)
     {
-    case states::pending_init:
+    case modes::pending_init:
         return (asyncInfo->initFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case states::pending_exec:
+    case modes::pending_exec:
         return (asyncInfo->execFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case states::pending_time:
+    case modes::pending_time:
         return (asyncInfo->timeRequestFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
-    case states::pending_iterative_time:
+    case modes::pending_iterative_time:
         return (asyncInfo->timeRequestIterativeFuture.wait_for (std::chrono::seconds (0)) ==
                 std::future_status::ready);
+    case modes::pending_finalize:
+        return (asyncInfo->finalizeFuture.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     default:
         return false;
     }
@@ -239,20 +242,20 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializingModeComplete ()
 {
-    switch (state)
+    switch (currentMode)
     {
-    case states::pending_init:
+    case modes::pending_init:
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->initFuture.get ();
-        state = states::initialization;
+        currentMode = modes::initializing;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();
     }
     break;
-    case states::initialization:
+    case modes::initializing:
         break;
-    case states::startup:
+    case modes::startup:
         enterInitializingMode ();
         break;
     default:
@@ -264,46 +267,46 @@ void Federate::enterInitializingModeComplete ()
 iteration_result Federate::enterExecutingMode (iteration_request iterate)
 {
     iteration_result res = iteration_result::next_step;
-    switch (state)
+    switch (currentMode)
     {
-    case states::startup:
-    case states::pending_init:
+    case modes::startup:
+    case modes::pending_init:
         enterInitializingMode ();
         FALLTHROUGH
         /* FALLTHROUGH */
-    case states::initialization:
+    case modes::initializing:
     {
         res = coreObject->enterExecutingMode (fedID, iterate);
         switch (res)
         {
         case iteration_result::next_step:
-            state = states::execution;
+            currentMode = modes::executing;
             currentTime = timeZero;
             initializeToExecuteStateTransition ();
             break;
         case iteration_result::iterating:
-            state = states::initialization;
+            currentMode = modes::initializing;
             updateTime (getCurrentTime (), getCurrentTime ());
             break;
         case iteration_result::error:
-            state = states::error;
+            currentMode = modes::error;
             break;
         case iteration_result::halted:
-            state = states::finalize;
+            currentMode = modes::finalize;
             break;
         }
         break;
     }
-    case states::pending_exec:
+    case modes::pending_exec:
         return enterExecutingModeComplete ();
-    case states::execution:
+    case modes::executing:
         // already in this state --> do nothing
         break;
-    case states::pending_time:
+    case modes::pending_time:
         requestTimeComplete ();
         break;
-    case states::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
-                                          // this fashion
+    case modes::pending_iterative_time:  // since this isn't guaranteed to progress it shouldn't be called in
+                                         // this fashion
     default:
         throw (InvalidFunctionCall ("cannot transition from current state to execution state"));
         break;
@@ -313,9 +316,9 @@ iteration_result Federate::enterExecutingMode (iteration_request iterate)
 
 void Federate::enterExecutingModeAsync (iteration_request iterate)
 {
-    switch (state)
+    switch (currentMode)
     {
-    case states::startup:
+    case modes::startup:
     {
         auto eExecFunc = [this, iterate]() {
             coreObject->enterInitializingMode (fedID);
@@ -323,25 +326,25 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
             return coreObject->enterExecutingMode (fedID, iterate);
         };
         auto asyncInfo = asyncCallInfo->lock ();
-        state = states::pending_exec;
+        currentMode = modes::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
-    case states::pending_init:
+    case modes::pending_init:
         enterInitializingModeComplete ();
         FALLTHROUGH
         /* FALLTHROUGH */
-    case states::initialization:
+    case modes::initializing:
     {
         auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingMode (fedID, iterate); };
         auto asyncInfo = asyncCallInfo->lock ();
-        state = states::pending_exec;
+        currentMode = modes::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
     }
     break;
-    case states::pending_exec:
+    case modes::pending_exec:
         break;
-    case states::execution:
+    case modes::executing:
         // already in this state --> do nothing
         break;
     default:
@@ -352,7 +355,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
 
 iteration_result Federate::enterExecutingModeComplete ()
 {
-    if (state != states::pending_exec)
+    if (currentMode != modes::pending_exec)
     {
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
@@ -361,31 +364,36 @@ iteration_result Federate::enterExecutingModeComplete ()
     switch (res)
     {
     case iteration_result::next_step:
-        state = states::execution;
+        currentMode = modes::executing;
         currentTime = timeZero;
         initializeToExecuteStateTransition ();
         break;
     case iteration_result::iterating:
-        state = states::initialization;
+        currentMode = modes::initializing;
         updateTime (getCurrentTime (), getCurrentTime ());
         break;
     case iteration_result::error:
-        state = states::error;
+        currentMode = modes::error;
         break;
     case iteration_result::halted:
-        state = states::finalize;
+        currentMode = modes::finalize;
         break;
     }
 
     return res;
 }
 
-void Federate::setTimeProperty (int32_t option, Time timeValue)
+void Federate::setProperty (int32_t option, double timeValue)
 {
     coreObject->setTimeProperty (fedID, option, timeValue);
 }
 
-void Federate::setIntegerProperty (int32_t option, int32_t optionValue)
+void Federate::setProperty (int32_t option, Time timeValue)
+{
+    coreObject->setTimeProperty (fedID, option, timeValue);
+}
+
+void Federate::setProperty (int32_t option, int32_t optionValue)
 {
     coreObject->setIntegerProperty (fedID, option, optionValue);
 }
@@ -405,35 +413,87 @@ void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOpt
 bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
 {
-    switch (state)
+    switch (currentMode)
     {
-    case states::startup:
+    case modes::startup:
         break;
-    case states::pending_init:
+    case modes::pending_init:
         enterInitializingModeComplete ();
         break;
-    case states::initialization:
+    case modes::initializing:
         break;
-    case states::pending_exec:
+    case modes::pending_exec:
         enterExecutingModeComplete ();
         break;
-    case states::pending_time:
+    case modes::pending_time:
         requestTimeComplete ();
         break;
-    case states::execution:
+    case modes::executing:
         break;
-    case states::pending_iterative_time:
+    case modes::pending_iterative_time:
         requestTimeIterativeComplete ();  // I don't care about the return any more
         break;
-    case states::finalize:
-    case states::error:
+    case modes::finalize:
+    case modes::error:
         return;
         // do nothing
+    case modes::pending_finalize:
+        finalizeComplete ();
+        return;
     default:
         throw (InvalidFunctionCall ("cannot call finalize in present state"));
     }
     coreObject->finalize (fedID);
-    state = states::finalize;
+    if (fManager)
+    {
+        fManager->closeAllFilters ();
+    }
+    currentMode = modes::finalize;
+}
+
+void Federate::finalizeAsync ()
+{
+    switch (currentMode)
+    {
+    case modes::pending_init:
+        enterInitializingModeComplete ();
+        break;
+    case modes::pending_exec:
+        enterExecutingModeComplete ();
+        break;
+    case modes::pending_time:
+        requestTimeComplete ();
+        break;
+    case modes::pending_iterative_time:
+        requestTimeIterativeComplete ();
+        break;
+    case modes::finalize:
+    case modes::error:
+    case modes::pending_finalize:
+        return;
+        // do nothing
+    default:
+        break;
+    }
+    auto finalizeFunc = [this]() { return coreObject->finalize (fedID); };
+    auto asyncInfo = asyncCallInfo->lock ();
+    currentMode = modes::pending_finalize;
+    asyncInfo->finalizeFuture = std::async (std::launch::async, finalizeFunc);
+}
+
+/** complete the asynchronous terminate pair*/
+void Federate::finalizeComplete ()
+{
+    if (currentMode == modes::pending_finalize)
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        asyncInfo->finalizeFuture.get ();
+        currentMode = modes::finalize;
+    }
+    else
+    {
+        finalize ();
+    }
 }
 
 void Federate::disconnect ()
@@ -442,26 +502,26 @@ void Federate::disconnect ()
     {
         coreObject->finalize (fedID);
     }
-    state = states::finalize;
+    currentMode = modes::finalize;
     coreObject = nullptr;
 }
 
 void Federate::error (int errorcode)
 {
-    state = states::error;
+    currentMode = modes::error;
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
 }
 
 void Federate::error (int errorcode, const std::string &message)
 {
-    state = states::error;
+    currentMode = modes::error;
     coreObject->logMessage (fedID, errorcode, message);
 }
 
 Time Federate::requestTime (Time nextInternalTimeStep)
 {
-    if (state == states::execution)
+    if (currentMode == modes::executing)
     {
         try
         {
@@ -471,17 +531,17 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             updateTime (newTime, oldTime);
             if (newTime == Time::maxVal ())
             {
-                state = states::finalize;
+                currentMode = modes::finalize;
             }
             return newTime;
         }
         catch (const FunctionExecutionFailure &fee)
         {
-            state = states::error;
+            currentMode = modes::error;
             throw;
         }
     }
-    else if (state == states::finalize)
+    else if (currentMode == modes::finalize)
     {
         return Time::maxVal ();
     }
@@ -493,7 +553,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
 
 iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate)
 {
-    if (state == states::execution)
+    if (currentMode == modes::executing)
     {
         auto iterativeTime = coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
         Time oldTime = currentTime;
@@ -509,15 +569,15 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         case iteration_result::halted:
             currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
-            state = states::finalize;
+            currentMode = modes::finalize;
             break;
         case iteration_result::error:
-            state = states::error;
+            currentMode = modes::error;
             break;
         }
         return iterativeTime;
     }
-    else if (state == states::finalize)
+    else if (currentMode == modes::finalize)
     {
         return iteration_time (Time::maxVal (), iteration_result::halted);
     }
@@ -529,8 +589,8 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
-    auto exp = states::execution;
-    if (state.compare_exchange_strong (exp, states::pending_time))
+    auto exp = modes::executing;
+    if (currentMode.compare_exchange_strong (exp, modes::pending_time))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
@@ -548,8 +608,8 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
-    auto exp = states::execution;
-    if (state.compare_exchange_strong (exp, states::pending_iterative_time))
+    auto exp = modes::executing;
+    if (currentMode.compare_exchange_strong (exp, modes::pending_iterative_time))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestIterativeFuture =
@@ -568,8 +628,8 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
-    auto exp = states::pending_time;
-    if (state.compare_exchange_strong (exp, states::execution))
+    auto exp = modes::pending_time;
+    if (currentMode.compare_exchange_strong (exp, modes::executing))
     {
         auto asyncInfo = asyncCallInfo->lock ();
         auto newTime = asyncInfo->timeRequestFuture.get ();
@@ -591,8 +651,8 @@ Time Federate::requestTimeComplete ()
 iteration_time Federate::requestTimeIterativeComplete ()
 {
     auto asyncInfo = asyncCallInfo->lock ();
-    auto exp = states::pending_iterative_time;
-    if (state.compare_exchange_strong (exp, states::execution))
+    auto exp = modes::pending_iterative_time;
+    if (currentMode.compare_exchange_strong (exp, modes::executing))
     {
         auto iterativeTime = asyncInfo->timeRequestIterativeFuture.get ();
         Time oldTime = currentTime;
@@ -608,10 +668,10 @@ iteration_time Federate::requestTimeIterativeComplete ()
         case iteration_result::halted:
             currentTime = iterativeTime.grantedTime;
             updateTime (currentTime, oldTime);
-            state = states::finalize;
+            currentMode = modes::finalize;
             break;
         case iteration_result::error:
-            state = states::error;
+            currentMode = modes::error;
             break;
         }
         return iterativeTime;
@@ -655,7 +715,7 @@ static Filter &generateFilter (Federate *fed,
                                bool global,
                                bool cloning,
                                const std::string &name,
-                               defined_filter_types operation,
+                               filter_types operation,
                                const std::string &inputType,
                                const std::string &outputType)
 {
@@ -695,14 +755,14 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
     {
         for (const auto &filt : doc["filters"])
         {
-            std::string key = jsonGetOrDefault (filt, "name", std::string ());
-            std::string inputType = jsonGetOrDefault (filt, "inputType", std::string ());
-            std::string outputType = jsonGetOrDefault (filt, "outputType", std::string ());
-            auto info = jsonGetOrDefault (filt, "info", std::string ());
-            bool cloningflag = jsonGetOrDefault (filt, "cloning", false);
+            std::string key = getOrDefault (filt, "name", std::string ());
+            std::string inputType = getOrDefault (filt, "inputType", std::string ());
+            std::string outputType = getOrDefault (filt, "outputType", std::string ());
+            auto info = getOrDefault (filt, "info", std::string ());
+            bool cloningflag = getOrDefault (filt, "cloning", false);
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation = jsonGetOrDefault (filt, "operation", std::string ("custom"));
+            std::string operation = getOrDefault (filt, "operation", std::string ("custom"));
 
             auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))
@@ -712,7 +772,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
@@ -720,70 +780,19 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
 
-            if (filt.isMember ("targets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addSourceTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets.asString ());
-                }
-            }
+            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
+            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
+            addTargets (filt, "targets", asrc);
+            addTargets (filt, "sourcetargets", asrc);
+            addTargets (filt, "desttargets", adest);
+            addTargets (filt, "sourceTargets", asrc);
+            addTargets (filt, "destTargets", adest);
 
-            if (filt.isMember ("sourcetargets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addSourceTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets.asString ());
-                }
-            }
-
-            if (filt.isMember ("desttargets"))
-            {
-                auto targets = filt["targets"];
-                if (targets.isArray ())
-                {
-                    for (const auto &target : targets)
-                    {
-                        filter.addDestinationTarget (target.asString ());
-                    }
-                }
-                else
-                {
-                    filter.addDestinationTarget (targets.asString ());
-                }
-            }
             if (cloningflag)
             {
-                if (filt.isMember ("delivery"))
-                {
-                    auto targets = filt["targets"];
-                    if (targets.isArray ())
-                    {
-                        for (const auto &target : targets)
-                        {
-                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.asString ());
-                        }
-                    }
-                    else
-                    {
-                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets.asString ());
-                    }
-                }
+                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                    static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
+                });
             }
             if (filt.isMember ("properties"))
             {
@@ -824,8 +833,27 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
+            }
+        }
+    }
+    if (doc.isMember ("globals"))
+    {
+        if (doc["globals"].isArray ())
+        {
+            for (auto &val : doc["globals"])
+            {
+                setGlobal (val[0].asString (), val[1].asString ());
+            }
+        }
+        else
+        {
+            auto members = doc["globals"].getMemberNames ();
+            for (auto &val : members)
+            {
+                setGlobal (val, doc["globals"][val].asString ());
             }
         }
     }
@@ -849,14 +877,14 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
         auto &filtArray = filts->as<toml::Array> ();
         for (const auto &filt : filtArray)
         {
-            std::string key = tomlGetOrDefault (filt, "name", std::string ());
-            bool cloningflag = tomlGetOrDefault (filt, "cloning", false);
-            std::string inputType = tomlGetOrDefault (filt, "inputType", std::string ());
-            std::string outputType = tomlGetOrDefault (filt, "outputType", std::string ());
-            auto info = tomlGetOrDefault (filt, "info", std::string ());
+            std::string key = getOrDefault (filt, "name", std::string ());
+            bool cloningflag = getOrDefault (filt, "cloning", false);
+            std::string inputType = getOrDefault (filt, "inputType", std::string ());
+            std::string outputType = getOrDefault (filt, "outputType", std::string ());
+            auto info = getOrDefault (filt, "info", std::string ());
             bool useTypes = !((inputType.empty ()) && (outputType.empty ()));
 
-            std::string operation = tomlGetOrDefault (filt, "operation", std::string ("custom"));
+            std::string operation = getOrDefault (filt, "operation", std::string ("custom"));
 
             auto opType = filterTypeFromString (operation);
             if ((useTypes) && (operation != "custom"))
@@ -866,7 +894,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             if (!useTypes)
             {
-                if (opType == defined_filter_types::unrecognized)
+                if (opType == filter_types::unrecognized)
                 {
                     std::cerr << "unrecognized filter operation:" << operation << '\n';
                     continue;
@@ -874,73 +902,19 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
             }
             auto &filter = generateFilter (this, false, cloningflag, key, opType, inputType, outputType);
 
-            auto targets = filt.find ("targets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addSourceTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets->as<std::string> ());
-                }
-            }
+            auto asrc = [&filter](const std::string &target) { filter.addSourceTarget (target); };
+            auto adest = [&filter](const std::string &target) { filter.addDestinationTarget (target); };
+            addTargets (filt, "targets", asrc);
+            addTargets (filt, "sourcetargets", asrc);
+            addTargets (filt, "desttargets", adest);
+            addTargets (filt, "sourceTargets", asrc);
+            addTargets (filt, "destTargets", adest);
 
-            targets = filt.find ("sourcetargets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addSourceTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addSourceTarget (targets->as<std::string> ());
-                }
-            }
-            targets = filt.find ("desttargets");
-            if (targets != nullptr)
-            {
-                if (targets->is<toml::Array> ())
-                {
-                    auto &targetArray = targets->as<toml::Array> ();
-                    for (const auto &target : targetArray)
-                    {
-                        filter.addDestinationTarget (target.as<std::string> ());
-                    }
-                }
-                else
-                {
-                    filter.addDestinationTarget (targets->as<std::string> ());
-                }
-            }
             if (cloningflag)
             {
-                targets = filt.find ("delivery");
-                if (targets != nullptr)
-                {
-                    if (targets->is<toml::Array> ())
-                    {
-                        auto &targetArray = targets->as<toml::Array> ();
-                        for (const auto &target : targetArray)
-                        {
-                            static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target.as<std::string> ());
-                        }
-                    }
-                    else
-                    {
-                        static_cast<CloningFilter &> (filter).addDeliveryEndpoint (targets->as<std::string> ());
-                    }
-                }
+                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                    static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
+                });
             }
             auto props = filt.find ("properties");
             if (props != nullptr)
@@ -988,8 +962,28 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
                     }
                 }
             }
-            if(!info.empty()){
-                setInfo(filter.getHandle(), info);
+            if (!info.empty ())
+            {
+                setInfo (filter.getHandle (), info);
+            }
+        }
+    }
+    auto globals = doc.find ("globals");
+    if (globals != nullptr)
+    {
+        if (globals->is<toml::Array> ())
+        {
+            for (auto &val : globals->as<toml::Array> ())
+            {
+                setGlobal (val.as<toml::Array> ()[0].as<std::string> (),
+                           val.as<toml::Array> ()[1].as<std::string> ());
+            }
+        }
+        else
+        {
+            for (const auto &val : globals->as<toml::Table> ())
+            {
+                setGlobal (val.first, val.second.as<std::string> ());
             }
         }
     }
@@ -1009,6 +1003,17 @@ std::string Federate::query (const std::string &queryStr)
     if (queryStr == "name")
     {
         res = getName ();
+    }
+    else if (queryStr == "corename")
+    {
+        if (coreObject)
+        {
+            res = coreObject->getIdentifier ();
+        }
+        else
+        {
+            res = "#unknown";
+        }
     }
     else
     {
@@ -1076,6 +1081,14 @@ bool Federate::isQueryCompleted (query_id_t queryIndex) const
         return (fnd->second.wait_for (std::chrono::seconds (0)) == std::future_status::ready);
     }
     return false;
+}
+
+void Federate::setGlobal (const std::string &valueName, const std::string &value)
+{
+    if (coreObject)
+    {
+        coreObject->setGlobal (valueName, value);
+    }
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,
@@ -1153,6 +1166,8 @@ Filter &Federate::getFilter (const std::string &filterName)
     return filt;
 }
 
+int Federate::getFilterCount () const { return fManager->getFilterCount (); }
+
 void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
 {
     coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
@@ -1163,12 +1178,13 @@ void Federate::setFilterOption (const Filter &filt, int32_t option, bool option_
     coreObject->setHandleOption (filt.getHandle (), option, option_value);
 }
 
-void Federate::setInfo(interface_handle handle, const std::string& info) {
-    coreObject->setInterfaceInfo(handle, info);
+void Federate::closeInterface (interface_handle handle) { coreObject->closeHandle (handle); }
+
+void Federate::setInfo (interface_handle handle, const std::string &info)
+{
+    coreObject->setInterfaceInfo (handle, info);
 }
 
-std::string const &Federate::getInfo(interface_handle handle) {
-    return coreObject->getInterfaceInfo(handle);
-}
+std::string const &Federate::getInfo (interface_handle handle) { return coreObject->getInterfaceInfo (handle); }
 
 }  // namespace helics

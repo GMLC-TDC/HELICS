@@ -13,14 +13,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
-#include "helics/helics-config.h"
-#include "helicsVersion.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
 #include <boost/asio/steady_timer.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/program_options.hpp>
 #include "loggingHelper.hpp"
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -200,12 +196,12 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     queueProcessingThread = std::thread (&BrokerBase::queueProcessingLoop, this);
 }
 
-bool BrokerBase::sendToLogger (global_federate_id_t federateID,
+bool BrokerBase::sendToLogger (global_federate_id federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const
 {
-    if ((federateID == parent_broker_id) || (federateID == global_broker_id.load ()))
+    if ((federateID == parent_broker_id) || (federateID == global_id.load ()))
     {
         if (logLevel > maxLogLevel)
         {
@@ -370,7 +366,7 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
         ticktimer.async_wait (timerCallback);
     }
-    global_broker_id_local = global_broker_id.load ();
+    global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
         if (dumplog)

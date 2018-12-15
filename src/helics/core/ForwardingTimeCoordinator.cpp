@@ -28,7 +28,7 @@ void ForwardingTimeCoordinator::disconnect ()
 {
     if (sendMessageFunction)
     {
-        std::set<global_federate_id_t> connections (dependents.begin (), dependents.end ());
+        std::set<global_federate_id> connections (dependents.begin (), dependents.end ());
         for (auto dep : dependencies)
         {
             if (dep.Tnext < Time::maxVal ())
@@ -75,7 +75,7 @@ void ForwardingTimeCoordinator::disconnect ()
     }
 }
 
-static inline bool isBroker (global_federate_id_t id)
+static inline bool isBroker (global_federate_id id)
 {
     return ((id.baseValue () == 1) || (id.baseValue () >= 0x7000'0000));
 }
@@ -86,12 +86,12 @@ class minTimeSet
     Time minNext = Time::maxVal ();
     Time minminDe = Time::maxVal ();
     Time minDe = minminDe;
-    global_federate_id_t minFed;
+    global_federate_id minFed;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
 };
 
 static minTimeSet
-generateMinTimeSet (const TimeDependencies &dependencies, global_federate_id_t ignore = global_federate_id_t ())
+generateMinTimeSet (const TimeDependencies &dependencies, global_federate_id ignore = global_federate_id ())
 {
     minTimeSet mTime;
     for (auto &dep : dependencies)
@@ -121,7 +121,7 @@ generateMinTimeSet (const TimeDependencies &dependencies, global_federate_id_t i
             }
             else if (dep.Tdemin == mTime.minminDe)
             {
-                mTime.minFed = global_federate_id_t ();
+                mTime.minFed = global_federate_id ();
             }
         }
         else
@@ -241,17 +241,17 @@ std::string ForwardingTimeCoordinator::printTimeStatus () const
                         static_cast<double> (time_minminDe));
 }
 
-bool ForwardingTimeCoordinator::isDependency (global_federate_id_t ofed) const
+bool ForwardingTimeCoordinator::isDependency (global_federate_id ofed) const
 {
     return dependencies.isDependency (ofed);
 }
 
-bool ForwardingTimeCoordinator::addDependency (global_federate_id_t fedID)
+bool ForwardingTimeCoordinator::addDependency (global_federate_id fedID)
 {
     return dependencies.addDependency (fedID);
 }
 
-bool ForwardingTimeCoordinator::addDependent (global_federate_id_t fedID)
+bool ForwardingTimeCoordinator::addDependent (global_federate_id fedID)
 {
     if (dependents.empty ())
     {
@@ -274,12 +274,12 @@ bool ForwardingTimeCoordinator::addDependent (global_federate_id_t fedID)
     return true;
 }
 
-void ForwardingTimeCoordinator::removeDependency (global_federate_id_t fedID)
+void ForwardingTimeCoordinator::removeDependency (global_federate_id fedID)
 {
     dependencies.removeDependency (fedID);
 }
 
-void ForwardingTimeCoordinator::removeDependent (global_federate_id_t fedID)
+void ForwardingTimeCoordinator::removeDependent (global_federate_id fedID)
 {
     auto dep = std::lower_bound (dependents.begin (), dependents.end (), fedID);
     if (dep != dependents.end ())
@@ -291,14 +291,14 @@ void ForwardingTimeCoordinator::removeDependent (global_federate_id_t fedID)
     }
 }
 
-const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (global_federate_id_t ofed) const
+const DependencyInfo *ForwardingTimeCoordinator::getDependencyInfo (global_federate_id ofed) const
 {
     return dependencies.getDependencyInfo (ofed);
 }
 
-std::vector<global_federate_id_t> ForwardingTimeCoordinator::getDependencies () const
+std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies () const
 {
-    std::vector<global_federate_id_t> deps;
+    std::vector<global_federate_id> deps;
     for (auto &dep : dependencies)
     {
         deps.push_back (dep.fedID);
@@ -335,7 +335,7 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry ()
 }
 
 ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (const ActionMessage &msg,
-                                                                              global_federate_id_t iFed) const
+                                                                              global_federate_id iFed) const
 {
     auto mTime = generateMinTimeSet (dependencies, iFed);
     ActionMessage nTime (msg);

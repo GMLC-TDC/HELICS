@@ -16,14 +16,12 @@ set(
   InfoClass-tests.cpp
   FederateState-tests.cpp
   ActionMessage-tests.cpp
-  # CoreBroker-tests.cpp
-  CoreFactory-tests.cpp MessageTimerTests.cpp
-  # CommonCore-tests.cpp
+  BrokerClassTests.cpp
+  CoreFactory-tests.cpp 
+  MessageTimerTests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
-  IPCcore_tests.cpp
   data-block-tests.cpp
-  UdpCore-tests.cpp
   ForwardingTimeCoordinatorTests.cpp
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
@@ -37,6 +35,14 @@ if(NOT DISABLE_TCP_CORE)
   list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
 endif()
 
+if(NOT DISABLE_UDP_CORE)
+  list(APPEND core_test_sources UdpCore-tests.cpp)
+endif()
+
+if(NOT DISABLE_IPC_CORE)
+  list(APPEND core_test_sources  IPCcore_tests.cpp)
+endif()
+
 if(MPI_ENABLE)
   list(APPEND core_test_sources MpiCore-tests.cpp)
 endif()
@@ -45,6 +51,9 @@ add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_definitions(
+  core-tests PRIVATE BOOST_DATE_TIME_NO_LIB
+)
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
