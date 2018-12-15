@@ -165,8 +165,10 @@ class Input
     /** get the type of the input*/
     const std::string &getType () const
     {
-        return (type == data_type::helicsUnknown) ? fed->getPublicationType (*this) : typeNameStringRef (type);
+        return (type == data_type::helicsUnknown) ? fed->getInputType (*this) : typeNameStringRef (type);
     }
+    /** get the type of the input*/
+    const std::string &getPublicationType () const { return fed->getPublicationType (*this); }
     /** get the units associated with a input*/
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
     /** get an associated target*/
