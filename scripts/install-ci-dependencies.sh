@@ -161,13 +161,13 @@ elif [[ "$os_name" == "Darwin" ]]; then
 fi
 
 if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
-    brew update
-    brew install python3
-    echo "brew upgrade python"
-    brew upgrade python
-    /usr/local/opt/python/libexec/bin/pip3 -m pip install --user --upgrade pytest
-    export PATH="/usr/local/opt/python/libexec/bin:${PATH}"
-    echo $PATH
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    conda info -a
+    pip install --user --upgrade pytest
 else
     if hash pyenv; then
         if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
