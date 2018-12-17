@@ -185,9 +185,9 @@ class Endpoint
 
     /** get the current value of a flag for the handle*/
     bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
+    /** close the endpoint from receiving more messages*/
+    void close () { fed->closeInterface (handle); }
 
-	void close() { fed->closeInterface(handle); }
-	void close() { fed->closeInterface(handle); }
   private:
     friend class MessageFederateManager;
 };
