@@ -18,7 +18,7 @@ namespace helicscpp
 class Broker
 {
   public:
-    // Default constructor, not meant to be used
+    /** Default constructor */
     Broker () : broker (NULL){};
 
     Broker (std::string type, std::string name, std::string initString)

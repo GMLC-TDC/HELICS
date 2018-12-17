@@ -1416,7 +1416,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         }
         else
         {
-            interfaceFlags &= ~make_flags (required_flag);
+            interfaceFlags &= ~(make_flags (required_flag));
         }
         break;
     case defs::flags::connections_optional:
@@ -1426,7 +1426,7 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         }
         else
         {
-            interfaceFlags &= ~make_flags (optional_flag);
+            interfaceFlags &= ~(make_flags (optional_flag));
         }
         break;
     default:

@@ -69,13 +69,12 @@ typedef struct
   public:
     helics_time grantedTime;  //!< the time of the granted step
     helics_iteration_result status;  //!< the convergence state
-    /** default constructor*/
 } helics_iteration_time;
 
 class Federate
 {
   public:
-    // Default constructor, not meant to be used
+    // Default constructor
     Federate () : fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)

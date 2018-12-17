@@ -14,28 +14,28 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <stdexcept>
 #include <string>
 
-#define HELICS_IGNORE_ERROR NULL
 namespace helicscpp
 {
 class Core
 {
   public:
-    // Default constructor, not meant to be used
+    /** Default constructor*/
     Core () : core (NULL){};
-
+    /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
         core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
     }
-
+    /** construct with type, core name and command line arguments */
     Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
         core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
-
+    /** destructor*/
     ~Core () { helicsCoreFree (core); }
+    /** implicit operator so the object can be used with the c api functions natively*/
     operator helics_core () { return core; }
-
+    /** explicity get the base helics_core object*/
     helics_core baseObject () const { return core; }
     bool isConnected () const { return helicsCoreIsConnected (core); }
 

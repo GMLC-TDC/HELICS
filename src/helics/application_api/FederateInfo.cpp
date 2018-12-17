@@ -130,7 +130,16 @@ static const std::map<std::string, int> optionStringsTranslations{
   {"only_transmit_on_change", helics_handle_option_only_transmit_on_change},
   {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
   {"only_update_on_change", helics_handle_option_only_update_on_change},
-  {"onlyupdateonchange", helics_handle_option_only_update_on_change}};
+  {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+  {"strict_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_type_matching", helics_handle_option_strict_type_checking},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_input_type_matching", helics_handle_option_strict_type_checking},
+  {"strictinputtypechecking", helics_handle_option_strict_type_checking},
+  {"strictinputtypematching", helics_handle_option_strict_type_checking},
+  {"stricttypechecking", helics_handle_option_strict_type_checking},
+  {"stricttypematching", helics_handle_option_strict_type_checking},
+  {"strict", helics_handle_option_strict_type_checking}};
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
