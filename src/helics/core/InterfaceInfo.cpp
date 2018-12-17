@@ -167,6 +167,74 @@ bool InterfaceInfo::setEndpointProperty (interface_handle /*id*/, int /*option*/
     return false;
 }
 
+bool InterfaceInfo::getInputProperty (interface_handle id, int option) const
+{
+    auto ipt = getInput (id);
+    switch (option)
+    {
+    case defs::options::ignore_interrupts:
+        return ipt->not_interruptible;
+        break;
+    case defs::options::handle_only_update_on_change:
+        return ipt->only_update_on_change;
+        break;
+    case defs::options::connection_required:
+        return ipt->required;
+        break;
+    case defs::options::connection_optional:
+        return !ipt->required;
+        break;
+    case defs::options::single_connection_only:
+        return ipt->single_source;
+        break;
+    case defs::options::multiple_connections_allowed:
+        return !ipt->single_source;
+        break;
+    case defs::options::strict_type_checking:
+        return ipt->strict_type_matching;
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool InterfaceInfo::getPublicationProperty (interface_handle id, int option) const
+{
+    auto pub = getPublication (id);
+    switch (option)
+    {
+    case defs::options::handle_only_transmit_on_change:
+        return pub->only_update_on_change;
+        break;
+    case defs::options::connection_required:
+        return pub->required;
+        break;
+    case defs::options::connection_optional:
+        return !pub->required;
+        break;
+    case defs::options::single_connection_only:
+        return pub->single_destination;
+        break;
+    case defs::options::multiple_connections_allowed:
+        return !pub->single_destination;
+        break;
+    case defs::options::buffer_data:
+        return pub->buffer_data;
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool InterfaceInfo::getEndpointProperty (interface_handle /*id*/, int /*option*/) const
+{
+    // auto ept = getEndpoint (id);
+    // currently no properties on endpoints
+    return false;
+}
+
 std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues ()
 {
     std::vector<std::pair<int, std::string>> issues;
@@ -181,6 +249,25 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                      fmt::format ("Input {} is required but has no connection", ipt->key));
             }
         }
+        if (ipt->single_source)
+        {
+            if (ipt->input_sources.size () > 1)
+            {
+                issues.emplace_back (
+                  helics::defs::errors::connection_failure,
+                  fmt::format ("Input {} is single source only but has more than one connection", ipt->key));
+            }
+        }
+        for (auto &source : ipt->source_types)
+        {
+            if (!checkTypeMatch (ipt->type, source.first, ipt->strict_type_matching))
+            {
+                issues.emplace_back (
+                  helics::defs::errors::connection_failure,
+                  fmt::format ("Input {} source has mismatched types {} is not compatible with {}", ipt->key,
+                               ipt->type, source.first));
+            }
+        }
     }
     ihandle.unlock ();
     auto phandle = publications.lock ();
@@ -192,6 +279,15 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             {
                 issues.emplace_back (helics::defs::errors::connection_failure,
                                      fmt::format ("Publication {} is required but has no subscribers", pub->key));
+            }
+        }
+        if (pub->single_destination)
+        {
+            if (pub->subscribers.size () > 1)
+            {
+                issues.emplace_back (
+                  helics::defs::errors::connection_failure,
+                  fmt::format ("Publication {} is single source only but has more than one connection", pub->key));
             }
         }
     }

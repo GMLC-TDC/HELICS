@@ -202,10 +202,34 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     fed1->registerGlobalPublication ("t1", "");
     auto &i2 = fed2->registerSubscription ("abcd", "");
     i2.setOption (helics::defs::options::connection_required, true);
-    
+
     fed1->enterInitializingModeAsync ();
     BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
     fed1->finalize ();
+    fed2->finalize ();
+    broker->disconnect ();
+}
+
+BOOST_AUTO_TEST_CASE (missing_required_pub_with_default)
+{
+    auto broker = AddBroker ("test", 2);
+
+    AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto fed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    fed1->registerGlobalPublication ("t1", "");
+    fed2->setFlagOption (helics::defs::flags::connections_required, true);
+    fed2->registerSubscription ("abcd", "");
+
+    fed1->enterInitializingModeAsync ();
+    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
+    // this is definitely not how you would normally do this,
+    // we are calling finalize while an async call is active, this should result in finalize throwing since it was
+    // a global connection failure
+    BOOST_CHECK_THROW (fed1->finalize (), helics::ConnectionFailure);
     fed2->finalize ();
     broker->disconnect ();
 }

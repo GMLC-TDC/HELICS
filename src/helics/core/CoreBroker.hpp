@@ -134,9 +134,12 @@ class CoreBroker : public Broker, public BrokerBase
     void routeMessage (ActionMessage &&cmd, global_federate_id dest);
     /** function for routing a message from based on the destination specified in the ActionMessage*/
     void routeMessage (const ActionMessage &cmd);
-    void routeMessage (const ActionMessage &&cmd);
+    void routeMessage (ActionMessage &&cmd);
     /** transmit a message to the parent or root */
     void transmitToParent (ActionMessage &&cmd);
+
+    /** broacast a message to all immediate brokers*/
+    void broadcast (ActionMessage &cmd);
     /**/
     route_id fillMessageRouteInformation (ActionMessage &mess);
 

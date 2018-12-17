@@ -1086,13 +1086,27 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 subI->addData (src, cmd.actionTime, cmd.counter,
                                std::make_shared<const data_block> (std::move (cmd.payload)));
-                timeCoord->updateValueTime (cmd.actionTime);
+                if (!subI->not_interruptible)
+                {
+                    timeCoord->updateValueTime (cmd.actionTime);
+                    LOG_TRACE (timeCoord->printTimeStatus ());
+                }
                 LOG_DATA (fmt::format ("receive publication {}", prettyPrintString (cmd)));
-                LOG_TRACE (timeCoord->printTimeStatus ());
             }
         }
     }
     break;
+    case CMD_WARNING:
+        if (cmd.payload.empty ())
+        {
+            cmd.payload = commandErrorString (cmd.messageID);
+            if (cmd.payload == "unknown")
+            {
+                cmd.payload += " code:" + std::to_string (cmd.messageID);
+            }
+        }
+        LOG_WARNING (cmd.payload);
+        break;
     case CMD_ERROR:
         setState (HELICS_ERROR);
         if (cmd.payload.empty ())
@@ -1211,8 +1225,7 @@ void FederateState::setProperties (const ActionMessage &cmd)
             {
                 ;  // spin
             }
-            if (cmd.dest_handle.isValid ())
-                setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
+            setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
             processing.clear (std::memory_order_release);
             break;
         case CMD_FED_CONFIGURE_TIME:
@@ -1354,6 +1367,9 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
     case defs::flags::only_update_on_change:
         interfaceInformation.setChangeUpdateFlag (value);
         break;
+    case defs::flags::strict_input_type_checking:
+        strict_input_type_checking = value;
+        break;
     case defs::flags::realtime:
         if (value)
         {
@@ -1453,9 +1469,27 @@ bool FederateState::getOptionFlag (int optionFlag) const
         return ((interfaceFlags.load () & make_flags (required_flag)) != 0);
     case defs::flags::connections_optional:
         return ((interfaceFlags.load () & make_flags (optional_flag)) != 0);
+    case defs::flags::strict_input_type_checking:
+        return strict_input_type_checking;
     default:
         return timeCoord->getOptionFlag (optionFlag);
     }
+}
+
+bool FederateState::getHandleOption (interface_handle handle, char iType, int32_t option) const
+{
+    switch (iType)
+    {
+    case 'i':
+        return interfaceInformation.getInputProperty (handle, option);
+    case 'p':
+        return interfaceInformation.getPublicationProperty (handle, option);
+    case 'e':
+        return interfaceInformation.getEndpointProperty (handle, option);
+    default:
+        break;
+    }
+    return false;
 }
 
 /** get an option flag value*/
@@ -1504,7 +1538,15 @@ int FederateState::checkInterfaces ()
     errorString = issues.front ().second;
     for (auto &issue : issues)
     {
-        LOG_WARNING (fmt::format ("error code {} {}", issue.first, issue.second));
+        switch (issue.first)
+        {
+        case defs::errors::connection_failure:
+            LOG_ERROR (fmt::format ("Connection Error: {}", issue.second));
+            break;
+        default:
+            LOG_ERROR (fmt::format ("error code {}: {}", issue.first, issue.second));
+            break;
+        }
     }
     return errorCode;
 }

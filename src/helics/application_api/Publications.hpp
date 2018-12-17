@@ -183,8 +183,10 @@ class Publication
     const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { fed->setInfo (handle, info); }
-
-    void setOption (int option, bool value) { fed->setInterfaceOption (handle, option, value); }
+    /** set an option on the publication
+    @param option the option to set
+    @param value the value to set the option*/
+    void setOption (int option, bool value = true) { fed->setInterfaceOption (handle, option, value); }
 
     /** get the current value of a flag for the handle*/
     bool getOption (int option) const { return fed->getInterfaceOption (handle, option); }

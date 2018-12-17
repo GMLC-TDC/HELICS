@@ -171,17 +171,48 @@ bool UnknownHandleManager::hasNonOptionalUnknowns () const
 
 bool UnknownHandleManager::hasRequiredUnknowns () const
 {
-    if (!(unknown_links.empty () && unknown_dest_filters.empty () && unknown_src_filters.empty ()))
+    for (auto &upub : unknown_publications)
     {
-        return true;
+        if ((upub.second.second & make_flags (required_flag)) != 0)
+        {
+            return true;
+        }
     }
+    for (auto &uept : unknown_endpoints)
+    {
+        if ((uept.second.second & make_flags (required_flag)) != 0)
+        {
+            return true;
+        }
+    }
+    for (auto &uinp : unknown_inputs)
+    {
+        if ((uinp.second.second & make_flags (required_flag)) != 0)
+        {
+            return true;
+        }
+    }
+
+    for (auto &ufilt : unknown_filters)
+    {
+        if ((ufilt.second.second & make_flags (required_flag)) != 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void UnknownHandleManager::processNonOptionalUnknowns (
+  std::function<void(const std::string &, char, global_handle handle)> cfunc) const
+{
     for (auto &upub : unknown_publications)
     {
         if ((upub.second.second & make_flags (optional_flag)) != 0)
         {
             continue;
         }
-        return true;
+        cfunc (upub.first, 'p', upub.second.first);
     }
     for (auto &uept : unknown_endpoints)
     {
@@ -189,7 +220,7 @@ bool UnknownHandleManager::hasRequiredUnknowns () const
         {
             continue;
         }
-        return true;
+        cfunc (uept.first, 'e', uept.second.first);
     }
     for (auto &uinp : unknown_inputs)
     {
@@ -197,7 +228,7 @@ bool UnknownHandleManager::hasRequiredUnknowns () const
         {
             continue;
         }
-        return true;
+        cfunc (uinp.first, 'i', uinp.second.first);
     }
 
     for (auto &ufilt : unknown_filters)
@@ -206,9 +237,42 @@ bool UnknownHandleManager::hasRequiredUnknowns () const
         {
             continue;
         }
-        return true;
+        cfunc (ufilt.first, 'f', ufilt.second.first);
     }
-    return false;
+}
+
+void UnknownHandleManager::processRequiredUnknowns (
+  std::function<void(const std::string &, char, global_handle handle)> cfunc) const
+{
+    for (auto &upub : unknown_publications)
+    {
+        if ((upub.second.second & make_flags (required_flag)) != 0)
+        {
+            cfunc (upub.first, 'p', upub.second.first);
+        }
+    }
+    for (auto &uept : unknown_endpoints)
+    {
+        if ((uept.second.second & make_flags (required_flag)) != 0)
+        {
+            cfunc (uept.first, 'e', uept.second.first);
+        }
+    }
+    for (auto &uinp : unknown_inputs)
+    {
+        if ((uinp.second.second & make_flags (required_flag)) != 0)
+        {
+            cfunc (uinp.first, 'i', uinp.second.first);
+        }
+    }
+
+    for (auto &ufilt : unknown_filters)
+    {
+        if ((ufilt.second.second & make_flags (required_flag)) != 0)
+        {
+            cfunc (ufilt.first, 'f', ufilt.second.first);
+        }
+    }
 }
 
 /** specify a found input*/

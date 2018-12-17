@@ -247,7 +247,15 @@ void Federate::enterInitializingModeComplete ()
     case modes::pending_init:
     {
         auto asyncInfo = asyncCallInfo->lock ();
-        asyncInfo->initFuture.get ();
+        try
+        {
+            asyncInfo->initFuture.get ();
+        }
+        catch (const std::exception &e)
+        {
+            currentMode = modes::error;
+            throw;
+        }
         currentMode = modes::initializing;
         currentTime = coreObject->getCurrentTime (fedID);
         startupToInitializeStateTransition ();

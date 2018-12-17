@@ -61,11 +61,16 @@ class InterfaceInfo
     bool setInputProperty (interface_handle id, int option, bool value);
     bool setPublicationProperty (interface_handle id, int option, bool value);
     bool setEndpointProperty (interface_handle id, int option, bool value);
+    /** get properties for an interface*/
+    bool getInputProperty (interface_handle id, int option) const;
+    bool getPublicationProperty (interface_handle id, int option) const;
+    bool getEndpointProperty (interface_handle id, int option) const;
+
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues ();
 
   private:
-        std::atomic<global_federate_id> global_id;
+    std::atomic<global_federate_id> global_id;
     bool only_update_on_change{
       false};  //!< flag indicating that subscriptions values should only be updated on change
     shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, interface_handle>>

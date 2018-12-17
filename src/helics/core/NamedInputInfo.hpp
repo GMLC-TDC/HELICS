@@ -102,4 +102,6 @@ class NamedInputInfo
   private:
     bool updateData (dataRecord &&update, int index);
 };
+
+bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
 }  // namespace helics

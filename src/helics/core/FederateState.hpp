@@ -65,6 +65,7 @@ class FederateState
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false};  //!< flag indicating the federate is a source_only
     bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
+    bool strict_input_type_checking{false};  //!< flag indicating that inputs should have strict type checking
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -162,7 +163,9 @@ class FederateState
     Time getTimeProperty (int timeProperty) const;
     /** get an option flag value*/
     bool getOptionFlag (int optionFlag) const;
-
+    /** get the currently active option for a handle*/
+    bool getHandleOption (interface_handle handle, char iType, int32_t option) const;
+    /** get the currently active interface flags*/
     uint16_t getInterfaceFlags () const { return interfaceFlags.load (); }
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
