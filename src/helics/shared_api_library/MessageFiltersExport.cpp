@@ -495,3 +495,37 @@ void helicsFilterSetInfo (helics_filter filt, const char *info, helics_error *er
         helicsErrorHandler (err);
     }
 }
+
+void helicsFilterSetOption (helics_filter filt, int option, helics_bool value, helics_error *err)
+{
+    auto filtObj = getFilterObj (filt, err);
+    if (filtObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        filtObj->filtPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+helics_bool helicsFilterGetOption (helics_filter filt, int option)
+{
+    auto filtObj = getFilterObj (filt, nullptr);
+    if (filtObj == nullptr)
+    {
+        return false;
+    }
+    try
+    {
+        return (filtObj->filtPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}

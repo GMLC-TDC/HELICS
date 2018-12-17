@@ -191,13 +191,13 @@ extern "C"
     /** enumeration of the predefined filter types*/
     typedef enum
     {
-        helics_filtertype_custom = 0,
-        helics_filtertype_delay = 1,
-        helics_filtertype_random_delay = 2,
-        helics_filtertype_random_drop = 3,
-        helics_filtertype_reroute = 4,
-        helics_filtertype_clone = 5,
-        helics_filtertype_firewall = 6
+        helics_filter_type_custom = 0,
+        helics_filter_type_delay = 1,
+        helics_filter_type_random_delay = 2,
+        helics_filter_type_random_drop = 3,
+        helics_filter_type_reroute = 4,
+        helics_filter_type_clone = 5,
+        helics_filter_type_firewall = 6
 
     } helics_filter_type;
 

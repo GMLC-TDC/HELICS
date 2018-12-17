@@ -351,7 +351,7 @@ extern "C"
     */
     HELICS_EXPORT int helicsGetPropertyIndex (const char *val);
 
-    /** get an option index for use in helicsPublicationSetOption, helicsInputSetOption, helicsFilterSetOption,
+    /** get an option index for use in helicsPublicationSetOption, helicsInputSetOption, helicsEndpointSetOption, helicsFilterSetOption,
     and the corresponding get functions
     @param val a string with the option name
     @return an int with the option index

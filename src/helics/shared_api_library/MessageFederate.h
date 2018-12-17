@@ -170,6 +170,9 @@ extern "C"
     @param err an error object to fill out in case of an error*/
 	HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err);
 
+    HELICS_EXPORT void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err);
+
+    HELICS_EXPORT helics_bool helicsEndpointGetOption (helics_endpoint end, int option);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

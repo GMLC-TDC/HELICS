@@ -18,13 +18,13 @@ class Federate;
 /** a set of common defined filters*/
 enum class filter_types
 {
-    custom = helics_filtertype_custom,
-    delay = helics_filtertype_delay,
-    random_delay = helics_filtertype_random_delay,
-    random_drop = helics_filtertype_random_drop,
-    reroute = helics_filtertype_reroute,
-    clone = helics_filtertype_clone,
-    firewall = helics_filtertype_firewall,
+    custom = helics_filter_type_custom,
+    delay = helics_filter_type_delay,
+    random_delay = helics_filter_type_random_delay,
+    random_drop = helics_filter_type_random_drop,
+    reroute = helics_filter_type_reroute,
+    clone = helics_filter_type_clone,
+    firewall = helics_filter_type_firewall,
     unrecognized = 7
 
 };

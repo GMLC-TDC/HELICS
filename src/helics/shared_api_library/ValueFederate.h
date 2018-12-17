@@ -513,26 +513,45 @@ extern "C"
     @param pub the publication to query
     @return a void enumeration, helics_ok if everything worked*/
     HELICS_EXPORT const char *helicsPublicationGetUnits (helics_publication pub);
-	
-	/** get the data in the info field of an input
-	@param inp the input to query
-	@return a string with the info field string*/
-	HELICS_EXPORT const char *helicsInputGetInfo(helics_input inp);
-	/** set the data in the info field for an input
+
+    /** get the data in the info field of an input
+    @param inp the input to query
+    @return a string with the info field string*/
+    HELICS_EXPORT const char *helicsInputGetInfo (helics_input inp);
+    /** set the data in the info field for an input
     @param inp the input to query
     @param info the string to set
     @param err an error object to fill out in case of an error*/
-	HELICS_EXPORT void helicsInputSetInfo(helics_input inp, const char *info, helics_error *err);
+    HELICS_EXPORT void helicsInputSetInfo (helics_input inp, const char *info, helics_error *err);
 
-	/** get the data in the info field of an publication
-	@param inp the publication to query
-	@return a string with the info field string*/
-	HELICS_EXPORT const char *helicsPublicationGetInfo(helics_publication pub);
-	/** set the data in the info field for an publication
+    /** get the data in the info field of an publication
+    @param inp the publication to query
+    @return a string with the info field string*/
+    HELICS_EXPORT const char *helicsPublicationGetInfo (helics_publication pub);
+    /** set the data in the info field for an publication
     @param inp the publication to query
     @param info the string to set
     @param err an error object to fill out in case of an error*/
-	HELICS_EXPORT void helicsPublicationSetInfo(helics_publication pub, const char *info, helics_error *err);
+    HELICS_EXPORT void helicsPublicationSetInfo (helics_publication pub, const char *info, helics_error *err);
+    /** get the data in the info field of an input
+    @param inp the input to query
+    @return a string with the info field string*/
+    HELICS_EXPORT helics_bool helicsInputGetOption (helics_input inp, int option);
+    /** set the data in the info field for an input
+    @param inp the input to query
+    @param info the string to set
+    @param err an error object to fill out in case of an error*/
+    HELICS_EXPORT void helicsInputSetOption (helics_input inp, int option, helics_bool value, helics_error *err);
+
+    /** get the data in the info field of an publication
+    @param inp the publication to query
+    @return a string with the info field string*/
+    HELICS_EXPORT helics_bool helicsPublicationGetOption (helics_publication pub, int option);
+    /** set the data in the info field for an publication
+    @param inp the publication to query
+    @param info the string to set
+    @param err an error object to fill out in case of an error*/
+    HELICS_EXPORT void helicsPublicationSetOption (helics_publication pub, int option, helics_bool val, helics_error *err);
     /**@}*/
 
     /** check if a particular subscription was updated

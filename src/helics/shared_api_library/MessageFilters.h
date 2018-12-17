@@ -162,6 +162,9 @@ extern "C"
     @param err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsFilterSetInfo (helics_filter filt, const char *info, helics_error *err);
 
+    HELICS_EXPORT void helicsFilterSetOption (helics_filter filt, int option, helics_bool value, helics_error *err);
+
+    HELICS_EXPORT helics_bool helicsFilterGetOption (helics_filter filt, int option);
 /**@}*/
 #ifdef __cplusplus
 } /* end of extern "C" { */

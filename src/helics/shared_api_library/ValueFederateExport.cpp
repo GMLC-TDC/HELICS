@@ -1473,6 +1473,74 @@ void helicsPublicationSetInfo(helics_publication pub, const char *info, helics_e
     }
 }
 
+helics_bool helicsInputGetOption(helics_input inp, int option)
+{
+	auto inpObj = verifyInput(inp, nullptr);
+	if (inpObj == nullptr)
+	{
+		return helics_false;
+	}
+	try
+	{
+		return (inpObj->inputPtr->getOption(option)) ? helics_true : helics_false;
+	}
+	catch (...)
+	{
+		helics_false;
+	}
+}
+
+void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error *err)
+{
+	auto inpObj = verifyInput(inp, err);
+	if (inpObj == nullptr)
+	{
+		return;
+	}
+	try
+	{
+		inpObj->inputPtr->setOption(option, (value == helics_true));
+	}
+	catch (...)
+	{
+		helicsErrorHandler(err);
+	}
+}
+
+helics_bool helicsPublicationGetOption (helics_publication pub, int option)
+{
+    auto pubObj = verifyPublication (pub, nullptr);
+    if (pubObj == nullptr)
+    {
+        return helics_false;
+    }
+    try
+    {
+        return (pubObj->pubPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return helics_false;
+    }
+}
+
+void helicsPublicationSetOption (helics_publication pub, int option, helics_bool value, helics_error *err)
+{
+    auto pubObj = verifyPublication (pub, err);
+    if (pubObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        pubObj->pubPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 helics_bool helicsInputIsUpdated (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
