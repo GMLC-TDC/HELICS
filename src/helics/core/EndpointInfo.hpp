@@ -27,10 +27,11 @@ class EndpointInfo
     const global_handle id;  //!< identifier for the handle
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
+    bool hasFilter = false;  //!< indicator that the message has a filter
+    bool not_interruptible = false;  //!< indicator that the message is not allowed to generate a time interrupt
   private:
     shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  //!< storage for the messages
   public:
-    bool hasFilter = false;  //!< indicator that the message has a filter
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage (Time maxTime);
     /** get the number of messages in the queue up to the specified time*/

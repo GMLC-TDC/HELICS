@@ -1067,7 +1067,10 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto epi = interfaceInformation.getEndpoint (cmd.dest_handle);
         if (epi != nullptr)
         {
-            timeCoord->updateMessageTime (cmd.actionTime);
+            if (!epi->not_interruptible)
+            {
+                timeCoord->updateMessageTime (cmd.actionTime);
+            }
             LOG_DATA (fmt::format ("receive_message {}", prettyPrintString (cmd)));
             epi->addMessage (createMessageFromCommand (std::move (cmd)));
         }

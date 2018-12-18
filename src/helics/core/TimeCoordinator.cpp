@@ -188,11 +188,11 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     }
     else
     {
-        if (time_minminDe < Time::maxVal ())
+        if (time_minSo < Time::maxVal ())
         {
-            if (time_minminDe + info.inputDelay > time_next)
+            if (time_minSo + info.inputDelay > time_next)
             {
-                time_next = time_minminDe + info.inputDelay;
+                time_next = time_minSo + info.inputDelay;
                 time_next = generateAllowedTime (time_next);
             }
         }
@@ -336,6 +336,7 @@ bool TimeCoordinator::updateTimeFactors ()
     Time minNext = Time::maxVal ();
     Time minminDe = std::min (time_value, time_message);
     Time minDe = minminDe;
+    Time minSo = minminDe;
     for (auto &dep : dependencies)
     {
         if (dep.Tnext < minNext)
@@ -356,14 +357,33 @@ bool TimeCoordinator::updateTimeFactors ()
             minminDe = -1;
         }
 
+        if (dep.Tso >= dep.Tnext)
+        {
+            if (dep.Tso < minSo)
+            {
+                minSo = dep.Tso;
+            }
+        }
+        else
+        {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            minSo = -1;
+        }
+
         if (dep.Te < minDe)
         {
             minDe = dep.Te;
+        }
+        if (dep.Te < minSo)
+        {
+            minSo = dep.Te;
         }
     }
 
     bool update = false;
     time_minminDe = std::min (minDe, minminDe);
+    time_minSo = std::min (minSo, time_minminDe);
     Time prev_next = time_next;
     updateNextPossibleEventTime ();
 
@@ -381,6 +401,11 @@ bool TimeCoordinator::updateTimeFactors ()
     {
         update = true;
         time_minDe = minDe;
+    }
+    if (minSo != time_minSo)
+    {
+        update = true;
+        time_minSo = minSo;
     }
     if (minNext < Time::maxVal ())
     {
@@ -467,7 +492,7 @@ void TimeCoordinator::sendTimeRequest () const
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal ()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
-
+    upd.Tso = (time_minSo < time_next) ? time_next : time_minSo;
     if (iterating)
     {
         setActionFlag (upd, iteration_requested_flag);
@@ -498,10 +523,11 @@ void TimeCoordinator::updateTimeGrant ()
 }
 std::string TimeCoordinator::printTimeStatus () const
 {
-    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={}",
+    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={} minSo={}",
                         static_cast<double> (time_exec), static_cast<double> (time_allow),
                         static_cast<double> (time_value), static_cast<double> (time_message),
-                        static_cast<double> (time_minDe), static_cast<double> (time_minminDe));
+                        static_cast<double> (time_minDe), static_cast<double> (time_minminDe),
+                        static_cast<double> (time_minSo));
 }
 
 bool TimeCoordinator::isDependency (global_federate_id ofed) const { return dependencies.isDependency (ofed); }
