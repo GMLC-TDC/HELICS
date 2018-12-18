@@ -179,8 +179,9 @@ install(
   COMPONENT matlab
 )
 
-file(GLOB EXTRA_MATLAB_FILES ${CMAKE_CURENT_SOURCE_DIR}/extra/*.m)
+file(GLOB EXTRA_MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/extra/*.m)
 
+message(STATUS "Extra ${EXTRA_MATLAB_FILES}")
 install(
   FILES ${EXTRA_MATLAB_FILES}
   DESTINATION matlab/+helics
