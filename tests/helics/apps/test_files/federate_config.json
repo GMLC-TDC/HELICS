@@ -1,0 +1,54 @@
+{
+  "name": "fed1",
+  "period": 1,
+  "log_level": 3,
+  "corename": "ccore_combo",
+  "type": "test",
+  "endpoints": [
+    {
+      "global": false,
+      "destination": "ep1",
+      "name": "airTemperature",
+      "type": "double",
+      "info": "{\n\t\t\t\t\"object\" : \"house1\",\n\t\t\t\t\"property\" : \"air_temperature\"\n\t\t\t}"
+    },
+    {
+      "global": false,
+      "destination": "ep2",
+      "name": "hvacState",
+      "type": "string",
+      "info": "{\n\t\t\t\t\"object\" : \"house1\",\n                                \"property\" : \"system_mode\"\n\t\t\t}"
+    },
+    {
+      "global": false,
+      "name": "heatingSetpoint",
+      "type": "double",
+      "info": "{\n                                \"object\" : \"house1\",\n                                \"property\" : \"heating_setpoint\"\n                        }"
+    }
+  ],
+  "publications": [
+    {
+      "global": false,
+      "key": "totalLoad",
+      "type": "complex",
+      "unit": "VA",
+      "info": "{\n                                \"object\" : \"tpm\",\n                                \"property\" : \"measured_power\"\n                        }"
+    },
+    {
+      "global": false,
+      "key": "coolingIsOn",
+      "type": "int",
+      "unit": "s",
+      "info": "{\n                                \"object\" : \"house1\",\n                                \"property\" : \"thermostat_cycle_time\"\n                        }"
+    }
+  ],
+  "inputs": [
+    {
+      "key": "coolingSetpoint",
+      "target": "coolingSetpoint",
+      "type": "double",
+      "unit": "deg F",
+      "info": "{\n                                \"object\" : \"house1\",\n                                \"property\" : \"cooling_setpoint\"\n                        }"
+    }
+  ]
+}

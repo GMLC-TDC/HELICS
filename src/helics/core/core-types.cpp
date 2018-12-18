@@ -104,6 +104,10 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return fnd->second;
     }
+    if ((type.front() == '=') || (type.front() == '-'))
+    {
+        return coreTypeFromString(type.substr(1));
+    }
     if (type.compare (0, 4, "zmq2") == 0)
     {
         return core_type::ZMQ_TEST;

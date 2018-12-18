@@ -35,10 +35,11 @@ class App
     /** default constructor*/
     App () = default;
     /** construct from command line arguments
+    @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    App (const std::string &appName, int argc, char *argv[]);
+    App (const std::string &defaultAppName, int argc, char *argv[]);
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
