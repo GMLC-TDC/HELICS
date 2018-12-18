@@ -1,0 +1,42 @@
+{
+  "messages": [
+    {
+      "source": "src",
+      "dest": "fed1/heatingSetpoint",
+      "time": 359,
+      "data": "55.5"
+    },
+    {
+      "source": "src",
+      "dest": "fed1/heatingSetpoint",
+      "time": 719,
+      "data": "61.25"
+    },
+    {
+      "source": "src",
+      "dest": "fed1/heatingSetpoint",
+      "time": 1119,
+      "data": "60.0"
+    }
+  ],
+  "points": [
+    {
+      "key": "coolingSetpoint",
+      "type": "double",
+      "value": 70.5,
+      "time": 359
+    },
+    {
+      "key": "coolingSetpoint",
+      "type": "double",
+      "value": 73.25,
+      "time": 799
+    },
+    {
+      "key": "coolingSetpoint",
+      "type": "double",
+      "value": 75,
+      "time": 1219
+    }
+  ]
+}

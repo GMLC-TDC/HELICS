@@ -1294,6 +1294,25 @@ const char *helicsInputGetType (helics_input inp)
     }
 }
 
+const char *helicsInputGetPublicationType (helics_input ipt)
+{
+    auto inpObj = verifyInput (ipt, nullptr);
+    if (inpObj == nullptr)
+    {
+        return emptyStr.c_str ();
+    }
+
+    try
+    {
+        const std::string &type = inpObj->inputPtr->getPublicationType ();
+        return type.c_str ();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str ();
+    }
+}
+
 const char *helicsPublicationGetType (helics_publication pub)
 {
     auto pubObj = verifyPublication (pub, nullptr);
