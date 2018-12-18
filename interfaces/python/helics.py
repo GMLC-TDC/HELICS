@@ -169,16 +169,17 @@ helics_handle_option_connection_optional = _helics.helics_handle_option_connecti
 helics_handle_option_single_connection_only = _helics.helics_handle_option_single_connection_only
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
+helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
-helics_filtertype_custom = _helics.helics_filtertype_custom
-helics_filtertype_delay = _helics.helics_filtertype_delay
-helics_filtertype_random_delay = _helics.helics_filtertype_random_delay
-helics_filtertype_random_drop = _helics.helics_filtertype_random_drop
-helics_filtertype_reroute = _helics.helics_filtertype_reroute
-helics_filtertype_clone = _helics.helics_filtertype_clone
-helics_filtertype_firewall = _helics.helics_filtertype_firewall
+helics_filter_type_custom = _helics.helics_filter_type_custom
+helics_filter_type_delay = _helics.helics_filter_type_delay
+helics_filter_type_random_delay = _helics.helics_filter_type_random_delay
+helics_filter_type_random_drop = _helics.helics_filter_type_random_drop
+helics_filter_type_reroute = _helics.helics_filter_type_reroute
+helics_filter_type_clone = _helics.helics_filter_type_clone
+helics_filter_type_firewall = _helics.helics_filter_type_firewall
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
 helics_iteration_request_iterate_if_needed = _helics.helics_iteration_request_iterate_if_needed
@@ -195,6 +196,7 @@ helics_state_pending_init = _helics.helics_state_pending_init
 helics_state_pending_exec = _helics.helics_state_pending_exec
 helics_state_pending_time = _helics.helics_state_pending_time
 helics_state_pending_iterative_time = _helics.helics_state_pending_iterative_time
+helics_state_pending_finalize = _helics.helics_state_pending_finalize
 class helics_complex(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, helics_complex, name, value)
@@ -820,6 +822,10 @@ def helicsGetPropertyIndex(val: 'char const *') -> "int":
     return _helics.helicsGetPropertyIndex(val)
 helicsGetPropertyIndex = _helics.helicsGetPropertyIndex
 
+def helicsGetOptionIndex(val: 'char const *') -> "int":
+    return _helics.helicsGetOptionIndex(val)
+helicsGetOptionIndex = _helics.helicsGetOptionIndex
+
 def helicsFederateInfoSetFlagOption(fi: 'helics_federate_info', flag: 'int', value: 'helics_bool') -> "void":
     return _helics.helicsFederateInfoSetFlagOption(fi, flag, value)
 helicsFederateInfoSetFlagOption = _helics.helicsFederateInfoSetFlagOption
@@ -849,6 +855,14 @@ def helicsFederateFinalize(fed: 'helics_federate') -> "void":
 
     """
     return _helics.helicsFederateFinalize(fed)
+
+def helicsFederateFinalizeAsync(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateFinalizeAsync(fed)
+helicsFederateFinalizeAsync = _helics.helicsFederateFinalizeAsync
+
+def helicsFederateFinalizeComplete(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateFinalizeComplete(fed)
+helicsFederateFinalizeComplete = _helics.helicsFederateFinalizeComplete
 
 def helicsFederateFree(fed: 'helics_federate') -> "void":
     """
@@ -1111,6 +1125,18 @@ def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time":
 
     """
     return _helics.helicsFederateGetCurrentTime(fed)
+
+def helicsFederateSetGlobal(fed: 'helics_federate', valueName: 'char const *', value: 'char const *') -> "void":
+    return _helics.helicsFederateSetGlobal(fed, valueName, value)
+helicsFederateSetGlobal = _helics.helicsFederateSetGlobal
+
+def helicsCoreSetGlobal(core: 'helics_core', valueName: 'char const *', value: 'char const *') -> "void":
+    return _helics.helicsCoreSetGlobal(core, valueName, value)
+helicsCoreSetGlobal = _helics.helicsCoreSetGlobal
+
+def helicsBrokerSetGlobal(broker: 'helics_broker', valueName: 'char const *', value: 'char const *') -> "void":
+    return _helics.helicsBrokerSetGlobal(broker, valueName, value)
+helicsBrokerSetGlobal = _helics.helicsBrokerSetGlobal
 
 def helicsCreateQuery(target: 'char const *', query: 'char const *') -> "helics_query":
     """
@@ -1533,6 +1559,22 @@ def helicsPublicationSetInfo(pub: 'helics_publication', info: 'char const *') ->
     return _helics.helicsPublicationSetInfo(pub, info)
 helicsPublicationSetInfo = _helics.helicsPublicationSetInfo
 
+def helicsInputGetOption(inp: 'helics_input', option: 'int') -> "helics_bool":
+    return _helics.helicsInputGetOption(inp, option)
+helicsInputGetOption = _helics.helicsInputGetOption
+
+def helicsInputSetOption(inp: 'helics_input', option: 'int', value: 'helics_bool') -> "void":
+    return _helics.helicsInputSetOption(inp, option, value)
+helicsInputSetOption = _helics.helicsInputSetOption
+
+def helicsPublicationGetOption(pub: 'helics_publication', option: 'int') -> "helics_bool":
+    return _helics.helicsPublicationGetOption(pub, option)
+helicsPublicationGetOption = _helics.helicsPublicationGetOption
+
+def helicsPublicationSetOption(pub: 'helics_publication', option: 'int', val: 'helics_bool') -> "void":
+    return _helics.helicsPublicationSetOption(pub, option, val)
+helicsPublicationSetOption = _helics.helicsPublicationSetOption
+
 def helicsInputIsUpdated(ipt: 'helics_input') -> "helics_bool":
     return _helics.helicsInputIsUpdated(ipt)
 helicsInputIsUpdated = _helics.helicsInputIsUpdated
@@ -1732,11 +1774,19 @@ def helicsEndpointSetInfo(end: 'helics_endpoint', info: 'char const *') -> "void
     return _helics.helicsEndpointSetInfo(end, info)
 helicsEndpointSetInfo = _helics.helicsEndpointSetInfo
 
-def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+def helicsEndpointSetOption(end: 'helics_endpoint', option: 'int', value: 'helics_bool') -> "void":
+    return _helics.helicsEndpointSetOption(end, option, value)
+helicsEndpointSetOption = _helics.helicsEndpointSetOption
+
+def helicsEndpointGetOption(end: 'helics_endpoint', option: 'int') -> "helics_bool":
+    return _helics.helicsEndpointGetOption(end, option)
+helicsEndpointGetOption = _helics.helicsEndpointGetOption
+
+def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterFilter(fed, type, name)
 helicsFederateRegisterFilter = _helics.helicsFederateRegisterFilter
 
-def helicsFederateRegisterGlobalFilter(fed: 'helics_federate', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+def helicsFederateRegisterGlobalFilter(fed: 'helics_federate', type: 'helics_filter_type', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterGlobalFilter(fed, type, name)
 helicsFederateRegisterGlobalFilter = _helics.helicsFederateRegisterGlobalFilter
 
@@ -1751,7 +1801,7 @@ def helicsFederateRegisterGlobalCloningFilter(fed: 'helics_federate', deliveryEn
     return _helics.helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint)
 helicsFederateRegisterGlobalCloningFilter = _helics.helicsFederateRegisterGlobalCloningFilter
 
-def helicsCoreRegisterFilter(core: 'helics_core', type: 'helics_filter_type_t', name: 'char const *') -> "helics_filter":
+def helicsCoreRegisterFilter(core: 'helics_core', type: 'helics_filter_type', name: 'char const *') -> "helics_filter":
     return _helics.helicsCoreRegisterFilter(core, type, name)
 helicsCoreRegisterFilter = _helics.helicsCoreRegisterFilter
 
@@ -1761,6 +1811,10 @@ def helicsCoreRegisterCloningFilter(core: 'helics_core', deliveryEndpoint: 'char
 
     """
     return _helics.helicsCoreRegisterCloningFilter(core, deliveryEndpoint)
+
+def helicsFederateGetFilterCount(fed: 'helics_federate') -> "int":
+    return _helics.helicsFederateGetFilterCount(fed)
+helicsFederateGetFilterCount = _helics.helicsFederateGetFilterCount
 
 def helicsFederateGetFilter(fed: 'helics_federate', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateGetFilter(fed, name)
@@ -1829,6 +1883,14 @@ helicsFilterGetInfo = _helics.helicsFilterGetInfo
 def helicsFilterSetInfo(filt: 'helics_filter', info: 'char const *') -> "void":
     return _helics.helicsFilterSetInfo(filt, info)
 helicsFilterSetInfo = _helics.helicsFilterSetInfo
+
+def helicsFilterSetOption(filt: 'helics_filter', option: 'int', value: 'helics_bool') -> "void":
+    return _helics.helicsFilterSetOption(filt, option, value)
+helicsFilterSetOption = _helics.helicsFilterSetOption
+
+def helicsFilterGetOption(filt: 'helics_filter', option: 'int') -> "helics_bool":
+    return _helics.helicsFilterGetOption(filt, option)
+helicsFilterGetOption = _helics.helicsFilterGetOption
 # This file is compatible with both classic and new-style classes.
 
 
