@@ -26,6 +26,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             time_state = time_state_t::time_granted;
             Tnext = timeZero;
             Tdemin = timeZero;
+            Tso = timeZero;
             Te = timeZero;
         }
         else
@@ -42,6 +43,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = m.Te;
         Tdemin = m.Tdemin;
+        Tso = m.Tso;
         if (forwardEvent < Te)
         {
             Te = forwardEvent;
@@ -50,8 +52,12 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         {
             Tdemin = Te;
         }
+        if (Te < Tso)
+        {
+            Tso = Te;
+        }
         forwardEvent = Time::maxVal ();
-        minFed = global_federate_id(m.source_handle.baseValue());
+        minFed = global_federate_id (m.source_handle.baseValue ());
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -60,7 +66,8 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
-        minFed = global_federate_id(m.source_handle.baseValue());
+        Tso = Tnext;
+        minFed = global_federate_id (m.source_handle.baseValue ());
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
@@ -70,7 +77,8 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
-        minFed = global_federate_id();
+        Tso = Time::maxVal ();
+        minFed = global_federate_id{};
         break;
     case CMD_SEND_MESSAGE:
         if (time_state == time_state_t::time_granted)
@@ -90,6 +98,10 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
                 {
                     Tdemin = Te;
                 }
+                if (Te < Tso)
+                {
+                    Tso = Te;
+                }
                 return true;
             }
         }
@@ -101,6 +113,10 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
                 if (Te < Tdemin)
                 {
                     Tdemin = Te;
+                }
+                if (Te < Tso)
+                {
+                    Tso = Te;
                 }
                 return true;
             }
@@ -189,7 +205,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
 {
     auto dependency_id = (m.action () != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-    auto depInfo = getDependencyInfo (global_federate_id(dependency_id));
+    auto depInfo = getDependencyInfo (global_federate_id (dependency_id));
     if (depInfo == nullptr)
     {
         return false;
@@ -212,8 +228,8 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
 
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
-  return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
-        return ((dep.fedID.isFederate()) &&(dep.Tnext < Time::maxVal ()));
+    return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+        return ((dep.fedID.isFederate ()) && (dep.Tnext < Time::maxVal ()));
     });
 }
 
@@ -275,17 +291,19 @@ void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
                 dep.time_state = DependencyInfo::time_state_t::time_granted;
                 dep.Te = requestTime;
                 dep.Tdemin = requestTime;
+                dep.Tso = requestTime;
             }
         }
     }
 }
 
-void TimeDependencies::resetDependentEvents(helics::Time grantTime)
+void TimeDependencies::resetDependentEvents (helics::Time grantTime)
 {
     for (auto &dep : dependencies)
     {
-        dep.Te = (std::max)(dep.Tnext, grantTime);
+        dep.Te = (std::max) (dep.Tnext, grantTime);
         dep.Tdemin = dep.Te;
+        dep.Tso = dep.Te;
     }
 }
 

@@ -35,6 +35,7 @@ class DependencyInfo
     Time Tnext = negEpsilon;  //!< next possible message or value
     Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time
+    Time Tso = timeZero;  // !< the second order dependency event time
     Time forwardEvent = Time::maxVal ();  //!< a predicted event
     /** default constructor*/
     DependencyInfo () = default;

@@ -10,8 +10,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 #include <atomic>
-#include <functional>
 #include <deque>
+#include <functional>
 
 namespace helics
 {
@@ -34,9 +34,6 @@ class tcoptions
     Time period = timeZero;
     Time rtLag = timeZero;
     Time rtLead = timeZero;
-    // bool observer = false;
-    // bool realtime = false;
-    // bool source_only = false;
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
     int maxIterations = 50;
@@ -54,6 +51,7 @@ class TimeCoordinator
     Time time_next = timeZero;  //!< the next possible internal event time
     Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
     Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
+    Time time_minSo = timeZero;  //!< the minimum second order event of the dependencies
     Time time_allow = Time::minVal ();  //!< the current allowable time
     Time time_exec = Time::maxVal ();  //!< the time of the next targeted execution
     Time time_message = Time::maxVal ();  //!< the time of the earliest message event
