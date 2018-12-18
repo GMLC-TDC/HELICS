@@ -9,9 +9,6 @@
 package com.java.helics;
 
 public class helicsJNI {
-  static {
-    System.loadLibrary("JNIhelicsd");
-  }
   public final static native int helics_core_type_default_get();
   public final static native int helics_core_type_zmq_get();
   public final static native int helics_core_type_mpi_get();
