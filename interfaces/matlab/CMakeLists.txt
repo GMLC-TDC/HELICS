@@ -162,18 +162,28 @@ install(
 install(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
 install(FILES ${KEY_LIBRARY_FILES} DESTINATION matlab COMPONENT matlab)
 install(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
+
 install(
   FILES ${PROJECT_BINARY_DIR}/src/helics/shared_api_library/helics_export.h
   DESTINATION matlab/headers
   COMPONENT matlab
 )
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m 
   DESTINATION matlab
   COMPONENT matlab
 )
 install(
   FILES helicsSharedLib.h libhelicsSharedLib.h
   DESTINATION matlab
+  COMPONENT matlab
+)
+
+file(GLOB EXTRA_MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/extra/*.m)
+
+message(STATUS "Extra ${EXTRA_MATLAB_FILES}")
+install(
+  FILES ${EXTRA_MATLAB_FILES}
+  DESTINATION matlab/+helics
   COMPONENT matlab
 )
