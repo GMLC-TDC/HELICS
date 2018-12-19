@@ -172,7 +172,7 @@ class Endpoint
     /** get the name of the endpoint*/
     const std::string &getName () const { return actualName; }
     /** get the specified type of the endpoint*/
-    const std::string &getType () const { return fed->getEndpointType (*this); }
+    const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
     /** implicit conversion operator for extracting the handle*/

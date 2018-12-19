@@ -195,12 +195,6 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @return an Endpoint*/
     Endpoint &getEndpoint (int index) const;
 
-    /** get the type associated with an endpoint
-    @param[in] ep the endpoint identifier
-    @return a string containing the endpoint type
-    */
-    const std::string &getEndpointType (const Endpoint &ept) const;
-
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
     */

@@ -1149,24 +1149,32 @@ CloningFilter &Federate::registerGlobalCloningFilter (const std::string &filterN
 
 void Federate::addSourceTarget (const Filter &filt, const std::string &targetEndpoint)
 {
-    coreObject->addSourceTarget (filt.getHandle (), targetEndpoint);
+    if (coreObject)
+    {
+        coreObject->addSourceTarget(filt.getHandle(), targetEndpoint);
+    }
 }
 
 void Federate::addDestinationTarget (const Filter &filt, const std::string &targetEndpoint)
 {
-    coreObject->addDestinationTarget (filt.getHandle (), targetEndpoint);
+    if (coreObject)
+    {
+        coreObject->addDestinationTarget(filt.getHandle(), targetEndpoint);
+    }
+    
 }
 
 const std::string &Federate::getFilterName (const Filter &filt) const { return filt.getName (); }
 
-const std::string &Federate::getFilterInputType (const Filter &filt) const
+
+const std::string &Federate::getInjectionType(interface_handle handle) const
 {
-    return coreObject->getType (filt.getHandle ());
+    return (coreObject) ? (coreObject->getInjectionType(handle)) : emptyStr;
 }
 
-const std::string &Federate::getFilterOutputType (const Filter &filt) const
+const std::string &Federate::getExtractionType(interface_handle handle) const
 {
-    return coreObject->getType (filt.getHandle ());
+    return (coreObject) ? (coreObject->getExtractionType(handle)) : emptyStr;
 }
 
 const Filter &Federate::getFilter (const std::string &filterName) const

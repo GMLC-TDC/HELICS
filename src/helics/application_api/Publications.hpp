@@ -176,7 +176,7 @@ class Publication
     /** get the key for the publication*/
     const std::string &getName () const { return key_; }
     /** get the type for the publication*/
-    const std::string &getType () const { return fed->getPublicationType (*this); }
+    const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
     /** get the interface information field of the publication*/

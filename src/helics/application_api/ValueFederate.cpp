@@ -485,20 +485,6 @@ const std::string &ValueFederate::getPublicationUnits (const Publication &pub) c
     return (coreObject) ? coreObject->getUnits (pub.getHandle ()) : emptyStr;
 }
 
-const std::string &ValueFederate::getInputType (const Input &inp) const
-{
-    return (coreObject) ? coreObject->getType (inp.getHandle ()) : emptyStr;
-}
-const std::string &ValueFederate::getPublicationType (const Publication &pub) const
-{
-    return (coreObject) ? coreObject->getType (pub.getHandle ()) : emptyStr;
-}
-
-const std::string &ValueFederate::getPublicationType (const Input &inp) const
-{
-    return (coreObject) ? coreObject->getType (inp.getHandle ()) : emptyStr;
-}
-
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
     vfManager->setInputNotificationCallback (callback);

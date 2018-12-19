@@ -377,15 +377,6 @@ class Federate
     @return empty string if an invalid id is passed*/
     const std::string &getFilterName (const Filter &filt) const;
 
-    /** get the input type of a filter from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string &getFilterInputType (const Filter &filt) const;
-
-    /** get the output type of a filter from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string &getFilterOutputType (const Filter &id) const;
     /** get the id of a source filter from the name of the endpoint
     @param[in] filterName the name of the filter
     @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
@@ -415,8 +406,6 @@ class Federate
     */
     void setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op);
 
-    /** set a filter option */
-    void setFilterOption (const Filter &filt, int32_t option, bool option_value = true);
     /** get the number of filters registered through this federate*/
     int getFilterCount () const;
 
@@ -468,12 +457,25 @@ class Federate
     /** get the data currently stored for a particular interface handle
     @param handle the handle to get the information for
     @return a string with the data for the information*/
-    std::string const &getInfo (interface_handle handle);
+    const std::string &getInfo (interface_handle handle);
 
     /** set an interface option */
     void setInterfaceOption (interface_handle handle, int32_t option, bool option_value = true);
     /** get the current value for an interface option*/
     bool getInterfaceOption (interface_handle handle, int32_t option);
+
+    /** get the injection type for an interface,  this is the type for data coming into an interface
+    @details for filters this is the input type, for publications this is type used to transmit data, for endpoints this is the specified type and for inputs this is the type of the transmitting publication
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getInjectionType(interface_handle handle) const;
+
+    /** get the type for which data comes out of an interface,  this is the type for data coming into an interface
+    @details for filters this is the output type, for publications this is the specified type, for endpoints this is the specified type and for inputs this is the specified type
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getExtractionType(interface_handle handle) const;
+    
 
   private:
     /** register filter interfaces defined in  file or string

@@ -58,7 +58,7 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
     auto &pub3name = vFed1->getPublicationKey (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
-    BOOST_CHECK_EQUAL (vFed1->getPublicationType (pubid3), "double");
+    BOOST_CHECK_EQUAL (vFed1->getExtractionType (pubid3), "double");
     BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
 
     BOOST_CHECK (vFed1->getPublication ("pub1").getHandle () == pubid.getHandle ());
@@ -121,8 +121,8 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid), "");
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
+    BOOST_CHECK_EQUAL (mFed1->getExtractionType (epid), "");
+    BOOST_CHECK_EQUAL (mFed1->getInjectionType (epid2), "random");
 
     BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
     BOOST_CHECK (mFed1->getEndpoint ("fed0/ep1").getHandle () == epid.getHandle ());
@@ -281,7 +281,7 @@ BOOST_DATA_TEST_CASE (test_file_load, bdata::make (combo_config_files), file)
 
     BOOST_CHECK_EQUAL (cFed.getEndpointCount (), 2);
     auto &id = cFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (cFed.getEndpointType (id), "genmessage");
+    BOOST_CHECK_EQUAL (cFed.getExtractionType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (cFed.getInputCount (), 2);
     BOOST_CHECK_EQUAL (cFed.getPublicationCount (), 2);

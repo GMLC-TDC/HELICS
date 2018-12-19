@@ -73,9 +73,9 @@ class Filter
     /** get the name for the filter*/
     const std::string &getName () const;
     /** get the specified input type of the filter*/
-    const std::string &getInputType () const;
+    const std::string &getInjectionType () const;
     /** get the specified output type of the filter*/
-    const std::string &getOutputType () const;
+    const std::string &getExtractionType () const;
     /** set a property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property

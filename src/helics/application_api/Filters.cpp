@@ -168,20 +168,20 @@ const std::string &Filter::getName () const
     return emptyStr;
 }
 
-const std::string &Filter::getInputType () const
+const std::string &Filter::getInjectionType () const
 {
     if (corePtr != nullptr)
     {
-        return corePtr->getType (handle);
+        return corePtr->getInjectionType (handle);
     }
     return emptyStr;
 }
 
-const std::string &Filter::getOutputType () const
+const std::string &Filter::getExtractionType () const
 {
     if (corePtr != nullptr)
     {
-        return corePtr->getOutputType (handle);
+        return corePtr->getExtractionType (handle);
     }
     return emptyStr;
 }

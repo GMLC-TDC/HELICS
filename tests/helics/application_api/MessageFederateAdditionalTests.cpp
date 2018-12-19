@@ -55,8 +55,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid), "");
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
+    BOOST_CHECK_EQUAL (mFed1->getExtractionType (epid), "");
+    BOOST_CHECK_EQUAL (mFed1->getExtractionType (epid2), "random");
 
     BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
     BOOST_CHECK (mFed1->getEndpoint ("fed0/ep1").getHandle () == epid.getHandle ());
@@ -478,7 +478,7 @@ BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
     auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+    BOOST_CHECK_EQUAL (mFed.getExtractionType (id), "genmessage");
     BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
 
     BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
@@ -496,7 +496,7 @@ BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), 
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
     auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+    BOOST_CHECK_EQUAL (mFed.getExtractionType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
 

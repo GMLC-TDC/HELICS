@@ -164,12 +164,12 @@ class Input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getName () const { return actualName; }
     /** get the type of the input*/
-    const std::string &getType () const
+    const std::string &getInjectionType () const
     {
-        return (type == data_type::helicsUnknown) ? fed->getInputType (*this) : typeNameStringRef (type);
+        return ((type == data_type::helicsUnknown)||(type==data_type::helicsCustom)) ? fed->getInjectionType (*this) : typeNameStringRef (type);
     }
     /** get the type of the input*/
-    const std::string &getPublicationType () const { return fed->getPublicationType (*this); }
+    const std::string &getExtractionType () const { return fed->getExtractionType (*this); }
     /** get the units associated with a input*/
     const std::string &getUnits () const { return fed->getInputUnits (*this); }
     /** get an associated target*/
@@ -431,7 +431,7 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helicsUnknown)
         {
-            type = getTypeFromString (fed->getPublicationType (*this));
+            type = getTypeFromString (fed->getInjectionType (*this));
         }
 
         valueExtract (dv, type, out);
@@ -490,7 +490,7 @@ const X &Input::getValueRef ()
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helicsUnknown)
         {
-            type = getTypeFromString (fed->getPublicationType (*this));
+            type = getTypeFromString (fed->getInjectionType (*this));
         }
 
         if (changeDetectionEnabled)

@@ -378,7 +378,7 @@ class Core
      */
     virtual const std::string &getHandleName (interface_handle handle) const = 0;
     /** remove a target from a handles operation
-    @param handle the handle to remove the target on
+    @param handle the handle from the publication, input, endpoint or filter
     @param targetToRemove the name of the target to remove*/
     virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) = 0;
 
@@ -386,45 +386,40 @@ class Core
      * Returns units for specified handle.
      */
     virtual const std::string &getUnits (interface_handle handle) const = 0;
+    /** get the injection type for an interface,  this is the type for data coming into an interface
+    @details for filters this is the input type, for publications this is type used to transmit data, for endpoints this is the specified type and for inputs this is the type of the transmitting publication
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    virtual const std::string &getInjectionType(interface_handle handle) const=0;
 
-    /**
-     * Returns type for specified handle.
-     @details for endpoints, publications, and filters, this is the input type
-     for subscriptions and control inputs this is the type of the publication or control input(if available)
-     @param handle the handle from the publication, subscription,control_input/output, endpoint or filter
-     */
-    virtual const std::string &getType (interface_handle handle) const = 0;
-
-    /**
-    * Returns output type for specified handle.
-    @details for filters this is the outputType, for Subscriptions and control inputs this is the expected type
-    for endpoints and publications and control Inputs this is the same as getType();
-    @param handle the handle from the interface
-    */
-    virtual const std::string &getOutputType (interface_handle handle) const = 0;
+    /** get the type for which data comes out of an interface,  this is the type for data coming into an interface
+    @details for filters this is the output type, for publications this is the specified type, for endpoints this is the specified type and for inputs this is the specified type
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    virtual const std::string &getExtractionType(interface_handle handle) const=0;
 
     /** set a handle option
-    @param handle the handle to set the option for
+    @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set
     @param value the value to set the option (mostly 0 or 1)
     */
     virtual void setHandleOption (interface_handle handle, int32_t option, bool option_value) = 0;
 
     /** get a handle option
-    @param handle the handle to set the option for
+    @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set
     @param value the value to set the option (mostly 0 or 1)
     */
     virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
 	/** close a handle from further connections
-	@param handle the handle to close
+	@param handle the handle from the publication, input, endpoint or filter
 	*/
 	virtual void closeHandle(interface_handle handle) = 0;
     /**
      * Publish specified data to the specified key.
      *
-     * @param handle a handle to a publication or control output to use for the value
+     * @param handle the handle from the publication, input, endpoint or filter
      @param[in] data the raw data to send
      @param len the size of the data
      */
