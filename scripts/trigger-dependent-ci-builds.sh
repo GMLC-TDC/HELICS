@@ -7,7 +7,7 @@ body='{
 "request": {
 "message":"'
 body+="${BUILD_MESSAGE}"
-body+='"
+body+='",
 "branch":"master"
 }}'
 
