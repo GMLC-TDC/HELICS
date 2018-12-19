@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_MESSAGE="Test integration with ${TRAVIS_REPO_SLUG} commits ${TRAVIS_COMMIT_RANGE}"
+BUILD_MESSAGE="Test ${TRAVIS_REPO_SLUG} ${TRAVIS_COMMIT_RANGE}"
 
 # Trigger HELICS-FMI build
 body='{
