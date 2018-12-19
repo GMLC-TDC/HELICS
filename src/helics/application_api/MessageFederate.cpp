@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
 #include "Endpoints.hpp"
 #include "MessageFederateManager.hpp"
 
@@ -108,6 +109,51 @@ void MessageFederate::registerMessageInterfaces (const std::string &configString
     }
 }
 
+static const std::string emptyStr;
+template <class Inp>
+static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
+{
+    addTargets (data, "flags", [&ept](const std::string &target) {
+        if (target.front () != '-')
+        {
+            ept.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            ept.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        ept.setOption (defs::options::connection_optional, optional);
+    }
+    bool required = getOrDefault (data, "required", false);
+    if (required)
+    {
+        ept.setOption (defs::options::connection_required, required);
+    }
+
+    auto info = getOrDefault (data, "info", emptyStr);
+    if (!info.empty ())
+    {
+        fed->setInfo (ept.getHandle (), info);
+    }
+    addTargets (data, "knownDestinations",
+                [&ept, fed](const std::string &dest) { fed->registerKnownCommunicationPath (ept, dest); });
+    addTargets (data, "subscriptions", [&ept, fed](const std::string &sub) { fed->subscribe (ept, sub); });
+    addTargets (data, "filters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "sourceFilters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "destFilters", [&ept](const std::string &filt) { ept.addDestinationFilter (filt); });
+
+    auto defTarget = getOrDefault (data, "target", emptyStr);
+    replaceIfMember (data, "destination", defTarget);
+    if (!defTarget.empty ())
+    {
+        ept.setTargetDestination (defTarget);
+    }
+}
+
 void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
@@ -117,29 +163,11 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         for (const auto &ept : doc["endpoints"])
         {
             auto eptName = getKey (ept);
-            auto type = getOrDefault (ept, "type", std::string ());
+            auto type = getOrDefault (ept, "type", emptyStr);
             bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
 
-            addTargets (ept, "knownDestinations",
-                        [&epObj, this](const std::string &dest) { registerKnownCommunicationPath (epObj, dest); });
-            addTargets (ept, "subscriptions", [&epObj, this](const std::string &sub) { subscribe (epObj, sub); });
-            addTargets (ept, "filters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "sourceFilters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "destFilters",
-                        [&epObj](const std::string &filt) { epObj.addDestinationFilter (filt); });
-            auto defTarget = getOrDefault (ept, "target", std::string ());
-            replaceIfMember (ept, "destination", defTarget);
-            if (!defTarget.empty ())
-            {
-                epObj.setTargetDestination (defTarget);
-            }
-
-            auto info = getOrDefault (ept, "info", std::string ());
-            if (!info.empty ())
-            {
-                setInfo (epObj.getHandle (), info);
-            }
+            loadOptions (this, ept, epObj);
         }
     }
 }
@@ -163,30 +191,11 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         for (auto &ept : eptArray)
         {
             auto key = getKey (ept);
-            auto type = getOrDefault (ept, "type", std::string ());
+            auto type = getOrDefault (ept, "type", emptyStr);
             bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
 
-            addTargets (ept, "knownDestinations",
-                        [&epObj, this](const std::string &dest) { registerKnownCommunicationPath (epObj, dest); });
-            addTargets (ept, "subscriptions", [&epObj, this](const std::string &sub) { subscribe (epObj, sub); });
-            addTargets (ept, "filters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "sourceFilters", [&epObj](const std::string &filt) { epObj.addSourceFilter (filt); });
-            addTargets (ept, "destFilters",
-                        [&epObj](const std::string &filt) { epObj.addDestinationFilter (filt); });
-
-            auto defTarget = getOrDefault (ept, "target", std::string ());
-            replaceIfMember (ept, "destination", defTarget);
-            if (!defTarget.empty ())
-            {
-                epObj.setTargetDestination (defTarget);
-            }
-
-            auto info = getOrDefault (ept, "info", std::string ());
-            if (!info.empty ())
-            {
-                setInfo (epObj.getHandle (), info);
-            }
+            loadOptions (this, ept, epObj);
         }
     }
 }
@@ -312,11 +321,6 @@ void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
 
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
-
-void MessageFederate::setEndpointOption (const Endpoint &ept, int32_t option, bool option_value)
-{
-    mfManager->setEndpointOption (ept, option, option_value);
-}
 
 void MessageFederate::addSourceFilter (const Endpoint &ept, const std::string &filterName)
 {

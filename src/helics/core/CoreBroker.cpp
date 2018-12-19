@@ -640,13 +640,7 @@ void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
     errorCom.messageID = error_code;
-    for (auto &brk : _brokers)
-    {
-        if (brk.parent == global_broker_id_local)
-        {
-            routeMessage (errorCom, brk.global_id);
-        }
-    }
+    broadcast (errorCom);
 }
 
 void CoreBroker::processCommand (ActionMessage &&command)
@@ -997,13 +991,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
     case CMD_BROADCAST_DISCONNECT:
     {
         timeCoord->processTimeMessage (command);
-        for (auto &brk : _brokers)
-        {
-            if (!brk._nonLocal)
-            {
-                transmit (brk.route, command);
-            }
-        }
+        broadcast (command);
     }
     break;
     case CMD_EXEC_REQUEST:
@@ -1870,7 +1858,7 @@ void CoreBroker::routeMessage (ActionMessage &&cmd, global_federate_id dest)
     }
 }
 
-void CoreBroker::routeMessage (const ActionMessage &&cmd)
+void CoreBroker::routeMessage (ActionMessage &&cmd)
 {
     if ((cmd.dest_id == parent_broker_id) || (cmd.dest_id == higher_broker_id))
     {
@@ -1883,29 +1871,105 @@ void CoreBroker::routeMessage (const ActionMessage &&cmd)
     }
 }
 
+void CoreBroker::broadcast (ActionMessage &cmd)
+{
+    for (auto &broker : _brokers)
+    {
+        if (!broker._nonLocal)
+        {
+            cmd.dest_id = broker.global_id;
+            transmit (broker.route, cmd);
+        }
+    }
+}
+
 void CoreBroker::executeInitializationOperations ()
 {
     checkDependencies ();
+
+    if (unknownHandles.hasUnknowns ())
+    {
+        if (unknownHandles.hasNonOptionalUnknowns ())
+        {
+            if (unknownHandles.hasRequiredUnknowns ())
+            {
+                ActionMessage eMiss (CMD_ERROR);
+                eMiss.source_id = global_broker_id_local;
+                eMiss.messageID = defs::errors::connection_failure;
+                unknownHandles.processRequiredUnknowns (
+                  [this, &eMiss](const std::string &target, char type, global_handle handle) {
+                      switch (type)
+                      {
+                      case 'p':
+                          eMiss.payload =
+                            fmt::format ("Unable to connect to required publication target {}", target);
+                          LOG_ERROR (parent_broker_id, getIdentifier (), eMiss.payload);
+                          break;
+                      case 'i':
+                          eMiss.payload = fmt::format ("Unable to connect to required input target {}", target);
+                          LOG_ERROR (parent_broker_id, getIdentifier (), eMiss.payload);
+                          break;
+                      case 'f':
+                          eMiss.payload = fmt::format ("Unable to connect to required filter target {}", target);
+                          LOG_ERROR (parent_broker_id, getIdentifier (), eMiss.payload);
+                          break;
+                      case 'e':
+                          eMiss.payload = fmt::format ("Unable to connect to required endpoint target {}", target);
+                          LOG_ERROR (parent_broker_id, getIdentifier (), eMiss.payload);
+                          break;
+                      }
+                      eMiss.setDestination (handle);
+                      routeMessage (eMiss);
+                  });
+                eMiss.payload = "Missing required connections";
+                eMiss.dest_handle = interface_handle{};
+                broadcast (eMiss);
+                sendDisconnect ();
+                addActionMessage (CMD_STOP);
+                return;
+            }
+            else
+            {
+                ActionMessage wMiss (CMD_WARNING);
+                wMiss.source_id = global_broker_id_local;
+                wMiss.messageID = defs::errors::connection_failure;
+                unknownHandles.processNonOptionalUnknowns (
+                  [this, &wMiss](const std::string &target, char type, global_handle handle) {
+                      switch (type)
+                      {
+                      case 'p':
+                          wMiss.payload = fmt::format ("Unable to connect to publication target {}", target);
+                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                          break;
+                      case 'i':
+                          wMiss.payload = fmt::format ("Unable to connect to input target {}", target);
+                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                          break;
+                      case 'f':
+                          wMiss.payload = fmt::format ("Unable to connect to filter target {}", target);
+                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                          break;
+                      case 'e':
+                          wMiss.payload = fmt::format ("Unable to connect to endpoint target {}", target);
+                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                          break;
+                      }
+                      wMiss.setDestination (handle);
+                      routeMessage (wMiss);
+                  });
+            }
+        }
+    }
+
     ActionMessage m (CMD_INIT_GRANT);
     m.source_id = global_broker_id_local;
     brokerState = broker_state_t::operating;
-    for (auto &broker : _brokers)
-    {
-        if (broker.parent == global_broker_id_local)
-        {
-            m.dest_id = broker.global_id;
-            transmit (broker.route, m);
-        }
-    }
+    broadcast (m);
     timeCoord->enteringExecMode ();
     auto res = timeCoord->checkExecEntry ();
     if (res == message_processing_result::next_step)
     {
         enteredExecutionMode = true;
-    }
-    if (unknownHandles.hasUnknowns ())
-    {
-        LOG_WARNING (parent_broker_id, getIdentifier (), "Some requested targets are unresolved");
     }
 }
 

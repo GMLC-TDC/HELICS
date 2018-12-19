@@ -451,26 +451,6 @@ Publication &ValueFederateManager::getPublication (int index)
     return invalidPubNC;
 }
 
-void ValueFederateManager::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
-{
-    coreObject->setHandleOption (pub.handle, option, option_value);
-}
-
-void ValueFederateManager::setInputOption (const Input &inp, int32_t option, bool option_value)
-{
-    coreObject->setHandleOption (inp.handle, option, option_value);
-}
-
-bool ValueFederateManager::getInputOption (const Input &inp, int32_t option) const
-{
-    return coreObject->getHandleOption (inp.handle, option);
-}
-
-bool ValueFederateManager::getPublicationOption (const Publication &pub, int32_t option) const
-{
-    return coreObject->getHandleOption (pub.handle, option);
-}
-
 /** get a count of the number publications registered*/
 int ValueFederateManager::getPublicationCount () const
 {

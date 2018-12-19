@@ -117,12 +117,12 @@ helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 helicsFederateRegisterGlobalEndpoint(mFed, 'port2', 'random');
 
-f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_custom,'filter1');
+f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_custom,'filter1');
 helicsFilterAddSourceTarget(f1,'port1');
-f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_delay,'filter2');
+f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_delay,'filter2');
 helicsFilterAddDestinationTarget(f2,'port2');
 helicsFederateRegisterEndpoint(fFed,'fout','');
-f3=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_random_delay,'filter3');
+f3=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_random_delay,'filter3');
 helicsFilterAddSourceTarget(f3,'fed2/fout');
 
 helicsFederateEnterExecutingModeAsync(mFed);
@@ -159,7 +159,7 @@ p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 
-f1=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_delay,'filter1');
+f1=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_delay,'filter1');
 helicsFilterAddSourceTarget(f1,'port1');
 helicsFilterSet(f1,'delay',2.5);
 

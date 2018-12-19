@@ -51,4 +51,7 @@ std::string generateFullCoreInitString (const FederateInfo &fi);
 /** get an integer property/flag from a string name of the property or flag*/
 int getPropertyIndex (std::string val);
 
+/** get an integer option index for an interface option */
+int getOptionIndex (std::string val);
+
 }  // namespace helics

@@ -573,6 +573,9 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_exec_request, "exec_request"},
   {action_message_def::action_t::cmd_exec_grant, "exec_grant"},
   {action_message_def::action_t::cmd_exec_check, "exec_check"},
+  {action_message_def::action_t::cmd_disconnect_broker_ack, "disconnect broker acknowledge"},
+  {action_message_def::action_t::cmd_disconnect_core_ack, "disconnect core acknowledge"},
+  {action_message_def::action_t::cmd_disconnect_fed_ack, "disconnect fed acknowledge"},
   {action_message_def::action_t::cmd_ack, "ack"},
 
   {action_message_def::action_t::cmd_stop, "stop"},
@@ -647,19 +650,18 @@ const char *actionMessageType (action_message_def::action_t action)
     }
     return static_cast<const char *> (unknownStr);
 }
-
-static constexpr std::pair<int, const char *> errorStrings[] = {
-  // priority commands
-  {-5, "lost connection with server"},
-  {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"},
-  {7, "duplicate broker name detected"}};
+// set of strings to translate error codes to something sensible
+static constexpr std::pair<int, const char *> errorStrings[] = {{-2, "connection error"},
+                                                                {-5, "lost connection with server"},
+                                                                {5, "already in initialization mode"},
+                                                                {6, "duplicate federate name detected"},
+                                                                {7, "duplicate broker name detected"}};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
-// can (in actuality) be used as the program is shutting down
+// can (in actuality-there was a case that did this) be used as the program is shutting down
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
@@ -747,8 +749,11 @@ int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
 {
     if (m.action () == CMD_MULTI_MESSAGE)
     {
-        m.setString (m.counter++, newMessage.to_string ());
-        return m.counter;
+        if (m.counter < 255)
+        {
+            m.setString (m.counter++, newMessage.to_string ());
+            return m.counter;
+        }
     }
     return (-1);
 }

@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
 #include "Publications.hpp"
 #include "ValueFederateManager.hpp"
 
@@ -107,6 +108,10 @@ void ValueFederate::addTarget (const Publication &pub, const std::string &target
 
 void ValueFederate::addTarget (const Input &inp, const std::string &target) { vfManager->addTarget (inp, target); }
 
+void ValueFederate::addAlias (const Input &inp, const std::string &shortcutName)
+{
+    vfManager->addAlias (inp, shortcutName);
+}
 void ValueFederate::removeTarget (const Publication &pub, const std::string &target)
 {
     vfManager->removeTarget (pub, target);
@@ -115,11 +120,6 @@ void ValueFederate::removeTarget (const Publication &pub, const std::string &tar
 void ValueFederate::removeTarget (const Input &inp, const std::string &target)
 {
     vfManager->removeTarget (inp, target);
-}
-
-void ValueFederate::addAlias (const Input &inp, const std::string &shortcutName)
-{
-    vfManager->addAlias (inp, shortcutName);
 }
 
 void ValueFederate::addAlias (const Publication &pub, const std::string &shortcutName)
@@ -154,12 +154,25 @@ static const std::string emptyStr;
 template <class Inp, class Obj>
 static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 {
-    // bool optional = getOrDefault (data, "optional", false);
+    addTargets (data, "flags", [&objUpdate](const std::string &target) {
+        if (target.front () != '-')
+        {
+            objUpdate.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            objUpdate.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        objUpdate.setOption (defs::options::connection_optional, optional);
+    }
     bool required = getOrDefault (data, "required", false);
-
     if (required)
     {
-        // TODO add setOPTION call
+        objUpdate.setOption (defs::options::connection_required, required);
     }
     callIfMember (data, "shortcut", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
     callIfMember (data, "alias", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
@@ -484,26 +497,6 @@ const std::string &ValueFederate::getPublicationType (const Publication &pub) co
 const std::string &ValueFederate::getPublicationType (const Input &inp) const
 {
     return (coreObject) ? coreObject->getType (inp.getHandle ()) : emptyStr;
-}
-
-void ValueFederate::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
-{
-    vfManager->setPublicationOption (pub, option, option_value);
-}
-
-void ValueFederate::setInputOption (const Input &inp, int32_t option, bool option_value)
-{
-    vfManager->setInputOption (inp, option, option_value);
-}
-
-bool ValueFederate::getInputOption (const Input &inp, int32_t option) const
-{
-    return vfManager->getInputOption (inp, option);
-}
-
-bool ValueFederate::getPublicationOption (const Publication &pub, int32_t option) const
-{
-    return vfManager->getPublicationOption (pub, option);
 }
 
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)

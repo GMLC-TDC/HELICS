@@ -341,7 +341,7 @@ BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_file
     BOOST_CHECK_EQUAL (str1, "this is another global value");
 
     auto str2 = Fed1->query ("global", "list");
-    BOOST_CHECK_EQUAL (str2, "[global1;global2]");
+    BOOST_CHECK ((str2 == "[global1;global2]") || (str2 == "[global2;global1]"));
 
     auto str3 = Fed1->query ("global", "all");
     BOOST_CHECK_NE (str3, "#invalid");

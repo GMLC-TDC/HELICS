@@ -603,7 +603,7 @@ iteration_time CommonCore::requestTimeIterative (federate_id_t federateID, Time 
     case HELICS_CREATED:
     case HELICS_INITIALIZING:
         return iteration_time{timeZero, iteration_result::error};
-    case HELICS_NONE:
+    case HELICS_UNKNOWN:
     case HELICS_ERROR:
         return iteration_time{Time::maxVal (), iteration_result::error};
     }
@@ -804,7 +804,8 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     {
         throw (RegistrationFailure ("named Input already exists"));
     }
-    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::input, key, type, units);
+    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::input, key, type, units,
+                                      fed->getInterfaceFlags ());
 
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createInput (id, key, type, units);
@@ -813,6 +814,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
     ActionMessage m (CMD_REG_INPUT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
+    m.flags = handle.flags;
     m.name = key;
     m.setStringData (type, units);
 
@@ -846,7 +848,8 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     {
         throw (RegistrationFailure ("Publication key already exists"));
     }
-    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::publication, key, type, units);
+    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::publication, key, type, units,
+                                      fed->getInterfaceFlags ());
 
     auto id = handle.handle.handle;
     fed->interfaces ().createPublication (id, key, type, units);
@@ -855,6 +858,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
     m.name = key;
+    m.flags = handle.flags;
     m.setStringData (type, units);
 
     actionQueue.push (std::move (m));
@@ -936,13 +940,66 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
 
 void CommonCore::setHandleOption (interface_handle handle, int32_t option, bool option_value)
 {
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        return;
+    }
     handles.modify (
       [handle, option, option_value](auto &hand) { return hand.setHandleOption (handle, option, option_value); });
+
+    ActionMessage fcn (CMD_INTERFACE_CONFIGURE);
+    fcn.dest_handle = handle;
+    fcn.messageID = option;
+    fcn.counter = static_cast<uint16_t> (handleInfo->handleType);
+
+    if (option_value)
+    {
+        setActionFlag (fcn, indicator_flag);
+    }
+    if (handleInfo->handleType != handle_type::filter)
+    {
+        auto fed = getHandleFederate (handle);
+        if (fed != nullptr)
+        {
+            fcn.dest_id = fed->global_id;
+            fed->setProperties (fcn);
+        }
+    }
+    else
+    {
+        // must be for filter
+    }
 }
 
 bool CommonCore::getHandleOption (interface_handle handle, int32_t option) const
 {
-    return handles.read ([handle, option](auto &hand) { return hand.getHandleOption (handle, option); });
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo == nullptr)
+    {
+        return false;
+    }
+    switch (option)
+    {
+    case defs::options::connection_required:
+    case defs::options::connection_optional:
+        return handles.read ([handle, option](auto &hand) { return hand.getHandleOption (handle, option); });
+    default:
+        break;
+    }
+    if (handleInfo->handleType != handle_type::filter)
+    {
+        auto fed = getFederateAt (handleInfo->local_fed_id);
+        if (fed != nullptr)
+        {
+            return fed->getHandleOption (handle, static_cast<char> (handleInfo->handleType), option);
+        }
+    }
+    else
+    {
+        // must be for filter
+    }
+    return false;
 }
 
 void CommonCore::closeHandle (interface_handle handle)
@@ -1171,18 +1228,17 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
     {
         throw (RegistrationFailure ("endpoint name is already used"));
     }
-    auto &handle =
-      createBasicHandle (fed->global_id, fed->local_id, handle_type::endpoint, name, type, std::string ());
+    auto &handle = createBasicHandle (fed->global_id, fed->local_id, handle_type::endpoint, name, type,
+                                      std::string{}, fed->getInterfaceFlags ());
 
     auto id = handle.getInterfaceHandle ();
     fed->interfaces ().createEndpoint (id, name, type);
-    fed->hasEndpoints = true;
     ActionMessage m (CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
     m.name = name;
     m.setStringData (type);
-
+    m.flags = handle.flags;
     actionQueue.push (std::move (m));
 
     return id;
@@ -2443,8 +2499,8 @@ void CommonCore::processCommand (ActionMessage &&command)
                     command.dest_id = command.source_id;
                     command.source_id = parent_broker_id;
                     routeMessage (command);
+                }
             }
-        }
         }
         else
         {
@@ -2462,7 +2518,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             bye.source_id = parent_broker_id;
             for (auto fed : loopFederates)
             {
-                if (fed->getState () != federate_state_t::HELICS_FINISHED)
+                if (fed->getState () != federate_state::HELICS_FINISHED)
                 {
                     bye.dest_id = fed->global_id.load ();
                     fed->addAction (bye);
@@ -2546,6 +2602,17 @@ void CommonCore::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
+    case CMD_WARNING:
+        if (command.dest_id == global_broker_id_local)
+        {
+            sendToLogger (command.source_id, log_level::warning, getFederateNameNoThrow (command.source_id),
+                          command.payload);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_ERROR:
         if (command.dest_id == global_broker_id_local)
         {
@@ -2555,7 +2622,8 @@ void CommonCore::processCommand (ActionMessage &&command)
             }
             else
             {
-                sendToLogger (parent_broker_id, 0, getFederateNameNoThrow (command.source_id), command.payload);
+                sendToLogger (parent_broker_id, log_level::error, getFederateNameNoThrow (command.source_id),
+                              command.payload);
             }
         }
         else
@@ -3244,7 +3312,7 @@ void CommonCore::checkDependencies ()
     bool issource = false;
     for (auto &fed : loopFederates)
     {
-        if (fed->hasEndpoints)
+        if (fed->endpointCount () > 0)
         {
             if (fed->getOptionFlag (defs::flags::observer))
             {
@@ -3620,7 +3688,7 @@ void CommonCore::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto fed : loopFederates)
     {
-        if (fed->getState () != federate_state_t::HELICS_FINISHED)
+        if (fed->getState () != federate_state::HELICS_FINISHED)
         {
             fed->addAction (bye);
         }
@@ -3679,7 +3747,7 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (cmd);
             }
@@ -3711,8 +3779,8 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
         auto fed = getFederateCore (cmd.dest_id);
         if (fed != nullptr)
         {
-            if ((fed->getState () != federate_state_t::HELICS_FINISHED) &&
-                (fed->getState () != federate_state_t::HELICS_ERROR))
+            if ((fed->getState () != federate_state::HELICS_FINISHED) &&
+                (fed->getState () != federate_state::HELICS_ERROR))
             {
                 fed->addAction (cmd);
             }
@@ -3749,7 +3817,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id dest)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (std::move (cmd));
             }
@@ -3782,7 +3850,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
         auto fed = getFederateCore (dest);
         if (fed != nullptr)
         {
-            if (fed->getState () != federate_state_t::HELICS_FINISHED)
+            if (fed->getState () != federate_state::HELICS_FINISHED)
             {
                 fed->addAction (std::move (cmd));
             }

@@ -294,11 +294,11 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
-    /** set a federation global value
-    @details this overwrites any previous value for this name
-    @param valueName the name of the global to set
-    @param value the value of the global
-    */
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
     void setGlobal (const std::string &valueName, const std::string &value);
     /** define a filter interface
     @details a source filter will be sent any packets that come from a particular source
@@ -469,6 +469,11 @@ class Federate
     @param handle the handle to get the information for
     @return a string with the data for the information*/
     std::string const &getInfo (interface_handle handle);
+
+    /** set an interface option */
+    void setInterfaceOption (interface_handle handle, int32_t option, bool option_value = true);
+    /** get the current value for an interface option*/
+    bool getInterfaceOption (interface_handle handle, int32_t option);
 
   private:
     /** register filter interfaces defined in  file or string

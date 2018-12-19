@@ -202,9 +202,11 @@ BOOST_AUTO_TEST_CASE (message_federate_send_receive_2fed_extra)
     BOOST_CHECK_EQUAL (M2->data[245], data[245]);
     mFed1->finalizeAsync ();
     mFed2->finalize ();
-    mFed1->finalizeComplete ();
+mFed1->finalizeComplete ();
     BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
     BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
+    
+
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)

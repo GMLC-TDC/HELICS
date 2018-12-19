@@ -48,8 +48,12 @@ class NamedInputInfo
     std::string inputType;  //!< the type of data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
     bool required = false;  //!< flag indicating that the subscription requires a matching publication
+    bool optional = false;  //!< flag indicating that any targets are optional
     bool has_target = false;  //!< flag indicating that the input has a source
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
+    bool not_interruptible = false;  //!< indicator that this handle should not be used for interrupting
+    bool strict_type_matching = false;  //!< indicator that the handle need to have strict type matching
+    bool single_source = false;  //!< allow only a single source to connect
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
@@ -98,4 +102,6 @@ class NamedInputInfo
   private:
     bool updateData (dataRecord &&update, int index);
 };
+
+bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
 }  // namespace helics

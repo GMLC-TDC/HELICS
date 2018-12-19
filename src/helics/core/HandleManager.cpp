@@ -156,29 +156,10 @@ void HandleManager::setHandleOption (interface_handle handle, int option, bool v
     {
         switch (option)
         {
-        case helics_handle_option_only_update_on_change:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag1);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag1);
-            }
-            break;
-        case helics_handle_option_only_transmit_on_change:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag2);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag1);
-            }
-            break;
         case helics_handle_option_connection_required:
             if (val)
             {
+                clearActionFlag (handles[index], optional_flag);
                 setActionFlag (handles[index], required_flag);
             }
             else
@@ -190,20 +171,11 @@ void HandleManager::setHandleOption (interface_handle handle, int option, bool v
             if (val)
             {
                 clearActionFlag (handles[index], required_flag);
+                setActionFlag (handles[index], optional_flag);
             }
             else
             {
-                setActionFlag (handles[index], required_flag);
-            }
-            break;
-        case helics_handle_option_single_connection_only:
-            if (val)
-            {
-                setActionFlag (handles[index], extra_flag4);
-            }
-            else
-            {
-                clearActionFlag (handles[index], extra_flag4);
+                clearActionFlag (handles[index], optional_flag);
             }
             break;
         }
@@ -224,7 +196,7 @@ bool HandleManager::getHandleOption (interface_handle handle, int option) const
         case helics_handle_option_connection_required:
             return checkActionFlag (handles[index], required_flag);
         case helics_handle_option_connection_optional:
-            return !checkActionFlag (handles[index], required_flag);
+            return checkActionFlag (handles[index], optional_flag);
         case helics_handle_option_single_connection_only:
             return checkActionFlag (handles[index], extra_flag4);
         default:

@@ -18,13 +18,13 @@ class Federate;
 /** a set of common defined filters*/
 enum class filter_types
 {
-    custom = helics_filtertype_custom,
-    delay = helics_filtertype_delay,
-    random_delay = helics_filtertype_random_delay,
-    random_drop = helics_filtertype_random_drop,
-    reroute = helics_filtertype_reroute,
-    clone = helics_filtertype_clone,
-    firewall = helics_filtertype_firewall,
+    custom = helics_filter_type_custom,
+    delay = helics_filter_type_delay,
+    random_delay = helics_filter_type_random_delay,
+    random_drop = helics_filter_type_random_drop,
+    reroute = helics_filter_type_reroute,
+    clone = helics_filter_type_clone,
+    firewall = helics_filter_type_firewall,
     unrecognized = 7
 
 };
@@ -68,6 +68,8 @@ class Filter
 
     /** get the underlying core handle for use with a core*/
     interface_handle getHandle () const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
     /** get the name for the filter*/
     const std::string &getName () const;
     /** get the specified input type of the filter*/
@@ -79,9 +81,9 @@ class Filter
     @param val the numerical value of the property
     */
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return corePtr->getInterfaceInfo(handle); }
+    const std::string &getInfo () const { return corePtr->getInterfaceInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { corePtr->setInterfaceInfo(handle, info); }
+    void setInfo (const std::string &info) { corePtr->setInterfaceInfo (handle, info); }
     virtual void set (const std::string &property, double val);
     /** set a string property on a filter
     @param property the name of the property of the filter to change
@@ -97,9 +99,13 @@ class Filter
 
     /** remove a sourceEndpoint to the list of endpoint to clone*/
     virtual void removeTarget (const std::string &sourceName);
-	/** close a filter during an active simulation
-	@details it is not necessary to call this function unless you are continuing the simulation after the close*/
-	void close() { corePtr->closeHandle(handle); }
+    void setOption (int32_t option, bool value) { fed->setInterfaceOption (handle, option, value); }
+    /** close a filter during an active simulation
+    @details it is not necessary to call this function unless you are continuing the simulation after the close*/
+    void close () { corePtr->closeHandle (handle); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
 
   protected:
     /** set a filter operations object */

@@ -47,7 +47,7 @@ class BasicHandleInfo
 
     {
         /* NOTE:: all current cases already have std::string they are passing into the function and most are
-        short,so we are taking by reference to avoid a copy/move  and just have a copy*/
+        short,so we are taking by reference to avoid a copy then move  and just have a copy*/
     }
 
     const global_handle handle = global_handle{};  //!< the global federate id for the creator of the handle

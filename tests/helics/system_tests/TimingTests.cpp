@@ -158,6 +158,53 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
+BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
+{
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
+    auto &IP2 = vFed2->registerSubscription ("pub1");
+    // test with the handle option vs the federate option
+    IP2.setOption (helics::defs::options::ignore_interrupts);
+    auto rfed1 = [&]() {
+        vFed1->enterExecutingMode ();
+        for (double ii = 1.0; ii <= 100.0; ii += 1.0)
+        {
+            pub->publish (ii);
+            vFed1->requestTime (ii);
+        }
+    };
+
+    auto rfed2 = [&]() {
+        vFed2->enterExecutingMode ();
+        std::vector<helics::Time> res;
+        for (double ii = 5.0; ii <= 100.0; ii += 5.0)
+        {
+            auto T2 = vFed2->requestTime (ii);
+            res.push_back (T2);
+        }
+        return res;
+    };
+
+    auto fed2res = std::async (std::launch::async, rfed2);
+    auto fed1res = std::async (std::launch::async, rfed1);
+
+    fed1res.get ();
+    auto rvec = fed2res.get ();
+    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
+    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec[1], 10.0);
+    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    vFed1->finalize ();
+    vFed2
+      ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+}
+
 BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
 {
     SetupTest<helics::ValueFederate> ("test", 2);

@@ -326,6 +326,15 @@ int helicsGetPropertyIndex (const char *val)
     return helics::getPropertyIndex (val);
 }
 
+int helicsGetOptionIndex (const char *val)
+{
+    if (val == nullptr)
+    {
+        return -1;
+    }
+    return helics::getOptionIndex (val);
+}
+
 void helicsFederateInfoSetFlagOption (helics_federate_info fi, int flag, helics_bool value, helics_error *err)
 {
     auto hfi = getFedInfo (fi, err);
@@ -833,24 +842,23 @@ helics_bool helicsCoreIsConnected (helics_core core)
     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
-
-void helicsCoreSetGlobal(helics_core core, const char *valueName, const char *value, helics_error *err)
+void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *value, helics_error *err)
 {
-	auto cr = getCore(core, err);
-	if (cr == nullptr)
-	{
-		return;
-	}
-	if (valueName == nullptr)
-	{
-		if (err != nullptr)
-		{
-			err->error_code = helics_error_invalid_argument;
-			err->message = invalidGlobalString;
-		}
-		return;
-	}
-	cr->setGlobal(valueName, AS_STRING(value));
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    if (valueName == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidGlobalString;
+        }
+        return;
+    }
+    cr->setGlobal (valueName, AS_STRING (value));
 }
 
 const char *helicsBrokerGetIdentifier (helics_broker broker)

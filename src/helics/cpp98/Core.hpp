@@ -7,77 +7,61 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_CORE_HPP_
 #pragma once
 
-#include "../shared_api_library/helics.h"
-#include "../shared_api_library/MessageFilters.h"
-#include "config.hpp"
-#include <string>
 #include "../cpp98/Filter.hpp"
+#include "../shared_api_library/MessageFilters.h"
+#include "../shared_api_library/helics.h"
+#include "config.hpp"
 #include <stdexcept>
+#include <string>
 
-#define HELICS_IGNORE_ERROR NULL
 namespace helicscpp
 {
-
 class Core
 {
   public:
-    // Default constructor, not meant to be used
-    Core ():core(NULL) {};
-
+    /** Default constructor*/
+    Core () : core (NULL){};
+    /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
-        core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str(),hThrowOnError());
+        core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
     }
-
+    /** construct with type, core name and command line arguments */
     Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
-        core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv,hThrowOnError());
+        core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
+    /** destructor*/
+    ~Core () { helicsCoreFree (core); }
+    /** implicit operator so the object can be used with the c api functions natively*/
+    operator helics_core () { return core; }
+    /** explicity get the base helics_core object*/
+    helics_core baseObject () const { return core; }
+    bool isConnected () const { return helicsCoreIsConnected (core); }
 
-    ~Core ()
-    {
-        helicsCoreFree(core);
-    }
-    operator helics_core() { return core; }
-
-    helics_core baseObject() const { return core; }
-    bool isConnected () const
-    { return helicsCoreIsConnected (core);
-    }
-
-    Core(const Core &cr)
-    {
-        core = helicsCoreClone(cr.core,hThrowOnError());
-    }
-    Core &operator=(const Core &cr)
+    Core (const Core &cr) { core = helicsCoreClone (cr.core, hThrowOnError ()); }
+    Core &operator= (const Core &cr)
     {
         core = helicsCoreClone (cr.core, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Core(Core &&cr) noexcept
+    Core (Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
     }
-    Core &operator=(Core &&cr) noexcept
+    Core &operator= (Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
         return *this;
     }
 #endif
-    void setReadyToInit()
-    { helicsCoreSetReadyToInit (core, hThrowOnError ());
-    }
-    void disconnect()
-    { helicsCoreDisconnect (core, hThrowOnError ());
-    }
+    void setReadyToInit () { helicsCoreSetReadyToInit (core, hThrowOnError ()); }
+    void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
 
-    const char *getIdentifier() const
-    {
-        return helicsCoreGetIdentifier(core);
-    }
+    const char *getIdentifier () const { return helicsCoreGetIdentifier (core); }
 
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
@@ -88,8 +72,7 @@ class Core
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
     */
-    Filter registerFilter(helics_filter_type_t type,
-        const std::string &name = std::string())
+    Filter registerFilter (helics_filter_type type, const std::string &name = std::string ())
     {
         return Filter (helicsCoreRegisterFilter (core, type, name.c_str (), hThrowOnError ()));
     }
@@ -101,7 +84,7 @@ class Core
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
-    CloningFilter registerCloningFilter( const std::string &deliveryEndpoint)
+    CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
     {
         return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
@@ -115,5 +98,5 @@ class Core
     helics_core core;
 };
 
-} //namespace helicscpp
+}  // namespace helicscpp
 #endif

@@ -483,15 +483,6 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return the type or empty string on invalid input*/
     const std::string &getPublicationType (const Input &inp) const;
 
-    /** set a publication option */
-    void setPublicationOption (const Publication &pub, int32_t option, bool option_value = true);
-
-    /** get a handle option*/
-    void setInputOption (const Input &inp, int32_t option, bool option_value = true);
-    /** get an option values for an input*/
-    bool getInputOption (const Input &inp, int32_t option) const;
-    /** get an option values for a publication*/
-    bool getPublicationOption (const Publication &pubd, int32_t option) const;
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call signature void(input_id_t, Time)

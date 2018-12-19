@@ -140,7 +140,8 @@ class Input
     /** get the underlying handle that can be used to make direct calls to the Core API
      */
     interface_handle getHandle () const { return handle; }
-
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
     /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
     bool operator< (const Input &inp) const { return (handle < inp.handle); }
@@ -181,6 +182,11 @@ class Input
     const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { fed->setInfo (handle, info); }
+    /** set a handle flag for the input*/
+    void setOption (int32_t option, bool value = true) { fed->setInterfaceOption (handle, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
     /** check if the value has been updated
     @details if changeDetection is Enabled this function also loads the value into the buffer*/
     bool isUpdated ();
