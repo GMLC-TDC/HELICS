@@ -1,10 +1,13 @@
 #!/bin/bash
 
+BUILD_MESSAGE="Test integration with ${TRAVIS_REPO_SLUG} commits ${TRAVIS_COMMIT_RANGE}"
+
 # Trigger HELICS-FMI build
-body='{
-"request": {
-"branch":"master"
-}}'
+body="{
+\"request\": {
+\"message\":\"${BUILD_MESSAGE}\"
+\"branch\":\"master\"
+}}"
 
 curl -s -X POST \
     -H "Content-Type: application/json" \
@@ -15,4 +18,16 @@ curl -s -X POST \
     https://api.travis-ci.org/repo/GMLC-TDC%2FHELICS-FMI/requests
 
 # Trigger helics-ns3 module build
+body='{
+"definition": {
+"id": 1
+},
+"reason": "individualCI"
+}'
 
+curl -s -X POST \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json" \
+    -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
+    -d "$body" \
+    https://dev.azure.com/HELICS-test/helics-ns3/_apis/build/builds?api-version=4.1
