@@ -181,6 +181,14 @@ void MpiComms::queue_tx_function ()
                     // std::cout << "send msg to brkr: " << prettyPrintString(cmd) << std::endl;
                     mpi_service.sendMessage (brokerLocation, cmd.to_vector ());
                 }
+                else
+                {
+                    if (!isDisconnectCommand (cmd))
+                    {
+                        logWarning (std::string ("unknown route and no broker, dropping message ") +
+                                    prettyPrintString (cmd));
+                    }
+                }
             }
         }
     }

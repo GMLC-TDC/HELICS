@@ -86,6 +86,7 @@ void MpiService::serviceLoop ()
     {
         // send/receive MPI messages
         sendAndReceiveMessages ();
+        std::this_thread::yield ();
     }
 
     MPI_Barrier (mpiCommunicator);
@@ -222,8 +223,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
-    std::lock_guard<std::mutex> mpilock (mpiDataLock);
-
+    std::unique_lock<std::mutex> mpilock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         // Skip any nullptr entries
@@ -273,6 +273,7 @@ void MpiService::sendAndReceiveMessages ()
         }
     }
 
+    mpilock.unlock ();
     // Send messages from the queue
     auto sendMsg = txMessageQueue.try_pop ();
     while (sendMsg)
@@ -297,12 +298,14 @@ void MpiService::sendAndReceiveMessages ()
         }
         else
         {
+            mpilock.lock ();
             if (comms[destTag] != nullptr)
             {
                 // Add the message directly to the destination rx queue (same process)
                 ActionMessage M (sendRequestData.second);
                 comms[destTag]->getRxMessageQueue ().push (M);
             }
+            mpilock.unlock ();
         }
         sendMsg = txMessageQueue.try_pop ();
     }
