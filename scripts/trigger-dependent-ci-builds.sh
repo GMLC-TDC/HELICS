@@ -3,11 +3,13 @@
 BUILD_MESSAGE="Test integration with ${TRAVIS_REPO_SLUG} commits ${TRAVIS_COMMIT_RANGE}"
 
 # Trigger HELICS-FMI build
-body="{
-\"request\": {
-\"message\":\"${BUILD_MESSAGE}\"
-\"branch\":\"master\"
-}}"
+body='{
+"request": {
+"message":"'
+body+="${BUILD_MESSAGE}"
+body+='"
+"branch":"master"
+}}'
 
 curl -s -X POST \
     -H "Content-Type: application/json" \
