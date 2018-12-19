@@ -225,6 +225,7 @@ jobs:
       osx_image: xcode8
       
     - stage: trigger dependent repositories
+      if: branch == develop
       before_install: true
       install: true
       script: scripts/trigger-dependent-ci-builds.sh
