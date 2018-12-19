@@ -5,20 +5,28 @@
 #
 
 set(
-  c_shared_library_test_sources ctestFixtures.cpp shared-library-tests.cpp
+  c_shared_library_test_sources 
+  ctestFixtures.cpp 
+  shared-library-tests.cpp
   # data_viewTests.cpp
-  test-value-federate1.cpp test-value-federate2.cpp
+  test-value-federate1.cpp 
+  test-value-federate2.cpp
   # ValueFederateTests2.cpp
-  FilterTests.cpp test-message-federate.cpp
+  FilterTests.cpp 
+  test-message-federate.cpp
   # test-message-federate_cpp.cpp
   # FederateTests.cpp
   TimingTests.cpp
   # iterationTests.cpp
-  QueryTests.cpp badInputTests.cpp
+  QueryTests.cpp 
+  badInputTests.cpp
+  comboConfigTests.cpp
 )
 
 set(
-  cpp_shared_library_test_sources cpptestFixtures.cpp cppshared-library-tests.cpp
+  cpp_shared_library_test_sources 
+  cpptestFixtures.cpp 
+  cppshared-library-tests.cpp
   # test-value-federate1_cpp.cpp
   test-value-federate2_cpp.cpp
   # FilterTests_cpp.cpp
@@ -63,7 +71,7 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-  shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
+  shared-library-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
 add_test(
@@ -80,7 +88,7 @@ target_compile_definitions(
 )
 
 target_compile_definitions(
-  shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
+  shared-library-tests-cpp PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
 add_test(
@@ -89,9 +97,7 @@ add_test(
 )
 
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Daily)
-# Setting a different label, because the test fixture for the C++ shared library tests
-# doesn't work push_back for vector causes a segfault for unknown reasons (Boost UTF
-# related?)
+
 set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Coverage Daily)
 
 # Tests used for Continuous Integration builds

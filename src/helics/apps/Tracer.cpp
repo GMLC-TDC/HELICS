@@ -257,8 +257,8 @@ void Tracer::loadTextFile (const std::string &textFile)
 
 void Tracer::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto state = fed->getCurrentMode ();
+    if (state == Federate::modes::startup)
     {
         generateInterfaces ();
 
@@ -400,14 +400,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
 /** run the Player until the specified time*/
 void Tracer::runTo (Time runToTime)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto state = fed->getCurrentMode ();
+    if (state == Federate::modes::startup)
     {
         initialize ();
-        state = Federate::states::initialization;
+        state = Federate::modes::initializing;
     }
 
-    if (state == Federate::states::initialization)
+    if (state == Federate::modes::initializing)
     {
         fed->enterExecutingMode ();
         captureForCurrentTime (0.0);

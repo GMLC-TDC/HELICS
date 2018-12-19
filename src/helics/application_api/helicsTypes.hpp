@@ -132,7 +132,7 @@ class named_point
 
 /** template class for generating a known name of a type*/
 template <class X>
-inline const char *typeNameString ()
+inline constexpr const char *typeNameString ()
 {
     // this will probably not be the same on all platforms
     return typeid (X).name ();
@@ -161,105 +161,105 @@ constexpr auto strstr = "string";
 }
 
 template <>
-inline const char *typeNameString<std::vector<std::string>> ()
+inline constexpr const char *typeNameString<std::vector<std::string>> ()
 {
     return typestrings::svecstr;
 }
 template <>
-inline const char *typeNameString<std::vector<double>> ()
+inline constexpr const char *typeNameString<std::vector<double>> ()
 {
     return typestrings::dvecstr;
 }
 
 template <>
-inline const char *typeNameString<std::vector<std::complex<double>>> ()
+inline constexpr const char *typeNameString<std::vector<std::complex<double>>> ()
 {
     return typestrings::cvecstr;
 }
 
 /** for float*/
 template <>
-inline const char *typeNameString<double> ()
+inline constexpr const char *typeNameString<double> ()
 {
     return typestrings::doublestr;
 }
 
 /** for float*/
 template <>
-inline const char *typeNameString<float> ()
+inline constexpr const char *typeNameString<float> ()
 {
     return typestrings::floatstr;
 }
 
 /** for boolean*/
 template <>
-inline const char *typeNameString<bool> ()
+inline constexpr const char *typeNameString<bool> ()
 {
     return typestrings::boolstr;
 }
 
 /** for character*/
 template <>
-inline const char *typeNameString<char> ()
+inline constexpr const char *typeNameString<char> ()
 {
     return typestrings::charstr;
 }
 /** for unsigned character*/
 template <>
-inline const char *typeNameString<unsigned char> ()
+inline constexpr const char *typeNameString<unsigned char> ()
 {
     return typestrings::ucharstr;
 }
 /** for integer*/
 template <>
-inline const char *typeNameString<std::int32_t> ()
+inline constexpr const char *typeNameString<std::int32_t> ()
 {
     return typestrings::i32str;
 }
 /** for unsigned integer*/
 template <>
-inline const char *typeNameString<std::uint32_t> ()
+inline constexpr const char *typeNameString<std::uint32_t> ()
 {
     return typestrings::ui32str;
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline const char *typeNameString<int64_t> ()
+inline constexpr const char *typeNameString<int64_t> ()
 {
     return typestrings::i64str;
     ;
 }
 /** for 64 bit unsigned integer*/
 template <>
-inline const char *typeNameString<std::uint64_t> ()
+inline constexpr const char *typeNameString<std::uint64_t> ()
 {
     return typestrings::ui64str;
 }
 /** for complex double*/
 template <>
-inline const char *typeNameString<std::complex<float>> ()
+inline constexpr const char *typeNameString<std::complex<float>> ()
 {
     return typestrings::cfloatstr;
 }
 /** for complex double*/
 template <>
-inline const char *typeNameString<std::complex<double>> ()
+inline constexpr const char *typeNameString<std::complex<double>> ()
 {
     return typestrings::cdoublestr;
 }
 template <>
-inline const char *typeNameString<std::string> ()
+inline constexpr const char *typeNameString<std::string> ()
 {
     return typestrings::strstr;
 }
 
 template <>
-inline const char *typeNameString<named_point> ()
+inline constexpr const char *typeNameString<named_point> ()
 {
     return typestrings::npstr;
 }
 /** the base types for  helics*/
-enum class helics_type_t : int
+enum class data_type : int
 {
     helicsString = helics_data_type_string,
     helicsDouble = helics_data_type_double,
@@ -277,16 +277,16 @@ enum class helics_type_t : int
 };
 
 
-inline constexpr bool isRawType (helics_type_t type)
+inline constexpr bool isRawType (data_type type)
 {
-    return (type == helics_type_t::helicsAny) || (type == helics_type_t::helicsCustom);
+    return (type == data_type::helicsAny) || (type == data_type::helicsCustom);
 }
 
 /** sometimes we just need a ref to a string for the basic types*/
-const std::string &typeNameStringRef (helics_type_t type);
+const std::string &typeNameStringRef (data_type type);
 
 /** convert a string to a type*/
-helics_type_t getTypeFromString (const std::string &typeName);
+data_type getTypeFromString (const std::string &typeName);
 
 /** generate a string representation of a complex number from separate real and imaginary parts*/
 std::string helicsComplexString (double real, double imag);
@@ -315,12 +315,15 @@ void helicsGetVector (const std::string &val, std::vector<double> &data);
 
 /** convert a string to a complex vector*/
 std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
+
+/** convert a string to a complex vector using an existing vector*/
 void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
 /** convert a string to a named point*/
 named_point helicsGetNamedPoint (const std::string &val);
 /** get a double from a string*/
 double getDoubleFromString (const std::string &val);
+/** get a complex number from a string*/
 std::complex<double> getComplexFromString (const std::string &val);
 /** compute the L2 norm of a vector*/
 double vectorNorm (const std::vector<double> &vec);
@@ -330,77 +333,77 @@ double vectorNorm (const std::vector<std::complex<double>> &vec);
 @param type the type used for the data conversion
 @param val a double to convert
 */
-data_block typeConvert (helics_type_t type, double val);
-data_block typeConvert (helics_type_t type, int64_t val);
-data_block typeConvert (helics_type_t type, const char *val);
-data_block typeConvert (helics_type_t type, const std::string &val);
-data_block typeConvert (helics_type_t type, const std::vector<double> &val);
-data_block typeConvert (helics_type_t type, const double *vals, size_t size);
-data_block typeConvert (helics_type_t type, const std::vector<std::complex<double>> &val);
-data_block typeConvert (helics_type_t type, const std::complex<double> &val);
-data_block typeConvert (helics_type_t type, const named_point &val);
-data_block typeConvert (helics_type_t type, const char *str, double val);
-data_block typeConvert (helics_type_t type, const std::string &str, double val);
-data_block typeConvert (helics_type_t type, bool val);
+data_block typeConvert (data_type type, double val);
+data_block typeConvert (data_type type, int64_t val);
+data_block typeConvert (data_type type, const char *val);
+data_block typeConvert (data_type type, const std::string &val);
+data_block typeConvert (data_type type, const std::vector<double> &val);
+data_block typeConvert (data_type type, const double *vals, size_t size);
+data_block typeConvert (data_type type, const std::vector<std::complex<double>> &val);
+data_block typeConvert (data_type type, const std::complex<double> &val);
+data_block typeConvert (data_type type, const named_point &val);
+data_block typeConvert (data_type type, const char *str, double val);
+data_block typeConvert (data_type type, const std::string &str, double val);
+data_block typeConvert (data_type type, bool val);
 
-/** template class for generating a known name of a type*/
+/** template function for generating a known name of a type*/
 template <class X>
-constexpr helics_type_t helicsType ()
+constexpr data_type helicsType ()
 {
-    return helics_type_t::helicsCustom;
+    return data_type::helicsCustom;
 }
 
 template <>
-constexpr helics_type_t helicsType<int64_t> ()
+constexpr data_type helicsType<int64_t> ()
 {
-    return helics_type_t::helicsInt;
+    return data_type::helicsInt;
 }
 
 template <>
-constexpr helics_type_t helicsType<bool> ()
+constexpr data_type helicsType<bool> ()
 {
-    return helics_type_t::helicsBool;
+    return data_type::helicsBool;
 }
 
 template <>
-constexpr helics_type_t helicsType<std::string> ()
+constexpr data_type helicsType<std::string> ()
 {
-    return helics_type_t::helicsString;
+    return data_type::helicsString;
 }
 
 template <>
-constexpr helics_type_t helicsType<named_point> ()
+constexpr data_type helicsType<named_point> ()
 {
-    return helics_type_t::helicsNamedPoint;
+    return data_type::helicsNamedPoint;
 }
 template <>
-constexpr helics_type_t helicsType<double> ()
+constexpr data_type helicsType<double> ()
 {
-    return helics_type_t::helicsDouble;
-}
-
-template <>
-constexpr helics_type_t helicsType<Time> ()
-{
-    return helics_type_t::helicsTime;
+    return data_type::helicsDouble;
 }
 
 template <>
-constexpr helics_type_t helicsType<std::complex<double>> ()
+constexpr data_type helicsType<Time> ()
 {
-    return helics_type_t::helicsComplex;
+    return data_type::helicsTime;
 }
 
 template <>
-constexpr helics_type_t helicsType<std::vector<double>> ()
+constexpr data_type helicsType<std::complex<double>> ()
 {
-    return helics_type_t::helicsVector;
+    return data_type::helicsComplex;
 }
 
 template <>
-constexpr helics_type_t helicsType<std::vector<std::complex<double>>> ()
+constexpr data_type helicsType<std::vector<double>> ()
 {
-    return helics_type_t::helicsComplexVector;
+    return data_type::helicsVector;
+}
+
+template <>
+constexpr data_type helicsType<std::vector<std::complex<double>>> ()
+{
+    return data_type::helicsComplexVector;
 }
 
 // check if the type is directly convertible to a base HelicsType
@@ -504,14 +507,17 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 template <typename T>
 using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
 
+constexpr int primaryType = 0;
+constexpr int convertibleType = 1;
+constexpr int nonConvertibleType = 2;
 /** template dividing types into 3 categories
 0 is primary types
 1 types convertible to primary types
 2 type not convertible to primary types */
 template <typename X>
-using typeCategory = std::conditional_t < helicsType<remove_cv_ref<X>> () != helics_type_t::helicsCustom,
-                                                  std::integral_constant<int, 0>,
+using typeCategory = std::conditional_t < helicsType<remove_cv_ref<X>> () != data_type::helicsCustom,
+                                                  std::integral_constant<int, primaryType>,
                                                   std::conditional_t<isConvertableType<remove_cv_ref<X>>(),
-                                                                     std::integral_constant<int, 1>,
-                                                                     std::integral_constant<int, 2>>>;
+                                                                     std::integral_constant<int, convertibleType>,
+                                                                     std::integral_constant<int, nonConvertibleType>>>;
 }  // namespace helics

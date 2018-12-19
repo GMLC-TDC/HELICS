@@ -27,7 +27,7 @@
   <tr>
   <td>Coverage</td>
   <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
   <tr>
   <td>Gitter</td>
@@ -76,7 +76,7 @@ Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
 #### [CHANGELOG](CHANGELOG.md)
-#### [ROADMAP](ROADMAP.md)
+#### [ROADMAP](docs/ROADMAP.md)
 
 # Tools with HELICS support
 

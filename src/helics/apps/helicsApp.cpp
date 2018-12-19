@@ -43,7 +43,7 @@ static const ArgDescriptors basicAppArgs{{"local", ArgDescriptor::arg_type_t::fl
                                          {"quiet", ArgDescriptor::arg_type_t::flag_type,
                                           "turn off most display output"}};
 
-App::App (const std::string &appName, int argc, char *argv[])
+App::App (const std::string &defaultAppName, int argc, char *argv[])
 {
     variable_map vm_map;
     // check for quiet mode
@@ -83,7 +83,12 @@ App::App (const std::string &appName, int argc, char *argv[])
         return;
     }
     FederateInfo fi (argc, argv);
-    fed = std::make_shared<CombinationFederate> (appName, fi);
+    if (fi.defName.empty())
+    {
+        fi.defName = defaultAppName;
+    }
+    
+    fed = std::make_shared<CombinationFederate> ("", fi);
     App::loadArguments (vm_map);
 }
 
@@ -197,8 +202,8 @@ void App::loadConfigOptions (const Json_helics::Value &element)
 }
 void App::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         fed->enterInitializingMode ();
     }

@@ -104,6 +104,10 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return fnd->second;
     }
+    if ((type.front() == '=') || (type.front() == '-'))
+    {
+        return coreTypeFromString(type.substr(1));
+    }
     if (type.compare (0, 4, "zmq2") == 0)
     {
         return core_type::ZMQ_TEST;
@@ -149,6 +153,24 @@ core_type coreTypeFromString (std::string type) noexcept
 #define TCP_AVAILABILITY true
 #endif
 
+#ifdef DISABLE_UDP_CORE
+#define UDP_AVAILABILITY false
+#else
+#define UDP_AVAILABILITY true
+#endif
+
+#ifdef DISABLE_IPC_CORE
+#define IPC_AVAILABILITY false
+#else
+#define IPC_AVAILABILITY true
+#endif
+
+#ifdef DISABLE_TEST_CORE
+#define TEST_AVAILABILITY false
+#else
+#define TEST_AVAILABILITY true
+#endif
+
 bool isCoreTypeAvailable (core_type type) noexcept
 {
     bool available = false;
@@ -169,14 +191,14 @@ bool isCoreTypeAvailable (core_type type) noexcept
         available = (HELICS_HAVE_MPI != 0);
         break;
     case core_type::TEST:
-        available = true;
+        available = TEST_AVAILABILITY;
         break;
     case core_type::INTERPROCESS:
     case core_type::IPC:
-        available = true;
+        available = IPC_AVAILABILITY;
         break;
     case core_type::UDP:
-        available = true;
+        available = UDP_AVAILABILITY;
         break;
     case core_type::TCP:
         available = TCP_AVAILABILITY;

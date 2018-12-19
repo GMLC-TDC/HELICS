@@ -208,7 +208,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
             auto openPort = (M.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, M.name);
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = global_federate_id_t (PortNumber);
+            portReply.source_id = global_federate_id (PortNumber);
             portReply.setExtraData (openPort);
             portReply.counter = M.counter;
             return portReply;

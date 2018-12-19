@@ -686,8 +686,8 @@ void Player::cleanUpPointList ()
 
 void Player::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         sortTags ();
         generatePublications ();
@@ -699,7 +699,7 @@ void Player::initialize ()
 
 void Player::sendInformation (Time sendTime, int iteration)
 {
-    if (!points.empty ())
+    if (isValidIndex(pointIndex,points))
     {
         while (points[pointIndex].time < sendTime)
         {
@@ -710,17 +710,20 @@ void Player::sendInformation (Time sendTime, int iteration)
                 break;
             }
         }
-        while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
+        if (isValidIndex(pointIndex, points))
         {
-            publications[points[pointIndex].index].publish (points[pointIndex].value);
-            ++pointIndex;
-            if (pointIndex >= points.size ())
+            while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
             {
-                break;
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
             }
         }
     }
-    if (!messages.empty ())
+    if (isValidIndex(messageIndex, messages))
     {
         while (messages[messageIndex].sendTime <= sendTime)
         {
@@ -736,12 +739,12 @@ void Player::sendInformation (Time sendTime, int iteration)
 
 void Player::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
-    if (state < Federate::states::execution)
+    if (md < Federate::modes::executing)
     {
         sendInformation (-Time::epsilon ());
 
@@ -752,7 +755,7 @@ void Player::runTo (Time stopTime_input)
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex,points))
         {
             while (points[pointIndex].time <= ctime)
             {
@@ -763,7 +766,7 @@ void Player::runTo (Time stopTime_input)
                 }
             }
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
@@ -784,12 +787,12 @@ void Player::runTo (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex, points))
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
             nextIteration = points[pointIndex].iteration;
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
@@ -824,7 +827,7 @@ void Player::runTo (Time stopTime_input)
     }
 }
 
-void Player::addPublication (const std::string &key, helics_type_t type, const std::string &pubUnits)
+void Player::addPublication (const std::string &key, data_type type, const std::string &pubUnits)
 {
     // skip already existing publications
     if (pubids.find (key) != pubids.end ())
@@ -882,7 +885,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::helics_type_t::helicsCustom)
+        if (defType == helics::data_type::helicsCustom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;

@@ -48,12 +48,12 @@ class FederateInfo
 
     void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value, NULL); }
 
-    void setTimeProperty (int timeProperty, helics_time timeValue)
+    void setProperty (int timeProperty, helics_time timeValue)
     {
         helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, NULL);
     }
 
-    void setIntegerProperty (int integerProperty, int propertyValue)
+    void setProperty (int integerProperty, int propertyValue)
     {
         helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, NULL);
     }
@@ -69,13 +69,12 @@ typedef struct
   public:
     helics_time grantedTime;  //!< the time of the granted step
     helics_iteration_result status;  //!< the convergence state
-    /** default constructor*/
 } helics_iteration_time;
 
 class Federate
 {
   public:
-    // Default constructor, not meant to be used
+    // Default constructor
     Federate () : fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
@@ -119,12 +118,12 @@ class Federate
         helicsFederateSetFlagOption (fed, flag, value ? helics_true : helics_false, hThrowOnError ());
     }
 
-    void setTimeProperty (int tProperty, helics_time timeValue)
+    void setProperty (int tProperty, helics_time timeValue)
     {
         helicsFederateSetTimeProperty (fed, tProperty, timeValue, hThrowOnError ());
     }
 
-    void setIntegerProperty (int intProperty, int value)
+    void setProperty (int intProperty, int value)
     {
         helicsFederateSetIntegerProperty (fed, intProperty, value, hThrowOnError ());
     }
@@ -207,6 +206,10 @@ class Federate
 
     void finalize () { helicsFederateFinalize (fed, hThrowOnError ()); }
 
+    void finalizeAsync () { helicsFederateFinalizeAsync (fed, hThrowOnError ()); }
+
+    void finalizeComplete () { helicsFederateFinalizeComplete (fed, hThrowOnError ()); }
+
     helics_time requestTime (helics_time time) { return helicsFederateRequestTime (fed, time, hThrowOnError ()); }
 
     helics_time requestNextStep () { return helicsFederateRequestNextStep (fed, hThrowOnError ()); }
@@ -255,7 +258,7 @@ class Federate
         return result;
     }
 
-    Filter registerFilter (helics_filter_type_t type, const std::string &name = std::string ())
+    Filter registerFilter (helics_filter_type type, const std::string &name = std::string ())
     {
         return Filter (helicsFederateRegisterFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
@@ -273,7 +276,7 @@ class Federate
           helicsFederateRegisterCloningFilter (fed, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
 
-    Filter registerGlobalFilter (helics_filter_type_t type, const std::string &name = std::string ())
+    Filter registerGlobalFilter (helics_filter_type type, const std::string &name = std::string ())
     {
         return Filter (helicsFederateRegisterGlobalFilter (fed, type, name.c_str (), hThrowOnError ()));
     }
@@ -298,6 +301,12 @@ class Federate
     Filter getSubscription (int index)
     {
         return Filter (helicsFederateGetFilterByIndex (fed, index, hThrowOnError ()));
+    }
+
+    /** set a global federation value*/
+    void setGlobal (const std::string &valueName, const std::string &value)
+    {
+        helicsFederateSetGlobal (fed, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
 
   protected:

@@ -175,10 +175,19 @@ class Endpoint
     const std::string &getType () const { return fed->getEndpointType (*this); }
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
+    void setOption (int32_t option, bool value) { fed->setInterfaceOption (handle, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
+    /** close the endpoint from receiving more messages*/
+    void close () { fed->closeInterface (handle); }
+
   private:
     friend class MessageFederateManager;
 };

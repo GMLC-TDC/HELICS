@@ -55,7 +55,7 @@ class InvalidFunctionCall : public HelicsException
         : HelicsException (message){};
 };
 
-/** exception indicating that the registration of an object has failed*/
+/** exception indicating that the connections of an object or network have failed*/
 class ConnectionFailure : public HelicsException
 {
   public:

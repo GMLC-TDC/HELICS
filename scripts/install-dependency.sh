@@ -158,7 +158,7 @@ install_boost () {
     fetch_and_untar ${boost_version_str}.tar.gz \
         http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download
     cd ${boost_version_str}/;
-    ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,system,chrono,timer,test --with-toolset=${boost_toolset};
+    ./bootstrap.sh --with-libraries=filesystem,program_options,system,test --with-toolset=${boost_toolset};
     ./b2 install -j2 --prefix=${install_path} \
         variant=release \
         link=${b2_link_type} \

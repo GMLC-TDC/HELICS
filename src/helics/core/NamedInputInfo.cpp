@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "NamedInputInfo.hpp"
 
 #include <algorithm>
+#include <set>
 
 namespace helics
 {
@@ -20,20 +21,20 @@ std::vector<std::shared_ptr<const data_block>> NamedInputInfo::getAllData ()
     return out;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData(int index)
+std::shared_ptr<const data_block> NamedInputInfo::getData (int index)
 {
-    if (isValidIndex(index, current_data))
+    if (isValidIndex (index, current_data))
     {
         return current_data[index].data;
     }
     return nullptr;
 }
 
-std::shared_ptr<const data_block> NamedInputInfo::getData()
+std::shared_ptr<const data_block> NamedInputInfo::getData ()
 {
     int ind = 0;
     int mxind = -1;
-    Time mxTime = Time::minVal();
+    Time mxTime = Time::minVal ();
     for (auto &cd : current_data)
     {
         if (cd.time > mxTime)
@@ -43,7 +44,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData()
         }
         ++ind;
     }
-    if (mxind>=0)
+    if (mxind >= 0)
     {
         return current_data[mxind].data;
     }
@@ -65,6 +66,10 @@ void NamedInputInfo::addData (global_handle source_id,
     {
         if (input_sources[index] == source_id)
         {
+            if (valueTime > deactivated[index])
+            {
+                return;
+            }
             found = true;
             break;
         }
@@ -86,12 +91,37 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits) 
-{ 
+void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits)
+{
     input_sources.push_back (newSource);
     source_types.emplace_back (stype, sunits);
-    data_queues.resize(input_sources.size());
-    current_data.resize(input_sources.size());
+    data_queues.resize (input_sources.size ());
+    current_data.resize (input_sources.size ());
+    deactivated.push_back (Time::maxVal ());
+    has_target = true;
+}
+
+void NamedInputInfo::removeSource (global_handle sourceToRemove, Time minTime)
+{
+    for (size_t ii = 0; ii < input_sources.size (); ++ii)
+    {
+        if (input_sources[ii] == sourceToRemove)
+        {
+            while ((!data_queues[ii].empty ()) && (data_queues[ii].back ().time > minTime))
+            {
+                data_queues[ii].pop_back ();
+            }
+            deactivated[ii] = minTime;
+        }
+    }
+}
+
+void NamedInputInfo::clearFutureData ()
+{
+    for (auto &vec : data_queues)
+    {
+        vec.clear ();
+    }
 }
 
 bool NamedInputInfo::updateTimeUpTo (Time newTime)
@@ -236,6 +266,10 @@ bool NamedInputInfo::updateData (dataRecord &&update, int index)
 Time NamedInputInfo::nextValueTime () const
 {
     Time nvtime = Time::maxVal ();
+    if (not_interruptible)
+    {
+        return nvtime;
+    }
     for (const auto &q : data_queues)
     {
         if (!q.empty ())
@@ -248,4 +282,36 @@ Time NamedInputInfo::nextValueTime () const
     }
     return nvtime;
 }
+
+static const std::set<std::string> convertible_set{"double_vector", "complex_vector", "double",    "float",
+                                                   "bool",          "char",           "uchar",     "int32",
+                                                   "int64",         "uint32",         "uint64",    "int16",
+                                                   "string",        "complex",        "complex_f", "named_point"};
+bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match)
+{
+    if ((type1.empty ()) || (type1 == type2) || (type1 == "def") || (type1 == "any") || (type1 == "raw"))
+    {
+        return true;
+    }
+    if (strict_match)
+    {
+        return false;
+    }
+    else
+    {
+        if ((type2.empty ()) || (type2 == "def") || (type2 == "any"))
+        {
+            return true;
+        }
+        if (convertible_set.find (type1) != convertible_set.end ())
+        {
+            return ((convertible_set.find (type2) != convertible_set.end ()));
+        }
+        else
+        {
+            return (type2 == "raw");
+        }
+    }
+}
+
 }  // namespace helics

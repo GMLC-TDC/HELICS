@@ -3,10 +3,10 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "TcpComms.h"
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
-#include "TcpComms.h"
 #include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
@@ -35,7 +35,6 @@ void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
-
 void TcpComms::setFlag (const std::string &flag, bool val)
 {
     if (flag == "reuse_address")
@@ -46,10 +45,10 @@ void TcpComms::setFlag (const std::string &flag, bool val)
             propertyUnLock ();
         }
     }
-	else
-	{
+    else
+    {
         NetworkCommsInterface::setFlag (flag, val);
-	}
+    }
 }
 
 /** destructor*/
@@ -77,7 +76,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
     while (used_total < bytes_received)
     {
         ActionMessage m;
-        auto used = m.depacketize (data + used_total, bytes_received - used_total);
+        auto used = m.depacketize (data + used_total, static_cast<int> (bytes_received - used_total));
         if (used == 0)
         {
             break;
@@ -212,6 +211,7 @@ void TcpComms::queue_rx_function ()
     }
 
     disconnecting = true;
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
     server->close ();
     setRxStatus (connection_status::terminated);
 }
@@ -235,14 +235,15 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
     }
     else
     {
-        logError(errorMessage);
+        logError (errorMessage);
     }
 }
 
 bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
-    auto terminate = [&,this](connection_status status) -> bool {
+    // lambda function that does the proper termination
+    auto terminate = [&, this](connection_status status) -> bool {
         if (brokerConnection)
         {
             brokerConnection->close ();
@@ -282,7 +283,6 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             tcp::endpoint brk;
             brokerConnection->async_receive (rx.data (), 128,
                                              [this, &rx](const boost::system::error_code &error, size_t bytes) {
-
                                                  if (!error)
                                                  {
                                                      txReceive (rx.data (), bytes, std::string ());
@@ -295,39 +295,38 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                                                      }
                                                  }
                                              });
-            std::chrono::milliseconds cumsleep{ 0 };
+            std::chrono::milliseconds cumsleep{0};
             while (PortNumber < 0)
             {
-                auto mess = txQueue.pop(std::chrono::milliseconds(100));
+                auto mess = txQueue.pop (std::chrono::milliseconds (100));
                 if (mess)
                 {
                     if (isProtocolCommand (mess->second))
                     {
                         if (mess->second.messageID == PORT_DEFINITIONS)
                         {
-                            rxMessageQueue.push(mess->second);
+                            rxMessageQueue.push (mess->second);
                             break;
                         }
-                        
-                         else if (mess->second.messageID == DISCONNECT)
+
+                        else if (mess->second.messageID == DISCONNECT)
                         {
-                            return terminate(connection_status::terminated);
+                            return terminate (connection_status::terminated);
                         }
-                         else
-                         {
-                             rxMessageQueue.push(mess->second);
-                         }
-                        
+                        else
+                        {
+                            rxMessageQueue.push (mess->second);
+                        }
                     }
                     else
                     {
-                        logWarning("unexpected message received in transmit queue");
+                        logWarning ("unexpected message received in transmit queue");
                     }
                 }
-                cumsleep += std::chrono::milliseconds(100);
+                cumsleep += std::chrono::milliseconds (100);
                 if (cumsleep >= connectionTimeout)
                 {
-                    brokerConnection->cancel();
+                    brokerConnection->cancel ();
                     logError ("port number query to broker timed out");
                     return terminate (connection_status::error);
                 }
@@ -349,7 +348,7 @@ void TcpComms::queue_tx_function ()
     auto serviceLoop = ioserv->startServiceLoop ();
     TcpConnection::pointer brokerConnection;
 
-    std::map<route_id_t, TcpConnection::pointer> routes;  // for all the other possible routes
+    std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
@@ -380,14 +379,14 @@ void TcpComms::queue_tx_function ()
     //  std::vector<ActionMessage> txlist;
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == control_route)
+            if (rid == control_route)
             {
                 switch (cmd.messageID)
                 {
@@ -402,7 +401,7 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (route_id_t (cmd.getExtraData ()), std::move (new_connect));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -411,6 +410,10 @@ void TcpComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+                case REMOVE_ROUTE:
+					routes.erase(route_id{ cmd.getExtraData() });
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     rxMessageQueue.push (cmd);
                     processed = true;
@@ -425,7 +428,7 @@ void TcpComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == parent_route_id)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
@@ -451,14 +454,14 @@ void TcpComms::queue_tx_function ()
                 }
             }
         }
-        else if (route_id == control_route)
+        else if (rid == control_route)
         {  // send to rx thread loop
             rxMessageQueue.push (cmd);
         }
         else
         {
             //  txlist.push_back(cmd);
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 try
@@ -471,7 +474,7 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError (std::string ("rt send ") + std::to_string (route_id.baseValue ()) +
+                            logError (std::string ("rt send ") + std::to_string (rid.baseValue ()) +
                                       "::" + se.what ());
                         }
                     }
@@ -491,7 +494,7 @@ void TcpComms::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError (std::string ("broker send") + std::to_string (route_id.baseValue ()) +
+                                logError (std::string ("broker send") + std::to_string (rid.baseValue ()) +
                                           " ::" + se.what ());
                             }
                         }
@@ -499,7 +502,11 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-                    logWarning ("unknown message destination message dropped");
+					if (!isDisconnectCommand(cmd))
+					{
+                        logWarning (std::string ("unknown message destination message dropped ") +
+                                    prettyPrintString (cmd));
+                    }
                 }
             }
         }

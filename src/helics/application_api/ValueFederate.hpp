@@ -235,11 +235,19 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     }
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
-    creates a local shortcut for referring to a subscription which may have a long actual name
+    creates a local shortcut for referring to a input which may not have another name
     @param[in] inp the input object
     @param[in] shortcutName the name of the shortcut
     */
-    void addShortcut (const Input &inp, const std::string &shortcutName);
+    void addAlias (const Input &inp, const std::string &shortcutName);
+
+    /** add a shortcut for locating a publication
+    @details primarily for use in looking up an id from a different location
+    creates a local shortcut for referring to a publication which may not have another name
+    @param[in] pub the publication object
+    @param[in] shortcutName the name of the shortcut
+    */
+    void addAlias (const Publication &pub, const std::string &shortcutName);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
@@ -319,9 +327,19 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param inp the input object to add a named publication
-    target the name of the input to send the data to
+    target the name of the publication to get data from
     */
     void addTarget (const Input &inp, const std::string &target);
+    /** remove a destination target from a publication
+    @param pub the publication object to add a target to
+    target the name of the input to remove
+    */
+    void removeTarget (const Publication &pub, const std::string &target);
+    /** remove a publication from an input/subscription
+    @param inp the input object to add a named publication
+    target the name of the publication to remove
+    */
+    void removeTarget (const Input &inp, const std::string &target);
     /** register an optional subscription
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param[in] target the name of the target
@@ -461,19 +479,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     const std::string &getPublicationType (const Publication &pub) const;
 
     /** get the type of the publication of a particular subscription
-    @param[in] id the subscription id to query
-    @return the type or empty string on unrecognized id*/
-    std::string getPublicationType (const Input &inp) const;
+    @param[in] inp the input to query
+    @return the type or empty string on invalid input*/
+    const std::string &getPublicationType (const Input &inp) const;
 
-    /** set a publication option */
-    void setPublicationOption (const Publication &pub, int32_t option, bool option_value = true);
-
-    /** get a handle option*/
-    void setInputOption (const Input &inp, int32_t option, bool option_value = true);
-    /** get an option values for an input*/
-    bool getInputOption (const Input &inp, int32_t option) const;
-    /** get an option values for a publication*/
-    bool getPublicationOption (const Publication &pubd, int32_t option) const;
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
     @param[in] callback the function to call signature void(input_id_t, Time)

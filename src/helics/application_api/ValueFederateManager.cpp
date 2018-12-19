@@ -3,11 +3,11 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "ValueFederateManager.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "ValueFederateManager.hpp"
 
 namespace helics
 {
@@ -93,7 +93,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
     }
 }
 
-void ValueFederateManager::addShortcut (const Input &inp, const std::string &shortcutName)
+void ValueFederateManager::addAlias (const Input &inp, const std::string &shortcutName)
 {
     if (inp.isValid ())
     {
@@ -103,7 +103,20 @@ void ValueFederateManager::addShortcut (const Input &inp, const std::string &sho
     }
     else
     {
-        throw (InvalidIdentifier ("input id is invalid"));
+        throw (InvalidIdentifier ("input is invalid"));
+    }
+}
+
+void ValueFederateManager::addAlias (const Publication &pub, const std::string &shortcutName)
+{
+    if (pub.isValid ())
+    {
+        auto pubHandle = publications.lock ();
+        pubHandle->addSearchTerm (shortcutName, pub.handle);
+    }
+    else
+    {
+        throw (InvalidIdentifier ("publication is invalid"));
     }
 }
 
@@ -118,6 +131,27 @@ void ValueFederateManager::addTarget (const Input &inp, const std::string &targe
     coreObject->addSourceTarget (inp.handle, target);
     targetIDs.emplace (target, inp.handle);
     inputTargets.emplace (inp.handle, target);
+}
+
+void ValueFederateManager::removeTarget (const Publication &pub, const std::string &target)
+{
+    // TODO:: erase from targetID's
+    coreObject->removeTarget (pub.handle, target);
+}
+
+void ValueFederateManager::removeTarget (const Input &inp, const std::string &target)
+{
+    auto rng = inputTargets.equal_range (inp.handle);
+    for (auto el = rng.first; el != rng.second; ++el)
+    {
+        if (el->second == target)
+        {
+            coreObject->removeTarget (inp.handle, target);
+            inputTargets.erase (el);
+            break;
+        }
+    }
+    // TODO:: erase from targetID's
 }
 
 void ValueFederateManager::setDefaultValue (const Input &inp, const data_view &block)
@@ -199,10 +233,10 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
     auto handles = coreObject->getValueUpdates (fedID);
-	if (handles.empty())
-	{
+    if (handles.empty ())
+    {
         return;
-	}
+    }
     // lock the data updates
     auto inpHandle = inputs.lock ();
     auto allCall = allCallback.load ();
@@ -415,26 +449,6 @@ Publication &ValueFederateManager::getPublication (int index)
         return (*pubHandle)[index];
     }
     return invalidPubNC;
-}
-
-void ValueFederateManager::setPublicationOption (const Publication &pub, int32_t option, bool option_value)
-{
-    coreObject->setHandleOption (pub.handle, option, option_value);
-}
-
-void ValueFederateManager::setInputOption (const Input &inp, int32_t option, bool option_value)
-{
-    coreObject->setHandleOption (inp.handle, option, option_value);
-}
-
-bool ValueFederateManager::getInputOption (const Input &inp, int32_t option) const
-{
-    return coreObject->getHandleOption (inp.handle, option);
-}
-
-bool ValueFederateManager::getPublicationOption (const Publication &pub, int32_t option) const
-{
-    return coreObject->getHandleOption (pub.handle, option);
 }
 
 /** get a count of the number publications registered*/

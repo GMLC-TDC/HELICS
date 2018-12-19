@@ -17,7 +17,7 @@ using the jsoncpp library
 /** check if the file has a valid json extension*/
 bool hasJsonExtension (const std::string &jsonString);
 
-  /** load a JSON string or filename that points to a JSON file and return a
+/** load a JSON string or filename that points to a JSON file and return a
 JSON::Value to the root object
 */
 Json_helics::Value loadJson (const std::string &jsonString);
@@ -33,42 +33,44 @@ helics::Time loadJsonTime (const Json_helics::Value &timeElement, timeUnits defa
 std::string getKey (const Json_helics::Value &element);
 
 /** generate a Json String*/
-std::string generateJsonString(const Json_helics::Value &block);
+std::string generateJsonString (const Json_helics::Value &block);
 
 inline std::string
-jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, const std::string &defVal)
+getOrDefault (const Json_helics::Value &element, const std::string &key, const std::string &defVal)
 {
-    return (element.isMember (key)) ? ((element[key].isString())?element[key].asString (): generateJsonString(element[key])): defVal;
+    return (element.isMember (key)) ?
+             ((element[key].isString ()) ? element[key].asString () : generateJsonString (element[key])) :
+             defVal;
 }
 
-inline double jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, double defVal)
+inline double getOrDefault (const Json_helics::Value &element, const std::string &key, double defVal)
 {
     return (element.isMember (key)) ? element[key].asDouble () : defVal;
 }
 
-inline bool jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, bool defVal)
+inline bool getOrDefault (const Json_helics::Value &element, const std::string &key, bool defVal)
 {
     return (element.isMember (key)) ? element[key].asBool () : defVal;
 }
 
-inline int64_t jsonGetOrDefault (const Json_helics::Value &element, const std::string &key, int64_t defVal)
+inline int64_t getOrDefault (const Json_helics::Value &element, const std::string &key, int64_t defVal)
 {
     return (element.isMember (key)) ? element[key].asInt64 () : defVal;
 }
 
-inline void jsonCallIfMember (const Json_helics::Value &element,
-                              const std::string &key,
-                              const std::function<void(const std::string &, helics::Time)> &call)
+inline void callIfMember (const Json_helics::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &, helics::Time)> &call)
 {
     if (element.isMember (key))
     {
-        call(key,loadJsonTime (element[key]));
+        call (key, loadJsonTime (element[key]));
     }
 }
 
-inline void jsonCallIfMember (const Json_helics::Value &element,
-                              const std::string &key,
-                              const std::function<void(const std::string &, bool)> &call)
+inline void callIfMember (const Json_helics::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &, bool)> &call)
 {
     if (element.isMember (key))
     {
@@ -76,9 +78,9 @@ inline void jsonCallIfMember (const Json_helics::Value &element,
     }
 }
 
-inline void jsonCallIfMember (const Json_helics::Value &element,
-                              const std::string &key,
-                              const std::function<void(const std::string &, int)> &call)
+inline void callIfMember (const Json_helics::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &, int)> &call)
 {
     if (element.isMember (key))
     {
@@ -86,7 +88,17 @@ inline void jsonCallIfMember (const Json_helics::Value &element,
     }
 }
 
-inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::string &key, helics::Time &timeVal)
+inline void callIfMember (const Json_helics::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &)> &call)
+{
+    if (element.isMember (key))
+    {
+        call (element[key].asString ());
+    }
+}
+
+inline void replaceIfMember (const Json_helics::Value &element, const std::string &key, helics::Time &timeVal)
 {
     if (element.isMember (key))
     {
@@ -94,7 +106,7 @@ inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::s
     }
 }
 
-inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::string &key, std::string &sval)
+inline void replaceIfMember (const Json_helics::Value &element, const std::string &key, std::string &sval)
 {
     if (element.isMember (key))
     {
@@ -102,7 +114,7 @@ inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::s
     }
 }
 
-inline void jsonReplaceIfMember (const Json_helics::Value &element, const std::string &key, bool &bval)
+inline void replaceIfMember (const Json_helics::Value &element, const std::string &key, bool &bval)
 {
     if (element.isMember (key))
     {

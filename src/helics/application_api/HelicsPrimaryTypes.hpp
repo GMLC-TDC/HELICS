@@ -100,19 +100,19 @@ void valueExtract (const defV &dv, Time &val);
 /** extract the value from a variant to a character*/
 void valueExtract (const defV &dv, char &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, std::string &val);
+void valueExtract (const data_view &dv, data_type baseType, std::string &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<double> &val);
+void valueExtract (const data_view &dv, data_type baseType, std::vector<double> &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, std::complex<double> &val);
+void valueExtract (const data_view &dv, data_type baseType, std::complex<double> &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, std::vector<std::complex<double>> &val);
+void valueExtract (const data_view &dv, data_type baseType, std::vector<std::complex<double>> &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, named_point &val);
+void valueExtract (const data_view &dv, data_type baseType, named_point &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, Time &val);
+void valueExtract (const data_view &dv, data_type baseType, Time &val);
 
-void valueExtract (const data_view &dv, helics_type_t baseType, defV &val);
+void valueExtract (const data_view &dv, data_type baseType, defV &val);
 
 /** extract the value from a variant to a numerical type*/
 template <class X>
@@ -173,11 +173,11 @@ valueExtract (const defV &dv, X &val)
 
 /** assume it is some numeric type (int or double)*/
 template <class X>
-std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, helics_type_t baseType, X &val)
+std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, data_type baseType, X &val)
 {
     switch (baseType)
     {
-    case helics_type_t::helicsAny:
+    case data_type::helicsAny:
     {
         if (dv.size () == 9)
         {
@@ -228,14 +228,14 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         }
         break;
     }
-    case helics_type_t::helicsString:
+    case data_type::helicsString:
     default:
         val = static_cast<X> (getDoubleFromString (dv.string ()));
         break;
-    case helics_type_t::helicsBool:
+    case data_type::helicsBool:
         val = static_cast<X> ((dv.string () != "0"));
         break;
-    case helics_type_t::helicsNamedPoint:
+    case data_type::helicsNamedPoint:
     {
         auto npval = ValueConverter<named_point>::interpret (dv);
         if (std::isnan (npval.value))
@@ -257,43 +257,43 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
 
         break;
     }
-    case helics_type_t::helicsDouble:
+    case data_type::helicsDouble:
     {
         auto V = ValueConverter<double>::interpret (dv);
         val = static_cast<X> (V);
         break;
     }
-    case helics_type_t::helicsInt:
-    case helics_type_t::helicsTime:
+    case data_type::helicsInt:
+    case data_type::helicsTime:
     {
         auto V = ValueConverter<int64_t>::interpret (dv);
         val = static_cast<X> (V);
         break;
     }
 
-    case helics_type_t::helicsVector:
+    case data_type::helicsVector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
         val = static_cast<X> (vectorNorm (V));
         break;
     }
-    case helics_type_t::helicsComplex:
+    case data_type::helicsComplex:
     {
         auto V = ValueConverter<std::complex<double>>::interpret (dv);
         val = static_cast<X> (std::abs (V));
         break;
     }
-    case helics_type_t::helicsComplexVector:
+    case data_type::helicsComplexVector:
     {
         auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
         val = static_cast<X> (vectorNorm (V));
         break;
     }
-    case helics_type_t::helicsCustom:
+    case data_type::helicsCustom:
         throw (std::invalid_argument ("unrecognized helics type"));
     }
 }
 
-void valueConvert (defV &val, helics_type_t newType);
+void valueConvert (defV &val, data_type newType);
 
 }  // namespace helics

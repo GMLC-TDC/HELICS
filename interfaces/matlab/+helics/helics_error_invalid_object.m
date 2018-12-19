@@ -1,7 +1,7 @@
 function v = helics_error_invalid_object()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 1946183081);
+    vInitialized = helicsMEX(0, 49);
   end
   v = vInitialized;
 end

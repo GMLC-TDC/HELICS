@@ -41,19 +41,45 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define TCPSSTEST2
 #endif
 
+#ifndef DISABLE_IPC_CORE
+#define IPCTEST "ipc",
+#define IPCTEST2 "ipc_2",
+
+#else
+#define IPCTEST
+#define IPCTEST2
+#endif
+
+#ifndef DISABLE_UDP_CORE
+#define UDPTEST "udp",
+#define UDPTEST2 "udp_2",
+#define UDPTEST3 "udp_3",
+#define UDPTEST4 "udp_4",
+
+#else
+#define UDPTEST
+#define UDPTEST2
+#define UDPTEST3
+#define UDPTEST4
+
+#endif
+
 const std::vector<std::string> ztypes = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
-const std::vector<std::string> core_types = {"test", ZMQTEST3 "ipc_2", TCPTEST "test_2", ZMQTEST "udp", "test_3"};
+const std::vector<std::string> core_types = {"test", ZMQTEST3 IPCTEST2 TCPTEST "test_2", ZMQTEST UDPTEST "test_3"};
 
-const std::vector<std::string> core_types_2 = {"ipc_2", TCPTEST2 "test_2", TCPSSTEST2 ZMQTEST2 "udp_2"};
+const std::vector<std::string> core_types_2 = {IPCTEST2 TCPTEST2 "test_2", TCPSSTEST2 ZMQTEST2 UDPTEST2};
 
-const std::vector<std::string> core_types_simple = {"test", TCPSSTEST "ipc", TCPTEST ZMQTEST "udp"};
-const std::vector<std::string> core_types_single = {"test", TCPSSTEST "ipc", TCPTEST ZMQTEST "udp", "test_3",
-                                                    TCPSSTEST2 ZMQTEST3 TCPTEST3 "udp_3"};
-const std::vector<std::string> core_types_all = {
-  "test",         TCPSSTEST "ipc_2", TCPTEST "test_2", ZMQTEST "udp",     TCPSSTEST2 "test_3",
-  ZMQTEST3 "ipc", ZMQTEST2 "udp_2",  TCPTEST2 "udp_3", TCPTEST3 "test_4", ZMQTEST4 TCPTEST4 "udp_4"};
-const std::vector<std::string> core_types_extended = {"ipc", ZMQTEST2 "udp_2", TCPTEST2 "udp_3", TCPTEST3 "test_4",
-                                                      ZMQTEST4 TCPTEST4 "udp_4"};
+const std::vector<std::string> core_types_simple = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
+const std::vector<std::string> core_types_single = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST "test_3",
+                                                    TCPSSTEST2 ZMQTEST3 TCPTEST3 UDPTEST3};
+const std::vector<std::string> core_types_all = {"test", TCPSSTEST IPCTEST2 TCPTEST "test_2",
+                                                 ZMQTEST UDPTEST TCPSSTEST2 "test_3",
+                                                 ZMQTEST3 IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 TCPTEST3
+                                                 "test_4",
+                                                 ZMQTEST4 TCPTEST4 UDPTEST4};
+const std::vector<std::string> core_types_extended = {IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 TCPTEST3
+                                                      "test_4",
+                                                      ZMQTEST4 TCPTEST4 UDPTEST4};
 
 const std::string defaultNamePrefix = "fed";
 
@@ -120,7 +146,8 @@ FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
     {
-        if (fed && fed->getCurrentState () != helics::Federate::states::finalize)
+        if (fed && (!((fed->getCurrentMode () == helics::Federate::modes::finalize) ||
+                      (fed->getCurrentMode () == helics::Federate::modes::error))))
         {
             fed->finalize ();
         }
@@ -130,11 +157,11 @@ FederateTestFixture::~FederateTestFixture ()
     {
         if (ctype.compare (0, 3, "tcp") == 0)
         {
-            broker->waitForDisconnect (2000);
+            broker->waitForDisconnect (std::chrono::milliseconds (2000));
         }
         else
         {
-            broker->waitForDisconnect (2000);
+            broker->waitForDisconnect (std::chrono::milliseconds (2000));
         }
 
         if (broker->isConnected ())
@@ -151,7 +178,7 @@ void FederateTestFixture::FullDisconnect ()
 {
     for (auto &fed : federates)
     {
-        if (fed && fed->getCurrentState () != helics::Federate::states::finalize)
+        if (fed && fed->getCurrentMode () != helics::Federate::modes::finalize)
         {
             fed->finalize ();
         }

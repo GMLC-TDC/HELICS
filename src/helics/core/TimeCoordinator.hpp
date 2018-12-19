@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeDependencies.hpp"
 #include <atomic>
 #include <functional>
+#include <deque>
 
 namespace helics
 {
@@ -33,9 +34,9 @@ class tcoptions
     Time period = timeZero;
     Time rtLag = timeZero;
     Time rtLead = timeZero;
-   // bool observer = false;
-    //bool realtime = false;
-    //bool source_only = false;
+    // bool observer = false;
+    // bool realtime = false;
+    // bool source_only = false;
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
     int maxIterations = 50;
@@ -60,18 +61,18 @@ class TimeCoordinator
     Time time_grantBase = Time::minVal ();  //!< time to use as a basis for calculating the next grantable
                                             //!< time(usually time granted unless values are changing)
     Time time_block = Time::maxVal ();  //!< a blocking time to not grant time >= the specified time
-    shared_guarded_m<std::vector<global_federate_id_t>>
+    shared_guarded_m<std::vector<global_federate_id>>
       dependent_federates;  //!< these are to maintain an accessible record of dependent federates
-    shared_guarded_m<std::vector<global_federate_id_t>>
+    shared_guarded_m<std::vector<global_federate_id>>
       dependency_federates;  //!< these are to maintain an accessible record of dependency federates
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<global_federate_id_t> dependents;  //!< federates which temporally depend on this federate
+    std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    global_federate_id_t source_id = global_federate_id_t (
+    global_federate_id source_id = global_federate_id (
       0);  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
@@ -87,13 +88,13 @@ class TimeCoordinator
     explicit TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_);
 
     /** set a timeProperty for a the coordinator*/
-	void setTimeProperty (int timeProperty, Time propertyVal);
+    void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
-    void setIntegerProperty (int intProperty, int propertyVal);
+    void setProperty (int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag (int optionFlag, bool value);
     /** get a time Property*/
-	Time getTimeProperty (int timeProperty) const;
+    Time getTimeProperty (int timeProperty) const;
     /** get an option flag value*/
     bool getOptionFlag (int optionFlag) const;
     /** get an option flag value*/
@@ -106,9 +107,9 @@ class TimeCoordinator
     /** get the current granted time*/
     Time allowedSendTime () const { return time_granted + info.outputDelay; }
     /** get a list of actual dependencies*/
-    std::vector<global_federate_id_t> getDependencies () const;
+    std::vector<global_federate_id> getDependencies () const;
     /** get a reference to the dependents vector*/
-    std::vector<global_federate_id_t> getDependents () const { return *dependent_federates.lock_shared (); }
+    std::vector<global_federate_id> getDependents () const { return *dependent_federates.lock_shared (); }
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
@@ -128,9 +129,9 @@ class TimeCoordinator
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
     */
-    DependencyInfo *getDependencyInfo (global_federate_id_t ofed);
+    DependencyInfo *getDependencyInfo (global_federate_id ofed);
     /** check whether a federate is a dependency*/
-    bool isDependency (global_federate_id_t ofed) const;
+    bool isDependency (global_federate_id ofed) const;
 
   private:
     /** helper function for computing the next event time*/
@@ -163,17 +164,17 @@ class TimeCoordinator
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency (global_federate_id_t fedID);
+    bool addDependency (global_federate_id fedID);
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent (global_federate_id_t fedID);
+    bool addDependent (global_federate_id fedID);
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency (global_federate_id_t fedID);
+    void removeDependency (global_federate_id fedID);
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent (global_federate_id_t fedID);
+    void removeDependent (global_federate_id fedID);
 
     /** check if entry to the executing state can be granted*/
     message_processing_result checkExecEntry ();

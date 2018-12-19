@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include <complex>
+#include <future>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
@@ -26,8 +27,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label ("ci"))
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    vFed1->setTimeProperty (helics_property_time_period, 0.5);
-    vFed2->setTimeProperty (helics_property_time_period, 0.5);
+    vFed1->setProperty (helics_property_time_period, 0.5);
+    vFed2->setProperty (helics_property_time_period, 0.5);
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     vFed2->registerSubscription ("pub1");
@@ -53,8 +54,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    vFed1->setTimeProperty (helics_property_time_period, 0.5);
-    vFed2->setTimeProperty (helics_property_time_period, 0.5);
+    vFed1->setProperty (helics_property_time_period, 0.5);
+    vFed2->setProperty (helics_property_time_period, 0.5);
 
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     vFed2->registerSubscription ("pub1");
@@ -83,8 +84,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto vFed2 = GetFederateAs<helics::MessageFederate> (1);
 
-    vFed1->setTimeProperty (helics_property_time_period, 0.6);
-    vFed2->setTimeProperty (helics_property_time_period, 0.45);
+    vFed1->setProperty (helics_property_time_period, 0.6);
+    vFed2->setProperty (helics_property_time_period, 0.45);
 
     auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
     vFed2->registerGlobalEndpoint ("e2");
@@ -110,15 +111,161 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
+BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
+{
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setFlagOption (helics_flag_uninterruptible);
+
+    auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
+    vFed2->registerSubscription ("pub1");
+
+    auto rfed1 = [&]() {
+        vFed1->enterExecutingMode ();
+        for (double ii = 1.0; ii <= 100.0; ii += 1.0)
+        {
+            pub->publish (ii);
+            vFed1->requestTime (ii);
+        }
+    };
+
+    auto rfed2 = [&]() {
+        vFed2->enterExecutingMode ();
+        std::vector<helics::Time> res;
+        for (double ii = 5.0; ii <= 100.0; ii += 5.0)
+        {
+            auto T2 = vFed2->requestTime (ii);
+            res.push_back (T2);
+        }
+        return res;
+    };
+
+    auto fed2res = std::async (std::launch::async, rfed2);
+    auto fed1res = std::async (std::launch::async, rfed1);
+
+    fed1res.get ();
+    auto rvec = fed2res.get ();
+    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
+    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec[1], 10.0);
+    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    vFed1->finalize ();
+    vFed2
+      ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+}
+
+BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
+{
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
+    auto &IP2 = vFed2->registerSubscription ("pub1");
+    // test with the handle option vs the federate option
+    IP2.setOption (helics::defs::options::ignore_interrupts);
+    auto rfed1 = [&]() {
+        vFed1->enterExecutingMode ();
+        for (double ii = 1.0; ii <= 100.0; ii += 1.0)
+        {
+            pub->publish (ii);
+            vFed1->requestTime (ii);
+        }
+    };
+
+    auto rfed2 = [&]() {
+        vFed2->enterExecutingMode ();
+        std::vector<helics::Time> res;
+        for (double ii = 5.0; ii <= 100.0; ii += 5.0)
+        {
+            auto T2 = vFed2->requestTime (ii);
+            res.push_back (T2);
+        }
+        return res;
+    };
+
+    auto fed2res = std::async (std::launch::async, rfed2);
+    auto fed1res = std::async (std::launch::async, rfed1);
+
+    fed1res.get ();
+    auto rvec = fed2res.get ();
+    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
+    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec[1], 10.0);
+    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    vFed1->finalize ();
+    vFed2
+      ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+}
+
+BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
+{
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_period, 1.0);
+    vFed2->setFlagOption (helics_flag_uninterruptible);
+
+    auto pub1 = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
+    auto pub2 = helics::make_publication<double> (helics::GLOBAL, vFed2.get (), "pub2");
+    vFed1->registerSubscription ("pub2");
+    vFed2->registerSubscription ("pub1");
+
+    auto rfed1 = [&]() {
+        vFed1->enterExecutingMode ();
+        for (double ii = 1.0; ii <= 100.0; ii += 1.0)
+        {
+            pub1->publish (ii);
+            vFed1->requestTime (ii);
+        }
+    };
+
+    auto rfed2 = [&]() {
+        vFed2->enterExecutingMode ();
+        std::vector<helics::Time> res;
+        for (double ii = 5.0; ii <= 100.0; ii += 5.0)
+        {
+            pub2->publish (ii);
+            auto T2 = vFed2->requestTime (ii);
+            res.push_back (T2);
+        }
+        return res;
+    };
+
+    auto fed2res = std::async (std::launch::async, rfed2);
+    auto fed1res = std::async (std::launch::async, rfed1);
+
+    fed1res.get ();
+    auto rvec = fed2res.get ();
+    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
+    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec[1], 10.0);
+    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    vFed1->finalize ();
+    vFed2
+      ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
+}
+
 BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label ("ci"))
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
     auto vFed2 = GetFederateAs<helics::MessageFederate> (1);
 
-    vFed1->setTimeProperty (helics_property_time_period, 0.1);
-    vFed2->setTimeProperty (helics_property_time_period, 0.1);
-    vFed2->setTimeProperty (helics_property_time_input_delay, 0.1);
+    vFed1->setProperty (helics_property_time_period, 0.1);
+    vFed2->setProperty (helics_property_time_period, 0.1);
+    vFed2->setProperty (helics_property_time_input_delay, 0.1);
 
     auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
     vFed2->registerGlobalEndpoint ("e2");
@@ -160,7 +307,7 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change, *utf::label ("ci"))
     res = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (res, 2.0);
 
-    vFed1->setTimeProperty (helics_property_time_delta, 0.1);
+    vFed1->setProperty (helics_property_time_delta, 0.1);
     res = vFed1->requestTime (res);
     BOOST_CHECK_EQUAL (res, 2.1);
     vFed1->finalize ();
@@ -170,7 +317,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change, *utf::label ("ci"))
 {
     SetupTest<helics::ValueFederate> ("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-    vFed1->setTimeProperty (helics_property_time_period, 1.0);
+    vFed1->setProperty (helics_property_time_period, 1.0);
     vFed1->enterExecutingMode ();
 
     auto res = vFed1->requestTime (1.0);
@@ -182,7 +329,7 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change, *utf::label ("ci"))
     res = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (res, 2.0);
 
-    vFed1->setTimeProperty (helics_property_time_period, 0.1);
+    vFed1->setProperty (helics_property_time_period, 0.1);
     res = vFed1->requestTime (res);
     BOOST_CHECK_EQUAL (res, 2.1);
     vFed1->finalize ();
@@ -195,7 +342,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -258,7 +405,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -326,7 +473,7 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::helics_type_t::helicsDouble);
+                                helics::data_type::helicsDouble);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -360,10 +507,10 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     auto vFed3 = GetFederateAs<helics::ValueFederate> (2);
     helics::Publication sender1 (helics::interface_visibility::global, vFed1, "pub1",
-                                 helics::helics_type_t::helicsDouble);
+                                 helics::data_type::helicsDouble);
     auto &receiver1 = vFed2->registerSubscription ("pub1");
     helics::Publication sender2 (helics::interface_visibility::global, vFed3, "pub2",
-                                 helics::helics_type_t::helicsDouble);
+                                 helics::data_type::helicsDouble);
     auto &receiver2 = vFed2->registerSubscription ("pub2");
     vFed1->enterExecutingModeAsync ();
     vFed3->enterExecutingModeAsync ();

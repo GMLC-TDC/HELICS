@@ -32,15 +32,26 @@ helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnit
 std::string getKey (const toml::Value &element);
 
 template <class X>
-inline X tomlGetOrDefault (const toml::Value &element, const std::string &key, const X &defVal)
+inline X getOrDefault (const toml::Value &element, const std::string &key, const X &defVal)
 {
     auto val = element.find (key);
     return (val != nullptr) ? val->as<X> () : defVal;
 }
 
-inline void tomlCallIfMember (const toml::Value &element,
-                              const std::string &key,
-                              const std::function<void(const std::string &, helics::Time)> &call)
+inline void callIfMember (const toml::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &)> &call)
+{
+    auto val = element.find (key);
+    if (val != nullptr)
+    {
+        call (val->as<std::string> ());
+    }
+}
+
+inline void callIfMember (const toml::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &, helics::Time)> &call)
 {
     auto val = element.find (key);
     if (val != nullptr)
@@ -50,9 +61,9 @@ inline void tomlCallIfMember (const toml::Value &element,
 }
 
 template <class X>
-inline void tomlCallIfMember (const toml::Value &element,
-                              const std::string &key,
-                              const std::function<void(const std::string &, X)> &call)
+inline void callIfMember (const toml::Value &element,
+                          const std::string &key,
+                          const std::function<void(const std::string &, X)> &call)
 {
     auto val = element.find (key);
     if (val != nullptr)
@@ -61,7 +72,7 @@ inline void tomlCallIfMember (const toml::Value &element,
     }
 }
 
-inline void tomlReplaceIfMember (const toml::Value &element, const std::string &key, helics::Time &timeVal)
+inline void replaceIfMember (const toml::Value &element, const std::string &key, helics::Time &timeVal)
 {
     auto val = element.find (key);
     if (val != nullptr)
@@ -71,7 +82,7 @@ inline void tomlReplaceIfMember (const toml::Value &element, const std::string &
 }
 
 template <class X>
-inline void tomlReplaceIfMember (const toml::Value &element, const std::string &key, X &loc)
+inline void replaceIfMember (const toml::Value &element, const std::string &key, X &loc)
 {
     auto val = element.find (key);
     if (val != nullptr)

@@ -248,6 +248,10 @@ public class helics {
     return helicsJNI.helicsGetPropertyIndex(val);
   }
 
+  public static int helicsGetOptionIndex(String val) {
+    return helicsJNI.helicsGetOptionIndex(val);
+  }
+
   public static void helicsFederateInfoSetFlagOption(SWIGTYPE_p_void fi, int flag, int value) {
     helicsJNI.helicsFederateInfoSetFlagOption(SWIGTYPE_p_void.getCPtr(fi), flag, value);
   }
@@ -270,6 +274,14 @@ public class helics {
 
   public static void helicsFederateFinalize(SWIGTYPE_p_void fed) {
     helicsJNI.helicsFederateFinalize(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsFederateFinalizeAsync(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateFinalizeAsync(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsFederateFinalizeComplete(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateFinalizeComplete(SWIGTYPE_p_void.getCPtr(fed));
   }
 
   public static void helicsFederateFree(SWIGTYPE_p_void fed) {
@@ -391,6 +403,18 @@ public class helics {
 
   public static double helicsFederateGetCurrentTime(SWIGTYPE_p_void fed) {
     return helicsJNI.helicsFederateGetCurrentTime(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsFederateSetGlobal(SWIGTYPE_p_void fed, String valueName, String value) {
+    helicsJNI.helicsFederateSetGlobal(SWIGTYPE_p_void.getCPtr(fed), valueName, value);
+  }
+
+  public static void helicsCoreSetGlobal(SWIGTYPE_p_void core, String valueName, String value) {
+    helicsJNI.helicsCoreSetGlobal(SWIGTYPE_p_void.getCPtr(core), valueName, value);
+  }
+
+  public static void helicsBrokerSetGlobal(SWIGTYPE_p_void broker, String valueName, String value) {
+    helicsJNI.helicsBrokerSetGlobal(SWIGTYPE_p_void.getCPtr(broker), valueName, value);
   }
 
   public static SWIGTYPE_p_void helicsCreateQuery(String target, String query) {
@@ -688,6 +712,22 @@ public class helics {
     helicsJNI.helicsPublicationSetInfo(SWIGTYPE_p_void.getCPtr(pub), info);
   }
 
+  public static int helicsInputGetOption(SWIGTYPE_p_void inp, int option) {
+    return helicsJNI.helicsInputGetOption(SWIGTYPE_p_void.getCPtr(inp), option);
+  }
+
+  public static void helicsInputSetOption(SWIGTYPE_p_void inp, int option, int value) {
+    helicsJNI.helicsInputSetOption(SWIGTYPE_p_void.getCPtr(inp), option, value);
+  }
+
+  public static int helicsPublicationGetOption(SWIGTYPE_p_void pub, int option) {
+    return helicsJNI.helicsPublicationGetOption(SWIGTYPE_p_void.getCPtr(pub), option);
+  }
+
+  public static void helicsPublicationSetOption(SWIGTYPE_p_void pub, int option, int val) {
+    helicsJNI.helicsPublicationSetOption(SWIGTYPE_p_void.getCPtr(pub), option, val);
+  }
+
   public static int helicsInputIsUpdated(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputIsUpdated(SWIGTYPE_p_void.getCPtr(ipt));
   }
@@ -788,12 +828,20 @@ public class helics {
     helicsJNI.helicsEndpointSetInfo(SWIGTYPE_p_void.getCPtr(end), info);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterFilter(SWIGTYPE_p_void fed, helics_filter_type_t type, String name) {
+  public static void helicsEndpointSetOption(SWIGTYPE_p_void end, int option, int value) {
+    helicsJNI.helicsEndpointSetOption(SWIGTYPE_p_void.getCPtr(end), option, value);
+  }
+
+  public static int helicsEndpointGetOption(SWIGTYPE_p_void end, int option) {
+    return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(end), option);
+  }
+
+  public static SWIGTYPE_p_void helicsFederateRegisterFilter(SWIGTYPE_p_void fed, helics_filter_type type, String name) {
     long cPtr = helicsJNI.helicsFederateRegisterFilter(SWIGTYPE_p_void.getCPtr(fed), type.swigValue(), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterGlobalFilter(SWIGTYPE_p_void fed, helics_filter_type_t type, String name) {
+  public static SWIGTYPE_p_void helicsFederateRegisterGlobalFilter(SWIGTYPE_p_void fed, helics_filter_type type, String name) {
     long cPtr = helicsJNI.helicsFederateRegisterGlobalFilter(SWIGTYPE_p_void.getCPtr(fed), type.swigValue(), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
@@ -808,7 +856,7 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCoreRegisterFilter(SWIGTYPE_p_void core, helics_filter_type_t type, String name) {
+  public static SWIGTYPE_p_void helicsCoreRegisterFilter(SWIGTYPE_p_void core, helics_filter_type type, String name) {
     long cPtr = helicsJNI.helicsCoreRegisterFilter(SWIGTYPE_p_void.getCPtr(core), type.swigValue(), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
@@ -816,6 +864,10 @@ public class helics {
   public static SWIGTYPE_p_void helicsCoreRegisterCloningFilter(SWIGTYPE_p_void core, String deliveryEndpoint) {
     long cPtr = helicsJNI.helicsCoreRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(core), deliveryEndpoint);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  public static int helicsFederateGetFilterCount(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederateGetFilterCount(SWIGTYPE_p_void.getCPtr(fed));
   }
 
   public static SWIGTYPE_p_void helicsFederateGetFilter(SWIGTYPE_p_void fed, String name) {
@@ -866,6 +918,14 @@ public class helics {
 
   public static void helicsFilterSetInfo(SWIGTYPE_p_void filt, String info) {
     helicsJNI.helicsFilterSetInfo(SWIGTYPE_p_void.getCPtr(filt), info);
+  }
+
+  public static void helicsFilterSetOption(SWIGTYPE_p_void filt, int option, int value) {
+    helicsJNI.helicsFilterSetOption(SWIGTYPE_p_void.getCPtr(filt), option, value);
+  }
+
+  public static int helicsFilterGetOption(SWIGTYPE_p_void filt, int option) {
+    return helicsJNI.helicsFilterGetOption(SWIGTYPE_p_void.getCPtr(filt), option);
   }
 
 }

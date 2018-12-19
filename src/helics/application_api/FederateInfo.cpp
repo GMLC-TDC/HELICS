@@ -28,7 +28,7 @@ static const ArgDescriptors InfoArgs{
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
   {"core,c"s, "type of the core to connect to"s},
-  {"type"s, "type of the core to connect to"s},
+  {"type,t"s, "type of the core to connect to"s},
   {"coretype"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
@@ -99,7 +99,47 @@ static const std::set<std::string> validIntProperties{"max_iterations", "logleve
 static const std::set<std::string> validFlagOptions{
   "interruptible",         "uninterruptible",         "observer",        "source_only", "sourceonly",
   "only_update_on_change", "only_transmit_on_change", "forward_compute", "realtime",    "delayed_update",
-  "wait_for_current_time"};
+  "wait_for_current_time",
+};
+
+static const std::map<std::string, int> optionStringsTranslations{
+  {"buffer", helics_handle_option_buffer_data},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"bufferdata", helics_handle_option_buffer_data},
+  {"optional", helics_handle_option_connection_optional},
+  {"connectionoptional", helics_handle_option_connection_optional},
+  {"connection_optional", helics_handle_option_connection_optional},
+  {"required", helics_handle_option_connection_required},
+  {"connectionrequired", helics_handle_option_connection_required},
+  {"connection_required", helics_handle_option_connection_required},
+  {"ignore_interrupts", helics_handle_option_ignore_interrupts},
+  {"ignoreinterrupts", helics_handle_option_ignore_interrupts},
+  {"nointerrupts", helics_handle_option_ignore_interrupts},
+  {"no_interrupts", helics_handle_option_ignore_interrupts},
+  {"uninterruptible", helics_handle_option_ignore_interrupts},
+  {"multiple", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections_allowed", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnections", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnectionsallowed", helics_handle_option_multiple_connections_allowed},
+  {"single", helics_handle_option_single_connection_only},
+  {"single_connection", helics_handle_option_single_connection_only},
+  {"single_connection_only", helics_handle_option_single_connection_only},
+  {"singleconnection", helics_handle_option_single_connection_only},
+  {"singleconnectionsonly", helics_handle_option_single_connection_only},
+  {"only_transmit_on_change", helics_handle_option_only_transmit_on_change},
+  {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
+  {"only_update_on_change", helics_handle_option_only_update_on_change},
+  {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+  {"strict_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_type_matching", helics_handle_option_strict_type_checking},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_input_type_matching", helics_handle_option_strict_type_checking},
+  {"strictinputtypechecking", helics_handle_option_strict_type_checking},
+  {"strictinputtypematching", helics_handle_option_strict_type_checking},
+  {"stricttypechecking", helics_handle_option_strict_type_checking},
+  {"stricttypematching", helics_handle_option_strict_type_checking},
+  {"strict", helics_handle_option_strict_type_checking}};
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
@@ -141,6 +181,34 @@ int getPropertyIndex (std::string val)
     makeLowerCase (val);
     fnd = propStringsTranslations.find (val);
     if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = propStringsTranslations.find (val);
+    if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    return -1;
+}
+
+int getOptionIndex (std::string val)
+{
+    auto fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    makeLowerCase (val);
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
     {
         return fnd->second;
     }
@@ -222,15 +290,14 @@ void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
     {
         if (vm.count (tprop) > 0)
         {
-            setTimeProperty (propStringsTranslations.at (tprop),
-                             loadTimeFromString (vm[tprop].as<std::string> ()));
+            setProperty (propStringsTranslations.at (tprop), loadTimeFromString (vm[tprop].as<std::string> ()));
         }
     }
     for (auto &iprop : validIntProperties)
     {
         if (vm.count (iprop) > 0)
         {
-            setTimeProperty (propStringsTranslations.at (iprop), vm[iprop].as<int> ());
+            setProperty (propStringsTranslations.at (iprop), vm[iprop].as<int> ());
         }
     }
 
@@ -296,36 +363,36 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     };
 
     std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
-        fi.setTimeProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
-        fi.setIntegerProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     for (auto &prop : validTimeProperties)
     {
-        jsonCallIfMember (doc, prop, timeCall);
+        callIfMember (doc, prop, timeCall);
     }
 
     for (auto &prop : validIntProperties)
     {
-        jsonCallIfMember (doc, prop, intCall);
+        callIfMember (doc, prop, intCall);
     }
 
     for (auto &prop : validFlagOptions)
     {
-        jsonCallIfMember (doc, prop, flagCall);
+        callIfMember (doc, prop, flagCall);
     }
     if (doc.isMember ("flags"))
     {
         loadFlags (fi, doc["flags"].asString ());
     }
 
-    jsonReplaceIfMember (doc, "broker", fi.broker);
-    fi.brokerPort = jsonGetOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
-    jsonReplaceIfMember (doc, "localport", fi.localport);
-    jsonReplaceIfMember (doc, "autobroker", fi.autobroker);
+    replaceIfMember (doc, "broker", fi.broker);
+    fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
+    replaceIfMember (doc, "localport", fi.localport);
+    replaceIfMember (doc, "autobroker", fi.autobroker);
     if (doc.isMember ("port"))
     {
         if (fi.localport.empty ())
@@ -377,7 +444,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    if (doc.isMember ("coretype"))
+    else if (doc.isMember ("coretype"))
     {
         try
         {
@@ -388,11 +455,23 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    jsonReplaceIfMember (doc, "name", fi.defName);
-    jsonReplaceIfMember (doc, "coreName", fi.coreName);
-    jsonReplaceIfMember (doc, "coreInit", fi.coreInitString);
-    jsonReplaceIfMember (doc, "coreinit", fi.coreInitString);
-    jsonReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
+    else if (doc.isMember ("type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].asString ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
+    replaceIfMember (doc, "name", fi.defName);
+    replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
+    replaceIfMember (doc, "coreInit", fi.coreInitString);
+    replaceIfMember (doc, "coreinit", fi.coreInitString);
+    replaceIfMember (doc, "coreinitstring", fi.coreInitString);
     return fi;
 }
 
@@ -413,35 +492,35 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     };
 
     std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
-        fi.setTimeProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
-        fi.setIntegerProperty (propStringsTranslations.at (fname), arg);
+        fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
     for (auto &prop : validTimeProperties)
     {
-        tomlCallIfMember (doc, prop, timeCall);
+        callIfMember (doc, prop, timeCall);
     }
 
     for (auto &prop : validIntProperties)
     {
-        tomlCallIfMember (doc, prop, intCall);
+        callIfMember (doc, prop, intCall);
     }
 
     for (auto &prop : validFlagOptions)
     {
-        tomlCallIfMember (doc, prop, flagCall);
+        callIfMember (doc, prop, flagCall);
     }
     if (isMember (doc, "flags"))
     {
         loadFlags (fi, doc["flags"].as<std::string> ());
     }
-    tomlReplaceIfMember (doc, "autobroker", fi.autobroker);
-    tomlReplaceIfMember (doc, "broker", fi.broker);
-    fi.brokerPort = tomlGetOrDefault (doc, "brokerport", fi.brokerPort);
-    tomlReplaceIfMember (doc, "localport", fi.localport);
+    replaceIfMember (doc, "autobroker", fi.autobroker);
+    replaceIfMember (doc, "broker", fi.broker);
+    fi.brokerPort = getOrDefault (doc, "brokerport", fi.brokerPort);
+    replaceIfMember (doc, "localport", fi.localport);
     if (isMember (doc, "port"))
     {
         if (fi.localport.empty ())
@@ -504,11 +583,23 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    tomlReplaceIfMember (doc, "name", fi.defName);
-    tomlReplaceIfMember (doc, "coreName", fi.coreName);
-    tomlReplaceIfMember (doc, "coreInit", fi.coreInitString);
-    tomlReplaceIfMember (doc, "coreinit", fi.coreInitString);
-    tomlReplaceIfMember (doc, "coreinitstring", fi.coreInitString);
+    else if (isMember (doc, "type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].as<std::string> ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
+    replaceIfMember (doc, "name", fi.defName);
+    replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
+    replaceIfMember (doc, "coreInit", fi.coreInitString);
+    replaceIfMember (doc, "coreinit", fi.coreInitString);
+    replaceIfMember (doc, "coreinitstring", fi.coreInitString);
 
     return fi;
 }

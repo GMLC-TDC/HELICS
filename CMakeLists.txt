@@ -12,8 +12,8 @@ project (HELICS VERSION 2.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_BUILD beta.1)
-set (HELICS_DATE "11-19-18")
+set (HELICS_VERSION_BUILD beta.2)
+set (HELICS_DATE "12-19-18")
 
 set(
   HELICS_VERSION_UNDERSCORE
@@ -273,13 +273,12 @@ endif(GENERATE_DOXYGEN_DOC)
 set(
   BOOST_REQUIRED_LIBRARIES
   program_options
-  unit_test_framework
   filesystem
   system
-  date_time
-  timer
-  chrono
 )
+if (BUILD_TESTING)
+	list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
+endif()
 include(addBoost)
 
 target_link_libraries(helics_base INTERFACE Boostlibs::core)
@@ -324,18 +323,19 @@ endif()
 if(MSYS)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if(BOOST_VERSION_LEVEL GREATER 1)
-      # set(DISABLE_TCP_CORE TRUE)
-			set(DISABLE_TCP_CORE FALSE)
-			target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
-		else()
-			set(DISABLE_TCP_CORE TRUE)
-			message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
-			target_link_libraries(helics_base INTERFACE ws2_32)
-		endif()
-
-	else()
+		set(DISABLE_TCP_CORE FALSE)
 		target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+			set(DISABLE_IPC_CORE TRUE)
+	else()
+		set(DISABLE_TCP_CORE TRUE)
+		message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
+		target_link_libraries(helics_base INTERFACE ws2_32)
+			set(DISABLE_IPC_CORE FALSE)
 	endif()
+
+  else()
+	target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+  endif()
 
 endif(MSYS)
 
@@ -355,7 +355,7 @@ option(ENABLE_ZeroMQ "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ENABLE_ZeroMQ)
 # If ZeroMQ library is enabled try to locate it and link against it
 
-if(ENABLE_ZeroMQ)
+if(ENABLE_ZeroMQ AND NOT DISABLE_ZMQ_CORE)
 	include(addZeroMQ)
 
   if(ZeroMQ_FOUND)
@@ -376,7 +376,7 @@ else(ENABLE_ZeroMQ)
   if(ENABLE_ZeroMQ)
 		message(SEND_ERROR "ZeroMQ not found")
    endif()
-endif(ENABLE_ZeroMQ)
+endif()
 
 # -------------------------------------------------------------
 # global include directories
@@ -530,7 +530,7 @@ add_subdirectory(src)
 # Setup CTEST environment
 # -----------------------------------------------------------------------------
 
-if(BUILD_HELICS_TESTS AND BUILD_TESTING)
+if(BUILD_HELICS_TESTS AND BUILD_TESTING AND NOT DISABLE_TEST_CORE)
 	mark_as_advanced(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
@@ -720,7 +720,7 @@ if(ENABLE_PACKAGE_BUILD)
   set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
   set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
 
-  set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave)
+  set(CPACK_COMPONENTS_ALL applications headers libs runtime matlab python java octave csharp)
   if(WIN32)
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
   else(WIN32)
@@ -736,6 +736,7 @@ if(ENABLE_PACKAGE_BUILD)
  set(CPACK_COMPONENT_JAVA_GROUP interfaces)
  set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
  set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
+ set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
   set(
     CPACK_COMPONENT_APPLICATION_DESCRIPTION

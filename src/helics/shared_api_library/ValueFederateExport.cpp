@@ -135,7 +135,8 @@ helicsFederateRegisterTypePublication (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_publication helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
+helics_publication
+helicsFederateRegisterPublication (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
@@ -158,7 +159,7 @@ helics_publication helicsFederateRegisterPublication (helics_federate fed, const
     try
     {
         auto pub = std::make_unique<helics::PublicationObject> ();
-        pub->pubPtr = &(fedObj->registerPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+        pub->pubPtr = &(fedObj->registerPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                      AS_STRING (units)));
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
@@ -223,7 +224,7 @@ helicsFederateRegisterGlobalPublication (helics_federate fed, const char *key, h
     {
         auto pub = std::make_unique<helics::PublicationObject> ();
         pub->pubPtr =
-          &(fedObj->registerGlobalPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
+          &(fedObj->registerGlobalPublication (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)),
                                                AS_STRING (units)));
         pub->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_publication> (pub.get ());
@@ -288,8 +289,8 @@ helics_input helicsFederateRegisterInput (helics_federate fed, const char *key, 
     try
     {
         auto inp = std::make_unique<helics::InputObject> ();
-        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
-                                                 AS_STRING (units)));
+        inp->inputPtr =
+          &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)), AS_STRING (units)));
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());
         addInput (fed, std::move (inp));
@@ -327,7 +328,8 @@ helicsFederateRegisterGlobalTypeInput (helics_federate fed, const char *key, con
     return nullptr;
 }
 
-helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
+helics_input
+helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err)
 {
     auto fedObj = getValueFedSharedPtr (fed, err);
     if (!fedObj)
@@ -354,8 +356,8 @@ helics_input helicsFederateRegisterGlobalInput (helics_federate fed, const char 
     try
     {
         auto inp = std::make_unique<helics::InputObject> ();
-        inp->inputPtr = &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::helics_type_t> (type)),
-                                                 AS_STRING (units)));
+        inp->inputPtr =
+          &(fedObj->registerInput (AS_STRING (key), helics::typeNameStringRef (static_cast<helics::data_type> (type)), AS_STRING (units)));
         inp->fedptr = std::move (fedObj);
         auto ret = reinterpret_cast<helics_input> (inp.get ());
         addInput (fed, std::move (inp));
@@ -1064,7 +1066,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
             if (actualLength != nullptr)
             {
                 *actualLength = maxStringLen;
-        }
+            }
         }
         else
         {
@@ -1072,7 +1074,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
             if (actualLength != nullptr)
             {
                 *actualLength = length + 1;
-        }
+            }
         }
 
         if (val != nullptr)
@@ -1292,6 +1294,24 @@ const char *helicsInputGetType (helics_input inp)
     }
 }
 
+const char *helicsInputGetPublicationType (helics_input ipt)
+{
+    auto inpObj = verifyInput (ipt, nullptr);
+    if (inpObj == nullptr)
+    {
+        return emptyStr.c_str ();
+    }
+
+    try
+    {
+        const std::string &type = inpObj->inputPtr->getPublicationType ();
+        return type.c_str ();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str ();
+    }
+}
 
 const char *helicsPublicationGetType (helics_publication pub)
 {
@@ -1404,72 +1424,140 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     }
 }
 
-const char *helicsInputGetInfo(helics_input inp)
+const char *helicsInputGetInfo (helics_input inp)
 {
-    auto inpObj = verifyInput(inp, nullptr);
+    auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
     try
     {
-        const std::string &info = inpObj->inputPtr->getInfo();
-        return info.c_str();
+        const std::string &info = inpObj->inputPtr->getInfo ();
+        return info.c_str ();
     }
     catch (...)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
 }
 
-void helicsInputSetInfo(helics_input inp, const char *info, helics_error *err)
+void helicsInputSetInfo (helics_input inp, const char *info, helics_error *err)
 {
-    auto inpObj = verifyInput(inp, err);
+    auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
     {
         return;
     }
     try
     {
-        inpObj->inputPtr->setInfo(AS_STRING(info));
+        inpObj->inputPtr->setInfo (AS_STRING (info));
     }
     catch (...)
     {
-        helicsErrorHandler(err);
+        helicsErrorHandler (err);
     }
 }
-const char *helicsPublicationGetInfo(helics_publication pub)
+const char *helicsPublicationGetInfo (helics_publication pub)
 {
-    auto pubObj = verifyPublication(pub, nullptr);
+    auto pubObj = verifyPublication (pub, nullptr);
     if (pubObj == nullptr)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
     try
     {
-        const std::string &info = pubObj->pubPtr->getInfo();
-        return info.c_str();
+        const std::string &info = pubObj->pubPtr->getInfo ();
+        return info.c_str ();
     }
     catch (...)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
 }
 
-void helicsPublicationSetInfo(helics_publication pub, const char *info, helics_error *err)
+void helicsPublicationSetInfo (helics_publication pub, const char *info, helics_error *err)
 {
-    auto pubObj = verifyPublication(pub, err);
+    auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
     {
         return;
     }
     try
     {
-        pubObj->pubPtr->setInfo(AS_STRING(info));
+        pubObj->pubPtr->setInfo (AS_STRING (info));
     }
     catch (...)
     {
-        helicsErrorHandler(err);
+        helicsErrorHandler (err);
+    }
+}
+
+helics_bool helicsInputGetOption (helics_input inp, int option)
+{
+    auto inpObj = verifyInput (inp, nullptr);
+    if (inpObj == nullptr)
+    {
+        return helics_false;
+    }
+    try
+    {
+        return (inpObj->inputPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return helics_false;
+    }
+}
+
+void helicsInputSetOption (helics_input inp, int option, helics_bool value, helics_error *err)
+{
+    auto inpObj = verifyInput (inp, err);
+    if (inpObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        inpObj->inputPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+helics_bool helicsPublicationGetOption (helics_publication pub, int option)
+{
+    auto pubObj = verifyPublication (pub, nullptr);
+    if (pubObj == nullptr)
+    {
+        return helics_false;
+    }
+    try
+    {
+        return (pubObj->pubPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return helics_false;
+    }
+}
+
+void helicsPublicationSetOption (helics_publication pub, int option, helics_bool value, helics_error *err)
+{
+    auto pubObj = verifyPublication (pub, err);
+    if (pubObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        pubObj->pubPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
     }
 }
 

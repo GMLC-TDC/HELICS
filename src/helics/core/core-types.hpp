@@ -15,14 +15,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** enumeration of the possible federate states*/
-enum federate_state_t
+enum federate_state
 {
     HELICS_CREATED, /*!> state upon creation, all registration calls are allowed*/
     HELICS_INITIALIZING,  //!< the federation has entered initialization state and initial values can be published
     HELICS_EXECUTING,  //!< the federation has entered execution state and it now advancing in time
+    HELICS_TERMINATING,  //!< the federate is in the process of shutting down
     HELICS_ERROR,  //!< the federation has encountered an error
     HELICS_FINISHED,  //!< the federation has finished its execution
-    HELICS_NONE,  //!< unknown state
+    HELICS_UNKNOWN,  //!< unknown state
 };
 
 /** the type of the cores that are available */

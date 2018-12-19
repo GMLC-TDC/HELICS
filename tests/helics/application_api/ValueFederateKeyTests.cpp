@@ -49,7 +49,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     // enter execution
     vFed1->enterExecutingMode ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == Federate::states::execution);
+    BOOST_CHECK (vFed1->getCurrentMode () == Federate::modes::executing);
     // check subscriptions
     const auto &sv = subid1.getTarget ();
     const auto &sv2 = subid2.getTarget ();
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK_EQUAL (pubid3.getUnits (), "V");
     vFed1->finalize ();
 
-    BOOST_CHECK (vFed1->getCurrentState () == Federate::states::finalize);
+    BOOST_CHECK (vFed1->getCurrentMode () == Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)
@@ -85,10 +85,10 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     BOOST_REQUIRE (vFed1);
     // register the publications
-    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::helics_type_t::helicsString);
+    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsString);
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterExecutingMode ();
     // publish string1 at time=0.0;
     pubid.publish ("string1");
@@ -121,8 +121,8 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
                                 helics::Publication &pubid,
                                 helics::Input &subid)
 {
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    vFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
     bool correct = true;
 
@@ -187,8 +187,9 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
     {
         correct = false;
     }
-    vFed1->finalize ();
+    vFed1->finalizeAsync ();
     vFed2->finalize ();
+    vFed1->finalizeComplete ();
     return correct;
 }
 
@@ -302,43 +303,49 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_direct, bdata::ma
     BOOST_CHECK (res);
 }
 
-static const std::vector<std::string> simple_connection_files{ "example_connections1.json", "example_connections2.json",
-"example_connections1.toml","example_connections2.toml","example_connections3.toml","example_connections4.toml" };
+static const std::vector<std::string> simple_connection_files{"example_connections1.json",
+                                                              "example_connections2.json",
+                                                              "example_connections1.toml",
+                                                              "example_connections2.toml",
+                                                              "example_connections3.toml",
+                                                              "example_connections4.toml"};
 
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_broker_link_file, bdata::make(simple_connection_files), file_name)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_file,
+                      bdata::make (simple_connection_files),
+                      file_name)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     auto &broker = brokers[0];
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    auto testFile = std::string(TEST_DIR) + "/test_files/" + file_name;
-    broker->makeConnections(testFile);
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    auto testFile = std::string (TEST_DIR) + file_name;
+    broker->makeConnections (testFile);
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_broker_link_json_string)
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_broker_link_json_string)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     auto &broker = brokers[0];
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    broker->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    broker->makeConnections ("{\"connections\":[[\"pub1\", \"inp1\"]]}");
 
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link, bdata::make (core_types_all), core_type)
@@ -432,41 +439,43 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_direct2, bdata::mak
     BOOST_CHECK (res);
 }
 
-BOOST_DATA_TEST_CASE(value_federate_dual_transfer_core_link_file, bdata::make(simple_connection_files), file_name)
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_core_link_file,
+                      bdata::make (simple_connection_files),
+                      file_name)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    auto core = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer ();
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    auto testFile=std::string(TEST_DIR) + "/test_files/"+file_name;
-    core->makeConnections(testFile);
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    auto testFile = std::string (TEST_DIR) + file_name;
+    core->makeConnections (testFile);
     core = nullptr;
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
-BOOST_AUTO_TEST_CASE(value_federate_dual_transfer_core_link_json_string)
+BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_core_link_json_string)
 {
-    SetupTest<helics::ValueFederate>("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    auto core = vFed1->getCorePointer();
+    auto core = vFed1->getCorePointer ();
 
-    auto &inpid = vFed2->registerGlobalInput<std::string>("inp1");
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    core->makeConnections("{\"connections\":[[\"pub1\", \"inp1\"]]}");
+    auto &inpid = vFed2->registerGlobalInput<std::string> ("inp1");
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    core->makeConnections ("{\"connections\":[[\"pub1\", \"inp1\"]]}");
     core = nullptr;
     // register the publications
-    auto &pubid = vFed1->registerGlobalPublication<std::string>("pub1");
-    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
-    BOOST_CHECK(res);
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+    bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
+    BOOST_CHECK (res);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types_single), core_type)
@@ -478,7 +487,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     auto &pubid = vFed1->registerGlobalPublication<double> ("pub1");
 
     auto &subid = vFed1->registerSubscription ("pub1");
-    vFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed1->enterInitializingMode ();
     vFed1->publish (pubid, 1.0);
 
@@ -602,4 +611,277 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     vFed1->finalize ();
 }
 
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_close, bdata::make (core_types_single), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+
+    // register the publications
+    auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto subid = vFed1->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed1->enterExecutingMode ();
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto gtime = vFed1->requestTime (1.0);
+
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    std::string s = vFed1->getString (subid);
+    // get the value
+    // make sure the string is what we expect
+    BOOST_CHECK_EQUAL (s, "string1");
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    // make sure the value is still what we expect
+    s = vFed1->getString (subid);
+    BOOST_CHECK_EQUAL (s, "string1");
+
+    vFed1->closeInterface (pubid.getHandle ());
+    // advance time
+    gtime = vFed1->requestTime (2.0);
+    // make sure the value was updated
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    s = vFed1->getString (subid);
+
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->publish (pubid, "string3");
+    // make sure the value is still what we expect
+
+    // advance time
+    gtime = vFed1->requestTime (3.0);
+    s = vFed1->getString (subid);
+    // make sure we didn't get the last publish
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize ();
+}
+
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_remove_target, bdata::make (core_types_single), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+
+    // register the publications
+    auto pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto subid = vFed1->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed1->enterExecutingMode ();
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto gtime = vFed1->requestTime (1.0);
+
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    std::string s = vFed1->getString (subid);
+    // get the value
+    // make sure the string is what we expect
+    BOOST_CHECK_EQUAL (s, "string1");
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    // make sure the value is still what we expect
+    s = vFed1->getString (subid);
+    BOOST_CHECK_EQUAL (s, "string1");
+
+    subid.removeTarget ("pub1");
+    // advance time
+    gtime = vFed1->requestTime (2.0);
+    // make sure the value was updated
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    s = vFed1->getString (subid);
+
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->publish (pubid, "string3");
+    // make sure the value is still what we expect
+
+    // advance time
+    gtime = vFed1->requestTime (3.0);
+    s = vFed1->getString (subid);
+    // make sure we didn't get the last publish
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize ();
+}
+
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_types_all), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    // register the publications
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto &subid = vFed2->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    vFed2->enterExecutingMode ();
+    f1finish.wait ();
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto gtime = vFed2->requestTime (1.0);
+
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    // get the value
+    std::string s = vFed2->getString (subid);
+
+    // make sure the string is what we expect
+    BOOST_CHECK_EQUAL (s, "string1");
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    // make sure the value is still what we expect
+    subid.getValue (s);
+    BOOST_CHECK_EQUAL (s, "string1");
+    // advance time
+    vFed1->closeInterface (pubid.getHandle ());
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    gtime = vFed2->requestTime (2.0);
+
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    // make sure the value was updated
+
+    subid.getValue (s);
+
+    BOOST_CHECK_EQUAL (s, "string2");
+
+    vFed1->publish (pubid, "string3");
+    // make sure the value is still what we expect
+
+    // advance time
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    gtime = vFed2->requestTime (3.0);
+    s = vFed2->getString (subid);
+    // make sure we didn't get the last publish
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize ();
+    vFed2->finalize ();
+}
+
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (core_types_all), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    // register the publications
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto &subid = vFed2->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    vFed2->enterExecutingMode ();
+    f1finish.wait ();
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto gtime = vFed2->requestTime (1.0);
+
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    // get the value
+    std::string s = vFed2->getString (subid);
+
+    // make sure the string is what we expect
+    BOOST_CHECK_EQUAL (s, "string1");
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    // make sure the value is still what we expect
+    subid.getValue (s);
+    BOOST_CHECK_EQUAL (s, "string1");
+    // advance time
+    subid.removeTarget ("pub1");
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    gtime = vFed2->requestTime (2.0);
+
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    // make sure the value was updated
+
+    subid.getValue (s);
+
+    BOOST_CHECK_EQUAL (s, "string2");
+
+    vFed1->publish (pubid, "string3");
+    // make sure the value is still what we expect
+
+    // advance time
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    gtime = vFed2->requestTime (3.0);
+    s = vFed2->getString (subid);
+    // make sure we didn't get the last publish
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize ();
+    vFed2->finalize ();
+}
+
+BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target_input, bdata::make (core_types_all), core_type)
+{
+    SetupTest<helics::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    // register the publications
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto &subid = vFed2->registerGlobalInput<std::string> ("sub1");
+    pubid.addTarget ("sub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    vFed2->enterExecutingMode ();
+    f1finish.wait ();
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto gtime = vFed2->requestTime (1.0);
+
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 1.0);
+    // get the value
+    std::string s = vFed2->getString (subid);
+
+    // make sure the string is what we expect
+    BOOST_CHECK_EQUAL (s, "string1");
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    // make sure the value is still what we expect
+    subid.getValue (s);
+    BOOST_CHECK_EQUAL (s, "string1");
+    // advance time
+    pubid.removeTarget ("sub1");
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    gtime = vFed2->requestTime (2.0);
+
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 2.0);
+    // make sure the value was updated
+
+    subid.getValue (s);
+
+    BOOST_CHECK_EQUAL (s, "string2");
+
+    vFed1->publish (pubid, "string3");
+    // make sure the value is still what we expect
+
+    // advance time
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    gtime = vFed2->requestTime (3.0);
+    s = vFed2->getString (subid);
+    // make sure we didn't get the last publish
+    BOOST_CHECK_EQUAL (s, "string2");
+    vFed1->finalize ();
+    vFed2->finalize ();
+}
 BOOST_AUTO_TEST_SUITE_END ()

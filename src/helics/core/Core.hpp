@@ -80,7 +80,7 @@ class Core
     /** waits in the current thread until the core is disconnected
     @return true if the disconnect was successful
      */
-    virtual bool waitForDisconnect (int msToWait = -1) const = 0;
+    virtual bool waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const = 0;
 
     /** check if the core is ready to accept new federates
      */
@@ -417,6 +417,10 @@ class Core
     */
     virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
+	/** close a handle from further connections
+	@param handle the handle to close
+	*/
+	virtual void closeHandle(interface_handle handle) = 0;
     /**
      * Publish specified data to the specified key.
      *
@@ -646,10 +650,16 @@ class Core
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;
 
+	/** set a federation global value
+	@details this overwrites any previous value for this name
+	@param valueName the name of the global to set
+	@param value the value of the global
+	*/
+	virtual void setGlobal(const std::string &valueName, const std::string &value) = 0;
     /** make a query for information from the co-simulation
     @details the format is somewhat unspecified  target is the name of an object typically one of
-    "federation",  "broker", "core", or the name of a specific object
-    query is a broken
+    "federation",  "broker", "core", or the name of a specific object/core/broker
+	target can also be "global" to query a global value stored in the broker
     @param target the specific target of the query
     @param queryStr the actual query
     @return a string containing the response to the query.  Query is a blocking call and will not return until the

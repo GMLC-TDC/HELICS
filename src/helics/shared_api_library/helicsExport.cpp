@@ -326,6 +326,15 @@ int helicsGetPropertyIndex (const char *val)
     return helics::getPropertyIndex (val);
 }
 
+int helicsGetOptionIndex (const char *val)
+{
+    if (val == nullptr)
+    {
+        return -1;
+    }
+    return helics::getOptionIndex (val);
+}
+
 void helicsFederateInfoSetFlagOption (helics_federate_info fi, int flag, helics_bool value, helics_error *err)
 {
     auto hfi = getFedInfo (fi, err);
@@ -342,7 +351,7 @@ void helicsFederateInfoSetTimeProperty (helics_federate_info fi, int timePropert
     {
         return;
     }
-    hfi->setTimeProperty (timeProperty, propertyValue);
+    hfi->setProperty (timeProperty, propertyValue);
 }
 
 void helicsFederateInfoSetSeparator (helics_federate_info fi, char separator, helics_error *err)
@@ -362,7 +371,7 @@ void helicsFederateInfoSetIntegerProperty (helics_federate_info fi, int integerP
     {
         return;
     }
-    hfi->setIntegerProperty (integerProperty, propertyValue);
+    hfi->setProperty (integerProperty, propertyValue);
 }
 
 static constexpr char invalidCoreString[] = "core object is not valid";
@@ -727,6 +736,26 @@ void helicsCoreDataLink (helics_core core, const char *source, const char *targe
     cr->dataLink (source, target);
 }
 
+static constexpr char invalidGlobalString[] = "Global name cannot be null";
+void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    if (valueName == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidGlobalString;
+        }
+        return;
+    }
+    brk->setGlobal (valueName, AS_STRING (value));
+}
+
 void helicsBrokerAddSourceFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
 {
     auto brk = getBroker (broker, err);
@@ -813,6 +842,25 @@ helics_bool helicsCoreIsConnected (helics_core core)
     return (cr->isConnected ()) ? helics_true : helics_false;
 }
 
+void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *value, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    if (valueName == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidGlobalString;
+        }
+        return;
+    }
+    cr->setGlobal (valueName, AS_STRING (value));
+}
+
 const char *helicsBrokerGetIdentifier (helics_broker broker)
 {
     auto brk = getBroker (broker, nullptr);
@@ -883,7 +931,7 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (msToWait);
+    brk->waitForDisconnect (std::chrono::milliseconds(msToWait));
     if (brk->isConnected ())
     {
         return helics_false;
@@ -930,6 +978,7 @@ void helicsCoreFree (helics_core core)
     auto coreObj = helics::getCoreObject (core, nullptr);
     if (coreObj != nullptr)
     {
+        coreObj->valid = 0;
         getMasterHolder ()->clearCore (coreObj->index);
     }
     helics::CoreFactory::cleanUpCores ();
@@ -940,6 +989,7 @@ void helicsBrokerFree (helics_broker broker)
     auto brokerObj = helics::getBrokerObject (broker, nullptr);
     if (brokerObj != nullptr)
     {
+        brokerObj->valid = 0;
         getMasterHolder ()->clearBroker (brokerObj->index);
     }
     helics::BrokerFactory::cleanUpBrokers ();
@@ -950,6 +1000,7 @@ void helicsFederateFree (helics_federate fed)
     auto fedObj = helics::getFedObject (fed, nullptr);
     if (fedObj != nullptr)
     {
+        fedObj->valid = 0;
         getMasterHolder ()->clearFed (fedObj->index);
     }
 
@@ -1229,6 +1280,7 @@ void MasterObjectHolder::clearBroker (int index)
     auto broker = brokers.lock ();
     if ((index < static_cast<int> (broker->size ())) && (index >= 0))
     {
+        (*broker)[index]->valid = 0;
         (*broker)[index] = nullptr;
         if (broker->size () > 10)
         {
@@ -1245,6 +1297,7 @@ void MasterObjectHolder::clearCore (int index)
     auto core = cores.lock ();
     if ((index < static_cast<int> (core->size ())) && (index >= 0))
     {
+        (*core)[index]->valid = 0;
         (*core)[index] = nullptr;
         if (core->size () > 10)
         {
@@ -1261,6 +1314,7 @@ void MasterObjectHolder::clearFed (int index)
     auto fed = feds.lock ();
     if ((index < static_cast<int> (fed->size ())) && (index >= 0))
     {
+        (*fed)[index]->valid = 0;
         (*fed)[index] = nullptr;
         if (fed->size () > 10)
         {

@@ -6,8 +6,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "MessageFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
 #include "Endpoints.hpp"
 #include "MessageFederateManager.hpp"
 
@@ -107,6 +109,51 @@ void MessageFederate::registerMessageInterfaces (const std::string &configString
     }
 }
 
+static const std::string emptyStr;
+template <class Inp>
+static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
+{
+    addTargets (data, "flags", [&ept](const std::string &target) {
+        if (target.front () != '-')
+        {
+            ept.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            ept.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        ept.setOption (defs::options::connection_optional, optional);
+    }
+    bool required = getOrDefault (data, "required", false);
+    if (required)
+    {
+        ept.setOption (defs::options::connection_required, required);
+    }
+
+    auto info = getOrDefault (data, "info", emptyStr);
+    if (!info.empty ())
+    {
+        fed->setInfo (ept.getHandle (), info);
+    }
+    addTargets (data, "knownDestinations",
+                [&ept, fed](const std::string &dest) { fed->registerKnownCommunicationPath (ept, dest); });
+    addTargets (data, "subscriptions", [&ept, fed](const std::string &sub) { fed->subscribe (ept, sub); });
+    addTargets (data, "filters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "sourceFilters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "destFilters", [&ept](const std::string &filt) { ept.addDestinationFilter (filt); });
+
+    auto defTarget = getOrDefault (data, "target", emptyStr);
+    replaceIfMember (data, "destination", defTarget);
+    if (!defTarget.empty ())
+    {
+        ept.setTargetDestination (defTarget);
+    }
+}
+
 void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
@@ -116,52 +163,11 @@ void MessageFederate::registerMessageInterfacesJson (const std::string &jsonStri
         for (const auto &ept : doc["endpoints"])
         {
             auto eptName = getKey (ept);
-            auto type = jsonGetOrDefault (ept, "type", std::string ());
-            bool global = jsonGetOrDefault (ept, "global", false);
+            auto type = getOrDefault (ept, "type", emptyStr);
+            bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
 
-            // retrieve the known paths
-            if (ept.isMember ("knownDestinations"))
-            {
-                auto kp = ept["knownDestinations"];
-                if (kp.isString ())
-                {
-                    registerKnownCommunicationPath (epObj, kp.asString ());
-                }
-                else if (kp.isArray ())
-                {
-                    for (const auto &path : kp)
-                    {
-                        registerKnownCommunicationPath (epObj, path.asString ());
-                    }
-                }
-            }
-            // endpoints can subscribe to publications
-            if (ept.isMember ("subscriptions"))
-            {
-                auto subs = ept["subscriptions"];
-                if (subs.isString ())
-                {
-                    subscribe (epObj, subs.asString ());
-                }
-                else if (subs.isArray ())
-                {
-                    for (const auto &sub : subs)
-                    {
-                        subscribe (epObj, sub.asString ());
-                    }
-                }
-            }
-            auto defTarget = (ept.isMember ("destination")) ? ept["destination"].asString () : std::string ();
-            if (!defTarget.empty ())
-            {
-                epObj.setTargetDestination (defTarget);
-            }
-
-            auto info = jsonGetOrDefault (ept, "info", std::string ());
-            if(!info.empty()){
-                setInfo(epObj.getHandle(), info);
-            }
+            loadOptions (this, ept, epObj);
         }
     }
 }
@@ -185,53 +191,11 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         for (auto &ept : eptArray)
         {
             auto key = getKey (ept);
-            auto type = tomlGetOrDefault (ept, "type", std::string ());
-            bool global = tomlGetOrDefault (ept, "global", false);
+            auto type = getOrDefault (ept, "type", emptyStr);
+            bool global = getOrDefault (ept, "global", false);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
 
-            // retrieve the known paths
-            auto kp = ept.find ("knownDestinations");
-            if (kp != nullptr)
-            {
-                if (kp->is<toml::Array> ())
-                {
-                    for (const auto &path : kp->as<toml::Array> ())
-                    {
-                        registerKnownCommunicationPath (epObj, path.as<std::string> ());
-                    }
-                }
-                else if (kp->is<std::string> ())
-                {
-                    registerKnownCommunicationPath (epObj, kp->as<std::string> ());
-                }
-            }
-            auto subs = ept.find ("subscriptions");
-            // endpoints can subscribe to publications
-            if (subs != nullptr)
-            {
-                if (subs->is<std::string> ())
-                {
-                    subscribe (epObj, subs->as<std::string> ());
-                }
-                else if (subs->is<toml::Array> ())
-                {
-                    for (const auto &sub : subs->as<toml::Array> ())
-                    {
-                        subscribe (epObj, sub.as<std::string> ());
-                    }
-                }
-            }
-            auto defTarget = tomlGetOrDefault (ept, "destination", std::string ());
-            if (!defTarget.empty ())
-            {
-                epObj.setTargetDestination (defTarget);
-
-			}
-
-            auto info = tomlGetOrDefault (ept, "info", std::string ());
-            if(!info.empty()){
-                setInfo(epObj.getHandle(), info);
-            }
+            loadOptions (this, ept, epObj);
         }
     }
 }
@@ -251,7 +215,7 @@ void MessageFederate::registerKnownCommunicationPath (const Endpoint &localEndpo
 
 bool MessageFederate::hasMessage () const
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->hasMessage ();
     }
@@ -260,32 +224,25 @@ bool MessageFederate::hasMessage () const
 
 bool MessageFederate::hasMessage (const Endpoint &ept) const
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->hasMessage (ept);
     }
     return false;
 }
 
-/**
- * Returns the number of pending receives for the specified destination endpoint.
- */
 uint64_t MessageFederate::pendingMessages (const Endpoint &ept) const
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->pendingMessages (ept);
     }
     return 0;
 }
-/**
-* Returns the number of pending receives for the specified destination endpoint.
-@details this function is not preferred in multithreaded contexts due to the required locking
-prefer to just use getMessage until it returns an invalid Message.
-*/
+
 uint64_t MessageFederate::pendingMessages () const
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->pendingMessages ();
     }
@@ -294,7 +251,7 @@ uint64_t MessageFederate::pendingMessages () const
 
 std::unique_ptr<Message> MessageFederate::getMessage ()
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->getMessage ();
     }
@@ -303,7 +260,7 @@ std::unique_ptr<Message> MessageFederate::getMessage ()
 
 std::unique_ptr<Message> MessageFederate::getMessage (const Endpoint &ept)
 {
-    if (state >= states::initialization)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->getMessage (ept);
     }
@@ -364,11 +321,6 @@ void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
 
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
-
-void MessageFederate::setEndpointOption (const Endpoint &ept, int32_t option, bool option_value)
-{
-    mfManager->setEndpointOption (ept, option, option_value);
-}
 
 void MessageFederate::addSourceFilter (const Endpoint &ept, const std::string &filterName)
 {

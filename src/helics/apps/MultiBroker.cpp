@@ -9,7 +9,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <atomic>
 #include <mutex>
 #include <thread>
+#ifndef DISABLE_UDP_CORE
 #include "../core/udp/UdpComms.h"
+#endif
 #ifndef DISABLE_TCP_CORE
 #include "../core/tcp/TcpComms.h"
 #include "../core/tcp/TcpCommsSS.h"
@@ -20,7 +22,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #if HELICS_HAVE_MPI!=0
 #include "../core/mpi/MpiComms.h"
 #endif
+#ifndef DISABLE_IPC_CORE
 #include "../core/ipc/IpcComms.h"
+#endif
 #include "../common/argParser.h"
 #include "../common/stringToCmdLine.h"
 #include "../core/NetworkBrokerData.hpp"
@@ -89,11 +93,15 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 #endif
 			break;
 		case core_type::UDP:
+#ifndef DISABLE_UDP_CORE
 			comm = std::make_unique<udp::UdpComms>();
+#endif
 			break;
 		case core_type::IPC:
 		case core_type::INTERPROCESS:
+#ifndef DISABLE_IPC_CORE
 			comm = std::make_unique<ipc::IpcComms>();
+#endif
 			break;
 		case core_type::MPI:
 #if HELICS_HAVE_MPI>0
@@ -181,21 +189,21 @@ bool MultiBroker::tryReconnect()
 }
 
 
-void MultiBroker::transmit(route_id_t route_id, const ActionMessage &cmd)
+void MultiBroker::transmit(route_id rid, const ActionMessage &cmd)
 {
-	masterComm->transmit(route_id, cmd);
+	masterComm->transmit(rid, cmd);
 }
 
 
-void MultiBroker::transmit(route_id_t route_id, ActionMessage &&cmd)
+void MultiBroker::transmit(route_id rid, ActionMessage &&cmd)
 {
-	masterComm->transmit(route_id, std::move(cmd));
+	masterComm->transmit(rid, std::move(cmd));
 }
 
 
-void MultiBroker::addRoute(route_id_t route_id, const std::string &routeInfo)
+void MultiBroker::addRoute(route_id rid, const std::string &routeInfo)
 {
-	masterComm->addRoute(route_id, routeInfo);
+	masterComm->addRoute(rid, routeInfo);
 }
 
 }  // namespace helics

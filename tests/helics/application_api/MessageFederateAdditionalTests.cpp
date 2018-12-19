@@ -30,12 +30,12 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     mFed1->finalize ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
@@ -48,7 +48,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto &sv = mFed1->getEndpointName (epid);
     auto &sv2 = mFed1->getEndpointName (epid2);
@@ -63,7 +63,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 // same as previous test case but using endpoint objects
@@ -76,7 +76,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     helics::Endpoint epid2 (helics::GLOBAL, mFed1.get (), "ep2", "random");
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
     auto const &sv = epid.getName ();
     auto const &sv2 = epid2.getName ();
@@ -90,7 +90,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     BOOST_CHECK (mFed1->getEndpoint ("ep2").getHandle () == epid2.getHandle ());
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_types_single), core_type)
@@ -110,11 +110,11 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     mFed1->setMessageNotificationCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     mFed1->sendMessage (epid, "ep2", data);
@@ -138,7 +138,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (core_types_single), core_type)
@@ -158,11 +158,11 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     ep1.send ("ep2", data);
@@ -184,7 +184,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (core_types_single), core_type)
@@ -204,11 +204,11 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     ep2.setCallback (mend);
 
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
 
     mFed1->enterExecutingMode ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     ep1.send ("ep2", data);
@@ -230,7 +230,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     BOOST_CHECK_EQUAL (M->data[245], data[245]);
     mFed1->finalize ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
@@ -248,15 +248,15 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed1->setMessageNotificationCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
     mFed2->setMessageNotificationCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
-    mFed1->setTimeProperty (helics_property_time_delta, 1.0);
-    mFed2->setTimeProperty (helics_property_time_delta, 1.0);
+    mFed1->setProperty (helics_property_time_delta, 1.0);
+    mFed2->setProperty (helics_property_time_delta, 1.0);
 
     auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::execution);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::execution);
+    BOOST_CHECK (mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data1 (500, 'a');
     helics::data_block data2 (400, 'b');
@@ -306,11 +306,12 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
 
     BOOST_CHECK_EQUAL (e1cnt, 0);
     BOOST_CHECK_EQUAL (e2cnt, 4);
-    mFed1->finalize ();
+    mFed1->finalizeAsync ();
     mFed2->finalize ();
+    mFed1->finalizeComplete ();
 
-    BOOST_CHECK (mFed1->getCurrentState () == helics::Federate::states::finalize);
-    BOOST_CHECK (mFed2->getCurrentState () == helics::Federate::states::finalize);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
+    BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 //#define ENABLE_OUTPUT
@@ -346,7 +347,7 @@ class PingPongFed
         helics::FederateInfo fi (coreType);
         fi.coreName = "pptest";
         fi.coreInitString = "-f 3";
-        fi.setTimeProperty (helics_property_time_delta, delta);
+        fi.setProperty (helics_property_time_delta, delta);
 #ifdef ENABLE_OUTPUT
         std::cout << std::string ("about to create federate ") + name + "\n";
 #endif
@@ -467,35 +468,29 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     BOOST_CHECK_EQUAL (p3.pongs, 2);
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load)
+static constexpr const char *config_files[] = {"example_message_fed.json", "example_message_fed.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
     auto id = mFed.getEndpoint ("ept1");
     BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
+    BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
+
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
+    BOOST_CHECK_EQUAL (mFed.query ("global", "global2"), "this is another global value");
     mFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_file_load_toml)
+static constexpr const char *filter_config_files[] = {"example_filters.json", "example_filters.toml"};
+
+BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), file)
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_message_fed.toml");
-
-    BOOST_CHECK_EQUAL (mFed.getName (), "messageFed");
-
-    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
-    auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-	BOOST_CHECK_EQUAL(id.getInfo(), "this is an information string for use by the application");
-    mFed.disconnect ();
-}
-
-BOOST_AUTO_TEST_CASE (test_file_load_filter)
-{
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.json");
+    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
 
     BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
 
@@ -510,28 +505,7 @@ BOOST_AUTO_TEST_CASE (test_file_load_filter)
     auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
     BOOST_CHECK (cloneFilt != nullptr);
 
-	BOOST_CHECK_EQUAL(mFed.getFilter(0).getInfo(), "this is an information string for use by the application");
-    mFed.disconnect ();
-}
-
-BOOST_AUTO_TEST_CASE (test_file_load_filter_toml)
-{
-    helics::MessageFederate mFed (std::string (TEST_DIR) + "/test_files/example_filters.toml");
-
-    BOOST_CHECK_EQUAL (mFed.getName (), "filterFed");
-
-    BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
-    auto &id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
-
-    BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
-
-    auto filt = &mFed.getFilter (2);
-
-    auto cloneFilt = dynamic_cast<helics::CloningFilter *> (filt);
-    BOOST_CHECK (cloneFilt!=nullptr);
-
-	BOOST_CHECK_EQUAL(mFed.getFilter(0).getInfo(), "this is an information string for use by the application");
+    BOOST_CHECK_EQUAL (mFed.getFilter (0).getInfo (), "this is an information string for use by the application");
     mFed.disconnect ();
 }
 

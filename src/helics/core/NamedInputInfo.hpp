@@ -48,11 +48,16 @@ class NamedInputInfo
     std::string inputType;  //!< the type of data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
     bool required = false;  //!< flag indicating that the subscription requires a matching publication
+    bool optional = false;  //!< flag indicating that any targets are optional
     bool has_target = false;  //!< flag indicating that the input has a source
     bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
+    bool not_interruptible = false;  //!< indicator that this handle should not be used for interrupting
+    bool strict_type_matching = false;  //!< indicator that the handle need to have strict type matching
+    bool single_source = false;  //!< allow only a single source to connect
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
-    std::vector<std::pair<std::string, std::string>> source_types; //!< the type and units of the sources
+    std::vector<Time> deactivated;
+    std::vector<std::pair<std::string, std::string>> source_types;  //!< the type and units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
@@ -62,7 +67,7 @@ class NamedInputInfo
     /** get a particular data input*/
     std::shared_ptr<const data_block> getData (int index);
     /** get a the most recent data point*/
-    std::shared_ptr<const data_block> getData();
+    std::shared_ptr<const data_block> getData ();
     /** add a data block into the queue*/
     void addData (global_handle source_handle,
                   Time valueTime,
@@ -88,8 +93,15 @@ class NamedInputInfo
     /** get the event based on the event queue*/
     Time nextValueTime () const;
     /** add a new source target to the input*/
-	void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+    void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+    /** remove a source */
+    void removeSource (global_handle sourceToRemove, Time minTime);
+    /** clear all non-current data*/
+    void clearFutureData ();
+
   private:
     bool updateData (dataRecord &&update, int index);
 };
+
+bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
 }  // namespace helics
