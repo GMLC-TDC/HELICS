@@ -103,10 +103,7 @@ class MessageFederateManager
 
     Endpoint &getEndpoint (int index);
     const Endpoint &getEndpoint (int index) const;
-    /** get the type of an endpoint from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed or no type was specified*/
-    const std::string &getEndpointType (const Endpoint &ept) const;
+
     /** register a callback function to call when any endpoint receives a message
     @details there can only be one generic callback
     @param[in] callback the function to call

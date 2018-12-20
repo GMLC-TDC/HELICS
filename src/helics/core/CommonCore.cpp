@@ -892,34 +892,51 @@ const std::string &CommonCore::getUnits (interface_handle handle) const
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
-        return handleInfo->units;
+        switch (handleInfo->handleType)
+        {
+        case handle_type::input:
+        case handle_type::publication:
+            return handleInfo->units;
+        default:
+            break;
+        }
+       
     }
     return emptyStr;
 }
 
-const std::string &CommonCore::getType (interface_handle handle) const
+const std::string &CommonCore::getInjectionType (interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo (handle);
+    auto handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr)
     {
-        if (handleInfo->handleType == handle_type::input)
+        switch (handleInfo->handleType)
         {
-            auto fed = getFederateAt (handleInfo->local_fed_id);
-            auto inpInfo = fed->interfaces ().getInput (handle);
+        case handle_type::input:
+        {
+            auto fed = getFederateAt(handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces().getInput(handle);
             if (inpInfo != nullptr)
             {
-                if (!inpInfo->inputType.empty ())
+                if (!inpInfo->inputType.empty())
                 {
                     return inpInfo->inputType;
                 }
             }
+            break;
         }
-        return handleInfo->type;
+        case handle_type::endpoint:
+            return handleInfo->type;
+        case handle_type::filter:
+            return handleInfo->type_in;
+        default:
+            return emptyStr;
+        }
     }
     return emptyStr;
 }
 
-const std::string &CommonCore::getOutputType (interface_handle handle) const
+const std::string &CommonCore::getExtractionType (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -927,6 +944,7 @@ const std::string &CommonCore::getOutputType (interface_handle handle) const
         switch (handleInfo->handleType)
         {
         case handle_type::publication:
+        case handle_type::input:
         case handle_type::endpoint:
             return handleInfo->type;
         case handle_type::filter:

@@ -59,8 +59,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
     BOOST_CHECK (subid1.getType ().empty ());  // def is the default type
-    BOOST_CHECK_EQUAL (subid2.getType (), "int32");
-    BOOST_CHECK (subid3.getType ().empty ());
+    BOOST_CHECK_EQUAL (subid2.getPublicationType (), "int32");
+    BOOST_CHECK (subid3.getPublicationType ().empty ());
     BOOST_CHECK_EQUAL (subid3.getUnits (), "V");
 
     // check publications

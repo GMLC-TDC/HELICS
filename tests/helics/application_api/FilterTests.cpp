@@ -388,7 +388,7 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     fFed1->enterExecutingModeComplete ();
     fFed2->enterExecutingModeComplete ();
 
-    auto &p2Name = mFed->getEndpointName (p2);
+    auto &p2Name = mFed->getInterfaceName (p2);
     BOOST_CHECK (fFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, p2Name, data);
@@ -426,11 +426,11 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     if (mFed->hasMessage (p2))
     {
         auto m2 = mFed->getMessage (p2);
-        auto ept1Name = mFed->getEndpointName (p1);
+        auto ept1Name = mFed->getInterfaceName (p1);
         if (ept1Name.size () > 1)
         {
-            BOOST_CHECK_EQUAL (m2->source, mFed->getEndpointName (p1));
-            BOOST_CHECK_EQUAL (m2->original_source, mFed->getEndpointName (p1));
+            BOOST_CHECK_EQUAL (m2->source, mFed->getInterfaceName (p1));
+            BOOST_CHECK_EQUAL (m2->original_source, mFed->getInterfaceName (p1));
         }
 
         BOOST_CHECK_EQUAL (m2->dest, p2Name);

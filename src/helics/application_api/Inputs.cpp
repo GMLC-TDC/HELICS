@@ -132,7 +132,7 @@ bool Input::isUpdated ()
             auto dv = fed->getValueRaw (*this);
             if (type == data_type::helicsUnknown)
             {
-                type = getTypeFromString (fed->getPublicationType (*this));
+                type = getTypeFromString (fed->getInjectionType (*this));
             }
             auto visitor = [&, this](auto &&arg) {
                 std::remove_reference_t<decltype (arg)> newVal;
@@ -254,7 +254,7 @@ char Input::getValueChar ()
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helicsUnknown)
         {
-            type = getTypeFromString (fed->getPublicationType (*this));
+            type = getTypeFromString (fed->getInjectionType (*this));
         }
 
         if ((type == data_type::helicsString) || (type == data_type::helicsAny) ||

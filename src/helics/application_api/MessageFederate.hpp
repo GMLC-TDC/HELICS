@@ -180,11 +180,6 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     void sendMessage (const Endpoint &source, const Message &message);
 
-    /** get the name of an endpoint from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string &getEndpointName (const Endpoint &ept) const;
-
     /** get an endpoint by its name
     @param[in] name the Endpoint
     @return an Endpoint*/
@@ -194,12 +189,6 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] index the index of the endpoint to retrieve
     @return an Endpoint*/
     Endpoint &getEndpoint (int index) const;
-
-    /** get the type associated with an endpoint
-    @param[in] ep the endpoint identifier
-    @return a string containing the endpoint type
-    */
-    const std::string &getEndpointType (const Endpoint &ept) const;
 
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
