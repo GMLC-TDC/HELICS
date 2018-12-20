@@ -472,7 +472,7 @@ class Federate
     @return a const ref to  std::string  */
     const std::string &getInjectionType (interface_handle handle) const;
 
-    /** get the type for which data comes out of an interface,  this is the type for data coming into an interface
+    /** get the extraction type for an interface,  this is the type for data coming into an interface
     @details for filters this is the output type, for publications this is the specified type, for endpoints this
     is the specified type and for inputs this is the specified type
     @param handle the interface handle to get the injection type for

@@ -517,6 +517,10 @@ void Federate::disconnect ()
 void Federate::error (int errorcode)
 {
     currentMode = modes::error;
+    if (!coreObject)
+    {
+        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+    }
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
 }
@@ -524,6 +528,10 @@ void Federate::error (int errorcode)
 void Federate::error (int errorcode, const std::string &message)
 {
     currentMode = modes::error;
+    if (!coreObject)
+    {
+        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+    }
     coreObject->logMessage (fedID, errorcode, message);
 }
 
@@ -1046,7 +1054,14 @@ std::string Federate::query (const std::string &queryStr)
     }
     if (res.empty ())
     {
-        res = coreObject->query (getName (), queryStr);
+        if (coreObject)
+        {
+            res = coreObject->query(getName(), queryStr);
+        }
+        else
+        {
+            res = "#unknown";
+        }
     }
     return res;
 }
@@ -1121,6 +1136,10 @@ void Federate::setGlobal (const std::string &valueName, const std::string &value
     {
         coreObject->setGlobal (valueName, value);
     }
+    else
+    {
+        throw(InvalidFunctionCall("set set Global cannot be called on uninitialized federate or after finalize call"));
+    }
 }
 
 Filter &Federate::registerFilter (const std::string &filterName,
@@ -1160,6 +1179,10 @@ void Federate::addSourceTarget (const Filter &filt, const std::string &targetEnd
     {
         coreObject->addSourceTarget (filt.getHandle (), targetEndpoint);
     }
+    else
+    {
+        throw(InvalidFunctionCall("add source target cannot be called on uninitialized federate or after finalize call"));
+    }
 }
 
 void Federate::addDestinationTarget (const Filter &filt, const std::string &targetEndpoint)
@@ -1167,6 +1190,10 @@ void Federate::addDestinationTarget (const Filter &filt, const std::string &targ
     if (coreObject)
     {
         coreObject->addDestinationTarget (filt.getHandle (), targetEndpoint);
+    }
+    else
+    {
+        throw(InvalidFunctionCall("add destination target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1216,18 +1243,33 @@ int Federate::getFilterCount () const { return fManager->getFilterCount (); }
 
 void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
 {
-    coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
+    if (coreObject)
+    {
+        coreObject->setFilterOperator(filt.getHandle(), std::move(mo));
+    }
+    else
+    {
+        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+    }
+    
 }
 
 void Federate::setInterfaceOption (interface_handle handle, int32_t option, bool option_value)
 {
-    coreObject->setHandleOption (handle, option, option_value);
+    if (coreObject)
+    {
+        coreObject->setHandleOption(handle, option, option_value);
+    }
+    else
+    {
+        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+    }
 }
 
 /** get the current value for an interface option*/
 bool Federate::getInterfaceOption (interface_handle handle, int32_t option)
 {
-    return coreObject->getHandleOption (handle, option);
+    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
 }
 
 void Federate::closeInterface (interface_handle handle)
@@ -1236,6 +1278,7 @@ void Federate::closeInterface (interface_handle handle)
     {
         coreObject->closeHandle (handle);
     }
+    //well if there is no core object it already is closed
 }
 
 void Federate::setInfo (interface_handle handle, const std::string &info)
@@ -1243,6 +1286,10 @@ void Federate::setInfo (interface_handle handle, const std::string &info)
     if (coreObject)
     {
         coreObject->setInterfaceInfo (handle, info);
+    }
+    else
+    {
+        throw(InvalidFunctionCall("cannot call set info on uninitialized or disconnected federate"));
     }
 }
 

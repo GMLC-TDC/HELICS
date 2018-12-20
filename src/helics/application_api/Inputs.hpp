@@ -160,10 +160,10 @@ class Input
             }
         });
     }
-    /** get the Name/Key for the subscription
+    /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getName () const { return actualName; }
-    /** get the Name/Key for the subscription
+    /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getKey () const { return fed->getInterfaceName (handle); }
 
@@ -182,11 +182,11 @@ class Input
     const std::string &getTarget () const { return fed->getTarget (*this); }
     /** subscribe to a named publication*/
     void addTarget (const std::string &newTarget) { fed->addTarget (*this, newTarget); }
-    /** remove a named subscription*/
+    /** remove a named publication from being a target*/
     void removeTarget (const std::string &targetToRemove) { fed->removeTarget (*this, targetToRemove); }
-    /** get the interface information field of the publication*/
+    /** get the interface information field of the input*/
     const std::string &getInfo () const { return fed->getInfo (handle); }
-    /** set the interface information field of the publication*/
+    /** set the interface information field of the input*/
     void setInfo (const std::string &info) { fed->setInfo (handle, info); }
     /** set a handle flag for the input*/
     void setOption (int32_t option, bool value = true) { fed->setInterfaceOption (handle, option, value); }
@@ -321,7 +321,7 @@ class Input
     int getValue (double *data, int maxsize);
     /** get string value functions to retrieve data by a C string*/
     int getValue (char *str, int maxsize);
-    /** get the latest value for the subscription
+    /** get the latest value for the input
     @param[out] out the location to store the value
     */
     template <class X>
@@ -359,7 +359,7 @@ class Input
 };
 
 /** class to handle an input and extract a specific type
-@tparam X the class of the value associated with a subscription*/
+@tparam X the class of the value associated with a input*/
 template <class X>
 class InputT : public Input
 {
@@ -376,7 +376,7 @@ class InputT : public Input
 
   public:
     InputT () = default;
-    /**constructor to build a subscription object
+    /**constructor to build an input with a defined object type
     @param[in] valueFed  the ValueFederate to use
     @param[in] name the name of the input
     @param[in] units the units associated with a Federate
@@ -385,7 +385,7 @@ class InputT : public Input
         : Input (valueFed, name, ValueConverter<X>::type (), units)
     {
     }
-    /**constructor to build a subscription object
+    /**constructor to build an input with a defined type
     @param[in] valueFed  the ValueFederate to use
     @param[in] name the name of the input
     @param[in] units the units associated with a Federate
