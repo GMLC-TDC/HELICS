@@ -284,7 +284,7 @@ namespace cereal
               return {(std::numeric_limits<size_t>::max)(), {}};
           };
 
-          std::stack<std::type_index> parentStack;      // Holds the parent nodes to be processed
+          std::stack<std::type_index>         parentStack;      // Holds the parent nodes to be processed
           std::vector<std::type_index> dirtySet;                // Marks child nodes that have been changed
           std::unordered_set<std::type_index> processedParents; // Marks parent nodes that have been processed
 
