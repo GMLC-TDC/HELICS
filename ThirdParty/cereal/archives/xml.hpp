@@ -822,7 +822,7 @@ namespace cereal
   {
       if (ar.hasSizeAttributes())
       {
-    ar.appendAttribute( "size", "dynamic" );
+          ar.appendAttribute("size", "dynamic");
       }
   }
 
