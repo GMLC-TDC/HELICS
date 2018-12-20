@@ -31,9 +31,9 @@ if (NOT ZeroMQ_LIBRARY_ONLY)
     NAMES
       include/zmq.h
     HINTS
+      ${ZeroMQ_INCLUDE_PATH}
       ${ZeroMQ_REGISTRY_PATH}
       ${ZeroMQ_INSTALL_PATH}
-      ${ZeroMQ_INCLUDE_PATH}
       ${ZeroMQ_PATH2}
     PATHS
       /usr
