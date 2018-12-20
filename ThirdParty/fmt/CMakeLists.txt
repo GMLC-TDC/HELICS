@@ -40,7 +40,6 @@ option(FMT_WERROR "Halt the compilation with an error on compiler warnings." OFF
 option(FMT_DOC "Generate the doc target." ${MASTER_PROJECT})
 option(FMT_INSTALL "Generate the install target." ${MASTER_PROJECT})
 option(FMT_TEST "Generate the test target." ${MASTER_PROJECT})
-option(FMT_USE_CPP14 "Enable the addition of C++14 compiler flags." ON)
 project(FMT)
 
 # Get version from core.h
