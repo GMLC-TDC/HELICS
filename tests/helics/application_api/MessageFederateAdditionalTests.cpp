@@ -50,8 +50,8 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 
     BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto &sv = mFed1->getEndpointName (epid);
-    auto &sv2 = mFed1->getEndpointName (epid2);
+    auto &sv = mFed1->getInterfaceName (epid);
+    auto &sv2 = mFed1->getInterfaceName (epid2);
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
@@ -255,7 +255,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data1 (500, 'a');

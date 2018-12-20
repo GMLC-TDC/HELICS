@@ -1275,7 +1275,7 @@ void helicsInputSetDefaultNamedPoint (helics_input inp, const char *str, double 
     }
 }
 
-const char *helicsInputGetExtractionType (helics_input inp)
+const char *helicsInputGetType (helics_input inp)
 {
     auto inpObj = verifyInput (inp, nullptr);
     if (inpObj == nullptr)
@@ -1285,7 +1285,7 @@ const char *helicsInputGetExtractionType (helics_input inp)
 
     try
     {
-        const std::string &type = inpObj->inputPtr->getExtractionType ();
+        const std::string &type = inpObj->inputPtr->getType ();
         return type.c_str ();
     }
     catch (...)
@@ -1294,7 +1294,7 @@ const char *helicsInputGetExtractionType (helics_input inp)
     }
 }
 
-const char *helicsInputGetInjectionType (helics_input ipt)
+const char *helicsInputGetPublicationType (helics_input ipt)
 {
     auto inpObj = verifyInput (ipt, nullptr);
     if (inpObj == nullptr)
@@ -1304,7 +1304,7 @@ const char *helicsInputGetInjectionType (helics_input ipt)
 
     try
     {
-        const std::string &type = inpObj->inputPtr->getInjectionType ();
+        const std::string &type = inpObj->inputPtr->getPublicationType ();
         return type.c_str ();
     }
     catch (...)
@@ -1342,7 +1342,7 @@ const char *helicsInputGetKey (helics_input inp)
 
     try
     {
-        const std::string &key = inpObj->inputPtr->getName ();
+        const std::string &key = inpObj->inputPtr->getKey ();
         return key.c_str ();
     }
     catch (...)

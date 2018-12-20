@@ -395,8 +395,6 @@ std::string ValueFederate::localQuery (const std::string &queryStr) const
 
 std::vector<int> ValueFederate::queryUpdates () { return vfManager->queryUpdates (); }
 
-const std::string &ValueFederate::getInputKey (const Input &inp) const { return inp.getName (); }
-
 const std::string &ValueFederate::getTarget (const Input &inp) const { return vfManager->getTarget (inp); }
 
 const Input &ValueFederate::getInput (const std::string &key) const
@@ -440,8 +438,6 @@ const Input &ValueFederate::getSubscription (const std::string &key) const
 
 Input &ValueFederate::getSubscription (const std::string &key) { return vfManager->getSubscription (key); }
 
-const std::string &ValueFederate::getPublicationKey (const Publication &pub) const { return pub.getName (); }
-
 Publication &ValueFederate::getPublication (const std::string &key)
 {
     auto &pub = vfManager->getPublication (key);
@@ -474,15 +470,6 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
 const Publication &ValueFederate::getPublication (const std::string &key, int index1, int index2) const
 {
     return vfManager->getPublication (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
-}
-
-const std::string &ValueFederate::getInputUnits (const Input &inp) const
-{
-    return (coreObject) ? coreObject->getUnits (inp.getHandle ()) : emptyStr;
-}
-const std::string &ValueFederate::getPublicationUnits (const Publication &pub) const
-{
-    return (coreObject) ? coreObject->getUnits (pub.getHandle ()) : emptyStr;
 }
 
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)

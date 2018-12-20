@@ -302,8 +302,6 @@ Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 
 Endpoint &MessageFederate::getEndpoint (int index) const { return mfManager->getEndpoint (index); }
 
-const std::string &MessageFederate::getEndpointName (const Endpoint &ept) const { return ept.getName (); }
-
 void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &func)
 {
     mfManager->setEndpointNotificationCallback (func);

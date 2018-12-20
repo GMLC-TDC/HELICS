@@ -160,18 +160,24 @@ class Input
             }
         });
     }
-    /** get the Name for the subscription
+    /** get the Name/Key for the subscription
     @details the name is the local name if given, key is the full key name*/
     const std::string &getName () const { return actualName; }
-    /** get the type of the input*/
-    const std::string &getInjectionType () const
+    /** get the Name/Key for the subscription
+    @details the name is the local name if given, key is the full key name*/
+    const std::string &getKey () const { return actualName; }
+
+    /** get the type of the data coming from the publication*/
+    const std::string &getPublicationType () const
     {
-        return ((type == data_type::helicsUnknown)||(type==data_type::helicsCustom)) ? fed->getInjectionType (*this) : typeNameStringRef (type);
+        return ((type == data_type::helicsUnknown) || (type == data_type::helicsCustom)) ?
+                 fed->getInjectionType (*this) :
+                 typeNameStringRef (type);
     }
     /** get the type of the input*/
-    const std::string &getExtractionType () const { return fed->getExtractionType (*this); }
+    const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units associated with a input*/
-    const std::string &getUnits () const { return fed->getInputUnits (*this); }
+    const std::string &getUnits () const { return fed->getInterfaceUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     /** subscribe to a named publication*/

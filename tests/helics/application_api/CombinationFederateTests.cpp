@@ -51,15 +51,15 @@ BOOST_DATA_TEST_CASE (combo_federate_publication_registration, bdata::make (core
 
     BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto &sv = vFed1->getPublicationKey (pubid);
-    auto &sv2 = vFed1->getPublicationKey (pubid2);
+    auto &sv = vFed1->getInterfaceName (pubid);
+    auto &sv2 = vFed1->getInterfaceName (pubid2);
     BOOST_CHECK_EQUAL (sv, "fed0/pub1");
     BOOST_CHECK_EQUAL (sv2, "pub2");
-    auto &pub3name = vFed1->getPublicationKey (pubid3);
+    auto &pub3name = vFed1->getInterfaceName (pubid3);
     BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
 
     BOOST_CHECK_EQUAL (vFed1->getExtractionType (pubid3), "double");
-    BOOST_CHECK_EQUAL (vFed1->getPublicationUnits (pubid3), "V");
+    BOOST_CHECK_EQUAL (vFed1->getInterfaceUnits (pubid3), "V");
 
     BOOST_CHECK (vFed1->getPublication ("pub1").getHandle () == pubid.getHandle ());
     BOOST_CHECK (vFed1->getPublication ("pub2").getHandle () == pubid2.getHandle ());
@@ -116,8 +116,8 @@ BOOST_DATA_TEST_CASE (combo_federate_endpoint_registration, bdata::make (core_ty
 
     BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto &sv = mFed1->getEndpointName (epid);
-    auto &sv2 = mFed1->getEndpointName (epid2);
+    auto &sv = mFed1->getInterfaceName (epid);
+    auto &sv2 = mFed1->getInterfaceName (epid2);
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 

@@ -180,11 +180,6 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     void sendMessage (const Endpoint &source, const Message &message);
 
-    /** get the name of an endpoint from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string &getEndpointName (const Endpoint &ept) const;
-
     /** get an endpoint by its name
     @param[in] name the Endpoint
     @return an Endpoint*/

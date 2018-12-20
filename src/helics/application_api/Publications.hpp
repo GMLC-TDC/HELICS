@@ -172,7 +172,7 @@ class Publication
     bool operator< (const Publication &pub) const { return (handle < pub.handle); }
 
     /** get the key for the publication*/
-    const std::string &getKey () const { return fed->getPublicationKey (*this); }
+    const std::string &getKey () const { return fed->getInterfaceName (*this); }
     /** get the key for the publication*/
     const std::string &getName () const { return key_; }
     /** get the type for the publication*/

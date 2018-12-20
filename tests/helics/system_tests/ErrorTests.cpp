@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
     // copy constructor
     helics::Publication pub2 (pubid);
 
-    auto &sub = fed1->registerSubscription (fed1->getPublicationKey (pubid));
+    auto &sub = fed1->registerSubscription (fed1->getInterfaceName (pubid));
     fed1->enterExecutingMode ();
     fed1->publish (pubid, 45.7);
     fed1->requestTime (1.0);

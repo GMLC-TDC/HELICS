@@ -1060,7 +1060,14 @@ std::string Federate::query (const std::string &target, const std::string &query
     }
     else
     {
-        res = coreObject->query (target, queryStr);
+        if (coreObject)
+        {
+            res = coreObject->query (target, queryStr);
+        }
+        else
+        {
+            return "#invalid";
+        }
     }
     return res;
 }
@@ -1151,7 +1158,7 @@ void Federate::addSourceTarget (const Filter &filt, const std::string &targetEnd
 {
     if (coreObject)
     {
-        coreObject->addSourceTarget(filt.getHandle(), targetEndpoint);
+        coreObject->addSourceTarget (filt.getHandle (), targetEndpoint);
     }
 }
 
@@ -1159,22 +1166,28 @@ void Federate::addDestinationTarget (const Filter &filt, const std::string &targ
 {
     if (coreObject)
     {
-        coreObject->addDestinationTarget(filt.getHandle(), targetEndpoint);
+        coreObject->addDestinationTarget (filt.getHandle (), targetEndpoint);
     }
-    
 }
 
-const std::string &Federate::getFilterName (const Filter &filt) const { return filt.getName (); }
-
-
-const std::string &Federate::getInjectionType(interface_handle handle) const
+const std::string &Federate::getInterfaceName (interface_handle handle) const
 {
-    return (coreObject) ? (coreObject->getInjectionType(handle)) : emptyStr;
+    return (coreObject) ? (coreObject->getHandleName (handle)) : emptyStr;
 }
 
-const std::string &Federate::getExtractionType(interface_handle handle) const
+const std::string &Federate::getInjectionType (interface_handle handle) const
 {
-    return (coreObject) ? (coreObject->getExtractionType(handle)) : emptyStr;
+    return (coreObject) ? (coreObject->getInjectionType (handle)) : emptyStr;
+}
+
+const std::string &Federate::getExtractionType (interface_handle handle) const
+{
+    return (coreObject) ? (coreObject->getExtractionType (handle)) : emptyStr;
+}
+
+const std::string &Federate::getInterfaceUnits (interface_handle handle) const
+{
+    return (coreObject) ? (coreObject->getUnits (handle)) : emptyStr;
 }
 
 const Filter &Federate::getFilter (const std::string &filterName) const
@@ -1210,19 +1223,32 @@ void Federate::setInterfaceOption (interface_handle handle, int32_t option, bool
 {
     coreObject->setHandleOption (handle, option, option_value);
 }
+
 /** get the current value for an interface option*/
 bool Federate::getInterfaceOption (interface_handle handle, int32_t option)
 {
     return coreObject->getHandleOption (handle, option);
 }
 
-void Federate::closeInterface (interface_handle handle) { coreObject->closeHandle (handle); }
+void Federate::closeInterface (interface_handle handle)
+{
+    if (coreObject)
+    {
+        coreObject->closeHandle (handle);
+    }
+}
 
 void Federate::setInfo (interface_handle handle, const std::string &info)
 {
-    coreObject->setInterfaceInfo (handle, info);
+    if (coreObject)
+    {
+        coreObject->setInterfaceInfo (handle, info);
+    }
 }
 
-std::string const &Federate::getInfo (interface_handle handle) { return coreObject->getInterfaceInfo (handle); }
+std::string const &Federate::getInfo (interface_handle handle)
+{
+    return (coreObject) ? coreObject->getInterfaceInfo (handle) : emptyStr;
+}
 
 }  // namespace helics

@@ -418,14 +418,11 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @return an input_id_t from the object, or invalid_id if no input was found
     */
     const Input &getSubscription (const std::string &key) const;
+
     /** get the input id based on target
     @return an input_id_t from the object, or invalid_id if no input was found
     */
     Input &getSubscription (const std::string &key);
-
-    /** get the name of a publication from its id
-    @return empty string if an invalid id is passed*/
-    const std::string &getPublicationKey (const Publication &pub) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
@@ -452,21 +449,6 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param[in] name the name of the publication
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     const Publication &getPublication (const std::string &key, int index1, int index2) const;
-
-    /** get the units of a subscriptions from its id
-    @param[in] id the subscription id to query
-    @return the name or empty string on unrecognized id*/
-    const std::string &getInputUnits (const Input &inp) const;
-
-    /** get the units of a publication from its id
-    @param[in] id the publication id to query
-    @return the units or empty string on unrecognized id*/
-    const std::string &getPublicationUnits (const Publication &pub) const;
-
-    /** get the key of an input from its id
-    @param[in] id the input id to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getInputKey (const Input &inp) const;
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
