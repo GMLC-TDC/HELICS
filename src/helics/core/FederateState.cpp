@@ -270,6 +270,59 @@ void FederateState::addAction (ActionMessage &&action)
     }
 }
 
+void FederateState::createInterface (handle_type htype,
+                                     interface_handle handle,
+                                     const std::string &key,
+                                     const std::string &type,
+                                     const std::string &units)
+{
+    while (!processing.test_and_set ())
+    {
+        ;  // spin
+    }
+    // this function could be called externally in a multi-threaded context
+    switch (htype)
+    {
+    case handle_type::publication:
+    {
+        interfaceInformation.createPublication (handle, key, type, units);
+        if (checkActionFlag (getInterfaceFlags (), required_flag))
+        {
+            interfaceInformation.setPublicationProperty (handle, defs::options::connection_required, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), optional_flag))
+        {
+            interfaceInformation.setPublicationProperty (handle, defs::options::connection_optional, true);
+        }
+    }
+    break;
+    case handle_type::input:
+    {
+        interfaceInformation.createInput (handle, key, type, units);
+        if (strict_input_type_checking)
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::strict_type_checking, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), required_flag))
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::connection_required, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), optional_flag))
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::connection_optional, true);
+        }
+    }
+    break;
+    case handle_type::endpoint:
+    {
+        interfaceInformation.createEndpoint (handle, key, type);
+    }
+    break;
+        break;
+    }
+    processing.clear (std::memory_order_release);
+}
+
 void FederateState::closeInterface (interface_handle handle, handle_type type)
 {
     while (!processing.test_and_set ())

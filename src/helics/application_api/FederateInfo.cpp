@@ -87,6 +87,10 @@ static const std::map<std::string, int> propStringsTranslations{
   {"realtime", helics_flag_realtime},
   {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
   {"delayed_update", helics_flag_wait_for_current_time_update},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"required", helics_handle_option_connection_required},
+  {"optional", helics_handle_option_connection_optional},
   {"wait_for_current_time", helics_flag_wait_for_current_time_update}};
 
 static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",  "offset",
@@ -96,11 +100,21 @@ static const std::set<std::string> validTimeProperties{"period",      "timedelta
 
 static const std::set<std::string> validIntProperties{"max_iterations", "loglevel", "log_level", "maxiterations"};
 
-static const std::set<std::string> validFlagOptions{
-  "interruptible",         "uninterruptible",         "observer",        "source_only", "sourceonly",
-  "only_update_on_change", "only_transmit_on_change", "forward_compute", "realtime",    "delayed_update",
-  "wait_for_current_time",
-};
+static const std::set<std::string> validFlagOptions{"interruptible",
+                                                    "uninterruptible",
+                                                    "observer",
+                                                    "source_only",
+                                                    "sourceonly",
+                                                    "only_update_on_change",
+                                                    "only_transmit_on_change",
+                                                    "forward_compute",
+                                                    "realtime",
+                                                    "delayed_update",
+                                                    "wait_for_current_time",
+                                                    "strict_input_type_checking",
+                                                    "buffer_data",
+                                                    "required",
+                                                    "optional"};
 
 static const std::map<std::string, int> optionStringsTranslations{
   {"buffer", helics_handle_option_buffer_data},

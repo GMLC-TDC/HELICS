@@ -305,7 +305,14 @@ class FederateState
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
+	/** create an interface*/
+    void createInterface (handle_type htype,
+                          interface_handle handle,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units);
     /** close an interface*/
     void closeInterface (interface_handle handle, handle_type type);
+
 };
 }  // namespace helics

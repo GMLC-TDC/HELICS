@@ -808,7 +808,7 @@ interface_handle CommonCore::registerInput (federate_id_t federateID,
                                       fed->getInterfaceFlags ());
 
     auto id = handle.getInterfaceHandle ();
-    fed->interfaces ().createInput (id, key, type, units);
+    fed->createInterface (handle_type::input, id, key, type, units);
 
     LOG_INTERFACES (parent_broker_id, fed->getIdentifier (), fmt::format ("registering Input {}", key));
     ActionMessage m (CMD_REG_INPUT);
@@ -852,7 +852,7 @@ interface_handle CommonCore::registerPublication (federate_id_t federateID,
                                       fed->getInterfaceFlags ());
 
     auto id = handle.handle.handle;
-    fed->interfaces ().createPublication (id, key, type, units);
+    fed->createInterface (handle_type::publication, id, key, type, units);
 
     ActionMessage m (CMD_REG_PUB);
     m.source_id = fed->global_id.load ();
@@ -1250,7 +1250,7 @@ CommonCore::registerEndpoint (federate_id_t federateID, const std::string &name,
                                       std::string{}, fed->getInterfaceFlags ());
 
     auto id = handle.getInterfaceHandle ();
-    fed->interfaces ().createEndpoint (id, name, type);
+    fed->createInterface (handle_type::endpoint, id, name, type, emptyStr);
     ActionMessage m (CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load ();
     m.source_handle = id;
