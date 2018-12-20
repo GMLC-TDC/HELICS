@@ -165,7 +165,7 @@ class Input
     const std::string &getName () const { return actualName; }
     /** get the Name/Key for the subscription
     @details the name is the local name if given, key is the full key name*/
-    const std::string &getKey () const { return actualName; }
+    const std::string &getKey () const { return fed->getInterfaceName (handle); }
 
     /** get the type of the data coming from the publication*/
     const std::string &getPublicationType () const

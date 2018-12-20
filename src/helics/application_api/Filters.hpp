@@ -71,7 +71,9 @@ class Filter
     /** implicit conversion operator for extracting the handle*/
     operator interface_handle () const { return handle; }
     /** get the name for the filter*/
-    const std::string &getName () const;
+    const std::string &getName () const { return name; }
+    /** get the full global key for the filter*/
+    const std::string &getKey () const;
     /** get the specified input type of the filter*/
     const std::string &getInjectionType () const;
     /** get the specified output type of the filter*/

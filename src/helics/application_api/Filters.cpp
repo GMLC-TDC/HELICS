@@ -159,7 +159,7 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
 
 static const std::string emptyStr;
 
-const std::string &Filter::getName () const
+const std::string &Filter::getKey () const
 {
     if (corePtr != nullptr)
     {
