@@ -52,7 +52,7 @@ if (NOT ZeroMQ_LIBRARY_ONLY)
     #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
     if (${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
-      set(_ZeroMQ_VERSIONS "4_2_5" "4_2_4" "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
+      set(_ZeroMQ_VERSIONS "4_3_0" "4_2_5" "4_2_4" "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
       set(ZeroMQ_LIBRARY_NAME)
   	  foreach(ver ${_ZeroMQ_VERSIONS})
 	  		  list(APPEND ZeroMQ_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}")

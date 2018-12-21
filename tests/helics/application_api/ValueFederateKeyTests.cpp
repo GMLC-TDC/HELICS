@@ -34,6 +34,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     SetupTest<ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<ValueFederate> (0);
 
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
+
     // register the publications
     Publication pubid (vFed1.get (), "pub1", helicsType<std::string> ());
     PublicationT<int> pubid2 (GLOBAL, vFed1, "pub2");
@@ -59,8 +61,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK_EQUAL (sub3name, "sub3");
 
     BOOST_CHECK (subid1.getType ().empty ());  // def is the default type
-    BOOST_CHECK_EQUAL (subid2.getPublicationType (), "int32");
-    BOOST_CHECK (subid3.getPublicationType ().empty ());
+    BOOST_CHECK_EQUAL (subid2.getType (), "int32");
+    BOOST_CHECK (subid3.getType ().empty ());
     BOOST_CHECK_EQUAL (subid3.getUnits (), "V");
 
     // check publications
@@ -217,6 +219,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_inputs, bdata::make (core_typ
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto &inpid = vFed2->registerInput<std::string> ("inp1");
+
     vFed2->addTarget (inpid, "pub1");
     bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
     BOOST_CHECK (res);
