@@ -546,7 +546,7 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     BOOST_CHECK_NE (vFed.getName (), "test1");
 }
 
-static const std::vector<std::string> config_files{"example_value_fed.json", "example_value_fed.toml"};
+static constexpr const char *config_files[] = {"example_value_fed.json", "example_value_fed.toml"};
 
 BOOST_DATA_TEST_CASE (test_file_load, boost::unit_test::data::make (config_files), file)
 {

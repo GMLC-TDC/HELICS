@@ -93,7 +93,7 @@ class RingTransmit
 
 BOOST_AUTO_TEST_SUITE (ring_tests)
 
-const int fedCount[] = {3, 4};
+static constexpr int fedCount[] = {3, 4};
 // const int fedCount[] = { 180 };
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_DATA_TEST_CASE (ring_test_single_core, bdata::make (fedCount), feds)
@@ -125,7 +125,7 @@ BOOST_DATA_TEST_CASE (ring_test_single_core, bdata::make (fedCount), feds)
     std::cout << feds << " feds total time=" << diff.count () / 1000000 << "ms \n";
 }
 
-const int fedCountB[] = {5, 5, 5, 5};
+static constexpr int fedCountB[] = {5, 5, 5, 5};
 
 BOOST_DATA_TEST_CASE (ring_test_multicores, bdata::make (fedCountB), feds)
 {
