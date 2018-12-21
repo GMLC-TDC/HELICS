@@ -509,7 +509,6 @@ mark_as_advanced(ENABLE_DEBUG_LOGGING)
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
 # -----------------------------------------------------------------------------
-set(FMT_TEST OFF)
 set(FMT_ASSUME_CPP14_SUPPORT ON)
 set(FMT_SILENT ON)
 # get the FMT header only library
@@ -518,7 +517,6 @@ hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)
 hide_variable(FMT_TEST)
-hide_variable(FMT_USE_CPP14)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
