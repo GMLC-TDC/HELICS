@@ -351,6 +351,13 @@ extern "C"
     */
     HELICS_EXPORT int helicsGetPropertyIndex (const char *val);
 
+    /** get an option index for use in helicsPublicationSetOption, helicsInputSetOption, helicsEndpointSetOption, helicsFilterSetOption,
+    and the corresponding get functions
+    @param val a string with the option name
+    @return an int with the option index
+    */
+    HELICS_EXPORT int helicsGetOptionIndex (const char *val);
+
     /** set a flag in the info structure
     @details valid flags are available  flag-definitions.h
     @param fi the federate info object to alter

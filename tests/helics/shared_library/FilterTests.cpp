@@ -32,15 +32,15 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types), cor
     helicsFederateRegisterGlobalEndpoint (mFed, "port1", "", &err);
     helicsFederateRegisterGlobalEndpoint (mFed, "port2", NULL, &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
-    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter1", &err));
+    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "filter1", &err));
     CE (helicsFilterAddSourceTarget (f1, "port1", &err));
     BOOST_CHECK (f1 != NULL);
-    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "filter2", &err));
     CE (helicsFilterAddDestinationTarget (f2, "port2", &err));
     BOOST_CHECK (f2 != f1);
     CE (auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "", &err));
     BOOST_CHECK (ep1 != NULL);
-    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "c4", &err));
+    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "c4", &err));
     helicsFilterAddSourceTarget (f3, "filter0/fout", nullptr);
     BOOST_CHECK (f3 != f2);
 
@@ -81,17 +81,17 @@ BOOST_DATA_TEST_CASE (filter_info_tests, bdata::make (core_types), core_type)
     CE (helicsEndpointSetInfo (p1, "p1_test", &err));
     CE (helicsEndpointSetInfo (p2, "p2_test", &err));
 
-    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter1", &err));
+    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "filter1", &err));
     CE (helicsFilterAddSourceTarget (f1, "port1", &err));
     CE (helicsFilterSetInfo (f1, "f1_test", &err));
 
-    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "filter2", &err));
     CE (helicsFilterAddDestinationTarget (f2, "port2", &err));
     CE (helicsFilterSetInfo (f2, "f2_test", &err));
 
     CE (auto ep1 = helicsFederateRegisterEndpoint (fFed, "fout", "", &err));
     CE (helicsEndpointSetInfo (ep1, "ep1_test", &err));
-    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_custom, "c4", &err));
+    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filter_type_custom, "c4", &err));
     helicsFilterAddSourceTarget (f3, "filter0/fout", nullptr);
     CE (helicsFilterSetInfo (f3, "f3_test", &err));
 
@@ -124,11 +124,11 @@ BOOST_AUTO_TEST_CASE (core_filter_reg)
 
     BOOST_CHECK_EQUAL (core1IdentifierString, "core1");
 
-    CE (auto sourceFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type_t::helics_filtertype_delay,
+    CE (auto sourceFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type::helics_filter_type_delay,
                                                        "core1SourceFilter", &err));
 
     CE (helicsFilterAddSourceTarget (sourceFilter1, "ep1", &err));
-    CE (auto destinationFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type_t::helics_filtertype_delay,
+    CE (auto destinationFilter1 = helicsCoreRegisterFilter (core1, helics_filter_type::helics_filter_type_delay,
                                                             "core1DestinationFilter", &err));
 
     helicsFilterAddDestinationTarget (destinationFilter1, "ep2", &err);
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1", &err);
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_delay, "filter1", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE (helicsFilterAddSourceTarget (f1, "port1", &err));
     BOOST_CHECK (f1 != NULL);
@@ -225,14 +225,14 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1", &err);
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_delay, "filter1", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
     CE (helicsFilterAddSourceTarget (f1, "port1", &err));
 
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 1.25, &err));
 
-    CE (auto f2 = helicsFederateRegisterFilter (fFed2, helics_filtertype_delay, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed2, helics_filter_type_delay, "filter2", &err));
     CE (helicsFilterAddSourceTarget (f2, "port1", &err));
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 1.25, &err));
@@ -307,12 +307,12 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types), core_t
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter1", &err));
+    CE (auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_delay, "filter1", &err));
     helicsFilterAddSourceTarget (f1, "port1", nullptr);
     BOOST_CHECK (f1 != NULL);
     CE (helicsFilterSet (f1, "delay", 2.5, &err));
 
-    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filtertype_delay, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterFilter (fFed, helics_filter_type_delay, "filter2", &err));
     helicsFilterAddSourceTarget (f2, "port2", nullptr);
     BOOST_CHECK (f2 != NULL);
     CE (helicsFilterSet (f2, "delay", 2.5, &err));
@@ -374,14 +374,14 @@ BOOST_DATA_TEST_CASE (message_filter_function3, bdata::make (core_types), core_t
     auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "random", &err);
     BOOST_CHECK_EQUAL (err.error_code, helics_ok);
 
-    CE (auto f1 = helicsFederateRegisterGlobalFilter (fFed, helics_filtertype_custom, "filter1", &err));
+    CE (auto f1 = helicsFederateRegisterGlobalFilter (fFed, helics_filter_type_custom, "filter1", &err));
     BOOST_CHECK (f1 != NULL);
     helicsFilterAddSourceTarget (f1, "port1", nullptr);
-    CE (auto f2 = helicsFederateRegisterGlobalFilter (fFed, helics_filtertype_delay, "filter2", &err));
+    CE (auto f2 = helicsFederateRegisterGlobalFilter (fFed, helics_filter_type_delay, "filter2", &err));
     helicsFilterAddSourceTarget (f2, "port1", nullptr);
 
     helicsFederateRegisterEndpoint (fFed, "fout", "", &err);
-    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filtertype_random_delay, "filter3", &err));
+    CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filter_type_random_delay, "filter3", &err));
     helicsFilterAddSourceTarget (f3, "filter/fout", nullptr);
 
     CE (helicsFilterSet (f2, "delay", 2.5, &err));

@@ -97,7 +97,7 @@ end
 %! helicsBrokerFree(broker);
 %! helicsCloseLibrary();
 
-% 
+%
 % testFilterRegistration
 %!test
 %! helics
@@ -106,30 +106,30 @@ end
 %! try
 %! mFed=feds.mFed{1};
 %! fFed=feds.mFed{2};
-%! 
+%!
 %! helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
-%! 
+%!
 %! helicsFederateRegisterGlobalEndpoint(mFed, 'port2', 'random');
-%! 
-%! f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_custom,'filter1');
+%!
+%! f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_custom,'filter1');
 %! helicsFilterAddSourceTarget(f1,'port1');
-%! f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filtertype_delay,'filter2');
+%! f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_delay,'filter2');
 %! helicsFilterAddDestinationTarget(f2,'port2');
 %! helicsFederateRegisterEndpoint(fFed,'fout','');
-%! f3=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_random_delay,'filter3');
+%! f3=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_random_delay,'filter3');
 %! helicsFilterAddSourceTarget(f3,'fed2/fout');
-%! 
+%!
 %! helicsFederateEnterExecutingModeAsync(mFed);
 %! helicsFederateEnterExecutingMode(fFed);
-%! 
+%!
 %! helicsFederateEnterExecutingModeComplete(mFed);
-%! 
+%!
 %! filt_key = helicsFilterGetName(f1);
 %! assert(filt_key,'filter1');
-%! 
+%!
 %! filt_key = helicsFilterGetName(f2);
 %! assert(filt_key,'filter2');
-%! 
+%!
 %! success=closeStruct(feds);
 %! assert(success);
 %! catch e
@@ -139,7 +139,7 @@ end
 %!     assert(false);
 %! end_try_catch
 % end
-% 
+%
 % testFilterFunction
 %!test
 %! helics
@@ -148,36 +148,36 @@ end
 %! try
 %! mFed=feds.mFed{1};
 %! fFed=feds.mFed{2};
-%! 
+%!
 %! p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
-%! 
+%!
 %! p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 %! 
-%! f1=helicsFederateRegisterFilter(fFed,helics.helics_filtertype_delay,'filter1');
+%! f1=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_delay,'filter1');
 %! helicsFilterAddSourceTarget(f1,'port1');
 %! helicsFilterSet(f1,'delay',2.5);
-%! 
+%!
 %! helicsFederateEnterExecutingModeAsync(mFed);
 %! helicsFederateEnterExecutingMode(fFed);
 %! helicsFederateEnterExecutingModeComplete(mFed);
-%! 
+%!
 %! data='hello world';
 %! helicsEndpointSendMessageRaw(p1,'port2',data);
-%! 
+%!
 %! granted_time=helicsFederateRequestTime(mFed,1.0);
 %! assert(granted_time,1.0);
-%! 
+%!
 %! res=helicsFederateHasMessage(mFed);
 %! assert(res,0);
-%! 
+%!
 %! granted_time=helicsFederateRequestTime(mFed,3.0);
 %! assert(granted_time,2.5);
-%! 
-%! 
+%!
+%!
 %! res=helicsEndpointHasMessage(p2);
 %! assert(res,1);
-%! 
-%! 
+%!
+%!
 %! success=closeStruct(feds);
 %! assert(success);
 %! catch e

@@ -58,13 +58,14 @@ class FederateState
     std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<federate_state_t> state{HELICS_CREATED};  //!< the current state of the federate
+    std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false};  //!< flag indicating the federate is a source_only
     bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
+    bool strict_input_type_checking{false};  //!< flag indicating that inputs should have strict type checking
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -80,9 +81,8 @@ class FederateState
     int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
-
+  private:
     bool iterating = false;  //!< the federate is iterating at a time step
-    bool hasEndpoints = false;  //!< the federate has endpoints
     bool timeGranted_mode =
       false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     // 1 byte free
@@ -92,14 +92,12 @@ class FederateState
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
-
+    std::atomic<uint16_t> interfaceFlags{
+      0};  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id, std::deque<ActionMessage>>
       delayQueues;  //!< queue for delaying processing of messages for a time
-
     std::vector<interface_handle> events;  //!< list of value events to process
     std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
-    std::map<interface_handle, std::vector<std::unique_ptr<Message>>>
-      message_queue;  // structure of message queues
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
     std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
@@ -113,7 +111,7 @@ class FederateState
     Time nextMessageTime () const;
 
     /** update the federate state */
-    void setState (federate_state_t newState);
+    void setState (federate_state newState);
 
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
@@ -127,7 +125,7 @@ class FederateState
     void reInit ();
     /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
-    federate_state_t getState () const;
+    federate_state getState () const;
     InterfaceInfo &interfaces () { return interfaceInformation; }
     const InterfaceInfo &interfaces () const { return interfaceInformation; }
 
@@ -153,7 +151,8 @@ class FederateState
    the action Message should be CMD_FED_CONFIGURE
    */
     void setProperties (const ActionMessage &cmd);
-
+    /** set a property on a specific interface*/
+    void setInterfaceProperty (const ActionMessage &cmd);
     /** set a timeProperty for a the coordinator*/
     void setProperty (int timeProperty, Time propertyVal);
     /** set a timeProperty for a the coordinator*/
@@ -164,8 +163,18 @@ class FederateState
     Time getTimeProperty (int timeProperty) const;
     /** get an option flag value*/
     bool getOptionFlag (int optionFlag) const;
+    /** get the currently active option for a handle*/
+    bool getHandleOption (interface_handle handle, char iType, int32_t option) const;
+    /** get the currently active interface flags*/
+    uint16_t getInterfaceFlags () const { return interfaceFlags.load (); }
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
+    /** get the number of publications*/
+    int publicationCount () const;
+    /** get the number of endpoints*/
+    int endpointCount () const;
+    /** get the number of inputs*/
+    int inputCount () const;
 
   private:
     /** process the federate queue until returnable event
@@ -207,7 +216,9 @@ class FederateState
     void addDependency (global_federate_id fedToDependOn);
     /** add a dependent federate*/
     void addDependent (global_federate_id fedThatDependsOnThis);
-    /** specify the core object that manages this federate*/
+    /** check the interfaces for any issues*/
+    int checkInterfaces ();
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
@@ -294,7 +305,14 @@ class FederateState
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
+	/** create an interface*/
+    void createInterface (handle_type htype,
+                          interface_handle handle,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units);
     /** close an interface*/
     void closeInterface (interface_handle handle, handle_type type);
+
 };
 }  // namespace helics

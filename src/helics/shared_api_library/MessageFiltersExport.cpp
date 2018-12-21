@@ -55,7 +55,7 @@ static inline void coreAddFilter (helics_core core, std::unique_ptr<helics::Filt
     coreObj->filters.push_back (std::move (filt));
 }
 
-helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_type type, const char *name, helics_error *err)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed, err);
@@ -80,7 +80,7 @@ helics_filter helicsFederateRegisterFilter (helics_federate fed, helics_filter_t
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_filter_type type, const char *name, helics_error *err)
 {
     // now generate a generic subscription
     auto fedObj = getFedSharedPtr (fed, err);
@@ -106,7 +106,7 @@ helics_filter helicsFederateRegisterGlobalFilter (helics_federate fed, helics_fi
     return nullptr;
 }
 
-helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type_t type, const char *name, helics_error *err)
+helics_filter helicsCoreRegisterFilter (helics_core cr, helics_filter_type type, const char *name, helics_error *err)
 {
     auto core = getCoreSharedPtr (cr, err);
     if (!core)
@@ -493,5 +493,39 @@ void helicsFilterSetInfo (helics_filter filt, const char *info, helics_error *er
     catch (...)
     {
         helicsErrorHandler (err);
+    }
+}
+
+void helicsFilterSetOption (helics_filter filt, int option, helics_bool value, helics_error *err)
+{
+    auto filtObj = getFilterObj (filt, err);
+    if (filtObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        filtObj->filtPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+helics_bool helicsFilterGetOption (helics_filter filt, int option)
+{
+    auto filtObj = getFilterObj (filt, nullptr);
+    if (filtObj == nullptr)
+    {
+        return false;
+    }
+    try
+    {
+        return (filtObj->filtPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return false;
     }
 }

@@ -82,10 +82,10 @@ def test_message_filter_registration(broker):
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", None)
 
-    f1 = h.helicsFederateRegisterFilter (fFed, h.helics_filtertype_custom, "filter1")
-    f2 = h.helicsFederateRegisterFilter (fFed, h.helics_filtertype_custom, "filter2")
+    f1 = h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom, "filter1")
+    f2 = h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom, "filter2")
     h.helicsFederateRegisterEndpoint (fFed, "fout", "")
-    h.helicsFederateRegisterFilter (fFed, h.helics_filtertype_custom,  "filter0/fout")
+    h.helicsFederateRegisterFilter (fFed, h.helics_filter_type_custom,  "filter0/fout")
     h.helicsFederateEnterExecutingModeAsync(fFed)
     h.helicsFederateEnterExecutingMode(mFed)
     h.helicsFederateEnterExecutingModeComplete(fFed)
@@ -114,12 +114,12 @@ def test_message_filter_function(broker):
     p1 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port1", "")
     p2 = h.helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random")
 
-    f1 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_custom, "filter1")
+    f1 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filter_type_custom, "filter1")
     h.helicsFilterAddSourceTarget(f1, "port1")
-    f2 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filtertype_delay, "filter2")
+    f2 = h.helicsFederateRegisterGlobalFilter(fFed, h.helics_filter_type_delay, "filter2")
     h.helicsFilterAddSourceTarget(f2, "port1")
     h.helicsFederateRegisterEndpoint(fFed,'fout','');
-    f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filtertype_random_delay, 'filter3');
+    f3 = h.helicsFederateRegisterFilter(fFed, h.helics_filter_type_random_delay, 'filter3');
     h.helicsFilterAddSourceTarget(f3,'filter/fout');
 
     h.helicsFilterSet(f2, "delay", 2.5)

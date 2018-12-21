@@ -14,17 +14,21 @@ else()
 endif()
 
 if(BUILD_PYTHON_INTERFACE)
-  add_subdirectory(python_helics)
+  add_subdirectory(python)
 endif()
 
 if(BUILD_JAVA_INTERFACE)
-  add_subdirectory(java_helics)
+  add_subdirectory(java)
 endif()
 
 if(BUILD_MATLAB_INTERFACE)
-  add_subdirectory(matlab_helics)
+  add_subdirectory(matlab)
 endif()
 
 if(BUILD_OCTAVE_INTERFACE)
-  # add_subdirectory(octave_helics)
+   add_subdirectory(octave)
+endif()
+
+if(BUILD_CSHARP_INTERFACE)
+   #add_subdirectory(csharp)
 endif()

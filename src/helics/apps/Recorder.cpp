@@ -279,7 +279,7 @@ void Recorder::writeJsonFile (const std::string &filename)
             }
             if (v.first)
             {
-                point["type"] = subscriptions[v.index].getType ();
+                point["type"] = subscriptions[v.index].getPublicationType ();
             }
             doc["points"].append (point);
         }
@@ -335,7 +335,7 @@ void Recorder::writeTextFile (const std::string &filename)
         if (v.first)
         {
             outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getTarget () << '\t'
-                    << v.value << '\t' << subscriptions[v.index].getType () << '\n';
+                    << v.value << '\t' << subscriptions[v.index].getPublicationType () << '\n';
         }
         else
         {

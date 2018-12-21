@@ -28,7 +28,7 @@ static const ArgDescriptors InfoArgs{
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
   {"core,c"s, "type of the core to connect to"s},
-  {"type"s, "type of the core to connect to"s},
+  {"type,t"s, "type of the core to connect to"s},
   {"coretype"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
@@ -87,6 +87,10 @@ static const std::map<std::string, int> propStringsTranslations{
   {"realtime", helics_flag_realtime},
   {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
   {"delayed_update", helics_flag_wait_for_current_time_update},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"required", helics_handle_option_connection_required},
+  {"optional", helics_handle_option_connection_optional},
   {"wait_for_current_time", helics_flag_wait_for_current_time_update}};
 
 static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",  "offset",
@@ -96,10 +100,60 @@ static const std::set<std::string> validTimeProperties{"period",      "timedelta
 
 static const std::set<std::string> validIntProperties{"max_iterations", "loglevel", "log_level", "maxiterations"};
 
-static const std::set<std::string> validFlagOptions{
-  "interruptible",         "uninterruptible",         "observer",        "source_only", "sourceonly",
-  "only_update_on_change", "only_transmit_on_change", "forward_compute", "realtime",    "delayed_update",
-  "wait_for_current_time"};
+static const std::set<std::string> validFlagOptions{"interruptible",
+                                                    "uninterruptible",
+                                                    "observer",
+                                                    "source_only",
+                                                    "sourceonly",
+                                                    "only_update_on_change",
+                                                    "only_transmit_on_change",
+                                                    "forward_compute",
+                                                    "realtime",
+                                                    "delayed_update",
+                                                    "wait_for_current_time",
+                                                    "strict_input_type_checking",
+                                                    "buffer_data",
+                                                    "required",
+                                                    "optional"};
+
+static const std::map<std::string, int> optionStringsTranslations{
+  {"buffer", helics_handle_option_buffer_data},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"bufferdata", helics_handle_option_buffer_data},
+  {"optional", helics_handle_option_connection_optional},
+  {"connectionoptional", helics_handle_option_connection_optional},
+  {"connection_optional", helics_handle_option_connection_optional},
+  {"required", helics_handle_option_connection_required},
+  {"connectionrequired", helics_handle_option_connection_required},
+  {"connection_required", helics_handle_option_connection_required},
+  {"ignore_interrupts", helics_handle_option_ignore_interrupts},
+  {"ignoreinterrupts", helics_handle_option_ignore_interrupts},
+  {"nointerrupts", helics_handle_option_ignore_interrupts},
+  {"no_interrupts", helics_handle_option_ignore_interrupts},
+  {"uninterruptible", helics_handle_option_ignore_interrupts},
+  {"multiple", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections", helics_handle_option_multiple_connections_allowed},
+  {"multiple_connections_allowed", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnections", helics_handle_option_multiple_connections_allowed},
+  {"multipleconnectionsallowed", helics_handle_option_multiple_connections_allowed},
+  {"single", helics_handle_option_single_connection_only},
+  {"single_connection", helics_handle_option_single_connection_only},
+  {"single_connection_only", helics_handle_option_single_connection_only},
+  {"singleconnection", helics_handle_option_single_connection_only},
+  {"singleconnectionsonly", helics_handle_option_single_connection_only},
+  {"only_transmit_on_change", helics_handle_option_only_transmit_on_change},
+  {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
+  {"only_update_on_change", helics_handle_option_only_update_on_change},
+  {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+  {"strict_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_type_matching", helics_handle_option_strict_type_checking},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"strict_input_type_matching", helics_handle_option_strict_type_checking},
+  {"strictinputtypechecking", helics_handle_option_strict_type_checking},
+  {"strictinputtypematching", helics_handle_option_strict_type_checking},
+  {"stricttypechecking", helics_handle_option_strict_type_checking},
+  {"stricttypematching", helics_handle_option_strict_type_checking},
+  {"strict", helics_handle_option_strict_type_checking}};
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
@@ -141,6 +195,34 @@ int getPropertyIndex (std::string val)
     makeLowerCase (val);
     fnd = propStringsTranslations.find (val);
     if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = propStringsTranslations.find (val);
+    if (fnd != propStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    return -1;
+}
+
+int getOptionIndex (std::string val)
+{
+    auto fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    makeLowerCase (val);
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
+    {
+        return fnd->second;
+    }
+    val.erase (std::remove (val.begin (), val.end (), '_'), val.end ());
+    fnd = optionStringsTranslations.find (val);
+    if (fnd != optionStringsTranslations.end ())
     {
         return fnd->second;
     }
@@ -376,7 +458,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
-    if (doc.isMember ("coretype"))
+    else if (doc.isMember ("coretype"))
     {
         try
         {
@@ -387,8 +469,20 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
             std::cerr << "Unrecognized core type\n";
         }
     }
+    else if (doc.isMember ("type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].asString ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
     replaceIfMember (doc, "name", fi.defName);
     replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
     replaceIfMember (doc, "coreInit", fi.coreInitString);
     replaceIfMember (doc, "coreinit", fi.coreInitString);
     replaceIfMember (doc, "coreinitstring", fi.coreInitString);
@@ -503,8 +597,20 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
             std::cerr << "Unrecognized core type\n";
         }
     }
+    else if (isMember (doc, "type"))
+    {
+        try
+        {
+            fi.coreType = coreTypeFromString (doc["type"].as<std::string> ());
+        }
+        catch (const std::invalid_argument &ia)
+        {
+            std::cerr << "Unrecognized core type\n";
+        }
+    }
     replaceIfMember (doc, "name", fi.defName);
     replaceIfMember (doc, "coreName", fi.coreName);
+    replaceIfMember (doc, "corename", fi.coreName);
     replaceIfMember (doc, "coreInit", fi.coreInitString);
     replaceIfMember (doc, "coreinit", fi.coreInitString);
     replaceIfMember (doc, "coreinitstring", fi.coreInitString);

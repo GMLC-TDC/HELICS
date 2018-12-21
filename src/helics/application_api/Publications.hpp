@@ -162,6 +162,8 @@ class Publication
     /** get the publication id that can be used to make the function calls from a Value Federate
      */
     interface_handle getHandle () const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
 
     /** check if the Publication links to a valid operation*/
     bool isValid () const { return handle.isValid (); }
@@ -170,17 +172,25 @@ class Publication
     bool operator< (const Publication &pub) const { return (handle < pub.handle); }
 
     /** get the key for the publication*/
-    const std::string &getKey () const { return fed->getPublicationKey (*this); }
+    const std::string &getKey () const { return fed->getInterfaceName (*this); }
     /** get the key for the publication*/
     const std::string &getName () const { return key_; }
     /** get the type for the publication*/
-    const std::string &getType () const { return fed->getPublicationType (*this); }
+    const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units of the publication*/
     const std::string &getUnits () const { return units_; }
     /** get the interface information field of the publication*/
     const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { fed->setInfo (handle, info); }
+    /** set an option on the publication
+    @param option the option to set
+    @param value the value to set the option*/
+    void setOption (int option, bool value = true) { fed->setInterfaceOption (handle, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int option) const { return fed->getInterfaceOption (handle, option); }
+
     /** add a target to the publication*/
     void addTarget (const std::string &target) { fed->addTarget (*this, target); }
     /** remove a named input from sending data*/

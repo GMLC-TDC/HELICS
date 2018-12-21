@@ -3,9 +3,9 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "MessageFederateManager.hpp"
 #include "../core/Core.hpp"
 #include "../core/queryHelpers.hpp"
-#include "MessageFederateManager.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include <cassert>
 
@@ -283,19 +283,9 @@ const Endpoint &MessageFederateManager::getEndpoint (int index) const
     return invalidEpt;
 }
 
-const std::string &MessageFederateManager::getEndpointType (const Endpoint &ept) const
-{
-    return coreObject->getType (ept.handle);
-}
-
 int MessageFederateManager::getEndpointCount () const
 {
     return static_cast<int> (local_endpoints.lock_shared ()->size ());
-}
-
-void MessageFederateManager::setEndpointOption (const Endpoint &ept, int32_t option, bool option_value)
-{
-    coreObject->setHandleOption (ept.handle, option, option_value);
 }
 
 void MessageFederateManager::addSourceFilter (const Endpoint &ept, const std::string &filterName)

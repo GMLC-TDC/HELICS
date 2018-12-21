@@ -161,14 +161,14 @@ class ActionMessage
         if (messageAction == CMD_TIME_REQUEST)
         {
             size += 24;
-    }
+        }
         if (!stringData.empty ())
-    {
+        {
             for (auto &str : stringData)
             {
                 // 4(to store the length)+length of the string
                 size += static_cast<int> (str.size ()) + 4;
-    }
+            }
         }
         return size;
     }
@@ -278,6 +278,10 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_REMOVE_FILTER:
     case CMD_REMOVE_ENDPOINT:
+    case CMD_DISCONNECT_FED_ACK:
+    case CMD_DISCONNECT_CORE_ACK:
+    case CMD_DISCONNECT_BROKER_ACK:
+    case CMD_DISCONNECT_BROKER:
     case CMD_STOP:
         return true;
     default:

@@ -20,7 +20,7 @@ class Endpoint
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     std::string targetDest;  //!< a predefined target destination
-    std::string actualName;  //!< the name of the federate
+    std::string actualName;  //!< the name of the endpoint
     bool disableAssign = false;  //!< disable assignment for the object
   public:
     /** default constructor*/
@@ -171,15 +171,25 @@ class Endpoint
     void setTargetDestination (const std::string &target) { targetDest = target; }
     /** get the name of the endpoint*/
     const std::string &getName () const { return actualName; }
+    /** get the name of the endpoint*/
+    const std::string &getKey () const { return fed->getInterfaceName (handle); }
     /** get the specified type of the endpoint*/
-    const std::string &getType () const { return fed->getEndpointType (*this); }
+    const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the actual endpoint id for the fed*/
     interface_handle getHandle () const { return handle; }
+    /** implicit conversion operator for extracting the handle*/
+    operator interface_handle () const { return handle; }
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return fed->getInfo(handle); }
+    const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { fed->setInfo(handle, info); }
-	void close() { fed->closeInterface(handle); }
+    void setInfo (const std::string &info) { fed->setInfo (handle, info); }
+    void setOption (int32_t option, bool value) { fed->setInterfaceOption (handle, option, value); }
+
+    /** get the current value of a flag for the handle*/
+    bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
+    /** close the endpoint from receiving more messages*/
+    void close () { fed->closeInterface (handle); }
+
   private:
     friend class MessageFederateManager;
 };

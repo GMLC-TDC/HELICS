@@ -101,12 +101,9 @@ class MessageFederateManager
     Endpoint &getEndpoint (const std::string &name);
     const Endpoint &getEndpoint (const std::string &name) const;
 
-	Endpoint &getEndpoint (int index);
+    Endpoint &getEndpoint (int index);
     const Endpoint &getEndpoint (int index) const;
-    /** get the type of an endpoint from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed or no type was specified*/
-    const std::string &getEndpointType (const Endpoint &ept) const;
+
     /** register a callback function to call when any endpoint receives a message
     @details there can only be one generic callback
     @param[in] callback the function to call
@@ -116,35 +113,35 @@ class MessageFederateManager
     @param[in] id  the endpoint id to register the callback for
     @param[in] callback the function to call
     */
-    void setEndpointNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void
+    setEndpointNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
     /**disconnect from the coreObject*/
     void disconnect ();
     /**get the number of registered endpoints*/
     int getEndpointCount () const;
 
-    /** set an endpoint option */
-    void setEndpointOption (const Endpoint &ept, int32_t option, bool option_value);
     /** add a named filter to an endpoint for all message coming from the endpoint*/
     void addSourceFilter (const Endpoint &ept, const std::string &filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
     void addDestinationFilter (const Endpoint &ept, const std::string &filterName);
 
   private:
-	  class EndpointData
-	  {
-        public:
-          SimpleQueue<std::unique_ptr<Message>> messages;
-          std::function<void(Endpoint &, Time)> callback;
-	  };
-    shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle,reference_stability::stable>>
+    class EndpointData
+    {
+      public:
+        SimpleQueue<std::unique_ptr<Message>> messages;
+        std::function<void(Endpoint &, Time)> callback;
+    };
+    shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
       local_endpoints;  //!< storage for the local endpoint information
-      atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
+    atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
-    MessageFederate *mFed; //!< pointer back to the message Federate
+    MessageFederate *mFed;  //!< pointer back to the message Federate
     const federate_id_t fedID;  //!< storage for the federate ID
-    shared_guarded<std::vector<std::unique_ptr<EndpointData>>> eptData;  //!< the storage for the message queues and other unique Endpoint information
+    shared_guarded<std::vector<std::unique_ptr<EndpointData>>>
+      eptData;  //!< the storage for the message queues and other unique Endpoint information
     guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages
   private:  // private functions
     void removeOrderedMessage (unsigned int index);

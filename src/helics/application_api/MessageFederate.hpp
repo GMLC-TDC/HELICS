@@ -52,26 +52,29 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
     virtual void updateTime (Time newTime, Time oldTime) override;
-    virtual std::string localQuery(const std::string &queryStr) const override;
+    virtual std::string localQuery (const std::string &queryStr) const override;
+
   public:
     /** register an endpoint
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint &registerEndpoint (const std::string &name=std::string(), const std::string &type = std::string());
+    Endpoint &
+    registerEndpoint (const std::string &name = std::string (), const std::string &type = std::string ());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint &registerGlobalEndpoint (const std::string &name, const std::string &type = std::string());
+    Endpoint &registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ());
     virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set Message interfaces
     @details call is only valid in startup mode it is a protected call to add an
-    @param[in] configString  the location of the file(TOML or JSON) or JSON String to load to generate the interfaces
+    @param[in] configString  the location of the file(TOML or JSON) or JSON String to load to generate the
+    interfaces
     */
     void registerMessageInterfaces (const std::string &configString);
 
@@ -82,14 +85,13 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
  */
     void registerMessageInterfacesJson (const std::string &jsonString);
 
-	 /** register a set Message interfaces
-   @details call is only valid in startup mode it is a protected call to add an
-   @param[in] configString  the location of the TOML to load to generate the interfaces
-   */
+    /** register a set Message interfaces
+  @details call is only valid in startup mode it is a protected call to add an
+  @param[in] configString  the location of the TOML to load to generate the interfaces
+  */
     void registerMessageInterfacesToml (const std::string &tomlString);
 
   public:
-
     /** give the core a hint for known communication paths
     @details the function will generate an error in the core if a communication path is not present once the
     simulation is initialized
@@ -178,26 +180,15 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     void sendMessage (const Endpoint &source, const Message &message);
 
-    /** get the name of an endpoint from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    const std::string &getEndpointName (const Endpoint &ept) const;
-
     /** get an endpoint by its name
     @param[in] name the Endpoint
     @return an Endpoint*/
     Endpoint &getEndpoint (const std::string &name) const;
 
-	/** get an Endpoint from an index
+    /** get an Endpoint from an index
     @param[in] index the index of the endpoint to retrieve
     @return an Endpoint*/
     Endpoint &getEndpoint (int index) const;
-
-    /** get the type associated with an endpoint
-    @param[in] ep the endpoint identifier
-    @return a string containing the endpoint type
-    */
-    const std::string &getEndpointType (const Endpoint &ept) const;
 
     /** register a callback for all endpoints
     @param[in] callback the function to execute upon receipt of a message for any endpoint
@@ -207,12 +198,10 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] ep the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
-    void setMessageNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    void
+    setMessageNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
-	/** set an endpoint option */
-	void setEndpointOption(const Endpoint &ept, int32_t option, bool option_value = true);
-
-	/** add a named filter to an endpoint for all message coming from the endpoint*/
+    /** add a named filter to an endpoint for all message coming from the endpoint*/
     void addSourceFilter (const Endpoint &ept, const std::string &filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
     void addDestinationFilter (const Endpoint &ept, const std::string &filterName);
