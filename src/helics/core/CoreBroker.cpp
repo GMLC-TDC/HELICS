@@ -412,18 +412,18 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         auto fed = _federates.find (command.name);
         if (fed != _federates.end ())
         {
-            fed->global_id = global_federate_id (command.dest_id);
+            fed->global_id = command.dest_id;
             auto route = fed->route;
-            _federates.addSearchTerm (global_federate_id (command.dest_id), fed->name);
+            _federates.addSearchTerm (command.dest_id, fed->name);
             transmit (route, command);
             routing_table.emplace (fed->global_id, route);
         }
         else
         {
             // this means we haven't seen this federate before for some reason
-            _federates.insert (command.name, global_federate_id (command.dest_id), command.name);
+            _federates.insert (command.name, command.dest_id, command.name);
             _federates.back ().route = getRoute (command.source_id);
-            _federates.back ().global_id = global_federate_id (command.dest_id);
+            _federates.back ().global_id = command.dest_id;
             routing_table.emplace (fed->global_id, _federates.back ().route);
             // it also means we don't forward it
         }
@@ -441,10 +441,10 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                 return;
             }
 
-            global_broker_id_local = global_broker_id (command.dest_id);
+            global_broker_id_local = global_broker_id{command.dest_id};
             global_id.store (global_broker_id_local);
-            higher_broker_id = global_broker_id (command.source_id);
-            timeCoord->source_id = global_federate_id (global_broker_id_local);
+            higher_broker_id = global_broker_id{command.source_id};
+            timeCoord->source_id = global_broker_id_local;
             transmitDelayedMessages ();
             for (auto &brk : _brokers)
             {
@@ -1018,7 +1018,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         else
         {
-            transmit (getRoute (global_federate_id (command.dest_id)), command);
+            transmit (getRoute (command.dest_id), command);
         }
 
         break;
@@ -1367,8 +1367,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                     {
                         // an anonymous publisher is adding an input
                         auto &apub =
-                          handles.addHandle (global_federate_id (command.source_id),
-                                             interface_handle (command.source_handle), handle_type::publication,
+                          handles.addHandle (command.source_id, command.source_handle, handle_type::publication,
                                              std::string (), command.getString (typeStringLoc),
                                              command.getString (unitStringLoc));
 
@@ -1385,8 +1384,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                     {
                         // an anonymous filter is adding and endpoint
                         auto &afilt =
-                          handles.addHandle (global_federate_id (command.source_id),
-                                             interface_handle (command.source_handle), handle_type::filter,
+                          handles.addHandle (command.source_id, command.source_handle, handle_type::filter,
                                              std::string (), command.getString (typeStringLoc),
                                              command.getString (typeOutStringLoc));
 
@@ -1499,7 +1497,7 @@ void CoreBroker::removeNamedTarget (ActionMessage &command)
 
 void CoreBroker::addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m)
 {
-    auto res = global_id_translation.find (global_federate_id (m.source_id));
+    auto res = global_id_translation.find (m.source_id);
     if (res != global_id_translation.end ())
     {
         handleInfo.local_fed_id = res->second;
@@ -1519,8 +1517,8 @@ void CoreBroker::addPublication (ActionMessage &m)
         routeMessage (eret);
         return;
     }
-    auto &pub = handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
-                                   handle_type::publication, m.name, m.getString (0), m.getString (1));
+    auto &pub = handles.addHandle (m.source_id, m.source_handle, handle_type::publication, m.name, m.getString (0),
+                                   m.getString (1));
 
     addLocalInfo (pub, m);
     if (!isRootc)
@@ -1544,8 +1542,8 @@ void CoreBroker::addInput (ActionMessage &m)
         routeMessage (eret);
         return;
     }
-    auto &inp = handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
-                                   handle_type::input, m.name, m.getString (0), m.getString (1));
+    auto &inp = handles.addHandle (m.source_id, m.source_handle, handle_type::input, m.name, m.getString (0),
+                                   m.getString (1));
 
     addLocalInfo (inp, m);
     if (!isRootc)
@@ -1570,9 +1568,8 @@ void CoreBroker::addEndpoint (ActionMessage &m)
         routeMessage (eret);
         return;
     }
-    auto &ept =
-      handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle),
-                         handle_type::endpoint, m.name, m.getString (typeStringLoc), m.getString (unitStringLoc));
+    auto &ept = handles.addHandle (m.source_id, m.source_handle, handle_type::endpoint, m.name,
+                                   m.getString (typeStringLoc), m.getString (unitStringLoc));
 
     addLocalInfo (ept, m);
 
@@ -1609,9 +1606,8 @@ void CoreBroker::addFilter (ActionMessage &m)
         return;
     }
 
-    auto &filt =
-      handles.addHandle (global_federate_id (m.source_id), interface_handle (m.source_handle), handle_type::filter,
-                         m.name, m.getString (typeStringLoc), m.getString (typeOutStringLoc));
+    auto &filt = handles.addHandle (m.source_id, m.source_handle, handle_type::filter, m.name,
+                                    m.getString (typeStringLoc), m.getString (typeOutStringLoc));
     addLocalInfo (filt, m);
 
     if (!isRootc)
@@ -1700,7 +1696,7 @@ bool CoreBroker::connect ()
                 if (!_isRoot)
                 {
                     ActionMessage m (CMD_REG_BROKER);
-                    m.source_id = global_federate_id ();
+                    m.source_id = global_federate_id{};
                     m.name = getIdentifier ();
                     m.setStringData (getAddress ());
                     transmit (parent_route_id, m);
@@ -1842,7 +1838,7 @@ void CoreBroker::routeMessage (const ActionMessage &cmd)
 
 void CoreBroker::routeMessage (ActionMessage &&cmd, global_federate_id dest)
 {
-    if (dest == global_federate_id ())
+    if (!dest.isValid ())
     {
         return;
     }
@@ -2002,7 +1998,7 @@ void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)
     }
     if (!Handles.empty ())
     {
-        unknownHandles.clearPublication (handleInfo.key);
+        unknownHandles.clearInput (handleInfo.key);
     }
 }
 
@@ -2497,7 +2493,7 @@ void CoreBroker::processLocalQuery (const ActionMessage &m)
     }
     else
     {
-        routeMessage (std::move (queryRep), global_federate_id (m.source_id));
+        routeMessage (std::move (queryRep), m.source_id);
     }
 }
 

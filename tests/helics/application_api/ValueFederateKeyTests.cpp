@@ -306,12 +306,12 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_direct, bdata::ma
     BOOST_CHECK (res);
 }
 
-static const std::vector<std::string> simple_connection_files{"example_connections1.json",
-                                                              "example_connections2.json",
-                                                              "example_connections1.toml",
-                                                              "example_connections2.toml",
-                                                              "example_connections3.toml",
-                                                              "example_connections4.toml"};
+static constexpr const char *simple_connection_files[] = {"example_connections1.json",
+                                                          "example_connections2.json",
+                                                          "example_connections1.toml",
+                                                          "example_connections2.toml",
+                                                          "example_connections3.toml",
+                                                          "example_connections4.toml"};
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_file,
                       bdata::make (simple_connection_files),
