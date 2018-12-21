@@ -4,9 +4,9 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include <cpp98/ValueFederate.hpp>
 #include <cpp98/Broker.hpp>
-#include <cpp98/helics.hpp> // helicsVersionString
+#include <cpp98/ValueFederate.hpp>
+#include <cpp98/helics.hpp>  // helicsVersionString
 #include <math.h>
 #include <stdio.h>
 #ifdef _MSC_VER
@@ -17,20 +17,20 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 int main (int /*argc*/, char ** /*argv*/)
 {
-    std::string initstring = "2 --name=mainbroker";
+    std::string initstring = "-f 2 --name=mainbroker";
     std::string fedinitstring = "--broker=mainbroker --federates=1";
     double deltat = 0.01;
-    helics98::Publication pub;
-    helics98::Subscription sub;
+    helicscpp::Publication pub;
+    helicscpp::Input sub;
 
-    std::string helicsversion = helics98::getHelicsVersionString();
+    std::string helicsversion = helicscpp::getHelicsVersionString ();
 
-    printf (" Helics version = %s\n", helicsversion.c_str());
+    printf (" Helics version = %s\n", helicsversion.c_str ());
 
     /* Create broker */
-    helics98::Broker broker("zmq", "", initstring);
+    helicscpp::Broker broker ("zmq", "", initstring);
 
-    if (broker.isConnected())
+    if (broker.isConnected ())
     {
         printf (" Broker created and connected\n");
     }
@@ -38,49 +38,49 @@ int main (int /*argc*/, char ** /*argv*/)
     /* Create Federate Info object that describes the federate properties
      * Set federate name and core type from string
      */
-    helics98::FederateInfo fi ("TestA Federate", "zmq");
+    helicscpp::FederateInfo fi ("zmq");
 
     /* Federate init string */
     fi.setCoreInitString (fedinitstring);
-    fi.setTimeDelta (deltat);
-    fi.setMaxIterations (100);
+    fi.setProperty (helics_property_time_delta, deltat);
+    fi.setProperty (helics_property_int_max_iterations, 100);
 
-    //fi.setLoggingLevel(5);
+    // fi.setLoggingLevel(5);
 
     /* Create value federate */
-    helics98::ValueFederate* vfed = new helics98::ValueFederate (fi);
+    helicscpp::ValueFederate *vfed = new helicscpp::ValueFederate ("TestA Federate", fi);
     printf (" Value federate created\n");
 
     /* Register the publication */
-    pub = vfed->registerGlobalPublication ("testA", "double");
+    pub = vfed->registerGlobalTypePublication ("testA", "double");
     printf (" Publication registered\n");
 
-    sub = vfed->registerSubscription ("testB", "double");
+    sub = vfed->registerSubscription ("testB");
     printf (" Subscription registered\n");
 
     /* Register the subscription */
 
     /* Enter initialization state */
-    vfed->enterInitializationMode (); // can throw helics98::InvalidStateTransition exception
+    vfed->enterInitializingMode ();  // can throw helicscpp::InvalidStateTransition exception
     printf (" Entered initialization state\n");
 
-    double x = 0.0, /*yprv = 100,*/ xprv=100;
-    helics_time_t currenttime = 0.0;
-    helics98::helics_iteration_time currenttimeiter;
-    currenttimeiter.status = iterating;
-   // int isUpdated;
+    double x = 0.0, /*yprv = 100,*/ xprv = 100;
+    helics_time currenttime = 0.0;
+    helicscpp::helics_iteration_time currenttimeiter;
+    currenttimeiter.status = helics_iteration_result_iterating;
+    // int isUpdated;
     double tol = 1E-8;
 
     pub.publish (x);
     /* Enter execution state */
-    vfed->enterExecutionMode (); // can throw helics98::InvalidStateTransition exception
+    vfed->enterExecutingMode ();  // can throw helicscpp::InvalidStateTransition exception
     printf (" Entered execution state\n");
 
     fflush (NULL);
     int helics_iter = 0;
-    while (currenttimeiter.status == iterating)
+    while (currenttimeiter.status == helics_iteration_result_iterating)
     {
-    //    yprv = y;
+        //    yprv = y;
         double y = sub.getDouble ();
         int newt_conv = 0, max_iter = 10, iter = 0;
         /* Solve the equation using Newton */
@@ -102,15 +102,15 @@ int main (int /*argc*/, char ** /*argv*/)
             x = x - f1 / J1;
         }
         ++helics_iter;
-        printf("Fed1: iteration %d x=%f, y=%f\n",helics_iter, x, y);
+        printf ("Fed1: iteration %d x=%f, y=%f\n", helics_iter, x, y);
 
-        if ((fabs(x-xprv)>tol)||(helics_iter<5))
+        if ((fabs (x - xprv) > tol) || (helics_iter < 5))
         {
             pub.publish (x);
-            printf("Fed1: publishing new x\n");
+            printf ("Fed1: publishing new x\n");
         }
-        fflush(NULL);
-        currenttimeiter = vfed->requestTimeIterative(currenttime, iterate_if_needed);
+        fflush (NULL);
+        currenttimeiter = vfed->requestTimeIterative (currenttime, helics_iteration_request_iterate_if_needed);
         xprv = x;
     }
 
@@ -118,7 +118,7 @@ int main (int /*argc*/, char ** /*argv*/)
     fflush (NULL);
     // Destructor for ValueFederate must be called before close library
     delete vfed;
-    while (broker.isConnected())
+    while (broker.isConnected ())
     {
 #ifdef _MSC_VER
         Sleep (50);
@@ -132,4 +132,3 @@ int main (int /*argc*/, char ** /*argv*/)
     fflush (NULL);
     return (0);
 }
-

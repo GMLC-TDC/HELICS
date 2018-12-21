@@ -19,16 +19,12 @@ class EndpointInfo
 {
   public:
     /** constructor from all data*/
-    EndpointInfo (Core::handle_id_t id_,
-                  Core::federate_id_t fed_id_,
-                  const std::string &key_,
-                  const std::string &type_)
-        : id (id_), fed_id (fed_id_), key (key_), type (type_)
+    EndpointInfo (global_handle id_, const std::string &key_, const std::string &type_)
+        : id (id_), key (key_), type (type_)
     {
     }
 
-    const Core::handle_id_t id;  //!< identifier for the endpoint
-    const Core::federate_id_t fed_id;  //!< local federate id
+    const global_handle id;  //!< identifier for the handle
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
@@ -43,5 +39,7 @@ class EndpointInfo
     void addMessage (std::unique_ptr<Message> message);
     /** get the timestamp of the first message in the queue*/
     Time firstMessageTime () const;
+    /** clear all the message queues*/
+    void clearQueue ();
 };
 }  // namespace helics

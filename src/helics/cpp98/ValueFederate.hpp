@@ -7,205 +7,201 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
 #pragma once
 
-#include "Federate.hpp"
 #include "../shared_api_library/ValueFederate.h"
+#include "Federate.hpp"
+#include "Input.hpp"
 #include "Publication.hpp"
-#include "Subscription.hpp"
-#include <sstream>
 #include <exception>
+#include <sstream>
 
-namespace helics98
+namespace helicscpp
 {
 enum PubSubTypes
 {
-    STRING_TYPE = HELICS_DATA_TYPE_STRING,
-    DOUBLE_TYPE = HELICS_DATA_TYPE_DOUBLE,
-    INT_TYPE = HELICS_DATA_TYPE_INT,
-    COMPLEX_TYPE = HELICS_DATA_TYPE_COMPLEX,
-    VECTOR_TYPE = HELICS_DATA_TYPE_VECTOR,
-    RAW_TYPE = HELICS_DATA_TYPE_RAW
+    STRING_TYPE = helics_data_type_string,
+    DOUBLE_TYPE = helics_data_type_double,
+    INT_TYPE = helics_data_type_int,
+    COMPLEX_TYPE = helics_data_type_complex,
+    VECTOR_TYPE = helics_data_type_vector,
+    TIME_TYPE = helics_data_type_time,
+    BOOLEAN_TYPE = helics_data_type_boolean,
+    RAW_TYPE = helics_data_type_raw
 };
 
 class ValueFederate : public virtual Federate
 {
-private:
-    std::vector<helics_subscription> subs;
+  private:
+    std::vector<helics_input> ipts;
     std::vector<helics_publication> pubs;
+
   public:
-    friend class helics98::FederateInfo;
+    friend class helicscpp::FederateInfo;
 
-    explicit ValueFederate (FederateInfo &fi)
+    explicit ValueFederate (const std::string &fedname, FederateInfo &fi)
     {
-        fed = helicsCreateValueFederate (fi.getInfo());
+        fed = helicsCreateValueFederate (fedname.c_str (), fi.getInfo (), hThrowOnError ());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr constructor"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL"));
         }
     }
 
-    explicit ValueFederate (const std::string &jsonString)
+    explicit ValueFederate (const std::string &configString)
     {
-        fed = helicsCreateValueFederateFromJson (jsonString.c_str());
+        fed = helicsCreateValueFederateFromConfig (configString.c_str (), hThrowOnError ());
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr create from JSON"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL"));
         }
     }
 
-    ValueFederate(const ValueFederate &vfed) :Federate(vfed),subs(vfed.subs),pubs(vfed.pubs)
+    ValueFederate (const ValueFederate &vfed) : Federate (vfed), ipts (vfed.ipts), pubs (vfed.pubs) {}
+    ValueFederate &operator= (const ValueFederate &fedObj)
     {
-    }
-    ValueFederate &operator=(const ValueFederate &fedObj)
-    {
-        Federate::operator=(fedObj);
-        subs = fedObj.subs;
+        Federate::operator= (fedObj);
+        ipts = fedObj.ipts;
         pubs = fedObj.pubs;
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr assignment"));
+            throw (HelicsException (helics_error_registration_failure, "Fed==NULL move constructor"));
         }
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate(ValueFederate &&fedObj) :Federate(),subs(std::move(fedObj.subs)),pubs(std::move(fedObj.pubs))
+    ValueFederate (ValueFederate &&fedObj)
+        : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
     {
-        Federate::operator=(std::move(fedObj));
+        Federate::operator= (std::move (fedObj));
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr move constructor"));
+            throw (HelicsException (helics_error_registration_failure, "fed==NULL move constructor"));
         }
     }
-    ValueFederate &operator=(ValueFederate &&fedObj)
+    ValueFederate &operator= (ValueFederate &&fedObj)
     {
-        subs = std::move(fedObj.subs);
-        pubs = std::move(fedObj.pubs);
-        Federate::operator=(std::move(fedObj));
+        ipts = std::move (fedObj.ipts);
+        pubs = std::move (fedObj.pubs);
+        Federate::operator= (std::move (fedObj));
         if (fed == NULL)
         {
-            throw(std::runtime_error("fed==nullptr move assignment"));
+            throw (HelicsException (helics_error_registration_failure, "fed==NULL move assignment"));
         }
         return *this;
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate () { }
+    ValueFederate () {}
 
     /** Methods to register publications **/
     Publication
-    registerPublication (const std::string &name, const std::string &type, const std::string &units = "")
+    registerTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        if (fed == NULL)
-        {
-            throw(std::runtime_error("fed==nullptr reg pub"));
-        }
-        helics_publication pub = helicsFederateRegisterPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        pubs.push_back(pub);
-        return Publication(pub);
+        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str (), type.c_str (),
+                                                                        units.c_str (), hThrowOnError ());
+        pubs.push_back (pub);
+        return Publication (pub);
+    }
+
+    Publication registerPublication (const std::string &name, helics_data_type type, const std::string &units = "")
+    {
+        helics_publication pub =
+          helicsFederateRegisterPublication (fed, name.c_str (), type, units.c_str (), hThrowOnError ());
+        pubs.push_back (pub);
+        return Publication (pub);
     }
 
     Publication
-    registerTypePublication (const std::string &name, int type, const std::string &units = "")
+    registerGlobalTypePublication (const std::string &name, const std::string &type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterTypePublication (fed, name.c_str(), type, units.c_str());
-        pubs.push_back(pub);
-        return Publication(pub);
+        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str (), type.c_str (),
+                                                                              units.c_str (), hThrowOnError ());
+        pubs.push_back (pub);
+        return Publication (pub);
     }
 
     Publication
-    registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "")
+    registerGlobalPublication (const std::string &name, helics_data_type type, const std::string &units = "")
     {
-        helics_publication pub = helicsFederateRegisterGlobalPublication (fed, name.c_str(), type.c_str(), units.c_str());
-        pubs.push_back(pub);
-        return Publication(pub);
+        helics_publication pub =
+          helicsFederateRegisterGlobalPublication (fed, name.c_str (), type, units.c_str (), hThrowOnError ());
+        pubs.push_back (pub);
+        return Publication (pub);
     }
 
-    Publication
-    registerGlobalTypePublication (const std::string &name, int type, const std::string &units = "")
-    {
-        helics_publication pub = helicsFederateRegisterGlobalTypePublication (fed, name.c_str(), type, units.c_str());
-        pubs.push_back(pub);
-        return Publication(pub);
-    }
-
-    Publication
-    registerPublicationIndexed (const std::string &name, int index1, int type, const std::string &units = "")
+    Publication registerPublicationIndexed (const std::string &name,
+                                            int index1,
+                                            helics_data_type type,
+                                            const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
-        return registerGlobalTypePublication (indexed_name, type, units);
+        return registerGlobalPublication (indexed_name, type, units);
     }
 
-    Publication
-    registerPublicationIndexed (const std::string &name, int index1, int index2,int type, const std::string &units = "")
+    Publication registerPublicationIndexed (const std::string &name,
+                                            int index1,
+                                            int index2,
+                                            helics_data_type type,
+                                            const std::string &units = std::string ())
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
-        return registerGlobalTypePublication (indexed_name, type, units);
+        return registerGlobalPublication (indexed_name, type, units);
     }
 
+    Publication getPublication (const std::string &name)
+    {
+        return Publication (helicsFederateGetPublication (fed, name.c_str (), hThrowOnError ()));
+    }
+    Publication getPublication (int index)
+    {
+        return Publication (helicsFederateGetPublicationByIndex (fed, index, hThrowOnError ()));
+    }
     /** Methods to register subscriptions **/
-    Subscription
-    registerSubscription (const std::string &name, const std::string &type, const std::string &units = "")
+    Input registerSubscription (const std::string &name, const std::string &units = std::string ())
     {
-        helics_subscription sub = helicsFederateRegisterSubscription (fed, name.c_str(), type.c_str(), units.c_str());
-        subs.push_back(sub);
-        return Subscription(sub);
+        helics_input sub =
+          helicsFederateRegisterSubscription (fed, name.c_str (), units.c_str (), hThrowOnError ());
+        ipts.push_back (sub);
+        return Input (sub);
     }
 
-    /** Methods to register subscriptions **/
-    Subscription
-        registerOptionalSubscription(const std::string &name, const std::string &type, const std::string &units = "")
-    {
-        helics_subscription sub = helicsFederateRegisterOptionalSubscription(fed, name.c_str(), type.c_str(), units.c_str());
-        subs.push_back(sub);
-        return Subscription(sub);
-    }
-
-    Subscription
-    registerTypeSubscription (const std::string &name, int type, const std::string &units = "")
-    {
-        helics_subscription sub = helicsFederateRegisterTypeSubscription (fed, name.c_str(), type, units.c_str());
-        subs.push_back(sub);
-        return Subscription(sub);
-    }
-
-    Subscription
-    registerSubscriptionIndexed (const std::string &name, int index1, int type, const std::string &units = "")
+    Input registerSubscriptionIndexed (const std::string &name, int index1, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1);
-        return registerTypeSubscription (indexed_name, type, units);
+        return registerSubscription (indexed_name, units);
     }
 
-    Subscription
-    registerSubscriptionIndexed (const std::string &name,
-                                         int index1,
-                                         int index2,
-                                         int type,
-                                         const std::string &units = "")
+    Input
+    registerSubscriptionIndexed (const std::string &name, int index1, int index2, const std::string &units = "")
     {
         std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
-        return registerTypeSubscription (indexed_name, type, units);
+        return registerSubscription (indexed_name, units);
     }
 
-    int getSubscriptionCount() const
+    Input getInput (const std::string &name)
     {
-        return helicsFederateGetSubscriptionCount(fed);
+        return Input (helicsFederateGetInput (fed, name.c_str (), hThrowOnError ()));
+    }
+    Input getSubscription (int index)
+    {
+        return Input (helicsFederateGetInputByIndex (fed, index, hThrowOnError ()));
     }
 
-    int getPublicationCount() const
-    {
-        return helicsFederateGetPublicationCount(fed);
-    }
+    int getInputCount () const { return helicsFederateGetInputCount (fed); }
+
+    int getPublicationCount () const { return helicsFederateGetPublicationCount (fed); }
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
-    std::vector<helics_subscription> queryUpdates () { return std::vector<helics_subscription>(); }
-    // call helicsSubscriptionIsUpdated for each sub
+    std::vector<helics_input> queryUpdates () { return std::vector<helics_input> (); }
+    // call helicsInputIsUpdated for each sub
   private:
     // Utility function for converting numbers to string
-    template <typename T> std::string toStr (T num)
+    template <typename T>
+    std::string toStr (T num)
     {
         std::ostringstream ss;
         ss << num;
-        return ss.str();
+        return ss.str ();
     }
 };
-} //namespace helics
+}  // namespace helicscpp
 #endif

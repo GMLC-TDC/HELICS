@@ -5,33 +5,39 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "MessageFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/TomlProcessingFunctions.hpp"
+#include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helics_definitions.hpp"
+#include "Endpoints.hpp"
 #include "MessageFederateManager.hpp"
-#include "../common/TomlProcessingFunctions.hpp"
-
 
 namespace helics
 {
-MessageFederate::MessageFederate (const FederateInfo &fi) : Federate (fi)
+MessageFederate::MessageFederate (const std::string &fedName, const FederateInfo &fi) : Federate (fedName, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
 }
-MessageFederate::MessageFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi) : Federate (core, fi)
+MessageFederate::MessageFederate (const std::string &fedName,
+                                  const std::shared_ptr<Core> &core,
+                                  const FederateInfo &fi)
+    : Federate (fedName, core, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
 }
-MessageFederate::MessageFederate (const std::string &jsonString) : Federate (loadFederateInfo (jsonString))
+MessageFederate::MessageFederate (const std::string &configString)
+    : Federate (std::string (), loadFederateInfo (configString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
+    MessageFederate::registerInterfaces (configString);
 }
 
-MessageFederate::MessageFederate (const std::string &name, const std::string &jsonString)
-    : Federate (loadFederateInfo (name, jsonString))
+MessageFederate::MessageFederate (const std::string &fedName, const std::string &configString)
+    : Federate (fedName, loadFederateInfo (configString))
 {
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
-    registerInterfaces (jsonString);
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
+    MessageFederate::registerInterfaces (configString);
 }
 
 MessageFederate::MessageFederate ()
@@ -42,7 +48,7 @@ MessageFederate::MessageFederate ()
 MessageFederate::MessageFederate (bool)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), getID ());
+    mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
 }
 MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
@@ -70,37 +76,30 @@ void MessageFederate::updateTime (Time newTime, Time oldTime) { mfManager->updat
 void MessageFederate::startupToInitializeStateTransition () { mfManager->startupToInitializeStateTransition (); }
 void MessageFederate::initializeToExecuteStateTransition () { mfManager->initializeToExecuteStateTransition (); }
 
-endpoint_id_t MessageFederate::registerEndpoint (const std::string &name, const std::string &type)
+std::string MessageFederate::localQuery (const std::string &queryStr) const
 {
-    if (state == op_states::startup)
-    {
-        return mfManager->registerEndpoint (getName () + separator_ + name, type);
-    }
-    throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
+    return mfManager->localQuery (queryStr);
 }
 
-endpoint_id_t MessageFederate::registerGlobalEndpoint (const std::string &name, const std::string &type)
+Endpoint &MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
-    if (state == op_states::startup)
-    {
-        return mfManager->registerEndpoint (name, type);
-    }
-    throw (InvalidFunctionCall ("cannot call register endpoint after entering initialization mode"));
+    return mfManager->registerEndpoint ((!eptName.empty ()) ? (getName () + separator_ + eptName) : eptName, type);
 }
 
-void MessageFederate::registerInterfaces (const std::string &jsonString)
+Endpoint &MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
 {
-    registerMessageInterfaces (jsonString);
-    Federate::registerFilterInterfaces (jsonString);
+    return mfManager->registerEndpoint (eptName, type);
 }
 
-void MessageFederate::registerMessageInterfaces(const std::string &configString)
+void MessageFederate::registerInterfaces (const std::string &configString)
 {
-    if (state != op_states::startup)
-    {
-        throw (InvalidFunctionCall ("cannot call register Interfaces after entering initialization mode"));
-    }
-    if (hasTomlExtension(configString))
+    registerMessageInterfaces (configString);
+    Federate::registerFilterInterfaces (configString);
+}
+
+void MessageFederate::registerMessageInterfaces (const std::string &configString)
+{
+    if (hasTomlExtension (configString))
     {
         registerMessageInterfacesToml (configString);
     }
@@ -110,85 +109,71 @@ void MessageFederate::registerMessageInterfaces(const std::string &configString)
     }
 }
 
+static const std::string emptyStr;
+template <class Inp>
+static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
+{
+    addTargets (data, "flags", [&ept](const std::string &target) {
+        if (target.front () != '-')
+        {
+            ept.setOption (getOptionIndex (target), true);
+        }
+        else
+        {
+            ept.setOption (getOptionIndex (target.substr (2)), false);
+        }
+    });
+    bool optional = getOrDefault (data, "optional", false);
+    if (optional)
+    {
+        ept.setOption (defs::options::connection_optional, optional);
+    }
+    bool required = getOrDefault (data, "required", false);
+    if (required)
+    {
+        ept.setOption (defs::options::connection_required, required);
+    }
+
+    auto info = getOrDefault (data, "info", emptyStr);
+    if (!info.empty ())
+    {
+        fed->setInfo (ept.getHandle (), info);
+    }
+    addTargets (data, "knownDestinations",
+                [&ept, fed](const std::string &dest) { fed->registerKnownCommunicationPath (ept, dest); });
+    addTargets (data, "subscriptions", [&ept, fed](const std::string &sub) { fed->subscribe (ept, sub); });
+    addTargets (data, "filters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "sourceFilters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "destFilters", [&ept](const std::string &filt) { ept.addDestinationFilter (filt); });
+
+    auto defTarget = getOrDefault (data, "target", emptyStr);
+    replaceIfMember (data, "destination", defTarget);
+    if (!defTarget.empty ())
+    {
+        ept.setTargetDestination (defTarget);
+    }
+}
+
 void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
 {
-    
     auto doc = loadJson (jsonString);
 
     if (doc.isMember ("endpoints"))
     {
         for (const auto &ept : doc["endpoints"])
         {
-            auto name = getKey (ept);
-            auto type = (ept.isMember ("type")) ? ept["type"].asString () : "";
-            bool global = (ept.isMember ("global")) ? (ept["global"].asBool ()) : false;
-            endpoint_id_t epid;
-            if (global)
-            {
-                epid = registerGlobalEndpoint (name, type);
-            }
-            else
-            {
-                epid = registerEndpoint (name, type);
-            }
+            auto eptName = getKey (ept);
+            auto type = getOrDefault (ept, "type", emptyStr);
+            bool global = getOrDefault (ept, "global", false);
+            Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
 
-            // retrieve the known paths
-            if (ept.isMember ("knownDestinations"))
-            {
-                auto kp = ept["knownDestinations"];
-                if (kp.isString ())
-                {
-                    registerKnownCommunicationPath (epid, kp.asString ());
-                }
-                else if (kp.isArray ())
-                {
-                    for (const auto &path : kp)
-                    {
-                        registerKnownCommunicationPath (epid, path.asString ());
-                    }
-                }
-            }
-            // endpoints can subscribe to publications
-            if (ept.isMember ("subscriptions"))
-            {
-                auto subs = ept["subscriptions"];
-                if (subs.isString ())
-                {
-                    subscribe (epid, subs.asString (), std::string ());
-                }
-                else if (subs.isArray ())
-                {
-                    for (const auto &sub : subs)
-                    {
-                        subscribe (epid, sub.asString (), std::string ());
-                    }
-                }
-            }
+            loadOptions (this, ept, epObj);
         }
     }
-    /*
-    // retrieve the known paths
-    if (doc.isMember("knownDestinations"))
-    {
-        auto kp = doc["knownDestinations"];
-        if (kp.isString())
-        {
-           // registerKnownCommunicationPath(epid, kp.asString());
-        }
-        else if (kp.isArray())
-        {
-           for (const auto &path : kp)
-            {
-           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
-            }
-        }
-    }
-    */
 }
 
 void MessageFederate::registerMessageInterfacesToml (const std::string &tomlString)
 {
-    
     toml::Value doc;
     try
     {
@@ -199,235 +184,145 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-   auto epts = doc.find ("endpoints");
+    auto epts = doc.find ("endpoints");
     if (epts != nullptr)
     {
         auto &eptArray = epts->as<toml::Array> ();
-        for (auto &ept:eptArray)
+        for (auto &ept : eptArray)
         {
-            auto name = getKey (ept);
-            auto type = tomlGetOrDefault (ept, "type", std::string ());
-            bool global = tomlGetOrDefault(ept,"global",false);
-            endpoint_id_t epid;
-            if (global)
-            {
-                epid = registerGlobalEndpoint (name, type);
-            }
-            else
-            {
-                epid = registerEndpoint (name, type);
-            }
+            auto key = getKey (ept);
+            auto type = getOrDefault (ept, "type", emptyStr);
+            bool global = getOrDefault (ept, "global", false);
+            Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
 
-            // retrieve the known paths
-            auto kp = ept.find("knownDestinations");
-            if (kp!=nullptr)
-            {
-                if (kp->is<toml::Array> ())
-                {
-                    for (const auto &path : kp->as<toml::Array>())
-                    {
-                        registerKnownCommunicationPath (epid, path.as<std::string> ());
-                    }
-                    
-                }
-                else if (kp->is<std::string>())
-                {
-                    registerKnownCommunicationPath (epid, kp->as<std::string> ());
-                }
-            }
-            auto subs = ept.find ("subscriptions");
-            // endpoints can subscribe to publications
-            if (subs!=nullptr)
-            {
-                if (subs->is<std::string> ())
-                {
-                    subscribe (epid, subs->as<std::string> (), std::string ());
-                }
-                else if (subs->is<toml::Array> ())
-                {
-                    for (const auto &sub : subs->as<toml::Array>())
-                    {
-                        subscribe (epid, sub.as<std::string> (), std::string ());
-                    }
-                }
-            }
+            loadOptions (this, ept, epObj);
         }
     }
-    /*
-    // retrieve the known paths
-    if (doc.isMember("knownDestinations"))
-    {
-        auto kp = doc["knownDestinations"];
-        if (kp.isString())
-        {
-           // registerKnownCommunicationPath(epid, kp.asString());
-        }
-        else if (kp.isArray())
-        {
-           for (const auto &path : kp)
-            {
-           //     registerKnownCommunicationPath(epid, (*kpIt).asString());
-            }
-        }
-    }
-    */
 }
 
-void MessageFederate::subscribe (endpoint_id_t endpoint, const std::string &name, const std::string &type)
+void MessageFederate::subscribe (const Endpoint &ept, const std::string &key)
 {
-    if (state == op_states::startup)
-    {
-        mfManager->subscribe (endpoint, name, type);
-        return;
-    }
-    throw (InvalidFunctionCall ("subscriptions can only be created in startup mode"));
+    mfManager->subscribe (ept, key);
+    return;
 }
 
-void MessageFederate::registerKnownCommunicationPath (endpoint_id_t localEndpoint,
+void MessageFederate::registerKnownCommunicationPath (const Endpoint &localEndpoint,
                                                       const std::string &remoteEndpoint)
 {
-    if (state == op_states::startup)
-    {
-        mfManager->registerKnownCommunicationPath (localEndpoint, remoteEndpoint);
-        return;
-    }
-    throw (InvalidFunctionCall ("paths can only be registered in startup mode"));
+    mfManager->registerKnownCommunicationPath (localEndpoint, remoteEndpoint);
+    return;
 }
 
 bool MessageFederate::hasMessage () const
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->hasMessage ();
     }
     return false;
 }
 
-bool MessageFederate::hasMessage (endpoint_id_t id) const
+bool MessageFederate::hasMessage (const Endpoint &ept) const
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
-        return mfManager->hasMessage (id);
+        return mfManager->hasMessage (ept);
     }
     return false;
 }
 
-/**
- * Returns the number of pending receives for the specified destination endpoint.
- */
-uint64_t MessageFederate::receiveCount (endpoint_id_t id) const
+uint64_t MessageFederate::pendingMessages (const Endpoint &ept) const
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
-        return mfManager->receiveCount (id);
+        return mfManager->pendingMessages (ept);
     }
     return 0;
 }
-/**
-* Returns the number of pending receives for the specified destination endpoint.
-@details this function is not preferred in multithreaded contexts due to the required locking
-prefer to just use getMessage until it returns an invalid Message.
-*/
-uint64_t MessageFederate::receiveCount () const
+
+uint64_t MessageFederate::pendingMessages () const
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
-        return mfManager->receiveCount ();
+        return mfManager->pendingMessages ();
     }
     return 0;
 }
 
 std::unique_ptr<Message> MessageFederate::getMessage ()
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
         return mfManager->getMessage ();
     }
     return nullptr;
 }
 
-std::unique_ptr<Message> MessageFederate::getMessage (endpoint_id_t endpoint)
+std::unique_ptr<Message> MessageFederate::getMessage (const Endpoint &ept)
 {
-    if (state == op_states::execution)
+    if (currentMode >= modes::initializing)
     {
-        return mfManager->getMessage (endpoint);
+        return mfManager->getMessage (ept);
     }
     return nullptr;
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, const std::string &dest, const data_view &data)
+void MessageFederate::sendMessage (const Endpoint &source, const std::string &dest, const data_view &data)
 {
-    if (state == op_states::execution)
-    {
-        mfManager->sendMessage (source, dest, data);
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
+    mfManager->sendMessage (source, dest, data);
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source,
+void MessageFederate::sendMessage (const Endpoint &source,
                                    const std::string &dest,
                                    const data_view &data,
                                    Time sendTime)
 {
-    if (state == op_states::execution)
-    {
-        mfManager->sendMessage (source, dest, data, sendTime);
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
+    mfManager->sendMessage (source, dest, data, sendTime);
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, std::unique_ptr<Message> message)
+void MessageFederate::sendMessage (const Endpoint &source, std::unique_ptr<Message> message)
 {
-    if (state == op_states::execution)
-    {
-        mfManager->sendMessage (source, std::move (message));
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
+    mfManager->sendMessage (source, std::move (message));
 }
 
-void MessageFederate::sendMessage (endpoint_id_t source, const Message &message)
+void MessageFederate::sendMessage (const Endpoint &source, const Message &message)
 {
-    if (state == op_states::execution)
-    {
-        mfManager->sendMessage (source, std::make_unique<Message> (message));
-        return;
-    }
-    throw (InvalidFunctionCall ("cannot send message outside of execution state"));
+    mfManager->sendMessage (source, std::make_unique<Message> (message));
 }
 
-endpoint_id_t MessageFederate::getEndpointId (const std::string &name) const
+Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 {
-    auto id = mfManager->getEndpointId (name);
-    if (id == invalid_id_value)
+    auto &id = mfManager->getEndpoint (eptName);
+    if (!id.isValid ())
     {
-        id = mfManager->getEndpointId (getName () + '.' + name);
+        return mfManager->getEndpoint (getName () + separator_ + eptName);
     }
     return id;
 }
 
-std::string MessageFederate::getEndpointName (endpoint_id_t id) const { return mfManager->getEndpointName (id); }
+Endpoint &MessageFederate::getEndpoint (int index) const { return mfManager->getEndpoint (index); }
 
-std::string MessageFederate::getEndpointType (endpoint_id_t ep) { return mfManager->getEndpointType (ep); }
-
-void MessageFederate::registerEndpointCallback (const std::function<void(endpoint_id_t, Time)> &func)
+void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &func)
 {
-    mfManager->registerCallback (func);
+    mfManager->setEndpointNotificationCallback (func);
 }
-void MessageFederate::registerEndpointCallback (endpoint_id_t ep,
-                                                const std::function<void(endpoint_id_t, Time)> &func)
+void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
+                                                      const std::function<void(Endpoint &ept, Time)> &func)
 {
-    mfManager->registerCallback (ep, func);
-}
-void MessageFederate::registerEndpointCallback (const std::vector<endpoint_id_t> &ep,
-                                                const std::function<void(endpoint_id_t, Time)> &func)
-{
-    mfManager->registerCallback (ep, func);
+    mfManager->setEndpointNotificationCallback (ept, func);
 }
 
 /** get a count of the number endpoints registered*/
 int MessageFederate::getEndpointCount () const { return mfManager->getEndpointCount (); }
+
+void MessageFederate::addSourceFilter (const Endpoint &ept, const std::string &filterName)
+{
+    mfManager->addSourceFilter (ept, filterName);
+}
+
+void MessageFederate::addDestinationFilter (const Endpoint &ept, const std::string &filterName)
+{
+    mfManager->addDestinationFilter (ept, filterName);
+}
 
 }  // namespace helics

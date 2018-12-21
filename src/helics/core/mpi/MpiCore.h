@@ -19,14 +19,14 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
   public:
     /** default constructor*/
     MpiCore () noexcept;
-    MpiCore (const std::string &core_name);
+    explicit MpiCore (const std::string &core_name);
     ~MpiCore ();
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
   public:
-    virtual std::string getAddress () const override;
-
+    virtual std::string generateLocalAddressString () const override;
   private:
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string brokerAddress;  //!< the mpi rank:tag of the broker
     int brokerRank;
     int brokerTag;

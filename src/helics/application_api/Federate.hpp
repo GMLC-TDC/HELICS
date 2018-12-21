@@ -9,9 +9,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
 
-#include "../core/CoreFederateInfo.hpp"
-#include "../flag-definitions.h"
-
+#include "../helics_enums.h"
+#include "FederateInfo.hpp"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -31,111 +30,65 @@ namespace helics
 {
 class Core;
 class AsyncFedCallInfo;
-
 class MessageOperator;
+class FilterFederateManager;
 class Filter;
-/** data class defining federate properties and information
- */
-class FederateInfo : public CoreFederateInfo
-{
-  public:
-    std::string name;  //!< federate name
-
-    bool rollback = false;  //!< indicator that the federate has rollback features
-    bool forwardCompute = false;  //!< indicator that the federate does computation ahead of the timing call[must
-                                  //! support rollback at least in a limited sense if set to true]
-    char separator = '/';  //!< separator for global name of localFederates
-    core_type coreType = core_type::ZMQ;  //!< the type of the core
-    std::string coreName;  //!< the name of the core
-    std::string coreInitString;  //!< an initialization string for the core API object
-
-    /** default constructor*/
-    FederateInfo () = default;
-    /** construct from the federate name*/
-    explicit FederateInfo (std::string fedname) : name (std::move (fedname)){};
-    /** construct from the name and type*/
-    FederateInfo (std::string fedname, core_type cType) : name (std::move (fedname)), coreType (cType){};
-    /** load a federateInfo object from command line arguments
-    @param argc the number of arguments
-    @param argv an array of char * pointers to the arguments
-    */
-    FederateInfo (int argc, const char *const *argv);
-    /** load a federateInfo object from command line arguments
-    @param argc the number of arguments
-    @param argv an array of char * pointers to the arguments
-    */
-    void loadInfoFromArgs (int argc, const char *const *argv);
-};
-
-/** generate a FederateInfo object from a config file (JSON, toml)
- */
-FederateInfo loadFederateInfo (const std::string &configString);
-
-/** generate a FederateInfo object from a config file (JSON, toml)
- */
-FederateInfo loadFederateInfo (const std::string &name, const std::string &configString);
-
-class Core;
+class CloningFilter;
 
 /** base class for a federate in the application API
  */
 class Federate
 {
   public:
-    /** the allowable states of the federate*/
-    enum class op_states : char
+    /** the allowable operation modes of the federate*/
+    enum class modes : char
     {
         startup = 0,  //!< when created the federate is in startup state
-        initialization = 1,  //!< entered after the enterInitializationState call has returned
-        execution = 2,  //!< entered after the enterExectuationState call has returned
+        initializing = 1,  //!< entered after the enterInitializingMode call has returned
+        executing = 2,  //!< entered after the enterExectuationState call has returned
         finalize = 3,  //!< the federate has finished executing normally final values may be retrieved
         error = 4,  //!< error state no core communication is possible but values can be retrieved
         // the following states are for asynchronous operations
         pending_init = 5,  //!< indicator that the federate is pending entry to initialization state
         pending_exec = 6,  //!< state pending EnterExecution State
         pending_time = 7,  //!< state that the federate is pending a timeRequest
-        pending_iterative_time = 8  //!< state that the federate is pending an iterative time request
+        pending_iterative_time = 8,  //!< state that the federate is pending an iterative time request
+        pending_finalize = 9  //!< state that the federate is pending a finalize call
     };
 
   protected:
-    std::atomic<op_states> state{op_states::startup};  //!< the current state of the simulation
+    std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
   private:
-    int32_t fedID = -2'000'000'000;  //!< the federate ID of the object for use in the core
-
+    federate_id_t fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime;  //!< the current simulation time
-    FederateInfo FedInfo;  //!< the information structure that contains the data on the federate
   private:
     std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
-    std::vector<std::shared_ptr<Filter>>
-      localFilters;  //!< vector of filters created through the register interfaces function
+    std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
+    std::string name;  //!< the name of the federate
   public:
     /**constructor taking a federate information structure
     @param[in] fi  a federate information structure
     */
-    explicit Federate (const FederateInfo &fi);
-    /**constructor taking a federate information structure
-    @param[in] fi  a federate information structure
-    */
-    Federate (const std::string &name, const FederateInfo &fi);
+    Federate (const std::string &fedname, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure
     @param core a shared pointer to a core object, the pointer will be copied
     @param[in] fi  a federate information structure
     */
-    Federate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Federate (const std::string &fedname, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] jsonString can be either a JSON file or a string containing JSON code
+    @param[in] configString can be either a JSON file or a string containing JSON code or a TOML file
     */
     explicit Federate (const std::string &configString);
     /**constructor taking a file with the required information and the name of the federate
     @param[in] name the name of the federate
-    @param[in] configString can be either a JSON file or a string containing JSON code or a toml file with
-    extension (.TOML, .toml)
+    @param[in] configString can be either a JSON file or a string containing JSON code or a TOML file with
+    extension (.toml, .TOML)
     */
-    Federate (const std::string &name, const std::string &configString);
+    Federate (const std::string &fedname, const std::string &configString);
     /**default constructor*/
     Federate () noexcept;
     Federate (Federate &&fed) noexcept;
@@ -149,37 +102,42 @@ class Federate
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will block until all federates have entered initialization mode
     */
-    void enterInitializationState ();
+    void enterInitializingMode ();
 
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will not block
     */
-    void enterInitializationStateAsync ();
+    void enterInitializingModeAsync ();
     /** called after one of the async calls and will indicate true if an async operation has completed
     @details only call from the same thread as the one that called the initial async call and will return false
     if called when no aysnc operation is in flight*/
     bool isAsyncOperationCompleted () const;
     /** second part of the async process for entering initializationState call after a call to
-    enterInitializationStateAsync if call any other time it will throw an InvalidFunctionCall exception*/
-    void enterInitializationStateComplete ();
+    enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall exception*/
+    void enterInitializingModeComplete ();
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
     */
-    iteration_result enterExecutionState (iteration_request iterate = iteration_request::no_iterations);
+    iteration_result enterExecutingMode (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     */
-    void enterExecutionStateAsync (iteration_request iterate = iteration_request::no_iterations);
+    void enterExecutingModeAsync (iteration_request iterate = iteration_request::no_iterations);
     /** complete the async call for entering Execution state
-    @details call will not block but will return quickly.  The enterInitializationStateFinalize must be called
+    @details call will not block but will return quickly.  The enterInitializingModeComplete must be called
     before doing other operations
     */
-    iteration_result enterExecutionStateComplete ();
+    iteration_result enterExecutingModeComplete ();
     /** terminate the simulation
-    @details call is normally non-blocking, but may block if called in the midst of an
-    asynchronous call sequence, no core calling commands may be called after completion of this function */
+    @details call is will block until the finalize has been acknowledged, no commands that interact with the core
+    may be called after this function function */
     void finalize ();
+    /** terminate the simulation in a non-blocking call
+    @details finalizeComplete must be called after this call to complete the finalize procedure*/
+    void finalizeAsync ();
+    /** complete the asynchronous terminate pair*/
+    void finalizeComplete ();
 
     /** disconnect a simulation from the core (will also call finalize before disconnecting if necessary)*/
     virtual void disconnect ();
@@ -194,13 +152,18 @@ class Federate
     @example setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
     setSeparator('/') will result in fedName/endpoint
     the default is '/'  any character can be used though many will not make that much sense.  This call is not
-    thread safe.
+    thread safe and should be called before any local interfaces are created otherwise it may not be possible to
+    retrieve them without using the full name.  recommended possibilities are ('.','/', ':','-','_')
      */
     void setSeparator (char separator) { separator_ = separator; }
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/
     Time requestTime (Time nextInternalTimeStep);
+
+    /** request a time advancement to the next allowed time
+  @return the granted time step*/
+    Time requestNextStep () { return requestTime (timeZero); }
 
     /** request a time advancement
     @param[in] the next requested time step
@@ -228,45 +191,42 @@ class Federate
     @return the granted time step in an iteration_time structure which contains a time and iteration result*/
     iteration_time requestTimeIterativeComplete ();
 
-    /** set the minimum time delta for the federate
-    @param[in] tdelta the minimum time delta to return from a time request function
+    /** set a time option for the federate
+    @param option the option to set
+    @param timeValue the value to be set
     */
-    void setTimeDelta (Time tdelta);
-    /** set the look ahead time or output delay
-    @details the look ahead is the propagation time for messages/event to propagate from the Federate
-    to the outside federation
-    @param[in] outputDelay the value of the time delay (must be >=0)
-    @throws invalid_value when using a time <0
-    */
-    void setOutputDelay (Time outputDelay);
+    void setProperty (int32_t option, double timeValue);
 
-    /** set the impact Window time
-    @details the impact window is the time window around the time request in which other federates cannot affect
-    the federate
-    @param[in] inputDelay the look ahead time
-    @throws invalid_value when using a time <0
+    /** set a time option for the federate
+    @param[in] option the option to set
+    @param[in] timeValue the value to be set
     */
-    void setInputDelay (Time inputDelay);
-    /** set the period and offset of the federate
-    @details the federate will on grant time on N*period+offset interval
-    @param[in] period the length of time between each subsequent grants
-    @param[in] offset the shift of the period from 0  offset must be < period
-    */
-    void setPeriod (Time period, Time offset = timeZero);
+    void setProperty (int32_t option, Time timeValue);
+
     /** set a flag for the federate
     @param[in] flag an index into the flag /ref flag-definitions.h
-    @param[in] flagvalue the value of the flag defaults to true
+    @param[in] flagValue the value of the flag defaults to true
     */
-    virtual void setFlag (int flag, bool flagValue = true);
-    /**  set the logging level for the federate
+    virtual void setFlagOption (int flag, bool flagValue = true);
+    /**  set an integer option for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
     @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
     */
-    void setLoggingLevel (int loggingLevel);
-    /**  set the maximum number of local iterations
-    @param maxIterations the maximum number of allowed iterations before helics forces a return
+    void setProperty (int32_t option, int32_t optionValue);
+
+    /** get the value of a time option for the federate
+    @param[in] option the option to get
     */
-    void setMaxIterations (int maxIterations);
+    Time getTimeProperty (int32_t option);
+
+    /** get the value of a flag option
+    @param[in] flag an index into the flag /ref flag-definitions.h
+    */
+    virtual bool getFlagOption (int flag);
+    /**  set an integer option for the federate
+    @param option,  the option to inquire
+    */
+    int getIntegerProperty (int32_t option);
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
@@ -334,135 +294,121 @@ class Federate
     */
     bool isQueryCompleted (query_id_t queryIndex) const;
 
+    /** set a federation global value
+    @details this overwrites any previous value for this name
+    @param valueName the name of the global to set
+    @param value the value of the global
+    */
+    void setGlobal (const std::string &valueName, const std::string &value);
+    /** define a filter interface
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    Filter &registerGlobalFilter (const std::string &filterName,
+                                  const std::string &inputType = std::string (),
+                                  const std::string &outputType = std::string ());
+
+    /** define a cloning filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param filterName the name of the filter
+    @param inputType the inputType which the filter can handle
+    @param outputType the outputType of the filter which the filter produces
+    */
+    CloningFilter &registerGlobalCloningFilter (const std::string &filterName,
+                                                const std::string &inputType = std::string (),
+                                                const std::string &outputType = std::string ());
+
+    /** define a filter interface
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param[in] the name of the endpoint
+    @param[in] the inputType which the source filter can receive
+    */
+    Filter &registerFilter (const std::string &filterName,
+                            const std::string &inputType = std::string (),
+                            const std::string &outputType = std::string ());
+
+    /** define a cloning filter interface on a source
+    @details a source filter will be sent any packets that come from a particular source
+    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @param filterName the name of the filter
+    @param inputType the inputType which the filter can handle
+    @param outputType the outputType of the filter which the filter produces
+    */
+    CloningFilter &registerCloningFilter (const std::string &filterName,
+                                          const std::string &inputType = std::string (),
+                                          const std::string &outputType = std::string ());
+
     /** define a filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerSourceFilter (const std::string &filterName,
-                                      const std::string &sourceEndpoint,
-                                      const std::string &inputType = std::string (),
-                                      const std::string &outputType = std::string ());
-    /** define a filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerDestinationFilter (const std::string &filterName,
-                                           const std::string &destEndpoint,
-                                           const std::string &inputType = std::string (),
-                                           const std::string &outputType = std::string ());
+    Filter &registerFilter () { return registerGlobalFilter (std::string (), std::string (), std::string ()); }
+
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
     if multiple filters are defined on the same source, they will be placed in some order defined by the core
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
-    filter_id_t registerCloningSourceFilter (const std::string &filterName,
-                                             const std::string &sourceEndpoint,
-                                             const std::string &inputType = std::string (),
-                                             const std::string &outputType = std::string ());
-    /** define a cloning filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerCloningDestinationFilter (const std::string &filterName,
-                                                  const std::string &destEndpoint,
-                                                  const std::string &inputType = std::string (),
-                                                  const std::string &outputType = std::string ());
-    /** define a filter interface on a source
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
-    */
-    filter_id_t registerSourceFilter (const std::string &sourceEndpoint)
+    CloningFilter &registerCloningFilter ()
     {
-        return registerSourceFilter (std::string (), sourceEndpoint, std::string (), std::string ());
+        return registerGlobalCloningFilter (std::string (), std::string (), std::string ());
     }
-    /** define a filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerDestinationFilter (const std::string &destEndpoint)
-    {
-        return registerDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
-    }
-    /** define a cloning filter interface on a source
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
-    */
-    filter_id_t registerCloningSourceFilter (const std::string &sourceEndpoint)
-    {
-        return registerCloningSourceFilter (std::string (), sourceEndpoint, std::string (), std::string ());
-    }
-    /** define a cloning filter interface for a destination
-    @details a destination filter will be sent any packets that are going to a particular destination
-    multiple filters are not allowed to specify the same destination
-    @param[in] the name of the destination endpoint
-    @param[in] the inputType which the destination filter can receive
-    */
-    filter_id_t registerCloningDestinationFilter (const std::string &destEndpoint)
-    {
-        return registerCloningDestinationFilter (std::string (), destEndpoint, std::string (), std::string ());
-    }
-    /** get the name of a filter
-    @param[in] id the filter to query
-    @return empty string if an invalid id is passed*/
-    std::string getFilterName (filter_id_t id) const;
 
-    /** get the name of the endpoint that a filter is associated with
-    @param[in] id the filter to query
-    @return empty string if an invalid id is passed*/
-    std::string getFilterEndpoint (filter_id_t id) const;
+    /** add a source target to a filter
+   @param id the identifier of the filter
+   target the name of the endpoint to filter the data from
+   */
+    void addSourceTarget (const Filter &filt, const std::string &targetEndpoint);
+    /** add a destination target to a filter
+  @param id the identifier of the filter
+  target the name of the endpoint to filter the data going to
+  */
+    void addDestinationTarget (const Filter &filt, const std::string &targetEndpoint);
 
-    /** get the input type of a filter from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    std::string getFilterInputType (filter_id_t id) const;
+    /** get the name/key associated with an interface
+    @param[in] handle the interface handle to query
+    @return empty string if an invalid id is passed otherwise the interface name or key (could be empty if the
+    interface was nameless*/
+    const std::string &getInterfaceName (interface_handle handle) const;
 
-    /** get the output type of a filter from its id
-    @param[in] id the endpoint to query
-    @return empty string if an invalid id is passed*/
-    std::string getFilterOutputType (filter_id_t id) const;
     /** get the id of a source filter from the name of the endpoint
     @param[in] filterName the name of the filter
     @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
-    filter_id_t getFilterId (const std::string &filterName) const;
-    /** get the id of a source filter from the name of the filter
-    @param[in] filterName the publication id
-    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
-    filter_id_t getSourceFilterId (const std::string &filterName) const;
+    const Filter &getFilter (const std::string &filterName) const;
 
-    /** get the id of a destination filter from the name of the endpoint
-    @param[in] filterName the publication id
-    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
-    filter_id_t getDestFilterId (const std::string &filterName) const;
+    /** get the id of a source filter from the name of the endpoint
+  @param[in] filterName the name of the filter
+  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    const Filter &getFilter (int index) const;
+
+    /** get the id of a source filter from the name of the endpoint
+  @param[in] filterName the name of the filter
+  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    Filter &getFilter (const std::string &filterName);
+
+    /** get the id of a source filter from the name of the endpoint
+  @param[in] filterName the name of the filter
+  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    Filter &getFilter (int index);
 
     /** @brief register a operator for the specified filter
-    @details for time_agnostic federates only,  all other settings would trigger an error
-    The MessageOperator gets called when there is a message to filter, There is no order or state to this
+    @details
+    The FilterOperator gets called when there is a message to filter, There is no order or state to this
     messages can come in any order.
     @param[in] filter the identifier for the filter to trigger
-    @param[in] op A shared_ptr to a message operator
+    @param[in] op a shared_ptr to a message operator
     */
-    void setFilterOperator (filter_id_t filter, std::shared_ptr<FilterOperator> op);
-    /** @brief register a operator for the specified filters
-    @details for time_agnostic federates only,  all other settings would trigger an error
-    The MessageOperator gets called when there is a message to filter, There is no order or state to this
-    message can come in any order.
-    @param[in] filters the identifier for the filter to trigger
-    @param[in] op A shared_ptr to a message operator
-    */
-    void setFilterOperator (const std::vector<filter_id_t> &filters, std::shared_ptr<FilterOperator> op);
+    void setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op);
+
+    /** get the number of filters registered through this federate*/
+    int getFilterCount () const;
 
   protected:
     /** function to deal with any operations that need to occur on a time update*/
@@ -471,6 +417,9 @@ class Federate
     virtual void startupToInitializeStateTransition ();
     /** function to deal with any operations that need to occur on the transition from startup to initialize*/
     virtual void initializeToExecuteStateTransition ();
+    /** function to generate results for a local Query
+    @details should return an empty string if the query is not recognized*/
+    virtual std::string localQuery (const std::string &queryStr) const;
 
   public:
     /** register a set of interfaces defined in a file
@@ -483,28 +432,57 @@ class Federate
     @param[in] configString  the location of the file or config String to load to generate the interfaces
     */
     void registerFilterInterfaces (const std::string &configString);
+    /** disconnect an interface from its targets and remove it from consideration
+     */
+    void closeInterface (interface_handle handle);
     /** get the underlying federateID for the core*/
     auto getID () const noexcept { return fedID; }
     /** get the current state of the federate*/
-    op_states getCurrentState () const { return state; }
+    modes getCurrentMode () const { return currentMode.load (); }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime () const { return currentTime; }
     /** get the federate name*/
-    const std::string &getName () const { return FedInfo.name; }
+    const std::string &getName () const { return name; }
     /** get a pointer to the core object used by the federate*/
     std::shared_ptr<Core> getCorePointer () { return coreObject; }
     // interface for filter objects
-    /** get a shared pointer to a filter object stored in the federate
-    @details filters can be created through the JSON file in which case there is no reference to
-    them elsewhere.  They are stored in the federate unless retrieved
-    @param index the index number of the stored federate
-    @return a shared_ptr to a filter object*/
-    std::shared_ptr<Filter> getFilterObject (int index);
-    /** add a shared pointer object to the Federate*/
-    void addFilterObject (std::shared_ptr<Filter> obj);
     /** get a count of the number of filter objects stored in the federate*/
-    int filterObjectCount () const;
+    int filterCount () const;
+    /** set the information field for an interface
+    @param handle the interface handle for any interface,  the interface handle can be created from
+    any interface object automatically
+    @param info the information to store
+    */
+    void setInfo (interface_handle handle, const std::string &info);
+    /** get the data currently stored for a particular interface handle
+    @param handle the handle to get the information for
+    @return a string with the data for the information*/
+    const std::string &getInfo (interface_handle handle);
+
+    /** set an interface option */
+    void setInterfaceOption (interface_handle handle, int32_t option, bool option_value = true);
+    /** get the current value for an interface option*/
+    bool getInterfaceOption (interface_handle handle, int32_t option);
+
+    /** get the injection type for an interface,  this is the type for data coming into an interface
+    @details for filters this is the input type, for publications this is type used to transmit data, for endpoints
+    this is the specified type and for inputs this is the type of the transmitting publication
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getInjectionType (interface_handle handle) const;
+
+    /** get the extraction type for an interface,  this is the type for data coming into an interface
+    @details for filters this is the output type, for publications this is the specified type, for endpoints this
+    is the specified type and for inputs this is the specified type
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getExtractionType (interface_handle handle) const;
+
+    /** get the units associated with an interface
+    @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string containing the units */
+    const std::string &getInterfaceUnits (interface_handle handle) const;
 
   private:
     /** register filter interfaces defined in  file or string

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,25 +8,23 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 bool TriggerVariable::activate ()
 {
-    std::unique_lock<std::mutex> lock (stateLock);
+    std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
         // we are already activated so this function did nothing so return false
         return false;
     }
     activated = true;
-    lock.unlock ();
     cv_active.notify_all ();
     return true;
 }
 
 bool TriggerVariable::trigger ()
 {
-    std::unique_lock<std::mutex> lock (stateLock);
+    std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
-        triggered.store (true);
-        lock.unlock ();
+        triggered.store (true,std::memory_order_release);
         cv_trigger.notify_all ();
         return true;
     }
@@ -37,18 +35,18 @@ bool TriggerVariable::trigger ()
 void TriggerVariable::wait () const
 {
     std::unique_lock<std::mutex> lk (stateLock);
-    if (activated && (!triggered.load ()))
+    if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        cv_trigger.wait (lk, [this] { return triggered.load (); });
+        cv_trigger.wait (lk, [this] { return triggered.load (std::memory_order_acquire); });
     }
 }
 
 bool TriggerVariable::wait_for (const std::chrono::milliseconds &duration) const
 {
     std::unique_lock<std::mutex> lk (stateLock);
-    if (activated && (!triggered.load ()))
+    if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        return cv_trigger.wait_for (lk, duration, [this] { return triggered.load (); });
+        return cv_trigger.wait_for(lk, duration, [this] { return triggered.load(std::memory_order_acquire); });
     }
     return true;
 }
@@ -77,7 +75,7 @@ void TriggerVariable::reset ()
     std::unique_lock<std::mutex> lk (stateLock);
     if (activated)
     {
-        while (!triggered.load ())
+        while (!triggered.load (std::memory_order_acquire))
         {
             lk.unlock ();
             trigger ();

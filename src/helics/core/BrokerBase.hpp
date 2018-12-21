@@ -12,7 +12,7 @@ and some common methods used cores and brokers
 
 #include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
-#include "Core.hpp"
+#include "federate_id.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
@@ -26,21 +26,23 @@ class ForwardingTimeCoordinator;
 class BrokerBase
 {
   protected:
-    std::atomic<Core::federate_id_t> global_broker_id{
-      0};  //!< the unique identifier for the broker(core or broker)
-    Core::federate_id_t higher_broker_id = 0;  //!< the id code of the broker 1 level about this broker
+      std::atomic<global_broker_id> global_id{ parent_broker_id };  //!< the unique identifier for the broker(core or broker)
+      global_broker_id global_broker_id_local;  //!< meant to be the same as global_id but not atomically protected
+    global_broker_id higher_broker_id{ 0 };  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
     int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
     int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
     int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
-    int32_t tickTimer = 4000;  //!< counter for the length of a keep alive tick in milliseconds
+    int32_t tickTimer = 5000;  //!< counter for the length of a keep alive tick in milliseconds
     int32_t timeout =
       30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
     int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
-
+	//address is mutable since during initial phases it may not be fixed so to maintain a consistent public interface for extracting it
+	//this variable may need to be updated in a constant function
+    mutable std::string address;  //!< network location of the broker 
     std::unique_ptr<Logger>
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
@@ -51,7 +53,7 @@ class BrokerBase
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
     bool dumplog = false;  //!< flag indicating the broker should capture a dump log
-
+    bool queueDisabled = false; //!< flag indicating that the message queue should not be used and all functions called directly instaed of distinct thread
   protected:
     std::string logFile;  //< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
@@ -75,13 +77,14 @@ class BrokerBase
     bool noAutomaticID = false;
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
-    bool waitingForServerPingReply = false;  //!< flag indicating we are waiting for a ping reply
+    bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
+    
   public:
     /** display help messages for the broker*/
     static void displayHelp ();
-    BrokerBase () noexcept;
-    explicit BrokerBase (const std::string &broker_name);
+    explicit BrokerBase (bool DisableQueue=false) noexcept;
+    explicit BrokerBase (const std::string &broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase ();
 
@@ -116,7 +119,9 @@ class BrokerBase
   private:
     /** start main broker loop*/
     void queueProcessingLoop ();
-
+    /** helper function for doing some preprocessing on a command
+	@return (-1) if the command is a termination command*/
+    action_message_def::action_t commandProcessor (ActionMessage &command);
   protected:
     /** process a disconnect signal*/
     virtual void processDisconnect (bool skipUnregister = false) = 0;
@@ -137,17 +142,19 @@ class BrokerBase
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger (Core::federate_id_t federateID,
+    virtual bool sendToLogger (global_federate_id federateID,
                                int logLevel,
                                const std::string &name,
                                const std::string &message) const;
 
-    /** generate a new random id based on a uuid*/
+    /** generate a new random id*/
     void generateNewIdentifier ();
-
+    /** generate the local address information*/
+    virtual std::string generateLocalAddressString () const=0;
   public:
     /** close all the threads*/
     void joinAllThreads ();
+    friend class TimeoutMonitor;
 };
 
 }  // namespace helics

@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <functional>
 #include <map>
@@ -12,10 +13,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 #include <unordered_map>
 
+#include "../common/AirLock.hpp"
 #include "../common/DelayedObjects.hpp"
 #include "../common/DualMappedVector.hpp"
 #include "../common/simpleQueue.hpp"
+#include "helics_includes/any.hpp"
 
+#include "../common/TriggerVariable.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
@@ -23,7 +27,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "HandleManager.hpp"
 #include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
-#include "../common/TriggerVariable.hpp"
+#include "UnknownHandleManager.hpp"
 
 namespace helics
 {
@@ -32,8 +36,10 @@ class BasicFedInfo
 {
   public:
     const std::string name;  //!< name of the federate
-    Core::federate_id_t global_id = invalid_fed_id;  //!< the identification code for the federate
-    int32_t route_id = invalid_fed_id;  //!< the routing information for data to be sent to the federate
+    global_federate_id global_id;  //!< the identification code for the federate
+    route_id route;  //!< the routing information for data to be sent to the federate
+    global_broker_id parent;  //!< the id of the parent broker/core
+    bool _disconnected = false;
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -43,29 +49,23 @@ class BasicBrokerInfo
   public:
     const std::string name;  //!< the name of the broker
 
-    Core::federate_id_t global_id = invalid_fed_id;  //!< the global identifier for the broker
-    int32_t route_id = invalid_fed_id;  //!< the identifier for the route to take to the broker
-
+    global_broker_id global_id;  //!< the global identifier for the broker
+    route_id route;  //!< the identifier for the route to take to the broker
+    global_broker_id parent;  //!< the id of the parent broker/core
     bool _initRequested = false;  //!< flag indicating the broker has requesting initialization
     bool _disconnected = false;  //!< flag indicating that the broker has disconnected
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
-    bool _nonLocal = false;  //!< flag indicating that a broker is a direct subbroker of the managing object
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
+    bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.
+    bool _route_key = false;  //!< indicator that the broker has a unique route id
+    bool _sent_disconnect_ack = false;  //!< indicator that the disconnect ack has been sent
     std::string routeInfo;  //!< string describing the connection information for the route
-    BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
+    explicit BasicBrokerInfo (const std::string &brokerName) : name (brokerName){};
 };
 
 class TimeCoordinator;
 class Logger;
-/** a shift in the global federate id numbers to allow discrimination between local ids and global ones
-this value allows 65535 federates to be available in each core
-1,878,982,656 allowable federates in the system and
-268,435,455 brokers allowed  if we need more than that this program has been phenomenally successful beyond
-all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
-*/
-constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
-/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
+class TimeoutMonitor;
 
 /** class implementing most of the functionality of a generic broker
 Basically acts as a router for information,  deals with stuff internally if it can and sends higher up if it can't
@@ -76,21 +76,25 @@ class CoreBroker : public Broker, public BrokerBase
   protected:
     bool _gateway = false;  //!< set to true if this broker should act as a gateway.
   private:
-    bool _isRoot = false;  //!< set to true if this object is a root broker
-    DualMappedVector<BasicFedInfo, std::string, Core::federate_id_t> _federates;  //!< container for all federates
-    DualMappedVector<BasicBrokerInfo, std::string, Core::federate_id_t>
+    std::atomic<bool> _isRoot{false};  //!< set to true if this object is a root broker
+    bool isRootc = false;
+    int routeCount = 1;  //!< counter for creating new routes;
+    DualMappedVector<BasicFedInfo, std::string, global_federate_id> _federates;  //!< container for all federates
+    DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
       _brokers;  //!< container for all the broker information
     std::string previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
-
-    std::vector<std::pair<std::string, int32_t>>
+    UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
+    std::vector<std::pair<std::string, global_federate_id>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::map<Core::federate_id_t, int32_t> global_id_translation;  //!< map to translate global ids to local ones
-    std::map<Core::federate_id_t, int32_t>
+    std::unordered_map<global_federate_id, federate_id_t>
+      global_id_translation;  //!< map to translate global ids to local ones
+    std::unordered_map<global_federate_id, route_id>
       routing_table;  //!< map for external routes  <global federate id, route id>
-    std::unordered_map<std::string, int32_t>
+    std::unordered_map<std::string, route_id>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
+    std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
     DelayedObjects<std::string> ActiveQueries;  //!< holder for
@@ -98,7 +102,13 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> fedMapRequestors;  //!< list of requesters for the active federate map
     JsonMapBuilder depMap;  //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors;  //!< list of requesters for the dependency graph
-	TriggerVariable disconnection; //!< controller for the disconnection process
+    JsonMapBuilder dataflowMap;  //!< builder for the dependency graph
+    std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
+
+    TriggerVariable disconnection;  //!< controller for the disconnection process
+    std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
+    std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
+    std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
     @param[in] command -- the message to process
@@ -111,20 +121,32 @@ class CoreBroker : public Broker, public BrokerBase
     */
     void processPriorityCommand (ActionMessage &&command) override;
 
+    /** process configure commands for the broker*/
+    void processBrokerConfigureCommands (ActionMessage &cmd);
+
     SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
     /* function to transmit the delayed messages*/
     void transmitDelayedMessages ();
     /**function for routing a message,  it will override the destination id with the specified argument
      */
-    void routeMessage (ActionMessage &cmd, Core::federate_id_t dest);
+    void routeMessage (ActionMessage &cmd, global_federate_id dest);
+    void routeMessage (ActionMessage &&cmd, global_federate_id dest);
     /** function for routing a message from based on the destination specified in the ActionMessage*/
     void routeMessage (const ActionMessage &cmd);
+    void routeMessage (ActionMessage &&cmd);
+    /** transmit a message to the parent or root */
+    void transmitToParent (ActionMessage &&cmd);
 
-    int32_t fillMessageRouteInformation (ActionMessage &mess);
+    /** broacast a message to all immediate brokers*/
+    void broadcast (ActionMessage &cmd);
+    /**/
+    route_id fillMessageRouteInformation (ActionMessage &mess);
 
     /** handle initialization operations*/
     void executeInitializationOperations ();
+    /** get an index for an airlock, function is threadsafe*/
+    uint16_t getNextAirlockIndex ();
 
   public:
     /** connect the core to its broker
@@ -156,7 +178,8 @@ class CoreBroker : public Broker, public BrokerBase
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
-    virtual void waitForDisconnect (int msToWait = -1) const override final;
+    virtual bool
+    waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;
 
   private:
     /** implementation details of the connection process
@@ -173,14 +196,25 @@ class CoreBroker : public Broker, public BrokerBase
     @param[in] route -the identifier for the routing information
     @param[in] command the actionMessage to transmit
     */
-    virtual void transmit (int32_t route, const ActionMessage &command) = 0;
+    virtual void transmit (route_id route, const ActionMessage &command) = 0;
+    /** this function is the one that will change for various flavors of broker communication
+    @details it takes a route info- a code of where to send the data and an action message
+    and proceeds to transmit it to the appropriate location, this variant does a move operation instead of copy
+    @param[in] route -the identifier for the routing information
+    @param[in] command the actionMessage to transmit
+    */
+    virtual void transmit (route_id route, ActionMessage &&command) = 0;
     /** add a route to the type specific routing information and establish the connection
     @details add a route to a table, the connection information is contained in the string with the described
     identifier
     @param[in] route_id  the identifier for the route
     @param[in] routeInfo  a string describing the connection info
     */
-    virtual void addRoute (int route_id, const std::string &routeInfo) = 0;
+    virtual void addRoute (route_id rid, const std::string &routeInfo) = 0;
+    /** remove or disconnect a route from use
+    @param route_id the identification of the route
+    */
+    virtual void removeRoute (route_id rid) = 0;
 
   public:
     /**default constructor
@@ -205,22 +239,31 @@ class CoreBroker : public Broker, public BrokerBase
     void setIdentifier (const std::string &name);
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const override final { return identifier; }
+    virtual const std::string &getAddress () const override final;
+    virtual void setLoggingLevel (int logLevel) override final;
     virtual std::string query (const std::string &target, const std::string &queryStr) override final;
+    virtual void setGlobal (const std::string &valueName, const std::string &value) override final;
+    virtual void makeConnections (const std::string &file) override final;
+    virtual void dataLink (const std::string &publication, const std::string &input) override final;
+
+    virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+
+    virtual void
+    addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
 
   private:
     /** check if we can remove some dependencies*/
     void checkDependencies ();
-    /** check subscriptions for completion and mismatches*/
-    void checkSubscriptions ();
     /** find any existing publishers for a subscription*/
-    bool FindandNotifySubscriptionPublisher (BasicHandleInfo &handleInfo);
-    void FindandNotifyPublicationSubscribers (BasicHandleInfo &handleInfo);
-    /** check endpoints for any issues*/
-    void checkEndpoints ();
-    /** check filters for any issues*/
-    void checkFilters ();
-    bool FindandNotifyFilterEndpoint (BasicHandleInfo &handleInfo);
-    void FindandNotifyEndpointFilters (BasicHandleInfo &handleInfo);
+    void FindandNotifyInputTargets (BasicHandleInfo &handleInfo);
+    void FindandNotifyPublicationTargets (BasicHandleInfo &handleInfo);
+
+    void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
+    void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
+    /** run a check for a named interface*/
+    void checkForNamedInterface (ActionMessage &command);
+    /** remove a named target from an interface*/
+    void removeNamedTarget (ActionMessage &command);
     /** answer a query or route the message the appropriate location*/
     void processQuery (const ActionMessage &m);
     /** answer a query or route the message the appropriate location*/
@@ -230,29 +273,38 @@ class CoreBroker : public Broker, public BrokerBase
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer (const std::string &query);
     /** locate the route to take to a particular federate*/
-    int32_t getRoute (Core::federate_id_t fedid) const;
-    const BasicBrokerInfo *getBrokerById (Core::federate_id_t fedid) const;
+    route_id getRoute (global_federate_id fedid) const;
+    /** locate the route to take to a particular federate*/
+    route_id getRoute (int32_t fedid) const { return getRoute (global_federate_id (fedid)); }
 
-    BasicBrokerInfo *getBrokerById (Core::federate_id_t fedid);
+    const BasicBrokerInfo *getBrokerById (global_broker_id brokerid) const;
+
+    BasicBrokerInfo *getBrokerById (global_broker_id brokerid);
 
     void addLocalInfo (BasicHandleInfo &handleInfo, const ActionMessage &m);
     void addPublication (ActionMessage &m);
-    void addSubscription (ActionMessage &m);
+    void addInput (ActionMessage &m);
     void addEndpoint (ActionMessage &m);
-    void addDestFilter (ActionMessage &m);
-    void addSourceFilter (ActionMessage &m);
+    void addFilter (ActionMessage &m);
+
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing the federate/broker/Core Map*/
     void initializeFederateMap ();
     /** generate a JSON string containing the dependency information for all federation object*/
     void initializeDependencyGraph ();
+    /** generate a json string containing the data flow information for all federation object*/
+    void initializeDataFlowGraph ();
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers (int error_code);
     /** send a disconnect message to time dependencies and child brokers*/
-	void sendDisconnect ();
+    void sendDisconnect ();
     /** generate a string about the federation summarizing connections*/
     std::string generateFederationSummary () const;
+    /** label the broker and all children as disconnected*/
+    void labelAsDisconnected (global_broker_id broker);
+
+    friend class TimeoutMonitor;
 };
 
 }  // namespace helics

@@ -7,100 +7,61 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_CORE_HPP_
 #pragma once
 
-#include "../shared_api_library/helics.h"
-#include "../shared_api_library/MessageFilters.h"
-#include "config.hpp"
-#include <string>
 #include "../cpp98/Filter.hpp"
+#include "../shared_api_library/MessageFilters.h"
+#include "../shared_api_library/helics.h"
+#include "config.hpp"
 #include <stdexcept>
+#include <string>
 
-namespace helics98
+namespace helicscpp
 {
-
 class Core
 {
   public:
-    // Default constructor, not meant to be used
-    Core ():core(NULL) {};
-
+    /** Default constructor*/
+    Core () : core (NULL){};
+    /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
-        core = helicsCreateCore (type.c_str(), name.c_str(), initString.c_str());
-        if (core == NULL)
-        {
-            throw(std::runtime_error("core creation failed"));
-        }
+        core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
     }
-
+    /** construct with type, core name and command line arguments */
     Core (const std::string &type, const std::string &name, int argc, const char **argv)
     {
-        core = helicsCreateCoreFromArgs (type.c_str(), name.c_str(), argc, argv);
-        if (core == NULL)
-        {
-            throw(std::runtime_error("core creation failed"));
-        }
+        core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
+    /** destructor*/
+    ~Core () { helicsCoreFree (core); }
+    /** implicit operator so the object can be used with the c api functions natively*/
+    operator helics_core () { return core; }
+    /** explicity get the base helics_core object*/
+    helics_core baseObject () const { return core; }
+    bool isConnected () const { return helicsCoreIsConnected (core); }
 
-    ~Core ()
+    Core (const Core &cr) { core = helicsCoreClone (cr.core, hThrowOnError ()); }
+    Core &operator= (const Core &cr)
     {
-        if (core != NULL)
-        {
-            helicsCoreFree(core);
-        }
-    }
-    operator helics_core() { return core; }
-
-    helics_core baseObject() const { return core; }
-    bool isConnected () const
-    {
-        return helicsCoreIsConnected (core);
-    }
-
-    Core(const Core &cr)
-    {
-        core = helicsCoreClone(cr.core);
-    }
-    Core &operator=(const Core &cr)
-    {
-        core = helicsCoreClone(cr.core);
+        core = helicsCoreClone (cr.core, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Core(Core &&cr) noexcept
+    Core (Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
     }
-    Core &operator=(Core &&cr) noexcept
+    Core &operator= (Core &&cr) noexcept
     {
         core = cr.core;
         cr.core = NULL;
         return *this;
     }
 #endif
-    void setReadyToInit()
-    {
-        helicsCoreSetReadyToInit(core);
-    }
-    void disconnect()
-    {
-        helicsCoreDisconnect(core);
-    }
+    void setReadyToInit () { helicsCoreSetReadyToInit (core, hThrowOnError ()); }
+    void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
 
-    std::string getIdentifier() const
-    {
-        char str[255];
-        helicsCoreGetIdentifier(core, &str[0], sizeof(str));
-        std::string result(str);
-        return result;
-    }
-
-    Filter registerSourceFilter(helics_filter_type_t type,
-        const std::string &target,
-        const std::string &name = std::string())
-    {
-        return Filter(helicsCoreRegisterSourceFilter(core, type, target.c_str(), name.c_str()));
-    }
+    const char *getIdentifier () const { return helicsCoreGetIdentifier (core); }
 
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
@@ -111,11 +72,9 @@ class Core
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
     */
-    Filter registerDestinationFilter(helics_filter_type_t type,
-        const std::string &target,
-        const std::string &name = std::string())
+    Filter registerFilter (helics_filter_type type, const std::string &name = std::string ())
     {
-        return Filter(helicsCoreRegisterDestinationFilter(core, type, target.c_str(), name.c_str()));
+        return Filter (helicsCoreRegisterFilter (core, type, name.c_str (), hThrowOnError ()));
     }
 
     /** create a cloning Filter on the specified federate
@@ -125,13 +84,19 @@ class Core
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
-    CloningFilter registerCloningFilter( const std::string &deliveryEndpoint)
+    CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
     {
-        return CloningFilter(helicsCoreRegisterCloningFilter(core, deliveryEndpoint.c_str()));
+        return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
+    /** set a global federation value*/
+    void setGlobal (const std::string &valueName, const std::string &value)
+    {
+        helicsCoreSetGlobal (core, valueName.c_str (), value.c_str (), hThrowOnError ());
+    }
+
   protected:
     helics_core core;
 };
 
-} //namespace helics
+}  // namespace helicscpp
 #endif

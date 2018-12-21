@@ -7,135 +7,58 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../../common/AsioServiceManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
 
-static const int BEGIN_OPEN_PORT_RANGE = 24228;
-static const int BEGIN_OPEN_PORT_RANGE_SUBBROKER = 24328;
-
-static const int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
+static constexpr int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
 namespace tcp
 {
 using boost::asio::ip::tcp;
-TcpComms::TcpComms () noexcept {}
 
-TcpComms::TcpComms (const std::string &brokerTarget,
-                    const std::string &localTarget,
-                    interface_networks targetNetwork)
-    : CommsInterface (brokerTarget, localTarget, targetNetwork)
-{
-    if (localTarget_.empty ())
-    {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
-            (brokerTarget_ == "localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
-        }
-    }
-}
+TcpComms::TcpComms () noexcept : NetworkCommsInterface (interface_type::tcp) {}
 
-TcpComms::TcpComms (const NetworkBrokerData &netInfo)
-    : CommsInterface (netInfo), brokerPort (netInfo.brokerPort), PortNumber (netInfo.portNumber)
+int TcpComms::getDefaultBrokerPort () const { return DEFAULT_TCP_BROKER_PORT_NUMBER; }
+
+/** load network information into the comms object*/
+void TcpComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    if (localTarget_.empty ())
+    NetworkCommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
     {
-        if ((brokerTarget_ == "tcp://127.0.0.1") || (brokerTarget_ == "tcp://localhost") ||
-            (brokerTarget_ == "localhost"))
-        {
-            localTarget_ = "localhost";
-        }
-        else if (brokerTarget_.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTarget_ = "localhost";
-                break;
-            default:
-                localTarget_ = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
-        }
-    }
-    if (netInfo.portStart > 0)
-    {
-        openPortStart = netInfo.portStart;
-    }
-    if (PortNumber > 0)
-    {
-        autoPortNumber = false;
+        return;
     }
     reuse_address = netInfo.reuse_address;
+    propertyUnLock ();
+}
+
+void TcpComms::setFlag (const std::string &flag, bool val)
+{
+    if (flag == "reuse_address")
+    {
+        if (propertyLock ())
+        {
+            useOsPortAllocation = val;
+            propertyUnLock ();
+        }
+    }
+    else
+    {
+        NetworkCommsInterface::setFlag (flag, val);
+    }
 }
 
 /** destructor*/
 TcpComms::~TcpComms () { disconnect (); }
 
-void TcpComms::setBrokerPort (int brokerPortNumber)
-{
-    if (getRxStatus () == connection_status::startup)
-    {
-        brokerPort = brokerPortNumber;
-    }
-}
-
-int TcpComms::findOpenPort ()
-{
-    int start = openPortStart;
-    if (openPortStart < 0)
-    {
-        start = (hasBroker) ? BEGIN_OPEN_PORT_RANGE_SUBBROKER : BEGIN_OPEN_PORT_RANGE;
-    }
-    while (usedPortNumbers.find (start) != usedPortNumbers.end ())
-    {
-        ++start;
-    }
-    usedPortNumbers.insert (start);
-    return start;
-}
-
-void TcpComms::setPortNumber (int localPortNumber)
-{
-    if (getRxStatus () == connection_status::startup)
-    {
-        PortNumber = localPortNumber;
-        if (PortNumber > 0)
-        {
-            autoPortNumber = false;
-        }
-    }
-}
-
-void TcpComms::setAutomaticPortStartPort (int startingPort) { openPortStart = startingPort; }
-
-int TcpComms::processIncomingMessage (ActionMessage &M)
+int TcpComms::processIncomingMessage (ActionMessage &&M)
 {
     if (isProtocolCommand (M))
     {
-        switch (M.index)
+        switch (M.messageID)
         {
         case CLOSE_RECEIVER:
             return (-1);
@@ -147,99 +70,36 @@ int TcpComms::processIncomingMessage (ActionMessage &M)
     return 0;
 }
 
-ActionMessage TcpComms::generateReplyToIncomingMessage (ActionMessage &M)
-{
-    if (isProtocolCommand (M))
-    {
-        switch (M.index)
-        {
-        case QUERY_PORTS:
-        {
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
-            return portReply;
-        }
-        break;
-        case REQUEST_PORTS:
-        {
-            auto openPort = findOpenPort ();
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.index = PORT_DEFINITIONS;
-            portReply.source_id = PortNumber;
-            portReply.source_handle = openPort;
-            return portReply;
-        }
-        break;
-        case CLOSE_RECEIVER:
-            return M;
-        default:
-            M.index = NULL_REPLY;
-            return M;
-        }
-    }
-    ActionCallback (std::move (M));
-    ActionMessage resp (CMD_PRIORITY_ACK);
-    return resp;
-}
-
-void TcpComms::txPriorityReceive (std::shared_ptr<TcpConnection> /*connection*/,
-                                  const char *data,
-                                  size_t bytes_received,
-                                  const boost::system::error_code &error)
-{
-    if (error)
-    {
-        return;
-    }
-    ActionMessage m;
-    auto used = m.depacketize (data, bytes_received);
-    if (used > 0)
-    {
-        if (m.action () == CMD_INVALID)
-        {
-            return;
-        }
-        if (m.action () == CMD_PRIORITY_ACK)
-        {
-            return;
-        }
-        if (isProtocolCommand (m))
-        {
-            txQueue.emplace (-1, m);
-        }
-        else
-        {
-            ActionCallback (std::move (m));
-        }
-    }
-}
-
-size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const char *data, size_t bytes_received)
+size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received)
 {
     size_t used_total = 0;
     while (used_total < bytes_received)
     {
         ActionMessage m;
-        auto used = m.depacketize (data + used_total, bytes_received - used_total);
+        auto used = m.depacketize (data + used_total, static_cast<int> (bytes_received - used_total));
         if (used == 0)
         {
             break;
         }
-        if (isPriorityCommand (m))
+        if (isProtocolCommand (m))
         {
+            // if the reply is not ignored respond with it otherwise
+            // forward the original message on to the receiver to handle
             auto rep = generateReplyToIncomingMessage (m);
-            try
+            if (rep.action () != CMD_IGNORE)
             {
-                connection->send (rep.packetize ());
+                try
+                {
+                    connection->send (rep.packetize ());
+                }
+                catch (const boost::system::system_error &se)
+                {
+                }
             }
-            catch (const boost::system::system_error &se)
+            else
             {
+                rxMessageQueue.push (std::move (m));
             }
-        }
-        else if (isProtocolCommand (m))
-        {
-            rxMessageQueue.push (m);
         }
         else
         {
@@ -254,7 +114,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpRxConnection> connection, const
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (std::shared_ptr<TcpRxConnection> /*connection*/,
+bool TcpComms::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/,
                                  const boost::system::error_code &error)
 {
     if (getRxStatus () == connection_status::connected)
@@ -278,28 +138,11 @@ void TcpComms::queue_rx_function ()
         auto message = rxMessageQueue.pop ();
         if (isProtocolCommand (message))
         {
-            switch (message.index)
+            switch (message.messageID)
             {
             case PORT_DEFINITIONS:
             {
-                auto mp = message.source_handle;
-                if (openPortStart < 0)
-                {
-                    if (mp < BEGIN_OPEN_PORT_RANGE)
-                    {
-                        openPortStart = BEGIN_OPEN_PORT_RANGE;
-                    }
-                    else if (mp < BEGIN_OPEN_PORT_RANGE_SUBBROKER)
-                    {
-                        openPortStart = BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE) * 10;
-                    }
-                    else
-                    {
-                        openPortStart =
-                          BEGIN_OPEN_PORT_RANGE_SUBBROKER + (mp - BEGIN_OPEN_PORT_RANGE_SUBBROKER) * 10 + 10;
-                    }
-                }
-                PortNumber = mp;
+                loadPortDefinitions (message);
             }
 
             break;
@@ -330,23 +173,23 @@ void TcpComms::queue_rx_function ()
         }
         else
         {
-            logWarning("retrying tcp bind");
+            logWarning ("retrying tcp bind");
             std::this_thread::sleep_for (std::chrono::milliseconds (150));
             auto connected = server->reConnect (connectionTimeout);
             if (!connected)
             {
-                logError("unable to bind to tcp connection socket");
+                logError ("unable to bind to tcp connection socket");
                 server->close ();
                 setRxStatus (connection_status::error);
                 return;
             }
         }
     }
-    auto serviceLoop = ioserv->runServiceLoop ();
-    server->setDataCall ([this](TcpRxConnection::pointer connection, const char *data, size_t datasize) {
+    auto serviceLoop = ioserv->startServiceLoop ();
+    server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server->setErrorCall ([this](TcpRxConnection::pointer connection, const boost::system::error_code &error) {
+    server->setErrorCall ([this](TcpConnection::pointer connection, const boost::system::error_code &error) {
         return commErrorHandler (connection, error);
     });
     server->start ();
@@ -357,7 +200,7 @@ void TcpComms::queue_rx_function ()
         auto message = rxMessageQueue.pop ();
         if (isProtocolCommand (message))
         {
-            switch (message.index)
+            switch (message.messageID)
             {
             case CLOSE_RECEIVER:
             case DISCONNECT:
@@ -368,6 +211,7 @@ void TcpComms::queue_rx_function ()
     }
 
     disconnecting = true;
+    std::this_thread::sleep_for (std::chrono::milliseconds (50));
     server->close ();
     setRxStatus (connection_status::terminated);
 }
@@ -379,119 +223,144 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
         ActionMessage m (data, bytes_received);
         if (isProtocolCommand (m))
         {
-            if (m.index == PORT_DEFINITIONS)
+            if (m.messageID == PORT_DEFINITIONS)
             {
                 rxMessageQueue.push (m);
             }
-            else if (m.index == DISCONNECT)
+            else if (m.messageID == DISCONNECT)
             {
-                txQueue.emplace (-1, m);
+                txQueue.emplace (control_route, m);
             }
         }
     }
+    else
+    {
+        logError (errorMessage);
+    }
+}
+
+bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
+                                          std::shared_ptr<TcpConnection> &brokerConnection)
+{
+    // lambda function that does the proper termination
+    auto terminate = [&, this](connection_status status) -> bool {
+        if (brokerConnection)
+        {
+            brokerConnection->close ();
+            brokerConnection = nullptr;
+        }
+        setTxStatus (status);
+        return false;
+    };
+
+    if (brokerPort < 0)
+    {
+        brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
+    }
+    try
+    {
+        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
+                                           maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+        if (!brokerConnection)
+        {
+            logError ("initial connection to broker timed out");
+            return terminate (connection_status::error);
+        }
+        if (PortNumber <= 0)
+        {
+            ActionMessage m (CMD_PROTOCOL_PRIORITY);
+            m.messageID = REQUEST_PORTS;
+            try
+            {
+                brokerConnection->send (m.packetize ());
+            }
+            catch (const boost::system::system_error &error)
+            {
+                logError (std::string ("error in initial send to broker ") + error.what ());
+                return terminate (connection_status::error);
+            }
+            std::vector<char> rx (512);
+            tcp::endpoint brk;
+            brokerConnection->async_receive (rx.data (), 128,
+                                             [this, &rx](const boost::system::error_code &error, size_t bytes) {
+                                                 if (!error)
+                                                 {
+                                                     txReceive (rx.data (), bytes, std::string ());
+                                                 }
+                                                 else
+                                                 {
+                                                     if (error != boost::asio::error::operation_aborted)
+                                                     {
+                                                         txReceive (rx.data (), bytes, error.message ());
+                                                     }
+                                                 }
+                                             });
+            std::chrono::milliseconds cumsleep{0};
+            while (PortNumber < 0)
+            {
+                auto mess = txQueue.pop (std::chrono::milliseconds (100));
+                if (mess)
+                {
+                    if (isProtocolCommand (mess->second))
+                    {
+                        if (mess->second.messageID == PORT_DEFINITIONS)
+                        {
+                            rxMessageQueue.push (mess->second);
+                            break;
+                        }
+
+                        else if (mess->second.messageID == DISCONNECT)
+                        {
+                            return terminate (connection_status::terminated);
+                        }
+                        else
+                        {
+                            rxMessageQueue.push (mess->second);
+                        }
+                    }
+                    else
+                    {
+                        logWarning ("unexpected message received in transmit queue");
+                    }
+                }
+                cumsleep += std::chrono::milliseconds (100);
+                if (cumsleep >= connectionTimeout)
+                {
+                    brokerConnection->cancel ();
+                    logError ("port number query to broker timed out");
+                    return terminate (connection_status::error);
+                }
+            }
+        }
+    }
+    catch (std::exception &e)
+    {
+        logError (std::string ("error connecting with Broker") + e.what ());
+        return terminate (connection_status::error);
+    }
+    return true;
 }
 
 void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = ioserv->runServiceLoop ();
+    auto serviceLoop = ioserv->startServiceLoop ();
     TcpConnection::pointer brokerConnection;
 
-    std::map<int, TcpConnection::pointer> routes;  // for all the other possible routes
+    std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
     }
     if (hasBroker)
     {
-        if (brokerPort < 0)
+        if (!establishBrokerConnection (ioserv, brokerConnection))
         {
-            brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
-        }
-        try
-        {
-            brokerConnection = TcpConnection::create (ioserv->getBaseService (), brokerTarget_,
-                                                      std::to_string (brokerPort), maxMessageSize_);
-            int cumsleep = 0;
-            while (!brokerConnection->isConnected ())
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                cumsleep += 100;
-                if (cumsleep >= connectionTimeout)
-                {
-                    logError("initial connection to broker timed out");
-                    setTxStatus (connection_status::terminated);
-                    return;
-                }
-            }
-
-            if (PortNumber <= 0)
-            {
-                ActionMessage m (CMD_PROTOCOL_PRIORITY);
-                m.index = REQUEST_PORTS;
-                try
-                {
-                    brokerConnection->send (m.packetize ());
-                }
-                catch (const boost::system::system_error &error)
-                {
-                    logError(std::string("error in initial send to broker ")+ error.what ());
-                    setTxStatus (connection_status::terminated);
-                    return;
-                }
-                std::vector<char> rx (512);
-                tcp::endpoint brk;
-                brokerConnection->async_receive (rx.data (), 128,
-                                                 [this, &rx](const boost::system::error_code &error,
-                                                             size_t bytes) {
-                                                     if (error != boost::asio::error::operation_aborted)
-                                                     {
-                                                         if (!error)
-                                                         {
-                                                             txReceive (rx.data (), bytes, std::string ());
-                                                         }
-                                                         else
-                                                         {
-                                                             txReceive (rx.data (), bytes, error.message ());
-                                                         }
-                                                     }
-                                                 });
-                cumsleep = 0;
-                while (PortNumber < 0)
-                {
-                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                    auto mess = txQueue.try_pop ();
-                    if (mess)
-                    {
-                        if (isProtocolCommand (mess->second))
-                        {
-                            if (mess->second.index == PORT_DEFINITIONS)
-                            {
-                                rxMessageQueue.push (mess->second);
-                            }
-                            else if (mess->second.index == DISCONNECT)
-                            {
-                                brokerConnection->cancel ();
-                                setTxStatus (connection_status::terminated);
-                                return;
-                            }
-                        }
-                    }
-                    cumsleep += 100;
-                    if (cumsleep >= connectionTimeout)
-                    {
-                        brokerConnection->cancel ();
-                        logError("port number query to broker timed out");
-                        setTxStatus (connection_status::terminated);
-                        return;
-                    }
-                }
-            }
-        }
-        catch (std::exception &e)
-        {
-           logError(e.what ());
+            ActionMessage m (CMD_PROTOCOL);
+            m.messageID = CLOSE_RECEIVER;
+            rxMessageQueue.push (m);
+            return;
         }
     }
     else
@@ -500,8 +369,8 @@ void TcpComms::queue_tx_function ()
         {
             PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
             ActionMessage m (CMD_PROTOCOL);
-            m.index = PORT_DEFINITIONS;
-            m.source_handle = PortNumber;
+            m.messageID = PORT_DEFINITIONS;
+            m.setExtraData (PortNumber);
             rxMessageQueue.push (m);
         }
     }
@@ -510,20 +379,20 @@ void TcpComms::queue_tx_function ()
     //  std::vector<ActionMessage> txlist;
     while (true)
     {
-        int route_id;
+        route_id rid;
         ActionMessage cmd;
 
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         bool processed = false;
         if (isProtocolCommand (cmd))
         {
-            if (route_id == -1)
+            if (rid == control_route)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
-                    auto newroute = cmd.payload;
+                    auto &newroute = cmd.payload;
 
                     try
                     {
@@ -532,7 +401,7 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-                        routes.emplace (cmd.dest_id, std::move (new_connect));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
                     }
                     catch (std::exception &e)
                     {
@@ -541,6 +410,10 @@ void TcpComms::queue_tx_function ()
                     processed = true;
                 }
                 break;
+                case REMOVE_ROUTE:
+					routes.erase(route_id{ cmd.getExtraData() });
+                    processed = true;
+                    break;
                 case CLOSE_RECEIVER:
                     rxMessageQueue.push (cmd);
                     processed = true;
@@ -555,21 +428,13 @@ void TcpComms::queue_tx_function ()
             continue;
         }
 
-        if (route_id == 0)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
                 try
                 {
                     brokerConnection->send (cmd.packetize ());
-                    if (isPriorityCommand (cmd))
-                    {
-                        brokerConnection->async_receive ([this](std::shared_ptr<TcpConnection> connection,
-                                                                const char *data, size_t bytes_received,
-                                                                const boost::system::error_code &error) {
-                            txPriorityReceive (connection, data, bytes_received, error);
-                        });
-                    }
                 }
                 catch (const boost::system::system_error &se)
                 {
@@ -589,27 +454,19 @@ void TcpComms::queue_tx_function ()
                 }
             }
         }
-        else if (route_id == -1)
+        else if (rid == control_route)
         {  // send to rx thread loop
             rxMessageQueue.push (cmd);
         }
         else
         {
             //  txlist.push_back(cmd);
-            auto rt_find = routes.find (route_id);
+            auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
                 try
                 {
                     rt_find->second->send (cmd.packetize ());
-                    if (isPriorityCommand (cmd))
-                    {
-                        rt_find->second->async_receive ([this](std::shared_ptr<TcpConnection> connection,
-                                                               const char *data, size_t bytes_received,
-                                                               const boost::system::error_code &error) {
-                            txPriorityReceive (connection, data, bytes_received, error);
-                        });
-                    }
                 }
                 catch (const boost::system::system_error &se)
                 {
@@ -617,7 +474,8 @@ void TcpComms::queue_tx_function ()
                     {
                         if (!isDisconnectCommand (cmd))
                         {
-                            logError(std::string("rt send ")+std::to_string(route_id)+"::"+se.what ());
+                            logError (std::string ("rt send ") + std::to_string (rid.baseValue ()) +
+                                      "::" + se.what ());
                         }
                     }
                 }
@@ -629,14 +487,6 @@ void TcpComms::queue_tx_function ()
                     try
                     {
                         brokerConnection->send (cmd.packetize ());
-                        if (isPriorityCommand (cmd))
-                        {
-                            brokerConnection->async_receive ([this](std::shared_ptr<TcpConnection> connection,
-                                                                    const char *data, size_t bytes_received,
-                                                                    const boost::system::error_code &error) {
-                                txPriorityReceive (connection, data, bytes_received, error);
-                            });
-                        }
                     }
                     catch (const boost::system::system_error &se)
                     {
@@ -644,14 +494,19 @@ void TcpComms::queue_tx_function ()
                         {
                             if (!isDisconnectCommand (cmd))
                             {
-                                logError(std::string("broker send")+std::to_string(route_id)+ " ::" + se.what ());
+                                logError (std::string ("broker send") + std::to_string (rid.baseValue ()) +
+                                          " ::" + se.what ());
                             }
                         }
                     }
                 }
                 else
                 {
-                    assert (false);
+					if (!isDisconnectCommand(cmd))
+					{
+                        logWarning (std::string ("unknown message destination message dropped ") +
+                                    prettyPrintString (cmd));
+                    }
                 }
             }
         }
@@ -672,11 +527,9 @@ CLOSE_TX_LOOP:
 void TcpComms::closeReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
+    cmd.messageID = CLOSE_RECEIVER;
     rxMessageQueue.push (cmd);
 }
-
-std::string TcpComms::getAddress () const { return makePortAddress (localTarget_, PortNumber); }
 
 }  // namespace tcp
 }  // namespace helics

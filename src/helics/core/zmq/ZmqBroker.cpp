@@ -7,72 +7,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "ZmqBroker.h"
 #include "../../common/zmqContextManager.h"
 #include "ZmqComms.h"
+#include "../NetworkBroker_impl.hpp"
+
 namespace helics
 {
 namespace zeromq
 {
-ZmqBroker::ZmqBroker (bool rootBroker) noexcept : CommsBroker (rootBroker) {}
+ZmqBroker::ZmqBroker(bool rootBroker) noexcept : NetworkBroker(rootBroker) { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active; }
 
-ZmqBroker::ZmqBroker (const std::string &broker_name) : CommsBroker (broker_name) {}
-
-void ZmqBroker::displayHelp (bool local_only)
-{
-    std::cout << " Help for Zero MQ Broker: \n";
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-void ZmqBroker::initializeFromArgs (int argc, const char *const *argv)
-{
-    if (brokerState == broker_state_t::created)
-    {
-        netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
-        CoreBroker::initializeFromArgs (argc, argv);
-    }
-}
+ZmqBroker::ZmqBroker (const std::string &broker_name) : NetworkBroker (broker_name) { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active; }
 
 bool ZmqBroker::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())
-    {
-        setAsRoot ();
-    }
     zmqContextManager::startContext ();
-    comms = std::make_unique<ZmqComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
-        {
-            netInfo.portNumber = comms->getPort ();
-        }
-    }
-    return res;
+    return NetworkBroker::brokerConnect();
 }
 
-std::string ZmqBroker::getAddress () const
+void ZmqBroker::displayHelp(bool localOnly)
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        return comms->getAddress ();
-    }
-    if (netInfo.localInterface == "tcp://*")
-    {
-        return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
-    }
-    else
-    {
-        return makePortAddress (netInfo.localInterface, netInfo.portNumber);
-    }
+    NetworkBroker::displayHelp(localOnly);
 }
 
 }  // namespace zeromq

@@ -49,7 +49,7 @@ namespace apps
     {
     public:
         /** construct from a FederateInfo structure*/
-        explicit Recorder(FederateInfo &fi);
+      explicit Recorder (const std::string &name, FederateInfo & fi);
         /** construct from command line arguments*/
         Recorder(int argc, char *argv[]);
 
@@ -57,7 +57,7 @@ namespace apps
         @param core a pointer to core object which the federate can join
         @param[in] fi  a federate information structure
         */
-        Recorder(const std::shared_ptr<Core> &core, const FederateInfo &fi);
+        Recorder (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
         /**constructor taking a file with the required information
         @param[in] name the name of the app
         @param[in] file a file defining the federate information
@@ -134,13 +134,13 @@ namespace apps
         Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt; //!< a pointer to a clone filter
         std::vector<ValueCapture> points;   //!< lists of points that were captured
-        std::vector<Subscription> subscriptions;    //!< the actual subscription objects
+        std::vector<Input> subscriptions;    //!< the actual subscription objects
         std::vector<Endpoint> endpoints;    //!< the actual endpoint objects
         std::unique_ptr<Endpoint> cloneEndpoint; //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages; //!< list of messages
-        std::map<helics::subscription_id_t, int> subids; //!< map of the subscription ids
+        std::map<helics::interface_handle, int> subids; //!< map of the subscription ids
         std::map<std::string, int> subkeys;  //!< translate subscription names to an index
-        std::map<helics::endpoint_id_t, int> eptids; //translate subscription id to index
+        std::map<helics::interface_handle, int> eptids; //translate subscription id to index
         std::map<std::string, int> eptNames;    //!< translate endpoint name to index
         std::vector<ValueStats> vStat; //!< storage for statistics capture
         std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture

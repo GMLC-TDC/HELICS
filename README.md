@@ -1,13 +1,47 @@
-# HELICS-SRC [![Build Status](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)](https://travis-ci.org/GMLC-TDC/HELICS-src)
-[![Build status](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)](https://ci.appveyor.com/project/nightlark/helics-src/branch/develop)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e)](https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS-src)
-[![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
-[![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](http://gmlc-tdc.github.io/HELICS-src)
-
 <p align="center">
 <img src="docs/img/HELICS_Logo.png" width="400">
 </p>
+
+# Build Status
+<table>
+  <tr>
+    <td><b>Service</b></td>
+    <td><b>Master</b></td>
+    <td><b>Develop</b></td>
+  </tr>
+  <tr>
+  <td>Travis CI</td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=develop" alt="Build Status" /></a></td>
+  </tr>
+  <tr>
+  <td>Appveyor</td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/master"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true" alt="Build Status" /></a></td>
+  </tr>
+  <tr>
+  <td>Codacy</td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
+  </tr>
+  <tr>
+  <td>Coverage</td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
+  </tr>
+  <tr>
+  <td>Gitter</td>
+  <td colspan="2" align="center">
+  <a href="https://gitter.im/GMLC-TDC/HELICS-src"><img src="https://badges.gitter.im/GMLC-TDC/HELICS-src.png" alt="Gitter Chat" /></a></td>
+  </tr>
+  <tr>
+  <td>Documentation</td>
+  <td colspan="2" align="center">
+  <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
+</table>
+
+
+# Introduction
 
 Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS).  HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OSX). It provides users a high-performance way to have multiple individual simulation model "federates" from various domains interact during execution to create a larger co-simulation "federation" able to capture rich interactions. Written in modern C++ (C++ 2014), HELICS provides includes a rich set of APIs for other languages including Python, C, Java, and MATLAB, and has native support within a growing number of energy simulation tools.
 
@@ -42,7 +76,7 @@ Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
 #### [CHANGELOG](CHANGELOG.md)
-#### [ROADMAP](ROADMAP.md)
+#### [ROADMAP](docs/ROADMAP.md)
 
 # Tools with HELICS support
 

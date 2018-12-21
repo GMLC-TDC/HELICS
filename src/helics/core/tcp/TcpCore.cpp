@@ -1,60 +1,66 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "TcpCore.h"
 #include "TcpComms.h"
+#include "TcpCommsSS.h"
+#include "../../common/argParser.h"
+#include "../NetworkCore_impl.hpp"
 
 namespace helics
 {
+template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
 namespace tcp
 {
-TcpCore::TcpCore () noexcept {}
 
-TcpCore::TcpCore (const std::string &core_name) : CommsBroker (core_name) {}
+TcpCoreSS::TcpCoreSS () noexcept {}
 
-void TcpCore::initializeFromArgs (int argc, const char *const *argv)
+TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
+
+
+using namespace std::string_literals;
+static const ArgDescriptors extraArgs{
+{ "connections"s, ArgDescriptor::arg_type_t::vector_string,"target link connections"s },
+{"no_outgoing_connections"s, ArgDescriptor::arg_type_t::flag_type,"disable outgoing connections"s} };
+
+void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
 {
     if (brokerState == created)
     {
-        netInfo.initializeFromArgs (argc, argv, "localhost");
-
-        CommonCore::initializeFromArgs (argc, argv);
-    }
-}
-
-bool TcpCore::brokerConnect ()
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())  // cores require a broker
-    {
-        netInfo.brokerAddress = "localhost";
-    }
-    comms = std::make_unique<TcpComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
+        std::unique_lock<std::mutex> lock(dataMutex);
+        if (brokerState == created)
         {
-            netInfo.portNumber = comms->getPort ();
+            variable_map vm;
+            argumentParser(argc, argv, vm, extraArgs);
+            if (vm.count("connections") > 0)
+            {
+                connections = vm["connections"].as<std::vector<std::string>>();
+            }
+            if (vm.count("no_outgoing_connections") > 0)
+            {
+                no_outgoing_connections = true;
+            }
         }
+        lock.unlock();
+        NetworkCore::initializeFromArgs(argc, argv);
     }
-    return res;
 }
 
-std::string TcpCore::getAddress () const
+bool TcpCoreSS::brokerConnect ()
 {
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
+    std::unique_lock<std::mutex> lock (dataMutex);
+	if (!connections.empty())
+	{
+		comms->addConnections(connections);
+	}
+    if (no_outgoing_connections)
     {
-        return comms->getAddress ();
+        comms->setFlag("allow_outgoing",false);
     }
-    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+    lock.unlock();
+    return NetworkCore::brokerConnect();
 }
 
 }  // namespace tcp

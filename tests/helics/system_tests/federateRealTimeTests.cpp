@@ -10,12 +10,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <future>
 
+#include "../application_api/testFixtures.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include  "../application_api/testFixtures.hpp"
+#include "helics/core/helics_definitions.hpp"
 #include <chrono>
 
 /** @file these test cases test out the real time mode for HELICS
@@ -27,19 +28,18 @@ BOOST_FIXTURE_TEST_SUITE (federate_realtime_tests, FederateTestFixture)
 BOOST_AUTO_TEST_CASE (federate_delay_tests)
 {
     auto broker = AddBroker ("test", 1);
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "cdelay";
-    fi.coreInitString = std::string ("1 --broker=") + broker->getIdentifier ();
-    fi.realtime = true;
-    fi.rt_lead = 0.1;
-    fi.period = 0.5;
-    auto fed = std::make_shared<helics::ValueFederate> (fi);
+    fi.coreInitString = std::string ("-f 1 --broker=") + broker->getIdentifier ();
+    fi.setFlagOption (helics::defs::flags::realtime);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
+    auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
 
-    helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::helics_type_t::helicsDouble);
+    helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::data_type::helicsDouble);
 
-    helics::Subscription subid (fed, "pub1");
-    fed->enterExecutionState ();
+    fed->registerSubscription ("pub1");
+    fed->enterExecutingMode ();
     // publish string1 at time=0.0;
     auto now = std::chrono::steady_clock::now ();
     helics::Time reqTime = 0.5;
@@ -68,19 +68,18 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
 BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
 {
     auto broker = AddBroker ("test", 1);
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+
     fi.coreName = "adelay";
-    fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
-    fi.realtime = true;
-    fi.rt_lag = 0.1;
-    fi.rt_lead = 0.1;
-    fi.period = 0.5;
-    auto fed = std::make_shared<helics::ValueFederate> (fi);
-    fi.realtime = false;
-    fi.name = "test2";
-    auto fed2 = std::make_shared<helics::ValueFederate> (fi);
-    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
+    fi.coreInitString = std::string ("-f 2 --broker=") + broker->getIdentifier ();
+    fi.setFlagOption (helics::defs::flags::realtime);
+    fi.setProperty (helics::defs::properties::rt_lag, 0.1);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
+    auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
+    fi.setFlagOption (helics::defs::flags::realtime, false);
+    auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helicsDouble);
     std::atomic<int> warnCounter{0};
     fed->setLoggingCallback ([&warnCounter](int logLevel, const std::string &, const std::string &) {
         if (logLevel == 1)
@@ -88,10 +87,10 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
             ++warnCounter;
         }
     });
-    helics::Subscription subid (fed, "pub1");
-    fed2->enterExecutionStateAsync ();
-    fed->enterExecutionState ();
-    fed2->enterExecutionStateComplete ();
+    fed->registerSubscription ("pub1");
+    fed2->enterExecutingModeAsync ();
+    fed->enterExecutingMode ();
+    fed2->enterExecutingModeComplete ();
     // publish string1 at time=0.0;
     std::this_thread::sleep_for (std::chrono::seconds (5));
     helics::Time reqTime = 0.5;
@@ -122,25 +121,24 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
 BOOST_AUTO_TEST_CASE (federate_trigger_tests)
 {
     auto broker = AddBroker ("test", 1);
-    helics::FederateInfo fi ("test1");
-    fi.coreType = CORE_TYPE_TO_TEST;
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "ctrig";
-    fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
-    fi.realtime = true;
-    fi.rt_lag = 0.1;
-    fi.rt_lead = 0.1;
-    fi.period = 0.5;
-    fi.logLevel = 0;
-    auto fed = std::make_shared<helics::ValueFederate> (fi);
-    fi.realtime = false;
-    fi.name = "test2";
-    auto fed2 = std::make_shared<helics::ValueFederate> (fi);
-    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::helics_type_t::helicsDouble);
+    fi.coreInitString = std::string ("-f 2 --broker=") + broker->getIdentifier ();
+    fi.setFlagOption (helics::defs::flags::realtime);
+    fi.setProperty (helics::defs::properties::rt_lag, 0.1);
+    fi.setProperty (helics::defs::properties::rt_lead, 0.1);
+    fi.setProperty (helics::defs::properties::period, 0.5);
+    fi.setProperty (helics::defs::properties::log_level, 0);
 
-    helics::Subscription subid (fed, "pub1");
-    fed2->enterExecutionStateAsync ();
-    fed->enterExecutionState ();
-    fed2->enterExecutionStateComplete ();
+    auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
+    fi.setFlagOption (helics::defs::flags::realtime, false);
+    auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helicsDouble);
+
+    fed->registerSubscription ("pub1");
+    fed2->enterExecutingModeAsync ();
+    fed->enterExecutingMode ();
+    fed2->enterExecutingModeComplete ();
     // publish string1 at time=0.0;
     auto now = std::chrono::steady_clock::now ();
     helics::Time reqTime = 0.5;

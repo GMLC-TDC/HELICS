@@ -15,6 +15,7 @@ if(BUILD_APPS)
     Tracer.hpp
     helicsApp.hpp
     BrokerApp.hpp
+	MultiBroker.hpp
   )
 
   set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
@@ -30,30 +31,32 @@ if(BUILD_APPS)
     Tracer.cpp
     helicsApp.cpp
     BrokerApp.cpp
+	MultiBroker.cpp
   )
 
   add_library(
-    helics_apps-static
+    helics_apps
     STATIC
+	../helics_apps.hpp
     ${helics_apps_library_files}
     ${helics_apps_public_headers}
     ${helics_apps_private_headers}
   )
 
-  target_link_libraries(helics_apps-static PUBLIC helics-static)
+  target_link_libraries(helics_apps PUBLIC helics-static)
   target_include_directories(
-    helics_apps-static SYSTEM
+    helics_apps SYSTEM
     PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
   )
   target_compile_definitions(
-    helics_apps-static PRIVATE
+    helics_apps PRIVATE
     $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
   )
   # add and alias library to match the find_package
-  add_library(HELICS::helics_apps-static ALIAS helics_apps-static)
+  add_library(HELICS::helics_apps ALIAS helics_apps)
 
   add_executable(helics_player playerMain.cpp)
-  target_link_libraries(helics_player helics_apps-static)
+  target_link_libraries(helics_player helics_apps)
   set_target_properties(helics_player PROPERTIES FOLDER apps)
   install(
     TARGETS helics_player
@@ -62,7 +65,7 @@ if(BUILD_APPS)
   )
 
   add_executable(helics_recorder recorderMain.cpp)
-  target_link_libraries(helics_recorder helics_apps-static)
+  target_link_libraries(helics_recorder helics_apps)
   set_target_properties(helics_recorder PROPERTIES FOLDER apps)
   install(
     TARGETS helics_recorder
@@ -71,7 +74,7 @@ if(BUILD_APPS)
   )
 
   add_executable(helics_broker helics-broker.cpp)
-  target_link_libraries(helics_broker helics_apps-static)
+  target_link_libraries(helics_broker helics_apps)
   set_target_properties(helics_broker PROPERTIES FOLDER apps)
   set(
     HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
@@ -84,7 +87,7 @@ if(BUILD_APPS)
   )
 
   add_executable(helics_app appMain.cpp)
-  target_link_libraries(helics_app helics_apps-static)
+  target_link_libraries(helics_app helics_apps)
   set_target_properties(helics_app PROPERTIES FOLDER apps)
   install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
@@ -106,7 +109,7 @@ if(BUILD_APPS)
   endif()
 
   install(
-    TARGETS helics_apps-static
+    TARGETS helics_apps
     EXPORT helics-targets
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
@@ -115,6 +118,11 @@ if(BUILD_APPS)
   install(
     FILES ${helics_apps_public_headers}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
+    COMPONENT headers
+  )
+  install(
+    FILES ../helics_apps.hpp
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
 

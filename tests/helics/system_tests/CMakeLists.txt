@@ -14,6 +14,7 @@ set(
   TimingTests2.cpp
   QueryTests.cpp
   heat-transfer-tests.cpp
+  flagTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )

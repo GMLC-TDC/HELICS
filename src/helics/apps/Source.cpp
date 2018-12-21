@@ -38,7 +38,7 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlag (SOURCE_ONLY_FLAG);
+        fed->setFlagOption (helics_flag_source_only);
         argumentParser (argc, argv, vm_map, InfoArgs, "input"s);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -52,16 +52,20 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
     }
 }
 
-Source::Source (const FederateInfo &fi) : App (fi) { fed->setFlag (SOURCE_ONLY_FLAG); }
-
-Source::Source (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
+Source::Source (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
+}
+
+Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_source_only);
 }
 
 Source::Source (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
 
     Source::loadJsonFile (jsonString);
 }
@@ -113,7 +117,7 @@ void Source::loadJsonFile (const std::string &jsonFile)
     {
         SourceObject newObj;
 
-        newObj.pub = Publication (fed, ii);
+        newObj.pub = fed->getPublication (ii);
         newObj.period = defaultPeriod;
         sources.push_back (newObj);
         pubids[newObj.pub.getKey ()] = static_cast<int> (sources.size ()) - 1;
@@ -200,8 +204,8 @@ void Source::loadJsonFile (const std::string &jsonFile)
 
 void Source::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state != Federate::op_states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md != Federate::modes::startup)
     {
         return;
     }
@@ -247,25 +251,25 @@ void Source::initialize ()
         }
     }
 
-    fed->enterInitializationState ();
+    fed->enterInitializingMode ();
 }
 
 void Source::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
     Time nextRequestTime = Time::maxVal ();
     Time currentTime;
-    if (state != Federate::op_states::execution)
+    if (md != Federate::modes::executing)
     {
         // send stuff before timeZero
 
         runSourceLoop (timeZero - timeEpsilon);
 
-        fed->enterExecutionState ();
+        fed->enterExecutingMode ();
         // send the stuff at timeZero
         nextRequestTime = runSourceLoop (timeZero);
         currentTime = timeZero;
@@ -297,7 +301,7 @@ void Source::runTo (Time stopTime_input)
 
 void Source::addPublication (const std::string &key,
                              const std::string &generator,
-                             helics_type_t type,
+                             data_type type,
                              Time period,
                              const std::string &units)
 {
@@ -309,7 +313,14 @@ void Source::addPublication (const std::string &key,
     }
     SourceObject newObj;
 
-    newObj.pub = Publication (useLocal ? LOCAL : GLOBAL, fed, key, type, units);
+    if (useLocal)
+    {
+        newObj.pub = fed->registerPublication (key, typeNameStringRef (type), units);
+    }
+    else
+    {
+        newObj.pub = fed->registerGlobalPublication (key, typeNameStringRef (type), units);
+    }
     newObj.period = period;
     if (!generator.empty ())
     {

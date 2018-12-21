@@ -25,16 +25,12 @@ class MpiComms final : public CommsInterface
   public:
     /** default constructor*/
     MpiComms ();
-    MpiComms (const std::string &brokerAddress);
     /** destructor*/
     ~MpiComms ();
 
   private:
-    std::string brokerAddress;  //!< the mpi rank:tag of the broker
-    std::string commAddress;  //!< the mpi rank:tag of this comm object
 
-    std::atomic<bool> shutdown;
-
+    std::atomic<bool> shutdown{false};
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
@@ -45,19 +41,21 @@ class MpiComms final : public CommsInterface
     /** queue for pending incoming messages*/
     BlockingQueue<ActionMessage> rxMessageQueue;
     /** queue for pending outgoing messages*/
-    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
+    BlockingQueue<std::pair<std::pair<int,int>, std::vector<char>>> txMessageQueue;
 
     std::atomic<bool> hasBroker{false};
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
 
-    void setBrokerAddress (const std::string &address) { brokerAddress = address; }
-
   public:
-    std::string getAddress () { return commAddress; }
+    void setBrokerAddress (const std::string &address);
+
+    std::string getAddress () { return localTarget_; }
     BlockingQueue<ActionMessage> &getRxMessageQueue () { return rxMessageQueue; }
-    BlockingQueue<std::pair<std::string, std::vector<char>>> &getTxMessageQueue () { return txMessageQueue; }
+    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> &getTxMessageQueue ()
+    {
+        return txMessageQueue;
+    }
 };
 
-} // namespace mpi
+}  // namespace mpi
 }  // namespace helics
-

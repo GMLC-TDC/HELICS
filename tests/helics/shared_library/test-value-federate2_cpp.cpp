@@ -19,7 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *utf::label("ci"))
+BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *utf::label ("ci"))
 
 // const std::string core_types[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
@@ -27,40 +27,40 @@ BOOST_FIXTURE_TEST_SUITE (value_federate_tests2_cpp, FederateTestFixture_cpp, *u
 
 BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_type)
 {
-    helics_time_t gtime;
+    helics_time gtime;
     std::string s (500, ';');
     int len = static_cast<int> (s.size ());
-    BOOST_TEST_CHECKPOINT("calling setup");
-    SetupTest<helics98::ValueFederate> (core_type, 1);
-    BOOST_TEST_CHECKPOINT("calling get federate");
-    auto vFed1 = GetFederateAs<helics98::ValueFederate> (0);
-    BOOST_REQUIRE((vFed1));
-    auto pubid1 = vFed1->registerPublication ("pub1", "string", "");
+    BOOST_TEST_CHECKPOINT ("calling setup");
+    SetupTest<helicscpp::ValueFederate> (core_type, 1);
+    BOOST_TEST_CHECKPOINT ("calling get federate");
+    auto vFed1 = GetFederateAs<helicscpp::ValueFederate> (0);
+    BOOST_REQUIRE ((vFed1));
+    auto pubid1 = vFed1->registerTypePublication ("pub1", "string", "");
     BOOST_CHECK (pubid1.baseObject () != nullptr);
-    auto pubid2 = vFed1->registerGlobalPublication ("pub2", "integer", "");
+    auto pubid2 = vFed1->registerGlobalPublication ("pub2", helics_data_type_int, "");
     BOOST_CHECK (pubid2.baseObject () != nullptr);
-    auto pubid3 = vFed1->registerPublication ("pub3", "", "");
+    auto pubid3 = vFed1->registerTypePublication ("pub3", "");
     BOOST_CHECK (pubid3.baseObject () != nullptr);
-    auto sub1 = vFed1->registerOptionalSubscription ("fed0/pub3", "", "");
-    BOOST_TEST_CHECKPOINT("reg opt1");
-    vFed1->setTimeDelta (1.0);
-    BOOST_TEST_CHECKPOINT("set Delta");
-    vFed1->enterExecutionMode ();
-    BOOST_TEST_CHECKPOINT("publish");
+    auto sub1 = vFed1->registerSubscription ("fed0/pub3");
+    BOOST_TEST_CHECKPOINT ("reg opt1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    BOOST_TEST_CHECKPOINT ("set Delta");
+    vFed1->enterExecutingMode ();
+    BOOST_TEST_CHECKPOINT ("publish");
     pubid3.publish (s);
-    BOOST_TEST_CHECKPOINT("reqtime");
+    BOOST_TEST_CHECKPOINT ("reqtime");
     gtime = vFed1->requestTime (1.0);
     BOOST_CHECK_EQUAL (gtime, 1.0);
     BOOST_CHECK (sub1.isUpdated ());
 
-    int len1 = sub1.getValueSize ();
+    int len1 = sub1.getRawValueSize ();
 
     BOOST_CHECK_EQUAL (len1, len);
     std::vector<char> rawdata;
     int actualLen = sub1.getRawValue (rawdata);
     BOOST_CHECK_EQUAL (actualLen, len);
 
-    len1 = sub1.getValueSize ();
+    len1 = sub1.getRawValueSize ();
 
     BOOST_CHECK_EQUAL (len1, len);
 
@@ -71,23 +71,23 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
 
 BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 {
-    helics_time_t gtime;
-    helics_time_t f1time;
-    // federate_state state;
-    SetupTest<helics98::ValueFederate> (core_type, 2);
-    auto vFed1 = GetFederateAs<helics98::ValueFederate> (0);
-    auto vFed2 = GetFederateAs<helics98::ValueFederate> (1);
+    helics_time gtime;
+    helics_time f1time;
+    // helics_federate_state state;
+    SetupTest<helicscpp::ValueFederate> (core_type, 2);
+    auto vFed1 = GetFederateAs<helicscpp::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helicscpp::ValueFederate> (1);
 
     // register the publications
-    auto pubid = vFed1->registerGlobalTypePublication ("pub1", HELICS_DATA_TYPE_STRING, "");
-    auto subid = vFed2->registerSubscription ("pub1", "string", "");
-    vFed1->setTimeDelta (1.0);
-    vFed2->setTimeDelta (1.0);
+    auto pubid = vFed1->registerGlobalPublication ("pub1", helics_data_type_string, "");
+    auto subid = vFed2->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
 
-    vFed1->enterExecutionModeAsync ();
-    vFed2->enterExecutionModeAsync ();
-    vFed1->enterExecutionModeComplete ();
-    vFed2->enterExecutionModeComplete ();
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingModeAsync ();
+    vFed1->enterExecutingModeComplete ();
+    vFed2->enterExecutingModeComplete ();
 
     // publish string1 at time=0.0;
     pubid.publish ("string1");
@@ -134,15 +134,15 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 //
 BOOST_AUTO_TEST_CASE (test_file_load)
 {
-    // fi = helicsFederateInfoCreate();
+    // fi = helicsCreateFederateInfo();
     // path of the JSON file is hardcoded for now
-    helics98::ValueFederate vFed (TEST_DIR "/test_files/example_value_fed.json");
+    helicscpp::ValueFederate vFed (TEST_DIR "/example_value_fed.json");
     BOOST_REQUIRE (vFed.baseObject () != nullptr);
     auto s = vFed.getName ();
     BOOST_CHECK_EQUAL (s, "valueFed");
-    BOOST_CHECK_EQUAL (vFed.getSubscriptionCount (), 2);
+    BOOST_CHECK_EQUAL (vFed.getInputCount (), 3);
     BOOST_CHECK_EQUAL (vFed.getPublicationCount (), 2);
-    //	 helics98::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
+    //	 helicscpp::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     vFed.finalize ();
 }
 

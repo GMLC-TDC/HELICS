@@ -3,14 +3,14 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include "IpcComms.h"
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
-#include "IpcComms.h"
+#include "../helics_definitions.hpp"
 #include "IpcQueueHelper.h"
 #include <algorithm>
 #include <cctype>
 #include <memory>
-#include "boost/date_time/posix_time/posix_time.hpp"
 #include <boost/interprocess/ipc/message_queue.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -24,12 +24,41 @@ namespace helics
 {
 namespace ipc
 {
-IpcComms::IpcComms (const std::string &brokerTarget, const std::string &localTarget)
-    : CommsInterface (brokerTarget, localTarget)
+IpcComms::IpcComms ()
 {
+    // override the default value for this comm system
+    maxMessageCount_ = 256;
 }
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
+
+void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
+{
+    CommsInterface::loadNetworkInfo (netInfo);
+    if (!propertyLock ())
+    {
+        return;
+    }
+    // brokerPort = netInfo.brokerPort;
+    // PortNumber = netInfo.portNumber;
+    if (localTarget_.empty ())
+    {
+        if (serverMode)
+        {
+            localTarget_ = "_ipc_broker";
+        }
+        else
+        {
+            localTarget_ = name;
+        }
+    }
+
+    // if (PortNumber > 0)
+    //{
+    //    autoPortNumber = false;
+    //}
+    propertyUnLock ();
+}
 
 void IpcComms::queue_rx_function ()
 {
@@ -39,6 +68,7 @@ void IpcComms::queue_rx_function ()
     {
         disconnecting = true;
         ActionMessage err (CMD_ERROR);
+        err.messageID = defs::errors::connection_failure;
         err.payload = rxQueue.getError ();
         ActionCallback (std::move (err));
         setRxStatus (connection_status::error);  // the connection has failed
@@ -46,7 +76,7 @@ void IpcComms::queue_rx_function ()
         return;
     }
     setRxStatus (connection_status::connected);  // this is a atomic indicator that the rx queue is ready
-    bool operating = false;
+    bool IPCoperating = false;
     while (true)
     {
         auto bc = ipcbackchannel.load ();
@@ -62,6 +92,7 @@ void IpcComms::queue_rx_function ()
             {
                 disconnecting = true;
                 ActionMessage err (CMD_ERROR);
+                err.messageID = defs::errors::connection_failure;
                 err.payload = rxQueue.getError ();
                 ActionCallback (std::move (err));
                 setRxStatus (connection_status::error);  // the connection has failed
@@ -79,27 +110,27 @@ void IpcComms::queue_rx_function ()
         }
         if (isProtocolCommand (*cmdopt))
         {
-            if (cmdopt->index == CLOSE_RECEIVER)
+            if (cmdopt->messageID == CLOSE_RECEIVER)
             {
                 disconnecting = true;
                 break;
             }
-            if (cmdopt->index == SET_TO_OPERATING)
+            if (cmdopt->messageID == SET_TO_OPERATING)
             {
-                if (!operating)
+                if (!IPCoperating)
                 {
                     rxQueue.changeState (queue_state_t::operating);
-                    operating = true;
+                    IPCoperating = true;
                 }
             }
             continue;
         }
         if (cmdopt->action () == CMD_INIT_GRANT)
         {
-            if (!operating)
+            if (!IPCoperating)
             {
                 rxQueue.changeState (queue_state_t::operating);
-                operating = true;
+                IPCoperating = true;
             }
         }
         ActionCallback (std::move (*cmdopt));
@@ -111,8 +142,7 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        logError("error changing states");
-		
+        logError ("error changing states");
     }
     setRxStatus (connection_status::terminated);
 }
@@ -121,7 +151,7 @@ void IpcComms::queue_tx_function ()
 {
     sendToQueue brokerQueue;  //!< the queue of the broker
     sendToQueue rxQueue;
-    std::map<int, sendToQueue> routes;  //!< table of the routes to other brokers
+    std::map<route_id, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
     if (!brokerTarget_.empty ())
@@ -130,7 +160,8 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
-            err.payload = fmt::format("Unable to open broker connection -> {}",brokerQueue.getError ());
+            err.payload = fmt::format ("Unable to open broker connection -> {}", brokerQueue.getError ());
+            err.messageID = defs::errors::connection_failure;
             ActionCallback (std::move (err));
             setTxStatus (connection_status::error);
             return;
@@ -141,6 +172,7 @@ void IpcComms::queue_tx_function ()
     if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
     {
         ActionMessage err (CMD_ERROR);
+        err.messageID = defs::errors::connection_failure;
         err.payload = "Unable to link with receiver";
         ActionCallback (std::move (err));
         setTxStatus (connection_status::error);
@@ -171,6 +203,7 @@ void IpcComms::queue_tx_function ()
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
+            err.messageID = defs::errors::connection_failure;
             err.payload = fmt::format ("Unable to open receiver connection -> {}", rxQueue.getError ());
             ActionCallback (std::move (err));
             setRxStatus (connection_status::error);
@@ -179,17 +212,17 @@ void IpcComms::queue_tx_function ()
     }
 
     setTxStatus (connection_status::connected);
-    bool operating = false;
+    bool IPCoperating = false;
     while (true)
     {
-        int route_id;
+        route_id rid;
         ActionMessage cmd;
-        std::tie (route_id, cmd) = txQueue.pop ();
+        std::tie (rid, cmd) = txQueue.pop ();
         if (isProtocolCommand (cmd))
         {
-            if (route_id == -1)
+            if (rid == control_route)
             {
-                switch (cmd.index)
+                switch (cmd.messageID)
                 {
                 case NEW_ROUTE:
                 {
@@ -197,10 +230,13 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-                        routes.emplace (cmd.dest_id, std::move (newQueue));
+						routes.emplace(route_id{ cmd.getExtraData() }, std::move(newQueue));
                     }
                     continue;
                 }
+                case REMOVE_ROUTE:
+					routes.erase(route_id{ cmd.getExtraData() });
+                    continue;
                 case DISCONNECT:
                     goto DISCONNECT_TX_QUEUE;
                 }
@@ -208,29 +244,29 @@ void IpcComms::queue_tx_function ()
         }
         if (cmd.action () == CMD_INIT_GRANT)
         {
-            if (!operating)
+            if (!IPCoperating)
             {
                 ActionMessage op (CMD_PROTOCOL);
-                op.index = SET_TO_OPERATING;
+                op.messageID = SET_TO_OPERATING;
                 rxQueue.sendMessage (op, 3);
             }
         }
         std::string buffer = cmd.to_string ();
         int priority = isPriorityCommand (cmd) ? 3 : 1;
-        if (route_id == 0)
+        if (rid == parent_route_id)
         {
             if (hasBroker)
             {
                 brokerQueue.sendMessage (cmd, priority);
             }
         }
-        else if (route_id == -1)
+        else if (rid == control_route)
         {
             rxQueue.sendMessage (cmd, priority);
         }
         else
         {
-            auto routeFnd = routes.find (route_id);
+            auto routeFnd = routes.find (rid);
             if (routeFnd != routes.end ())
             {
                 routeFnd->second.sendMessage (cmd, priority);
@@ -255,10 +291,10 @@ void IpcComms::closeReceiver ()
         return;
     }
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = CLOSE_RECEIVER;
+    cmd.messageID = CLOSE_RECEIVER;
     if (getTxStatus () == connection_status::connected)
     {
-        transmit (-1, cmd);
+        transmit (control_route, cmd);
     }
     else if (!disconnecting)
     {
@@ -279,6 +315,8 @@ void IpcComms::closeReceiver ()
         }
     }
 }
+
+std::string IpcComms::getAddress () const { return localTarget_; }
 
 }  // namespace ipc
 }  // namespace helics

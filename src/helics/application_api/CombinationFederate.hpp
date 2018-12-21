@@ -20,12 +20,12 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /**constructor taking a federate information structure and using the default core
     @param fi  a federate information structure
     */
-    explicit CombinationFederate (const FederateInfo &fi);
+    explicit CombinationFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    CombinationFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    CombinationFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] file a file defining the federate information
     */
@@ -48,6 +48,7 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual void updateTime (Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
+    virtual std::string localQuery (const std::string &queryStr) const override;
 
   public:
     virtual void registerInterfaces (const std::string &jsonString) override;

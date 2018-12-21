@@ -5,30 +5,31 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../CommonCore.hpp"
-#include "../CommsBroker.hpp"
-#include "../NetworkBrokerData.hpp"
+#include "../NetworkCore.hpp"
+
 namespace helics
 {
 namespace tcp
 {
 class TcpComms;
+class TcpCommsSS;
 /** implementation for the core that uses tcp messages to communicate*/
-class TcpCore final : public CommsBroker<TcpComms, CommonCore>
+using TcpCore = NetworkCore<TcpComms, interface_type::tcp>;
+
+
+/** implementation for the core that uses tcp messages to communicate*/
+class TcpCoreSS final : public NetworkCore<TcpCommsSS, interface_type::tcp>
 {
   public:
     /** default constructor*/
-    TcpCore () noexcept;
-    TcpCore (const std::string &core_name);
+    TcpCoreSS () noexcept;
+    TcpCoreSS (const std::string &core_name);
 
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
-  public:
-    virtual std::string getAddress () const override;
-
   private:
-    NetworkBrokerData netInfo{
-      NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+    std::vector<std::string> connections;  //!< defined connections 
+    bool no_outgoing_connections = false; //!< disable outgoing connections if true;
     virtual bool brokerConnect () override;
 };
 

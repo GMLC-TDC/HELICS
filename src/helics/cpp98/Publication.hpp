@@ -8,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/ValueFederate.h"
+#include "helicsExceptions.hpp"
 
-namespace helics98
+namespace helicscpp
 {
 class Publication
 {
@@ -36,81 +37,71 @@ public:
 void publish( const char *data, int len)
 {
     // returns helics_status
-    helicsPublicationPublishRaw(pub, data, len);
+    helicsPublicationPublishRaw(pub, data, len, NULL);
 }
 
 void publish(const char *str)
 {
     // returns helics_status
-    helicsPublicationPublishString(pub,str);
+    helicsPublicationPublishString (pub, str, NULL);
 }
 
 void publish(const std::string &str)
 {
     // returns helics_status
-    helicsPublicationPublishString(pub, str.c_str());
+    helicsPublicationPublishString(pub, str.c_str(),NULL);
 }
 
 void publish( int64_t val)
 {
     // returns helics_status
-    helicsPublicationPublishInteger(pub, val);
+    helicsPublicationPublishInteger(pub, val,NULL);
 }
 
 void publish( double val)
 {
     // returns helics_status
-    helicsPublicationPublishDouble(pub, val);
+    helicsPublicationPublishDouble(pub, val,NULL);
 }
 
 void publish( std::complex<double> cmplx)
 {
-    // returns helics_status
-    helicsPublicationPublishComplex(pub, cmplx.real(), cmplx.imag());
+    helicsPublicationPublishComplex(pub, cmplx.real(), cmplx.imag(),NULL);
 }
 
 void publish(const std::vector<double> &data)
 {
     // returns helics_status
-    helicsPublicationPublishVector(pub, data.data(), static_cast<int>(data.size() * sizeof(double)));
+    helicsPublicationPublishVector(pub, data.data(), static_cast<int>(data.size() * sizeof(double)),NULL);
 }
 
 void publish(const std::string &name, double val)
 {
     // returns helics_status
-    helicsPublicationPublishNamedPoint(pub, name.c_str(), val);
+    helicsPublicationPublishNamedPoint(pub, name.c_str(), val,NULL);
 }
 
 void publish(bool val)
 {
     // returns helics_status
-    helicsPublicationPublishBoolean(pub, val?helics_true:helics_false);
+    helicsPublicationPublishBoolean(pub, val?helics_true:helics_false,NULL);
 }
 
-std::string getKey() const
+const char *getKey() const
 {
-    char str[255];
-    helicsPublicationGetKey(pub, &str[0], sizeof(str));
-    std::string result(str);
-    return result;
+    return helicsPublicationGetKey(pub);
 }
 
 
-std::string getUnits() const
+const char *getUnits() const
 {
-    char str[255];
-    helicsPublicationGetUnits(pub, &str[0], sizeof(str));
-    std::string result(str);
-    return result;
+    return helicsPublicationGetUnits (pub);
 }
 
 
-std::string getType() const
+const char *getType() const
 {
-    char str[255];
-    helicsPublicationGetType(pub, &str[0], sizeof(str));
-    std::string result(str);
-    return result;
+    return helicsPublicationGetType (pub);
 }
 
 private:

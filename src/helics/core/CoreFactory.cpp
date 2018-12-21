@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -18,15 +17,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../common/delayedDestructor.hpp"
 #include "../common/searchableObjectHolder.hpp"
-#include "TestCore.h"
+
+#ifndef DISABLE_TEST_CORE
+#include "test/TestCore.h"
+#endif
+
+#ifndef DISABLE_IPC_CORE
 #include "ipc/IpcCore.h"
+#endif
+
+#ifndef DISABLE_UDP_CORE
 #include "udp/UdpCore.h"
+#endif
 
 #ifndef DISABLE_TCP_CORE
 #include "tcp/TcpCore.h"
 #endif
 
 #include <cassert>
+#include <cstring>
 
 namespace helics
 {
@@ -38,8 +47,32 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #if HELICS_HAVE_ZEROMQ
         type = core_type::ZMQ;
 #else
+#ifndef DISABLE_TCP_CORE
+        type = core_type::TCP;
+#else
+#ifndef DISABLE_UDP_CORE
         type = core_type::UDP;
-#endif
+#else
+#ifdef HELICS_HAVE_MPI
+        type = core_type::MPI;
+#else
+#ifndef DISABLE_UDP_CORE
+        type = core_type::UDP;
+#else
+#ifndef DISABLE_IPC_CORE
+        type = core_type::IPC;
+#else
+#ifndef DISABLE_TEST_CORE
+        type = core_type::TEST;
+#else
+        type = core_type::UNRECOGNIZED;
+#endif  // DISABLE_TEST_CORE
+#endif  // DISABLE_IPC_CORE
+#endif  // DISABLE_UDP_CORE
+#endif  // HELICS_HAVE_MPI
+#endif  // DISABLE_UDP_CORE
+#endif  // DISABLE_TCP_CORE
+#endif  // HELICS_HAVE_ZEROMQ
     }
 
     switch (type)
@@ -74,6 +107,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TEST:
+#ifndef DISABLE_TEST_CORE
         if (name.empty ())
         {
             core = std::make_shared<testcore::TestCore> ();
@@ -83,8 +117,12 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<testcore::TestCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("TEST core is not available"));
+#endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
+#ifndef DISABLE_IPC_CORE
         if (name.empty ())
         {
             core = std::make_shared<ipc::IpcCore> ();
@@ -94,7 +132,11 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<ipc::IpcCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("IPC core is not available"));
+#endif
     case core_type::UDP:
+#ifndef DISABLE_UDP_CORE
         if (name.empty ())
         {
             core = std::make_shared<udp::UdpCore> ();
@@ -104,6 +146,9 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
             core = std::make_shared<udp::UdpCore> (name);
         }
         break;
+#else
+        throw (HelicsException ("UDP core is not available"));
+#endif
     case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
         if (name.empty ())
@@ -118,6 +163,20 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         throw (HelicsException ("TCP core is not available"));
 #endif
         break;
+    case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
+        if (name.empty ())
+        {
+            core = std::make_shared<tcp::TcpCoreSS> ();
+        }
+        else
+        {
+            core = std::make_shared<tcp::TcpCoreSS> (name);
+        }
+#else
+        throw (HelicsException ("TCP single socket core is not available"));
+#endif
+        break;
     default:
         throw (HelicsException ("unrecognized core type"));
     }
@@ -128,7 +187,7 @@ namespace CoreFactory
 {
 std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
 {
-    auto core = makeCore (type, "");
+    auto core = makeCore (type, std::string ());
     core->initialize (initializationString);
     registerCore (core);
 
@@ -253,7 +312,7 @@ static tripwire::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
-bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
+static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &ptr)
 {
     if (ptr->isOpenToNewFederates ())
     {
@@ -272,15 +331,35 @@ bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCore> &pt
             break;
 #endif
         case core_type::TEST:
+#ifndef DISABLE_TEST_CORE
             return (dynamic_cast<testcore::TestCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
+#ifndef DISABLE_IPC_CORE
             return (dynamic_cast<ipc::IpcCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::UDP:
+#ifndef DISABLE_UDP_CORE
             return (dynamic_cast<udp::UdpCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::TCP:
 #ifndef DISABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
+        case core_type::TCP_SS:
+#ifndef DISABLE_TCP_CORE
+            return (dynamic_cast<tcp::TcpCoreSS *> (ptr.get ()) != nullptr);
+#else
+            break;
 #endif
         default:
             return true;
@@ -312,11 +391,11 @@ bool registerCore (const std::shared_ptr<Core> &core)
 
 size_t cleanUpCores () { return delayedDestroyer.destroyObjects (); }
 
-size_t cleanUpCores (int delay) { return delayedDestroyer.destroyObjects (delay); }
+size_t cleanUpCores (std::chrono::milliseconds delay) { return delayedDestroyer.destroyObjects (delay); }
 
-void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
+bool copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName)
 {
-    searchableObjects.copyObject (copyFromName, copyToName);
+    return searchableObjects.copyObject (copyFromName, copyToName);
 }
 
 void unregisterCore (const std::string &name)

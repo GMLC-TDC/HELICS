@@ -1,0 +1,107 @@
+/*
+Copyright © 2017-2018,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+All rights reserved. See LICENSE file and DISCLAIMER for more details.
+*/
+#pragma once
+
+#include "../core/Core.hpp"
+#include "helics-time.hpp"
+#include "helics/helics-config.h"
+#include <utility>
+#include <vector>
+
+namespace helics
+{
+/** data class for managing information about a subscription*/
+class NamedInputInfo
+{
+  public:
+    struct dataRecord
+    {
+        Time time;
+        unsigned int iteration = 0;
+        std::shared_ptr<const data_block> data;
+        dataRecord () = default;
+        dataRecord (Time recordTime, std::shared_ptr<const data_block> recordData)
+            : time (recordTime), data (std::move (recordData))
+        {
+        }
+        dataRecord (Time recordTime, int recordIteration, std::shared_ptr<const data_block> recordData)
+            : time (recordTime), iteration (recordIteration), data (std::move (recordData))
+        {
+        }
+    };
+
+    /** constructor with all the information*/
+    NamedInputInfo (global_handle id_,
+                    const std::string &key_,
+                    const std::string &type_,
+                    const std::string &units_)
+        : id (id_), key (key_), type (type_), units (units_)
+    {
+    }
+
+    const global_handle id;  //!< identifier for the handle
+    const std::string key;  //!< the identifier for the input
+    const std::string type;  //! the nominal type of data for the input
+    std::string inputType;  //!< the type of data that its first matching input uses
+    const std::string units;  //!< the units of the controlInput
+    bool required = false;  //!< flag indicating that the subscription requires a matching publication
+    bool optional = false;  //!< flag indicating that any targets are optional
+    bool has_target = false;  //!< flag indicating that the input has a source
+    bool only_update_on_change = false;  //!< flag indicating that the data should only be updated on change
+    bool not_interruptible = false;  //!< indicator that this handle should not be used for interrupting
+    bool strict_type_matching = false;  //!< indicator that the handle need to have strict type matching
+    bool single_source = false;  //!< allow only a single source to connect
+    std::vector<dataRecord> current_data;  //!< the most recent published data
+    std::vector<global_handle> input_sources;  //!< the sources of the input signals
+    std::vector<Time> deactivated;
+    std::vector<std::pair<std::string, std::string>> source_types;  //!< the type and units of the sources
+  private:
+    std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
+
+  public:
+    /** get all the current data*/
+    std::vector<std::shared_ptr<const data_block>> getAllData ();
+    /** get a particular data input*/
+    std::shared_ptr<const data_block> getData (int index);
+    /** get a the most recent data point*/
+    std::shared_ptr<const data_block> getData ();
+    /** add a data block into the queue*/
+    void addData (global_handle source_handle,
+                  Time valueTime,
+                  unsigned int index,
+                  std::shared_ptr<const data_block> data);
+
+    /** update current data not including data at the specified time
+    @param newTime the time to move the subscription to
+    @return true if the value has changed
+    */
+    bool updateTimeUpTo (Time newTime);
+    /** update current data to all new data at newTime
+    @param newTime the time to move the subscription to
+    @return true if the value has changed
+    */
+    bool updateTimeInclusive (Time newTime);
+
+    /** update current data to get all data through the first iteration at newTime
+    @param newTime the time to move the subscription to
+    @return true if the value has changed
+    */
+    bool updateTimeNextIteration (Time newTime);
+    /** get the event based on the event queue*/
+    Time nextValueTime () const;
+    /** add a new source target to the input*/
+    void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+    /** remove a source */
+    void removeSource (global_handle sourceToRemove, Time minTime);
+    /** clear all non-current data*/
+    void clearFutureData ();
+
+  private:
+    bool updateData (dataRecord &&update, int index);
+};
+
+bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
+}  // namespace helics

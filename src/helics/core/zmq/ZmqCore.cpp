@@ -6,60 +6,24 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "ZmqCore.h"
 #include "../../common/zmqContextManager.h"
+#include "../NetworkCore_impl.hpp"
 #include "ZmqComms.h"
+
 namespace helics
 {
 namespace zeromq
 {
-ZmqCore::ZmqCore () noexcept {}
+ZmqCore::ZmqCore () noexcept { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated; }
 
-ZmqCore::ZmqCore (const std::string &core_name) : CommsBroker (core_name) {}
-
-void ZmqCore::initializeFromArgs (int argc, const char *const *argv)
+ZmqCore::ZmqCore (const std::string &core_name) : NetworkCore (core_name)
 {
-    if (brokerState == created)
-    {
-        netInfo.initializeFromArgs (argc, argv, "tcp://127.0.0.1");
-        CommonCore::initializeFromArgs (argc, argv);
-    }
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
 }
 
 bool ZmqCore::brokerConnect ()
 {
     zmqContextManager::startContext ();
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (netInfo.brokerAddress.empty ())  // cores require a broker
-    {
-        netInfo.brokerAddress = "tcp://127.0.0.1";
-    }
-    comms = std::make_unique<ZmqComms> (netInfo);
-    comms->setCallback ([this](ActionMessage &&M) { addActionMessage (std::move (M)); });
-    comms->setName (getIdentifier ());
-    comms->setTimeout (networkTimeout);
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
-    auto res = comms->connect ();
-    if (res)
-    {
-        if (netInfo.portNumber < 0)
-        {
-            netInfo.portNumber = comms->getPort ();
-        }
-    }
-    return res;
-}
-
-std::string ZmqCore::getAddress () const
-{
-    std::lock_guard<std::mutex> lock (dataMutex);
-    if (comms)
-    {
-        return comms->getAddress ();
-    }
-    if (netInfo.localInterface == "tcp://*")
-    {
-        return makePortAddress ("tcp://127.0.0.1", netInfo.portNumber);
-    }
-    return makePortAddress (netInfo.localInterface, netInfo.portNumber);
+    return NetworkCore::brokerConnect ();
 }
 
 }  // namespace zeromq

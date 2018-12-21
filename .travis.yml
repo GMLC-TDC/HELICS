@@ -65,6 +65,22 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode7.3
 
+    # XCode 8gm, OS X 10.11
+    - <<: *daily_osx
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
+        - HOMEBREW_NO_AUTO_UPDATE=1
+      osx_image: xcode8
+
+    - name: "XCode 8gm, macOS 10.11"
+      if: branch =~ /^.*HELICS_2.*$/
+      os: osx
+      compiler: clang
+      env:
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
+        - HOMEBREW_NO_AUTO_UPDATE=1
+      osx_image: xcode8
+
     - <<: *linux_base
       name: "GCC 6"
       addons:
@@ -90,6 +106,9 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
+        - ENABLE_CPACK=true
+        - INSTALL_SYSTEM_LIBRARIES=true
+      after_script: scripts/upload-ci-artifact.sh
 
     - <<: *linux_base
       name: "Clang 3.6"
@@ -116,17 +135,20 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - RUN_VALGRIND=true
+        - DISABLE_INTERFACES="Python,Java"
         - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
       name: "GCC 6 Code Coverage"
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
-        - USE_SWIG=true
+        - USE_SWIG=true 
         - TEST_TYPE=Coverage
         - BUILD_TYPE=Coverage
+        - DISABLE_INTERFACES="Python,Java"
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
+        - CTEST_VERBOSE=true
     # GCC 5 build
     - <<: *daily_linux
       name: "GCC 5"
@@ -170,9 +192,30 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
         - CCACHE_CPP2=yes
+        - CI_TEST_CONFIG="TSAN"
+        - DISABLE_INTERFACES="Python,Java"
         - RUN_TSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
+    # UBSAN build
+    - <<: *daily_linux
+      name: "Clang 4 Undefined Behavior Sanitizer"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - libstdc++-6-dev
+            - clang-4.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - CCACHE_CPP2=yes
+        - DISABLE_INTERFACES="Python,Java"
+        - RUN_UBSAN=true
+        - USE_MPI=mpich
+        - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
     # XCode 8gm, OS X 10.11
     - <<: *daily_osx
       name: "XCode 8gm macOS 10.11"
@@ -180,6 +223,12 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode8
+      
+    - stage: trigger dependent repositories
+      if: branch == develop
+      before_install: true
+      install: true
+      script: scripts/trigger-dependent-ci-builds.sh
 
 branches:
   except:
@@ -192,33 +241,8 @@ before_install:
 install:
   - export BOOST_USE_STATIC=true
   - source scripts/install-ci-dependencies.sh
-
-  - OPTION_FLAGS_ARR=()
-  - OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_CXX_SHARED_LIB=ON" "-DBUILD_PYTHON_INTERFACE=ON" "-DBUILD_JAVA_INTERFACE=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
-  - OPTION_FLAGS_ARR+=("-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
-  - OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON -DUSE_BOOST_STATIC_LIBS=ON")
-
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON") ; fi
-
-  - if [[ "$USE_SWIG" == 'false' ]] ; then HELICS_OPTION_FLAGS+=("-DDISABLE_SWIG=ON") ; fi
-  - if [[ "$BUILD_TYPE" ]]; then OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}") ; fi
-  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON") ; fi
-  - if [[ "$CXX_STANDARD" == 17 ]] ; then HELICS_OPTION_FLAGS+=("-DENABLE_CXX_17=ON") ; fi
-  - if [[ "$USE_MPI" ]]; then OPTION_FLAGS_ARR+=("-DMPI_ENABLE=ON") ; fi
-  - if [[ "$USE_MPI" ]]; then CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc ; CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++ ; fi
-  - export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
-
-  - TEST_FLAGS_ARR=("$TEST_TYPE")
-  - if [[ "$RUN_VALGRIND" ]]; then TEST_FLAGS_ARR+=("--valgrind" "--disable-unit-tests") ; fi
-  - if [[ "$RUN_CACHEGRIND" ]]; then TEST_FLAGS_ARR+=("--cachegrind") ; fi
-  - if [[ "$RUN_ASAN" ]]; then TEST_FLAGS_ARR+=("--asan") ; fi
-  - if [[ "$RUN_MSAN" ]]; then TEST_FLAGS_ARR+=("--msan") ; fi
-  - if [[ "$RUN_TSAN" ]]; then TEST_FLAGS_ARR+=("--tsan") ; fi
-  - if [[ "$RUN_UBSAN" ]]; then TEST_FLAGS_ARR+=("--ubsan") ; fi
-  - if [[ "$NO_CTEST" ]]; then TEST_FLAGS_ARR+=("--no-ctest") ; fi
-  - if [[ "$DISABLE_CI_TESTS" ]]; then TEST_FLAGS_ARR+=("--disable-unit-tests") ; fi
-  - export CI_TEST_FLAGS=${TEST_FLAGS_ARR[@]}
-
+  - source scripts/setup-helics-ci-options.sh
+  
 script:
   - mkdir -p build && cd build
   - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
@@ -228,15 +252,18 @@ script:
   # Setup counters for coverage
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
 
-  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then python ../scripts/fix_install_names.py ; fi
-  - if [[ "TRAVIS_OS_NAME" == "osx" ]] ; then make ${MAKEFLAGS} install ; fi
- 
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then python ../scripts/fix_install_names.py ; fi
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then make ${MAKEFLAGS} install ; fi
+
   # Run CI tests
   - export CTEST_OPTIONS="--output-on-failure"
-  - ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+  - travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
+
+  # Create an installer using CPack
+  - if [[ "$ENABLE_CPACK" ]]; then cpack -G STGZ -B $(pwd)/cpack-output ; fi
 
 notifications:
     email: false

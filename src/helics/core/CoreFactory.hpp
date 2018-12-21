@@ -8,6 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "core-types.hpp"
 #include <memory>
 #include <string>
+#include <chrono>
 
 namespace helics
 {
@@ -98,11 +99,12 @@ registered or when the clean up function is called this prevents some odd thread
 @param delay the delay time in milliseconds to wait for the cores to finish before destroying
 @return the number of cores still operating
 */
-size_t cleanUpCores (int delay);
+size_t cleanUpCores (std::chrono::milliseconds delay);
 
-/** make a copy of the broker pointer to allow access to the new name
+/** make a copy of the core pointer to allow access to the new name
+@return true if the copyFromName was found and the copy successful
  */
-void copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName);
+bool copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName);
 }  // namespace CoreFactory
 
 }  // namespace helics

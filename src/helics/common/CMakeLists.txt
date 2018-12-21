@@ -34,6 +34,7 @@ set(
   TripWire.hpp
   fmt_format.h
   fmt_ostream.h
+  addTargets.hpp
 )
 
 set(
@@ -77,6 +78,7 @@ set(
   JsonProcessingFunctions.hpp
   stringToCmdLine.h
   AsioServiceManager.h
+  AsioServiceManagerFwd.hpp
   logger.h
   stringOps.h
   MapTraits.hpp

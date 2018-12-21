@@ -20,14 +20,23 @@ set(
   ValueFederate.hpp
   HelicsPrimaryTypes.hpp
   queryFunctions.hpp
+  FederateInfo.hpp
+  Inputs.hpp
 )
 
+set (conv_headers
+   ../application_api.hpp
+   ../ValueFederates.hpp
+   ../MessageFederates.hpp
+   )
+   
 set(
   private_application_api_headers
   MessageFederateManager.hpp
   ValueFederateManager.hpp
   AsyncFedCallInfo.hpp
   FilterOperations.hpp
+  FilterFederateManager.hpp
 )
 
 set(
@@ -41,20 +50,22 @@ set(
   ValueConverter.cpp
   ValueFederateManager.cpp
   helicsPrimaryTypes.cpp
-  Subscriptions.cpp
   Publications.cpp
   Filters.cpp
   FilterOperations.cpp
+  FilterFederateManager.cpp
   Endpoints.cpp
   helicsTypes.cpp
   queryFunctions.cpp
   FederateInfo.cpp
+  Inputs.cpp
 )
 
 add_library(
   application_api
   OBJECT
   ${application_api_sources}
+  ${conv_headers}
   ${public_application_api_headers}
   ${private_application_api_headers}
 )
@@ -76,8 +87,18 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+if(MSYS AND USE_LIBCXX)
+  target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
+endif()
+
 install(
   FILES ${public_application_api_headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
+  COMPONENT headers
+)
+
+install(
+  FILES ${conv_headers}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )

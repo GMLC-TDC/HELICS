@@ -25,15 +25,15 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     // register the publications
     vFed1->registerGlobalPublication<double> ("pub1");
 
-    vFed2->registerRequiredSubscription<double> ("pub1");
+    vFed2->registerSubscription("pub1");
 
     vFed1->registerPublication<double> ("pub2");
 
     vFed2->registerPublication<double> ("pub3");
 
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
 
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("fed0", "publications");
@@ -66,9 +66,9 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     str.append (vFed2->getName ());
     str.push_back (']');
     BOOST_CHECK_EQUAL (res, "[fed0;fed1]");
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
     core = nullptr;
     vFed1->finalize ();
     vFed2->finalize ();
@@ -87,9 +87,9 @@ BOOST_DATA_TEST_CASE (test_publication_fed_queries, bdata::make (core_types), co
 
     vFed2->registerPublication<double> ("pub3");
 
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
 
     auto res = vFed1->query ("federation", "publications");
 
@@ -110,9 +110,9 @@ BOOST_AUTO_TEST_CASE (test_federate_map)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("root", "federate_map");
-    vFed1->enterInitializationStateAsync ();
-    vFed2->enterInitializationState ();
-    vFed1->enterInitializationStateComplete ();
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
     auto val = loadJsonStr(res);
     BOOST_CHECK_EQUAL(val["cores"].size(), 1u);
     BOOST_CHECK_EQUAL(val["cores"][0]["federates"].size(), 2u);
@@ -132,9 +132,9 @@ BOOST_AUTO_TEST_CASE(test_federate_map2)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
     auto res = core->query("root", "federate_map");
-    vFed1->enterInitializationStateAsync();
-    vFed2->enterInitializationState();
-    vFed1->enterInitializationStateComplete();
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
     BOOST_CHECK_EQUAL(val["cores"].size(), 2u);
     BOOST_CHECK_EQUAL(val["cores"][1]["federates"].size(), 1u);
@@ -154,9 +154,9 @@ BOOST_AUTO_TEST_CASE(test_federate_map3)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
     auto res = core->query("root", "federate_map");
-    vFed1->enterInitializationStateAsync();
-    vFed2->enterInitializationState();
-    vFed1->enterInitializationStateComplete();
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
     BOOST_CHECK_EQUAL(val["cores"].size(), 0u);
     BOOST_CHECK_EQUAL(val["brokers"].size(), 1u);
@@ -181,9 +181,9 @@ BOOST_AUTO_TEST_CASE(test_dependency_graph)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
     auto res = core->query("root", "dependency_graph");
-    vFed1->enterInitializationStateAsync();
-    vFed2->enterInitializationState();
-    vFed1->enterInitializationStateComplete();
+    vFed1->enterInitializingModeAsync();
+    vFed2->enterInitializingMode();
+    vFed1->enterInitializingModeComplete();
     auto val = loadJsonStr(res);
     BOOST_CHECK_EQUAL(val["cores"].size(), 1u);
     BOOST_CHECK_EQUAL(val["cores"][0]["federates"].size(), 2u);

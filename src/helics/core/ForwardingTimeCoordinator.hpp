@@ -26,20 +26,21 @@ class ForwardingTimeCoordinator
 
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
-    Core::federate_id_t lastMinFed = invalid_fed_id;  //!< the latest minimum fed
+   global_federate_id lastMinFed;  //!< the latest minimum fed
     // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a
     // ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
-    std::vector<Core::federate_id_t> dependents;  //!< federates which temporally depend on this federate
+    std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
 
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    Core::federate_id_t
-      source_id;  //!< the identifier for inserting into the source id field of any generated messages;
+    global_federate_id
+      source_id=global_federate_id(0);  //!< the identifier for inserting into the source id field of any generated messages;
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
     bool iterating = false;  //!< flag indicating that the min dependency is iterating
+    bool ignoreMinFed = false;  //!< flag indicating that minFed Controls should not be used
   public:
     ForwardingTimeCoordinator () = default;
 
@@ -50,9 +51,9 @@ class ForwardingTimeCoordinator
     }
 
     /** get a list of actual dependencies*/
-    std::vector<Core::federate_id_t> getDependencies () const;
+    std::vector<global_federate_id> getDependencies () const;
     /** get a reference to the dependents vector*/
-    const std::vector<Core::federate_id_t> &getDependents () const { return dependents; }
+    const std::vector<global_federate_id> &getDependents () const { return dependents; }
 
     /** compute updates to time values
     and send an update if needed
@@ -62,9 +63,9 @@ class ForwardingTimeCoordinator
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
     */
-    const DependencyInfo *getDependencyInfo (Core::federate_id_t ofed) const;
+    const DependencyInfo *getDependencyInfo (global_federate_id ofed) const;
     /** check whether a federate is a dependency*/
-    bool isDependency (Core::federate_id_t ofed) const;
+    bool isDependency (global_federate_id ofed) const;
 
   private:
     /**send out the latest time request command*/
@@ -72,7 +73,7 @@ class ForwardingTimeCoordinator
     void transmitTimingMessage (ActionMessage &msg) const;
     /** generate a new timing request message by recalculating the times ignoring a particular brokers input
      */
-    ActionMessage generateTimeRequestIgnoreDependency (const ActionMessage &msg, Core::federate_id_t iFed) const;
+    ActionMessage generateTimeRequestIgnoreDependency (const ActionMessage &msg, global_federate_id iFed) const;
 
   public:
     /** process a message related to time
@@ -85,17 +86,17 @@ class ForwardingTimeCoordinator
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency (Core::federate_id_t fedID);
+    bool addDependency (global_federate_id fedID);
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent (Core::federate_id_t fedID);
+    bool addDependent (global_federate_id fedID);
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency (Core::federate_id_t fedID);
+    void removeDependency (global_federate_id fedID);
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent (Core::federate_id_t fedID);
+    void removeDependent (global_federate_id fedID);
 
 	 /** disconnect*/
     void disconnect ();

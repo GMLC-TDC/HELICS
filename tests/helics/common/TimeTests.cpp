@@ -3,6 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
+#include <chrono>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
@@ -100,12 +101,12 @@ BOOST_AUTO_TEST_CASE (test_math)
     BOOST_CHECK_EQUAL (time3, Time (2.0));
 }
 
-BOOST_AUTO_TEST_CASE(rounding_tests)
+BOOST_AUTO_TEST_CASE (rounding_tests)
 {
-    BOOST_CHECK(Time(1.25e-9) == Time(1, timeUnits::ns));
-    BOOST_CHECK(Time(0.99e-9) == Time(1, timeUnits::ns));
-    BOOST_CHECK(Time(1.49e-9) == Time(1, timeUnits::ns));
-    BOOST_CHECK(Time(1.51e-9) == Time(2, timeUnits::ns));
+    BOOST_CHECK (Time (1.25e-9) == Time (1, timeUnits::ns));
+    BOOST_CHECK (Time (0.99e-9) == Time (1, timeUnits::ns));
+    BOOST_CHECK (Time (1.49e-9) == Time (1, timeUnits::ns));
+    BOOST_CHECK (Time (1.51e-9) == Time (2, timeUnits::ns));
 }
 
 BOOST_AUTO_TEST_CASE (comparison_tests)
@@ -182,5 +183,19 @@ BOOST_AUTO_TEST_CASE (test_string_conversions)
     BOOST_CHECK_THROW (loadTimeFromString ("happy"), std::invalid_argument);
 }
 
+BOOST_AUTO_TEST_CASE (chrono_tests)
+{
+    using namespace std::chrono;
+    milliseconds tm1 (100);
+
+    Time b (tm1);
+    BOOST_CHECK_EQUAL (b, 0.1);
+
+    nanoseconds tmns (10026523523);
+    Time b2 (tmns);
+    BOOST_CHECK_EQUAL (b2.getBaseTimeCode (), tmns.count ());
+
+    BOOST_CHECK (b2.to_ns () == tmns);
+}
 
 BOOST_AUTO_TEST_SUITE_END ()

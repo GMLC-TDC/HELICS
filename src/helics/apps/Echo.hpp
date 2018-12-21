@@ -33,12 +33,12 @@ class Echo:public App
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    explicit Echo (const FederateInfo &fi);
+    explicit Echo (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Echo (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Echo (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */
@@ -75,7 +75,7 @@ class Echo:public App
     /** load information from a JSON file*/
       virtual void loadJsonFile(const std::string &filename) override;
     /** echo an actual message from an endpoint*/
-    void echoMessage(const Endpoint *ept, Time currentTime);
+    void echoMessage(const Endpoint &ept, Time currentTime);
   private:
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     Time delayTime = timeZero;  //!< respond to each message with the specified delay

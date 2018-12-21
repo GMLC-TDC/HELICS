@@ -43,6 +43,10 @@ class FederateState
   public:
     /** constructor from name and information structure*/
     FederateState (const std::string &name_, const CoreFederateInfo &info_);
+    // the destructor is defined so some classes linked with unique ptrs don't have to be defined in the header
+    /** DISABLE_COPY_AND_ASSIGN */
+    FederateState (const FederateState &) = delete;
+    FederateState &operator= (const FederateState &) = delete;
     /** destructor*/
     ~FederateState ();
 
@@ -50,14 +54,18 @@ class FederateState
     const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
-    Core::federate_id_t local_id = invalid_fed_id;  //!< id code, default to something invalid
-    std::atomic<Core::federate_id_t> global_id{invalid_fed_id};  //!< global id code, default to invalid
+    federate_id_t local_id;  //!< id code for the local federate descriptor
+    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<federate_state_t> state{HELICS_NONE};  //!< the current state of the federate
+    std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{
       false};  //!< flag indicating that values should only be transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
+    bool observer{false};  //!< flag indicating the federate is an observer only
+    bool source_only{false};  //!< flag indicating the federate is a source_only
+    bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
+    bool strict_input_type_checking{false};  //!< flag indicating that inputs should have strict type checking
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -73,9 +81,8 @@ class FederateState
     int32_t realTimeTimerIndex = -1;  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
-
+  private:
     bool iterating = false;  //!< the federate is iterating at a time step
-    bool hasEndpoints = false;  //!< the federate has endpoints
     bool timeGranted_mode =
       false;  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     // 1 byte free
@@ -85,22 +92,16 @@ class FederateState
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
     BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
-
-    std::map<Core::federate_id_t, std::deque<ActionMessage>>
+    std::atomic<uint16_t> interfaceFlags{
+      0};  //!< current defaults for operational flags of interfaces for this federate
+    std::map<global_federate_id, std::deque<ActionMessage>>
       delayQueues;  //!< queue for delaying processing of messages for a time
-
-    std::vector<Core::handle_id_t> events;  //!< list of value events to process
-    std::vector<Core::federate_id_t> delayedFederates;  //!< list of federates to delay messages from
-    std::map<Core::handle_id_t, std::vector<std::unique_ptr<Message>>>
-      message_queue;  // structure of message queues
+    std::vector<interface_handle> events;  //!< list of value events to process
+    std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    std::atomic<bool> processing{false};  //!< the federate is processing
+    std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
-    /** DISABLE_COPY_AND_ASSIGN */
-    FederateState (const FederateState &) = delete;
-    FederateState &operator= (const FederateState &) = delete;
-
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string &, const std::string &)> loggerFunction;
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
@@ -110,12 +111,12 @@ class FederateState
     Time nextMessageTime () const;
 
     /** update the federate state */
-    void setState (federate_state_t newState);
+    void setState (federate_state newState);
 
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay (Core::federate_id_t id);
+    void addFederateToDelay (global_federate_id id);
 
   public:
     /** reset the federate to created state*/
@@ -124,12 +125,12 @@ class FederateState
     void reInit ();
     /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
-    federate_state_t getState () const;
+    federate_state getState () const;
     InterfaceInfo &interfaces () { return interfaceInformation; }
     const InterfaceInfo &interfaces () const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize (Core::handle_id_t id) const;
+    uint64_t getQueueSize (interface_handle id) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all endpoints*/
     uint64_t getQueueSize () const;
     /** get the current iteration counter for an iterative call
@@ -139,12 +140,41 @@ class FederateState
     /** get the next available message for an endpoint
     @param id the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transfered to the caller*/
-    std::unique_ptr<Message> receive (Core::handle_id_t id);
+    std::unique_ptr<Message> receive (interface_handle id);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny (Core::handle_id_t &id);
+    std::unique_ptr<Message> receiveAny (interface_handle &id);
     /** set the CommonCore object that is managing this Federate*/
     void setParent (CommonCore *coreObject) { parent_ = coreObject; };
+    /** update the info structure
+   @details public call so it also calls the federate lock before calling private update function
+   the action Message should be CMD_FED_CONFIGURE
+   */
+    void setProperties (const ActionMessage &cmd);
+    /** set a property on a specific interface*/
+    void setInterfaceProperty (const ActionMessage &cmd);
+    /** set a timeProperty for a the coordinator*/
+    void setProperty (int timeProperty, Time propertyVal);
+    /** set a timeProperty for a the coordinator*/
+    void setProperty (int intProperty, int propertyVal);
+    /** set an option Flag for a the coordinator*/
+    void setOptionFlag (int optionFlag, bool value);
+    /** get a time Property*/
+    Time getTimeProperty (int timeProperty) const;
+    /** get an option flag value*/
+    bool getOptionFlag (int optionFlag) const;
+    /** get the currently active option for a handle*/
+    bool getHandleOption (interface_handle handle, char iType, int32_t option) const;
+    /** get the currently active interface flags*/
+    uint16_t getInterfaceFlags () const { return interfaceFlags.load (); }
+    /** get an option flag value*/
+    int getIntegerProperty (int intProperty) const;
+    /** get the number of publications*/
+    int publicationCount () const;
+    /** get the number of endpoints*/
+    int endpointCount () const;
+    /** get the number of inputs*/
+    int inputCount () const;
 
   private:
     /** process the federate queue until returnable event
@@ -170,8 +200,6 @@ class FederateState
     @return a convergence state value with an indicator of return reason and state of convergence
     */
     message_processing_result processActionMessage (ActionMessage &cmd);
-    /** process a message that updates the configuration of the federate for timing*/
-    void processConfigUpdate (const ActionMessage &m);
     /** fill event list
     @param the time of the update
     */
@@ -185,32 +213,26 @@ class FederateState
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
-    void addDependency (Core::federate_id_t fedToDependOn);
+    void addDependency (global_federate_id fedToDependOn);
     /** add a dependent federate*/
-    void addDependent (Core::federate_id_t fedThatDependsOnThis);
-    /** specify the core object that manages this federate*/
+    void addDependent (global_federate_id fedThatDependsOnThis);
+    /** check the interfaces for any issues*/
+    int checkInterfaces ();
+
   public:
-    /** get the info structure for the federate
-     */
-    CoreFederateInfo getInfo () const;
-    /** update the info structure
-    @details public call so it also calls the federate lock before calling private update function
-    the action Message should be CMD_FED_CONFIGURE
-    */
-    void updateFederateInfo (const ActionMessage &cmd);
     /** get the granted time of a federate*/
     Time grantedTime () const { return time_granted; }
     /** get allowable message time*/
     Time nextAllowedSendTime () const { return allowed_send_time; }
     /**get a reference to the handles of subscriptions with value updates
      */
-    const std::vector<Core::handle_id_t> &getEvents () const;
+    const std::vector<interface_handle> &getEvents () const;
     /** get a vector of the federates this one depends on
      */
-    std::vector<Core::federate_id_t> getDependencies () const;
+    std::vector<global_federate_id> getDependencies () const;
     /** get a vector to the global ids of dependent federates
      */
-    std::vector<Core::federate_id_t> getDependents () const;
+    std::vector<global_federate_id> getDependents () const;
     /** get the last error string */
     const std::string &lastErrorString () const { return errorString; }
     /** get the last error code*/
@@ -221,12 +243,12 @@ class FederateState
     /** process until the federate has verified its membership and assigned a global id number*/
     iteration_result waitSetup ();
     /** process until the initialization state has been entered or there is a failure*/
-    iteration_result enterInitializationState ();
+    iteration_result enterInitializingMode ();
     /** function to call when entering execution state
     @param converged indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
-    iteration_result enterExecutingState (iteration_request iterate);
+    iteration_result enterExecutingMode (iteration_request iterate);
     /** request a time advancement
     @param nextTime the time of the requested advancement
     @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need
@@ -238,11 +260,15 @@ class FederateState
     with no specific end in mind
     */
     iteration_result genericUnspecifiedQueueProcess ();
+    /** function to process the queue until a disconnect_fed_ack is received*/
+    void finalize ();
+
     /** add an action message to the queue*/
     void addAction (const ActionMessage &action);
     /** move a message to the queue*/
     void addAction (ActionMessage &&action);
-
+    /** sometime a message comes in after a federate has terminated and may require a response*/
+    stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
     @param logMessageSource- the name of the object that sent the message
@@ -275,9 +301,18 @@ class FederateState
     @param len the length of the data
     @return true if it should be published, false if not
     */
-    bool checkAndSetValue (Core::handle_id_t pub_id, const char *data, uint64_t len);
+    bool checkAndSetValue (interface_handle pub_id, const char *data, uint64_t len);
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
+	/** create an interface*/
+    void createInterface (handle_type htype,
+                          interface_handle handle,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units);
+    /** close an interface*/
+    void closeInterface (interface_handle handle, handle_type type);
+
 };
 }  // namespace helics

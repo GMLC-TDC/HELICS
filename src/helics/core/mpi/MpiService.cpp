@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "MpiService.h"
+#include <iostream>
 
 namespace helics
 {
@@ -85,6 +86,7 @@ void MpiService::serviceLoop ()
     {
         // send/receive MPI messages
         sendAndReceiveMessages ();
+        std::this_thread::yield ();
     }
 
     MPI_Barrier (mpiCommunicator);
@@ -113,25 +115,28 @@ void MpiService::serviceLoop ()
 
 std::string MpiService::addMpiComms (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     comms.push_back (comm);
-    comms_connected += 1;
-
+    comms_connected++;
+    auto tag = comms.size () - 1;
+    dataLock.unlock ();
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service)
         ;
 
     // return the rank:tag for the MpiComms object
-    return std::to_string (commRank) + ":" + std::to_string (comms.size () - 1);
+    return std::to_string (commRank) + ":" + std::to_string (tag);
 }
 
 void MpiService::removeMpiComms (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
         {
             comms[i] = nullptr;
-            comms_connected -= 1;
+            --comms_connected;
             break;
         }
     }
@@ -139,6 +144,7 @@ void MpiService::removeMpiComms (MpiComms *comm)
 
 std::string MpiService::getAddress (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -166,6 +172,7 @@ int MpiService::getRank ()
 
 int MpiService::getTag (MpiComms *comm)
 {
+    std::unique_lock<std::mutex> dataLock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         if (comms[i] == comm)
@@ -216,6 +223,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
+    std::unique_lock<std::mutex> mpilock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {
         // Skip any nullptr entries
@@ -243,8 +251,8 @@ void MpiService::sendAndReceiveMessages ()
 
                 // Post an asynchronous receive
                 MPI_Request req;
-                MPI_Irecv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
-                           mpiCommunicator, &req);
+                MPI_Irecv (buffer.data (), static_cast<int> (buffer.size ()), MPI_CHAR, status.MPI_SOURCE,
+                           status.MPI_TAG, mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
                 int message_received = false;
@@ -265,42 +273,44 @@ void MpiService::sendAndReceiveMessages ()
         }
     }
 
+    mpilock.unlock ();
     // Send messages from the queue
     auto sendMsg = txMessageQueue.try_pop ();
     while (sendMsg)
     {
-        std::vector<char> msg;
-        std::string address;
-        std::tie (address, msg) = sendMsg.value ();
+        // std::vector<char> msg;
+        // std::string address;
+        // std::tie (address, msg) = sendMsg.value ();
 
         MPI_Request req;
-        auto sendRequestData = std::make_pair (req, msg);
+        auto sendRequestData = std::pair<MPI_Request, std::vector<char>> (req, std::move (sendMsg->second));
 
-        auto addr_delim_pos = address.find (":");
-        int destRank = std::stoi (address.substr (0, addr_delim_pos));
-        ;
-        int destTag = std::stoi (address.substr (addr_delim_pos + 1, address.length ()));
+        int destRank = sendMsg->first.first;
+        int destTag = sendMsg->first.second;
 
         if (destRank != commRank)
         {
+            send_requests.push_back (std::move (sendRequestData));
+            auto &sreq = send_requests.back ();
             // Send the message using asynchronous send
-            MPI_Isend (sendRequestData.second.data (), static_cast<int>(sendRequestData.second.size ()), MPI_CHAR, destRank, destTag,
-                       mpiCommunicator, &sendRequestData.first);
-            send_requests.push_back (sendRequestData);
+            MPI_Isend (sreq.second.data (), static_cast<int> (sreq.second.size ()), MPI_CHAR, destRank, destTag,
+                       mpiCommunicator, &sreq.first);
         }
         else
         {
+            mpilock.lock ();
             if (comms[destTag] != nullptr)
             {
                 // Add the message directly to the destination rx queue (same process)
-                ActionMessage M (msg);
+                ActionMessage M (sendRequestData.second);
                 comms[destTag]->getRxMessageQueue ().push (M);
             }
+            mpilock.unlock ();
         }
         sendMsg = txMessageQueue.try_pop ();
     }
 
-    send_requests.remove_if ([](std::pair<MPI_Request, std::vector<char>> req) {
+    send_requests.remove_if ([](std::pair<MPI_Request, std::vector<char>> &req) {
         int send_finished;
         MPI_Test (&req.first, &send_finished, MPI_STATUS_IGNORE);
 
@@ -309,7 +319,7 @@ void MpiService::sendAndReceiveMessages ()
             // Any cleanup needed here? Freeing the vector or MPI_Request?
         }
 
-        return send_finished == 1;
+        return (send_finished == 1);
     });
 }
 
@@ -330,8 +340,8 @@ void MpiService::drainRemainingMessages ()
             buffer.resize (recv_size);
 
             // Receive the message
-            MPI_Recv (buffer.data (), static_cast<int>(buffer.size ()), MPI_CHAR, status.MPI_SOURCE, status.MPI_TAG,
-                      mpiCommunicator, &status);
+            MPI_Recv (buffer.data (), static_cast<int> (buffer.size ()), MPI_CHAR, status.MPI_SOURCE,
+                      status.MPI_TAG, mpiCommunicator, &status);
         }
     }
 }

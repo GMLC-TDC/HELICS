@@ -5,34 +5,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include "../helics_enums.h"
 #include <cstdint>
-#include "../flag-definitions.h"
 namespace helics
 {
-/** flag definitions for the action Message Flag field*/
-enum action_message_flags : uint16_t
-{
-    iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
-    processing_complete_flag = 1,  //!< indicator that processing has been completed
-    required_flag = 2,  //!< flag indicating that an action or match is required
-    core_flag=3, //!< flag indicating that message comes from a core vs a broker
-    error_flag = 4,  //!< flag indicating an error condition associated with the command
-    indicator_flag = 5,  //!< flag used for setting values
-    empty_flag=6, //!< flag indicating that the message is empty
-    extra_flag1 = 7,  //!< extra flag
-    forwarding_coordinator = 8,  //!< flag indicating that a dependency is a forwarding coordinator
-    clone_flag = 9,  //!< flag indicating the filter is a clone filter
-    extra_flag2 = 8, //!< extra flag
-    destination_processing_flag = 11,  //!< flag indicating the message is for destination processing
-    broker_min_time_flag = 12,  //!< flag indicating that a broker the time constraint
-    extra_flag3 = 13, //!< extra flag
-    extra_flag4 = 14, //!< extra flag
-    extra_flag5 =15, //!< extra flag
-};
 /** namespace for message definitions*/
 namespace action_message_def
 {
-const int32_t cmd_info_basis = 0x10000000;
+constexpr int32_t cmd_info_basis = 0x10000000;
 
 /** enumeration of globally recognized commands
 @details they are explicitly numbered for debugging and to ensure the enumeration is constant
@@ -50,18 +30,27 @@ enum class action_t : int32_t
     cmd_reg_fed = -105,  //!< register a federate
     cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
     cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
-    cmd_broker_query=-37, //!< send a query to a core
+	cmd_set_global = -cmd_info_basis-55,  //!< set a global value
+    cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
-
+    cmd_broker_setup = -1,  //!< command to load the setup information for a broker
     cmd_ignore = 0,  //!< null command
     cmd_tick = 1,  //!< command for a timer tick
-	cmd_user_disconnect = 2, //!< command specifying that a user has issued a disconnect signal
+    cmd_user_disconnect = 2,  //!< command specifying that a user has issued a disconnect signal
     cmd_disconnect = 3,  //!< disconnect command
     cmd_disconnect_name = 4,  //!< disconnect a broker or core by name vs id
-	cmd_disconnect_check = 5, //!< check for a disconnect
-    cmd_ping = 6,  //!< request for an Echo response
-    cmd_ping_reply = 7,  //!< response to a ping request
+    cmd_disconnect_check = 5,  //!< check for a disconnect
+    cmd_disconnect_fed = 6,  //!< disconnect a federate
+    cmd_broadcast_disconnect = 7,  //!< a broadcast disconnect message
+    cmd_disconnect_core = 8,  //!< disconnect a core
+    cmd_disconnect_broker = 9,  //!< disconnect a broker
+    cmd_disconnect_fed_ack = 1006,  //!< federate disconnect ack
+    cmd_disconnect_core_ack = 1008,  //!< ack for core disconnect
+    cmd_disconnect_broker_ack = 1009,  //!< ack for broker disconnect
+    cmd_check_connections = 297,  //!< command to check for any connections
+    cmd_ping = 298,  //!< request for an Echo response
+    cmd_ping_reply = 299,  //!< response to a ping request
 
     cmd_init = 10,  //!< request entry to init mode
     cmd_init_grant = 11,  //!< grant entry to initialization mode
@@ -80,16 +69,18 @@ enum class action_t : int32_t
 
     cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
     cmd_time_unblock = 41,  //!< clear a time block
+    cmd_time_barrier_request = 42,  //!< request a time barrier
+    cmd_time_barrier = 43,  //!< setup a global time barrier
+    cmd_time_barrier_clear = 44,  //!< clear a global time barrier
 
-    cmd_pub = 45,  //!< publish a value
+    cmd_pub = 52,  //!< publish a value
     cmd_bye = 2000,  //!< message stating this is the last communication from a federate
     cmd_log = 55,  //!< log a message with the root broker
     cmd_warning = 9990,  //!< indicate some sort of warning
     cmd_error = 10000,  //!< indicate an error with a federate
     cmd_invalid = 1010101,  //!< indicates that command has generated an invalid state
     cmd_send_route = 75,  //!< command to define a route information
-    cmd_subscriber = 85,  // !< command to send a subscriber
-    cmd_search_dependency = 134,  //!< command to add a dependency by name
+    cmd_search_dependency = 1464,  //!< command to add a dependency by name
     cmd_add_dependency = 140,  //!< command to send a federate dependency information
     cmd_remove_dependency = 141,  //!< command to remove a dependency
     cmd_add_dependent = 144,  //!< command to add a dependent to a federate
@@ -97,8 +88,15 @@ enum class action_t : int32_t
     cmd_add_interdependency = 148,  //!< command to add a federate as both dependent and a dependency
     cmd_remove_interdependency = 149,  //!< command to remove a federate as both dependent and a dependency
 
-    cmd_fed_configure = 205,  //!< command to update the configuration of a federate
+    cmd_data_link = cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
+    cmd_filter_link = cmd_info_basis + 709,  //!< command to add a target to a filter
+
+    cmd_fed_configure_time = 202,  //!< command to update the configuration of a federate a time parameter
+    cmd_fed_configure_int = 203,  //!< command to update the configuration of a federate an int parameter
+    cmd_fed_configure_flag = 204,  //!< command to update the configuration of a federate a flag parameter
     cmd_core_configure = 207,  //!< command to update the configuration of a core
+    cmd_interface_configure = 209,  //!< command to update the configuration of an interface
+    cmd_broker_configure = 211,  //!< command to update the configuration of a broker
 
     cmd_update_filter_op = 10427,  //!< command to update a filter op [should only used internal to a core]
     null_info_command = cmd_info_basis - 1,  //!< biggest command that doesn't have the info structure
@@ -106,7 +104,7 @@ enum class action_t : int32_t
     priority_null_info_command = -cmd_info_basis - 1,
     // commands that require the extra info allocation have numbers greater than cmd_info_basis
     cmd_time_request = 500,  //!< request a time or iteration
-    cmd_force_time_grant = 525, //!< command to force grant a time regardless of other considerations
+    cmd_force_time_grant = 525,  //!< command to force grant a time regardless of other considerations
     cmd_send_message = cmd_info_basis + 20,  //!< send a message
     cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
     cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -119,21 +117,35 @@ enum class action_t : int32_t
     cmd_dest_filter_result =
       cmd_info_basis + 41,  //!< the result of a destination filter going back to its originator
     cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
-    cmd_notify_pub = 50,  //!< notify of a publication
-    cmd_reg_dst_filter = cmd_info_basis + 60,  //!< register a destination filter
-    cmd_notify_dst_filter = cmd_info_basis + 62,  //!< notify of a destination filter
-    cmd_reg_sub = cmd_info_basis + 70,  //!< register a subscription
-    cmd_notify_sub = 70,  //!< notify of a subscription
-    cmd_reg_src_filter = cmd_info_basis + 80,  //!< register a source filter
-    cmd_notify_src_filter = cmd_info_basis + 82,  //!< notify of a source
+    cmd_add_publisher = 50,  //!< notify of a publication
+    cmd_reg_filter = cmd_info_basis + 60,  //!< register a destination filter
+    cmd_add_filter = 62,  //!< notify of a destination filter
+    cmd_reg_input = cmd_info_basis + 70,  //!< register an input interface
+    cmd_add_subscriber = 70,  //!< notify of a subscription
     cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
-    cmd_notify_end = 90,  //!< notify of an endpoint
+    cmd_add_endpoint = 90,  //!< notify of a source endpoint
 
-    cmd_has_operator = 92,  //!< notify that a filter has an operator
+    cmd_add_named_input = 104,  //!< command to add a named input as a target
+    cmd_add_named_filter = 105,  //!< command to add named filter as a target
+    cmd_add_named_publication = 106,  //!< command to add a named publication as a target
+    cmd_add_named_endpoint = 107,  //!< command to add a named endpoint as a target
+    cmd_remove_named_input = 124,  //!< cmd to remove a target from connection by name
+    cmd_remove_named_filter = 125,  //!< cmd to remove a filter from connection by name
+    cmd_remove_named_publication = 126,  //!< cmd to remove a publication from connection by name
+    cmd_remove_named_endpoint = 127,  //!< cmd to remove an endpoint
+
+    cmd_remove_subscriber = 134,  //!< cmd to remove a target from connection
+    cmd_remove_filter = 135,  //!< cmd to remove a filter from connection
+    cmd_remove_publication = 136,  //!< cmd to remove a publication from connection
+    cmd_remove_endpoint = 137,  //!< cmd to remove an endpoint
+
+    cmd_close_interface = 133,  //!< cmd to close all communications from an interface
+    cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
+
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
-    cmd_protocol_big = cmd_info_basis + 60000  //!< command used in the protocol stacks with the additional info
-
+    cmd_protocol_big = cmd_info_basis + 60000,  //!< command used in the protocol stacks with the additional info
+    cmd_resend = 121212  //!< command to resend some data
 };
 
 }  // namespace action_message_def
@@ -147,8 +159,19 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check
+#define CMD_DISCONNECT_FED action_message_def::action_t::cmd_disconnect_fed
+#define CMD_BROADCAST_DISCONNECT action_message_def::action_t::cmd_broadcast_disconnect
+
+#define CMD_DISCONNECT_CORE action_message_def::action_t::cmd_disconnect_core
+#define CMD_DISCONNECT_BROKER action_message_def::action_t::cmd_disconnect_broker
+#define CMD_DISCONNECT_FED_ACK action_message_def::action_t::cmd_disconnect_fed_ack
+#define CMD_DISCONNECT_CORE_ACK action_message_def::action_t::cmd_disconnect_core_ack
+#define CMD_DISCONNECT_BROKER_ACK action_message_def::action_t::cmd_disconnect_broker_ack
+
+#define CMD_CHECK_CONNECTIONS action_message_def::action_t::cmd_check_connections
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
+#define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup
 
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
@@ -169,6 +192,10 @@ enum class action_t : int32_t
 #define CMD_TIME_BLOCK action_message_def::action_t::cmd_time_block
 #define CMD_TIME_UNBLOCK action_message_def::action_t::cmd_time_unblock
 
+#define CMD_TIME_BARRIER_REQUEST action_message_def::action_t::cmd_time_barrier_request
+#define CMD_TIME_BARRIER action_message_def::action_t::cmd_time_barrier
+#define CMD_TIME_BARRIER_CLEAR action_message_def::action_t::cmd_time_barrier_clear
+
 #define CMD_SEND_MESSAGE action_message_def::action_t::cmd_send_message
 #define CMD_SEND_FOR_FILTER action_message_def::action_t::cmd_send_for_filter
 #define CMD_SEND_FOR_FILTER_AND_RETURN action_message_def::action_t::cmd_send_for_filter_return
@@ -182,19 +209,41 @@ enum class action_t : int32_t
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
 #define CMD_ERROR action_message_def::action_t::cmd_error
+#define CMD_RESEND action_message_def::action_t::cmd_resend
+
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
-#define CMD_NOTIFY_PUB action_message_def::action_t::cmd_notify_pub
+#define CMD_ADD_PUBLISHER action_message_def::action_t::cmd_add_publisher
+#define CMD_REG_INPUT action_message_def::action_t::cmd_reg_input
+#define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
 
-#define CMD_REG_SUB action_message_def::action_t::cmd_reg_sub
-#define CMD_NOTIFY_SUB action_message_def::action_t::cmd_notify_sub
-#define CMD_REG_END action_message_def::action_t::cmd_reg_end
-#define CMD_NOTIFY_END action_message_def::action_t::cmd_notify_end
-#define CMD_REG_DST_FILTER action_message_def::action_t::cmd_reg_dst_filter
-#define CMD_NOTIFY_DST_FILTER action_message_def::action_t::cmd_notify_dst_filter
+#define CMD_ADD_NAMED_ENDPOINT action_message_def::action_t::cmd_add_named_endpoint
+#define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
+#define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
+#define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
 
-#define CMD_REG_SRC_FILTER action_message_def::action_t::cmd_reg_src_filter
-#define CMD_NOTIFY_SRC_FILTER action_message_def::action_t::cmd_notify_src_filter
-#define CMD_UPDATE_FILTER_OP action_message_def::action_t::cmd_update_filter_op
+#define CMD_REMOVE_NAMED_ENDPOINT action_message_def::action_t::cmd_remove_named_endpoint
+#define CMD_REMOVE_NAMED_FILTER action_message_def::action_t::cmd_remove_named_filter
+#define CMD_REMOVE_NAMED_PUBLICATION action_message_def::action_t::cmd_remove_named_publication
+#define CMD_REMOVE_NAMED_INPUT action_message_def::action_t::cmd_remove_named_input
+
+#define CMD_REMOVE_ENDPOINT action_message_def::action_t::cmd_remove_endpoint
+#define CMD_REMOVE_FILTER action_message_def::action_t::cmd_remove_filter
+#define CMD_REMOVE_PUBLICATION action_message_def::action_t::cmd_remove_publication
+#define CMD_REMOVE_SUBSCRIBER action_message_def::action_t::cmd_remove_subscriber
+
+#define CMD_CLOSE_INTERFACE action_message_def::action_t::cmd_close_interface
+
+#define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
+#define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link
+
+#define CMD_REMOVE_NAMED_TARGET action_message_def::action_t::cmd_remove_named_target
+#define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
+
+#define CMD_REG_ENDPOINT action_message_def::action_t::cmd_reg_end
+#define CMD_ADD_ENDPOINT action_message_def::action_t::cmd_add_endpoint
+
+#define CMD_REG_FILTER action_message_def::action_t::cmd_reg_filter
+#define CMD_ADD_FILTER action_message_def::action_t::cmd_add_filter
 
 #define CMD_SEARCH_DEPENDENCY action_message_def::action_t::cmd_search_dependency
 #define CMD_ADD_DEPENDENCY action_message_def::action_t::cmd_add_dependency
@@ -211,8 +260,13 @@ enum class action_t : int32_t
 #define CMD_PROTOCOL action_message_def::action_t::cmd_protocol
 #define CMD_PROTOCOL_BIG action_message_def::action_t::cmd_protocol_big
 
-#define CMD_FED_CONFIGURE action_message_def::action_t::cmd_fed_configure
+#define CMD_FED_CONFIGURE_TIME action_message_def::action_t::cmd_fed_configure_time
+#define CMD_FED_CONFIGURE_INT action_message_def::action_t::cmd_fed_configure_int
+#define CMD_FED_CONFIGURE_FLAG action_message_def::action_t::cmd_fed_configure_flag
+#define CMD_INTERFACE_CONFIGURE action_message_def::action_t::cmd_interface_configure
+
 #define CMD_CORE_CONFIGURE action_message_def::action_t::cmd_core_configure
+#define CMD_BROKER_CONFIGURE action_message_def::action_t::cmd_broker_configure
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
@@ -220,17 +274,22 @@ enum class action_t : int32_t
 #define CMD_QUERY action_message_def::action_t::cmd_query
 #define CMD_BROKER_QUERY action_message_def::action_t::cmd_broker_query
 #define CMD_QUERY_REPLY action_message_def::action_t::cmd_query_reply
+#define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
+
+#define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
 
 // definitions for the protocol options
 #define PROTOCOL_PING 10
 #define PROTOCOL_PONG 11
 #define CLOSE_RECEIVER 23425215
 #define NEW_ROUTE 233
+#define REMOVE_ROUTE 244
+#define CONNECTION_INFORMATION 299
 #define DISCONNECT 2523
 #define DISCONNECT_ERROR 2623
 
 #define NAME_NOT_FOUND 2726
-#define RECONNECT 1997
+#define RECONNECT_TRANSMITTER 1997
 #define RECONNECT_RECEIVER 1999
 // for requesting port definitions on a computer
 #define PORT_DEFINITIONS 1451
@@ -239,29 +298,11 @@ enum class action_t : int32_t
 #define SET_USED_PORTS 1457
 #define NULL_REPLY 0;
 
-// definitions for FED_CONFIGURE_COMMAND
-#define UPDATE_INPUT_DELAY 0
-#define UPDATE_OUTPUT_DELAY 1
-#define UPDATE_MINDELTA 2
-#define UPDATE_PERIOD 3
-#define UPDATE_OFFSET 4
-#define UPDATE_MAX_ITERATION 5
-#define UPDATE_LOG_LEVEL 6
-#define UPDATE_FLAG 7
-#define UPDATE_RTLAG 10
-#define UPDATE_RTLEAD 11
-
-//definitions related to Core Configure
+// definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 
-/** check if the action has an info structure associated with it*/
-inline bool hasInfo (action_message_def::action_t action) noexcept
-{
-    return ((action > action_message_def::action_t::null_info_command) ||
-            (action < action_message_def::action_t::priority_null_info_command));
-}
 /** return the name of the action
 @param action The action to get the name for
 @return a pointer to string with the name

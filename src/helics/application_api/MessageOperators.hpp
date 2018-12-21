@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include <atomic>
 #include <functional>
 
 #include "../core/core-data.hpp"
@@ -100,6 +101,36 @@ class CloneOperator : public FilterOperator
 
   private:
     std::function<void(const Message *)> evalFunction;  //!< the function actually doing the processing
+    virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
+};
+
+/** class defining an message operator that either passes the message or not
+@details  the evaluation function used should return true if the message should be allowed through
+false if it should be dropped
+*/
+class FirewallOperator : public FilterOperator
+{
+  public:
+    enum class operations
+    {
+        drop = 0,
+        pass = 1,
+        setFlag1 = 2,
+        setFlag2 = 3,
+        setFlag3 = 4
+    };
+    /** default constructor*/
+    FirewallOperator () = default;
+    /** set the function to modify the data of the message in the constructor*/
+    explicit FirewallOperator (std::function<bool(const Message *)> userCheckFunction);
+    /** set the function to modify the data of the message*/
+    void setCheckFunction (std::function<bool(const Message *)> userCheckFunction);
+    /** set the operation to perform on positive checkFunction*/
+    void setOperation (operations newop) { operation.store (newop); }
+
+  private:
+    std::function<bool(const Message *)> checkFunction;  //!< the function actually doing the processing
+    std::atomic<operations> operation;
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 

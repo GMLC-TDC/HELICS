@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "Broker.hpp"
 #include "core-types.hpp"
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -35,6 +36,9 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 @return a shared_ptr to the Broker*/
 std::shared_ptr<Broker> findBroker (const std::string &brokerName);
 
+/** try to find a joinable broker of a specific type*/
+std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type);
+
 /** register a coreBroker so it can be found by others
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling
 cleanUpBrokers earlier if desired
@@ -58,11 +62,12 @@ registered or when the clean up function is called this prevents some odd thread
 @param delay the number of milliseconds to wait to ensure stuff is cleaned up
 @return the number of brokers still operating
 */
-size_t cleanUpBrokers (int delay);
+size_t cleanUpBrokers (std::chrono::milliseconds delay);
 
 /** make a copy of the broker pointer to allow access to the new name
+@return true if successful
  */
-void copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName);
+bool copyBrokerIdentifier (const std::string &copyFromName, const std::string &copyToName);
 
 /** display the help listing for a particular core_type*/
 void displayHelp (core_type type = core_type::UNRECOGNIZED);

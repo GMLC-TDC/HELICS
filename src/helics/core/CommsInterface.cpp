@@ -5,29 +5,22 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "CommsInterface.hpp"
 #include "NetworkBrokerData.hpp"
+#include <iostream>
 
 namespace helics
 {
-CommsInterface::CommsInterface (const std::string &localTarget,
-                                const std::string &brokerTarget,
-                                interface_networks targetNetwork)
-    : localTarget_ (localTarget), brokerTarget_ (brokerTarget), interfaceNetwork (targetNetwork)
-{
-}
-
-CommsInterface::CommsInterface (const NetworkBrokerData &netInfo)
-    : localTarget_ (netInfo.localInterface), brokerTarget_ (netInfo.brokerAddress),
-      brokerName_ (netInfo.brokerName), interfaceNetwork (netInfo.interfaceNetwork)
-{
-}
+CommsInterface::CommsInterface (thread_generation threads) : singleThread (threads == thread_generation::single) {}
 
 /** destructor*/
 CommsInterface::~CommsInterface ()
 {
     std::lock_guard<std::mutex> syncLock (threadSyncLock);
-    if (queue_watcher.joinable ())
+    if (!singleThread)
     {
-        queue_watcher.join ();
+        if (queue_watcher.joinable ())
+        {
+            queue_watcher.join ();
+        }
     }
     if (queue_transmitter.joinable ())
     {
@@ -35,25 +28,105 @@ CommsInterface::~CommsInterface ()
     }
 }
 
-void CommsInterface::transmit (int route_id, const ActionMessage &cmd)
+void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    if (isPriorityCommand (cmd))
+    if (propertyLock ())
     {
-        txQueue.emplacePriority (route_id, cmd);
-    }
-    else
-    {
-        txQueue.emplace (route_id, cmd);
+        localTarget_ = netInfo.localInterface;
+        brokerTarget_ = netInfo.brokerAddress;
+        brokerName_ = netInfo.brokerName;
+        interfaceNetwork = netInfo.interfaceNetwork;
+        maxMessageSize_ = netInfo.maxMessageSize;
+        maxMessageCount_ = netInfo.maxMessageCount;
+        autoBroker = netInfo.autobroker;
+        switch (netInfo.server_mode)
+        {
+        case NetworkBrokerData::server_mode_options::server_active:
+        case NetworkBrokerData::server_mode_options::server_default_active:
+            serverMode = true;
+            break;
+        case NetworkBrokerData::server_mode_options::server_deactivated:
+        case NetworkBrokerData::server_mode_options::server_default_deactivated:
+            serverMode = false;
+            break;
+        case NetworkBrokerData::server_mode_options::unspecified:
+            break;
+        }
+        propertyUnLock ();
     }
 }
 
-void CommsInterface::addRoute (int route_id, const std::string &routeInfo)
+void CommsInterface::loadTargetInfo (const std::string &localTarget,
+                                     const std::string &brokerTarget,
+                                     interface_networks targetNetwork)
+{
+    if (propertyLock ())
+    {
+        localTarget_ = localTarget;
+        brokerTarget_ = brokerTarget;
+        interfaceNetwork = targetNetwork;
+        propertyUnLock ();
+    }
+}
+
+bool CommsInterface::propertyLock ()
+{
+    bool exp = false;
+    while (!operating.compare_exchange_weak (exp, true))
+    {
+        if (tx_status != connection_status::startup)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void CommsInterface::propertyUnLock ()
+{
+    bool exp = true;
+    operating.compare_exchange_strong (exp, false);
+}
+
+void CommsInterface::transmit (route_id rid, const ActionMessage &cmd)
+{
+    if (isPriorityCommand (cmd))
+    {
+        txQueue.emplacePriority (rid, cmd);
+    }
+    else
+    {
+        txQueue.emplace (rid, cmd);
+    }
+}
+
+void CommsInterface::transmit (route_id rid, ActionMessage &&cmd)
+{
+    if (isPriorityCommand (cmd))
+    {
+        txQueue.emplacePriority (rid, std::move (cmd));
+    }
+    else
+    {
+        txQueue.emplace (rid, std::move (cmd));
+    }
+}
+
+void CommsInterface::addRoute (route_id rid, const std::string &routeInfo)
 {
     ActionMessage rt (CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
-    rt.index = NEW_ROUTE;
-    rt.dest_id = route_id;
-    transmit (-1, rt);
+    rt.messageID = NEW_ROUTE;
+    rt.setExtraData (rid.baseValue ());
+    transmit (control_route, std::move (rt));
+}
+
+void CommsInterface::removeRoute (route_id rid)
+{
+    ActionMessage rt (CMD_PROTOCOL);
+    rt.messageID = REMOVE_ROUTE;
+    rt.setExtraData (rid.baseValue ());
+    transmit (control_route, rt);
 }
 
 void CommsInterface::setTxStatus (connection_status txStatus)
@@ -145,7 +218,12 @@ bool CommsInterface::connect ()
         logError ("no callback specified, the receiver cannot start");
         return false;
     }
-    std::lock_guard<std::mutex> syncLock (threadSyncLock);
+    if (!propertyLock ())
+    {
+        // this will lock all the properties and should not be unlocked;
+        return isConnected ();
+    }
+    std::unique_lock<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
         name = localTarget_;
@@ -154,8 +232,32 @@ bool CommsInterface::connect ()
     {
         localTarget_ = name;
     }
-    queue_watcher = std::thread ([this] { queue_rx_function (); });
-    queue_transmitter = std::thread ([this] { queue_tx_function (); });
+    if (!singleThread)
+    {
+        queue_watcher = std::thread ([this] {
+            try
+            {
+                queue_rx_function ();
+            }
+            catch (const std::exception &e)
+            {
+                rx_status = connection_status::error;
+                logError (std::string ("error in receiver >") + e.what ());
+            }
+        });
+    }
+
+    queue_transmitter = std::thread ([this] {
+        try
+        {
+            queue_tx_function ();
+        }
+        catch (const std::exception &e)
+        {
+            tx_status = connection_status::error;
+            logError (std::string ("error in transmitter >") + e.what ());
+        }
+    });
     txTrigger.waitActivation ();
     rxTrigger.waitActivation ();
     if (rx_status != connection_status::connected)
@@ -169,19 +271,25 @@ bool CommsInterface::connect ()
                 queue_transmitter.join ();
             }
         }
-        queue_watcher.join ();
+        if (!singleThread)
+        {
+            queue_watcher.join();
+        }
         return false;
     }
 
     if (tx_status != connection_status::connected)
     {
         logError ("transmitter connection failure");
-        if (rx_status == connection_status::connected)
+        if (!singleThread)
         {
-            if (queue_watcher.joinable ())
+            if (rx_status == connection_status::connected)
             {
-                closeReceiver ();
-                queue_watcher.join ();
+                if (queue_watcher.joinable ())
+                {
+                    closeReceiver ();
+                    queue_watcher.join ();
+                }
             }
         }
         queue_transmitter.join ();
@@ -190,15 +298,28 @@ bool CommsInterface::connect ()
     return true;
 }
 
-void CommsInterface::setName (const std::string &name_) { name = name_; }
+void CommsInterface::setName (const std::string &name_)
+{
+    if (propertyLock ())
+    {
+        name = name_;
+        propertyUnLock ();
+    }
+}
+
 void CommsInterface::disconnect ()
 {
-    if (tripDetector.isTripped ())
+    if (!operating)
     {
-        rx_status = connection_status::terminated;
-        tx_status = connection_status::terminated;
-        return;
+        if (propertyLock ())
+        {
+            setRxStatus (connection_status::terminated);
+            setTxStatus (connection_status::terminated);
+            return;
+        }
     }
+    requestDisconnect.store (true, std::memory_order::memory_order_release);
+
     if (rx_status.load () <= connection_status::connected)
     {
         closeReceiver ();
@@ -206,6 +327,12 @@ void CommsInterface::disconnect ()
     if (tx_status.load () <= connection_status::connected)
     {
         closeTransmitter ();
+    }
+    if (tripDetector.isTripped ())
+    {
+        setRxStatus (connection_status::terminated);
+        setTxStatus (connection_status::terminated);
+        return;
     }
     int cnt = 0;
     while (rx_status.load () <= connection_status::connected)
@@ -243,7 +370,7 @@ void CommsInterface::disconnect ()
         ++cnt;
         if ((cnt & 3) == 0)  // call this every 2400 milliseconds
         {
-            // try calling closeReceiver again
+            // try calling closeTransmitter again
             closeTransmitter ();
         }
         if (cnt == 14)  // Eventually give up
@@ -296,7 +423,11 @@ bool CommsInterface::reconnect ()
 
 void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
-    ActionCallback = std::move (callback);
+    if (propertyLock ())
+    {
+        ActionCallback = std::move (callback);
+        propertyUnLock ();
+    }
 }
 
 void CommsInterface::setLoggingCallback (
@@ -307,13 +438,43 @@ void CommsInterface::setLoggingCallback (
 
 void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
 {
-    if (maxMessageSize > 0)
+    if (propertyLock ())
     {
-        maxMessageSize_ = maxMessageSize;
+        if (maxMessageSize > 0)
+        {
+            maxMessageSize_ = maxMessageSize;
+        }
+        if (maxMessageCount > 0)
+        {
+            maxMessageCount_ = maxMessageCount;
+        }
+        propertyUnLock ();
     }
-    if (maxMessageCount > 0)
+}
+
+void CommsInterface::setFlag (const std::string &flag, bool val)
+{
+    if (flag == "server_mode")
     {
-        maxMessageCount_ = maxMessageCount;
+        setServerMode (val);
+    }
+}
+
+void CommsInterface::setTimeout (std::chrono::milliseconds timeOut)
+{
+    if (propertyLock ())
+    {
+        connectionTimeout = timeOut;
+        propertyUnLock ();
+    }
+}
+
+void CommsInterface::setServerMode (bool serverActive)
+{
+    if (propertyLock ())
+    {
+        serverMode = serverActive;
+        propertyUnLock ();
     }
 }
 
@@ -322,20 +483,19 @@ bool CommsInterface::isConnected () const
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
-
-void CommsInterface::logWarning(const std::string &message) const
-{ 
-	if (loggingCallback)
+void CommsInterface::logWarning (const std::string &message) const
+{
+    if (loggingCallback)
     {
         loggingCallback (1, name, message);
     }
-	else
-	{
+    else
+    {
         std::cerr << "commWarning||" << name << ":" << message << std::endl;
-	}
+    }
 }
 
-void CommsInterface::logError(const std::string &message) const
+void CommsInterface::logError (const std::string &message) const
 {
     if (loggingCallback)
     {
@@ -343,29 +503,29 @@ void CommsInterface::logError(const std::string &message) const
     }
     else
     {
-        std::cerr <<"commERROR||"<<name<<":"<< message << std::endl;
+        std::cerr << "commERROR||" << name << ":" << message << std::endl;
     }
 }
 
 void CommsInterface::closeTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.index = DISCONNECT;
-    transmit (-1, rt);
+    rt.messageID = DISCONNECT;
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectTransmitter ()
 {
     ActionMessage rt (CMD_PROTOCOL);
-    rt.index = RECONNECT;
-    transmit (-1, rt);
+    rt.messageID = RECONNECT_TRANSMITTER;
+    transmit (control_route, rt);
 }
 
 void CommsInterface::reconnectReceiver ()
 {
     ActionMessage cmd (CMD_PROTOCOL);
-    cmd.index = RECONNECT_RECEIVER;
-    transmit (-1, cmd);
+    cmd.messageID = RECONNECT_RECEIVER;
+    transmit (control_route, cmd);
 }
 
 }  // namespace helics

@@ -8,9 +8,17 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <string>
 #include <type_traits>
 
+/**enumeration of reference stability in a container*/
+enum class reference_stability
+{
+    stable,
+    unstable
+};
+
 /** type trait to check if a type is easily hashable
 @details this is not necessarily all hashable types, just those which are easily known
 so arithmetic types, pointers, and strings others may be added if needed
+the trait can be overloaded for other types which have a std::hash overload
 */
 template <typename X>
 struct is_easily_hashable

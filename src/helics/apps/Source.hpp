@@ -67,12 +67,12 @@ class Source:public App
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    explicit Source (const FederateInfo &fi);
+    Source (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Source (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Source (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] name the name of the app
     @param[in] jsonString file or JSON string defining the federate information and other configuration
@@ -102,7 +102,7 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication (const std::string &key,const std::string &generator, helics_type_t type, Time period, const std::string &units = std::string());
+    void addPublication (const std::string &key,const std::string &generator, data_type type, Time period, const std::string &units = std::string());
 
     /** add a publication to a source
     @param key the key of the publication to add
@@ -110,7 +110,7 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication(const std::string &key, helics_type_t type, Time period, const std::string &units = std::string())
+    void addPublication(const std::string &key, data_type type, Time period, const std::string &units = std::string())
     {
         addPublication(key, std::string(), type, period, units);
     }
@@ -121,7 +121,7 @@ class Source:public App
     /** set the start time for a publication */
     void setStartTime(const std::string &key, Time startTime);
     /** set the start time for a publication */
-    void setPeriod(const std::string &key, Time period);
+    void setPeriod (const std::string &key, Time period);
     /** tie a publication to a signal generator*/
     void linkPublicationToGenerator(const std::string &key, const std::string &generator);
     /** tie a publication to a signal generator*/

@@ -55,7 +55,7 @@ class InvalidFunctionCall : public HelicsException
         : HelicsException (message){};
 };
 
-/** exception indicating that the registration of an object has failed*/
+/** exception indicating that the connections of an object or network have failed*/
 class ConnectionFailure : public HelicsException
 {
   public:
@@ -70,10 +70,11 @@ class RegistrationFailure : public HelicsException
         : HelicsException (message){};
 };
 
-/** severe exception indicating HELICS has terminated*/
-class HelicsTerminated : public HelicsException
+/** severe exception indicating HELICS has failed and terminated unexpectedly*/
+class HelicsSystemFailure : public HelicsException
 {
   public:
-    explicit HelicsTerminated (const std::string &message = "HELICS termination") : HelicsException (message){};
+    explicit HelicsSystemFailure (const std::string &message = "HELICS system failure")
+        : HelicsException (message){};
 };
 }

@@ -99,6 +99,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
  - added helics-config executable for getting paths and links and used flags
  - added a broker app that can start up a broker easily
 
+### Added
+ - BrokerApp as a slightly more convenient runner to Brokers
+
 ### Changed
  - upgrade autobuild ZMQ version to 4.2.5 and change CMake scripts to use zmq target
  - updated HELICSConfig.cmake install file to link properly to external libraries and find them if necessary, also included some find functions.  The find_package(HELICS) should work properly now

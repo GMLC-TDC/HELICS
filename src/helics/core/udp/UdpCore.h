@@ -5,30 +5,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "../CommonCore.hpp"
-#include "../CommsBroker.hpp"
-#include "../NetworkBrokerData.hpp"
+#include "../NetworkCore.hpp"
+
 namespace helics
 {
 namespace udp {
 class UdpComms;
-/** implementation for the core that uses udp messages to communicate*/
-class UdpCore final : public CommsBroker<UdpComms, CommonCore>
-{
-public:
-    /** default constructor*/
-    UdpCore() noexcept;
-    UdpCore(const std::string &core_name);
-    virtual void initializeFromArgs(int argc, const char *const *argv) override;
+using UdpCore = NetworkCore<UdpComms, interface_type::udp>;
 
-public:
-    virtual std::string getAddress() const override;
-
-private:
-    NetworkBrokerData netInfo{
-      NetworkBrokerData::interface_type::udp };  //!< structure containing the networking information
-    virtual bool brokerConnect() override;
-};
 } // namespace udp
 }  // namespace helics
 

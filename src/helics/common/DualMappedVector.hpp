@@ -5,7 +5,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 #include "MapTraits.hpp"
+#include "helics_includes/optional.hpp"
 #include <algorithm>
+#include <deque>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -15,107 +17,125 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** class to create a searchable vector by defined unique indices.
 The result object can be indexed multiple ways both by searching using indices or by numerical index
 */
-template <class VType, class searchType1, class searchType2>
+template <class VType,
+          class searchType1,
+          class searchType2,
+          reference_stability STABILITY = reference_stability::unstable>
 class DualMappedVector
 {
   public:
     static_assert (!std::is_same<searchType1, searchType2>::value,
                    "searchType1 and searchType2 cannot be the same type");
+
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    stx::optional<size_t> insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
-        if (fnd != lookup1.end())
+        if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
-                return false;
+                return stx::nullopt;
             }
         }
-        auto index = dataStorage.size();
-        dataStorage.emplace_back(std::forward<Us>(data)...);
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1[searchValue1] = index;
         lookup2[searchValue2] = index;
-        return true;
+        return index;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    stx::optional<size_t> insert (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            return false;
+            return stx::nullopt;
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1.emplace (searchValue1, index);
-        return true;
+        return index;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    bool insert (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    stx::optional<size_t> insert (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup2.find (searchValue2);
         if (fnd != lookup2.end ())
         {
-            return false;
+            return stx::nullopt;
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup2.emplace (searchValue2, index);
-        return true;
+        return index;
+    }
+
+	/** insert a new element into the vector
+    @param searchValue1 the primary unique index of the vector
+    @param searchValue2 the secondary unique index of the vector*/
+    template <typename... Us>
+    stx::optional<size_t> insert (std::nullptr_t /*searchValue1*/, std::nullptr_t /*searchValue2*/, Us &&... data)
+    {
+        auto index = dataStorage.size ();
+        dataStorage.emplace_back (std::forward<Us> (data)...);
+        return index;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
+    size_t insert_or_assign (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
-                dataStorage[fnd->second] = VType(std::forward<Us>(data)...);
+                dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
                 lookup2[searchValue2] = fnd->second;
-                return;
+                return fnd->second;
             }
         }
         auto index = dataStorage.size ();
         dataStorage.emplace_back (std::forward<Us> (data)...);
         lookup1[searchValue1] = index;
         lookup2[searchValue2] = index;
+        return index;
     }
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
+    size_t insert_or_assign (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
+            return fnd->second;
         }
         else
         {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup1.emplace (searchValue1, index);
+            return index;
         }
     }
 
@@ -123,18 +143,20 @@ class DualMappedVector
     @param searchValue1 the primary unique index of the vector
     @param searchValue2 the secondary unique index of the vector*/
     template <typename... Us>
-    void insert_or_assign (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
+    size_t insert_or_assign (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
         auto fnd = lookup2.find (searchValue2);
         if (fnd != lookup2.end ())
         {
             dataStorage[fnd->second] = VType (std::forward<Us> (data)...);
+            return fnd->second;
         }
         else
         {
             auto index = dataStorage.size ();
             dataStorage.emplace_back (std::forward<Us> (data)...);
             lookup2.emplace (searchValue2, index);
+            return index;
         }
     }
     /** add an additional index term for searching
@@ -341,7 +363,7 @@ class DualMappedVector
         std::transform (dataStorage.begin (), dataStorage.end (), dataStorage.begin (), F);
     }
     auto begin () { return dataStorage.begin (); }
-    auto end (){ return dataStorage.end (); }
+    auto end () { return dataStorage.end (); }
     auto begin () const { return dataStorage.cbegin (); }
     auto end () const { return dataStorage.cend (); }
 
@@ -355,7 +377,8 @@ class DualMappedVector
     }
 
   private:
-    std::vector<VType> dataStorage;  //!< primary storage for data
+    std::conditional_t<STABILITY == reference_stability::unstable, std::vector<VType>, std::deque<VType>>
+      dataStorage;  //!< primary storage for data
     std::conditional_t<is_easily_hashable<searchType1>::value,
                        std::unordered_map<searchType1, size_t>,
                        std::map<searchType1, size_t>>

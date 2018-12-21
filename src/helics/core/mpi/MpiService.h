@@ -40,7 +40,7 @@ class MpiService
     int getRank ();
     int getTag (MpiComms *comm);
 
-    void sendMessage (std::string address, std::vector<char> message)
+    void sendMessage (std::pair<int,int> address, std::vector<char> message)
     {
         txMessageQueue.emplace (address, std::move (message));
     }
@@ -58,9 +58,10 @@ class MpiService
     static MPI_Comm mpiCommunicator;
     static bool startServiceThread;
 
+    std::mutex mpiDataLock; //!< lock for the comms and send_requests
     std::vector<MpiComms *> comms;
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
-    BlockingQueue<std::pair<std::string, std::vector<char>>> txMessageQueue;
+    BlockingQueue<std::pair<std::pair<int,int>, std::vector<char>>> txMessageQueue;
 
     bool helics_initialized_mpi;
     std::atomic<int> comms_connected;

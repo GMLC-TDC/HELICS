@@ -6,7 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "helics/helics-config.h"
-#include "helics/flag-definitions.h"
+#include "helics/helics_enums.h"
 
 /** @file
 this file is meant to be included in the commonCore.cpp and coreBroker.cpp
@@ -18,21 +18,26 @@ using elsewhere is probably not going to work.
 /** enumeration of defined print levels*/
 enum log_level : int
 {
-    no_print = LOG_LEVEL_NO_PRINT,  //!< never print
-    error = LOG_LEVEL_ERROR,  //!< only print errors
-    warning = LOG_LEVEL_WARNING,  //!< print/log warning and errors
-    summary = LOG_LEVEL_SUMMARY,  //!< print/log summary information
-    connections = LOG_LEVEL_CONNECTIONS,  //!< print summary+ federate level connection information
-    interfaces = LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
-    timing = LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
-    data = LOG_LEVEL_DATA,  //!< print timing+data transmissions
-    trace = LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)
+    no_print = helics_log_level_no_print,  //!< never print
+    error = helics_log_level_error,  //!< only print errors
+    warning = helics_log_level_warning,  //!< print/log warning and errors
+    summary = helics_log_level_summary,  //!< print/log summary information
+    connections = helics_log_level_connections,  //!< print summary+ federate level connection information
+    interfaces = helics_log_level_interfaces,  //!< print connections +interface level connection information
+    timing = helics_log_level_timing,  //!< print interfaces+ timing(exec/grant/disconnect)
+    data = helics_log_level_data,  //!< print timing+data transmissions
+    trace = helics_log_level_trace,  //!< trace level printing (all processed messages)
 };
 
 #define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);
+#define LOG_ERROR_SIMPLE(message)                                                                                 \
+    semdToLogger (global_broker_id_local, log_level::error, getIdentifier (), message);
 #define LOG_WARNING(id, ident, message) sendToLogger (id, log_level::warning, ident, message);
 
-#ifndef LOGGING_DISABLED
+#define LOG_WARNING_SIMPLE(message)                                                                               \
+    sendToLogger (global_broker_id_local, log_level::warning, getIdentifier (), message);
+
+#ifdef ENABLE_LOGGING
 #define LOG_SUMMARY(id, ident, message)                                                                           \
     if (maxLogLevel >= log_level::summary)                                                                        \
     {                                                                                                             \
@@ -51,7 +56,7 @@ enum log_level : int
         sendToLogger (id, log_level::interfaces, ident, message);                                                 \
     }
 
-#ifndef DEBUG_LOGGING_DISABLED
+#ifdef ENABLE_DEBUG_LOGGING
 #define LOG_TIMING(id, ident, message)                                                                            \
     if (maxLogLevel >= log_level::timing)                                                                         \
     {                                                                                                             \
@@ -67,7 +72,7 @@ enum log_level : int
 #define LOG_DATA_MESSAGES(id, ident, message)
 #endif
 
-#ifndef TRACE_LOGGING_DISABLED
+#ifdef ENABLE_TRACE_LOGGING
 #define LOG_TRACE(id, ident, message)                                                                             \
     if (maxLogLevel >= log_level::trace)                                                                          \
     {                                                                                                             \

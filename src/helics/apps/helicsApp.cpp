@@ -43,7 +43,7 @@ static const ArgDescriptors basicAppArgs{{"local", ArgDescriptor::arg_type_t::fl
                                          {"quiet", ArgDescriptor::arg_type_t::flag_type,
                                           "turn off most display output"}};
 
-App::App (const std::string &appName, int argc, char *argv[])
+App::App (const std::string &defaultAppName, int argc, char *argv[])
 {
     variable_map vm_map;
     // check for quiet mode
@@ -82,16 +82,23 @@ App::App (const std::string &appName, int argc, char *argv[])
         deactivated = true;
         return;
     }
-    FederateInfo fi (appName);
-    fi.loadInfoFromArgs (argc, argv);
-    fed = std::make_shared<CombinationFederate> (fi);
+    FederateInfo fi (argc, argv);
+    if (fi.defName.empty())
+    {
+        fi.defName = defaultAppName;
+    }
+    
+    fed = std::make_shared<CombinationFederate> ("", fi);
     App::loadArguments (vm_map);
 }
 
-App::App (const FederateInfo &fi) : fed (std::make_shared<CombinationFederate> (fi)) {}
+App::App (const std::string &appName, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName, fi))
+{
+}
 
-App::App (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : fed (std::make_shared<CombinationFederate> (core, fi))
+App::App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName, core, fi))
 {
 }
 
@@ -195,10 +202,10 @@ void App::loadConfigOptions (const Json_helics::Value &element)
 }
 void App::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
-        fed->enterInitializationState ();
+        fed->enterInitializingMode ();
     }
 }
 

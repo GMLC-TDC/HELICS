@@ -5,12 +5,15 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include "MessageTimer.hpp"
+#include <iostream>
 
 namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction) : sendFunction (std::move (sFunction)), servicePtr(AsioServiceManager::getServicePointer ())
 {
-    loopHandle = servicePtr->runServiceLoop ();
+  //  std::cout << "getting loop handle for timer" << std::endl;
+    loopHandle = servicePtr->startServiceLoop ();
+   // std::cout << "got loop handle for timer" << std::endl;
 }
 
 static void

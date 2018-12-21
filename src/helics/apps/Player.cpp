@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../common/argParser.h"
 #include "Player.hpp"
+#include "../common/argParser.h"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -52,17 +52,17 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-static const ArgDescriptors InfoArgs{{"datatype", "type of the publication data type to use"},
+static const ArgDescriptors InfoArgs{
+  {"datatype", "type of the publication data type to use"},
   {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
-                                     {"timeunits",
-                                      "the default units on the timestamps used in file based input"}};
+  {"timeunits", "the default units on the timestamps used in file based input"}};
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
     variable_map vm_map;
     if (!deactivated)
     {
-        fed->setFlag (SOURCE_ONLY_FLAG);
+        fed->setFlagOption (helics_flag_source_only);
         argumentParser (argc, argv, vm_map, InfoArgs);
         loadArguments (vm_map);
         if (!masterFileName.empty ())
@@ -76,17 +76,21 @@ Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
     }
 }
 
-Player::Player (const FederateInfo &fi) : App (fi) { fed->setFlag (SOURCE_ONLY_FLAG); }
-
-Player::Player (const std::shared_ptr<Core> &core, const FederateInfo &fi) : App (core, fi)
+Player::Player (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
+    fed->setFlagOption (helics_flag_source_only);
 }
 
-Player::Player (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Player::Player (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : App (appName, core, fi)
 {
-    fed->setFlag (SOURCE_ONLY_FLAG);
-    Player::loadJsonFile (jsonString);
+    fed->setFlagOption (helics_flag_source_only);
+}
+
+Player::Player (const std::string &appName, const std::string &configString) : App (appName, configString)
+{
+    fed->setFlagOption (helics_flag_source_only);
+    Player::loadJsonFile (configString);
 }
 
 void Player::addMessage (Time sendTime,
@@ -213,7 +217,7 @@ void Player::loadTextFile (const std::string &filename)
         {
             if (fc + 2 < str.size ())
             {
-                if ((str[fc] == '#') && (str[fc+1] == '#') && (str[fc+2] == ']'))
+                if ((str[fc] == '#') && (str[fc + 1] == '#') && (str[fc + 2] == ']'))
                 {
                     mlineComment = false;
                 }
@@ -291,8 +295,8 @@ void Player::loadTextFile (const std::string &filename)
         }
         else
         {
-			if (blk.size() == 2)
-			{
+            if (blk.size () == 2)
+            {
                 auto cloc = blk[0].find_last_of (':');
                 if (cloc == std::string::npos)
                 {
@@ -314,79 +318,80 @@ void Player::loadTextFile (const std::string &filename)
                 {
                     points[pIndex].pubName = points[pIndex - 1].pubName;
                 }
-				else
-				{
-                    std::cerr << "lines without publication name but follow one with a publication line " << lcount << '\n';
-				}
+                else
+                {
+                    std::cerr << "lines without publication name but follow one with a publication line " << lcount
+                              << '\n';
+                }
                 points[pIndex].value = blk[1];
                 ++pIndex;
-			}
-                else if (blk.size () == 3)
+            }
+            else if (blk.size () == 3)
+            {
+                auto cloc = blk[0].find_last_of (':');
+                if (cloc == std::string::npos)
                 {
-                    auto cloc = blk[0].find_last_of (':');
-                    if (cloc == std::string::npos)
+                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
                     {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
-                        {
-                            continue;
-                        }
+                        continue;
                     }
-                    else
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                            Time::minVal ())
-                        {
-                            continue;
-                        }
-                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
-                    }
-                    if ((blk[1].empty ()) && (pIndex > 0))
-                    {
-                        points[pIndex].pubName = points[pIndex - 1].pubName;
-                    }
-                    else
-                    {
-                        points[pIndex].pubName = blk[1];
-                    }
-
-                    points[pIndex].value = blk[2];
-                    ++pIndex;
-                }
-                else if (blk.size () == 4)
-                {
-                    auto cloc = blk[0].find_last_of (':');
-                    if (cloc == std::string::npos)
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
-                            Time::minVal ())
-                        {
-                            continue;
-                        }
-                        points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
-                    }
-                    if ((blk[1].empty ()) && (pIndex > 0))
-                    {
-                        points[pIndex].pubName = points[pIndex - 1].pubName;
-                    }
-                    else
-                    {
-                        points[pIndex].pubName = blk[1];
-                    }
-                    points[pIndex].type = blk[2];
-                    points[pIndex].value = blk[3];
-                    ++pIndex;
                 }
                 else
                 {
-                    std::cerr << "unknown publish format line " << lcount << '\n';
+                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                        Time::minVal ())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
                 }
+                if ((blk[1].empty ()) && (pIndex > 0))
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+                else
+                {
+                    points[pIndex].pubName = blk[1];
+                }
+
+                points[pIndex].value = blk[2];
+                ++pIndex;
+            }
+            else if (blk.size () == 4)
+            {
+                auto cloc = blk[0].find_last_of (':');
+                if (cloc == std::string::npos)
+                {
+                    if ((points[pIndex].time = extractTime (trim (blk[0]), lcount)) == Time::minVal ())
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    if ((points[pIndex].time = extractTime (trim (blk[0]).substr (0, cloc), lcount)) ==
+                        Time::minVal ())
+                    {
+                        continue;
+                    }
+                    points[pIndex].iteration = std::stoi (blk[0].substr (cloc + 1));
+                }
+                if ((blk[1].empty ()) && (pIndex > 0))
+                {
+                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                }
+                else
+                {
+                    points[pIndex].pubName = blk[1];
+                }
+                points[pIndex].type = blk[2];
+                points[pIndex].value = blk[3];
+                ++pIndex;
+            }
+            else
+            {
+                std::cerr << "unknown publish format line " << lcount << '\n';
+            }
         }
     }
 }
@@ -398,13 +403,13 @@ void Player::loadJsonFile (const std::string &jsonFile)
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
-        publications.emplace_back (fed.get (), ii);
+        publications.emplace_back (fed->getPublication (ii));
         pubids[publications.back ().getName ()] = static_cast<int> (publications.size () - 1);
     }
     auto eptCount = fed->getEndpointCount ();
     for (int ii = 0; ii < eptCount; ++ii)
     {
-        endpoints.emplace_back (fed.get (), ii);
+        endpoints.emplace_back (fed->getEndpoint (ii));
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
@@ -681,20 +686,20 @@ void Player::cleanUpPointList ()
 
 void Player::initialize ()
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         sortTags ();
         generatePublications ();
         generateEndpoints ();
         cleanUpPointList ();
-        fed->enterInitializationState ();
+        fed->enterInitializingMode ();
     }
 }
 
 void Player::sendInformation (Time sendTime, int iteration)
 {
-    if (!points.empty ())
+    if (isValidIndex(pointIndex,points))
     {
         while (points[pointIndex].time < sendTime)
         {
@@ -705,17 +710,20 @@ void Player::sendInformation (Time sendTime, int iteration)
                 break;
             }
         }
-        while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
+        if (isValidIndex(pointIndex, points))
         {
-            publications[points[pointIndex].index].publish (points[pointIndex].value);
-            ++pointIndex;
-            if (pointIndex >= points.size ())
+            while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
             {
-                break;
+                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                ++pointIndex;
+                if (pointIndex >= points.size())
+                {
+                    break;
+                }
             }
         }
     }
-    if (!messages.empty ())
+    if (isValidIndex(messageIndex, messages))
     {
         while (messages[messageIndex].sendTime <= sendTime)
         {
@@ -731,23 +739,23 @@ void Player::sendInformation (Time sendTime, int iteration)
 
 void Player::runTo (Time stopTime_input)
 {
-    auto state = fed->getCurrentState ();
-    if (state == Federate::op_states::startup)
+    auto md = fed->getCurrentMode ();
+    if (md == Federate::modes::startup)
     {
         initialize ();
     }
-    if (state < Federate::op_states::execution)
+    if (md < Federate::modes::executing)
     {
         sendInformation (-Time::epsilon ());
 
-        fed->enterExecutionState ();
+        fed->enterExecutingMode ();
         // send the stuff at timeZero
         sendInformation (timeZero);
     }
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex,points))
         {
             while (points[pointIndex].time <= ctime)
             {
@@ -758,7 +766,7 @@ void Player::runTo (Time stopTime_input)
                 }
             }
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
@@ -771,7 +779,7 @@ void Player::runTo (Time stopTime_input)
         }
     }
 
-     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
+    Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     bool moreToSend = true;
     Time nextSendTime = timeZero;
     int nextIteration = 0;
@@ -779,12 +787,12 @@ void Player::runTo (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-        if (pointIndex < points.size ())
+        if (isValidIndex(pointIndex, points))
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
             nextIteration = points[pointIndex].iteration;
         }
-        if (messageIndex < messages.size ())
+        if (isValidIndex(messageIndex, messages))
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
@@ -816,11 +824,10 @@ void Player::runTo (Time stopTime_input)
             ++currentIteration;
             sendInformation (nextSendTime, currentIteration);
         }
-       
     }
 }
 
-void Player::addPublication (const std::string &key, helics_type_t type, const std::string &pubUnits)
+void Player::addPublication (const std::string &key, data_type type, const std::string &pubUnits)
 {
     // skip already existing publications
     if (pubids.find (key) != pubids.end ())
@@ -878,7 +885,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::helics_type_t::helicsInvalid)
+        if (defType == helics::data_type::helicsCustom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;

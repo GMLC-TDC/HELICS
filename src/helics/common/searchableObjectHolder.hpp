@@ -3,7 +3,6 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
 #include "TripWire.hpp"
@@ -14,8 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <thread>
 
-/** helper class to destroy objects at a late time when it is convenient and there are no more possibilities of
- * threading issues*/
+/** helper class to contain a list of objects that need to be referencable at some level*/
 template <class X>
 class SearchableObjectHolder
 {
@@ -65,10 +63,10 @@ class SearchableObjectHolder
             }
         }
     }
-    bool addObject (const std::string &name, std::shared_ptr<X> &obj)
+    bool addObject (const std::string &name, std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock (mapLock);
-        auto res = ObjectMap.emplace (name, obj);
+        auto res = ObjectMap.emplace (name, std::move(obj));
         return res.second;
     }
 

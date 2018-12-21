@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "TripWire.hpp"
 #include <algorithm>
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -67,38 +68,58 @@ class DelayedDestructor
     /** destroy objects that are now longer used*/
     size_t destroyObjects ()
     {
-        std::lock_guard<std::mutex> lock (destructionLock);
+        std::unique_lock<std::mutex> lock (destructionLock);
         if (!ElementsToBeDestroyed.empty ())
         {
-            if (callBeforeDeleteFunction)
+            std::vector<std::shared_ptr<X>> ecall;
+            std::vector<std::string> ename;
+            for (auto &element : ElementsToBeDestroyed)
             {
-                for (auto &element : ElementsToBeDestroyed)
+                if (element.use_count () == 1)
                 {
-                    if (element.use_count () == 1)
-                    {
-                        callBeforeDeleteFunction (element);
-                    }
+                    ecall.push_back (element);
+                    ename.push_back (element->getIdentifier ());
                 }
             }
-            // so apparently remove_if can actually call the destructor for shared_ptrs so the call function needs
-            // to be before this call
-            auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                       [](const auto &element) { return (element.use_count () <= 1); });
-            ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+            if (!ename.empty ())
+            {
+                // so apparently remove_if can actually call the destructor for shared_ptrs so the call function
+                // needs to be before this call
+                auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                           [&ename](const auto &element) {
+                                               return ((element.use_count () == 2) &&
+                                                       (std::find (ename.begin (), ename.end (),
+                                                                   element->getIdentifier ()) != ename.end ()));
+                                           });
+                ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                auto deleteFunc = callBeforeDeleteFunction;
+                lock.unlock ();
+                // this needs to be done after the lock, so a destructor can never called while under the lock
+                if (deleteFunc)
+                {
+                    for (auto &element : ecall)
+                    {
+                        deleteFunc (element);
+                    }
+                }
+                ecall.clear ();  // make sure the destructors get called before returning.
+                lock.lock ();  // reengage the lock so the size is correct
+            }
         }
         return ElementsToBeDestroyed.size ();
     }
 
-    size_t destroyObjects (int delay)
+    size_t destroyObjects (std::chrono::milliseconds delay)
     {
+        using namespace std::literals::chrono_literals;
         std::unique_lock<std::mutex> lock (destructionLock);
-        auto delayTime = std::chrono::milliseconds ((delay < 100) ? delay : 50);
-        int delayCount = (delay < 100) ? 1 : (delay / 50);
+        auto delayTime = (delay < 100ms) ? delay : 50ms;
+        int delayCount = (delay < 100ms) ? 1 : (delay / 50).count ();
 
         int cnt = 0;
         while ((!ElementsToBeDestroyed.empty ()) && (cnt < delayCount))
         {
-            if (cnt > 0)
+            if (cnt > 0)  // don't sleep on the first loop
             {
                 lock.unlock ();
                 std::this_thread::sleep_for (delayTime);
@@ -112,34 +133,17 @@ class DelayedDestructor
 
             if (!ElementsToBeDestroyed.empty ())
             {
-                auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                           [](const auto &element) { return (element.use_count () <= 1); });
-                if (callBeforeDeleteFunction)
-                {
-                    auto locIt = loc;
-                    while (locIt != ElementsToBeDestroyed.end ())
-                    {
-                        if (*locIt)
-                        {
-                            callBeforeDeleteFunction (*locIt);
-                        }
-                        ++locIt;
-                    }
-                }
-                ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                lock.unlock ();
+                destroyObjects ();
+                lock.lock ();
             }
         }
         return ElementsToBeDestroyed.size ();
     }
 
-    void addObjectsToBeDestroyed (std::shared_ptr<X> &&obj)
+    void addObjectsToBeDestroyed (std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock (destructionLock);
         ElementsToBeDestroyed.push_back (std::move (obj));
-    }
-    void addObjectsToBeDestroyed (std::shared_ptr<X> &obj)
-    {
-        std::lock_guard<std::mutex> lock (destructionLock);
-        ElementsToBeDestroyed.push_back (obj);
     }
 };

@@ -25,7 +25,7 @@ class Federate;
 class Broker;
 class ValueFederate;
 class MessageFederate;
-class Subscription;
+class Input;
 class Publication;
 class Endpoint;
 class Filter;
@@ -51,7 +51,7 @@ class BrokerObject
 };
 
 /** get the brokerObject from a helics_broker and verify it is valid*/
-BrokerObject *getBrokerObject (helics_broker broker);
+BrokerObject *getBrokerObject (helics_broker broker, helics_error *err);
 /** object wrapping a core for the c-api*/
 class CoreObject
 {
@@ -63,10 +63,11 @@ class CoreObject
     CoreObject () = default;
     ~CoreObject ();
 };
-/** get the CoreObject from a helics_core and verify it is valid*/
-CoreObject *getCoreObject (helics_core core);
 
-class SubscriptionObject;
+/** get the CoreObject from a helics_core and verify it is valid*/
+CoreObject *getCoreObject (helics_core core, helics_error *err);
+
+class InputObject;
 class PublicationObject;
 class EndpointObject;
 
@@ -79,7 +80,7 @@ class FedObject
     int index = -2;
     std::shared_ptr<Federate> fedptr;
     std::unique_ptr<Message> lastMessage;
-    std::vector<std::unique_ptr<SubscriptionObject>> subs;
+    std::vector<std::unique_ptr<InputObject>> inputs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;
@@ -88,53 +89,43 @@ class FedObject
 };
 
 /** get the FedObject from a helics_broker and verify it is valid*/
-FedObject *getFedObject (helics_federate fed);
+FedObject *getFedObject (helics_federate fed, helics_error *err);
 
 /** object wrapping a subscription*/
-class SubscriptionObject
+class InputObject
 {
   public:
-    std::unique_ptr<Subscription> subptr;
-    subscription_id_t id;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Input *inputPtr;
 };
+
 /** object wrapping a publication*/
 class PublicationObject
 {
   public:
-    std::unique_ptr<Publication> pubptr;
-    publication_id_t id;
     int valid = 0;
-    bool rawOnly = false;
     std::shared_ptr<ValueFederate> fedptr;
+    Publication *pubPtr;
 };
 /** object wrapping and endpoint*/
 class EndpointObject
 {
   public:
-    std::unique_ptr<Endpoint> endptr;
+    Endpoint *endPtr;
     std::shared_ptr<MessageFederate> fedptr;
     std::unique_ptr<Message> lastMessage;
     int valid = 0;
-};
-
-/** enumeration of possible filter object types*/
-enum class ftype
-{
-    source,
-    dest,
-    clone,
 };
 
 /** object wrapping a source filter*/
 class FilterObject
 {
   public:
-    ftype type;
+    bool cloning = false;  // indicator that the filter is a cloning filter
     int valid = 0;
-    std::unique_ptr<Filter> filtptr;
+    Filter *filtPtr;
+    std::unique_ptr<Filter> uFilter;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };
@@ -147,25 +138,55 @@ class QueryObject
     std::string query;  //!< the actual query itself
     std::string response;  //!< the response to the query
     std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
-    query_id_t asyncIndexCode = invalid_id_value;  //!< the index to use for the queryComplete call
+    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
     bool activeAsync = false;
     int valid = 0;
 };
 
 }  // namespace helics
 
-helics::Federate *getFed (helics_federate fed);
-helics::ValueFederate *getValueFed (helics_federate fed);
-helics::MessageFederate *getMessageFed (helics_federate fed);
-helics::Core *getCore (helics_core core);
-helics::Broker *getBroker (helics_broker broker);
+/** definitions to simplify error returns if an error already exists*/
+#define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
+    do                                                                                                                                     \
+    {                                                                                                                                      \
+        if ((err != nullptr) && (err->error_code != 0))                                                                                    \
+        {                                                                                                                                  \
+            return retval;                                                                                                                 \
+        }                                                                                                                                  \
+    } while (0)
 
-std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed);
-std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core);
+extern const std::string emptyStr;
+extern const std::string nullStringArgument;
+#define AS_STRING(str) (str != nullptr) ? std::string (str) : emptyStr
+
+#define CHECK_NULL_STRING(str, retval)                                                                                                     \
+    do                                                                                                                                     \
+    {                                                                                                                                      \
+        if (str == nullptr)                                                                                                                \
+        {                                                                                                                                  \
+            if (err != nullptr)                                                                                                            \
+            {                                                                                                                              \
+                err->error_code = helics_error_invalid_argument;                                                                           \
+                err->message = nullStringArgument.c_str ();                                                                                \
+            }                                                                                                                              \
+            return retval;                                                                                                                 \
+        }                                                                                                                                  \
+    } while (0)
+
+helics::Federate *getFed (helics_federate fed, helics_error *err);
+helics::ValueFederate *getValueFed (helics_federate fed, helics_error *err);
+helics::MessageFederate *getMessageFed (helics_federate fed, helics_error *err);
+helics::Core *getCore (helics_core core, helics_error *err);
+helics::Broker *getBroker (helics_broker broker, helics_error *err);
+
+std::shared_ptr<helics::Federate> getFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate fed, helics_error *err);
+std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core, helics_error *err);
 /**centralized error handler for the C interface*/
-helics_status helicsErrorHandler () noexcept;
+void helicsErrorHandler (helics_error *err) noexcept;
+
+bool checkOutArgString (char *outputString, int maxlen, helics_error *err);
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder
@@ -174,8 +195,8 @@ class MasterObjectHolder
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
-    tripwire::TripWireDetector tripDetect; //!< detector for library termination
-
+    tripwire::TripWireDetector tripDetect;  //!< detector for library termination
+    guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
     MasterObjectHolder () noexcept;
     ~MasterObjectHolder ();
@@ -190,6 +211,9 @@ class MasterObjectHolder
     void clearCore (int index);
     void clearFed (int index);
     void deleteAll ();
+    /** store an error string to a string buffer
+    @return a pointer to the memory location*/
+    const char *addErrorString (std::string newError);
 };
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder ();

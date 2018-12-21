@@ -6,6 +6,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "TimeDependencies.hpp"
 #include "ActionMessage.hpp"
+#include "flagOperations.hpp"
 #include <algorithm>
 #include <cassert>
 
@@ -50,7 +51,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
             Tdemin = Te;
         }
         forwardEvent = Time::maxVal ();
-        minFed = m.source_handle;
+        minFed = global_federate_id(m.source_handle.baseValue());
         break;
     case CMD_TIME_GRANT:
         time_state = time_state_t::time_granted;
@@ -59,16 +60,17 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
         Tnext = m.actionTime;
         Te = Tnext;
         Tdemin = Tnext;
-        minFed = m.source_handle;
+        minFed = global_federate_id(m.source_handle.baseValue());
         break;
     case CMD_DISCONNECT:
     case CMD_PRIORITY_DISCONNECT:
+    case CMD_BROADCAST_DISCONNECT:
         time_state = time_state_t::time_granted;
         //   printf("%d disconnect from %d\n", fedID, m.source_id);
         Tnext = Time::maxVal ();
         Te = Time::maxVal ();
         Tdemin = Time::maxVal ();
-        minFed = invalid_fed_id;
+        minFed = global_federate_id();
         break;
     case CMD_SEND_MESSAGE:
         if (time_state == time_state_t::time_granted)
@@ -114,7 +116,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
 // comparison helper lambda for comparing dependencies
 static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
 
-bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
+bool TimeDependencies::isDependency (global_federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if (res == dependencies.end ())
@@ -124,7 +126,7 @@ bool TimeDependencies::isDependency (Core::federate_id_t ofed) const
     return (res->fedID == ofed);
 }
 
-const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed) const
+const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed) const
 {
     auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
     if ((res == dependencies.cend ()) || (res->fedID != ofed))
@@ -135,7 +137,7 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t o
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed)
 {
     auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
     if ((res == dependencies.end ()) || (res->fedID != ofed))
@@ -146,7 +148,7 @@ DependencyInfo *TimeDependencies::getDependencyInfo (Core::federate_id_t ofed)
     return &(*res);
 }
 
-bool TimeDependencies::addDependency (Core::federate_id_t id)
+bool TimeDependencies::addDependency (global_federate_id id)
 
 {
     if (dependencies.empty ())
@@ -171,7 +173,7 @@ bool TimeDependencies::addDependency (Core::federate_id_t id)
     return true;
 }
 
-void TimeDependencies::removeDependency (Core::federate_id_t id)
+void TimeDependencies::removeDependency (global_federate_id id)
 {
     auto dep = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);
     if (dep != dependencies.end ())
@@ -187,7 +189,7 @@ bool TimeDependencies::updateTime (const ActionMessage &m)
 {
     auto dependency_id = (m.action () != CMD_SEND_MESSAGE) ? m.source_id : m.dest_id;
 
-    auto depInfo = getDependencyInfo (dependency_id);
+    auto depInfo = getDependencyInfo (global_federate_id(dependency_id));
     if (depInfo == nullptr)
     {
         return false;
@@ -208,27 +210,11 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
     });
 }
 
-constexpr Core::federate_id_t global_federate_id_shift = 0x0001'0000;
-/** a shift in the global id index to discriminate between global ids of brokers vs federates*/
-constexpr Core::federate_id_t global_broker_id_shift = 0x7000'0000;
-
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
-	for (auto & dep : dependencies)
-	{
-        auto v1 = (dep.fedID >= global_federate_id_shift);
-        auto v2 = (dep.fedID < global_broker_id_shift);
-        auto v3 = (dep.Tnext < Time::maxVal ());
-		if (v1&&v2&&v3)
-		{
-            return true;
-		}
-	}
-    return false;
-   /* return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
-        return (((dep.fedID >= global_federate_id_shift) && (dep.fedID < global_broker_id_shift)) &&
-                (dep.Tnext < Time::maxVal ()));
-    });*/
+  return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+        return ((dep.fedID.isFederate()) &&(dep.Tnext < Time::maxVal ()));
+    });
 }
 
 void TimeDependencies::resetIteratingExecRequests ()
@@ -291,6 +277,15 @@ void TimeDependencies::resetIteratingTimeRequests (helics::Time requestTime)
                 dep.Tdemin = requestTime;
             }
         }
+    }
+}
+
+void TimeDependencies::resetDependentEvents(helics::Time grantTime)
+{
+    for (auto &dep : dependencies)
+    {
+        dep.Te = (std::max)(dep.Tnext, grantTime);
+        dep.Tdemin = dep.Te;
     }
 }
 

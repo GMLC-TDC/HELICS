@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright Â© 2017-2018,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -31,9 +31,12 @@ endif ()
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
+
+
 if (MSVC)
 
 set (boost_versions
+boost_1_69_0
 boost_1_68_0
 boost_1_67_0
 boost_1_66_0
@@ -95,7 +98,11 @@ endif(MSVC)
 HIDE_VARIABLE(BOOST_TEST_PATH)
 
 if (NOT BOOST_REQUIRED_LIBRARIES)
-	set(BOOST_REQUIRED_LIBRARIES program_options unit_test_framework filesystem system date_time timer chrono)
+	set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
+	if (BUILD_TESTING)
+		message(STATUS "adding unit testing")
+		list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
+	endif()
 endif()
 
 # Minimum version of Boost required for building HELICS
@@ -160,6 +167,10 @@ if (${Boost_USE_STATIC_LIBS})
 else()
 	add_library(Boostlibs::core UNKNOWN IMPORTED)
 	add_library(Boostlibs::test UNKNOWN IMPORTED)
+#	if(MINGW)
+#		set_property(TARGET Boostlibs::core PROPERTY
+#			INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H)
+#	endif()
 endif()
 
 list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)

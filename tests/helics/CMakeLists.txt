@@ -15,7 +15,9 @@ add_subdirectory(core)
 add_subdirectory(application_api)
 add_subdirectory(system_tests)
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
-  add_subdirectory(shared_library)
+    add_subdirectory(shared_library)
 endif()
 
 add_subdirectory(apps)
+
+add_subdirectory(performance_tests)

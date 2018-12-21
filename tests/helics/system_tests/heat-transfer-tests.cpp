@@ -29,8 +29,8 @@ class HeatUnitBlock
     helics::Time deltaTime = 5.0;  // sampling rate
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::publication_id_t pub;
-    helics::subscription_id_t sub[4];
+    helics::Publication *pub;
+    helics::Input *sub[4];
     bool initialized = false;
 
   public:
@@ -43,34 +43,35 @@ class HeatUnitBlock
             initialize (coreName);
         }
 
-        vFed->enterInitializationState ();
-        vFed->publish (pub, T);
-        vFed->enterExecutionState ();
+        vFed->enterInitializingMode ();
+        vFed->publish (*pub, T);
+        vFed->enterExecutingMode ();
         mainLoop ();
     };
     void initialize (const std::string &coreName)
     {
         std::string name = "heatUnit_(" + std::to_string (x) + "," + std::to_string (y) + ")";
-        helics::FederateInfo fi (name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.timeDelta = deltaTime;
-        vFed = std::make_unique<helics::ValueFederate> (fi);
-        pub = vFed->registerPublicationIndexed<double> ("temp", x, y);
+        fi.setProperty (helics_property_time_delta, deltaTime);
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
+        pub = &vFed->registerPublicationIndexed<double> ("temp", x, y);
         if (x - 1 < 0)
         {
-            sub[0] = vFed->registerRequiredSubscription<double> ("temp_wall");
+            sub[0] = &vFed->registerSubscription ("temp_wall");
         }
         else
         {
-            sub[0] = vFed->registerRequiredSubscriptionIndexed<double> ("temp", x - 1, y);
+            sub[0] = &vFed->registerSubscriptionIndexed ("temp", x - 1, y);
         }
-        vFed->setDefaultValue (sub[0], T);
-        sub[1] = vFed->registerOptionalSubscriptionIndexed<double> ("temp", x + 1, y);
-        vFed->setDefaultValue (sub[1], -512.0);
-        sub[2] = vFed->registerOptionalSubscriptionIndexed<double> ("temp", x, y - 1);
-        vFed->setDefaultValue (sub[2], -512.0);
-        sub[3] = vFed->registerOptionalSubscriptionIndexed<double> ("temp", x, y + 1);
-        vFed->setDefaultValue (sub[3], -512.0);
+        sub[0]->setDefault (T);
+        sub[1] = &vFed->registerSubscriptionIndexed ("temp", x + 1, y);
+        sub[1]->setDefault (-512.0);
+
+        sub[2] = &vFed->registerSubscriptionIndexed ("temp", x, y - 1);
+        sub[2]->setDefault (-512.0);
+        sub[3] = &vFed->registerSubscriptionIndexed ("temp", x, y + 1);
+        sub[3]->setDefault (-512.0);
         initialized = true;
     }
 
@@ -79,13 +80,13 @@ class HeatUnitBlock
         auto cTime = 0.0_t;
         while (cTime < tend)
         {
-            auto T0 = vFed->getValue<double> (sub[0]);
+            auto T0 = sub[0]->getValue<double> ();
 
             double Etransfer = (T0 - T) * tRate * deltaTime;
 
             for (int ii = 1; ii < 3; ++ii)
             {
-                auto TT = vFed->getValue<double> (sub[ii]);
+                auto TT = sub[ii]->getValue<double> ();
                 if (TT > -500)
                 {
                     Etransfer += (TT - T) * tRate * deltaTime;
@@ -93,7 +94,7 @@ class HeatUnitBlock
             }
             double deltaT = Etransfer / ThermalCap;
             T = T + deltaT;
-            vFed->publish (pub, T);
+            vFed->publish (*pub, T);
             cTime = vFed->requestTime (cTime + deltaTime);
         }
         vFed->finalize ();
@@ -107,7 +108,7 @@ class Wall
 
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::publication_id_t pub;
+    helics::Publication *pub;
     int index = 0;
     bool initialized = false;
 
@@ -120,19 +121,19 @@ class Wall
         {
             initialize (coreName);
         }
-        vFed->enterInitializationState ();
-        vFed->publish (pub, Temp);
-        vFed->enterExecutionState ();
-        vFed->publish (pub, Temp);
+        vFed->enterInitializingMode ();
+        vFed->publish (*pub, Temp);
+        vFed->enterExecutingMode ();
+        vFed->publish (*pub, Temp);
         mainLoop ();
     };
     void initialize (const std::string &coreName)
     {
         std::string name = "Wall";
-        helics::FederateInfo fi (name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate> (fi);
-        pub = vFed->registerGlobalPublication<double> ("temp_wall");
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
+        pub = &vFed->registerGlobalPublication<double> ("temp_wall");
         initialized = true;
     }
 
@@ -150,7 +151,7 @@ class Wall
             retTime = vFed->requestTime (nextTime);
             if (index < static_cast<int> (schedTemp.size ()))
             {
-                vFed->publish (pub, schedTemp[index].second);
+                vFed->publish (*pub, schedTemp[index].second);
                 nextTime = schedTemp[index].first;
                 ++index;
             }
@@ -186,17 +187,17 @@ class observer
         {
             initialize (coreName);
         }
-        vFed->enterExecutionState ();
+        vFed->enterExecutingMode ();
         mainLoop ();
     };
     void initialize (const std::string &coreName)
     {
         std::string name = "observer";
-        helics::FederateInfo fi (name);
+        helics::FederateInfo fi;
         fi.coreName = coreName;
-        fi.observer = true;
-        fi.timeDelta = 10.0;
-        vFed = std::make_unique<helics::ValueFederate> (fi);
+        fi.setFlagOption (helics_flag_observer);
+        fi.setProperty (helics_property_time_delta, 10.0);
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
         vSub = helics::VectorSubscription2d<double> (vFed.get (), subName, 0, m_count, 0, 1, 0.0);
         initialized = true;
     }

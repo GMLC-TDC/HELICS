@@ -35,19 +35,20 @@ class App
     /** default constructor*/
     App () = default;
     /** construct from command line arguments
+    @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    App (const std::string &appName, int argc, char *argv[]);
+    App (const std::string &defaultAppName, int argc, char *argv[]);
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    explicit App (const FederateInfo &fi);
+    App (const std::string &appName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    App(const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] jsonString file or JSON string defining the federate information and other configuration
     */

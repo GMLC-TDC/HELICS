@@ -9,24 +9,21 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
+#include "helicsExceptions.hpp"
 #include <stdexcept>
 #include <string>
 
-namespace helics98
+namespace helicscpp
 {
 class Broker
 {
   public:
-    // Default constructor, not meant to be used
+    /** Default constructor */
     Broker () : broker (NULL){};
 
     Broker (std::string type, std::string name, std::string initString)
     {
-        broker = helicsCreateBroker (type.c_str (), name.c_str (), initString.c_str ());
-        if (broker == NULL)
-        {
-            throw (std::runtime_error ("broker creation failed"));
-        }
+        broker = helicsCreateBroker (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
         if (helicsBrokerIsConnected (broker) != helics_true)
         {
             throw (std::runtime_error ("broker creation failed"));
@@ -35,17 +32,13 @@ class Broker
 
     Broker (std::string type, std::string name, int argc, const char **argv)
     {
-        broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv);
-        if (broker == NULL)
-        {
-            throw (std::runtime_error ("broker creation failed"));
-        }
+        broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
 
-    Broker (const Broker &brk) { broker = helicsBrokerClone (brk.broker); }
+    Broker (const Broker &brk) { broker = helicsBrokerClone (brk.broker, hThrowOnError ()); }
     Broker &operator= (const Broker &brk)
     {
-        broker = helicsBrokerClone (brk.broker);
+        broker = helicsBrokerClone (brk.broker, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
@@ -74,26 +67,24 @@ class Broker
     helics_broker baseObject () const { return broker; }
 
     bool isConnected () const { return helicsBrokerIsConnected (broker); }
-    void disconnect () { helicsBrokerDisconnect (broker); }
-    bool waitForDisconnect (int msToWait=-1) { return (helicsBrokerWaitForDisconnect (broker, msToWait) == helics_ok); }
-    std::string getIdentifier () const
+    bool waitForDisconnect (int msToWait = -1)
     {
-        char str[255];
-        helicsBrokerGetIdentifier (broker, &str[0], sizeof (str));
-        std::string result (str);
-        return result;
+        return helicsBrokerWaitForDisconnect (broker, msToWait, hThrowOnError ());
     }
-    std::string getAddress () const
+    void disconnect () { helicsBrokerDisconnect (broker, hThrowOnError ()); }
+    const char *getIdentifier () const { return helicsBrokerGetIdentifier (broker); }
+
+    const char *getAddress () const { return helicsBrokerGetAddress (broker); }
+
+    /** set a global federation value*/
+    void setGlobal (const std::string &valueName, const std::string &value)
     {
-        char str[255];
-        helicsBrokerGetAddress (broker, &str[0], sizeof (str));
-        std::string result (str);
-        return result;
+        helicsBrokerSetGlobal (broker, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
 
   protected:
     helics_broker broker;
 };
 
-}  // namespace helics
+}  // namespace helicscpp
 #endif

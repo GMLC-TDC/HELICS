@@ -63,7 +63,8 @@ int main (int argc, char *argv[])
         {
             while (true)
             {
-                // I am purposely making an object that creates and destroys itself on the same line
+                // I am purposely making an object that creates and destroys itself on the same line because this
+                // will run until termination so will take a while
                 helics::apps::BrokerApp (argc, argv);
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (1));

@@ -6,43 +6,54 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../common/BlockingPriorityQueue.hpp"
+#include "../common/TriggerVariable.hpp"
 #include "../common/TripWire.hpp"
-#include "NetworkBrokerData.hpp"
 #include "ActionMessage.hpp"
+#include "NetworkBrokerData.hpp"
 #include <functional>
 #include <thread>
-#include "../common/TriggerVariable.hpp"
 
 namespace helics
 {
-enum class interface_networks :char;
+enum class interface_networks : char;
 
-/** implementation of a generic communications interface
+constexpr route_id control_route(-1);
+  /** implementation of a generic communications interface
  */
 class CommsInterface
 {
   public:
+    enum class thread_generation
+    {
+        single, dual
+    };
     /** default constructor*/
     CommsInterface () = default;
-    /** construct from a localTarget and brokerTarget
-    @param localTarget the interface or specification that should be set to receive incoming connections
-    @param brokerTarget the target of the broker Interface to link to
-    */
-    CommsInterface (const std::string &localTarget, const std::string &brokerTarget, interface_networks targetNetwork = interface_networks::local);
-    /** construct from a NetworkBrokerData structure*/
-    explicit CommsInterface (const NetworkBrokerData &netInfo);
+    explicit CommsInterface (thread_generation threads);
     /** destructor*/
     virtual ~CommsInterface ();
+
+	/** load network information into the comms object*/
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo);
+	void loadTargetInfo(const std::string &localTarget,
+                    const std::string &brokerTarget,
+                    interface_networks targetNetwork = interface_networks::local);
     /** transmit a message along a particular route
      */
-    void transmit (int route_id, const ActionMessage &cmd);
+    void transmit (route_id rid, const ActionMessage &cmd);
+    /** transmit a message along a particular route
+     */
+    void transmit (route_id rid, ActionMessage &&cmd);
     /** add a new route assigned to the appropriate id
      */
-    void addRoute (int route_id, const std::string &routeInfo);
+    void addRoute (route_id rid, const std::string &routeInfo);
+    /** remove a route from use*/
+    void removeRoute (route_id rid);
     /** connect the commsInterface
     @return true if the connection was successful false otherwise
     */
     bool connect ();
+
     /** disconnected the comms interface
      */
     void disconnect ();
@@ -68,7 +79,11 @@ class CommsInterface
     /** set the timeout for the initial broker connection
     @param timeout the value is in milliseconds
     */
-    void setTimeout (int timeout) { connectionTimeout = timeout; }
+	void setTimeout(std::chrono::milliseconds timeOut);
+    /** set a flag for the comms system*/
+	virtual void setFlag (const std::string &flag, bool val);
+	/** enable or disable the server mode for the comms*/
+	void setServerMode(bool serverActive);
 
   protected:
     void logWarning (const std::string &message) const;
@@ -89,32 +104,36 @@ class CommsInterface
   private:
     std::atomic<connection_status> rx_status{connection_status::startup};  //!< the status of the receiver thread
   protected:
-	TriggerVariable rxTrigger;
+    TriggerVariable rxTrigger;
 
     std::string name;  //!< the name of the object
     std::string localTarget_;  //!< the base for the receive address
     std::string brokerTarget_;  //!< the base for the broker address
     std::string brokerName_;  //!< the identifier for the broker
+    std::string brokerInitString_;  //!< the initialization string for any automatically generated broker
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
     TriggerVariable txTrigger;
-
+    std::atomic<bool> operating;  //!< the comms interface is in startup mode
+    const bool singleThread = false;
   protected:
-    int connectionTimeout = 4000;  // timeout for the initial connection to a broker or to bind a broker port(in ms)
+	 bool serverMode = true;  //!< some comms have a server mode and non-server mode
+    bool autoBroker = false; //!< the broker should be automatically generated if needed
+     std::chrono::milliseconds connectionTimeout{ 4000 };  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
-    
+    std::atomic<bool> requestDisconnect{ false }; //!< flag gets set when disconnect is called
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-    BlockingPriorityQueue<std::pair<int, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
+    BlockingPriorityQueue<std::pair<route_id, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
       false};  //!< flag indicating that the comm system is in the process of disconnecting
     interface_networks interfaceNetwork;
-    
+
   private:
     std::thread queue_transmitter;  //!< single thread for sending data
     std::thread queue_watcher;  //!< thread monitoring the receive queue
@@ -130,20 +149,13 @@ class CommsInterface
     void setRxStatus (connection_status rxStatus);
     connection_status getRxStatus () const { return rx_status.load (); }
     connection_status getTxStatus () const { return tx_status.load (); }
+    /** function to protect certain properties in a threaded environment
+	these functions should be called in a pair*/
+    bool propertyLock ();
+    void propertyUnLock ();
+
   private:
     tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
-};
-
-template <class X>
-class changeOnDestroy
-{
-  private:
-    std::atomic<X> &aref;
-    X fval;
-
-  public:
-    changeOnDestroy (std::atomic<X> &var, X finalValue) : aref (var), fval (std::move (finalValue)) {}
-    ~changeOnDestroy () { aref.store (fval); }
 };
 
 template <class X>

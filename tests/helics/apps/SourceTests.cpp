@@ -15,31 +15,29 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-//BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
-BOOST_AUTO_TEST_SUITE (source_tests, *utf::label("ci"))
+// BOOST_AUTO_TEST_SUITE (source_tests, *boost::unit_test::disabled())
+BOOST_AUTO_TEST_SUITE (source_tests, *utf::label ("ci"))
 
-BOOST_AUTO_TEST_CASE (simple_source_test )
+BOOST_AUTO_TEST_CASE (simple_source_test)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    fi.name = "block1";
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = "score-source";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("player1", fi);
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto gen = src1.getGenerator (index);
     BOOST_CHECK (gen);
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
-    src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 1.0);
+    src1.addPublication ("pub1", helics::data_type::helicsDouble, 1.0);
     src1.setStartTime ("pub1", 1.0);
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -70,12 +68,12 @@ BOOST_AUTO_TEST_CASE (simple_source_test )
 
 BOOST_AUTO_TEST_CASE (simple_source_test2)
 {
-    helics::FederateInfo fi ("player1");
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    fi.name = "block1";
+    fi.coreName = "score-simple";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("player1", fi);
+
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto index2 = src1.addSignalGenerator ("ramp2", "ramp");
     auto gen = src1.getGenerator (index);
@@ -84,20 +82,20 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
     BOOST_CHECK (gen2);
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
-    src1.addPublication ("pub1", "ramp", helics::helics_type_t::helicsDouble, 1.0);
+    src1.addPublication ("pub1", "ramp", helics::data_type::helicsDouble, 1.0);
     src1.setStartTime ("pub1", 1.0);
     gen2->set ("ramp", 0.6);
     gen2->set ("level", 2.0);
-    src1.addPublication ("pub2", "ramp2", helics::helics_type_t::helicsDouble, 2.0);
+    src1.addPublication ("pub2", "ramp2", helics::data_type::helicsDouble, 2.0);
     src1.setStartTime ("pub2", 3.0);
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -134,26 +132,26 @@ BOOST_AUTO_TEST_CASE (simple_source_test2)
 
 BOOST_AUTO_TEST_CASE (sine_source_test)
 {
-    helics::FederateInfo fi ("player1");
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    fi.name = "block1";
+    fi.coreName = "score-sine";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("player1", fi);
+
     auto index = src1.addSignalGenerator ("sine", "sine");
     auto gen = src1.getGenerator (index);
     BOOST_CHECK (gen);
     gen->set ("freq", 0.5);
     gen->set ("amplitude", 1.0);
-    src1.addPublication ("pub1", helics::helics_type_t::helicsDouble, 0.5);
+    src1.addPublication ("pub1", helics::data_type::helicsDouble, 0.5);
     src1.setStartTime ("pub1", 1.0);
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
 
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -190,21 +188,19 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
 
 BOOST_AUTO_TEST_CASE (simple_source_test_file)
 {
-    helics::FederateInfo fi ("source1");
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "corep";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test.json");
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = "scorep";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("source1", fi);
+    src1.loadFile (std::string (TEST_DIR) + "/simple_source_test.json");
 
-    fi.name = "block1";
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1.1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -235,22 +231,20 @@ BOOST_AUTO_TEST_CASE (simple_source_test_file)
 
 BOOST_AUTO_TEST_CASE (simple_source_test2_file)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core2";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    fi.name = "block1";
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = "score2";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("player1", fi);
 
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_source_test2.json");
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
-    helics::Subscription sub2 (&vfed, "pub2");
+    src1.loadFile (std::string (TEST_DIR) + "/simple_source_test2.json");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
+    auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     BOOST_CHECK_EQUAL (retTime, 1.0);
     auto val = sub1.getValue<double> ();
@@ -287,22 +281,20 @@ BOOST_AUTO_TEST_CASE (simple_source_test2_file)
 
 BOOST_AUTO_TEST_CASE (sine_source_test_file)
 {
-    helics::FederateInfo fi ("player1");
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "core1";
-    fi.coreInitString = "2";
-    helics::apps::Source src1 (fi);
-    src1.loadFile (std::string (TEST_DIR) + "/test_files/simple_sine_source.json");
+    helics::FederateInfo fi (helics::core_type::TEST);
 
-    fi.name = "block1";
+    fi.coreName = "score1";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Source src1 ("player1", fi);
+    src1.loadFile (std::string (TEST_DIR) + "/simple_sine_source.json");
 
-    helics::ValueFederate vfed (fi);
-    helics::Subscription sub1 (&vfed, "pub1");
+    helics::ValueFederate vfed ("block1", fi);
+    auto &sub1 = vfed.registerSubscription ("pub1");
     auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
-    vfed.enterExecutionState ();
+    vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
 
     BOOST_CHECK_EQUAL (retTime, 1.0);

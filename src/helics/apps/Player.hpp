@@ -55,12 +55,12 @@ class Player : public App
     /** construct from a federate info object
     @param fi a pointer info object containing information on the desired federate configuration
     */
-    explicit Player (const FederateInfo &fi);
+    explicit Player (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Player (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] name the name of the app
     @param[in] jsonString file or JSON string defining the federate information and other configuration
@@ -89,7 +89,7 @@ class Player : public App
     @param type the type of the publication
     @param units the units associated with the publication
     */
-    void addPublication (const std::string &key, helics_type_t type, const std::string &pubUnits = std::string ());
+    void addPublication (const std::string &key, data_type type, const std::string &pubUnits = std::string ());
 
     /** add a publication to a Player
     @param key the key of the publication to add
@@ -97,7 +97,7 @@ class Player : public App
     @param units the units associated with the publication
     */
     template <class valType>
-    typename std::enable_if_t<helicsType<valType> () != helics_type_t::helicsInvalid>
+    typename std::enable_if_t<helicsType<valType> () != data_type::helicsCustom>
     addPublication (const std::string &key, const std::string &pubUnits = std::string ())
     {
         if (!useLocal)
@@ -213,8 +213,8 @@ class Player : public App
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     std::map<std::string, int> pubids;  //!< publication id map
     std::map<std::string, int> eptids;  //!< endpoint id maps
-    helics::helics_type_t defType =
-      helics::helics_type_t::helicsString;  //!< the default data type unless otherwise specified
+    helics::data_type defType =
+      helics::data_type::helicsString;  //!< the default data type unless otherwise specified
     size_t pointIndex = 0;  //!< the current point index
     size_t messageIndex = 0;  //!< the current message index
     timeUnits units = timeUnits::sec;

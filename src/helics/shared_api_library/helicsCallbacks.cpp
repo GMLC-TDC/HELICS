@@ -14,76 +14,65 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
-
-helics_status helicsBrokerAddLoggingCallback (helics_broker broker, void (*logger) (int, const char *, const char *))
+void helicsBrokerAddLoggingCallback (helics_broker broker,
+                                     void (*logger) (int loglevel, const char *identifier, const char *message),
+                                     helics_error *err)
 {
-    if (broker == nullptr)
+    auto brk = getBroker (broker,err);
+    if (brk == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
-        auto brk = getBroker (broker);
-        if (brk == nullptr)
-        {
-            return helics_invalid_object;
-        }
         brk->setLoggingCallback ([logger](int loglevel, const std::string &ident, const std::string &message) {
             logger (loglevel, ident.c_str (), message.c_str ());
         });
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsCoreAddLoggingCallback (helics_core core, void (*logger) (int, const char *, const char *))
+void helicsCoreAddLoggingCallback (helics_core core,
+                                   void (*logger) (int loglevel, const char *identifier, const char *message),
+                                   helics_error *err)
 {
-    if (core == nullptr)
+    auto cr = getCore (core,err);
+    if (cr == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
-        auto cr = getCore (core);
-        if (cr == nullptr)
-        {
-            return helics_invalid_object;
-        }
-        cr->setLoggingCallback (0, [logger](int loglevel, const std::string &ident, const std::string &message) {
+        cr->setLoggingCallback (helics::local_core_id, [logger](int loglevel, const std::string &ident, const std::string &message) {
             logger (loglevel, ident.c_str (), message.c_str ());
         });
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }
 
-helics_status helicsFederateAddLoggingCallback (helics_federate fed, void (*logger) (int, const char *, const char *))
+void helicsFederateAddLoggingCallback (helics_federate fed,
+                                       void (*logger) (int loglevel, const char *identifier, const char *message),
+                                       helics_error *err)
 {
-    if (fed == nullptr)
+    auto fedptr = getFed (fed, err);
+    if (fedptr == nullptr)
     {
-        return helics_invalid_object;
+        return;
     }
     try
     {
-        auto fedptr = getFed (fed);
-        if (fedptr == nullptr)
-        {
-            return helics_invalid_object;
-        }
         fedptr->setLoggingCallback ([logger](int loglevel, const std::string &ident, const std::string &message) {
             logger (loglevel, ident.c_str (), message.c_str ());
         });
-        return helics_ok;
     }
     catch (...)
     {
-        return helicsErrorHandler ();
+        helicsErrorHandler (err);
     }
 }

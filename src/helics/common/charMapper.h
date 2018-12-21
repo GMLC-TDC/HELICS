@@ -10,8 +10,6 @@
  * LLNS Copyright End
  */
 
-#ifndef CHARMAPPERS_H_
-#define CHARMAPPERS_H_
 #pragma once
 
 #include <array>
@@ -59,5 +57,3 @@ charMapper<unsigned char> hexMapper ();
 charMapper<unsigned char> pairMapper ();
 
 }  // namespace utilities
-#endif
-

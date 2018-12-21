@@ -10,10 +10,11 @@ set(
   CombinationFederate.hpp
   Federate.hpp
   MessageFederate.hpp
+  helicsExceptions.hpp
   ValueFederate.hpp
   helics.hpp
   Publication.hpp
-  Subscription.hpp
+  Input.hpp
   Endpoint.hpp
   Filter.hpp
   config.hpp
@@ -30,6 +31,7 @@ add_library(HELICS::helicsCpp98 ALIAS helicsCpp98)
 if(MSVC)
   add_library(helicsCpp98_ide STATIC ${helicsCpp98_headers} ../../empty.cpp)
   target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_SOURCE_DIR}/src/helics")
+  target_include_directories(helicsCpp98_ide PRIVATE "${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
   set_target_properties(helicsCpp98_ide PROPERTIES FOLDER interfaces)
 endif(MSVC)
 

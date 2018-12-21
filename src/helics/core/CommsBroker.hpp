@@ -5,14 +5,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
+#include "ActionMessage.hpp"
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <string>
 
 namespace helics
 {
-class ActionMessage;
 class CommsInterface;
 
 /** helper class defining some common functionality for brokers and cores that use different
@@ -22,7 +21,6 @@ class CommsBroker : public BrokerT
 {
   protected:
     std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
-    mutable std::mutex dataMutex;  //!< mutex protecting comms data
     std::unique_ptr<COMMS> comms;  //!< the actual comms object
     std::atomic<bool> initialized_{false};  //!< atomic protecting local initialization
   public:
@@ -39,10 +37,15 @@ class CommsBroker : public BrokerT
     virtual void brokerDisconnect () override;
     virtual bool tryReconnect () override;
     /** disconnect the comm object*/
-    void commDisconnect();
-  public:
-    virtual void transmit (int route_id, const ActionMessage &cmd) override;
+    void commDisconnect ();
+    void loadComms ();
 
-    virtual void addRoute (int route_id, const std::string &routeInfo) override;
+  public:
+    virtual void transmit (route_id rid, const ActionMessage &cmd) override;
+    virtual void transmit (route_id rid, ActionMessage &&cmd) override;
+
+    virtual void addRoute (route_id rid, const std::string &routeInfo) override;
+
+    virtual void removeRoute (route_id rid) override;
 };
 }  // namespace helics

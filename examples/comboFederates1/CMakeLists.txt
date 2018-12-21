@@ -6,7 +6,7 @@
 
 add_executable(comboFed comboFed.cpp)
 
-target_link_libraries(comboFed helics_apps-static)
+target_link_libraries(comboFed helics_apps)
 
 set_target_properties(comboFed PROPERTIES FOLDER examples)
 

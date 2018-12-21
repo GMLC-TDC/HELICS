@@ -8,23 +8,25 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 CombinationFederate::CombinationFederate () = default;
-CombinationFederate::CombinationFederate (const FederateInfo &fi)
-    : Federate (fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &fedName, const FederateInfo &fi)
+    : Federate (fedName,fi), ValueFederate (true), MessageFederate (true)
 {
 }
-CombinationFederate::CombinationFederate (const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : Federate (core, fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &fedName,
+                                          const std::shared_ptr<Core> &core,
+                                          const FederateInfo &fi)
+    : Federate (fedName,core, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 
 CombinationFederate::CombinationFederate (const std::string &configString)
-    : Federate (loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+    : Federate (std::string(),loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }
 
-CombinationFederate::CombinationFederate (const std::string &name, const std::string &configString)
-    : Federate (loadFederateInfo (name, configString)), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate (const std::string &fedName, const std::string &configString)
+    : Federate (fedName,loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }
@@ -56,6 +58,16 @@ void CombinationFederate::initializeToExecuteStateTransition ()
 {
     ValueFederate::initializeToExecuteStateTransition ();
     MessageFederate::initializeToExecuteStateTransition ();
+}
+
+std::string CombinationFederate::localQuery(const std::string &queryStr) const
+{
+    std::string res = ValueFederate::localQuery(queryStr);
+    if (res.empty())
+    {
+        res= MessageFederate::localQuery(queryStr);
+    }
+    return res;
 }
 
 void CombinationFederate::registerInterfaces (const std::string &configString)

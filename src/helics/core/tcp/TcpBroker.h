@@ -3,37 +3,37 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-
 #pragma once
 
-#include "../CommsBroker.hpp"
-#include "../CoreBroker.hpp"
-#include "../NetworkBrokerData.hpp"
-
+#include "../NetworkBroker.hpp"
+#include "../core-types.hpp"
 namespace helics
 {
 namespace tcp
 {
 class TcpComms;
+class TcpCommsSS;
+/** implementation for the core that uses TCP messages to communicate*/
+using TcpBroker = NetworkBroker<TcpComms, interface_type::tcp,static_cast<int>(core_type::TCP)>;
 
-class TcpBroker final : public CommsBroker<TcpComms, CoreBroker>
+class TcpBrokerSS final : public NetworkBroker<TcpCommsSS, interface_type::tcp, static_cast<int>(core_type::TCP_SS)>
 {
   public:
-    /** default constructor*/
-    TcpBroker (bool rootBroker = false) noexcept;
-    TcpBroker (const std::string &broker_name);
+    /** default constructor*/ 
+    explicit TcpBrokerSS (bool rootBroker = false) noexcept;
+    explicit TcpBrokerSS (const std::string &broker_name);
 
     void initializeFromArgs (int argc, const char *const *argv) override;
 
-    virtual std::string getAddress () const override;
+  public:
     static void displayHelp (bool local_only = false);
 
   private:
     virtual bool brokerConnect () override;
-
-    NetworkBrokerData netInfo{
-      NetworkBrokerData::interface_type::tcp};  //!< structure containing the networking information
+    bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+    std::vector<std::string> connections;  //!< defined connections These are connections that the comm section reaches out to regardless of whether it is a broker/core/ or server
 };
+
 }  // namespace tcp
 }  // namespace helics
 

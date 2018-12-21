@@ -31,13 +31,13 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     auto pub2_b = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_b");
     
     
-    auto sub1_a = helics::Subscription( vFed2, "pub1_a");
-    auto sub1_b = helics::Subscription( vFed2, "pub1_b");
-    auto sub2_a = helics::Subscription( vFed1, "pub2_a");
-    auto sub2_b = helics::Subscription( vFed1, "pub2_b");
-    vFed1->enterExecutionStateAsync ();
-    vFed2->enterExecutionState ();
-    vFed1->enterExecutionStateComplete ();
+    auto sub1_a = vFed2->registerSubscription("pub1_a");
+    auto sub1_b = vFed2->registerSubscription ("pub1_b");
+    auto sub2_a = vFed2->registerSubscription ("pub2_a");
+    auto sub2_b = vFed2->registerSubscription ("pub2_b");
+    vFed1->enterExecutingModeAsync ();
+    vFed2->enterExecutingMode ();
+    vFed1->enterExecutingModeComplete ();
     auto echoRun = [&]() {helics::Time grantedTime = helics::timeZero;
     helics::Time stopTime(100, timeUnits::ns);
     while (grantedTime < stopTime)
@@ -88,5 +88,82 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     vFed2->finalize ();
 }
 
+BOOST_AUTO_TEST_CASE(ring_test3)
+{
+    SetupTest<helics::ValueFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+
+
+    auto pub1 = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1");
+    auto pub2 = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2");
+    auto pub3 = helics::make_publication<double>(helics::GLOBAL, vFed3, "pub3");
+    auto sub1 = vFed1->registerSubscription ("pub3");
+    auto sub2 = vFed2->registerSubscription ("pub1");
+    auto sub3 = vFed3->registerSubscription ("pub2");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingModeAsync();
+    vFed3->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeComplete();
+    pub1->publish(45.7);
+    vFed1->requestTimeAsync(50.0);
+    vFed2->requestTimeAsync(50.0);
+    vFed3->requestTimeAsync(50.0);
+
+    auto newTime = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 1e-9);
+    BOOST_CHECK(sub2.isUpdated());
+    double val = sub2.getValue<double>();
+    pub2->publish(val);
+    vFed2->requestTimeAsync(50.0);
+    newTime = vFed3->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 1e-9);
+    BOOST_CHECK(sub3.isUpdated());
+    val = sub3.getValue<double>();
+    pub3->publish(val);
+    vFed3->requestTimeAsync(50.0);
+    newTime = vFed1->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 1e-9);
+    BOOST_CHECK(sub1.isUpdated());
+    val = sub1.getValue<double>();
+    pub1->publish(val);
+    vFed1->requestTimeAsync(50.0);
+    // round 2 for time
+    newTime = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 2e-9);
+    BOOST_CHECK(sub2.isUpdated());
+    val = sub2.getValue<double>();
+    pub2->publish(val);
+    vFed2->requestTimeAsync(50.0);
+    newTime = vFed3->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 2e-9);
+    BOOST_CHECK(sub3.isUpdated());
+    val = sub3.getValue<double>();
+    pub3->publish(val);
+    vFed3->requestTimeAsync(50.0);
+    newTime = vFed1->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 2e-9);
+    BOOST_CHECK(sub1.isUpdated());
+    val = sub1.getValue<double>();
+    pub1->publish(val);
+    vFed1->requestTimeAsync(50.0);
+    // round 3
+    newTime = vFed2->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 3e-9);
+    BOOST_CHECK(sub2.isUpdated());
+    val = sub2.getValue<double>();
+    vFed2->finalize();
+    newTime = vFed3->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 50.0);
+    BOOST_CHECK(!sub3.isUpdated());
+    val = sub3.getValue<double>();
+    vFed3->finalize();
+    newTime = vFed1->requestTimeComplete();
+    BOOST_CHECK_EQUAL(newTime, 50.0);
+    BOOST_CHECK(!sub1.isUpdated());
+    vFed1->finalize();
+}
 
 BOOST_AUTO_TEST_SUITE_END ()

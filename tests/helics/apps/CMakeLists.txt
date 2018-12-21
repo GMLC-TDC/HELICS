@@ -23,12 +23,12 @@ add_executable(helics_apps-tests ${helics_apps_test_sources})
 
 set_target_properties(helics_apps-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_apps-tests helics_apps-static helics_test_base)
+target_link_libraries(helics_apps-tests helics_apps helics_test_base)
 
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_definitions(
-  helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
+  helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
 target_compile_definitions(
   helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\"
@@ -48,7 +48,7 @@ set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Coverage Daily)
 # Tests for Continous Integration builds
 add_test(
   NAME helics_apps-ci-tests
-  COMMAND helics_apps-tests --run_test=@ci --report_level=short
+  COMMAND helics_apps-tests --run_test=@ci --report_level=short --log_level=test_suite
 )
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
 

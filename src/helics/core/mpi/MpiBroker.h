@@ -18,19 +18,20 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
 {
   public:
     /** default constructor*/
-    MpiBroker (bool rootBroker = false) noexcept;
-    MpiBroker (const std::string &broker_name);
+    explicit MpiBroker (bool rootBroker = false) noexcept;
+    explicit MpiBroker (const std::string &broker_name);
 
-    void initializeFromArgs (int argc, const char *const *argv) override;
+    virtual void initializeFromArgs (int argc, const char *const *argv) override;
 
     /**destructor*/
     virtual ~MpiBroker ();
 
-    virtual std::string getAddress () const override;
+    virtual std::string generateLocalAddressString () const override;
     static void displayHelp (bool local_only = false);
 
   private:
     virtual bool brokerConnect () override;
+    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string brokerAddress;  //!< the mpi rank:tag of the parent broker
     int brokerRank;
     int brokerTag;

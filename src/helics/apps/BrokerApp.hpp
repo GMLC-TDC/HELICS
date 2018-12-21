@@ -43,7 +43,7 @@ public:
     */
     BrokerApp(core_type ctype, const std::string &argString);
     /** move construction*/
-    BrokerApp(BrokerApp &&other_echo) = default;
+    BrokerApp(BrokerApp &&brokerApp) = default;
     /** move assignment*/
     BrokerApp &operator= (BrokerApp &&brokerApp) = default;
     /** the destructor will wait until the broker is finished before returning- unless forceTerminate() is used*/

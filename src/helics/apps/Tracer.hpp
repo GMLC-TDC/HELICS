@@ -23,7 +23,7 @@ class Tracer: public App
 {
   public:
     /** construct from a FederateInfo structure*/
-    explicit Tracer (FederateInfo &fi);
+    explicit Tracer (const std::string &name, FederateInfo &fi);
     /** construct from command line arguments*/
     Tracer (int argc, char *argv[]);
 
@@ -31,7 +31,7 @@ class Tracer: public App
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
-    Tracer (const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Tracer (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param[in] name the name of the app
     @param[in] file a file defining the federate information
@@ -59,14 +59,14 @@ class Tracer: public App
     void addCapture (const std::string &captureDesc);
 
     /** set the callback for a message received through cloned interfaces
-    @details the function signature will take the time in the Tracer a unique ptr to the message
+    @details the function signature will take the time in the Tracer a unique_ptr to the message
     */
     void setClonedMessageCallback(std::function<void(Time, std::unique_ptr<Message>)> callback)
     {
         clonedMessageCallback = std::move(callback);
     }
     /** set the callback for a message received through endpoints
-    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a unique ptr to the message
+    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a unique_ptr to the message
     */
     void setEndpointMessageCallback(std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
     {
@@ -111,7 +111,7 @@ class Tracer: public App
       bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
-    std::vector<Subscription> subscriptions;  //!< the actual subscription objects
+    std::vector<Input> subscriptions;  //!< the actual subscription objects
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects

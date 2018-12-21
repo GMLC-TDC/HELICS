@@ -4,27 +4,23 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #include "ActionMessage.hpp"
-#include <cereal/archives/portable_binary.hpp>
-#include <complex>
-//#include <cereal/archives/binary.hpp>
 #include "../common/fmt_format.h"
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
+#include "flagOperations.hpp"
+#include <complex>
 
 #include <algorithm>
+#include <cstring>
 
 namespace helics
 {
 ActionMessage::ActionMessage (action_message_def::action_t startingAction)
-    : messageAction (startingAction), index (dest_handle), name (payload)
+    : messageAction (startingAction), name (payload)
 {
-    if (hasInfo (startingAction))
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ();
-    }
 }
 
-ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32_t sourceId, int32_t destId)
+ActionMessage::ActionMessage (action_message_def::action_t startingAction,
+                              global_federate_id sourceId,
+                              global_federate_id destId)
     : ActionMessage (startingAction)
 {
     source_id = sourceId;
@@ -32,48 +28,45 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction, int32
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
-      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin),
-      payload (std::move (act.payload)), name (payload), extraInfo (std::move (act.extraInfo))
+    : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
+      source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), payload (std::move (act.payload)),
+      name (payload), Te (act.Te), Tdemin (act.Tdemin), Tso (act.Tso), stringData (std::move (act.stringData))
 {
 }
 
 ActionMessage::ActionMessage (const ActionMessage &act)
-    : messageAction (act.messageAction), source_id (act.source_id), source_handle (act.source_handle),
-      dest_id (act.dest_id), dest_handle (act.dest_handle), index (dest_handle), counter (act.counter),
-      flags (act.flags), actionTime (act.actionTime), Te (act.Te), Tdemin (act.Tdemin), payload (act.payload),
-      name (payload)
+    : messageAction (act.messageAction), messageID (act.messageID), source_id (act.source_id),
+      source_handle (act.source_handle), dest_id (act.dest_id), dest_handle (act.dest_handle),
+      counter (act.counter), flags (act.flags), actionTime (act.actionTime), payload (act.payload), name (payload),
+      Te (act.Te), Tdemin (act.Tdemin), Tso (act.Tso), stringData (act.stringData)
 
 {
-    if (act.extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
-    }
 }
 
 ActionMessage::ActionMessage (std::unique_ptr<Message> message)
-    : messageAction (CMD_SEND_MESSAGE), index (dest_handle), actionTime (message->time),
-      payload (std::move (message->data.m_data)), name (payload), extraInfo (std::make_unique<AdditionalInfo> ())
+    : messageAction (CMD_SEND_MESSAGE), messageID (message->messageID), actionTime (message->time),
+      payload (std::move (message->data.m_data)), name (payload),
+      stringData ({std::move (message->dest), std::move (message->source), std::move (message->original_source),
+                   std::move (message->original_dest)})
 {
-    extraInfo->source = std::move (message->source);
-    extraInfo->orig_source = std::move (message->original_source);
-    extraInfo->original_dest = std::move (message->original_dest);
-    extraInfo->target = std::move (message->dest);
-    extraInfo->messageID = message->messageID;
 }
 
 ActionMessage::ActionMessage (const std::string &bytes) : ActionMessage () { from_string (bytes); }
 
 ActionMessage::ActionMessage (const std::vector<char> &bytes) : ActionMessage () { from_vector (bytes); }
 
-ActionMessage::ActionMessage (const char *data, size_t size) : ActionMessage () { fromByteArray (data, size); }
+ActionMessage::ActionMessage (const char *data, size_t size) : ActionMessage ()
+{
+    fromByteArray (data, static_cast<int> (size));
+}
 
 ActionMessage::~ActionMessage () = default;
 
 ActionMessage &ActionMessage::operator= (const ActionMessage &act)
 {
     messageAction = act.messageAction;
+    messageID = act.messageID;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
@@ -83,117 +76,159 @@ ActionMessage &ActionMessage::operator= (const ActionMessage &act)
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
+    Tso = act.Tso;
     payload = act.payload;
-    index = act.index;
-    if (act.extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ((*act.extraInfo));
-    }
+    stringData = act.stringData;
     return *this;
 }
 
 ActionMessage &ActionMessage::operator= (ActionMessage &&act) noexcept
 {
     messageAction = act.messageAction;
+    messageID = act.messageID;
     source_id = act.source_id;
     source_handle = act.source_handle;
     dest_id = act.dest_id;
     dest_handle = act.dest_handle;
     counter = act.counter;
     flags = act.flags;
-    index = act.index;
     actionTime = act.actionTime;
     Te = act.Te;
     Tdemin = act.Tdemin;
+    Tso = act.Tso;
     payload = std::move (act.payload);
-    extraInfo = std::move (act.extraInfo);
+    stringData = std::move (act.stringData);
     return *this;
 }
 
 void ActionMessage::moveInfo (std::unique_ptr<Message> message)
 {
     messageAction = CMD_SEND_MESSAGE;
+    messageID = message->messageID;
     payload = std::move (message->data.m_data);
     actionTime = message->time;
-    if (!extraInfo)
-    {
-        extraInfo = std::make_unique<AdditionalInfo> ();
-    }
-    extraInfo->source = std::move (message->source);
-    extraInfo->orig_source = std::move (message->original_source);
-    extraInfo->original_dest = std::move (message->original_dest);
-    extraInfo->target = std::move (message->dest);
-    extraInfo->messageID = message->messageID;
+    stringData = {std::move (message->dest), std::move (message->source), std::move (message->original_source),
+                  std::move (message->original_dest)};
 }
 
-void ActionMessage::setAction (action_message_def::action_t newAction)
+void ActionMessage::setAction (action_message_def::action_t newAction) { messageAction = newAction; }
+
+static const std::string emptyStr;
+const std::string &ActionMessage::getString (int index) const
 {
-    if (hasInfo (newAction))
+    if (isValidIndex (index, stringData))
     {
-        if (!extraInfo)
+        return stringData[index];
+    }
+    return emptyStr;
+}
+
+void ActionMessage::setString (int index, const std::string &str)
+{
+    if ((index >= 0) && (index < 256))
+    {
+        if (index >= static_cast<int> (stringData.size ()))
         {
-            extraInfo = std::make_unique<AdditionalInfo> ();
+            stringData.resize (index + 1);
         }
+        stringData[index] = str;
     }
-    messageAction = newAction;
-}
-
-ActionMessage::AdditionalInfo &ActionMessage::info ()
-{
-    if (!extraInfo)
+    else
     {
-        extraInfo = std::make_unique<AdditionalInfo> ();
+        throw (std::invalid_argument ("index out of specified range (0-255)"));
     }
-    return *extraInfo;
 }
 
-const ActionMessage::AdditionalInfo emptyAddInfo;
-
-const ActionMessage::AdditionalInfo &ActionMessage::info () const
+/** check for little endian*/
+static inline std::uint8_t is_little_endian ()
 {
-    if (extraInfo)
-    {
-        return *extraInfo;
-    }
-    return emptyAddInfo;
+    static std::int32_t test = 1;
+    return *reinterpret_cast<std::int8_t *> (&test) == 1;
 }
 
-using archiver = cereal::PortableBinaryOutputArchive;
-
-using retriever = cereal::PortableBinaryInputArchive;
-
-int ActionMessage::toByteArray (char *data, size_t buffer_size) const
+int ActionMessage::toByteArray (char *data, int buffer_size) const
 {
+    static const uint8_t littleEndian = is_little_endian ();
+
     if ((data == nullptr) || (buffer_size == 0))
     {
         return -1;
     }
-    boost::iostreams::basic_array_sink<char> sr (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_sink<char>> s (sr);
-
-    archiver oa (s);
-    try
-    {
-        save (oa);
-        return static_cast<int> (boost::iostreams::seek (s, 0, std::ios_base::cur));
-    }
-    catch (const std::ios_base::failure &)
+    if (static_cast<int> (buffer_size) < serializedByteCount ())
     {
         return -1;
     }
+    char *dataStart = data;
+    // put the main string size in the first 4 bytes;
+    auto ssize = static_cast<uint32_t> (payload.size ()) & 0x00FFFFFF;
+    *data = littleEndian;
+    data[1] = static_cast<uint8_t> (ssize >> 16);
+    data[2] = static_cast<uint8_t> ((ssize >> 8) & 0xFF);
+    data[3] = static_cast<uint8_t> (ssize & 0xFF);
+    data += sizeof (uint32_t);
+    *reinterpret_cast<action_message_def::action_t *> (data) = messageAction;
+    data += sizeof (action_message_def::action_t);
+    *reinterpret_cast<int32_t *> (data) = messageID;
+    data += sizeof (int32_t);
+    *reinterpret_cast<int32_t *> (data) = source_id.baseValue ();
+    data += sizeof (int32_t);
+    *reinterpret_cast<int32_t *> (data) = source_handle.baseValue ();
+    data += sizeof (int32_t);
+    *reinterpret_cast<int32_t *> (data) = dest_id.baseValue ();
+    data += sizeof (int32_t);
+    *reinterpret_cast<int32_t *> (data) = dest_handle.baseValue ();
+    data += sizeof (int32_t);
+    *reinterpret_cast<uint16_t *> (data) = counter;
+    data += sizeof (uint16_t);
+    *reinterpret_cast<uint16_t *> (data) = flags;
+    data += sizeof (uint16_t);
+    *reinterpret_cast<int32_t *> (data) = sequenceID;
+    data += sizeof (int32_t);
+    *reinterpret_cast<int64_t *> (data) = actionTime.getBaseTimeCode ();
+    data += sizeof (int64_t);
+
+    if (messageAction == CMD_TIME_REQUEST)
+    {
+        *reinterpret_cast<int64_t *> (data) = Te.getBaseTimeCode ();
+        data += sizeof (int64_t);
+        *reinterpret_cast<int64_t *> (data) = Tdemin.getBaseTimeCode ();
+        data += sizeof (int64_t);
+        *reinterpret_cast<int64_t *> (data) = Tso.getBaseTimeCode ();
+        data += sizeof (int64_t);
+    }
+    if (ssize > 0)
+    {
+        std::memcpy (data, payload.data (), ssize);
+        data += ssize;
+    }
+
+    if (stringData.empty ())
+    {
+        *data = 0;
+        ++data;
+    }
+    else
+    {
+        *data = static_cast<uint8_t> (stringData.size ());
+        ++data;
+        for (auto &str : stringData)
+        {
+            *reinterpret_cast<uint32_t *> (data) = static_cast<uint32_t> (str.size ());
+            data += sizeof (uint32_t);
+            memcpy (data, str.data (), str.size ());
+            data += str.size ();
+        }
+    }
+    auto actSize = static_cast<int> (data - dataStart);
+    return actSize;
 }
 
 std::string ActionMessage::to_string () const
 {
     std::string data;
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    auto sz = serializedByteCount ();
+    data.resize (sz);
+    toByteArray (&(data[0]), sz);
     return data;
 }
 
@@ -204,91 +239,198 @@ constexpr auto TAIL_CHAR2 = '\xFC';
 std::string ActionMessage::packetize () const
 {
     std::string data;
-    data.push_back (LEADING_CHAR);
-    data.resize (4);
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
+    packetize (data);
+    return data;
+}
 
-    save (oa);
+void ActionMessage::packetize (std::string &data) const
+{
+    auto sz = serializedByteCount ();
+    data.resize (sz + 4);
+    toByteArray (&(data[4]), sz);
 
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    data[0] = LEADING_CHAR;
     // now generate a length header
-    auto sz = static_cast<int32_t> (data.size ());
-    data[1] = static_cast<char> (((sz >> 16) & 0xFF));
-    data[2] = static_cast<char> (((sz >> 8) & 0xFF));
-    data[3] = static_cast<char> (sz & 0xFF);
+    auto dsz = static_cast<uint32_t> (data.size ());
+    data[1] = static_cast<char> (((dsz >> 16) & 0xFF));
+    data[2] = static_cast<char> (((dsz >> 8) & 0xFF));
+    data[3] = static_cast<char> (dsz & 0xFF);
     data.push_back (TAIL_CHAR1);
     data.push_back (TAIL_CHAR2);
-    return data;
 }
 
 std::vector<char> ActionMessage::to_vector () const
 {
     std::vector<char> data;
-    boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    auto sz = serializedByteCount ();
+    data.resize (sz);
+    toByteArray (data.data (), sz);
     return data;
 }
 
 void ActionMessage::to_vector (std::vector<char> &data) const
 {
-    data.clear ();
-    boost::iostreams::back_insert_device<std::vector<char>> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::vector<char>>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    auto sz = serializedByteCount ();
+    data.resize (sz);
+    toByteArray (data.data (), sz);
 }
 
 void ActionMessage::to_string (std::string &data) const
 {
-    data.clear ();
-
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    archiver oa (s);
-
-    save (oa);
-
-    // don't forget to flush the stream to finish writing into the buffer
-    s.flush ();
+    auto sz = serializedByteCount ();
+    data.resize (sz);
+    toByteArray (&(data[0]), sz);
 }
 
-void ActionMessage::fromByteArray (const char *data, size_t buffer_size)
+template <std::size_t DataSize>
+inline void swap_bytes (std::uint8_t *data)
 {
+    for (std::size_t i = 0, end = DataSize / 2; i < end; ++i)
+        std::swap (data[i], data[DataSize - i - 1]);
+}
+
+int ActionMessage::fromByteArray (const char *data, int buffer_size)
+{
+    int tsize = 45;
+    static const uint8_t littleEndian = is_little_endian ();
+    if (buffer_size < tsize)
+    {
+        messageAction = CMD_INVALID;
+        return (0);
+    }
     if (data[0] == LEADING_CHAR)
     {
         auto res = depacketize (data, buffer_size);
         if (res > 0)
         {
-            return;
+            return static_cast<int> (res);
         }
     }
-    boost::iostreams::basic_array_source<char> device (data, buffer_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
-    retriever ia (s);
-    try
-    {
-        load (ia);
-    }
-    catch (const cereal::Exception &ce)
+    int sz = 256 * 256 * (static_cast<uint8_t> (data[1])) + 256 * static_cast<uint8_t> (data[2]) +
+             static_cast<uint8_t> (data[3]);
+    tsize += sz;
+    if (buffer_size < tsize)
     {
         messageAction = CMD_INVALID;
+        return (0);
     }
+    bool swap = (data[0] != littleEndian);
+    data += sizeof (uint32_t);
+    messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
+    if (swap)
+    {
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&messageAction));
+    }
+    data += sizeof (action_message_def::action_t);
+    messageID = *reinterpret_cast<const int32_t *> (data);
+    data += sizeof (int32_t);
+    source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    data += sizeof (int32_t);
+    source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    data += sizeof (int32_t);
+    dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    data += sizeof (int32_t);
+    dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    data += sizeof (int32_t);
+    counter = *reinterpret_cast<const uint16_t *> (data);
+    data += sizeof (uint16_t);
+    flags = *reinterpret_cast<const uint16_t *> (data);
+    data += sizeof (uint16_t);
+    sequenceID = *reinterpret_cast<const uint32_t *> (data);
+    data += sizeof (uint32_t);
+    actionTime.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+    data += sizeof (int64_t);
+
+    if (messageAction == CMD_TIME_REQUEST)
+    {
+        tsize += 24;
+        if (buffer_size < tsize)
+        {
+            messageAction = CMD_INVALID;
+            return (0);
+        }
+        Te.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        data += sizeof (int64_t);
+        Tdemin.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        data += sizeof (int64_t);
+        Tso.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        data += sizeof (int64_t);
+    }
+    else
+    {
+        Te = timeZero;
+        Tdemin = timeZero;
+        Tso = timeZero;
+    }
+    if (sz > 0)
+    {
+        payload.assign (data, sz);
+        data += sz;
+    }
+    int stringCount = *data;
+    ++data;
+    if (stringCount != 0)
+    {
+        stringData.resize (stringCount);
+        tsize += 4 * stringCount;
+        if (buffer_size < tsize)
+        {
+            messageAction = CMD_INVALID;
+            return (0);
+        }
+
+        for (int ii = 0; ii < stringCount; ++ii)
+        {
+            auto ssize = *reinterpret_cast<const uint32_t *> (data);
+            data += 4;
+            if (swap)
+            {
+                swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&ssize));
+            }
+            tsize += ssize;
+            if (buffer_size < tsize)
+            {
+                messageAction = CMD_INVALID;
+                return (0);
+            }
+            stringData[ii].assign (data, ssize);
+            data += ssize;
+        }
+    }
+    else
+    {
+        stringData.clear ();
+    }
+
+    if (swap)
+    {
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&messageID));
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&source_id));
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&source_handle));
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&dest_id));
+        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&dest_handle));
+        swap_bytes<2> (reinterpret_cast<std::uint8_t *> (&counter));
+        swap_bytes<2> (reinterpret_cast<std::uint8_t *> (&flags));
+        auto timecode = actionTime.getBaseTimeCode ();
+        swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+        actionTime.setBaseTimeCode (timecode);
+        if (messageAction == CMD_TIME_REQUEST)
+        {
+            timecode = Te.getBaseTimeCode ();
+            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            Te.setBaseTimeCode (timecode);
+            timecode = Tdemin.getBaseTimeCode ();
+            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            Tdemin.setBaseTimeCode (timecode);
+            timecode = Tso.getBaseTimeCode ();
+            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            Tso.setBaseTimeCode (timecode);
+        }
+    }
+    return tsize;
 }
 
-size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
+int ActionMessage::depacketize (const char *data, int buffer_size)
 {
     if (data[0] != LEADING_CHAR)
     {
@@ -298,7 +440,7 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     {
         return 0;
     }
-    size_t message_size = static_cast<unsigned char> (data[1]);
+    int message_size = static_cast<unsigned char> (data[1]);
     message_size <<= 8;
     message_size += static_cast<unsigned char> (data[2]);
     message_size <<= 8;
@@ -315,35 +457,50 @@ size_t ActionMessage::depacketize (const char *data, size_t buffer_size)
     {
         return 0;
     }
-    boost::iostreams::basic_array_source<char> device (data + 4, message_size);
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
-    retriever ia (s);
-    try
-    {
-        load (ia);
-        return message_size + 2;
-    }
-    catch (const cereal::Exception &ce)
-    {
-        messageAction = CMD_INVALID;
-        return 0;
-    }
+
+    int bytesUsed = fromByteArray (data + 4, message_size - 4);
+    return (bytesUsed > 0) ? message_size + 2 : 0;
 }
 
-void ActionMessage::from_string (const std::string &data) { fromByteArray (data.data (), data.size ()); }
+void ActionMessage::from_string (const std::string &data)
+{
+    fromByteArray (data.data (), static_cast<int> (data.size ()));
+}
 
-void ActionMessage::from_vector (const std::vector<char> &data) { fromByteArray (data.data (), data.size ()); }
+void ActionMessage::from_vector (const std::vector<char> &data)
+{
+    fromByteArray (data.data (), static_cast<int> (data.size ()));
+}
 
 std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->original_source = cmd.info ().orig_source;
-    msg->original_dest = cmd.info ().original_dest;
-    msg->dest = cmd.info ().target;
+    switch (cmd.stringData.size ())
+    {
+    case 0:
+        break;
+    case 1:
+        msg->dest = cmd.stringData[0];
+        break;
+    case 2:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        break;
+    case 3:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        msg->original_source = cmd.stringData[2];
+        break;
+    default:
+        msg->dest = cmd.stringData[0];
+        msg->source = cmd.stringData[1];
+        msg->original_source = cmd.stringData[2];
+        msg->original_dest = cmd.stringData[3];
+        break;
+    }
     msg->data = cmd.payload;
     msg->time = cmd.actionTime;
-    msg->messageID = cmd.info ().messageID;
-    msg->source = cmd.info ().source;
+    msg->messageID = cmd.messageID;
 
     return msg;
 }
@@ -351,26 +508,46 @@ std::unique_ptr<Message> createMessageFromCommand (const ActionMessage &cmd)
 std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 {
     auto msg = std::make_unique<Message> ();
-    msg->original_source = std::move (cmd.info ().orig_source);
-    msg->original_dest = std::move (cmd.info ().original_dest);
-    msg->dest = std::move (cmd.info ().target);
+    switch (cmd.stringData.size ())
+    {
+    case 0:
+        break;
+    case 1:
+        msg->dest = std::move (cmd.stringData[0]);
+        break;
+    case 2:
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
+        break;
+    case 3:
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
+        msg->original_source = std::move (cmd.stringData[2]);
+        break;
+    default:
+        msg->dest = std::move (cmd.stringData[0]);
+        msg->source = std::move (cmd.stringData[1]);
+        msg->original_source = std::move (cmd.stringData[2]);
+        msg->original_dest = std::move (cmd.stringData[3]);
+        break;
+    }
     msg->data = std::move (cmd.payload);
     msg->time = cmd.actionTime;
-    msg->source = std::move (cmd.info ().source);
-    msg->messageID = cmd.info ().messageID;
+    msg->messageID = cmd.messageID;
     return msg;
 }
 
-constexpr char nullStr[] = "unknown";
+static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
-// consts can cause seg faults
+// consts can cause seg faults someday will change to frozen::  once we can use all of C++17
 
-constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
+static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands
   {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
+  {action_message_def::action_t::cmd_user_disconnect, "disconnect from user"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},
@@ -387,13 +564,18 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_tick, "tick"},
   {action_message_def::action_t::cmd_ping, "ping"},
   {action_message_def::action_t::cmd_ping_reply, "ping reply"},
-  {action_message_def::action_t::cmd_fed_configure, "fed_configure"},
+  {action_message_def::action_t::cmd_fed_configure_time, "fed_configure_time"},
+  {action_message_def::action_t::cmd_fed_configure_int, "fed_configure_int"},
+  {action_message_def::action_t::cmd_fed_configure_flag, "fed_configure_flag"},
   {action_message_def::action_t::cmd_init, "init"},
   {action_message_def::action_t::cmd_init_grant, "init_grant"},
   {action_message_def::action_t::cmd_init_not_ready, "init_not_ready"},
   {action_message_def::action_t::cmd_exec_request, "exec_request"},
   {action_message_def::action_t::cmd_exec_grant, "exec_grant"},
   {action_message_def::action_t::cmd_exec_check, "exec_check"},
+  {action_message_def::action_t::cmd_disconnect_broker_ack, "disconnect broker acknowledge"},
+  {action_message_def::action_t::cmd_disconnect_core_ack, "disconnect core acknowledge"},
+  {action_message_def::action_t::cmd_disconnect_fed_ack, "disconnect fed acknowledge"},
   {action_message_def::action_t::cmd_ack, "ack"},
 
   {action_message_def::action_t::cmd_stop, "stop"},
@@ -410,7 +592,6 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_error, "error"},
 
   {action_message_def::action_t::cmd_send_route, "send_route"},
-  {action_message_def::action_t::cmd_subscriber, "subscriber"},
   {action_message_def::action_t::cmd_add_dependency, "add_dependency"},
   {action_message_def::action_t::cmd_remove_dependency, "remove_dependency"},
   {action_message_def::action_t::cmd_add_dependent, "add_dependent"},
@@ -428,26 +609,37 @@ constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] 
   {action_message_def::action_t::cmd_null_message, "null message"},
 
   {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
-  {action_message_def::action_t::cmd_notify_pub, "notify_pub"},
-  {action_message_def::action_t::cmd_reg_dst_filter, "reg_dst_filter"},
-  {action_message_def::action_t::cmd_notify_dst_filter, "notify_dst_filter"},
-  {action_message_def::action_t::cmd_reg_sub, "reg_sub"},
-  {action_message_def::action_t::cmd_notify_sub, "notify_sub"},
-  {action_message_def::action_t::cmd_reg_src_filter, "reg_src_filter"},
-  {action_message_def::action_t::cmd_notify_src_filter, "notify_src_filter"},
+  {action_message_def::action_t::cmd_add_publisher, "add publisher"},
+  {action_message_def::action_t::cmd_remove_publication, "remove publisher"},
+  {action_message_def::action_t::cmd_reg_filter, "reg_filter"},
+  {action_message_def::action_t::cmd_add_filter, "add_filter"},
+  {action_message_def::action_t::cmd_remove_filter, "remove filter"},
+  {action_message_def::action_t::cmd_reg_input, "reg_input"},
+  {action_message_def::action_t::cmd_add_subscriber, "add_subscriber"},
+  {action_message_def::action_t::cmd_remove_subscriber, "remove subscriber"},
   {action_message_def::action_t::cmd_reg_end, "reg_end"},
-  {action_message_def::action_t::cmd_notify_end, "notify_end"},
-
-  {action_message_def::action_t::cmd_has_operator, "has_operator"},
+  {action_message_def::action_t::cmd_resend, "reg_resend"},
+  {action_message_def::action_t::cmd_add_endpoint, "add_endpoint"},
+  {action_message_def::action_t::cmd_remove_endpoint, "remove endpoint"},
+  {action_message_def::action_t::cmd_add_named_endpoint, "add_named_endpoint"},
+  {action_message_def::action_t::cmd_add_named_input, "add_named_input"},
+  {action_message_def::action_t::cmd_add_named_publication, "add_named_publication"},
+  {action_message_def::action_t::cmd_add_named_filter, "add_named_filter"},
+  {action_message_def::action_t::cmd_remove_named_endpoint, "remove_named_endpoint"},
+  {action_message_def::action_t::cmd_remove_named_input, "remove_named_input"},
+  {action_message_def::action_t::cmd_remove_named_publication, "remove_named_publication"},
+  {action_message_def::action_t::cmd_remove_named_filter, "remove_named_filter"},
+  {action_message_def::action_t::cmd_close_interface, "close_interface"},
+  {action_message_def::action_t::cmd_multi_message, "multi message"},
   // protocol messages are meant for the communication standard and are not used in the Cores/Brokers
   {action_message_def::action_t::cmd_protocol_priority, "protocol_priority"},
   {action_message_def::action_t::cmd_protocol, "protocol"},
   {action_message_def::action_t::cmd_protocol_big, "protocol_big"}};
 
 using actionPair = std::pair<action_message_def::action_t, const char *>;
-constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
-//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
-//be used as the program is shutting down
+static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
+// can (in actuality) be used as the program is shutting down
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
@@ -456,19 +648,20 @@ const char *actionMessageType (action_message_def::action_t action)
     {
         return res->second;
     }
-    return static_cast<const char *> (nullStr);
+    return static_cast<const char *> (unknownStr);
 }
-
-constexpr std::pair<int, const char *> errorStrings[] = {
-  // priority commands
-  {5, "already in initialization mode"},
-  {6, "duplicate federate name detected"}};
+// set of strings to translate error codes to something sensible
+static constexpr std::pair<int, const char *> errorStrings[] = {{-2, "connection error"},
+                                                                {-5, "lost connection with server"},
+                                                                {5, "already in initialization mode"},
+                                                                {6, "duplicate federate name detected"},
+                                                                {7, "duplicate broker name detected"}};
 
 using errorPair = std::pair<int, const char *>;
-constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
+static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 
-//this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function can (in actuality)
-//be used as the program is shutting down
+// this was done this way to keep the string array as a constexpr otherwise it could be deleted as this function
+// can (in actuality-there was a case that did this) be used as the program is shutting down
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
@@ -477,12 +670,17 @@ const char *commandErrorString (int errorcode)
     {
         return res->second;
     }
-    return static_cast<const char *> (nullStr);
+    return static_cast<const char *> (unknownStr);
 }
 
 std::string prettyPrintString (const ActionMessage &command)
 {
     std::string ret (actionMessageType (command.action ()));
+    if (ret == unknownStr)
+    {
+        ret += " " + std::to_string (static_cast<int> (command.action ()));
+        return ret;
+    }
     switch (command.action ())
     {
     case CMD_REG_FED:
@@ -499,14 +697,14 @@ std::string prettyPrintString (const ActionMessage &command)
         }
         else
         {
-            ret.append (std::to_string (command.dest_id));
-        } 
+            ret.append (std::to_string (command.dest_id.baseValue ()));
+        }
         break;
     case CMD_PUB:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) handle({}) size {} at {}",command.source_id,
-                     command.dest_handle, command.payload.size (), static_cast<double> (command.actionTime))
-                      );
+        ret.append (fmt::format ("From ({}) handle({}) size {} at {} to {}", command.source_id.baseValue (),
+                                 command.dest_handle.baseValue (), command.payload.size (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_REG_BROKER:
         ret.push_back (':');
@@ -514,24 +712,28 @@ std::string prettyPrintString (const ActionMessage &command)
         break;
     case CMD_TIME_GRANT:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Granted Time({})", command.source_id ,
-                     static_cast<double> (command.actionTime)));
+        ret.append (fmt::format ("From ({}) Granted Time({}) to ({})", command.source_id.baseValue (),
+                                 static_cast<double> (command.actionTime), command.dest_id.baseValue ()));
         break;
     case CMD_TIME_REQUEST:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({}) Time({}, {}, {})", command.source_id,
-                     static_cast<double> (command.actionTime), static_cast<double> (command.Te),
-                     static_cast<double> (command.Tdemin)));
+        ret.append (fmt::format ("From ({}) Time({}, {}, {}) to ({})", command.source_id.baseValue (),
+                                 static_cast<double> (command.actionTime), static_cast<double> (command.Te),
+                                 static_cast<double> (command.Tdemin), command.dest_id.baseValue ()));
         break;
-    case CMD_FED_CONFIGURE:
+    case CMD_FED_CONFIGURE_TIME:
+    case CMD_FED_CONFIGURE_INT:
+    case CMD_FED_CONFIGURE_FLAG:
         break;
     case CMD_SEND_MESSAGE:
         ret.push_back (':');
-        ret.append (fmt::format ("From ({})(%d:%d) To %s size %d at %f",command.info ().orig_source,
-                     command.source_id, command.source_handle, command.info ().target, command.payload.size (),
-                     static_cast<double> (command.actionTime)));
+        ret.append (fmt::format ("From ({})({}:{}) To {} size {} at {}", command.getString (origSourceStringLoc),
+                                 command.source_id.baseValue (), command.source_handle.baseValue (),
+                                 command.getString (targetStringLoc), command.payload.size (),
+                                 static_cast<double> (command.actionTime)));
         break;
     default:
+        ret.append (fmt::format (":From {}", command.source_id.baseValue ()));
         break;
     }
     return ret;
@@ -541,5 +743,18 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command)
 {
     os << prettyPrintString (command);
     return os;
+}
+
+int appendMessage (ActionMessage &m, const ActionMessage &newMessage)
+{
+    if (m.action () == CMD_MULTI_MESSAGE)
+    {
+        if (m.counter < 255)
+        {
+            m.setString (m.counter++, newMessage.to_string ());
+            return m.counter;
+        }
+    }
+    return (-1);
 }
 }  // namespace helics

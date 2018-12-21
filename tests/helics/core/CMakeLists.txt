@@ -16,14 +16,12 @@ set(
   InfoClass-tests.cpp
   FederateState-tests.cpp
   ActionMessage-tests.cpp
-  # CoreBroker-tests.cpp
-  CoreFactory-tests.cpp MessageTimerTests.cpp
-  # CommonCore-tests.cpp
+  BrokerClassTests.cpp
+  CoreFactory-tests.cpp 
+  MessageTimerTests.cpp
   TestCore-tests.cpp
   testFixtures.cpp
-  IPCcore_tests.cpp
   data-block-tests.cpp
-  UdpCore-tests.cpp
   ForwardingTimeCoordinatorTests.cpp
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
@@ -34,7 +32,15 @@ if(HELICS_HAVE_ZEROMQ)
 endif(HELICS_HAVE_ZEROMQ)
 
 if(NOT DISABLE_TCP_CORE)
-  list(APPEND core_test_sources TcpCore-tests.cpp)
+  list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
+endif()
+
+if(NOT DISABLE_UDP_CORE)
+  list(APPEND core_test_sources UdpCore-tests.cpp)
+endif()
+
+if(NOT DISABLE_IPC_CORE)
+  list(APPEND core_test_sources  IPCcore_tests.cpp)
 endif()
 
 if(MPI_ENABLE)
@@ -45,10 +51,13 @@ add_executable(core-tests ${core_test_sources} ${core_test_headers})
 target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_definitions(
+  core-tests PRIVATE BOOST_DATE_TIME_NO_LIB
+)
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
-add_test(NAME core-tests COMMAND core-tests --log_level=message --report_level=short)
-set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily)
+add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
+set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily TSAN)
 
 # Tests for Continuous Integration builds
 add_test(
@@ -56,11 +65,11 @@ add_test(
   COMMAND
     core-tests
     --run_test=@ci
-    --log_level=message
+    --log_level=test_suite
     --report_level=short
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
-
+#set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
 foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
   add_custom_command(
     TARGET

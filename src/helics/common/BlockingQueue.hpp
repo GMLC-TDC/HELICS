@@ -222,6 +222,37 @@ class BlockingQueue
         return std::move (*val);
     }
 
+    /** blocking call to wait on an object from the stack with timeout*/
+    stx::optional<T> pop(std::chrono::milliseconds timeout)
+    {
+        auto val = try_pop();
+        while (!val)
+        {
+            std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
+            if (!pullElements.empty())  // make sure we are actually empty;
+            {
+                val = std::move(pullElements.back());
+                pullElements.pop_back();
+                break;
+            }
+            auto res=condition.wait_for(pullLock,timeout);  // now wait
+            if (!pullElements.empty())  // check for spurious wake-ups
+            {
+                val = std::move(pullElements.back());
+                pullElements.pop_back();
+                break;
+            }
+            pullLock.unlock();
+            val = try_pop();
+            if (res == std::cv_status::timeout)
+            {
+                break;
+            }
+        }
+        // move the value out of the optional
+        return val;
+    }
+
     /** blocking call that will call the specified functor
     if the queue is empty
     @param callOnWaitFunction an nullary functor that will be called if the initial query does not return a value
@@ -300,7 +331,7 @@ stx::optional<T> BlockingQueue<T>::try_pop ()
             return val;
         }
         queueEmptyFlag = true;
-        return {};  // return the empty optional
+        return stx::nullopt;  // return the empty optional
     }
     stx::optional<T> val (std::move (pullElements.back ()));  // do it this way to allow movable only types
     pullElements.pop_back ();
