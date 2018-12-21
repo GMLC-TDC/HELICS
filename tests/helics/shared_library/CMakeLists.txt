@@ -38,10 +38,10 @@ set(
   # QueryTests.cpp
 )
 
-add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp)
+add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp ../coreTypeLists.hpp)
 
 add_executable(
-  shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp
+  shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp ../coreTypeLists.hpp
 )
 
 target_link_libraries(

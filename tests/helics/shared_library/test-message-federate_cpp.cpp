@@ -22,7 +22,7 @@ namespace utf = boost::unit_test;
 BOOST_FIXTURE_TEST_SUITE (message_federate_tests_cpp, FederateTestFixture_cpp, *utf::label ("ci"))
 
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_simple), core_type)
 {
     SetupTest<helicscpp::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
@@ -38,7 +38,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_simple), core_type)
 {
     SetupTest<helicscpp::MessageFederate> (core_type, 1);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
@@ -63,7 +63,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
     BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_simple), core_type)
 {
     SetupTest<helicscpp::MessageFederate> (core_type, 1, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);

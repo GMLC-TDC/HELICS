@@ -12,18 +12,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include "../coreTypeLists.hpp"
 
-extern const std::vector<std::string> ztypes;
-extern const std::vector<std::string> core_types;
-
-extern const std::vector<std::string> core_types_2;
-
-extern const std::vector<std::string> core_types_simple;
-extern const std::vector<std::string> core_types_single;
-extern const std::vector<std::string> core_types_all;
-extern const std::vector<std::string> core_types_extended;
-
-extern const std::string defaultNamePrefix;
 
 struct FederateTestFixture
 {
