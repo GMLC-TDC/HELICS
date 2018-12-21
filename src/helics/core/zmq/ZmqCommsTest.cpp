@@ -13,8 +13,9 @@
 //#include <boost/asio.hpp>
 //#include <csignal>
 #include <memory>
+#include <iostream>
 
-static const int DEFAULT_BROKER_PORT_NUMBER = 23404;  // Todo define a different port number
+static const int DEFAULT_BROKER_PORT_NUMBER = 23414;  // Todo define a different port number
 
 using namespace std::chrono;
 /** bind a zmq socket, with a timeout and timeout period*/
@@ -107,12 +108,11 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::str
         }
     }
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
-    // std::cout << "****NAME: " << name << " Frontend rx message" << " Protocol command action: " << M.action() <<
-    // " message ID: " << M.messageID << std::endl;
+    //std::cout << "****NAME: " << name << " RX Message " << " Protocol command action: " << prettyPrintString(M) << " source ID: " << M.source_id << " dest ID: " << M.dest_id << std::endl;
 
     if (!isValidCommand (M))
     {
-        std::cerr << "invalid command received" << std::endl;
+    	std::cerr << "invalid command received" << M.action() << std::endl;
         return 0;
     }
     if (isProtocolCommand (M))
@@ -123,15 +123,14 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::str
             loadPortDefinitions (M);
             break;
         case NAME_NOT_FOUND:
-            // std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
+            //std::cout << "broker name " << brokerName_ << " does not match broker connection\n";
             disconnecting = true;
             setRxStatus (connection_status::error);
             status = -1;
             break;
         case DISCONNECT:
             disconnecting = true;
-            // std::cout << "name " << name
-            //		<< " processIncomingMessage DISCONNECTING\n";
+            std::cout << "name " << name << " processIncomingMessage DISCONNECTING\n";
             setRxStatus (connection_status::terminated);
             status = -1;
         case DISCONNECT_ERROR:
@@ -140,6 +139,8 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::str
             status = -1;
             break;
         case CLOSE_RECEIVER:
+        	//std::cout << name << "Received Close Receiver: " << std::endl;
+        	setRxStatus (connection_status::terminated);
             status = -1;
             break;
         case RECONNECT_RECEIVER:
@@ -148,12 +149,11 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::str
         case CONNECTION_INFORMATION:
             if (serverMode)
             {
-                // std::cout << name << "Adding connection info: " << M.payload << std::endl;
+                //std::cout << name << "Adding connection info: " << M.payload << std::endl;
                 connection_info.emplace (M.name, M.payload);
-                //        			for(auto &mc : connection_info) {
-                //        				std::cout << name << "conn info: " << mc.first << "second: " << mc.second
-                //        << std::endl;
-                //        			}
+                //for(auto &mc : connection_info) {
+                //std::cout << name << "conn info: " << mc.first << "second: " << mc.second << std::endl;
+                //}
             }
             break;
         default:
@@ -198,7 +198,7 @@ int ZmqCommsTest::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq:
     if (serverMode)
     {
         brokerSocket.setsockopt (ZMQ_LINGER, 500);
-        auto bindsuccess = bindzmqSocket (brokerSocket, localTarget_, brokerPort, connectionTimeout);
+    	auto bindsuccess = bindzmqSocket (brokerSocket, localTarget_, brokerPort, connectionTimeout);
         if (!bindsuccess)
         {
             brokerSocket.close ();
@@ -231,14 +231,14 @@ int ZmqCommsTest::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq:
         cmessage.name = name;
         cmessage.payload = getAddress ();
         cmessage.to_vector (buffer);
-        // std::cout << "***NAME: " << name << " action: " << cmessage.action() << '\n';
-        brokerConnection.send (buffer.data (), buffer.size ());
+        //std::cout << "***NAME: " << name << " action: " << cmessage.action() << '\n';
+        brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
     }
     return 0;
 }
 
 bool ZmqCommsTest::processTxControlCmd (ActionMessage cmd,
-                                        std::map<route_id_t, std::string> &routes,
+                                        std::map<route_id, std::string> &routes,
                                         std::map<std::string, std::string> &connection_info)
 {
     bool close_tx = false;
@@ -256,17 +256,16 @@ bool ZmqCommsTest::processTxControlCmd (ActionMessage cmd,
         }
         break;
     case NEW_ROUTE:
-        // std::cout << name << " update connection info" << std::endl;
+        //std::cout << name << " update connection info" << std::endl;
         try
         {
             for (auto &mc : connection_info)
             {
-                // std::cout << name << " mc.second: " << mc.second << " cmd.payload: " << cmd.payload <<
-                // std::endl;
+                //std::cout << name << " mc.second: " << mc.second << " cmd.payload: " << cmd.payload << std::endl;
                 if (mc.second == cmd.payload)
                 {
-                    routes.emplace (route_id_t (cmd.getExtraData ()), mc.first);
-                    // std::cout << "Route id: " << cmd.getExtraData() << std::endl;
+                    routes.emplace (route_id (cmd.getExtraData ()), mc.first);
+                    //std::cout << "New Route id: " << cmd.getExtraData() << std::endl;
                     break;
                 }
             }
@@ -278,10 +277,14 @@ bool ZmqCommsTest::processTxControlCmd (ActionMessage cmd,
         }
         break;
     case REMOVE_ROUTE:
-        routes.erase (route_id_t (cmd.getExtraData ()));
+        routes.erase (route_id (cmd.getExtraData ()));
+        break;
+    case CLOSE_RECEIVER:
+        setRxStatus (connection_status::terminated);
+        close_tx = true;
         break;
     case DISCONNECT:
-        // std::cout << name << " processTxControlCmd    DISCONNECTING" << std::endl;
+        std::cout << name << " processTxControlCmd    DISCONNECTING" << std::endl;
         close_tx = true;
         break;
     }
@@ -294,14 +297,14 @@ void ZmqCommsTest::queue_tx_function ()
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::message_t msg;
 
-    std::cout << "In queue_tx_function: "
-              << " server mode: " << serverMode << " hasBroker: " << hasBroker << std::endl;
     if (!brokerTarget_.empty ())
     {
         hasBroker = true;
     }
+    //std::cout << "In queue_tx_function: "
+    //          << name << " server mode: " << serverMode << " hasBroker: " << hasBroker << std::endl;
     // contains mapping between route id and core name
-    std::map<route_id_t, std::string> routes;
+    std::map<route_id, std::string> routes;
     // contains mapping between core name and address
     std::map<std::string, std::string> connection_info;
 
@@ -358,64 +361,43 @@ void ZmqCommsTest::queue_tx_function ()
 
     while (true)
     {
-        route_id_t route_id;
+        route_id rid;
         ActionMessage cmd;
         int count = 0;
         int rc = 1;
-        // std::tie (route_id, cmd) = txQueue.pop ();
+        //std::tie (rid, cmd) = txQueue.try_pop ();
 
         // Handle Tx messages first
         auto tx_msg = txQueue.try_pop ();
-        rc = zmq::poll (poller, std::chrono::milliseconds (1));
-
+        //rc = zmq::poll (poller, std::chrono::milliseconds (1));
+        rc = zmq::poll (poller, std::chrono::milliseconds (10));
         if (!tx_msg || (rc <= 0))
         {
-            // std::cout << "yield" << std::endl;
+            ////std::cout << "yield" << std::endl;
             std::this_thread::yield ();
         }
 
         // Balance between tx and rx processing since both running on single thread
         while (tx_msg && count < 5)
         {
-            // std::cout << "TX LOOP **** NAME: " << name << count << std::endl;
+            ////std::cout << "TX LOOP **** NAME: " << name << " " << count << std::endl;
 
             bool processed = false;
             cmd = std::move (tx_msg->second);
-            route_id = std::move (tx_msg->first);
-            // std::cout << name << "route_id: " << route_id << " parent route id: " << parent_route_id << '\n';
-            // std::cout << "TX LOOP **** NAME: " << name << " TX message" << ": protocol command: " <<
-            // cmd.action() << "message ID:" << cmd.messageID << std::endl;
+            rid = std::move (tx_msg->first);
+            //std::cout << name << " rid: " << rid << " parent route id: " << parent_route_id << '\n';
+            //std::cout << "TX LOOP **** NAME: " << name << ": protocol command: " << prettyPrintString(cmd) << " source id: " << cmd.source_id << " dest id: " << cmd.dest_id << std::endl;
             if (isProtocolCommand (cmd))
             {
-                if (route_id == control_route)
+                if (rid == control_route)
                 {
-                    // std::cout << "Enter control route" << std::endl;
+                	processed = true;
+                    //std::cout << "Enter control route" << std::endl;
                     close_tx = processTxControlCmd (cmd, routes, connection_info);
 
                     if (close_tx)
                     {
-                        routes.clear ();
-                        connection_info.clear ();
-                        if (getRxStatus () == connection_status::connected)
-                        {
-                            setRxStatus (connection_status::terminated);
-                        }
-                        if (serverMode)
-                        {
-                            // std::cout << "Closing broker socket" << std::endl;
-                            brokerSocket.close ();
-                        }
-                        if (hasBroker)
-                        {
-                            // std::cout << "Closing broker connection" << std::endl;
-                            brokerConnection.close ();
-                        }
-                        setTxStatus (connection_status::terminated);
-                        break;
-                    }
-                    else
-                    {
-                        processed = true;
+                        goto CLOSE_TX_LOOP;
                     }
                 }
             }
@@ -423,39 +405,39 @@ void ZmqCommsTest::queue_tx_function ()
             {
                 buffer.clear ();
                 cmd.to_vector (buffer);
-                if (route_id == parent_route_id)
+                if (rid == parent_route_id)
                 {
                     if (hasBroker)
                     {
-                        //						std::cout << "**** NAME: " << name << " Sending message to broker: "
-                        //<< cmd.action()
-                        //									<< "message ID: " << cmd.messageID << std::endl;
-                        brokerConnection.send (buffer.data (), buffer.size ());
+                        //std::cout << "**** NAME: " << name << " Sending message to broker: "<< cmd.action() << "message ID: " << cmd.messageID << std::endl;
+                        std::string empty = "";
+                        brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                     }
                     else
                     {
                         logWarning ("no route to broker for message");
                     }
                 }
-                else if (route_id == control_route)
+                else if (rid == control_route)
                 {
                     status = processIncomingMessage (msg, connection_info);  //----------> ToCheck
                     if (status < 0)
                     {
-                        break;
+                    	goto CLOSE_TX_LOOP;
                     }
                 }
                 else
                 {
                     // If route found send out through the front end socket connection
-                    auto rt_find = routes.find (route_id);
+                    auto rt_find = routes.find (rid);
                     if (rt_find != routes.end ())
                     {
                         std::string route_name = rt_find->second;
-                        // std::cout << "Sending message to core: " << name << std::endl;
+                        std::string empty = "";
+                        //std::cout << name << "::Sending message to core: " << route_name.c_str() << " cmd: " << cmd.action() << std::endl;
                         // Need to first send identity and empty string
                         brokerSocket.send (route_name.c_str (), route_name.size (), ZMQ_SNDMORE);
-                        brokerSocket.send ("", route_name.size (), ZMQ_SNDMORE);
+                        brokerSocket.send (empty.c_str(), empty.size (), ZMQ_SNDMORE);
                         // Send the actual data
                         brokerSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                     }
@@ -463,7 +445,8 @@ void ZmqCommsTest::queue_tx_function ()
                     {
                         if (hasBroker)
                         {
-                            brokerConnection.send (buffer.data (), buffer.size ());
+                        	//std::cout << name << "::Sending message to broker: " << " cmd: " << cmd.action() << std::endl;
+                            brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                         }
                         else
                         {
@@ -475,53 +458,58 @@ void ZmqCommsTest::queue_tx_function ()
             tx_msg = txQueue.try_pop ();
             count++;
         }
-        if (close_tx || (status < 0))
-        {
-            // exit from the thread
-            break;
-        }
+
         count = 0;
-        // std::cout << "Checking RX  **** NAME: " << name << std::endl;
+        rc = 1;
         while ((rc > 0) && (count < 5))
         {
-            // std::cout << "RX LOOP **** NAME: " << name << count << std::endl;
-            rc = zmq::poll (poller, std::chrono::milliseconds (1));
+        	////std::cout << "Checking RX  **** NAME: " << name << std::endl;
+            rc = zmq::poll (poller, std::chrono::milliseconds (10));
 
             if (rc > 0)
             {
-                // std::cout << " FRONTEND MESSAGE: Identity" << name << " count: " << '\n';
+                ////std::cout << " RX LOOP:: FRONTEND MESSAGE: Identity" << name << " count: " << '\n';
                 if ((poller[0].revents & ZMQ_POLLIN) != 0)
                 {
                     status = processRxMessage (brokerSocket, brokerConnection, connection_info);
-
-                    if (status < 0)
-                    {
-                        break;
-                    }
                 }
                 if (serverMode && hasBroker)
                 {
                     if ((poller[1].revents & ZMQ_POLLIN) != 0)
                     {
-                        processRxMessage (brokerSocket, brokerConnection, connection_info);
-
-                        if (status < 0)
-                        {
-                            break;
-                        }
+                        status = processRxMessage (brokerSocket, brokerConnection, connection_info);
                     }
+                }
+
+                if (status < 0)
+                {
+                	goto CLOSE_TX_LOOP;
                 }
             }
             count++;
         }
-        // std::cout << "out of rx loop " << name << std::endl;
-        if (close_tx || (status < 0))
-        {
-            // std::cout << "exit from thread" << name << std::endl;
-            // exit from the thread
-            break;
-        }
+        //std::cout << "out of rx loop " << name << std::endl;
     }
+    CLOSE_TX_LOOP:
+		routes.clear ();
+		connection_info.clear ();
+		if (getRxStatus () == connection_status::connected)
+		{
+			setRxStatus (connection_status::terminated);
+		}
+		if (serverMode)
+		{
+			std::cout << "Closing broker socket" << std::endl;
+			std::this_thread::sleep_for (std::chrono::milliseconds (50));
+			brokerSocket.close ();
+		}
+		if (hasBroker)
+		{
+			std::cout << name << ":: Closing connection to broker" << std::endl;
+			brokerConnection.close ();
+		}
+		setTxStatus (connection_status::terminated);
+
     std::cout << "exit from queue tx loop" << std::endl;
 }
 
@@ -530,29 +518,29 @@ int ZmqCommsTest::processRxMessage (zmq::socket_t &brokerSocket,
                                     std::map<std::string, std::string> &connection_info)
 {
     int status = 0;
-    zmq::message_t msg;
+    zmq::message_t msg1;
+    zmq::message_t msg2;
 
     if (serverMode)
     {
-        brokerSocket.recv (&msg);
-        std::string str (static_cast<char *> (msg.data ()), msg.size ());
+        brokerSocket.recv (&msg1);
+        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
 
-        // std::cout << " BROKER SOCKET RX MESSAGE: Identity" << name << " *****DATA: " << str << '\n';
-        brokerSocket.recv (&msg);
+        //std::cout << " BROKER SOCKET RX MESSAGE: Identity" << name << " *****1st DATA: " << str.c_str() << '\n';
+        brokerSocket.recv (&msg2);
     }
     else
     {
-        brokerConnection.recv (&msg);
-        std::string str (static_cast<char *> (msg.data ()), msg.size ());
+        brokerConnection.recv (&msg1);
+        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
 
-        // std::cout << " BROKER CONNECTION RX MESSAGE: Identity" << name << " *****DATA: " << str << '\n';
-        brokerConnection.recv (&msg);
+        //std::cout << " BROKER CONNECTION RX MESSAGE: Identity" << name << " *****1st DATA: " << str.c_str() << '\n';
+        brokerConnection.recv (&msg2);
     }
-    std::string str2 (static_cast<char *> (msg.data ()), msg.size ());
-    // std::cout << " FRONTEND RX MESSAGE: message data" << name << " *****DATA: " << str2 << '\n';
-    status = processIncomingMessage (msg, connection_info);
+    std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
+    status = processIncomingMessage (msg2, connection_info);
     //	for (auto &mc : connection_info) {
-    //		std::cout << name << " mc.second: " << mc.second << std::endl;
+    //		//std::cout << name << " mc.second: " << mc.second << std::endl;
     //	}
     return status;
 }
@@ -564,6 +552,7 @@ void ZmqCommsTest::closeReceiver ()
     case connection_status::startup:
     case connection_status::connected:
     {
+    	std::cout << name << "Transmit CLOSE_RECEIVER" << std::endl;
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
         transmit (control_route, cmd);
