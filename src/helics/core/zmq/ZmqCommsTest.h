@@ -17,6 +17,7 @@ namespace zmq
 class message_t;
 class socket_t;
 }
+
 namespace helics {
 namespace zeromq {
 /** implementation for the communication interface that uses ZMQ messages to communicate with

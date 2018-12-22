@@ -16,6 +16,7 @@
 #include <iostream>
 
 static const int DEFAULT_BROKER_PORT_NUMBER = 23414;  // Todo define a different port number
+static const int TX_RX_MSG_COUNT = 20;
 
 using namespace std::chrono;
 /** bind a zmq socket, with a timeout and timeout period*/
@@ -364,6 +365,7 @@ void ZmqCommsTest::queue_tx_function ()
         route_id rid;
         ActionMessage cmd;
         int count = 0;
+        int tx_count = 0;
         int rc = 1;
         //std::tie (rid, cmd) = txQueue.try_pop ();
 
@@ -373,12 +375,12 @@ void ZmqCommsTest::queue_tx_function ()
         rc = zmq::poll (poller, std::chrono::milliseconds (10));
         if (!tx_msg || (rc <= 0))
         {
-            ////std::cout << "yield" << std::endl;
+            //std::cout << "yield" << std::endl;
             std::this_thread::yield ();
         }
-
+        tx_count = 0;
         // Balance between tx and rx processing since both running on single thread
-        while (tx_msg && count < 5)
+        while (tx_msg && (tx_count < TX_RX_MSG_COUNT))
         {
             ////std::cout << "TX LOOP **** NAME: " << name << " " << count << std::endl;
 
@@ -386,7 +388,7 @@ void ZmqCommsTest::queue_tx_function ()
             cmd = std::move (tx_msg->second);
             rid = std::move (tx_msg->first);
             //std::cout << name << " rid: " << rid << " parent route id: " << parent_route_id << '\n';
-            //std::cout << "TX LOOP **** NAME: " << name << ": protocol command: " << prettyPrintString(cmd) << " source id: " << cmd.source_id << " dest id: " << cmd.dest_id << std::endl;
+            //std::cout << "TX LOOP **** NAME: " << name << " count:" << tx_count << "proto cmd: " << prettyPrintString(cmd) << " source id: " << cmd.source_id << " dest id: " << cmd.dest_id << std::endl;
             if (isProtocolCommand (cmd))
             {
                 if (rid == control_route)
@@ -455,8 +457,10 @@ void ZmqCommsTest::queue_tx_function ()
                     }
                 }
             }
-            tx_msg = txQueue.try_pop ();
-            count++;
+            tx_count++;
+            if (tx_count < TX_RX_MSG_COUNT) {
+            	tx_msg = txQueue.try_pop ();
+            }
         }
 
         count = 0;
