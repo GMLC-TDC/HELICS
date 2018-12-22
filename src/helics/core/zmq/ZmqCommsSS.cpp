@@ -3,7 +3,7 @@
  Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
  All rights reserved. See LICENSE file and DISCLAIMER for more details.
  */
-#include "ZmqCommsTest.h"
+#include "ZmqCommsSS.h"
 #include "../../common/zmqContextManager.h"
 #include "../../common/zmqHelper.h"
 #include "../../common/zmqSocketDescriptor.h"
@@ -56,7 +56,7 @@ namespace helics
 {
 namespace zeromq
 {
-void ZmqCommsTest::loadNetworkInfo (const NetworkBrokerData &netInfo)
+void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
     NetworkCommsInterface::loadNetworkInfo (netInfo);
     if (!propertyLock ())
@@ -90,14 +90,14 @@ void ZmqCommsTest::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
-ZmqCommsTest::ZmqCommsTest () noexcept : NetworkCommsInterface (interface_type::ip) {}
+ZmqCommsSS::ZmqCommsSS () noexcept : NetworkCommsInterface (interface_type::ip) {}
 
 /** destructor*/
-ZmqCommsTest::~ZmqCommsTest () { disconnect (); }
+ZmqCommsSS::~ZmqCommsSS () { disconnect (); }
 
-int ZmqCommsTest::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
+int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
 
-int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info)
+int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info)
 {
     int status = 0;
     if (msg.size () == 5)
@@ -157,7 +157,7 @@ int ZmqCommsTest::processIncomingMessage (zmq::message_t &msg, std::map<std::str
     return status;
 }
 
-int ZmqCommsTest::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
+int ZmqCommsSS::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 {
     ActionMessage M (static_cast<char *> (msg.data ()), msg.size ());
     if (isProtocolCommand (M))
@@ -181,12 +181,12 @@ int ZmqCommsTest::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &so
     }
 }
 
-void ZmqCommsTest::queue_rx_function ()
+void ZmqCommsSS::queue_rx_function ()
 {
     // Everything is handled by tx thread
 }
 
-int ZmqCommsTest::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::socket_t &brokerConnection)
+int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::socket_t &brokerConnection)
 {
     if (serverMode)
     {
@@ -229,7 +229,7 @@ int ZmqCommsTest::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq:
     return 0;
 }
 
-bool ZmqCommsTest::processTxControlCmd (ActionMessage cmd,
+bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
                                         std::map<route_id, std::string> &routes,
                                         std::map<std::string, std::string> &connection_info)
 {
@@ -279,7 +279,7 @@ bool ZmqCommsTest::processTxControlCmd (ActionMessage cmd,
     return close_tx;
 }
 
-void ZmqCommsTest::queue_tx_function ()
+void ZmqCommsSS::queue_tx_function ()
 {
     std::vector<char> buffer;
     auto ctx = zmqContextManager::getContextPointer ();
@@ -485,7 +485,7 @@ void ZmqCommsTest::queue_tx_function ()
 		setTxStatus (connection_status::terminated);
 }
 
-int ZmqCommsTest::processRxMessage (zmq::socket_t &brokerSocket,
+int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
                                     zmq::socket_t &brokerConnection,
                                     std::map<std::string, std::string> &connection_info)
 {
@@ -513,7 +513,7 @@ int ZmqCommsTest::processRxMessage (zmq::socket_t &brokerSocket,
     return status;
 }
 
-void ZmqCommsTest::closeReceiver ()
+void ZmqCommsSS::closeReceiver ()
 {
     switch (getTxStatus ())
     {

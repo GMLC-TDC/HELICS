@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
 #include "helics/core/zmq/ZmqBroker.h"
-#include "helics/core/zmq/ZmqCommsTest.h"
+#include "helics/core/zmq/ZmqCommsSS.h"
 #include "helics/core/zmq/ZmqCore.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/application_api/Inputs.hpp"
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_transmit)
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
 
-    helics::zeromq::ZmqCommsTest comm;
-    helics::zeromq::ZmqCommsTest comm2;
+    helics::zeromq::ZmqCommsSS comm;
+    helics::zeromq::ZmqCommsSS comm2;
     comm.loadTargetInfo (host, host);
     // comm2 is the broker
     comm2.loadTargetInfo (host, std::string ());
@@ -103,9 +103,9 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    helics::zeromq::ZmqCommsTest comm;
-    helics::zeromq::ZmqCommsTest comm2;
-    helics::zeromq::ZmqCommsTest comm3;
+    helics::zeromq::ZmqCommsSS comm;
+    helics::zeromq::ZmqCommsSS comm2;
+    helics::zeromq::ZmqCommsSS comm3;
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, host);
     // comm3 is the broker
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
 {
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
-    helics::zeromq::ZmqCommsTest comm;
+    helics::zeromq::ZmqCommsSS comm;
     comm.loadTargetInfo (host, std::string());
     comm.setName ("test_broker");
     comm.setPortNumber (ZMQ_SS_BROKER_PORT);
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     comm.connect();
 
     std::string initializationString = "-f 1 --name=core1";
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_TEST, initializationString);
+    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
@@ -252,9 +252,9 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_core_broker_default_test)
 {
     std::string initializationString = "-f 1";
 
-    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_TEST, initializationString);
+    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_TEST, initializationString);
+    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
     bool connected = broker->isConnected ();
     BOOST_CHECK (connected);
     connected = core->connect ();
@@ -340,14 +340,14 @@ class FedTest
 BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
 {
 	int feds = 100;
-	auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_TEST, "zmq_test_broker", std::to_string (feds));
+	auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
 	std::vector<std::shared_ptr<helics::Core>> cores (feds);
 	std::vector<FedTest> leafs (feds);
 
 	for (int ii = 0; ii < feds; ++ii)
 	{
 		std::string initializationString = "-f 1 --name=core" + std::to_string(ii);
-		cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_TEST, initializationString);
+		cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 		cores[ii]->connect ();
 		int s_index = ii+1;
 		if(ii == feds - 1) {

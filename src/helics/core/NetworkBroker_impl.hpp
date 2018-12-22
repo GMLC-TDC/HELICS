@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright ï¿½ 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",      "interprocess",
-                                "TCP",     "UDP",    "undef", "nng",    "ZMQ_test", "TCPSS",
+                                "TCP",     "UDP",    "undef", "nng",    "ZMQ_SS", "TCPSS",
                                 "undef",   "undef",  "http",  "unknown"};
 
 constexpr const char *tcodeStr (int tcode) { return ((tcode >= 0) && (tcode < 15)) ? tstr[tcode] : tstr[15]; }

@@ -20,15 +20,15 @@ class socket_t;
 
 namespace helics {
 namespace zeromq {
-/** implementation for the communication interface that uses ZMQ messages to communicate with
+/** implementation for the communication interface that uses ZMQ messages to communicate using
  * single socket and using ROUTER-DEALER communication pattern */
-class ZmqCommsTest final:public NetworkCommsInterface {
+class ZmqCommsSS final:public NetworkCommsInterface {
 
 public:
 	/** default constructor*/
-	ZmqCommsTest() noexcept;
+	ZmqCommsSS() noexcept;
 	/** destructor*/
-	~ZmqCommsTest();
+	~ZmqCommsSS();
     /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
 	/** set the port numbers for the local ports*/

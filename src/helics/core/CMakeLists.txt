@@ -62,7 +62,7 @@ set(
 	zmq/ZmqCore.cpp
 	zmq/ZmqBroker.cpp
 	zmq/ZmqComms.cpp
-	zmq/ZmqCommsTest.cpp
+	zmq/ZmqCommsSS.cpp
 	zmq/ZmqRequestSets.cpp
 )
 
@@ -140,7 +140,7 @@ set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHe
 #ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
-set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsTest.h zmq/ZmqRequestSets.h)
+set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h)
 
 set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
 

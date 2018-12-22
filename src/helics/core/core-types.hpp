@@ -42,7 +42,7 @@ enum class core_type : int
       helics_core_type_tcp_ss,  //!< a single socket version of the TCP core for more easily handling firewalls
     UDP = helics_core_type_udp,  //!< use UDP packets to send the data
     NNG = helics_core_type_nng,  //!< reserved for future Nanomsg implementation
-    ZMQ_TEST = helics_core_type_zmq_test,  //!< test code for different type of ZMQ core
+    ZMQ_SS = helics_core_type_zmq_ss,  //!< single socket version of ZMQ core for better scalability performance
     HTTP = helics_core_type_http,  //!< core/broker using web traffic
     UNRECOGNIZED = 22,  //!< unknown
 
