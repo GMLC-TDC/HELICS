@@ -30,7 +30,7 @@ extern "C"
         helics_core_type_ipc = 5,
         helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
         helics_core_type_udp = 7, /** use UDP packets to send the data */
-        helics_core_type_zmq_ss =
+        helics_core_type_zmq_test =
           10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
         helics_core_type_nng = 9, /*!< for using the nanomsg communications */
         helics_core_type_tcp_ss =
