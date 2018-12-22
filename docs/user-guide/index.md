@@ -19,7 +19,7 @@ This manual is primarily targeted to those in the first two categories. Other do
 * [**Co-simuation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 * [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
 * [**HELICS Co-Simulation Walk-through**](./helics_co-sim_sequence.md) - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
-* [**Federates**](./federates.md) - Discussion of the different types of federates in HELICS and how configure them
+* [**Federates**](./federates.md) - Discussion of the different types of federates in HELICS ([value federates](./value_federates.md) and [message federates](./message_federates.md)) and how configure them
 * [**Message Filters**](./filters) - How HELICS message filters can be implemented natively in HELICS or as stand-alone federates
 * [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
 * **Cores (future version)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
