@@ -2310,19 +2310,19 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     }
     if (request == "dependencies")
     {
-        Json_helics::Value base;
+        Json::Value base;
         base["name"] = getIdentifier ();
         base["id"] = global_broker_id_local.baseValue ();
         if (!isRootc)
         {
             base["parent"] = higher_broker_id.baseValue ();
         }
-        base["dependents"] = Json_helics::arrayValue;
+        base["dependents"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependents ())
         {
             base["dependents"].append (dep.baseValue ());
         }
-        base["dependencies"] = Json_helics::arrayValue;
+        base["dependencies"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependencies ())
         {
             base["dependencies"].append (dep.baseValue ());
@@ -2334,14 +2334,14 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
 
 void CoreBroker::initializeFederateMap ()
 {
-    Json_helics::Value &base = fedMap.getJValue ();
+    Json::Value &base = fedMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = global_broker_id_local.baseValue ();
     if (!isRootc)
     {
         base["parent"] = higher_broker_id.baseValue ();
     }
-    base["brokers"] = Json_helics::arrayValue;
+    base["brokers"] = Json::arrayValue;
     ActionMessage queryReq (CMD_BROKER_QUERY);
     queryReq.payload = "federate_map";
     queryReq.source_id = global_broker_id_local;
@@ -2357,7 +2357,7 @@ void CoreBroker::initializeFederateMap ()
                 if (!hasCores)
                 {
                     hasCores = true;
-                    base["cores"] = Json_helics::arrayValue;
+                    base["cores"] = Json::arrayValue;
                 }
                 index = fedMap.generatePlaceHolder ("cores");
             }
@@ -2374,14 +2374,14 @@ void CoreBroker::initializeFederateMap ()
 
 void CoreBroker::initializeDependencyGraph ()
 {
-    Json_helics::Value &base = depMap.getJValue ();
+    Json::Value &base = depMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = global_broker_id_local.baseValue ();
     if (!isRootc)
     {
         base["parent"] = higher_broker_id.baseValue ();
     }
-    base["brokers"] = Json_helics::arrayValue;
+    base["brokers"] = Json::arrayValue;
     ActionMessage queryReq (CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
@@ -2395,7 +2395,7 @@ void CoreBroker::initializeDependencyGraph ()
             if (!hasCores)
             {
                 hasCores = true;
-                base["cores"] = Json_helics::arrayValue;
+                base["cores"] = Json::arrayValue;
             }
             index = depMap.generatePlaceHolder ("cores");
         }
@@ -2408,12 +2408,12 @@ void CoreBroker::initializeDependencyGraph ()
         transmit (broker.route, queryReq);
     }
 
-    base["dependents"] = Json_helics::arrayValue;
+    base["dependents"] = Json::arrayValue;
     for (auto &dep : timeCoord->getDependents ())
     {
         base["dependents"].append (dep.baseValue ());
     }
-    base["dependencies"] = Json_helics::arrayValue;
+    base["dependencies"] = Json::arrayValue;
     for (auto &dep : timeCoord->getDependencies ())
     {
         base["dependencies"].append (dep.baseValue ());
@@ -2422,14 +2422,14 @@ void CoreBroker::initializeDependencyGraph ()
 
 void CoreBroker::initializeDataFlowGraph ()
 {
-    Json_helics::Value &base = depMap.getJValue ();
+    Json::Value &base = depMap.getJValue ();
     base["name"] = getIdentifier ();
     base["id"] = global_broker_id_local.baseValue ();
     if (!isRootc)
     {
         base["parent"] = higher_broker_id.baseValue ();
     }
-    base["brokers"] = Json_helics::arrayValue;
+    base["brokers"] = Json::arrayValue;
     ActionMessage queryReq (CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
@@ -2443,7 +2443,7 @@ void CoreBroker::initializeDataFlowGraph ()
             if (!hasCores)
             {
                 hasCores = true;
-                base["cores"] = Json_helics::arrayValue;
+                base["cores"] = Json::arrayValue;
             }
             index = depMap.generatePlaceHolder ("cores");
         }
@@ -2456,12 +2456,12 @@ void CoreBroker::initializeDataFlowGraph ()
         transmit (broker.route, queryReq);
     }
 
-    base["dependents"] = Json_helics::arrayValue;
+    base["dependents"] = Json::arrayValue;
     for (auto &dep : timeCoord->getDependents ())
     {
         base["dependents"].append (dep.baseValue ());
     }
-    base["dependencies"] = Json_helics::arrayValue;
+    base["dependencies"] = Json::arrayValue;
     for (auto &dep : timeCoord->getDependencies ())
     {
         base["dependencies"].append (dep.baseValue ());

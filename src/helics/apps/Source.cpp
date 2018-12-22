@@ -70,7 +70,7 @@ Source::Source (const std::string &name, const std::string &jsonString) : App (n
     Source::loadJsonFile (jsonString);
 }
 
-static void setGeneratorProperty (SignalGenerator *gen, const std::string &name, const Json_helics::Value &prop)
+static void setGeneratorProperty (SignalGenerator *gen, const std::string &name, const Json::Value &prop)
 {
     if (prop.isDouble ())
     {

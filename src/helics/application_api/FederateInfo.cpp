@@ -362,7 +362,7 @@ FederateInfo loadFederateInfo (const std::string &configString)
 FederateInfo loadFederateInfoJson (const std::string &jsonString)
 {
     FederateInfo fi;
-    Json_helics::Value doc;
+    Json::Value doc;
     try
     {
         doc = loadJson (jsonString);

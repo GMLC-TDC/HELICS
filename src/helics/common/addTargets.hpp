@@ -42,7 +42,7 @@ void addTargets (const toml::Value &section, std::string targetName, Callable ca
 }
 
 template <typename Callable>
-void addTargets (const Json_helics::Value &section, std::string targetName, Callable callback)
+void addTargets (const Json::Value &section, std::string targetName, Callable callback)
 {
     // There should probably be a static_assert here but there isn't a nice type trait to check that
     if (section.isMember (targetName))
