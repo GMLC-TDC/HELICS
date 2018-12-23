@@ -1035,14 +1035,6 @@ void CommonCore::closeHandle (interface_handle handle)
     cmd.messageID = static_cast<int32_t> (handleInfo->handleType);
     addActionMessage (cmd);
     handles.modify ([handle](auto &hand) { setActionFlag (*hand.getHandleInfo (handle), disconnected_flag); });
-    if (handleInfo->handleType != handle_type::filter)
-    {
-        auto fed = getFederateAt (handleInfo->local_fed_id);
-        if (fed != nullptr)
-        {
-            fed->closeInterface (handle, handleInfo->handleType);
-        }
-    }
 }
 
 void CommonCore::removeTarget (interface_handle handle, const std::string &targetToRemove)
@@ -1170,7 +1162,10 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
     {
         throw (InvalidIdentifier ("handle does not point to a publication or control output"));
     }
-
+    if (checkActionFlag (*handleInfo, disconnected_flag))
+    {
+        return;
+    }
     if (!handleInfo->used)
     {
         return;  // if the value is not required do nothing
@@ -3120,7 +3115,17 @@ void CommonCore::disconnectInterface (ActionMessage &command)
         filt->destTargets.clear ();
         setActionFlag (*filt, disconnected_flag);
     }
-    // closing in the federate state should be dealt with at the interface level
+    else
+    {
+        if (handleInfo->handleType != handle_type::filter)
+        {
+            auto fed = getFederateCore (command.source_id);
+            if (fed != nullptr)
+            {
+                fed->addAction (command);
+            }
+        }
+    }
 
     if (!checkActionFlag (*handleInfo, nameless_interface_flag))
     {

@@ -318,8 +318,6 @@ void FederateState::createInterface (handle_type htype,
 
 void FederateState::closeInterface (interface_handle handle, handle_type type)
 {
-    std::lock_guard<FederateState> plock (*this);
-    // this function could be called externally in a multi-threaded context
     switch (type)
     {
     case handle_type::publication:
@@ -1063,6 +1061,12 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 timeGranted_mode = true;
                 return ret;
             }
+        }
+        break;
+    case CMD_CLOSE_INTERFACE:
+        if (cmd.source_id == global_id.load ())
+        {
+            closeInterface (cmd.source_handle, static_cast<handle_type> (cmd.counter));
         }
         break;
     case CMD_TIME_REQUEST:
