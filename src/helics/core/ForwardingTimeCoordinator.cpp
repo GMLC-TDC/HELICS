@@ -408,9 +408,17 @@ void ForwardingTimeCoordinator::transmitTimingMessage (ActionMessage &msg) const
 
 bool ForwardingTimeCoordinator::processTimeMessage (const ActionMessage &cmd)
 {
-    if ((cmd.action () == CMD_DISCONNECT) || (cmd.action () == CMD_BROADCAST_DISCONNECT))
+    switch (cmd.action ())
     {
+    case CMD_DISCONNECT:
+    case CMD_DISCONNECT_BROKER:
+    case CMD_DISCONNECT_FED:
+    case CMD_DISCONNECT_CORE:
+    case CMD_BROADCAST_DISCONNECT:
         removeDependent (cmd.source_id);
+        break;
+    default:
+        break;
     }
     return dependencies.updateTime (cmd);
 }

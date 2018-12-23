@@ -920,6 +920,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
                     dis.dest_id = brk->global_id;
                     transmit (brk->route, dis);
                     brk->_sent_disconnect_ack = true;
+                    if ((isRootc) && (brokerState < broker_state_t::operating))
+                    {
+                        command.setAction (CMD_BROADCAST_DISCONNECT);
+                        broadcast (command);
+                        unknownHandles.clearFederateUnknowns (command.source_id);
+                    }
                     removeRoute (brk->route);
                 }
             }
@@ -966,13 +972,8 @@ void CoreBroker::processCommand (ActionMessage &&command)
         else if (brokerState < broker_state_t::operating)
         {
             command.setAction (CMD_BROADCAST_DISCONNECT);
-            for (auto &brk : _brokers)
-            {
-                if (!brk._nonLocal)
-                {
-                    transmit (brk.route, command);
-                }
-            }
+            broadcast (command);
+            unknownHandles.clearFederateUnknowns (command.source_id);
         }
     }
     break;
@@ -1871,7 +1872,7 @@ void CoreBroker::broadcast (ActionMessage &cmd)
 {
     for (auto &broker : _brokers)
     {
-        if (!broker._nonLocal)
+        if ((!broker._nonLocal) && (!broker._disconnected))
         {
             cmd.dest_id = broker.global_id;
             transmit (broker.route, cmd);

@@ -75,7 +75,7 @@ bool CommonCore::connect ()
                 // now register this core object as a broker
 
                 ActionMessage m (CMD_REG_BROKER);
-                m.source_id = global_federate_id ();
+                m.source_id = global_federate_id{};
                 m.name = getIdentifier ();
                 m.setStringData (getAddress ());
                 setActionFlag (m, core_flag);
@@ -498,7 +498,7 @@ federate_id_t CommonCore::registerFederate (const std::string &name, const CoreF
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control the level*/
     fed->setLogger ([this](int /*level*/, const std::string &ident, const std::string &message) {
-        sendToLogger (global_federate_id (0), -2, ident, message);
+        sendToLogger (parent_broker_id, -2, ident, message);
     });
 
     fed->local_id = local_id;
@@ -900,25 +900,24 @@ const std::string &CommonCore::getUnits (interface_handle handle) const
         default:
             break;
         }
-       
     }
     return emptyStr;
 }
 
 const std::string &CommonCore::getInjectionType (interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
         switch (handleInfo->handleType)
         {
         case handle_type::input:
         {
-            auto fed = getFederateAt(handleInfo->local_fed_id);
-            auto inpInfo = fed->interfaces().getInput(handle);
+            auto fed = getFederateAt (handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces ().getInput (handle);
             if (inpInfo != nullptr)
             {
-                if (!inpInfo->inputType.empty())
+                if (!inpInfo->inputType.empty ())
                 {
                     return inpInfo->inputType;
                 }
@@ -2383,7 +2382,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             {
                 LOG_WARNING_SIMPLE ("resending broker reg");
                 ActionMessage m (CMD_REG_BROKER);
-                m.source_id = global_federate_id ();
+                m.source_id = global_federate_id{};
                 m.name = getIdentifier ();
                 m.setStringData (getAddress ());
                 setActionFlag (m, core_flag);
@@ -2483,7 +2482,7 @@ void CommonCore::processCommand (ActionMessage &&command)
         break;
     case CMD_TIME_REQUEST:
     case CMD_TIME_GRANT:
-        if (isLocal (global_federate_id (command.source_id)))
+        if (isLocal (command.source_id))
         {
             if (!ongoingFilterProcesses[command.source_id.baseValue ()].empty ())
             {
@@ -3603,9 +3602,9 @@ void CommonCore::processCommandsForCore (const ActionMessage &cmd)
                 timeCoord->updateTimeFactors ();
             }
         }
-        if (cmd.action () == CMD_DISCONNECT)
+        if (isDisconnectCommand (cmd))
         {
-            if (cmd.source_id == higher_broker_id)
+            if ((cmd.action () == CMD_DISCONNECT) && (cmd.source_id == higher_broker_id))
             {
                 brokerState = broker_state_t::terminating;
                 if (hasTimeDependency || hasFilters)
@@ -3747,7 +3746,7 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id dest)
 {
-    if (dest == global_federate_id ())
+    if (!dest.isValid ())
     {
         return;
     }
@@ -3817,7 +3816,7 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
 
 void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id dest)
 {
-    if (dest == global_federate_id ())
+    if (!dest.isValid ())
     {
         return;
     }
@@ -3854,7 +3853,7 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id dest)
 
 void CommonCore::routeMessage (ActionMessage &&cmd)
 {
-    global_federate_id dest (cmd.dest_id);
+    global_federate_id dest = cmd.dest_id;
     if ((dest == parent_broker_id) || (dest == higher_broker_id))
     {
         transmit (parent_route_id, cmd);

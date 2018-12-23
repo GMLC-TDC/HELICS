@@ -175,6 +175,16 @@ class FederateState
     int endpointCount () const;
     /** get the number of inputs*/
     int inputCount () const;
+    /** locks the processing*/
+    void lock ()
+    {
+        while (processing.test_and_set ())
+        {
+            ;  // spin
+        }
+    }
+    /** unlocks the processing*/
+    void unlock () { processing.clear (std::memory_order_release); }
 
   private:
     /** process the federate queue until returnable event
@@ -305,7 +315,7 @@ class FederateState
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
-	/** create an interface*/
+    /** create an interface*/
     void createInterface (handle_type htype,
                           interface_handle handle,
                           const std::string &key,
@@ -313,6 +323,5 @@ class FederateState
                           const std::string &units);
     /** close an interface*/
     void closeInterface (interface_handle handle, handle_type type);
-
 };
 }  // namespace helics

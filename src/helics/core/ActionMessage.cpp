@@ -548,6 +548,7 @@ static constexpr std::pair<action_message_def::action_t, const char *> actionStr
   {action_message_def::action_t::cmd_disconnect, "disconnect"},
   {action_message_def::action_t::cmd_disconnect_name, "disconnect by name"},
   {action_message_def::action_t::cmd_user_disconnect, "disconnect from user"},
+  {action_message_def::action_t::cmd_broadcast_disconnect, "broadcast disconnect"},
   {action_message_def::action_t::cmd_fed_ack, "fed_ack"},
 
   {action_message_def::action_t::cmd_broker_ack, "broker_ack"},

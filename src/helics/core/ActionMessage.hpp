@@ -237,6 +237,10 @@ inline bool isTimingCommand (const ActionMessage &command) noexcept
     switch (command.action ())
     {
     case CMD_DISCONNECT:
+    case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_CORE:
+    case CMD_DISCONNECT_BROKER:
+    case CMD_DISCONNECT_FED:
     case CMD_TIME_GRANT:
     case CMD_TIME_REQUEST:
     case CMD_EXEC_GRANT:
@@ -274,6 +278,8 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_DISCONNECT_CHECK:
     case CMD_DISCONNECT_NAME:
     case CMD_USER_DISCONNECT:
+    case CMD_DISCONNECT_FED:
+    case CMD_DISCONNECT_CORE:
     case CMD_PRIORITY_DISCONNECT:
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_REMOVE_FILTER:
@@ -282,8 +288,11 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_DISCONNECT_CORE_ACK:
     case CMD_DISCONNECT_BROKER_ACK:
     case CMD_DISCONNECT_BROKER:
+    case CMD_BROADCAST_DISCONNECT:
     case CMD_STOP:
         return true;
+    case CMD_TIME_GRANT:
+        return (command.actionTime == Time::maxVal ());
     default:
         return false;
     }
