@@ -1056,6 +1056,11 @@ void CommonCore::removeTarget (interface_handle handle, const std::string &targe
     ActionMessage cmd;
     cmd.setSource (handleInfo->handle);
     cmd.name = targetToRemove;
+    auto fed = getFederateAt (handleInfo->local_fed_id);
+    if (fed != nullptr)
+    {
+        cmd.actionTime = fed->grantedTime ();
+    }
     switch (handleInfo->handleType)
     {
     case handle_type::publication:

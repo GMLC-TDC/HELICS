@@ -540,7 +540,7 @@ std::unique_ptr<Message> createMessageFromCommand (ActionMessage &&cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // done in this screwy way because this can be called after things have started to be deconstructed so static
-// consts can cause seg faults someday will change to frozen::  once we can use all of C++17
+// consts can cause seg faults someday will change to frozen::  once we can use all of C++14
 
 static constexpr std::pair<action_message_def::action_t, const char *> actionStrings[] = {
   // priority commands

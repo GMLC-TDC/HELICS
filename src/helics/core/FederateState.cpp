@@ -329,6 +329,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_PUBLICATION);
             rem.setSource (pub->id);
+            rem.actionTime = time_granted;
             for (auto &sub : pub->subscribers)
             {
                 rem.setDestination (sub);
@@ -354,6 +355,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_SUBSCRIBER);
             rem.setSource (ipt->id);
+            rem.actionTime = time_granted;
             for (auto &pub : ipt->input_sources)
             {
                 rem.setDestination (pub);
@@ -1235,7 +1237,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->removeSource (cmd.getSource (), time_granted);
+            subI->removeSource (cmd.getSource (), (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
         }
         break;
     }
