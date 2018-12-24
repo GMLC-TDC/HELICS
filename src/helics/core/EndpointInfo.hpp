@@ -19,8 +19,8 @@ class EndpointInfo
 {
   public:
     /** constructor from all data*/
-    EndpointInfo (global_handle id_, const std::string &key_, const std::string &type_)
-        : id (id_), key (key_), type (type_)
+    EndpointInfo (global_handle handle, const std::string &key_, const std::string &type_)
+        : id (handle), key (key_), type (type_)
     {
     }
 

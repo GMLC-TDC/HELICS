@@ -28,7 +28,7 @@ namespace bdata = boost::unit_test::data;
 class EchoHub
 {
   public:
-    helics::Time finalTime = helics::Time (1000, timeUnits::ns);  // final time
+    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     std::vector<helics::Publication> pubs;
@@ -89,8 +89,8 @@ class EchoHub
 class EchoLeaf
 {
   public:
-    helics::Time deltaTime = helics::Time (10, timeUnits::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (1000, timeUnits::ns);  // final time
+    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
+    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;

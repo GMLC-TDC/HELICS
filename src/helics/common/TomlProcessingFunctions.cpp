@@ -53,14 +53,14 @@ toml::Value loadTomlStr (const std::string &tomlString)
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits)
+helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits)
 {
     if (timeElement.is<toml::Table> ())
     {
         auto units = timeElement.find ("units");
         if (units != nullptr)
         {
-            defaultUnits = helics::timeUnitsFromString (units->as<std::string> ());
+            defaultUnits = helics::time_unitsFromString (units->as<std::string> ());
         }
         auto val = timeElement.find ("value");
         if (val != nullptr)

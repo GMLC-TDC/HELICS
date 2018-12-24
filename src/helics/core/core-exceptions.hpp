@@ -17,64 +17,67 @@ namespace helics
 class HelicsException : public std::exception
 {
   private:
-    std::string message_ = "HELICS EXCEPTION";
+    std::string errorMessage = "HELICS EXCEPTION";
 
   public:
     HelicsException () = default;
-    explicit HelicsException (const std::string &message) : message_ (message) {}
-    virtual const char *what () const noexcept override { return message_.c_str (); }
+    explicit HelicsException (std::string message) : errorMessage (std::move (message)) {}
+    virtual const char *what () const noexcept override { return errorMessage.c_str (); }
 };
 
 /** exception class indicating that a function has failed for some reason*/
 class FunctionExecutionFailure : public HelicsException
 {
   public:
-    explicit FunctionExecutionFailure (const std::string &message = "HELICS execution failure")
-        : HelicsException (message){};
+    explicit FunctionExecutionFailure (std::string message = "HELICS execution failure")
+        : HelicsException (std::move (message)){};
 };
 
 /** exception for an invalid identification Handle*/
 class InvalidIdentifier : public HelicsException
 {
   public:
-    explicit InvalidIdentifier (const std::string &message = "invalid identifier") : HelicsException (message){};
+    explicit InvalidIdentifier (std::string message = "invalid identifier")
+        : HelicsException (std::move (message)){};
 };
 
 /** exception when one or more of the parameters in the function call were invalid*/
 class InvalidParameter : public HelicsException
 {
   public:
-    explicit InvalidParameter (const std::string &message = "invalid parameter") : HelicsException (message){};
+    explicit InvalidParameter (std::string message = "invalid parameter")
+        : HelicsException (std::move (message)){};
 };
 
 /** exception thrown when a function call was made at an inappropriate time*/
 class InvalidFunctionCall : public HelicsException
 {
   public:
-    explicit InvalidFunctionCall (const std::string &message = "invalid function call")
-        : HelicsException (message){};
+    explicit InvalidFunctionCall (std::string message = "invalid function call")
+        : HelicsException (std::move (message)){};
 };
 
 /** exception indicating that the connections of an object or network have failed*/
 class ConnectionFailure : public HelicsException
 {
   public:
-    explicit ConnectionFailure (const std::string &message = "failed to connect") : HelicsException (message){};
+    explicit ConnectionFailure (std::string message = "failed to connect")
+        : HelicsException (std::move (message)){};
 };
 
 /** exception indicating that the registration of an object has failed*/
 class RegistrationFailure : public HelicsException
 {
   public:
-    explicit RegistrationFailure (const std::string &message = "registration failure")
-        : HelicsException (message){};
+    explicit RegistrationFailure (std::string message = "registration failure")
+        : HelicsException (std::move (message)){};
 };
 
 /** severe exception indicating HELICS has failed and terminated unexpectedly*/
 class HelicsSystemFailure : public HelicsException
 {
   public:
-    explicit HelicsSystemFailure (const std::string &message = "HELICS system failure")
-        : HelicsException (message){};
+    explicit HelicsSystemFailure (std::string message = "HELICS system failure")
+        : HelicsException (std::move (message)){};
 };
-}
+}  // namespace helics

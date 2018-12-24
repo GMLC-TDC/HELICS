@@ -57,12 +57,12 @@ Time loadTimeFromString (const std::string &timeString);
 @return a helics time generated from the string
 @throw, invalid_argument if the string is not a valid time
 */
-Time loadTimeFromString (const std::string &timeString, timeUnits defUnit);
+Time loadTimeFromString (const std::string &timeString, time_units defUnit);
 
 /** generate a time related unit,
-@return a timeUnits enumeration value
+@return a time_units enumeration value
 @throw, invalid_argument if the string is not a valid unit
 */
-timeUnits timeUnitsFromString (const std::string &unitString);
+time_units time_unitsFromString (const std::string &unitString);
 
 }  // namespace helics

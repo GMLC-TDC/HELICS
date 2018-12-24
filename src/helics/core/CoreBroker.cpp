@@ -354,7 +354,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         }
         if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
         {
-            // TODO:: this will need to be updated when we enable mesh routing
+            // TODO PT:: this will need to be updated when we enable mesh routing
             _brokers.back ().route = route_id{routeCount++};
             addRoute (_brokers.back ().route, command.getString (targetStringLoc));
             _brokers.back ().parent = global_broker_id_local;
@@ -1747,10 +1747,7 @@ bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
         disconnection.wait ();
         return true;
     }
-    else
-    {
-        return disconnection.wait_for (msToWait);
-    }
+    return disconnection.wait_for (msToWait);
 }
 
 void CoreBroker::processDisconnect (bool skipUnregister)
@@ -1939,36 +1936,33 @@ void CoreBroker::executeInitializationOperations ()
                 addActionMessage (CMD_STOP);
                 return;
             }
-            else
-            {
-                ActionMessage wMiss (CMD_WARNING);
-                wMiss.source_id = global_broker_id_local;
-                wMiss.messageID = defs::errors::connection_failure;
-                unknownHandles.processNonOptionalUnknowns (
-                  [this, &wMiss](const std::string &target, char type, global_handle handle) {
-                      switch (type)
-                      {
-                      case 'p':
-                          wMiss.payload = fmt::format ("Unable to connect to publication target {}", target);
-                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
-                          break;
-                      case 'i':
-                          wMiss.payload = fmt::format ("Unable to connect to input target {}", target);
-                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
-                          break;
-                      case 'f':
-                          wMiss.payload = fmt::format ("Unable to connect to filter target {}", target);
-                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
-                          break;
-                      case 'e':
-                          wMiss.payload = fmt::format ("Unable to connect to endpoint target {}", target);
-                          LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
-                          break;
-                      }
-                      wMiss.setDestination (handle);
-                      routeMessage (wMiss);
-                  });
-            }
+            ActionMessage wMiss (CMD_WARNING);
+            wMiss.source_id = global_broker_id_local;
+            wMiss.messageID = defs::errors::connection_failure;
+            unknownHandles.processNonOptionalUnknowns (
+              [this, &wMiss](const std::string &target, char type, global_handle handle) {
+                  switch (type)
+                  {
+                  case 'p':
+                      wMiss.payload = fmt::format ("Unable to connect to publication target {}", target);
+                      LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                      break;
+                  case 'i':
+                      wMiss.payload = fmt::format ("Unable to connect to input target {}", target);
+                      LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                      break;
+                  case 'f':
+                      wMiss.payload = fmt::format ("Unable to connect to filter target {}", target);
+                      LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                      break;
+                  case 'e':
+                      wMiss.payload = fmt::format ("Unable to connect to endpoint target {}", target);
+                      LOG_WARNING (parent_broker_id, getIdentifier (), wMiss.payload);
+                      break;
+                  }
+                  wMiss.setDestination (handle);
+                  routeMessage (wMiss);
+              });
         }
     }
 

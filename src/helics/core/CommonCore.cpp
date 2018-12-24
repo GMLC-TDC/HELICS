@@ -89,13 +89,11 @@ bool CommonCore::connect ()
             }
             return res;
         }
-        else
+
+        LOG_WARNING (global_id.load (), getIdentifier (), "multiple connect calls");
+        while (brokerState == broker_state_t::connecting)
         {
-            LOG_WARNING (global_id.load (), getIdentifier (), "multiple connect calls");
-            while (brokerState == broker_state_t::connecting)
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-            }
+            std::this_thread::sleep_for (std::chrono::milliseconds (100));
         }
     }
     return isConnected ();
@@ -234,9 +232,9 @@ FederateState *CommonCore::getFederate (const std::string &federateName) const
     return feds->find (federateName);
 }
 
-FederateState *CommonCore::getHandleFederate (interface_handle id_)
+FederateState *CommonCore::getHandleFederate (interface_handle handle)
 {
-    auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
+    auto local_fed_id = handles.read ([handle](auto &hand) { return hand.getLocalFedID (handle); });
     if (local_fed_id.isValid ())
     {
         auto feds = federates.lock ();
@@ -258,9 +256,9 @@ FederateState *CommonCore::getFederateCore (const std::string &federateName)
     return (fed != loopFederates.end ()) ? (*fed) : nullptr;
 }
 
-FederateState *CommonCore::getHandleFederateCore (interface_handle id_)
+FederateState *CommonCore::getHandleFederateCore (interface_handle handle)
 {
-    auto local_fed_id = handles.read ([id_](auto &hand) { return hand.getLocalFedID (id_); });
+    auto local_fed_id = handles.read ([handle](auto &hand) { return hand.getLocalFedID (handle); });
     if (local_fed_id.isValid ())
     {
         return loopFederates[local_fed_id.baseValue ()];
@@ -269,9 +267,9 @@ FederateState *CommonCore::getHandleFederateCore (interface_handle id_)
     return nullptr;
 }
 
-const BasicHandleInfo *CommonCore::getHandleInfo (interface_handle id_) const
+const BasicHandleInfo *CommonCore::getHandleInfo (interface_handle handle) const
 {
-    return handles.read ([id_](auto &hand) { return hand.getHandleInfo (id_.baseValue ()); });
+    return handles.read ([handle](auto &hand) { return hand.getHandleInfo (handle.baseValue ()); });
 }
 
 const BasicHandleInfo *CommonCore::getLocalEndpoint (const std::string &name) const
@@ -358,10 +356,7 @@ bool CommonCore::allDisconnected () const
     {
         return (afed) && (!timeCoord->hasActiveTimeDependencies ());
     }
-    else
-    {
-        return (afed);
-    }
+    return (afed);
 }
 
 bool CommonCore::allFedDisconnected () const
@@ -827,7 +822,7 @@ interface_handle CommonCore::getInput (federate_id_t federateID, const std::stri
     auto ci = handles.read ([&key](auto &hand) { return hand.getInput (key); });
     if (ci->local_fed_id != federateID)
     {
-        return interface_handle ();
+        return {};
     }
     return ci->getInterfaceHandle ();
 }
@@ -1194,14 +1189,11 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-    if (handleInfo->handleType == handle_type::input)
-    {
-        return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ();
-    }
-    else
+    if (handleInfo->handleType != handle_type::input)
     {
         throw (InvalidIdentifier ("Handle does not identify an input"));
     }
+    return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ();
 }
 
 std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interface_handle handle)
@@ -1212,14 +1204,11 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interfa
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
     // todo:: this is a long chain should be refactored
-    if (handleInfo->handleType == handle_type::input)
-    {
-        return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getAllData ();
-    }
-    else
+    if (handleInfo->handleType != handle_type::input)
     {
         throw (InvalidIdentifier ("Handle does not identify an input"));
     }
+    return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getAllData ();
 }
 
 const std::vector<interface_handle> &CommonCore::getValueUpdates (federate_id_t federateID)
@@ -1852,9 +1841,9 @@ void CommonCore::setFilterOperator (interface_handle filter, std::shared_ptr<Fil
     actionQueue.push (filtOpUpdate);
 }
 
-FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle id_)
+FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle handle)
 {
-    auto fnd = filterCoord.find (id_);
+    auto fnd = filterCoord.find (handle);
     if (fnd == filterCoord.end ())
     {
         if (brokerState < operating)
@@ -1862,7 +1851,7 @@ FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle id_)
             // just make a dummy filterFunction so we have something to return
             auto ff = std::make_unique<FilterCoordinator> ();
             auto ffp = ff.get ();
-            filterCoord.emplace (id_, std::move (ff));
+            filterCoord.emplace (handle, std::move (ff));
             return ffp;
         }
         return nullptr;

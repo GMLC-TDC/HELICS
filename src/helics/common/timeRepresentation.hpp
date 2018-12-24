@@ -32,7 +32,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 /** enumeration of different time units
  */
-enum class timeUnits : int
+enum class time_units : int
 {
     ps = 0,
     ns = 1,
@@ -54,9 +54,12 @@ constexpr double timeCountForward[10]{1e12, 1e9,        1e6,          1e3,      
 /** defining doubles for time Multipliers*/
 constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7 * 86400};
 
-inline constexpr double toSecondMultiplier (timeUnits units) { return timeCountReverse[static_cast<int> (units)]; }
+inline constexpr double toSecondMultiplier (time_units units)
+{
+    return timeCountReverse[static_cast<int> (units)];
+}
 
-inline constexpr double toUnitMultiplier (timeUnits units) { return timeCountForward[static_cast<int> (units)]; }
+inline constexpr double toUnitMultiplier (time_units units) { return timeCountForward[static_cast<int> (units)]; }
 
 /** generate powers to two as a constexpr
 @param[in] exponent the power of 2 desired*/
@@ -105,7 +108,7 @@ class integer_time
     }
     static CHRONO_CONSTEXPR baseType convert (std::chrono::nanoseconds nsTime) noexcept
     {
-        return static_cast<baseType> (toDouble (nsTime.count ()) * toSecondMultiplier (timeUnits::ns));
+        return static_cast<baseType> (toDouble (nsTime.count ()) * toSecondMultiplier (time_units::ns));
     }
     /** convert the value to a double representation in seconds*/
     static constexpr double toDouble (baseType val) noexcept
@@ -115,11 +118,11 @@ class integer_time
     /** convert the val to a count of the specified time units
     @details really kind of awkward to do with this time representation so I just convert to a double first
     */
-    static constexpr std::int64_t toCount (baseType val, timeUnits units) noexcept
+    static constexpr std::int64_t toCount (baseType val, time_units units) noexcept
     {
         return static_cast<std::int64_t> (toDouble (val) * toUnitMultiplier (units));
     }
-    static constexpr baseType fromCount (std::uint64_t count, timeUnits units) noexcept
+    static constexpr baseType fromCount (std::uint64_t count, time_units units) noexcept
     {
         return static_cast<baseType> (toDouble (count) * toSecondMultiplier (units));
     }
@@ -198,59 +201,59 @@ class count_time
         return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);
     }
 
-    static std::int64_t toCount (baseType val, timeUnits units) noexcept
+    static std::int64_t toCount (baseType val, time_units units) noexcept
     {
         switch (units)
         {
-        case timeUnits::ps:
+        case time_units::ps:
             return (N >= 12) ? static_cast<std::int64_t> (val / fac10[N - 12]) :
                                static_cast<std::int64_t> (val * fac10[12 - N]);
-        case timeUnits::ns:
+        case time_units::ns:
             return (N >= 9) ? static_cast<std::int64_t> (val / fac10[N - 9]) :
                               static_cast<std::int64_t> (val * fac10[9 - N]);
-        case timeUnits::us:
+        case time_units::us:
             return (N >= 6) ? static_cast<std::int64_t> (val / fac10[N - 6]) :
                               static_cast<std::int64_t> (val * fac10[6 - N]);
-        case timeUnits::ms:
+        case time_units::ms:
             return (N >= 3) ? static_cast<std::int64_t> (val / fac10[N - 3]) :
                               static_cast<std::int64_t> (val * fac10[3 - N]);
-        case timeUnits::s:
-        case timeUnits::sec:
+        case time_units::s:
+        case time_units::sec:
         default:
             return seconds (val);
-        case timeUnits::minutes:
+        case time_units::minutes:
             return static_cast<std::int64_t> (val / (iFactor * 60));
-        case timeUnits::hr:
+        case time_units::hr:
             return static_cast<std::int64_t> (val / (iFactor * 3600));
-        case timeUnits::day:
+        case time_units::day:
             return static_cast<std::int64_t> (val / (iFactor * 86400));
         }
     }
-    static baseType fromCount (std::int64_t val, timeUnits units) noexcept
+    static baseType fromCount (std::int64_t val, time_units units) noexcept
     {
         switch (units)
         {
-        case timeUnits::ps:
+        case time_units::ps:
             return (N >= 12) ? static_cast<baseType> (val * fac10[N - 12]) :
                                static_cast<baseType> (val / fac10[12 - N]);
-        case timeUnits::ns:
+        case time_units::ns:
             return (N >= 9) ? static_cast<baseType> (val * fac10[N - 9]) :
                               static_cast<baseType> (val / fac10[9 - N]);
-        case timeUnits::us:
+        case time_units::us:
             return (N >= 6) ? static_cast<baseType> (val * fac10[N - 6]) :
                               static_cast<baseType> (val / fac10[6 - N]);
-        case timeUnits::ms:
+        case time_units::ms:
             return (N >= 3) ? static_cast<baseType> (val * fac10[N - 3]) :
                               static_cast<baseType> (val / fac10[3 - N]);
-        case timeUnits::s:
-        case timeUnits::sec:
+        case time_units::s:
+        case time_units::sec:
         default:
             return static_cast<baseType> (val * iFactor);
-        case timeUnits::minutes:
+        case time_units::minutes:
             return static_cast<baseType> (val * 60 * iFactor);
-        case timeUnits::hr:
+        case time_units::hr:
             return static_cast<baseType> (val * 3600 * iFactor);
-        case timeUnits::day:
+        case time_units::day:
             return static_cast<baseType> (val * 86400 * iFactor);
         }
     }
@@ -279,11 +282,11 @@ class double_time
     static constexpr baseType minVal () noexcept { return (std::numeric_limits<base>::min); }
     static constexpr baseType zeroVal () noexcept { return 0.0; }
     static constexpr baseType epsilon () noexcept { return (std::numeric_limits<base>::epsilon); }
-    static constexpr std::int64_t toCount (baseType val, timeUnits units) noexcept
+    static constexpr std::int64_t toCount (baseType val, time_units units) noexcept
     {
         return static_cast<std::int64_t> (val * timeCountForward[static_cast<int> (units)]);
     }
-    static constexpr baseType fromCount (std::int64_t val, timeUnits units) noexcept
+    static constexpr baseType fromCount (std::int64_t val, time_units units) noexcept
     {
         return static_cast<baseType> (val * timeCountReverse[static_cast<int> (units)]);
     }
@@ -350,7 +353,7 @@ class TimeRepresentation
 #ifdef _DEBUG
     /** normal time constructor from a double representation of seconds*/
     constexpr TimeRepresentation (double t) noexcept : timecode_ (Tconv::convert (t)), dtime_ (t) {}
-    TimeRepresentation (std::int64_t count, timeUnits units) noexcept
+    TimeRepresentation (std::int64_t count, time_units units) noexcept
         : timecode_ (Tconv::fromCount (count, units)){DOUBLETIME};
     TimeRepresentation (std::chrono::nanoseconds nsTime) noexcept : timecode_ (Tconv::convert (nsTime))
     {
@@ -364,7 +367,7 @@ class TimeRepresentation
         : timecode_ (Tconv::convert (nsTime))
     {
     }
-    constexpr TimeRepresentation (std::int64_t count, timeUnits units) noexcept
+    constexpr TimeRepresentation (std::int64_t count, time_units units) noexcept
         : timecode_ (Tconv::fromCount (count, units))
     {
     }
@@ -394,7 +397,7 @@ class TimeRepresentation
     /** generate the time in seconds*/
     constexpr std::int64_t seconds () const noexcept { return Tconv::seconds (timecode_); }
     /** convert to an integer 64 value*/
-    std::int64_t toCount (timeUnits units) const noexcept { return Tconv::toCount (timecode_, units); }
+    std::int64_t toCount (time_units units) const noexcept { return Tconv::toCount (timecode_, units); }
 
     /** default copy operation*/
     TimeRepresentation &operator= (const TimeRepresentation &x) noexcept = default;
@@ -409,7 +412,7 @@ class TimeRepresentation
     /** direct conversion to chrono nanoseconds*/
     std::chrono::nanoseconds to_ns () const
     {
-        return std::chrono::nanoseconds (Tconv::toCount (timecode_, timeUnits::ns));
+        return std::chrono::nanoseconds (Tconv::toCount (timecode_, time_units::ns));
     }
     /** direct conversion to double static cast overload*/
     constexpr operator double () const noexcept { return Tconv::toDouble (timecode_); }
