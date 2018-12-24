@@ -116,7 +116,7 @@ void makeConnectionsJson (brkX *brk, const std::string &file)
 {
     static_assert (std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
                    "broker must be Core or broker");
-    Json_helics::Value doc;
+    Json::Value doc;
     try
     {
         doc = loadJson (file);

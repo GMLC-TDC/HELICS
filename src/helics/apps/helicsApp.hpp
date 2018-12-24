@@ -12,22 +12,20 @@ namespace boost
 namespace program_options
 {
 class variables_map;
-} //namespace program_options
-} //namespace boost
-
-namespace Json_helics
-{
-class Value;
-}
+}  // namespace program_options
+}  // namespace boost
 
 namespace helics
 {
+namespace Json
+{
+class Value;
+}
 namespace apps
 {
-
 /** class defining a basic helics App
-@details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple threads without external
-protection, that will result in undefined behavior
+@details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple threads without
+external protection, that will result in undefined behavior
 */
 class App
 {
@@ -80,7 +78,7 @@ class App
     /** run the Player until the specified time
     @param stopTime_input the desired stop time
     */
-    virtual void runTo (Time stopTime_input)=0;
+    virtual void runTo (Time stopTime_input) = 0;
 
     /** finalize the Player federate*/
     virtual void finalize ();
@@ -97,11 +95,13 @@ class App
     /** load from a jsonString and check a field named appName for configuration options
     @param jsonString either a JSON filename or a string containing JSON
     */
-    void loadJsonFileConfiguration(const std::string &appName, const std::string &jsonString);
+    void loadJsonFileConfiguration (const std::string &appName, const std::string &jsonString);
     /** load a text file*/
     virtual void loadTextFile (const std::string &textFile);
-private:
-    void loadConfigOptions(const Json_helics::Value &element);
+
+  private:
+    void loadConfigOptions (const Json::Value &element);
+
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
     Time stopTime = Time::maxVal ();  //!< the time the Player should stop
@@ -112,5 +112,4 @@ private:
     bool quietMode = false;
 };
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics
