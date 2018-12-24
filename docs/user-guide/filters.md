@@ -60,8 +60,8 @@ The JSON configuration file adds a new `filter` section that implements the filt
 * **`name`** (optional) - Name of the endpoint filter
 * **`target`** - Name of the endpoint to which this filter will apply
 * **`mode`** - Either `source` or `destination`, defining whether the filter should impact out-going or in-coming messages, respectively.
-* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`.
-* **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayedl.
+* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
+* **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed.
 
 Let's run [this co-simulation](../../examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
 
