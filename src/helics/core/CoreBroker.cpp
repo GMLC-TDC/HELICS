@@ -867,6 +867,12 @@ void CoreBroker::processCommand (ActionMessage &&command)
             if (brk != nullptr)
             {
                 brk->_disconnected = true;
+                if ((isRootc) && (brokerState < broker_state_t::operating))
+                {
+                    command.setAction (CMD_BROADCAST_DISCONNECT);
+                    broadcast (command);
+                    unknownHandles.clearFederateUnknowns (command.source_id);
+                }
             }
             if (hasTimeDependency)
             {
