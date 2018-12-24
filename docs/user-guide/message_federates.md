@@ -19,7 +19,9 @@ Consider a counter-example: automated meter-reading (AMI) using a wireless netwo
 ![ami message federates](../img/ami_message_federate.pdf)
 
 ## Interactions Between Messages and Values
+Though it is not possible to to send to have a HELICS message show up at a value interface, the converse is possible; message_federates can subscribe to HELICS values. Every time a value federate publishes a new value to the federation, if a message federate has subscribed to that message HELICS will generate a new HELICS message and send it directly to the destination endpoint. These messages are queued and not overwritten (unlike in HELICS values) which means when a message federate is synchronized it may have multiple messages from the same source to manage.
 
+This feature offers the convenience of allowing a message federate to receive messages from pure value federates that have no endpoints defined. This is particularly useful for simulators that do not support endpoints but are required to provide measurement signals controllers. Implemented in this way, though, it is not possible to later implement a full-blown communication simulator that these values-turned-messages can traverse. Such co-simulation architectures in HELICS require the existence of both a sending and receiving endpoint; this feature very explicitly by-passes the need for a sending endpoint.
 
 
 ## Message Federate Configuration in JSON ##
@@ -60,14 +62,14 @@ Once the message topology considering endpoints has been determined, the definit
 
 There are a few other configuration parameters that are applicable if the endpoint is interacting with a HELICS value message.
 
-* **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive. Each time that federate publishes a new value, a HELICS message is generated end sent to this endpoint. These messages are queued and not overwriting (unlike in HELICS values) which means when a message federate is synchronized it may have multiple messages from the same source to manage.
+* **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive. HELICS will generate a message and send it to this endpoint whenever the originating value federate updates to value.
 * **`type`** and **`units`** - Just as in HELICS values, messages that come from value federates have associated data types and units. As in value federates, HELICS can use the specified `type` and `units` field to perform appropriate conversions. (As of v2.0, unit conversion is not supported.)
 
 
 ## Example 1b - Distribution system EV charge controller ##
 To demonstrate how a message federate interacts with the federation, let's take the previous example and add two things to it: electric vehicle (EV) loads in the distribution system, and a centralized EV charge control manager.
 
-Keeping in mind that this a model for demonstration purposes (which is to say, don't take this too seriously), let's make the following assumptions to simplify the behavior of the EV charge controller:
+Keeping in mind that this a model for demonstration purposes (which is to say, don't take this too seriously), let's make the following assumptions and definitions to simplify the behavior of the EV charge controller:
 
   * All EVs are very large (200kW; level 2 charging is rated up to 20kW)
   * All EVs have infinite battery capacity
@@ -198,7 +200,6 @@ Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_exa
 
 ```
 GridLAB-D is publishing out the total load on the feeder as well as the individual EV charging loads. It also has endpoints set up for each of the EV chargers to receive messages from the controller. Based on the strings in the `info` field it appears that the received messages are used to define the EV charge power.
-
 
 
 [Running the example](../../examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
