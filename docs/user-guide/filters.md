@@ -4,39 +4,78 @@ As was introduced in the [introductory section on federates](./federates.md), me
 
   1. **Messages are directed and unique, values are persistent.** - Because HELICS values are used to represent physical reality, they are available to any subscribing federate at any time. If the publishing federate only updates the value, say, once every minute, any subscribing federates that are granted a time during that minute window will all receive the same value regardless of when they requested it. 
 
-  HELICS messages, though, are much more like other kinds of real-world messages in that they are directed and unique. Messages are sent by a federate from one endpoint to another endpoint in the federation (presumably the endpoint endpoint is owned by another federate but this doesn't have to be the case). Internal to HELICS, each message has a unique serial number and can be thought to travel between a generic communication system between the source and destination endpoints.
+  HELICS messages, though, are much more like other kinds of real-world messages in that they are directed and unique. Messages are sent by a federate from one endpoint to another endpoint in the federation (presumably the receiving endpoint is owned by another federate but this doesn't have to be the case). Internal to HELICS, each message has a unique serial number and can be thought to travel between a generic communication system between the source and destination endpoints.
   
-  2. **Messages can be filtered, values cannot.** - By creating a generic communication system between two endpoints, HELICS has the ability to model simple communication system effects on messages traveling through said network. These effects are called "filters" and are associated with the HELICS core (which in turn manages the federate's endpoints) embedded with the federate in question. Common filtering actions might be delaying the transmission of the message or randomly dropping a certain percentage of the received messages. Filters can also be defined to operate on messages being sent ("source filters") and/or messages being received ("destination filters").
+  2. **Messages can be filtered, values cannot.** - By creating a generic communication system between two endpoints, HELICS has the ability to model simple communication system effects on messages traveling through said network. These effects are called "filters" and are associated with the HELICS core (which in turn manages the federate's endpoints) embedded with the federate in question. Typical filtering actions might be delaying the transmission of the message or randomly dropping a certain percentage of the received messages. Filters can also be defined to operate on messages being sent ("source filters") and/or messages being received ("destination filters").
 
-  Because HELICS values do not pass through this generic network, they cannot be operated on by filters. Since HELICS values are used to represent physics of the system not the control and coordination of it, it is appropriate that filters not be available to to. Its entirely possible to to use HELICS value federates to send control signals to other federates; co-simulations can and have been made to work in such ways. Doing so, though, cuts out the possibility of using filters and, as we'll see, the easy integration of communication system simulators.
+  Because HELICS values do not pass through this generic network, they cannot be operated on by filters. Since HELICS values are used to represent physics of the system not the control and coordination of it, it is appropriate that filters not be available to to. It is entirely possible to to use HELICS value federates to send control signals to other federates; co-simulations can and have been made to work in such ways. Doing so, though, cuts out the possibility of using filters and, as we'll see, the easy integration of communication system simulators.
   
 The figure below is an example of a representation of the message topology of a generic co-simulation federation composed entirely of message federates. Source and destination filters have been implemented (indicated by the blue endpoints), each showing a different built-in HELICS filter function. 
   
-  - As a reminder, a single endpoint can be used to both send and receive messages (as shown by Federate 4) but a single filter will only act on messages sent or messages received. Both a source filter and a destination filter can be set up on a single endpoint.
-  - The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by the same 0.4 seconds. Without establishing a separate endpoint to devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
-  - Because the filter on Federate 4 is a destination filter, the message it receives  from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
-  - As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
+  * As a reminder, a single endpoint can be used to both send and receive messages (as shown by Federate 4) but a single filter will only act on messages sent or messages received. Both a source filter and a destination filter can be set up on a single endpoint.
+  * The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by the same 0.5 seconds. Without establishing a separate endpoint to devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
+  * Because the filter on Federate 4 is a destination filter, the message it receives  from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
+  * As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
 
 ![messages and filters example](../img/messages_and_filters_example.pdf)
   
 ### Example 1c - EV charge controller with HELICS filters ###
 
-To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a xxxxxxx second delay to the message received by the EV charge controller from the substation and an error rate of xxxxxxx for the messages sent to the EV chargers.
+To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
 
 ![Ex. 1c message topology](../img/ex1c_message_topology.pdf)
 
-Let's run this co-simulation and capture the same data as last time for direct comparison: total substation load and number of EV's charging, both as a function of time.
+The JSON configuration file adds a new `filter` section that implements the filtering:
 
-(xxxxxxx - graph showing Substation load (using results from 1b and 1c) vs time)
+```
+...
+"filters":
+	[
+		{
+		"name":"filterEV6",
+		"target":"EV_Controller/EV6",
+		"mode":"source", 
+		"operation":"delay",
+		"properties":
+			{
+			"name":"delay", 
+			"value":600
+			}
+		},
+		{
+		"name":"filterEV5",
+		"target":"EV_Controller/EV5",
+		"mode":"source", 
+		"operation":"delay",
+		"properties":
+			{
+			"name":"delay", 
+			"value":600
+			}
+		},
+		...
+	]	
+```
 
-(xxxxxxx- graph showing Number of EVs charging (using results from 1b and 1c) vs time)
+* **`name`** (optional) - Name of the endpoint filter
+* **`target`** - Name of the endpoint to which this filter will apply
+* **`mode`** - Either `source` or `destination`, defining whether the filter should impact out-going or in-coming messages, respectively.
+* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`.
+* **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayedl.
 
-The impact of the communication system modeled by this single HELICS filter is clear. xxxxxxx
+Let's run [this co-simulation](../../examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
+
+![Ex. 1c total feeder load](../img/Ex1c_Feeder_consumption.png)
+
+![Ex. 1c EV charge pattern](../img/Ex1c_EV_outputs.png)
+
+
+Granted that the charge controller communication system is ridiculously poor, this example does show that communication system effects can have a significant impact on system operation. For more realistic example, the HELICS Use Case repository has [an example](https://github.com/GMLC-TDC/HELICS-Use-Cases/tree/master/PNNL-Wide-Area-Control) of frequency control using real-time PMU measurements that shows the impact of imperfect communication systems.
 
 ## Explicit Communication System Modeling ##
 HELICS filters are a simple, easy step to adding a touch of realism to messages in the HELICS co-simulation. The simplicity of filters, though, may be inadequate at times. Real-world communication networks have dynamic delays and data loss rates, protocol effects, and more complex topologies. Sometimes, these effects are important (or may even be the point of the co-simulation) and an explicit communication system model is required to capture these effects. 
 
-The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in the communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the the figure below:
+The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the the figure below:
 
 ![filters federate example](../img/filter_federate_example.pdf)
 
@@ -48,7 +87,13 @@ For the [version of ns-3 that includes HELICS integration](https://github.com/GM
 
 The specific ns-3 model built for this example uses the CSMA model built into ns-3 as a stand-in for a power-line carrier (PLC) communication system. Both CSMA and PLC use a bus topology with all transmitters attached to a common, shared communication channel. Each EV in the electrical network will be represented by a corresponding communication node. Older PLC implementations were known to be quite slow and we'll abuse and stretch this fact to force the average of the communication delays through the network to match that of the previous example. We'll also set the receiver at the substation to have a corresponding receive error rate. 
 
-First, you'll need to install the [HELICS-enabled version of ns-3](xxxxxxx - need documentation on how to do this that isn't a YouTube video).
+First, you'll need to install the [HELICS-enabled version of ns-3](https://github.com/GMLC-TDC/helics-ns3). As the README indicates, HELICS for ns-3 is an extension that is simply plopped into the standard ns-3 distribution `contrib` folder and the configured with a few extra switches and compiled.
+
+**REMAINDER OF THIS SECTION IS TBD**
+
+<!--
+Scott Harpool is developing the GLD model
+Touhid is developing the ns-3 model
 
 First, to make sure the model is working as intended, let's verify that performance of the communication system model is different when using the native HELICS filters vs a stand-alone communication network simulator.
 
@@ -63,3 +108,4 @@ What impact does this model have on the performance of the system?
 (xxxxxxx - Graph showing impact at transmission level due to communication system effects.)
 
 As you can see, xxxxxxx
+-->
