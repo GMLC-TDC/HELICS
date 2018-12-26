@@ -900,25 +900,24 @@ const std::string &CommonCore::getUnits (interface_handle handle) const
         default:
             break;
         }
-       
     }
     return emptyStr;
 }
 
 const std::string &CommonCore::getInjectionType (interface_handle handle) const
 {
-    auto handleInfo = getHandleInfo(handle);
+    auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
     {
         switch (handleInfo->handleType)
         {
         case handle_type::input:
         {
-            auto fed = getFederateAt(handleInfo->local_fed_id);
-            auto inpInfo = fed->interfaces().getInput(handle);
+            auto fed = getFederateAt (handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces ().getInput (handle);
             if (inpInfo != nullptr)
             {
-                if (!inpInfo->inputType.empty())
+                if (!inpInfo->inputType.empty ())
                 {
                     return inpInfo->inputType;
                 }
@@ -1964,16 +1963,16 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "dependencies")
     {
-        Json_helics::Value base;
+        Json::Value base;
         base["name"] = getIdentifier ();
         base["id"] = global_broker_id_local.baseValue ();
         base["parent"] = higher_broker_id.baseValue ();
-        base["dependents"] = Json_helics::arrayValue;
+        base["dependents"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependents ())
         {
             base["dependents"].append (dep.baseValue ());
         }
-        base["dependencies"] = Json_helics::arrayValue;
+        base["dependencies"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependencies ())
         {
             base["dependencies"].append (dep.baseValue ());
@@ -1982,14 +1981,14 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "federate_map")
     {
-        Json_helics::Value block;
+        Json::Value block;
         block["name"] = getIdentifier ();
         block["id"] = global_broker_id_local.baseValue ();
         block["parent"] = higher_broker_id.baseValue ();
-        block["federates"] = Json_helics::arrayValue;
+        block["federates"] = Json::arrayValue;
         for (auto fed : loopFederates)
         {
-            Json_helics::Value fedBlock;
+            Json::Value fedBlock;
             fedBlock["name"] = fed->getIdentifier ();
             fedBlock["id"] = fed->global_id.load ().baseValue ();
             fedBlock["parent"] = global_broker_id_local.baseValue ();
@@ -1999,33 +1998,33 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "dependency_graph")
     {
-        Json_helics::Value block;
+        Json::Value block;
         block["name"] = getIdentifier ();
         block["id"] = global_broker_id_local.baseValue ();
         block["parent"] = higher_broker_id.baseValue ();
-        block["federates"] = Json_helics::arrayValue;
-        block["dependents"] = Json_helics::arrayValue;
+        block["federates"] = Json::arrayValue;
+        block["dependents"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependents ())
         {
             block["dependents"].append (dep.baseValue ());
         }
-        block["dependencies"] = Json_helics::arrayValue;
+        block["dependencies"] = Json::arrayValue;
         for (auto &dep : timeCoord->getDependencies ())
         {
             block["dependencies"].append (dep.baseValue ());
         }
         for (auto fed : loopFederates)
         {
-            Json_helics::Value fedBlock;
+            Json::Value fedBlock;
             fedBlock["name"] = fed->getIdentifier ();
             fedBlock["id"] = fed->global_id.load ().baseValue ();
             fedBlock["parent"] = global_broker_id_local.baseValue ();
-            fedBlock["dependencies"] = Json_helics::arrayValue;
+            fedBlock["dependencies"] = Json::arrayValue;
             for (auto &dep : fed->getDependencies ())
             {
                 fedBlock["dependencies"].append (dep.baseValue ());
             }
-            fedBlock["dependents"] = Json_helics::arrayValue;
+            fedBlock["dependents"] = Json::arrayValue;
             for (auto &dep : fed->getDependents ())
             {
                 fedBlock["dependents"].append (dep.baseValue ());

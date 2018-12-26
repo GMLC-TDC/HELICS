@@ -83,11 +83,11 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
         return;
     }
     FederateInfo fi (argc, argv);
-    if (fi.defName.empty())
+    if (fi.defName.empty ())
     {
         fi.defName = defaultAppName;
     }
-    
+
     fed = std::make_shared<CombinationFederate> ("", fi);
     App::loadArguments (vm_map);
 }
@@ -175,7 +175,7 @@ void App::loadJsonFileConfiguration (const std::string &appName, const std::stri
     }
 }
 
-void App::loadConfigOptions (const Json_helics::Value &element)
+void App::loadConfigOptions (const Json::Value &element)
 {
     if (element.isMember ("stop"))
     {
