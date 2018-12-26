@@ -247,13 +247,13 @@ FederateState *CommonCore::getHandleFederate (interface_handle handle)
 FederateState *CommonCore::getFederateCore (global_federate_id federateID)
 {
     auto fed = loopFederates.find (federateID);
-    return (fed != loopFederates.end ()) ? (*fed) : nullptr;
+    return (fed != loopFederates.end ()) ? (fed->fed) : nullptr;
 }
 
 FederateState *CommonCore::getFederateCore (const std::string &federateName)
 {
     auto fed = loopFederates.find (federateName);
-    return (fed != loopFederates.end ()) ? (*fed) : nullptr;
+    return (fed != loopFederates.end ()) ? (fed->fed) : nullptr;
 }
 
 FederateState *CommonCore::getHandleFederateCore (interface_handle handle)
@@ -261,7 +261,7 @@ FederateState *CommonCore::getHandleFederateCore (interface_handle handle)
     auto local_fed_id = handles.read ([handle](auto &hand) { return hand.getLocalFedID (handle); });
     if (local_fed_id.isValid ())
     {
-        return loopFederates[local_fed_id.baseValue ()];
+        return loopFederates[local_fed_id.baseValue ()].fed;
     }
 
     return nullptr;
@@ -347,11 +347,7 @@ bool CommonCore::allInitReady () const
 bool CommonCore::allDisconnected () const
 {
     // all federates must have hit finished state
-    auto pred = [](const auto &fed) {
-        auto state = fed->getState ();
-        return (HELICS_FINISHED == state) || (HELICS_ERROR == state) || (HELICS_TERMINATING == state);
-    };
-    auto afed = std::all_of (loopFederates.begin (), loopFederates.end (), pred);
+    auto afed = allFedDisconnected ();
     if ((hasTimeDependency) || (hasFilters))
     {
         return (afed) && (!timeCoord->hasActiveTimeDependencies ());
@@ -362,10 +358,7 @@ bool CommonCore::allDisconnected () const
 bool CommonCore::allFedDisconnected () const
 {
     // all federates must have hit finished state
-    auto pred = [](const auto &fed) {
-        auto state = fed->getState ();
-        return (HELICS_FINISHED == state) || (HELICS_ERROR == state) || (HELICS_TERMINATING == state);
-    };
+    auto pred = [](const auto &fed) { return fed.disconnected; };
     return std::all_of (loopFederates.begin (), loopFederates.end (), pred);
 }
 
@@ -2294,7 +2287,7 @@ void CommonCore::sendErrorToFederates (int error_code)
     errorCom.messageID = error_code;
     for (auto &fed : loopFederates)
     {
-        if (fed != nullptr)
+        if ((fed) && (!fed.disconnected))
         {
             fed->addAction (errorCom);
         }
@@ -2497,6 +2490,12 @@ void CommonCore::processCommand (ActionMessage &&command)
         {
             if (brokerState < broker_state_t::terminating)
             {
+                auto fed = loopFederates.find (command.source_id);
+                if (fed == loopFederates.end ())
+                {
+                    return;
+                }
+                fed->disconnected = true;
                 auto cstate = brokerState.load ();
                 if ((!checkAndProcessDisconnect ()) || (cstate < broker_state_t::operating))
                 {
@@ -2900,6 +2899,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         auto pub = loopHandles.getPublication (command.name);
         if (pub != nullptr)
         {
+            if (checkActionFlag (*pub, disconnected_flag))
+            {
+                // TODO:: this might generate an error if the required flag was set
+                return;
+            }
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.setDestination (pub->handle);
             command.name.clear ();
@@ -2921,6 +2925,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         auto inp = loopHandles.getInput (command.name);
         if (inp != nullptr)
         {
+            if (checkActionFlag (*inp, disconnected_flag))
+            {
+                // TODO:: this might generate an error if the required flag was set
+                return;
+            }
             command.setAction (CMD_ADD_PUBLISHER);
             command.setDestination (inp->handle);
             command.name.clear ();
@@ -2949,6 +2958,11 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
         auto filt = loopHandles.getFilter (command.name);
         if (filt != nullptr)
         {
+            if (checkActionFlag (*filt, disconnected_flag))
+            {
+                // TODO:: this might generate an error if the required flag was set
+                return;
+            }
             command.setAction (CMD_ADD_ENDPOINT);
             command.setDestination (filt->handle);
             command.name.clear ();
@@ -2965,11 +2979,16 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
     break;
     case CMD_ADD_NAMED_ENDPOINT:
     {
-        auto pub = loopHandles.getEndpoint (command.name);
-        if (pub != nullptr)
+        auto ept = loopHandles.getEndpoint (command.name);
+        if (ept != nullptr)
         {
+            if (checkActionFlag (*ept, disconnected_flag))
+            {
+                // TODO:: this might generate an error if the required flag was set
+                return;
+            }
             command.setAction (CMD_ADD_FILTER);
-            command.setDestination (pub->handle);
+            command.setDestination (ept->handle);
             command.name.clear ();
             addTargetToInterface (command);
             command.setAction (CMD_ADD_ENDPOINT);

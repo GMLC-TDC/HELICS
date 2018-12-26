@@ -40,6 +40,19 @@ class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
 
+/** helper class for containing some wrapper around a federate for the core*/
+class FedInfo
+{
+  public:
+    FederateState *fed = nullptr;
+    bool disconnected = false;
+    constexpr FedInfo () noexcept {};
+    constexpr FedInfo (FederateState *newfed) noexcept : fed (newfed){};
+    FederateState *operator-> () { return fed; }
+    const FederateState *operator-> () const { return fed; }
+    operator bool () const { return (fed != nullptr); }
+};
+
 /** base class implementing a standard interaction strategy between federates
 @details the CommonCore is virtual class that manages local federates and handles most of the
 interaction between federate it is meant to be instantiated for specific inter-federate communication
@@ -309,7 +322,7 @@ class CommonCore : public Core, public BrokerBase
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
     shared_guarded<MappedPointerVector<FederateState, std::string>>
       federates;  //!< threadsafe local federate information list for external functions
-    DualMappedVector<FederateState *, std::string, global_federate_id>
+    DualMappedVector<FedInfo, std::string, global_federate_id>
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent

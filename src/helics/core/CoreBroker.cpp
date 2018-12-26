@@ -2034,6 +2034,7 @@ void CoreBroker::processDisconnect (ActionMessage &command)
     switch (command.action ())
     {
     case CMD_DISCONNECT:
+    case CMD_PRIORITY_DISCONNECT:
         if (command.dest_id == global_broker_id_local)
         {
             // deal with the time implications of the message
@@ -2073,7 +2074,8 @@ void CoreBroker::processDisconnect (ActionMessage &command)
             if (brk != nullptr)
             {
                 LOG_CONNECTIONS (parent_broker_id, getIdentifier (),
-                                 fmt::format ("got disconnect from {}", command.source_id.baseValue ()));
+                                 fmt::format ("got disconnect from {}({})", brk->name,
+                                              command.source_id.baseValue ()));
                 disconnectBroker (*brk);
             }
 
@@ -2151,6 +2153,8 @@ void CoreBroker::processDisconnect (ActionMessage &command)
             }
         }
         break;
+    default:
+        break;
     }
 }
 
@@ -2161,9 +2165,9 @@ void CoreBroker::disconnectBroker (BasicBrokerInfo &brk)
     {
         if (isRootc)
         {
-            ActionMessage disconnect (CMD_BROADCAST_DISCONNECT);
-            disconnect.source_id = brk.global_id;
-            broadcast (disconnect);
+            ActionMessage dis (CMD_BROADCAST_DISCONNECT);
+            dis.source_id = brk.global_id;
+            broadcast (dis);
             unknownHandles.clearFederateUnknowns (brk.global_id);
             if (!brk._core)
             {

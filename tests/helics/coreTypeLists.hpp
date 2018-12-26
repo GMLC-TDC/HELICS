@@ -25,8 +25,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define TCPTEST3 "tcp_3",
 #define TCPTEST4 "tcp_4",
 
-#define TCPSSTEST "tcp",
-#define TCPSSTEST2 "tcp_2",
+#define TCPSSTEST "tcpss",
+#define TCPSSTEST2 "tcpss_2",
 #else
 #define TCPTEST
 #define TCPTEST2
@@ -62,13 +62,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 constexpr const char *ztypes[] = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
 
-constexpr const char *core_types[] = {"test", ZMQTEST3 IPCTEST2 TCPTEST "test_2", ZMQTEST UDPTEST "test_3"};
+constexpr const char *core_types[] = {"test", ZMQTEST3 IPCTEST2 TCPTEST "test_2",
+                                      ZMQTEST UDPTEST TCPSSTEST "test_3"};
 
 constexpr const char *core_types_2[] = {IPCTEST2 TCPTEST2 "test_2", TCPSSTEST2 ZMQTEST2 UDPTEST2};
 
 constexpr const char *core_types_simple[] = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
 constexpr const char *core_types_single[] = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST "test_3",
-                                             TCPSSTEST2 ZMQTEST3 TCPTEST3 UDPTEST3};
+                                             ZMQTEST3 TCPTEST3 UDPTEST3};
 constexpr const char *core_types_all[] = {"test", TCPSSTEST IPCTEST2 TCPTEST "test_2",
                                           ZMQTEST UDPTEST TCPSSTEST2 "test_3",
                                           ZMQTEST3 IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 TCPTEST3 "test_4",
