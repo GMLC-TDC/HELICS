@@ -2495,16 +2495,20 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_DISCONNECT_FED:
         if (command.dest_id == parent_broker_id)
         {
-            if ((!checkAndProcessDisconnect ()) || (brokerState < broker_state_t::operating))
+            if (brokerState < broker_state_t::terminating)
             {
-                command.setAction (CMD_DISCONNECT_FED);
-                transmit (parent_route_id, command);
-                if (!allFedDisconnected ())
+                auto cstate = brokerState.load ();
+                if ((!checkAndProcessDisconnect ()) || (cstate < broker_state_t::operating))
                 {
-                    command.setAction (CMD_DISCONNECT_FED_ACK);
-                    command.dest_id = command.source_id;
-                    command.source_id = parent_broker_id;
-                    routeMessage (command);
+                    command.setAction (CMD_DISCONNECT_FED);
+                    transmit (parent_route_id, command);
+                    if (!allFedDisconnected ())
+                    {
+                        command.setAction (CMD_DISCONNECT_FED_ACK);
+                        command.dest_id = command.source_id;
+                        command.source_id = parent_broker_id;
+                        routeMessage (command);
+                    }
                 }
             }
         }
@@ -3685,6 +3689,10 @@ bool CommonCore::waitCoreRegistration ()
 
 bool CommonCore::checkAndProcessDisconnect ()
 {
+    if ((brokerState == broker_state_t::terminating) || (brokerState == broker_state_t::terminated))
+    {
+        return true;
+    }
     if (allDisconnected ())
     {
         brokerState = broker_state_t::terminating;

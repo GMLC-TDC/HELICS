@@ -646,7 +646,7 @@ void CoreBroker::sendErrorToImmediateBrokers (int error_code)
 void CoreBroker::processCommand (ActionMessage &&command)
 {
     LOG_TRACE (global_broker_id_local, getIdentifier (),
-               fmt::format ("|| cmd:{} from {} to ", prettyPrintString (command), command.source_id.baseValue (),
+               fmt::format ("|| cmd:{} from {} to {}", prettyPrintString (command), command.source_id.baseValue (),
                             command.dest_id.baseValue ()));
     switch (command.action ())
     {
@@ -656,7 +656,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
 
     case CMD_TICK:
         timeoutMon->tick (this);
-        LOG_WARNING (global_broker_id_local, getIdentifier (), " broker tick");
+        LOG_SUMMARY (global_broker_id_local, getIdentifier (), " broker tick");
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -850,106 +850,9 @@ void CoreBroker::processCommand (ActionMessage &&command)
         /* FALLTHROUGH */
     case CMD_DISCONNECT:
     case CMD_DISCONNECT_CORE:
-    {
-        if ((command.dest_id == parent_broker_id) || (command.dest_id == global_broker_id_local))
-        {
-            if (!isRootc)
-            {
-                if (command.source_id == higher_broker_id)
-                {
-                    sendDisconnect ();
-                    addActionMessage (CMD_STOP);
-                    return;
-                }
-            }
-
-            auto brk = getBrokerById (global_broker_id (command.source_id));
-            if (brk != nullptr)
-            {
-                brk->_disconnected = true;
-                if (brokerState < broker_state_t::operating)
-                {
-                    if (isRootc)
-                    {
-                        command.setAction (CMD_BROADCAST_DISCONNECT);
-                        broadcast (command);
-                        unknownHandles.clearFederateUnknowns (command.source_id);
-                    }
-                    else
-                    {
-                        command.setAction (CMD_DISCONNECT_CORE);
-                        transmit (parent_route_id, command);
-                    }
-                }
-            }
-            if (hasTimeDependency)
-            {
-                if (!enteredExecutionMode)
-                {
-                    timeCoord->processTimeMessage (command);
-                    auto res = timeCoord->checkExecEntry ();
-                    if (res == message_processing_result::next_step)
-                    {
-                        enteredExecutionMode = true;
-                    }
-                }
-                else
-                {
-                    if (timeCoord->processTimeMessage (command))
-                    {
-                        timeCoord->updateTimeFactors ();
-                    }
-                }
-            }
-
-            if (allDisconnected ())
-            {
-                timeCoord->disconnect ();
-                if (!isRootc)
-                {
-                    ActionMessage dis (CMD_DISCONNECT);
-                    dis.source_id = global_broker_id_local;
-                    transmit (parent_route_id, dis);
-                }
-                else
-                {
-                    if (brk != nullptr)
-                    {
-                        ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
-                        dis.source_id = global_broker_id_local;
-                        dis.dest_id = brk->global_id;
-                        transmit (brk->route, dis);
-                        brk->_sent_disconnect_ack = true;
-                        removeRoute (brk->route);
-                    }
-                    addActionMessage (CMD_STOP);
-                }
-            }
-            else
-            {
-                if (brk != nullptr)
-                {
-                    ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
-                    dis.source_id = global_broker_id_local;
-                    dis.dest_id = brk->global_id;
-                    transmit (brk->route, dis);
-                    brk->_sent_disconnect_ack = true;
-                    if ((isRootc) && (brokerState < broker_state_t::operating))
-                    {
-                        command.setAction (CMD_BROADCAST_DISCONNECT);
-                        broadcast (command);
-                        unknownHandles.clearFederateUnknowns (command.source_id);
-                    }
-                    removeRoute (brk->route);
-                }
-            }
-        }
-        else
-        {
-            transmit (getRoute (command.dest_id), command);
-        }
-    }
-    break;
+    case CMD_DISCONNECT_BROKER:
+        processDisconnect (command);
+        break;
     case CMD_DISCONNECT_BROKER_ACK:
         if ((command.dest_id == global_broker_id_local) && (command.source_id == higher_broker_id))
         {
@@ -1752,9 +1655,13 @@ bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
 
 void CoreBroker::processDisconnect (bool skipUnregister)
 {
-    LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "||disconnecting");
+    if ((brokerState == broker_state_t::terminating) || (brokerState == broker_state_t::terminated))
+    {
+        return;
+    }
     if (brokerState > broker_state_t::initialized)
     {
+        LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "||disconnecting");
         brokerState = broker_state_t::terminating;
         brokerDisconnect ();
     }
@@ -2118,6 +2025,157 @@ void CoreBroker::FindandNotifyFilterTargets (BasicHandleInfo &handleInfo)
     if (!(Handles.empty () && FiltDestTargets.empty () && FiltSourceTargets.empty ()))
     {
         unknownHandles.clearFilter (handleInfo.key);
+    }
+}
+
+void CoreBroker::processDisconnect (ActionMessage &command)
+{
+    auto brk = getBrokerById (global_broker_id (command.source_id));
+    switch (command.action ())
+    {
+    case CMD_DISCONNECT:
+        if (command.dest_id == global_broker_id_local)
+        {
+            // deal with the time implications of the message
+            if (hasTimeDependency)
+            {
+                if (!enteredExecutionMode)
+                {
+                    timeCoord->processTimeMessage (command);
+                    auto res = timeCoord->checkExecEntry ();
+                    if (res == message_processing_result::next_step)
+                    {
+                        enteredExecutionMode = true;
+                    }
+                }
+                else
+                {
+                    if (timeCoord->processTimeMessage (command))
+                    {
+                        timeCoord->updateTimeFactors ();
+                    }
+                }
+            }
+        }
+        else if (command.dest_id == parent_broker_id)
+        {
+            if (!isRootc)  // we got a disconnect from up above
+            {
+                LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "got disconnect from parent");
+                if (command.source_id == higher_broker_id)
+                {
+                    sendDisconnect ();
+                    addActionMessage (CMD_STOP);
+                    return;
+                }
+            }
+
+            if (brk != nullptr)
+            {
+                LOG_CONNECTIONS (parent_broker_id, getIdentifier (),
+                                 fmt::format ("got disconnect from {}", command.source_id.baseValue ()));
+                disconnectBroker (*brk);
+            }
+
+            if (allDisconnected ())
+            {
+                timeCoord->disconnect ();
+                if (!isRootc)
+                {
+                    ActionMessage dis (CMD_DISCONNECT);
+                    dis.source_id = global_broker_id_local;
+                    transmit (parent_route_id, dis);
+                }
+                else
+                {
+                    if ((brk != nullptr) && (!brk->_nonLocal))
+                    {
+                        ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                        dis.source_id = global_broker_id_local;
+                        dis.dest_id = brk->global_id;
+                        transmit (brk->route, dis);
+                        brk->_sent_disconnect_ack = true;
+                        removeRoute (brk->route);
+                    }
+                    addActionMessage (CMD_STOP);
+                }
+            }
+            else
+            {
+                if ((brk != nullptr) && (!brk->_nonLocal))
+                {
+                    ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                    dis.source_id = global_broker_id_local;
+                    dis.dest_id = brk->global_id;
+                    transmit (brk->route, dis);
+                    brk->_sent_disconnect_ack = true;
+                    if ((!isRootc) && (brokerState < broker_state_t::operating))
+                    {
+                        command.setAction ((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
+                        transmit (parent_route_id, command);
+                    }
+                    removeRoute (brk->route);
+                }
+                else
+                {
+                    if ((!isRootc) && (brokerState < broker_state_t::operating))
+                    {
+                        command.setAction ((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
+                        transmit (parent_route_id, command);
+                    }
+                }
+            }
+        }
+        else
+        {
+            transmit (getRoute (command.dest_id), command);
+        }
+        break;
+    case CMD_DISCONNECT_CORE:
+        if (brk != nullptr)
+        {
+            disconnectBroker (*brk);
+            if (!isRootc)
+            {
+                transmit (parent_route_id, command);
+            }
+        }
+        break;
+    case CMD_DISCONNECT_BROKER:
+        if (brk != nullptr)
+        {
+            disconnectBroker (*brk);
+            if (!isRootc)
+            {
+                transmit (parent_route_id, command);
+            }
+        }
+        break;
+    }
+}
+
+void CoreBroker::disconnectBroker (BasicBrokerInfo &brk)
+{
+    brk._disconnected = true;
+    if (brokerState < broker_state_t::operating)
+    {
+        if (isRootc)
+        {
+            ActionMessage disconnect (CMD_BROADCAST_DISCONNECT);
+            disconnect.source_id = brk.global_id;
+            broadcast (disconnect);
+            unknownHandles.clearFederateUnknowns (brk.global_id);
+            if (!brk._core)
+            {
+                for (auto &subbrk : _brokers)
+                {
+                    if ((subbrk.parent == brk.global_id) && (subbrk._core))
+                    {
+                        unknownHandles.clearFederateUnknowns (subbrk.global_id);
+                    }
+                }
+            }
+        }
     }
 }
 

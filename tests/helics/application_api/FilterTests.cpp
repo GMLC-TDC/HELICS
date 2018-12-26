@@ -23,11 +23,13 @@ namespace utf = boost::unit_test;
 BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test registration of filters*/
-BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all), core_type)
+BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
+
     AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "message");
+    broker->setLoggingLevel (3);
     broker = nullptr;
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);

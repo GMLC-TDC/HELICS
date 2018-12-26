@@ -260,6 +260,10 @@ class CoreBroker : public Broker, public BrokerBase
 
     void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
+	/** process a disconnect message*/
+	void processDisconnect(ActionMessage &command);
+	/** disconnect a broker/core*/
+    void disconnectBroker (BasicBrokerInfo &brk);
     /** run a check for a named interface*/
     void checkForNamedInterface (ActionMessage &command);
     /** remove a named target from an interface*/
