@@ -22,11 +22,12 @@ This manual is primarily targeted to those in the first two categories. Other do
 * [**Federates**](./federates.md) - Discussion of the different types of federates in HELICS ([value federates](./value_federates.md) and [message federates](./message_federates.md)) and how configure them
 * [**Message Filters**](./filters) - How HELICS message filters can be implemented natively in HELICS or as stand-alone federates
 * [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
+* **Running HELICS co-simulations via `helics_cli`(future version)** - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
 * **Cores (future version)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
-* **Broker Hierarchies (future version)** - Advantages and disadvantages of implmenting hierarchies of brokers and how that is accomplished in HELICS
-* **Reiteration (future version)** - Discussion of why reiteration is used and how to sucessfully execute it in HELICS
+* **Broker Hierarchies (future version)** - Advantages and disadvantages of implementing hierarchies of brokers and how that is accomplished in HELICS
+* **Reiteration (future version)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 * [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
-*  **Trouble-Shooting HELICS Co-Simulations (future version)** - What to do when the co-simulations don't seem to be working corectly.
+*  **Trouble-Shooting HELICS Co-Simulations (future version)** - What to do when the co-simulations don't seem to be working correctly.
 * **Large Co-Simulations in HELICS (future version)** - How to run HELICS co-simulations with a large (100+) number of federates
 
 ## Additional Resources ##
