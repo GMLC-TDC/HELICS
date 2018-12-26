@@ -5,7 +5,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
-
+#include <boost/test/data/monomorphic.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
+#include "helics/application_api/Inputs.hpp"
+#include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
@@ -17,13 +23,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/zmq/ZmqCommsSS.h"
 #include "helics/core/zmq/ZmqCore.h"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/application_api/Inputs.hpp"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+
 //#include "boost/process.hpp"
 #include <future>
-#include <numeric>
 #include <iostream>
 
 namespace utf = boost::unit_test;
