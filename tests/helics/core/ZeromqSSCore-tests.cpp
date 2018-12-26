@@ -23,6 +23,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/application_api/ValueFederate.hpp"
 //#include "boost/process.hpp"
 #include <future>
+#include <numeric>
 #include <iostream>
 
 namespace utf = boost::unit_test;
