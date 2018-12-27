@@ -46,7 +46,7 @@ class FedInfo
   public:
     FederateState *fed = nullptr;
     bool disconnected = false;
-    constexpr FedInfo () noexcept {};
+    constexpr FedInfo () = default;
     constexpr FedInfo (FederateState *newfed) noexcept : fed (newfed){};
     FederateState *operator-> () { return fed; }
     const FederateState *operator-> () const { return fed; }

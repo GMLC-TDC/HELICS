@@ -308,15 +308,11 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                             rxMessageQueue.push (mess->second);
                             break;
                         }
-
-                        else if (mess->second.messageID == DISCONNECT)
+                        if (mess->second.messageID == DISCONNECT)
                         {
                             return terminate (connection_status::terminated);
                         }
-                        else
-                        {
-                            rxMessageQueue.push (mess->second);
-                        }
+                        rxMessageQueue.push (mess->second);
                     }
                     else
                     {
@@ -405,7 +401,7 @@ void TcpComms::queue_tx_function ()
                     }
                     catch (std::exception &e)
                     {
-                        // TODO:: do something???
+                        // TODO(PT):: do something???
                     }
                     processed = true;
                 }
