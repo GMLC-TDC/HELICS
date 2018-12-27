@@ -20,8 +20,6 @@ The message type used for a given federation configuration is often an expressio
 
 Though all four message types are supported, the remainder of this guide will focus on publications and subscriptions as they are conceptually easily understood and can be comprehensively configured through the individual federate configuration files.
 
-(xxxxxxx Add at least one example of how directed outputs and inputs are configured.) 
-
 
 ##Federate Configuration Options via JSON ##
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
@@ -133,9 +131,9 @@ This example has a very simple message topology (with only one message being sen
 
 * **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 
-* **Distribution system** - A GridLAB-D model of the IEEE-123 node distribution system has been used. The model includes voltage regulators along the primary side of the system and includes secondary (or distribution) transformers with loads attached to the secondary of these transformers. The loads themselves are ZIP loads with a high impednace traction that are randomly scaled versions of the same time-varying load-shapes. 
+* **Distribution system** - A GridLAB-D model of the IEEE-123 node distribution system has been used. The model includes voltage regulators along the primary side of the system and includes secondary (or distribution) transformers with loads attached to the secondary of these transformers. The loads themselves are ZIP loads with a high impedance traction that are randomly scaled versions of the same time-varying load-shapes. 
 
-In this particular case, the Python script executing the transmission model also creates the broker; this is a choice of convenience and could have been created (xxxxxxx - Can the helics_cli create the broker?). This simulation is run for 24 hours.
+In this particular case, the Python script executing the transmission model also creates the broker; this is a choice of convenience and could have been created by any other federates. This simulation is run for 24 hours.
 
 
 ### Running co-simulations via helics_cli ###

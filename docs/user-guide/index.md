@@ -1,7 +1,7 @@
 # User Guide Introduction #
 
 
-Co-simulation is a powerful analysis technique that allows simulators of different domains to interact through the course of the simulation, typically by dynamically exchanging values that define boundary conditions for other simulators. HELICS is a co-simulation platform that has been designed to allow integration of these simulators across a variety of computation platforms and languages. HELICS has been designed to with power system simulation in mind ([GridLAB-D](https://github.com/gridlab-d/gridlab-d), [GridDyn](https://github.com/LLNL/GridDyn), [MATPOWER](https://github.com/GMLC-TDC/MATPOWER-wrapper), [OpenDSS](xxxxxxx), [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper), [InterPSS](https://github.com/InterPSS-Project/ipss-common), [FESTIV](xxxxxxx)) but is general enough to support a wide variety of simulators and co-simulation tasks.
+Co-simulation is a powerful analysis technique that allows simulators of different domains to interact through the course of the simulation, typically by dynamically exchanging values that define boundary conditions for other simulators. HELICS is a co-simulation platform that has been designed to allow integration of these simulators across a variety of computation platforms and languages. HELICS has been designed to with power system simulation in mind ([GridLAB-D](https://github.com/gridlab-d/gridlab-d), [GridDyn](https://github.com/LLNL/GridDyn), [MATPOWER](https://github.com/GMLC-TDC/MATPOWER-wrapper), [OpenDSS](https://sourceforge.net/projects/electricdss/), [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper), [InterPSS](https://github.com/InterPSS-Project/ipss-common), [FESTIV](https://www.nrel.gov/grid/festiv-model.html)) but is general enough to support a wide variety of simulators and co-simulation tasks.
 
 ## Who Is This User Guide For? ##
 There are a number of classes of HELICS users: 
@@ -11,11 +11,8 @@ There are a number of classes of HELICS users:
 * experienced users that are incorporating a new simulator and need to know how to use specific features in the HELICS API
 * developers of HELICS who are improving HELICS functionality and contributing to the code base
 
-This manual is primarily targeted to those in the first two categories. Other documentation xxxxxxxx exists that can be helpful for the latter two types of users.
 
 ## User Guide Overview ##
-
-
 * [**Co-simuation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 * [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
 * [**HELICS Co-Simulation Walk-through**](./helics_co-sim_sequence.md) - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
