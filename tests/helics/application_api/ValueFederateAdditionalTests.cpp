@@ -107,6 +107,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
 
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
     auto &subid = vFed1->registerSubscription ("sub1", "V");
     auto &subid2 = vFed1->registerSubscription ("sub2");
 
@@ -143,7 +144,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
     // register the publications
     auto pubid = vFed1->registerPublication<std::string> ("pub1");
     auto pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
@@ -192,7 +193,7 @@ BOOST_DATA_TEST_CASE (value_federate_input_and_publication_registration,
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
     // register the publications
     auto &pubid = vFed1->registerPublication<std::string> ("pub1");
     auto &pubid2 = vFed1->registerGlobalPublication<int> ("pub2");
@@ -493,7 +494,7 @@ BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make (core_types_single), core
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
     auto pubid1 = vFed1->registerPublicationIndexed<double> ("pub1", 0);
     pubid1.setInfo (std::string ("pub_test1"));
 

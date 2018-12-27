@@ -2136,7 +2136,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         {
             // forward on to Broker
             command.source_id = global_broker_id_local;
-            transmit (parent_route_id, command);
+            transmit (parent_route_id, std::move (command));
         }
         else
         {
@@ -3694,6 +3694,7 @@ bool CommonCore::waitCoreRegistration ()
             LOG_WARNING (parent_broker_id, identifier, "resending reg message");
             ActionMessage M (CMD_RESEND);
             M.messageID = static_cast<int32_t> (CMD_REG_BROKER);
+            addActionMessage (M);
         }
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_id.load ();

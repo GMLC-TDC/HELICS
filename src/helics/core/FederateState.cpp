@@ -1210,7 +1210,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 subI->inputType = cmd.getString (typeStringLoc);
             }
-            addDependency (global_federate_id (cmd.source_id));
+            addDependency (cmd.source_id);
         }
     }
     break;

@@ -373,7 +373,8 @@ void UdpComms::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown route, message dropped ") + prettyPrintString (cmd));
+                        logWarning (std::string ("(udp) unknown route, message dropped ") +
+                                    prettyPrintString (cmd));
                     }
                 }
             }

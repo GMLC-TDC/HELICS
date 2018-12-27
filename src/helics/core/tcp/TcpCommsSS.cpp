@@ -322,6 +322,10 @@ void TcpCommsSS::queue_tx_function ()
                                 made_connections.emplace_back (cmd.payload, std::move (conn));
                             }
                         }
+                        else
+                        {
+                            logWarning ("(tcpss) unable to locate socket");
+                        }
                     }
                     break;
                 case NEW_ROUTE:
@@ -418,7 +422,7 @@ void TcpCommsSS::queue_tx_function ()
             }
             else
             {
-                logWarning (std::string ("no route to broker for message, message dropped :") +
+                logWarning (std::string ("(tcpss) no route to broker for message, message dropped :") +
                             actionMessageType (cmd.action ()));
             }
         }
@@ -468,7 +472,7 @@ void TcpCommsSS::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown message destination message dropped ") +
+                        logWarning (std::string ("(tcpss) unknown message destination message dropped ") +
                                     prettyPrintString (cmd));
                     }
                 }

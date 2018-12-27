@@ -12,6 +12,7 @@ class CommonCore;
 class CoreBroker;
 class ActionMessage;
 
+/** class to handle timeouts and other issues for cores and brokers*/
 class TimeoutMonitor
 {
   public:
