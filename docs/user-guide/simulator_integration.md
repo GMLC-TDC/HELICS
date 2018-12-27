@@ -15,7 +15,7 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
     - Java
     - MATLAB
     - Octave
-  3. **What is the simulators concept of time?** - Understanding how the simulator natively moves through time is essential when determining how time requests will need to be made. Does the simulator have a fixed timestep? Is it user-definable? Does the simulator have any concept of time or is it event-based?
+  3. **What is the simulators concept of time?** - Understanding how the simulator natively moves through time is essential when determining how time requests will need to be made. Does the simulator have a fixed time-step? Is it user-definable? Does the simulator have any concept of time or is it event-based?
   4. **What is the nature of the values it will send to and receive from the rest of the federation?** Depending on the nature of the simulator, this may or may not be specifically definable but a general understanding of how this simulator will be used in a co-simulation should be clear. As a stand-alone simulator, what are its inputs and outputs? What are its assumed or provided boundary conditions? What kinds of values will it be providing to the rest of the federation?
 
 ## The Essential APIs ##
@@ -46,7 +46,7 @@ The easiest way to do this is using a specific API that reads in a user-defined 
 
 There are ways to programmatically ("hard-code") the configuration of the federate and for small, one-off simulators (like an EV charge controller, for example), doing so may be the fastest way to get the HELICS co-simulation up and running. Then again, how often does one-off code stay one-off....
 
-The JSON configuration file, as discussed earlier in this guide, contains information both about the federate in general (which core type is being used, what its time step is) as well as the information it will be providing to the federate and receiving from it. HELICS has a single API command to read in that file and create the federate:
+The JSON configuration file, as discussed earlier in this guide, contains information both about the federate in general (which core type is being used, what its time-step is) as well as the information it will be providing to the federate and receiving from it. HELICS has a single API command to read in that file and create the federate:
 
 ```
 fed = h.helicsCreateValueFederateFromConfig('Control.json')
@@ -95,7 +95,7 @@ And now begins the core of the co-simulation where the following several steps a
   grantedtime = h.helicsFederateRequestTime (fed, time)
   ```
   
-  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with fixed a fixed time step, the time requested will be the next time step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.) 
+  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with fixed a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.) 
   
   For other types of simulators, controller for example, you may want to change an output every time an input changes, but never any other time. In these cases, you can make the time request of `maxTime`; this is the end of the simulation time and thus the federate will do nothing until a new input value changes and the federate is granted that time. (In this case, you would want to make sure the "uninterruptible" flag was NOT set so that the federate is woken up on these input changes.)
   
