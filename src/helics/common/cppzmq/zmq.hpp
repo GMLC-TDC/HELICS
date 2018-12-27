@@ -34,18 +34,16 @@
 #define ZMQ_DEPRECATED(msg) __attribute__((deprecated(msg)))
 #endif
 
-#if (__cplusplus >= 201103L)
+#if (__cplusplus >= 201103L) || (defined(_MSC_VER) && (_MSC_VER >= 1900))
    #define ZMQ_CPP11
    #define ZMQ_NOTHROW noexcept
    #define ZMQ_EXPLICIT explicit
-#elif  (defined(_MSC_VER) && (_MSC_VER >= 1900))
-   #define ZMQ_CPP11
-   #define ZMQ_NOTHROW noexcept
-   #define ZMQ_EXPLICIT explicit
+#define ZMQ_OVERRIDE override
 #else
     #define ZMQ_CPP03
     #define ZMQ_NOTHROW
     #define ZMQ_EXPLICIT
+#define ZMQ_OVERRIDE
 #endif
 
 #include <zmq.h>
@@ -63,8 +61,8 @@
 
 /*  Version macros for compile-time API version detection                     */
 #define CPPZMQ_VERSION_MAJOR 4
-#define CPPZMQ_VERSION_MINOR 3
-#define CPPZMQ_VERSION_PATCH 0
+#define CPPZMQ_VERSION_MINOR 3 
+#define CPPZMQ_VERSION_PATCH 1 
 
 #define CPPZMQ_VERSION                                                              \
     ZMQ_MAKE_VERSION(CPPZMQ_VERSION_MAJOR, CPPZMQ_VERSION_MINOR,                    \
@@ -269,7 +267,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
 
 #if defined(ZMQ_BUILD_DRAFT_API) && defined(ZMQ_CPP11)
     template<typename T>
-    message_t(const T &msg_) : message_t(std::begin(msg_), std::end(msg_))
+    explicit message_t(const T &msg_) : message_t(std::begin(msg_), std::end(msg_))
     {
     }
 #endif
@@ -407,6 +405,33 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
         return value;
     }
 #endif
+
+#if defined(ZMQ_BUILD_DRAFT_API) && ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 0)
+    inline uint32_t routing_id() const
+    {
+        return zmq_msg_routing_id(const_cast<zmq_msg_t*>(&msg));
+    }
+
+    inline void set_routing_id(uint32_t routing_id)
+    {
+        int rc = zmq_msg_set_routing_id(&msg, routing_id);
+        if (rc != 0)
+            throw error_t();
+    }
+
+    inline const char* group() const
+    {
+        return zmq_msg_group(const_cast<zmq_msg_t*>(&msg));
+    }
+
+    inline void set_group(const char* group)
+    {
+        int rc = zmq_msg_set_group(&msg, group);
+        if (rc != 0)
+            throw error_t();
+    }
+#endif
+
     /** Dump content to string. Ascii chars are readable, the rest is printed as hex.
          *  Probably ridiculously slow.
          */
@@ -417,17 +442,16 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
 
         const unsigned char *msg_data = this->data<unsigned char>();
         unsigned char byte;
-
-        size_t message_size = this->size();
+        size_t size = this->size();
         int is_ascii[2] = {0, 0};
 
         os << "zmq::message_t [size " << std::dec << std::setw(3)
-           << std::setfill('0') << message_size << "] (";
+           << std::setfill('0') << size << "] (";
         // Totally arbitrary
-        if (message_size >= 1000) {
+        if (size >= 1000) {
             os << "... too big to print)";
         } else {
-            while (message_size--) {
+            while (size--) {
                 byte = *msg_data++;
 
                 is_ascii[1] = (byte >= 33 && byte < 127);
@@ -512,8 +536,12 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
             if (ptr == NULL)
                 return;
 
-            int rc = zmq_ctx_destroy (ptr);
-            ZMQ_ASSERT (rc == 0);
+        int rc;
+        do {
+            rc = zmq_ctx_destroy(ptr);
+        } while (rc == -1 && errno == EINTR);
+
+        ZMQ_ASSERT(rc == 0);
             ptr = NULL;
         }
 
@@ -546,9 +574,11 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
         xsub = ZMQ_XSUB,
         push = ZMQ_PUSH,
         pull = ZMQ_PULL,
-#ifdef ZMQ_BUILD_DRAFT_API
+#if defined(ZMQ_BUILD_DRAFT_API) && ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 0)
     server = ZMQ_SERVER,
     client = ZMQ_CLIENT,
+    radio = ZMQ_RADIO,
+    dish = ZMQ_DISH,
 #endif
 #if ZMQ_VERSION_MAJOR >= 4
     stream = ZMQ_STREAM,
@@ -717,7 +747,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
             throw error_t ();
         }
 
-        template<typename I> bool send(I first, I last, int flags_=0)
+    template<typename T> bool send(T first, T last, int flags_ = 0)
         {
             zmq::message_t msg(first, last);
             return send(msg, flags_);
@@ -750,6 +780,22 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
             throw error_t ();
         }
         
+#if defined(ZMQ_BUILD_DRAFT_API) && ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 0)
+    inline void join(const char* group)
+    {
+        int rc = zmq_join(ptr, group);
+        if (rc != 0)
+            throw error_t();
+    }
+
+    inline void leave(const char* group)
+    {
+        int rc = zmq_leave(ptr, group);
+        if (rc != 0)
+            throw error_t();
+    }
+#endif
+
     private:
         inline void init(context_t& context_, int type_)
         {
@@ -893,7 +939,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
 #ifdef ZMQ_EVENT_MONITOR_STOPPED
         if (event->event == ZMQ_EVENT_MONITOR_STOPPED) {
             zmq_msg_close(&eventMsg);
-            return true;
+            return false;
         }
 
 #endif
@@ -967,11 +1013,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
             if (socketPtr)
                 zmq_socket_monitor(socketPtr, NULL, 0);
 
-        if (monitor_socket)
-            zmq_close(monitor_socket);
-
         socketPtr = NULL;
-        monitor_socket = NULL;
         }
 #endif
         virtual void on_monitor_started() {}

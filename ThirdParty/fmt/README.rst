@@ -80,20 +80,21 @@ Format strings can be checked at compile time:
 .. code:: c++
 
     // test.cc
+    #define FMT_STRING_ALIAS 1
     #include <fmt/format.h>
-    std::string s = fmt::format(fmt("{2}"), 42);
+    std::string s = format(fmt("{2}"), 42);
 
 .. code::
 
-    $ g++ -Iinclude test.cc -std=c++14
+    $ c++ -Iinclude -std=c++14 test.cc
     ...
-    test.cc:2:22: note: in instantiation of function template specialization 'fmt::format<S, int>' requested here
-    std::string s = fmt::format(fmt("{2}"), 42);
-                         ^
-    include/fmt/core.h:749:19: note: non-constexpr function 'on_error' cannot be used in a constant expression
+    test.cc:4:17: note: in instantiation of function template specialization 'fmt::v5::format<S, int>' requested here
+    std::string s = format(fmt("{2}"), 42);
+                    ^
+    include/fmt/core.h:778:19: note: non-constexpr function 'on_error' cannot be used in a constant expression
         ErrorHandler::on_error(message);
                       ^
-    include/fmt/format.h:2081:16: note: in call to '&checker.context_->on_error(&"argument index out of range"[0])'
+    include/fmt/format.h:2226:16: note: in call to '&checker.context_->on_error(&"argument index out of range"[0])'
           context_.on_error("argument index out of range");
                    ^
 
@@ -107,24 +108,29 @@ Format strings can be checked at compile time:
     format_to(buf, "{:x}", 42);  // replaces itoa(42, buffer, 16)
     // access the string using to_string(buf) or buf.data()
 
-An object of any user-defined type for which there is an overloaded
-:code:`std::ostream` insertion operator (``operator<<``) can be formatted:
+Formatting of user-defined types is supported via a simple
+`extension API <http://fmtlib.net/latest/api.html#formatting-user-defined-types>`_:
 
 .. code:: c++
 
-    #include "fmt/ostream.h"
+    #include "fmt/format.h"
 
-    class Date {
-      int year_, month_, day_;
-     public:
-      Date(int year, int month, int day) : year_(year), month_(month), day_(day) {}
+    struct date {
+      int year, month, day;
+    };
 
-      friend std::ostream &operator<<(std::ostream &os, const Date &d) {
-        return os << d.year_ << '-' << d.month_ << '-' << d.day_;
+    template <>
+    struct fmt::formatter<date> {
+      template <typename ParseContext>
+      constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+
+      template <typename FormatContext>
+      auto format(const date &d, FormatContext &ctx) {
+        return format_to(ctx.begin(), "{}-{}-{}", d.year, d.month, d.day);
       }
     };
 
-    std::string s = fmt::format("The date is {}", Date(2012, 12, 9));
+    std::string s = fmt::format("The date is {}", date{2012, 12, 9});
     // s == "The date is 2012-12-9"
 
 You can create your own functions similar to `format
@@ -272,7 +278,7 @@ Boost Format library
 ~~~~~~~~~~~~~~~~~~~~
 
 This is a very powerful library which supports both printf-like format
-strings and positional arguments. The main its drawback is performance.
+strings and positional arguments. Its main drawback is performance.
 According to various benchmarks it is much slower than other methods
 considered here. Boost Format also has excessive build times and severe
 code bloat issues (see `Benchmarks`_).
@@ -369,18 +375,18 @@ macOS Sierra, best of three) is shown in the following tables.
 ============= =============== ==================== ==================
 Method        Compile Time, s Executable size, KiB Stripped size, KiB
 ============= =============== ==================== ==================
-printf                    2.7                   29                 26
-printf+string            18.4                   29                 26
-IOStreams                34.6                   59                 55
-fmt                      22.0                   37                 34
-tinyformat               51.8                  103                 97
-Boost Format            120.5                  762                739
-Folly Format            158.7                  102                 87
+printf                    2.6                   29                 26
+printf+string            16.4                   29                 26
+IOStreams                31.1                   59                 55
+fmt                      19.0                   37                 34
+tinyformat               44.0                  103                 97
+Boost Format             91.9                  226                203
+Folly Format            115.7                  101                 88
 ============= =============== ==================== ==================
 
 As you can see, fmt has 60% less overhead in terms of resulting binary code
 size compared to IOStreams and comes pretty close to ``printf``. Boost Format
-has by far the largest overheads.
+and Folly Format have the largest overheads.
 
 ``printf+string`` is the same as ``printf`` but with extra ``<string>``
 include to measure the overhead of the latter.
@@ -390,13 +396,13 @@ include to measure the overhead of the latter.
 ============= =============== ==================== ==================
 Method        Compile Time, s Executable size, KiB Stripped size, KiB
 ============= =============== ==================== ==================
-printf                    2.4                   33                 30
-printf+string            18.5                   33                 30
-IOStreams                31.9                   56                 52
-fmt                      20.9                   56                 51
-tinyformat               38.9                   88                 82
-Boost Format             64.8                  366                304
-Folly Format            113.5                  442                428
+printf                    2.2                   33                 30
+printf+string            16.0                   33                 30
+IOStreams                28.3                   56                 52
+fmt                      18.2                   59                 50
+tinyformat               32.6                   88                 82
+Boost Format             54.1                  365                303
+Folly Format             79.9                  445                430
 ============= =============== ==================== ==================
 
 ``libc``, ``lib(std)c++`` and ``libfmt`` are all linked as shared
@@ -428,6 +434,29 @@ Then you can run the speed test::
 or the bloat test::
 
     $ make bloat-test
+
+FAQ
+---
+
+Q: how can I capture formatting arguments and format them later?
+
+A: use ``std::tuple``:
+
+.. code:: c++
+
+   template <typename... Args>
+   auto capture(const Args&... args) {
+     return std::make_tuple(args...);
+   }
+
+   auto print_message = [](const auto&... args) {
+     fmt::print(args...);
+   };
+
+   // Capture and store arguments:
+   auto args = capture("{} {}", 42, "foo");
+   // Do formatting:
+   std::apply(print_message, args);
 
 License
 -------

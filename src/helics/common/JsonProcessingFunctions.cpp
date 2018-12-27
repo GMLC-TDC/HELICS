@@ -13,7 +13,7 @@ bool hasJsonExtension (const std::string &jsonString)
     return ((ext == "json") || (ext == "JSON") || (ext == ".jsn") || (ext == ".JSN"));
 }
 
-Json_helics::Value loadJson (const std::string &jsonString)
+helics::Json::Value loadJson (const std::string &jsonString)
 {
     if (jsonString.size () > 128)
     {
@@ -30,10 +30,10 @@ Json_helics::Value loadJson (const std::string &jsonString)
 
     if (file.is_open ())
     {
-        Json_helics::Value doc;
-        Json_helics::CharReaderBuilder rbuilder;
+        helics::Json::Value doc;
+        helics::Json::CharReaderBuilder rbuilder;
         std::string errs;
-        bool ok = Json_helics::parseFromStream (rbuilder, file, &doc, &errs);
+        bool ok = helics::Json::parseFromStream (rbuilder, file, &doc, &errs);
         if (!ok)
         {
             throw (std::invalid_argument (errs.c_str ()));
@@ -43,13 +43,13 @@ Json_helics::Value loadJson (const std::string &jsonString)
     return loadJsonStr (jsonString);
 }
 
-Json_helics::Value loadJsonStr (const std::string &jsonString)
+helics::Json::Value loadJsonStr (const std::string &jsonString)
 {
-    Json_helics::Value doc;
-    Json_helics::CharReaderBuilder rbuilder;
+    helics::Json::Value doc;
+    helics::Json::CharReaderBuilder rbuilder;
     std::string errs;
     std::istringstream jstring (jsonString);
-    bool ok = Json_helics::parseFromStream (rbuilder, jstring, &doc, &errs);
+    bool ok = helics::Json::parseFromStream (rbuilder, jstring, &doc, &errs);
     if (!ok)
     {
         throw (std::invalid_argument (errs.c_str ()));
@@ -58,7 +58,7 @@ Json_helics::Value loadJsonStr (const std::string &jsonString)
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const Json_helics::Value &timeElement, time_units defaultUnits)
+helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units defaultUnits)
 {
     if (timeElement.isObject ())
     {
@@ -90,16 +90,16 @@ helics::Time loadJsonTime (const Json_helics::Value &timeElement, time_units def
     return helics::Time::minVal ();
 }
 
-std::string getKey (const Json_helics::Value &element)
+std::string getKey (const helics::Json::Value &element)
 {
     return (element.isMember ("key")) ?
              element["key"].asString () :
              ((element.isMember ("name")) ? element["name"].asString () : std::string ());
 }
 
-std::string generateJsonString (const Json_helics::Value &block)
+std::string generateJsonString (const helics::Json::Value &block)
 {
-    Json_helics::StreamWriterBuilder builder;
+    helics::Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
     auto writer (builder.newStreamWriter ());

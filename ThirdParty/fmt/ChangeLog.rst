@@ -1,3 +1,220 @@
+5.2.1 - 2018-09-21
+------------------
+
+* Fixed ``visit`` lookup issues on gcc 7 & 8
+  (`#870 <https://github.com/fmtlib/fmt/pull/870>`_).
+  Thanks `@medithe <https://github.com/medithe>`_.
+
+* Fixed linkage errors on older gcc.
+
+* Prevented ``fmt/range.h`` from specializing ``fmt::basic_string_view``
+  (`#865 <https://github.com/fmtlib/fmt/issues/865>`_,
+  `#868 <https://github.com/fmtlib/fmt/pull/868>`_).
+  Thanks `@hhggit (dual) <https://github.com/hhggit>`_.
+
+* Improved error message when formatting unknown types
+  (`#872 <https://github.com/fmtlib/fmt/pull/872>`_).
+  Thanks `@foonathan (Jonathan Müller) <https://github.com/foonathan>`_,
+
+* Disabled templated user-defined literals when compiled under nvcc
+  (`#875 <https://github.com/fmtlib/fmt/pull/875>`_).
+  Thanks `@CandyGumdrop (Candy Gumdrop) <https://github.com/CandyGumdrop>`_,
+
+* Fixed ``format_to`` formatting to ``wmemory_buffer``
+  (`#874 <https://github.com/fmtlib/fmt/issues/874>`_).
+
+5.2.0 - 2018-09-13
+------------------
+
+* Optimized format string parsing and argument processing which resulted in up
+  to 5x speed up on long format strings and significant performance boost on
+  various benchmarks. For example, version 5.2 is 2.22x faster than 5.1 on
+  decimal integer formatting with ``format_to`` (macOS, clang-902.0.39.2):
+
+  ==================  =======  =======
+  Method              Time, s  Speedup
+  ==================  =======  =======
+  fmt::format 5.1      0.58
+  fmt::format 5.2      0.35     1.66x
+  fmt::format_to 5.1   0.51
+  fmt::format_to 5.2   0.23     2.22x
+  sprintf              0.71
+  std::to_string       1.01
+  std::stringstream    1.73
+  ==================  =======  =======
+
+* Changed the ``fmt`` macro from opt-out to opt-in to prevent name collisions.
+  To enable it define the ``FMT_STRING_ALIAS`` macro to 1 before including
+  ``fmt/format.h``:
+
+  .. code:: c++
+
+     #define FMT_STRING_ALIAS 1
+     #include <fmt/format.h>
+     std::string answer = format(fmt("{}"), 42);
+
+* Added compile-time format string checks to ``format_to`` overload that takes
+  ``fmt::memory_buffer`` (`#783 <https://github.com/fmtlib/fmt/issues/783>`_):
+
+  .. code:: c++
+
+     fmt::memory_buffer buf;
+     // Compile-time error: invalid type specifier.
+     fmt::format_to(buf, fmt("{:d}"), "foo");
+
+* Moved experimental color support to ``fmt/color.h`` and enabled the
+  new API by default. The old API can be enabled by defining the
+  ``FMT_DEPRECATED_COLORS`` macro.
+
+* Added formatting support for types explicitly convertible to
+  ``fmt::string_view``:
+
+  .. code:: c++
+
+     struct foo {
+       explicit operator fmt::string_view() const { return "foo"; }
+     };
+     auto s = format("{}", foo());
+
+  In particular, this makes formatting function work with
+  ``folly::StringPiece``.
+
+* Implemented preliminary support for ``char*_t`` by replacing the ``format``
+  function overloads with a single function template parameterized on the string
+  type.
+
+* Added support for dynamic argument lists
+  (`#814 <https://github.com/fmtlib/fmt/issues/814>`_,
+  `#819 <https://github.com/fmtlib/fmt/pull/819>`_).
+  Thanks `@MikePopoloski (Michael Popoloski)
+  <https://github.com/MikePopoloski>`_.
+
+* Reduced executable size overhead for embedded targets using newlib nano by
+  making locale dependency optional
+  (`#839 <https://github.com/fmtlib/fmt/pull/839>`_).
+  Thanks `@teajay-fr (Thomas Benard) <https://github.com/teajay-fr>`_.
+
+* Keep ``noexcept`` specifier when exceptions are disabled
+  (`#801 <https://github.com/fmtlib/fmt/issues/801>`_,
+  `#810 <https://github.com/fmtlib/fmt/pull/810>`_).
+  Thanks `@qis (Alexej Harm) <https://github.com/qis>`_.
+
+* Fixed formatting of user-defined types providing ``operator<<`` with
+  ``format_to_n``
+  (`#806 <https://github.com/fmtlib/fmt/pull/806>`_).
+  Thanks `@mkurdej (Marek Kurdej) <https://github.com/mkurdej>`_.
+
+* Fixed dynamic linkage of new symbols
+  (`#808 <https://github.com/fmtlib/fmt/issues/808>`_).
+
+* Fixed global initialization issue
+  (`#807 <https://github.com/fmtlib/fmt/issues/807>`_):
+
+  .. code:: c++
+
+     // This works on compilers with constexpr support.
+     static const std::string answer = fmt::format("{}", 42);
+
+* Fixed various compiler warnings and errors
+  (`#804 <https://github.com/fmtlib/fmt/pull/804>`_,
+  `#809 <https://github.com/fmtlib/fmt/issues/809>`_,
+  `#811 <https://github.com/fmtlib/fmt/pull/811>`_,
+  `#822 <https://github.com/fmtlib/fmt/issues/822>`_,
+  `#827 <https://github.com/fmtlib/fmt/pull/827>`_,
+  `#830 <https://github.com/fmtlib/fmt/issues/830>`_,
+  `#838 <https://github.com/fmtlib/fmt/pull/838>`_,
+  `#843 <https://github.com/fmtlib/fmt/issues/843>`_,
+  `#844 <https://github.com/fmtlib/fmt/pull/844>`_,
+  `#851 <https://github.com/fmtlib/fmt/issues/851>`_,
+  `#852 <https://github.com/fmtlib/fmt/pull/852>`_,
+  `#854 <https://github.com/fmtlib/fmt/pull/854>`_).
+  Thanks `@henryiii (Henry Schreiner) <https://github.com/henryiii>`_,
+  `@medithe <https://github.com/medithe>`_, and
+  `@eliasdaler (Elias Daler) <https://github.com/eliasdaler>`_.
+
+5.1.0 - 2018-07-05
+------------------
+
+* Added experimental support for RGB color output enabled with
+  the ``FMT_EXTENDED_COLORS`` macro:
+
+  .. code:: c++
+
+     #define FMT_EXTENDED_COLORS
+     #define FMT_HEADER_ONLY // or compile fmt with FMT_EXTENDED_COLORS defined
+     #include <fmt/format.h>
+
+     fmt::print(fmt::color::steel_blue, "Some beautiful text");
+
+  The old API (the ``print_colored`` and ``vprint_colored`` functions and the
+  ``color`` enum) is now deprecated.
+  (`#762 <https://github.com/fmtlib/fmt/issues/762>`_
+  `#767 <https://github.com/fmtlib/fmt/pull/767>`_).
+  thanks `@remotion (remo) <https://github.com/remotion>`_.
+
+* Added quotes to strings in ranges and tuples
+  (`#766 <https://github.com/fmtlib/fmt/pull/766>`_).
+  Thanks `@Remotion (Remo) <https://github.com/Remotion>`_.
+
+* Made ``format_to`` work with ``basic_memory_buffer``
+  (`#776 <https://github.com/fmtlib/fmt/issues/776>`_).
+
+* Added ``vformat_to_n`` and ``wchar_t`` overload of ``format_to_n``
+  (`#764 <https://github.com/fmtlib/fmt/issues/764>`_,
+  `#769 <https://github.com/fmtlib/fmt/issues/769>`_).
+
+* Made ``is_range`` and ``is_tuple_like`` part of public (experimental) API
+  to allow specialization for user-defined types
+  (`#751 <https://github.com/fmtlib/fmt/issues/751>`_,
+  `#759 <https://github.com/fmtlib/fmt/pull/759>`_).
+  Thanks `@drrlvn (Dror Levin) <https://github.com/drrlvn>`_.
+
+* Added more compilers to continuous integration and increased ``FMT_PEDANTIC``
+  warning levels
+  (`#736 <https://github.com/fmtlib/fmt/pull/736>`_).
+  Thanks `@eliaskosunen (Elias Kosunen) <https://github.com/eliaskosunen>`_.
+
+* Fixed compilation with MSVC 2013.
+
+* Fixed handling of user-defined types in ``format_to``
+  (`#793 <https://github.com/fmtlib/fmt/issues/793>`_).
+
+* Forced linking of inline ``vformat`` functions into the library
+  (`#795 <https://github.com/fmtlib/fmt/issues/795>`_).
+
+* Fixed incorrect call to on_align in ``'{:}='``
+  (`#750 <https://github.com/fmtlib/fmt/issues/750>`_).
+
+* Fixed floating-point formatting to a non-back_insert_iterator with sign &
+  numeric alignment specified
+  (`#756 <https://github.com/fmtlib/fmt/issues/756>`_).
+
+* Fixed formatting to an array with ``format_to_n``
+  (`#778 <https://github.com/fmtlib/fmt/issues/778>`_).
+
+* Fixed formatting of more than 15 named arguments
+  (`#754 <https://github.com/fmtlib/fmt/issues/754>`_).
+
+* Fixed handling of compile-time strings when including ``fmt/ostream.h``.
+  (`#768 <https://github.com/fmtlib/fmt/issues/768>`_).
+
+* Fixed various compiler warnings and errors
+  (`#742 <https://github.com/fmtlib/fmt/issues/742>`_,
+  `#748 <https://github.com/fmtlib/fmt/issues/748>`_,
+  `#752 <https://github.com/fmtlib/fmt/issues/752>`_,
+  `#770 <https://github.com/fmtlib/fmt/issues/770>`_,
+  `#775 <https://github.com/fmtlib/fmt/pull/775>`_,
+  `#779 <https://github.com/fmtlib/fmt/issues/779>`_,
+  `#780 <https://github.com/fmtlib/fmt/pull/780>`_,
+  `#790 <https://github.com/fmtlib/fmt/pull/790>`_,
+  `#792 <https://github.com/fmtlib/fmt/pull/792>`_,
+  `#800 <https://github.com/fmtlib/fmt/pull/800>`_).
+  Thanks `@Remotion (Remo) <https://github.com/Remotion>`_,
+  `@gabime (Gabi Melman) <https://github.com/gabime>`_,
+  `@foonathan (Jonathan Müller) <https://github.com/foonathan>`_,
+  `@Dark-Passenger (Dhruv Paranjape) <https://github.com/Dark-Passenger>`_, and
+  `@0x8000-0000 (Sign Bit) <https://github.com/0x8000-0000>`_.
+
 5.0.0 - 2018-05-21
 ------------------
 
@@ -134,8 +351,8 @@
        vreport_error(format, fmt::make_format_args(args...));
      }
 
-* Added the ``make_printf_args`` function for capturing ``printf`` arguments (
-  `#687 <https://github.com/fmtlib/fmt/issues/687>`_,
+* Added the ``make_printf_args`` function for capturing ``printf`` arguments
+  (`#687 <https://github.com/fmtlib/fmt/issues/687>`_,
   `#694 <https://github.com/fmtlib/fmt/pull/694>`_).
   Thanks `@Kronuz (Germán Méndez Bravo) <https://github.com/Kronuz>`_.
 
@@ -207,8 +424,8 @@
 * Disallowed formatting of multibyte strings into a wide character target
   (`#606 <https://github.com/fmtlib/fmt/pull/606>`_).
 
-* Improved documentation (
-  `#515 <https://github.com/fmtlib/fmt/pull/515>`_,
+* Improved documentation
+  (`#515 <https://github.com/fmtlib/fmt/pull/515>`_,
   `#614 <https://github.com/fmtlib/fmt/issues/614>`_,
   `#617 <https://github.com/fmtlib/fmt/pull/617>`_,
   `#661 <https://github.com/fmtlib/fmt/pull/661>`_,
@@ -257,8 +474,8 @@
   (`#626 <https://github.com/fmtlib/fmt/pull/626>`_).
   Thanks `@aroig (Abdó Roig-Maranges) <https://github.com/aroig>`_.
 
-* Fixed various compiler warnings (
-  `#640 <https://github.com/fmtlib/fmt/pull/640>`_,
+* Fixed various compiler warnings
+  (`#640 <https://github.com/fmtlib/fmt/pull/640>`_,
   `#656 <https://github.com/fmtlib/fmt/pull/656>`_,
   `#679 <https://github.com/fmtlib/fmt/pull/679>`_,
   `#681 <https://github.com/fmtlib/fmt/pull/681>`_,
@@ -1184,8 +1401,8 @@ Fixes
   `@Jopie64 (Johan) <https://github.com/Jopie64>`_.
 
 * Fixed portability issues (mostly causing test failures) on ARM, ppc64, ppc64le,
-  s390x and SunOS 5.11 i386 (
-  `#138 <https://github.com/fmtlib/fmt/issues/138>`_,
+  s390x and SunOS 5.11 i386
+  (`#138 <https://github.com/fmtlib/fmt/issues/138>`_,
   `#179 <https://github.com/fmtlib/fmt/issues/179>`_,
   `#180 <https://github.com/fmtlib/fmt/issues/180>`_,
   `#202 <https://github.com/fmtlib/fmt/issues/202>`_,
