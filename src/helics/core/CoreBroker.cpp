@@ -288,6 +288,22 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     break;
     case CMD_REG_BROKER:
     {
+        if (command.counter > 0)
+        {  // this indicates it is a resend
+            auto brk = _brokers.find (command.name);
+            // we would get this if the ack didn't go through for some reason
+            brk->route = route_id{routeCount++};
+            addRoute (brk->route, command.getString (targetStringLoc));
+            routing_table[brk->global_id] = brk->route;
+
+            // sending the response message
+            ActionMessage brokerReply (CMD_BROKER_ACK);
+            brokerReply.source_id = global_broker_id_local;  // source is global root
+            brokerReply.dest_id = brk->global_id;  // the new id
+            brokerReply.name = command.name;  // the identifier of the broker
+            transmit (brk->route, brokerReply);
+            return;
+        }
         if (brokerState != operating)
         {
             if (allInitReady ())
