@@ -64,7 +64,7 @@ helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units de
     {
         if (timeElement.isMember ("units"))
         {
-            defaultUnits = helics::time_unitsFromString (timeElement["units"].asString ());
+            defaultUnits = helics::timeUnitsFromString (timeElement["units"].asString ());
         }
         if (timeElement.isMember ("value"))
         {

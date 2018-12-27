@@ -60,7 +60,7 @@ helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUni
         auto units = timeElement.find ("units");
         if (units != nullptr)
         {
-            defaultUnits = helics::time_unitsFromString (units->as<std::string> ());
+            defaultUnits = helics::timeUnitsFromString (units->as<std::string> ());
         }
         auto val = timeElement.find ("value");
         if (val != nullptr)

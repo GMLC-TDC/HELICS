@@ -63,6 +63,6 @@ Time loadTimeFromString (const std::string &timeString, time_units defUnit);
 @return a time_units enumeration value
 @throw, invalid_argument if the string is not a valid unit
 */
-time_units time_unitsFromString (const std::string &unitString);
+time_units timeUnitsFromString (const std::string &unitString);
 
 }  // namespace helics

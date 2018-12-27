@@ -895,7 +895,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     {
         try
         {
-            units = time_unitsFromString (vm_map["time_units"].as<std::string> ());
+            units = timeUnitsFromString (vm_map["time_units"].as<std::string> ());
             timeMultiplier = toSecondMultiplier (units);
         }
         catch (...)

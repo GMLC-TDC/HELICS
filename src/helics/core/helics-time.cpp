@@ -30,7 +30,7 @@ const std::map<std::string, time_units> time_unitstrings{
   {"week", time_units::week},
   {"wk", time_units::week}};
 
-time_units time_unitsFromString (const std::string &unitString)
+time_units timeUnitsFromString (const std::string &unitString)
 {
     auto fnd = time_unitstrings.find (unitString);
     if (fnd != time_unitstrings.end ())
@@ -55,7 +55,7 @@ helics::Time loadTimeFromString (const std::string &timeString)
         return Time (val);
     }
     std::string units = stringOps::trim (timeString.substr (pos));
-    return Time (val * toSecondMultiplier (time_unitsFromString (units)));
+    return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
 
 helics::Time loadTimeFromString (const std::string &timeString, time_units defUnits)
@@ -67,6 +67,6 @@ helics::Time loadTimeFromString (const std::string &timeString, time_units defUn
         return Time (val * toSecondMultiplier (defUnits));
     }
     std::string units = stringOps::trim (timeString.substr (pos));
-    return Time (val * toSecondMultiplier (time_unitsFromString (units)));
+    return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
 } //namespace helics
