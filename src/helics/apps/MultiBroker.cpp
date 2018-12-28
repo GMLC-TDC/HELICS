@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright ï¿½ 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -18,6 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #endif
 #if HELICS_HAVE_ZEROMQ!=0
 #include "../core/zmq/ZmqComms.h"
+#include "../core/zmq/ZmqCommsSS.h"
 #endif
 #if HELICS_HAVE_MPI!=0
 #include "../core/mpi/MpiComms.h"
@@ -86,6 +87,11 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 			comm = std::make_unique<zeromq::ZmqComms>();
 #endif
 			break;
+		case core_type::ZMQ_SS:
+#if HELICS_HAVE_ZEROMQ!=0
+			comm = std::make_unique<zeromq::ZmqCommsSS>();
+#endif
+			break;
 		case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
 			comm = std::make_unique<tcp::TcpCommsSS>();
@@ -109,7 +115,6 @@ static std::unique_ptr<CommsInterface> generateComms(const std::string &type, co
 			break;
 #endif
 		case core_type::HTTP:
-		case core_type::ZMQ_TEST:
         case core_type::TEST:
         case core_type::NNG:
         case core_type::UNRECOGNIZED:
