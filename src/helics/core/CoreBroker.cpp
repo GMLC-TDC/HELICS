@@ -1877,7 +1877,7 @@ void CoreBroker::broadcast (ActionMessage &cmd)
     {
         if (!broker._nonLocal)
         {
-            cmd.dest_id = broker.global_id;
+        	cmd.dest_id = broker.global_id;
             transmit (broker.route, cmd);
         }
     }

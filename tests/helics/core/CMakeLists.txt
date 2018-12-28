@@ -28,7 +28,7 @@ set(
 )
 
 if(HELICS_HAVE_ZEROMQ)
-  list(APPEND core_test_sources ZeromqCore-tests.cpp)
+  list(APPEND core_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
 endif(HELICS_HAVE_ZEROMQ)
 
 if(NOT DISABLE_TCP_CORE)

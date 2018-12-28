@@ -11,9 +11,21 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #ifndef DISABLE_TCP_CORE
 #ifdef HELICS_HAVE_ZEROMQ
-const std::vector<std::string> core_types = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                             "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "zmq", "udp"};
+const std::vector<std::string> core_types = {"test",
+                                             "ipc",
+                                             "zmq",
+                                             "udp",
+                                             "tcp",
+                                             "zmq_ss"
+                                             "test_2",
+                                             "ipc_2",
+                                             "zmq_2",
+                                             "udp_2",
+                                             "tcp_2"
+                                             "zmq_ss_2"};
+const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "zmq",
+                                                    "udp"
+                                                    "zmq_ss"};
 #else
 const std::vector<std::string> core_types = {"test",  "ipc",   "udp",   "tcp",  "test_2",
                                              "ipc_2", "zmq_2", "udp_2", "tcp_2"};
