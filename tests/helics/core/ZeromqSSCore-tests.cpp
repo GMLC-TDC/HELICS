@@ -31,7 +31,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (ZMQSSCore_tests, *utf::label("cic"))
+BOOST_AUTO_TEST_SUITE (ZMQSSCore_tests, *utf::label("ci"))
 
 using helics::Core;
 
@@ -342,7 +342,7 @@ class FedTest
 
 BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
 {
-	int feds = 100;
+	int feds = 20;
 	auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
 	std::vector<std::shared_ptr<helics::Core>> cores (feds);
 	std::vector<FedTest> leafs (feds);

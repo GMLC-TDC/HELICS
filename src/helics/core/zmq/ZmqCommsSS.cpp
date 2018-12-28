@@ -515,27 +515,10 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
 
 void ZmqCommsSS::closeReceiver ()
 {
-    switch (getTxStatus ())
-    {
-    case connection_status::startup:
-    case connection_status::connected:
-    {
-    	ActionMessage cmd (CMD_PROTOCOL);
-        cmd.messageID = CLOSE_RECEIVER;
-        transmit (control_route, cmd);
-    }
-
-    break;
-    default:
-        if (!disconnecting)
-        {
-            // try connecting with the receivers push socket
-            ActionMessage cmd (CMD_PROTOCOL);
-            cmd.messageID = CLOSE_RECEIVER;
-            transmit (control_route, cmd);
-        }
-        break;
-    }
+	// Send close message to close Tx and Rx connection
+	ActionMessage cmd (CMD_PROTOCOL);
+	cmd.messageID = CLOSE_RECEIVER;
+	transmit (control_route, cmd);
 }
 
 }  // namespace zeromq

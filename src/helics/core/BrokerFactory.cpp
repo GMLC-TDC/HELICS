@@ -83,7 +83,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
             broker = std::make_shared<zeromq::ZmqBrokerSS> (name);
         }
 #else
-        throw (HelicsException ("ZMQ broker type is not available"));
+        throw (HelicsException ("ZMQ single socket broker type is not available"));
 #endif
         break;
     case core_type::MPI:
