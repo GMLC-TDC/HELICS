@@ -156,6 +156,7 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     }
     BOOST_REQUIRE (connected2);
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
+    std::this_thread::sleep_for (250ms);
     if (counter3 != 3)
     {
         std::this_thread::sleep_for (500ms);
