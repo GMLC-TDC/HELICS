@@ -279,7 +279,7 @@ class FedTest
 {
   public:
     helics::Time deltaTime = helics::Time (10, timeUnits::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (200, timeUnits::ns);  // final time
+    helics::Time finalTime = helics::Time (100, timeUnits::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -289,6 +289,7 @@ class FedTest
     int pub_index = 0;
     int sub_index = 0;
     bool initialized = false;
+    int counter = 0;
 
   public:
     FedTest () = default;
@@ -320,6 +321,7 @@ class FedTest
     {
         auto nextTime = deltaTime;
         std::string txstring (fed_name);
+
         while (nextTime < finalTime)
         {
             nextTime = vFed->requestTime (nextTime + deltaTime);
@@ -335,10 +337,12 @@ class FedTest
                         std::cout << "incorrect string\n";
                         break;
                     }
+                    counter++;
             	}
 
             }
         }
+        BOOST_REQUIRE_EQUAL (counter, 80);
         vFed->finalize ();
     }
 };
@@ -368,15 +372,15 @@ BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
         threads[ii] = std::thread ([](FedTest &leaf) { leaf.run (); }, std::ref (leafs[ii]));
     }
     std::this_thread::yield ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (500));
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::this_thread::yield ();
     for (auto &thrd : threads)
     {
         thrd.join ();
     }
-    std::this_thread::sleep_for (std::chrono::milliseconds (1000));
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
     broker->disconnect ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (1000));
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
