@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     }
     BOOST_REQUIRE (connected2);
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
-    if (counter3 != 1)
+    if (counter3 != 3)
     {
         std::this_thread::sleep_for (500ms);
     }
@@ -221,6 +221,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
         if(!msgs.empty()) {
         	auto rM = msgs.at(0);
         	BOOST_CHECK_EQUAL (rM.name, "core1");
+        	std::cout << "rM.name: " << rM.name << std::endl;
         	BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
 
@@ -238,6 +239,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
         if(!msgs.empty()) {
             auto rM2 = msgs.at(1);
             BOOST_CHECK_EQUAL (rM2.name, "core1");
+            std::cout << "rM.name: " << rM2.name << std::endl;
         	BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
         }
     }
