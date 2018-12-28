@@ -192,8 +192,7 @@ void TimeCoordinator::updateNextPossibleEventTime ()
         {
             if (time_minSo + info.inputDelay > time_next)
             {
-                time_next = time_minSo + info.inputDelay;
-                time_next = generateAllowedTime (time_next);
+                time_next = generateAllowedTime (time_minSo + info.inputDelay);
             }
         }
         time_next = std::min (time_next, time_exec) + info.outputDelay;

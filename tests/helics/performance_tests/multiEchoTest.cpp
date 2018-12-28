@@ -153,7 +153,9 @@ const int fedCount[] = {1, 5, 10, 20, 40, 80, 160, 320, 500, 1000, 2000};
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_DATA_TEST_CASE (echo_test_single_core, bdata::make (fedCount), feds)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate (CORE_TYPE_TO_TEST, "mcore", std::to_string (feds + 1));
+    auto wcore =
+      helics::CoreFactory::FindOrCreate (CORE_TYPE_TO_TEST, "mcore",
+                                         std::string ("--autobroker --federates=") + std::to_string (feds + 1));
     // this is to delay until the threads are ready
     wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
     EchoHub hub;
@@ -188,8 +190,9 @@ const int fedCountB[] = {5, 5, 5, 5};
 BOOST_DATA_TEST_CASE (echo_test_multicores, bdata::make (fedCountB), feds)
 {
     auto cType = helics::core_type::TEST;
-    auto broker = helics::BrokerFactory::create (cType, "brokerb", std::to_string (feds + 1));
-    auto wcore = helics::CoreFactory::FindOrCreate (cType, "mcore", "1");
+    auto broker =
+      helics::BrokerFactory::create (cType, "brokerb", std::string ("--federates=") + std::to_string (feds + 1));
+    auto wcore = helics::CoreFactory::FindOrCreate (cType, "mcore", "-f 1");
     // this is to delay until the threads are ready
     wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
     EchoHub hub;
