@@ -34,6 +34,8 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     SetupTest<ValueFederate> (core_type, 1);
     auto vFed1 = GetFederateAs<ValueFederate> (0);
 
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
+
     // register the publications
     Publication pubid (vFed1.get (), "pub1", helicsType<std::string> ());
     PublicationT<int> pubid2 (GLOBAL, vFed1, "pub2");
@@ -217,6 +219,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_inputs, bdata::make (core_typ
     auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
 
     auto &inpid = vFed2->registerInput<std::string> ("inp1");
+
     vFed2->addTarget (inpid, "pub1");
     bool res = dual_transfer_test (vFed1, vFed2, pubid, inpid);
     BOOST_CHECK (res);
@@ -303,12 +306,12 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_direct, bdata::ma
     BOOST_CHECK (res);
 }
 
-static const std::vector<std::string> simple_connection_files{"example_connections1.json",
-                                                              "example_connections2.json",
-                                                              "example_connections1.toml",
-                                                              "example_connections2.toml",
-                                                              "example_connections3.toml",
-                                                              "example_connections4.toml"};
+static constexpr const char *simple_connection_files[] = {"example_connections1.json",
+                                                          "example_connections2.json",
+                                                          "example_connections1.toml",
+                                                          "example_connections2.toml",
+                                                          "example_connections3.toml",
+                                                          "example_connections4.toml"};
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_broker_link_file,
                       bdata::make (simple_connection_files),
@@ -810,12 +813,22 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (c
 
     BOOST_CHECK_EQUAL (s, "string2");
 
+    // so in theory the remove target could take a little while since it needs to route through the core on
+    // occasion
+    // and this is an asynchronous operation so there is no guarantees the remove will stop the next broadcast
+    // but it should do it within the next timestep so we have an extra loop here
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    gtime = vFed2->requestTime (3.0);
+
+    BOOST_CHECK_EQUAL (gtime, 3.0);
+    gtime = f1time.get ();
+    BOOST_CHECK_EQUAL (gtime, 3.0);
     vFed1->publish (pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
-    gtime = vFed2->requestTime (3.0);
+    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (4.0); });
+    gtime = vFed2->requestTime (4.0);
     s = vFed2->getString (subid);
     // make sure we didn't get the last publish
     BOOST_CHECK_EQUAL (s, "string2");

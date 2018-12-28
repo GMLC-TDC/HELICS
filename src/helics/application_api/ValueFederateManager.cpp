@@ -277,7 +277,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     // get the actual publication types
     auto inpHandle = inputs.lock ();
-    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString (coreObject->getType (inp.handle)); });
+    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }

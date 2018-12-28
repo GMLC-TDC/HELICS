@@ -23,11 +23,13 @@ namespace utf = boost::unit_test;
 BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test registration of filters*/
-BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all), core_type)
+BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
+
     AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "filter");
     AddFederates<helics::MessageFederate> (core_type, 1, broker, helics::timeZero, "message");
+    // broker->setLoggingLevel (3);
     broker = nullptr;
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -43,11 +45,14 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
     BOOST_CHECK (f2.getHandle ().isValid ());
     auto &ep1 = fFed->registerEndpoint ("fout");
     BOOST_CHECK (ep1.getHandle ().isValid ());
+
+    mFed->finalizeAsync ();
+    // std::this_thread::sleep_for (std::chrono::milliseconds (50));
     auto &f3 = fFed->registerFilter ();
     fFed->addSourceTarget (f3, "filter0/fout");
     BOOST_CHECK (f3.getHandle () != f2.getHandle ());
-    mFed->finalizeAsync ();
     fFed->finalize ();
+    // std::cout << "fFed returned\n";
     mFed->finalizeComplete ();
     BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
     FullDisconnect ();
@@ -56,7 +61,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_all),
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
+BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -125,7 +130,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (ztypes), core_type)
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -185,7 +190,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types), core_type
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -306,7 +311,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
@@ -388,7 +393,7 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     fFed1->enterExecutingModeComplete ();
     fFed2->enterExecutingModeComplete ();
 
-    auto &p2Name = mFed->getEndpointName (p2);
+    auto &p2Name = mFed->getInterfaceName (p2);
     BOOST_CHECK (fFed1->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, p2Name, data);
@@ -426,11 +431,11 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     if (mFed->hasMessage (p2))
     {
         auto m2 = mFed->getMessage (p2);
-        auto ept1Name = mFed->getEndpointName (p1);
+        auto ept1Name = mFed->getInterfaceName (p1);
         if (ept1Name.size () > 1)
         {
-            BOOST_CHECK_EQUAL (m2->source, mFed->getEndpointName (p1));
-            BOOST_CHECK_EQUAL (m2->original_source, mFed->getEndpointName (p1));
+            BOOST_CHECK_EQUAL (m2->source, mFed->getInterfaceName (p1));
+            BOOST_CHECK_EQUAL (m2->original_source, mFed->getInterfaceName (p1));
         }
 
         BOOST_CHECK_EQUAL (m2->dest, p2Name);
@@ -1061,7 +1066,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 /** test whether a core termination when it should
  */
 
-BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_2), core_type)
+BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_single), core_type)
 {
     auto broker = AddBroker (core_type, 2);
     AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");

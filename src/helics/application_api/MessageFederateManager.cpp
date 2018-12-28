@@ -283,11 +283,6 @@ const Endpoint &MessageFederateManager::getEndpoint (int index) const
     return invalidEpt;
 }
 
-const std::string &MessageFederateManager::getEndpointType (const Endpoint &ept) const
-{
-    return coreObject->getType (ept.handle);
-}
-
 int MessageFederateManager::getEndpointCount () const
 {
     return static_cast<int> (local_endpoints.lock_shared ()->size ());

@@ -10,36 +10,36 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-const std::map<std::string, timeUnits> timeUnitStrings{
-  {"ps", timeUnits::ps},
-  {"ns", timeUnits::ns},
-  {"us", timeUnits::us},
-  {"ms", timeUnits::ms},
-  {"s", timeUnits::s},
-  {"sec", timeUnits::sec},
-  {"", timeUnits::sec},  // don't want empty string to error default is sec
-  {"seconds", timeUnits::sec},
-  {"second", timeUnits::sec},
-  {"min", timeUnits::minutes},
-  {"minute", timeUnits::minutes},
-  {"minutes", timeUnits::minutes},
-  {"hr", timeUnits::hr},
-  {"hour", timeUnits::hr},
-  {"hours", timeUnits::hr},
-  {"day", timeUnits::day},
-  {"week", timeUnits::week},
-  {"wk", timeUnits::week}};
+const std::map<std::string, time_units> time_unitstrings{
+  {"ps", time_units::ps},
+  {"ns", time_units::ns},
+  {"us", time_units::us},
+  {"ms", time_units::ms},
+  {"s", time_units::s},
+  {"sec", time_units::sec},
+  {"", time_units::sec},  // don't want empty string to error default is sec
+  {"seconds", time_units::sec},
+  {"second", time_units::sec},
+  {"min", time_units::minutes},
+  {"minute", time_units::minutes},
+  {"minutes", time_units::minutes},
+  {"hr", time_units::hr},
+  {"hour", time_units::hr},
+  {"hours", time_units::hr},
+  {"day", time_units::day},
+  {"week", time_units::week},
+  {"wk", time_units::week}};
 
-timeUnits timeUnitsFromString (const std::string &unitString)
+time_units timeUnitsFromString (const std::string &unitString)
 {
-    auto fnd = timeUnitStrings.find (unitString);
-    if (fnd != timeUnitStrings.end ())
+    auto fnd = time_unitstrings.find (unitString);
+    if (fnd != time_unitstrings.end ())
     {
         return fnd->second;
     }
     auto lcUstring = convertToLowerCase (stringOps::trim (unitString));
-    fnd = timeUnitStrings.find (lcUstring);
-    if (fnd != timeUnitStrings.end ())
+    fnd = time_unitstrings.find (lcUstring);
+    if (fnd != time_unitstrings.end ())
     {
         return fnd->second;
     }
@@ -58,7 +58,7 @@ helics::Time loadTimeFromString (const std::string &timeString)
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
 
-helics::Time loadTimeFromString (const std::string &timeString, timeUnits defUnits)
+helics::Time loadTimeFromString (const std::string &timeString, time_units defUnits)
 {
     size_t pos;
     double val = std::stod (timeString, &pos);

@@ -55,7 +55,7 @@ static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { re
 static const ArgDescriptors InfoArgs{
   {"datatype", "type of the publication data type to use"},
   {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
-  {"timeunits", "the default units on the timestamps used in file based input"}};
+  {"time_units", "the default units on the timestamps used in file based input"}};
 
 Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
 {
@@ -124,9 +124,9 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
 {
     try
     {
-        if (units == timeUnits::ns)  // ns
+        if (units == time_units::ns)  // ns
         {
-            return helics::Time (std::stoll (str), timeUnits::ns);
+            return helics::Time (std::stoll (str), time_units::ns);
         }
         else
         {
@@ -241,9 +241,9 @@ void Player::loadTextFile (const std::string &filename)
 
 
 
-                    if (playerConfig.find("timeunits") != playerConfig.end())
+                    if (playerConfig.find("time_units") != playerConfig.end())
                     {
-                        if (playerConfig["timeunits"] == "ns")
+                        if (playerConfig["time_units"] == "ns")
                         {
                             timeMultiplier = 1e-9;
                         }
@@ -418,9 +418,9 @@ void Player::loadJsonFile (const std::string &jsonFile)
     if (doc.isMember ("player"))
     {
         auto playerConfig = doc["player"];
-        if (playerConfig.isMember ("timeunits"))
+        if (playerConfig.isMember ("time_units"))
         {
-            if (playerConfig["timeunits"].asString () == "ns")
+            if (playerConfig["time_units"].asString () == "ns")
             {
                 timeMultiplier = 1e-9;
             }
@@ -891,16 +891,16 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
             return -3;
         }
     }
-    if (vm_map.count ("timeunits") > 0)
+    if (vm_map.count ("time_units") > 0)
     {
         try
         {
-            units = timeUnitsFromString (vm_map["timeunits"].as<std::string> ());
+            units = timeUnitsFromString (vm_map["time_units"].as<std::string> ());
             timeMultiplier = toSecondMultiplier (units);
         }
         catch (...)
         {
-            std::cerr << vm_map["timeunits"].as<std::string> () << " is not recognized as a valid unit of time \n";
+            std::cerr << vm_map["time_units"].as<std::string> () << " is not recognized as a valid unit of time \n";
         }
     }
     if (vm_map.count ("marker") > 0)

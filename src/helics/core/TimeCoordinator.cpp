@@ -704,6 +704,9 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
         return message_process_result::no_effect;
     case CMD_DISCONNECT:
     case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_CORE:
+    case CMD_DISCONNECT_FED:
+    case CMD_DISCONNECT_BROKER:
         // this command requires removing dependents as well as dealing with dependency processing
         removeDependent (global_federate_id (cmd.source_id));
         break;

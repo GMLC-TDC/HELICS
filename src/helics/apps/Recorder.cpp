@@ -263,13 +263,13 @@ void Recorder::loadTextFile (const std::string &textFile)
 
 void Recorder::writeJsonFile (const std::string &filename)
 {
-    Json_helics::Value doc;
+    Json::Value doc;
     if (!points.empty ())
     {
-        doc["points"] = Json_helics::Value (Json_helics::arrayValue);
+        doc["points"] = Json::Value (Json::arrayValue);
         for (auto &v : points)
         {
-            Json_helics::Value point;
+            Json::Value point;
             point["key"] = subscriptions[v.index].getTarget ();
             point["value"] = v.value;
             point["time"] = static_cast<double> (v.time);
@@ -279,7 +279,7 @@ void Recorder::writeJsonFile (const std::string &filename)
             }
             if (v.first)
             {
-                point["type"] = subscriptions[v.index].getType ();
+                point["type"] = subscriptions[v.index].getPublicationType ();
             }
             doc["points"].append (point);
         }
@@ -287,10 +287,10 @@ void Recorder::writeJsonFile (const std::string &filename)
 
     if (!messages.empty ())
     {
-        doc["messages"] = Json_helics::Value (Json_helics::arrayValue);
+        doc["messages"] = Json::Value (Json::arrayValue);
         for (auto &mess : messages)
         {
-            Json_helics::Value message;
+            Json::Value message;
             message["time"] = static_cast<double> (mess->time);
             message["src"] = mess->source;
             if ((!mess->original_source.empty ()) && (mess->original_source != mess->source))
@@ -335,7 +335,7 @@ void Recorder::writeTextFile (const std::string &filename)
         if (v.first)
         {
             outFile << static_cast<double> (v.time) << "\t\t" << subscriptions[v.index].getTarget () << '\t'
-                    << v.value << '\t' << subscriptions[v.index].getType () << '\n';
+                    << v.value << '\t' << subscriptions[v.index].getPublicationType () << '\n';
         }
         else
         {

@@ -26,61 +26,63 @@ else()
 string(REPLACE "?" "" ZeroMQ_PATH2 ${ZeroMQ_INSTALL_PATH})
 endif()
 
-find_path(ZeroMQ_ROOT_DIR
-  NAMES
-    include/zmq.h
-  HINTS
-    ${ZeroMQ_REGISTRY_PATH}
-	${ZeroMQ_INSTALL_PATH}
-	${ZeroMQ_INCLUDE_PATH}
-	${ZeroMQ_PATH2}
-  PATHS
-    /usr
-    /usr/local
-)
+if (NOT ZeroMQ_LIBRARY_ONLY)
+  find_path(ZeroMQ_ROOT_DIR
+    NAMES
+      include/zmq.h
+    HINTS
+      ${ZeroMQ_INCLUDE_PATH}
+      ${ZeroMQ_REGISTRY_PATH}
+      ${ZeroMQ_INSTALL_PATH}
+      ${ZeroMQ_PATH2}
+    PATHS
+      /usr
+      /usr/local
+  )
 
-find_path(ZeroMQ_INCLUDE_DIR zmq.h ${ZeroMQ_ROOT_DIR}/include)
-if (MSVC)
-  # Read registry key holding version
-    get_filename_component(ZeroMQ_NAME "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayVersion]" NAME)
+  find_path(ZeroMQ_INCLUDE_DIR zmq.h ${ZeroMQ_ROOT_DIR}/include)
+  if (MSVC)
+      # Read registry key holding version
+      get_filename_component(ZeroMQ_NAME "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayVersion]" NAME)
 
-  # Replace dots with underscores
-  string(REGEX REPLACE "\\." "_" ZeroMQ_NAME ${ZeroMQ_NAME})
-  # Get Visual studio version number
+    # Replace dots with underscores
+    string(REGEX REPLACE "\\." "_" ZeroMQ_NAME ${ZeroMQ_NAME})
+    # Get Visual studio version number
 
-  #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
+    #message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
-  if (${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
-    set(_ZeroMQ_VERSIONS "4_2_5" "4_2_4" "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
-    set(ZeroMQ_LIBRARY_NAME)
-	foreach(ver ${_ZeroMQ_VERSIONS})
-			list(APPEND ZeroMQ_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}")
-	endforeach()
-	foreach(ver ${_ZeroMQ_VERSIONS})
-			list(APPEND ZeroMQ_DEBUG_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${ver}")
-	endforeach()
-  else()
-    # Format ZeroMQ library file name
-	foreach(vs ${_VS_VERSIONS})
-		set(ZeroMQ_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ZeroMQ_NAME}")
-	endforeach()
-	foreach(vs ${_VS_VERSIONS})
-		set(ZeroMQ_DEBUG_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${ZeroMQ_NAME}")
-	endforeach()
+    if (${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
+      set(_ZeroMQ_VERSIONS "4_3_0" "4_2_5" "4_2_4" "4_2_3" "4_2_2" "4_2_1" "4_2_0" "4_1_5" "4_1_4" "4_0_4" "4_0_3" "4_0_2" "4_0_1" "4_0_0")
+      set(ZeroMQ_LIBRARY_NAME)
+  	  foreach(ver ${_ZeroMQ_VERSIONS})
+	  		  list(APPEND ZeroMQ_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}")
+	  endforeach()
+	  foreach(ver ${_ZeroMQ_VERSIONS})
+			  list(APPEND ZeroMQ_DEBUG_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${ver}")
+	  endforeach()
+    else()
+      # Format ZeroMQ library file name
+	  foreach(vs ${_VS_VERSIONS})
+		  set(ZeroMQ_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ZeroMQ_NAME}")
+	  endforeach()
+	  foreach(vs ${_VS_VERSIONS})
+		  set(ZeroMQ_DEBUG_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${ZeroMQ_NAME}")
+	  endforeach()
+    endif()
   endif()
 endif()
 
 find_library(ZeroMQ_LIBRARY
   NAMES
     zmq
-	libzmq
+    libzmq
     ${ZeroMQ_LIBRARY_NAME}
-HINTS
-	"${ZeroMQ_ROOT_DIR}/lib"
-	"${ZeroMQ_INSTALL_PATH}/lib"
-	"${ZeroMQ_INSTALL_PATH}/bin"
-	${ZeroMQ_PATH2}/lib
-	"${ZeroMQ_LIBRARY_PATH}"
+  HINTS
+    "${ZeroMQ_LIBRARY_PATH}"
+    "${ZeroMQ_ROOT_DIR}/lib"
+    "${ZeroMQ_INSTALL_PATH}/lib"
+    "${ZeroMQ_INSTALL_PATH}/bin"
+    ${ZeroMQ_PATH2}/lib
   PATHS
     /lib
     /usr/lib
@@ -92,11 +94,11 @@ find_library(ZeroMQ_DEBUG_LIBRARY
   NAMES
     ${ZeroMQ_DEBUG_LIBRARY_NAME}
 HINTS
+    "${ZeroMQ_LIBRARY_PATH}"
 	"${ZeroMQ_ROOT_DIR}/lib"
 	"${ZeroMQ_INSTALL_PATH}/lib"
 	"${ZeroMQ_INSTALL_PATH}/bin"
 	${ZeroMQ_PATH2}/lib
-	"${ZeroMQ_LIBRARY_PATH}"
   PATHS
     /lib
     /usr/lib
@@ -107,14 +109,14 @@ endif()
 find_library(ZeroMQ_STATIC_LIBRARY
   NAMES
     zmq.a
-	libzmq.a
+    libzmq.a
     ${ZeroMQ_LIBRARY_NAME}.a
-HINTS
-	"${ZeroMQ_ROOT_DIR}/lib"
-	"${ZeroMQ_INSTALL_PATH}/lib"
-	"${ZeroMQ_INSTALL_PATH}/bin"
-	${ZeroMQ_PATH2}/lib
-	"${ZeroMQ_LIBRARY_PATH}"
+  HINTS
+    "${ZeroMQ_LIBRARY_PATH}"
+    "${ZeroMQ_ROOT_DIR}/lib"
+    "${ZeroMQ_INSTALL_PATH}/lib"
+    "${ZeroMQ_INSTALL_PATH}/bin"
+    ${ZeroMQ_PATH2}/lib
   PATHS
     /lib
     /usr/lib

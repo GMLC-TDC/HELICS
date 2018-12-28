@@ -217,7 +217,7 @@ class Player : public App
       helics::data_type::helicsString;  //!< the default data type unless otherwise specified
     size_t pointIndex = 0;  //!< the current point index
     size_t messageIndex = 0;  //!< the current message index
-    timeUnits units = timeUnits::sec;
+    time_units units = time_units::sec;
     double timeMultiplier = 1.0;  //!< specify the time multiplier for different time specifications
     Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
 };

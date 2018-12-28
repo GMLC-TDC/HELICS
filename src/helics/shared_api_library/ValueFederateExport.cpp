@@ -1342,7 +1342,7 @@ const char *helicsInputGetKey (helics_input inp)
 
     try
     {
-        const std::string &key = inpObj->inputPtr->getName ();
+        const std::string &key = inpObj->inputPtr->getKey ();
         return key.c_str ();
     }
     catch (...)

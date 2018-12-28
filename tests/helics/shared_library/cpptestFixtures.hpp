@@ -11,6 +11,7 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
+#include "../coreTypeLists.hpp"
 #include "../src/helics/cpp98/Broker.hpp"
 #include "../src/helics/cpp98/Core.hpp"
 #include "../src/helics/cpp98/Federate.hpp"
@@ -18,25 +19,6 @@ Lawrence Livermore National Laboratory, operated by Lawrence Livermore National 
 #include <memory>
 
 #define HELICS_SIZE_MAX 512
-
-#ifndef DISABLE_TCP_CORE
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                  "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "ipc", "udp", "tcp", "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::string core_types_single[] = {"test", "ipc", "tcp", "udp"};
-#endif
-#else
-#ifdef HELICS_HAVE_ZEROMQ
-const std::string core_types[] = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "zmq", "udp"};
-#else
-const std::string core_types[] = {"test", "ipc", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::string core_types_single[] = {"test", "ipc", "udp"};
-#endif
-#endif
 
 struct FederateTestFixture_cpp
 {

@@ -28,7 +28,7 @@ namespace bdata = boost::unit_test::data;
 class EchoHub
 {
   public:
-    helics::Time finalTime = helics::Time (1000, timeUnits::ns);  // final time
+    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     std::vector<helics::Publication> pubs;
@@ -89,8 +89,8 @@ class EchoHub
 class EchoLeaf
 {
   public:
-    helics::Time deltaTime = helics::Time (10, timeUnits::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (1000, timeUnits::ns);  // final time
+    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
+    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -148,7 +148,7 @@ class EchoLeaf
 
 BOOST_AUTO_TEST_SUITE (echo_tests)
 
-const int fedCount[] = {1, 5, 10, 20, 40, 80, 160, 320, 500, 1000, 2000};
+static constexpr int fedCount[] = {1, 5, 10, 20, 40, 80, 160, 320, 500, 1000, 2000};
 // const int fedCount[] = {180};
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_DATA_TEST_CASE (echo_test_single_core, bdata::make (fedCount), feds)
@@ -185,7 +185,7 @@ BOOST_DATA_TEST_CASE (echo_test_single_core, bdata::make (fedCount), feds)
     std::cout << feds << " feds total time=" << diff.count () / 1000000 << "ms \n";
 }
 
-const int fedCountB[] = {5, 5, 5, 5};
+static constexpr int fedCountB[] = {5, 5, 5, 5};
 
 BOOST_DATA_TEST_CASE (echo_test_multicores, bdata::make (fedCountB), feds)
 {

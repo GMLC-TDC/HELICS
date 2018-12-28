@@ -31,7 +31,7 @@ enum log_level : int
 
 #define LOG_ERROR(id, ident, message) sendToLogger (id, log_level::error, ident, message);
 #define LOG_ERROR_SIMPLE(message)                                                                                 \
-    semdToLogger (global_broker_id_local, log_level::error, getIdentifier (), message);
+    sendToLogger (global_broker_id_local, log_level::error, getIdentifier (), message);
 #define LOG_WARNING(id, ident, message) sendToLogger (id, log_level::warning, ident, message);
 
 #define LOG_WARNING_SIMPLE(message)                                                                               \

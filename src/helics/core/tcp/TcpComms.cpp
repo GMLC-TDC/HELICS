@@ -308,15 +308,11 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                             rxMessageQueue.push (mess->second);
                             break;
                         }
-
-                        else if (mess->second.messageID == DISCONNECT)
+                        if (mess->second.messageID == DISCONNECT)
                         {
                             return terminate (connection_status::terminated);
                         }
-                        else
-                        {
-                            rxMessageQueue.push (mess->second);
-                        }
+                        rxMessageQueue.push (mess->second);
                     }
                     else
                     {
@@ -401,17 +397,17 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-						routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
+                        routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }
                     catch (std::exception &e)
                     {
-                        // TODO:: do something???
+                        // TODO(PT):: do something???
                     }
                     processed = true;
                 }
                 break;
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -502,9 +498,9 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-					if (!isDisconnectCommand(cmd))
-					{
-                        logWarning (std::string ("unknown message destination message dropped ") +
+                    if (!isDisconnectCommand (cmd))
+                    {
+                        logWarning (std::string ("(tcp) unknown message destination message dropped ") +
                                     prettyPrintString (cmd));
                     }
                 }

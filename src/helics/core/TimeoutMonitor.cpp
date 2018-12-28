@@ -28,13 +28,13 @@ void TimeoutMonitor::tick (CommonCore *core)
             core->brokerState = BrokerBase::broker_state_t::errored;
             core->addActionMessage (CMD_STOP);
         }
-		else
-		{  //ping again
+        else
+        {  // ping again
             ActionMessage png (CMD_PING);
             png.source_id = core->global_broker_id_local;
             png.dest_id = core->higher_broker_id;
             core->transmit (parent_route_id, png);
-		}
+        }
     }
     else if ((core->isConnected ()) && (core->global_broker_id_local.isValid ()) &&
              (core->global_broker_id_local != parent_broker_id))
@@ -52,26 +52,16 @@ void TimeoutMonitor::tick (CommonCore *core)
         }
         //}
     }
-    else if ((core->brokerState==BrokerBase::broker_state_t::terminated)||(core->brokerState==BrokerBase::broker_state_t::errored))
+    else if ((core->isConnected ()) &&
+             ((!core->global_broker_id_local.isValid ()) || (core->global_broker_id_local == parent_broker_id)))
     {
-		if (waitingForConnection)
-		{
-            auto now = std::chrono::steady_clock::now ();
-            if (now - startWaiting > timeout)
-            {
-                ActionMessage png (CMD_CHECK_CONNECTIONS);
-                png.source_id = core->global_broker_id_local;
-                core->addActionMessage (png);
-			}
-		}
-		else
-		{
-            waitingForConnection = true;
-            startWaiting = std::chrono::steady_clock::now ();
-		}
+        ActionMessage rsend (CMD_RESEND);
+        rsend.messageID = static_cast<int32_t> (CMD_REG_BROKER);
+        core->processCommand (std::move (rsend));
     }
-	else
-	{
+    else if ((core->brokerState == BrokerBase::broker_state_t::terminated) ||
+             (core->brokerState == BrokerBase::broker_state_t::errored))
+    {
         if (waitingForConnection)
         {
             auto now = std::chrono::steady_clock::now ();
@@ -87,12 +77,30 @@ void TimeoutMonitor::tick (CommonCore *core)
             waitingForConnection = true;
             startWaiting = std::chrono::steady_clock::now ();
         }
-	}
+    }
+    else
+    {
+        if (waitingForConnection)
+        {
+            auto now = std::chrono::steady_clock::now ();
+            if (now - startWaiting > timeout)
+            {
+                ActionMessage png (CMD_CHECK_CONNECTIONS);
+                png.source_id = core->global_broker_id_local;
+                core->addActionMessage (png);
+            }
+        }
+        else
+        {
+            waitingForConnection = true;
+            startWaiting = std::chrono::steady_clock::now ();
+        }
+    }
 }
 
 void TimeoutMonitor::tick (CoreBroker *brk)
 {
-    if (!brk->isRoot())
+    if (!brk->isRoot ())
     {
         if (waitingForPingReply)
         {
@@ -102,7 +110,7 @@ void TimeoutMonitor::tick (CoreBroker *brk)
                 // try to reset the connection to the broker
                 // brokerReconnect()
                 brk->sendToLogger (brk->global_broker_id_local, log_level::error, brk->getIdentifier (),
-                                    "core lost connection with broker");
+                                   "core lost connection with broker");
                 brk->sendErrorToImmediateBrokers (-5);
                 brk->processDisconnect ();
                 brk->brokerState = BrokerBase::broker_state_t::errored;
@@ -171,7 +179,7 @@ void TimeoutMonitor::tick (CoreBroker *brk)
         }
     }
 }
- 
+
 void TimeoutMonitor::pingReply (const ActionMessage & /*cmd*/)
 {
     waitingForPingReply = false;

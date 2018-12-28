@@ -260,6 +260,10 @@ class CoreBroker : public Broker, public BrokerBase
 
     void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
+	/** process a disconnect message*/
+	void processDisconnect(ActionMessage &command);
+	/** disconnect a broker/core*/
+    void disconnectBroker (BasicBrokerInfo &brk);
     /** run a check for a named interface*/
     void checkForNamedInterface (ActionMessage &command);
     /** remove a named target from an interface*/
@@ -271,7 +275,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** generate an answer to a local query*/
     void processLocalQuery (const ActionMessage &m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer (const std::string &query);
+    std::string generateQueryAnswer (const std::string &request);
     /** locate the route to take to a particular federate*/
     route_id getRoute (global_federate_id fedid) const;
     /** locate the route to take to a particular federate*/
@@ -302,7 +306,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** generate a string about the federation summarizing connections*/
     std::string generateFederationSummary () const;
     /** label the broker and all children as disconnected*/
-    void labelAsDisconnected (global_broker_id broker);
+    void labelAsDisconnected (global_broker_id brkid);
 
     friend class TimeoutMonitor;
 };

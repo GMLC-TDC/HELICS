@@ -70,7 +70,8 @@ class UnknownHandleManager
 
     /** specify a found source filter*/
     void clearFilter (const std::string &newFilter);
-
+    /** clear all unknowns belonging to a certain federate*/
+    void clearFederateUnknowns (global_federate_id id);
     /** check if there are any unknowns remaining*/
     bool hasUnknowns () const;
 

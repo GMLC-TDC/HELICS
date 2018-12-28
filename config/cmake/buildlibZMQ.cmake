@@ -63,7 +63,7 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 ExternalProject_Add(libzmq
 	SOURCE_DIR ${PROJECT_BINARY_DIR}/Download/libzmq
     GIT_REPOSITORY  https://github.com/zeromq/libzmq.git
-	GIT_TAG v4.2.5
+	GIT_TAG v4.3.0
     DOWNLOAD_COMMAND " "
     UPDATE_COMMAND " "
 	BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/libzmq

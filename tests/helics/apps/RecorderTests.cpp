@@ -121,13 +121,13 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
 }
 
-const std::vector<std::string> simple_files{"example1.recorder", "example2.record",    "example3rec.json",
-                                            "example4rec.json",  "exampleCapture.txt", "exampleCapture.json"};
+static constexpr const char *simple_files[] = {"example1.recorder", "example2.record",    "example3rec.json",
+                                               "example4rec.json",  "exampleCapture.txt", "exampleCapture.json"};
 
 BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (simple_files), file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "coref" + file;
+    fi.coreName = std::string ("coref") + file;
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
@@ -178,14 +178,14 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     BOOST_CHECK_EQUAL (v1.second, std::to_string (3.9));
 }
 
-const std::vector<std::string> simple_message_files{"example4.recorder", "example5.record", "example6rec.json"};
+static constexpr const char *simple_message_files[] = {"example4.recorder", "example5.record", "example6rec.json"};
 
 BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcoretmf" + file;
+    fi.coreName = std::string ("rcoretmf") + file;
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
 
@@ -454,15 +454,15 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
 }
 
-const std::vector<std::string> simple_clone_test_files{"clone_example1.txt",  "clone_example2.txt",
-                                                       "clone_example3.txt",  "clone_example4.txt",
-                                                       "clone_example5.txt",  "clone_example6.txt",
-                                                       "clone_example7.json", "clone_example8.JSON"};
+static constexpr const char *simple_clone_test_files[] = {"clone_example1.txt",  "clone_example2.txt",
+                                                          "clone_example3.txt",  "clone_example4.txt",
+                                                          "clone_example5.txt",  "clone_example6.txt",
+                                                          "clone_example7.json", "clone_example8.JSON"};
 
 BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore4" + file;
+    fi.coreName = std::string ("rcore4") + file;
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1 ("rec1", fi);
     fi.setProperty (helics_property_time_period, 1.0);

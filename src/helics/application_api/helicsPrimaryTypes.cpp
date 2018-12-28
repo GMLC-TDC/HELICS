@@ -151,7 +151,7 @@ bool changeDetected (const defV &prevValue, Time val, double deltaV)
     }
     else if (prevValue.index () == intLoc)
     {
-        return (std::abs (Time (mpark::get<int64_t> (prevValue), timeUnits::ns) - val) > deltaV);
+        return (std::abs (Time (mpark::get<int64_t> (prevValue), time_units::ns) - val) > deltaV);
     }
     return true;
 }
@@ -605,7 +605,7 @@ void valueExtract (const data_view &dv, data_type baseType, std::vector<double> 
     }
     case data_type::helicsTime:
     {
-        Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
+        Time tm (ValueConverter<int64_t>::interpret (dv), time_units::ns);
         val.push_back (static_cast<double> (tm));
     }
     break;
@@ -671,7 +671,7 @@ void valueExtract (const data_view &dv, data_type baseType, std::vector<std::com
     }
     case data_type::helicsTime:
     {
-        Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
+        Time tm (ValueConverter<int64_t>::interpret (dv), time_units::ns);
         val.emplace_back (static_cast<double> (tm), 0.0);
     }
     break;
@@ -733,7 +733,7 @@ void valueExtract (const data_view &dv, data_type baseType, std::complex<double>
     }
     case data_type::helicsTime:
     {
-        Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
+        Time tm (ValueConverter<int64_t>::interpret (dv), time_units::ns);
         val = std::complex<double> (static_cast<double> (tm), 0.0);
     }
     break;
@@ -797,7 +797,7 @@ void valueExtract (const data_view &dv, data_type baseType, named_point &val)
     }
     case data_type::helicsTime:
     {
-        Time tm (ValueConverter<int64_t>::interpret (dv), timeUnits::ns);
+        Time tm (ValueConverter<int64_t>::interpret (dv), time_units::ns);
         val.name = "time";
         val.value = static_cast<double> (tm);
     }

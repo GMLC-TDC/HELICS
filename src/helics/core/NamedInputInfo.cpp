@@ -283,7 +283,7 @@ Time NamedInputInfo::nextValueTime () const
     return nvtime;
 }
 
-static const std::set<std::string> convertible_set{"double_vector", "complex_vector", "double",    "float",
+static const std::set<std::string> convertible_set{"double_vector", "complex_vector", "vector", "double",    "float",
                                                    "bool",          "char",           "uchar",     "int32",
                                                    "int64",         "uint32",         "uint64",    "int16",
                                                    "string",        "complex",        "complex_f", "named_point"};
