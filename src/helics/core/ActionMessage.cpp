@@ -165,35 +165,39 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     data[1] = static_cast<uint8_t> (ssize >> 16);
     data[2] = static_cast<uint8_t> ((ssize >> 8) & 0xFF);
     data[3] = static_cast<uint8_t> (ssize & 0xFF);
-    data += sizeof (uint32_t);
+    data += sizeof (uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t *> (data) = messageAction;
     data += sizeof (action_message_def::action_t);
     *reinterpret_cast<int32_t *> (data) = messageID;
-    data += sizeof (int32_t);
+    data += sizeof (int32_t);  // 8
     *reinterpret_cast<int32_t *> (data) = source_id.baseValue ();
-    data += sizeof (int32_t);
+    data += sizeof (int32_t);  // 12
     *reinterpret_cast<int32_t *> (data) = source_handle.baseValue ();
-    data += sizeof (int32_t);
+    data += sizeof (int32_t);  // 16
     *reinterpret_cast<int32_t *> (data) = dest_id.baseValue ();
-    data += sizeof (int32_t);
+    data += sizeof (int32_t);  // 20
     *reinterpret_cast<int32_t *> (data) = dest_handle.baseValue ();
-    data += sizeof (int32_t);
+    data += sizeof (int32_t);  // 24
     *reinterpret_cast<uint16_t *> (data) = counter;
-    data += sizeof (uint16_t);
+    data += sizeof (uint16_t);  // 26
     *reinterpret_cast<uint16_t *> (data) = flags;
-    data += sizeof (uint16_t);
+    data += sizeof (uint16_t);  // 28
     *reinterpret_cast<int32_t *> (data) = sequenceID;
-    data += sizeof (int32_t);
-    *reinterpret_cast<int64_t *> (data) = actionTime.getBaseTimeCode ();
+    data += sizeof (int32_t);  // 32
+    auto bt = actionTime.getBaseTimeCode ();
+    std::memcpy (data, &(bt), sizeof (int64_t));
     data += sizeof (int64_t);
 
     if (messageAction == CMD_TIME_REQUEST)
     {
-        *reinterpret_cast<int64_t *> (data) = Te.getBaseTimeCode ();
+        bt = Te.getBaseTimeCode ();
+        std::memcpy (data, &(bt), sizeof (int64_t));
         data += sizeof (int64_t);
-        *reinterpret_cast<int64_t *> (data) = Tdemin.getBaseTimeCode ();
+        bt = Tdemin.getBaseTimeCode ();
+        std::memcpy (data, &(bt), sizeof (int64_t));
         data += sizeof (int64_t);
-        *reinterpret_cast<int64_t *> (data) = Tso.getBaseTimeCode ();
+        bt = Tso.getBaseTimeCode ();
+        std::memcpy (data, &(bt), sizeof (int64_t));
         data += sizeof (int64_t);
     }
     if (ssize > 0)
@@ -213,9 +217,10 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
         ++data;
         for (auto &str : stringData)
         {
-            *reinterpret_cast<uint32_t *> (data) = static_cast<uint32_t> (str.size ());
+            auto strsize = static_cast<uint32_t> (str.size ());
+            std::memcpy (data, &strsize, sizeof (uint32_t));
             data += sizeof (uint32_t);
-            memcpy (data, str.data (), str.size ());
+            std::memcpy (data, str.data (), str.size ());
             data += str.size ();
         }
     }
