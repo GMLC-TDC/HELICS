@@ -169,6 +169,8 @@ class Endpoint
     void addDestinationFilter (const std::string &filterName) { fed->addDestinationFilter (*this, filterName); }
     /** set a target destination for unspecified messages*/
     void setTargetDestination (const std::string &target) { targetDest = target; }
+    /** get the target destination for the endpoint*/
+    const std::string &getDestination() const { return targetDest; }
     /** get the name of the endpoint*/
     const std::string &getName () const { return actualName; }
     /** get the name of the endpoint*/
