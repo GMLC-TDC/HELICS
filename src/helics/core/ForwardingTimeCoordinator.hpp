@@ -45,9 +45,9 @@ class ForwardingTimeCoordinator
     ForwardingTimeCoordinator () = default;
 
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
+    void setMessageSender (std::function<void(const ActionMessage &)> userSendMessageFunction)
     {
-        sendMessageFunction = std::move (sendMessageFunction_);
+        sendMessageFunction = std::move (userSendMessageFunction);
     }
 
     /** get a list of actual dependencies*/

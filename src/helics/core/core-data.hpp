@@ -33,7 +33,7 @@ class data_block
     friend class ActionMessage;  //!< let action Message access the string directly
   public:
     /** default constructor */
-    data_block () noexcept {};
+    data_block () = default;
     /** size allocation constructor */
     explicit data_block (size_t blockSize) { m_data.resize (blockSize); };
     /** size and data */
@@ -148,6 +148,8 @@ class Message
   public:
     /** default constructor*/
     Message () = default;
+    /** default destructor*/
+    ~Message () = default;
     /** move constructor*/
     Message (Message &&m) noexcept;
     /** copy constructor*/

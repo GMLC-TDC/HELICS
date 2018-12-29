@@ -43,14 +43,14 @@ inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 template <class FlagIndex>
 inline bool checkActionFlag (uint16_t flags, FlagIndex flag)
 {
-    return ((flags & (static_cast<uint16_t> (1) << (flag))) != 0);
+    return ((flags & (static_cast<uint16_t> (1) << (flag))) != 0u);
 }
 
 /** template function to check a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
 {
-    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0);
+    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0u);
 }
 
 /** template function to clear a flag in an object containing a flags field*/

@@ -143,7 +143,7 @@ void ActionMessage::setString (int index, const std::string &str)
 static inline std::uint8_t is_little_endian ()
 {
     static std::int32_t test = 1;
-    return *reinterpret_cast<std::int8_t *> (&test) == 1;
+    return (*reinterpret_cast<std::int8_t *> (&test) == 1) ? std::uint8_t (1) : 0;
 }
 
 int ActionMessage::toByteArray (char *data, int buffer_size) const
@@ -160,11 +160,11 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     }
     char *dataStart = data;
     // put the main string size in the first 4 bytes;
-    auto ssize = static_cast<uint32_t> (payload.size ()) & 0x00FFFFFF;
+    auto ssize = static_cast<uint32_t> (payload.size ()) & 0x00FFFFFFu;
     *data = littleEndian;
-    data[1] = static_cast<uint8_t> (ssize >> 16);
-    data[2] = static_cast<uint8_t> ((ssize >> 8) & 0xFF);
-    data[3] = static_cast<uint8_t> (ssize & 0xFF);
+    data[1] = static_cast<uint8_t> (ssize >> 16u);
+    data[2] = static_cast<uint8_t> ((ssize >> 8) & 0xFFu);
+    data[3] = static_cast<uint8_t> (ssize & 0xFFu);
     data += sizeof (uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t *> (data) = messageAction;
     data += sizeof (action_message_def::action_t);
@@ -257,9 +257,9 @@ void ActionMessage::packetize (std::string &data) const
     data[0] = LEADING_CHAR;
     // now generate a length header
     auto dsz = static_cast<uint32_t> (data.size ());
-    data[1] = static_cast<char> (((dsz >> 16) & 0xFF));
-    data[2] = static_cast<char> (((dsz >> 8) & 0xFF));
-    data[3] = static_cast<char> (dsz & 0xFF);
+    data[1] = static_cast<char> (((dsz >> 16) & 0xFFu));
+    data[2] = static_cast<char> (((dsz >> 8) & 0xFFu));
+    data[3] = static_cast<char> (dsz & 0xFFu);
     data.push_back (TAIL_CHAR1);
     data.push_back (TAIL_CHAR2);
 }
@@ -291,7 +291,9 @@ template <std::size_t DataSize>
 inline void swap_bytes (std::uint8_t *data)
 {
     for (std::size_t i = 0, end = DataSize / 2; i < end; ++i)
+    {
         std::swap (data[i], data[DataSize - i - 1]);
+    }
 }
 
 int ActionMessage::fromByteArray (const char *data, int buffer_size)
@@ -446,9 +448,9 @@ int ActionMessage::depacketize (const char *data, int buffer_size)
         return 0;
     }
     int message_size = static_cast<unsigned char> (data[1]);
-    message_size <<= 8;
+    message_size <<= 8u;
     message_size += static_cast<unsigned char> (data[2]);
-    message_size <<= 8;
+    message_size <<= 8u;
     message_size += static_cast<unsigned char> (data[3]);
     if (buffer_size < message_size + 2)
     {

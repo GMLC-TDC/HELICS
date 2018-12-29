@@ -37,7 +37,7 @@ class ActionMessage
     interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
-    uint32_t sequenceID;  //!< a sequence number for ordering
+    uint32_t sequenceID = 0;  //!< a sequence number for ordering
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
@@ -75,7 +75,7 @@ class ActionMessage
     /** copy constructor*/
     ActionMessage (const ActionMessage &act);
     /** copy operator*/
-    ActionMessage &operator= (const ActionMessage &);
+    ActionMessage &operator= (const ActionMessage &act);
     /** move assignment*/
     ActionMessage &operator= (ActionMessage &&act) noexcept;
     /** get the action of the message*/
