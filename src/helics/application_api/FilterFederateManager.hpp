@@ -29,7 +29,7 @@ class FilterFederateManager
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    FilterFederateManager (Core *coreObj, Federate *fFed, federate_id_t id);
+    FilterFederateManager (Core *coreObj, Federate *fFed, local_federate_id id);
     ~FilterFederateManager ();
     /** register a Filter
     @details call is only valid in startup mode
@@ -77,6 +77,6 @@ class FilterFederateManager
     Core *coreObject = nullptr;
     shared_guarded<MappedVector<std::unique_ptr<Filter>, std::string>> filters;
     Federate *fed = nullptr;  //!< pointer back to the message Federate
-    const federate_id_t fedID;  //!< storage for the federate ID
+    const local_federate_id fedID;  //!< storage for the federate ID
 };
 }  // namespace helics

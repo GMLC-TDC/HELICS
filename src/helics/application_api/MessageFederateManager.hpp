@@ -31,7 +31,7 @@ class MessageFederateManager
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    MessageFederateManager (Core *coreOb, MessageFederate *mFed, federate_id_t id);
+    MessageFederateManager (Core *coreOb, MessageFederate *mFed, local_federate_id id);
     ~MessageFederateManager ();
     /** register an endpoint
     @details call is only valid in startup mode
@@ -139,7 +139,7 @@ class MessageFederateManager
     Time CurrentTime;  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     MessageFederate *mFed;  //!< pointer back to the message Federate
-    const federate_id_t fedID;  //!< storage for the federate ID
+    const local_federate_id fedID;  //!< storage for the federate ID
     shared_guarded<std::vector<std::unique_ptr<EndpointData>>>
       eptData;  //!< the storage for the message queues and other unique Endpoint information
     guarded<std::vector<unsigned int>> messageOrder;  //!< maintaining a list of the ordered messages

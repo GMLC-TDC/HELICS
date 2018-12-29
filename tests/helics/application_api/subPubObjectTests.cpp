@@ -426,11 +426,13 @@ BOOST_AUTO_TEST_CASE (subscriptionDefaults_test, *utf::label ("ci"))
     fi.coreInitString = "--autobroker";
 
     auto vFed = std::make_shared<helics::ValueFederate> ("test1", fi);
+    vFed->setFlagOption (helics_handle_option_connection_optional);
     // register the publications
     auto &subObj1 = vFed->registerSubscription ("pub1");
     auto &subObj2 = vFed->registerSubscription ("pub2");
     subObj1.setDefault (45.3);
     subObj2.setDefault (67.4);
+
     vFed->enterExecutingMode ();
     auto gtime = vFed->requestTime (1.0);
 

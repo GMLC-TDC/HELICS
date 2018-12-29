@@ -83,7 +83,9 @@ std::string MessageFederate::localQuery (const std::string &queryStr) const
 
 Endpoint &MessageFederate::registerEndpoint (const std::string &eptName, const std::string &type)
 {
-    return mfManager->registerEndpoint ((!eptName.empty ()) ? (getName () + separator_ + eptName) : eptName, type);
+    return mfManager->registerEndpoint ((!eptName.empty ()) ? (getName () + nameSegmentSeparator + eptName) :
+                                                              eptName,
+                                        type);
 }
 
 Endpoint &MessageFederate::registerGlobalEndpoint (const std::string &eptName, const std::string &type)
@@ -295,7 +297,7 @@ Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
     auto &id = mfManager->getEndpoint (eptName);
     if (!id.isValid ())
     {
-        return mfManager->getEndpoint (getName () + separator_ + eptName);
+        return mfManager->getEndpoint (getName () + nameSegmentSeparator + eptName);
     }
     return id;
 }

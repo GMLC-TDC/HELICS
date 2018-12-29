@@ -23,7 +23,7 @@ class data_view
       ref;  //!< need to capture a reference to the data being viewed if it is from a shared_ptr
   public:
     /** default constructor*/
-    data_view () noexcept {};
+    data_view () = default;
     /** construct from a shared_ptr to a data_block*/
     data_view (std::shared_ptr<const data_block> dt) : dblock (dt->m_data), ref (std::move (dt)){};
     /** construct from a regular data_block*/
@@ -46,12 +46,7 @@ class data_view
     /** construct from a string_view*/
     data_view (const stx::string_view &sview) noexcept : dblock (sview){};  // NOLINT (intended implicit)
     /** assignment operator from another ata_view*/
-    data_view &operator= (const data_view &dv) noexcept
-    {
-        dblock = dv.dblock;
-        ref = dv.ref;
-        return *this;
-    }
+    data_view &operator= (const data_view &dv) noexcept = default;
 
     data_view &operator= (data_view &&dv) noexcept
     {

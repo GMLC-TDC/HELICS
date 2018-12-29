@@ -148,7 +148,7 @@ void FederateState::reset ()
 {
     global_id = global_federate_id ();
     interfaceInformation.setGlobalId (global_federate_id ());
-    local_id = federate_id_t ();
+    local_id = local_federate_id ();
     state = HELICS_CREATED;
     queue.clear ();
     delayQueues.clear ();

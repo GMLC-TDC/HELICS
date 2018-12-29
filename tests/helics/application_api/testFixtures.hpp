@@ -14,6 +14,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <stdexcept>
 
+/** check if a type_name has an index code*/
+bool hasIndexCode (const std::string &type_name);
+/** get the index code if it has one*/
+int getIndexCode (const std::string &type_name);
+
 struct FederateTestFixture
 {
     FederateTestFixture () = default;
@@ -236,8 +241,4 @@ struct FederateTestFixture
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
     std::string ctype;
-
-  private:
-    bool hasIndexCode (const std::string &type_name);
-    int getIndexCode (const std::string &type_name);
 };

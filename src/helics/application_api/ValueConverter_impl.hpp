@@ -60,15 +60,13 @@ void load (Archive &ar, data_view &db)
 {
     std::string val;
     ar (val);
-    db = data_view (std::move (val));
+    db = data_view{std::move (val)};
 }
 
-
-template<class Archive>
-void serialize(Archive & archive,
-    named_point & m)
+template <class Archive>
+void serialize (Archive &archive, named_point &m)
 {
-    archive(m.name, m.value);
+    archive (m.name, m.value);
 }
 
 template <class X>
@@ -127,18 +125,19 @@ struct is_iterable
 };
 
 template <typename T>
-struct is_iterable<
-  T,
-  typename std::enable_if_t<std::is_same<
-    decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and has default constructor
-              void(),
-              void(*std::begin (T ())),  // dereference operator
-              std::true_type{}),
-    std::true_type>::value>>
+struct is_iterable<T,
+                   typename std::enable_if_t<
+                     std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
+                                                                                   // has default constructor
+                                            void(),
+                                            void(*std::begin (T ())),  // dereference operator
+                                            std::true_type{}),
+                                  std::true_type>::value>>
 {
     static constexpr bool value = true;
 };
 
+/** for non iterable classes and not strings*/
 template <class X>
 constexpr std::enable_if_t<!is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
 getMinSize ()
@@ -146,6 +145,7 @@ getMinSize ()
     return sizeof (X) + 1;
 }
 
+/** for class that are iterable and not strings like vector*/
 template <class X>
 constexpr std::enable_if_t<is_iterable<X>::value && !std::is_convertible<X, std::string>::value, size_t>
 getMinSize ()
@@ -160,8 +160,8 @@ constexpr std::enable_if_t<std::is_convertible<X, std::string>::value, size_t> g
 }
 
 /** min size for a named point*/
-template<>
-constexpr size_t getMinSize<named_point>()
+template <>
+constexpr size_t getMinSize<named_point> ()
 {
     return 10;
 }

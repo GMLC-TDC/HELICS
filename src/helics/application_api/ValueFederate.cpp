@@ -73,7 +73,8 @@ ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 Publication &
 ValueFederate::registerPublication (const std::string &key, const std::string &type, const std::string &units)
 {
-    return vfManager->registerPublication ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
+    return vfManager->registerPublication ((!key.empty ()) ? (getName () + nameSegmentSeparator + key) : key, type,
+                                           units);
 }
 
 Publication &ValueFederate::registerGlobalPublication (const std::string &key,
@@ -85,7 +86,8 @@ Publication &ValueFederate::registerGlobalPublication (const std::string &key,
 
 Input &ValueFederate::registerInput (const std::string &key, const std::string &type, const std::string &units)
 {
-    return vfManager->registerInput ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
+    return vfManager->registerInput ((!key.empty ()) ? (getName () + nameSegmentSeparator + key) : key, type,
+                                     units);
 }
 
 Input &
@@ -402,7 +404,7 @@ const Input &ValueFederate::getInput (const std::string &key) const
     auto &inp = vfManager->getInput (key);
     if (!inp.isValid ())
     {
-        return vfManager->getInput (getName () + separator_ + key);
+        return vfManager->getInput (getName () + nameSegmentSeparator + key);
     }
     return inp;
 }
@@ -412,7 +414,7 @@ Input &ValueFederate::getInput (const std::string &key)
     auto &inp = vfManager->getInput (key);
     if (!inp.isValid ())
     {
-        return vfManager->getInput (getName () + separator_ + key);
+        return vfManager->getInput (getName () + nameSegmentSeparator + key);
     }
     return inp;
 }
@@ -443,7 +445,7 @@ Publication &ValueFederate::getPublication (const std::string &key)
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid ())
     {
-        return vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + nameSegmentSeparator + key);
     }
     return pub;
 }
@@ -453,7 +455,7 @@ const Publication &ValueFederate::getPublication (const std::string &key) const
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid ())
     {
-        return vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + nameSegmentSeparator + key);
     }
     return pub;
 }

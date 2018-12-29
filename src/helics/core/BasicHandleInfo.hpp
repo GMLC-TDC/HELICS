@@ -36,13 +36,13 @@ class BasicHandleInfo
     /** default constructor*/
     BasicHandleInfo () noexcept : type_in (type), type_out (units){};
     /** construct from the data*/
-    BasicHandleInfo (global_federate_id federate_id_t,
+    BasicHandleInfo (global_federate_id federate_id,
                      interface_handle handle_id,
                      handle_type type_of_handle,
                      const std::string &key_name,
                      const std::string &type_name,
                      const std::string &unit_name)
-        : handle{federate_id_t, handle_id}, handleType (type_of_handle), key (key_name), type (type_name),
+        : handle{federate_id, handle_id}, handleType (type_of_handle), key (key_name), type (type_name),
           units (unit_name), type_in (type), type_out (units)
 
     {
@@ -51,7 +51,7 @@ class BasicHandleInfo
     }
 
     const global_handle handle = global_handle{};  //!< the global federate id for the creator of the handle
-    federate_id_t local_fed_id;  //!< the local federate id of the handle
+    local_federate_id local_fed_id{};  //!< the local federate id of the handle
     const handle_type handleType = handle_type::unknown;  //!< the type of the handle
     bool used = false;  //!< indicator that the handle is being used to link with another federate
     uint16_t flags = 0;  //!< flags corresponding to the flags used in ActionMessages +some extra ones

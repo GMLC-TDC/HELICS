@@ -330,11 +330,11 @@ BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
     return nullptr;
 }
 
-federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
+local_federate_id HandleManager::getLocalFedID (interface_handle id_) const
 {
     // only activate the lock if we not in an operating state
     auto index = id_.baseValue ();
-    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : federate_id_t ();
+    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : local_federate_id ();
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)

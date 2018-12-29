@@ -54,7 +54,7 @@ class FederateState
     const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
-    federate_id_t local_id;  //!< id code for the local federate descriptor
+    local_federate_id local_id;  //!< id code for the local federate descriptor
     std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:

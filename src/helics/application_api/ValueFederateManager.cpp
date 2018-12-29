@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-ValueFederateManager::ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id)
+ValueFederateManager::ValueFederateManager (Core *coreOb, ValueFederate *vfed, local_federate_id id)
     : coreObject (coreOb), fed (vfed), fedID (id)
 {
 }
@@ -277,7 +277,8 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     // get the actual publication types
     auto inpHandle = inputs.lock ();
-    inpHandle->apply ([this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
+    inpHandle->apply (
+      [this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }

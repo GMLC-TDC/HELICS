@@ -101,7 +101,7 @@ class Endpoint
     */
     void send (const char *data, size_t data_size, Time sendTime) const
     {
-        fed->sendMessage (*this, targetDest, data_view (data, data_size), sendTime);
+        fed->sendMessage (*this, targetDest, data_view{data, data_size}, sendTime);
     }
     /** send a data_view
     @details a data view can convert from many different formats so this function should

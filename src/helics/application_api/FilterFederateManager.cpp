@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-FilterFederateManager::FilterFederateManager (Core *coreObj, Federate *ffed, federate_id_t id)
+FilterFederateManager::FilterFederateManager (Core *coreObj, Federate *ffed, local_federate_id id)
     : coreObject (coreObj), fed (ffed), fedID (id)
 {
 }

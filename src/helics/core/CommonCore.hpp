@@ -76,41 +76,42 @@ class CommonCore : public Core, public BrokerBase
     virtual void initializeFromArgs (int argc, const char *const *argv) override;
     virtual bool isInitialized () const override final;
     virtual bool isOpenToNewFederates () const override final;
-    virtual void error (federate_id_t federateID, int errorCode = -1) override final;
-    virtual void finalize (federate_id_t federateID) override final;
-    virtual void enterInitializingMode (federate_id_t federateID) override final;
+    virtual void error (local_federate_id federateID, int errorCode = -1) override final;
+    virtual void finalize (local_federate_id federateID) override final;
+    virtual void enterInitializingMode (local_federate_id federateID) override final;
     virtual void setCoreReadyToInit () override final;
     virtual iteration_result
-    enterExecutingMode (federate_id_t federateID, iteration_request iterate = NO_ITERATION) override final;
-    virtual federate_id_t registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
-    virtual const std::string &getFederateName (federate_id_t federateID) const override final;
-    virtual federate_id_t getFederateId (const std::string &name) const override final;
+    enterExecutingMode (local_federate_id federateID, iteration_request iterate = NO_ITERATION) override final;
+    virtual local_federate_id
+    registerFederate (const std::string &name, const CoreFederateInfo &info) override final;
+    virtual const std::string &getFederateName (local_federate_id federateID) const override final;
+    virtual local_federate_id getFederateId (const std::string &name) const override final;
     virtual int32_t getFederationSize () override final;
-    virtual Time timeRequest (federate_id_t federateID, Time next) override final;
+    virtual Time timeRequest (local_federate_id federateID, Time next) override final;
     virtual iteration_time
-    requestTimeIterative (federate_id_t federateID, Time next, iteration_request iterate) override final;
-    virtual Time getCurrentTime (federate_id_t federateID) const override final;
-    virtual uint64_t getCurrentReiteration (federate_id_t federateID) const override final;
-    virtual void setTimeProperty (federate_id_t federateID, int32_t property, Time time) override final;
+    requestTimeIterative (local_federate_id federateID, Time next, iteration_request iterate) override final;
+    virtual Time getCurrentTime (local_federate_id federateID) const override final;
+    virtual uint64_t getCurrentReiteration (local_federate_id federateID) const override final;
+    virtual void setTimeProperty (local_federate_id federateID, int32_t property, Time time) override final;
     virtual void
-    setIntegerProperty (federate_id_t federateID, int32_t property, int16_t propertyValue) override final;
-    virtual Time getTimeProperty (federate_id_t federateID, int32_t property) const override final;
-    virtual int16_t getIntegerProperty (federate_id_t federateID, int32_t property) const override final;
-    virtual void setFlagOption (federate_id_t federateID, int32_t flag, bool flagValue = true) override final;
-    virtual bool getFlagOption (federate_id_t federateID, int32_t flag) const override final;
+    setIntegerProperty (local_federate_id federateID, int32_t property, int16_t propertyValue) override final;
+    virtual Time getTimeProperty (local_federate_id federateID, int32_t property) const override final;
+    virtual int16_t getIntegerProperty (local_federate_id federateID, int32_t property) const override final;
+    virtual void setFlagOption (local_federate_id federateID, int32_t flag, bool flagValue = true) override final;
+    virtual bool getFlagOption (local_federate_id federateID, int32_t flag) const override final;
 
-    virtual interface_handle registerPublication (federate_id_t federateID,
+    virtual interface_handle registerPublication (local_federate_id federateID,
                                                   const std::string &key,
                                                   const std::string &type,
                                                   const std::string &units) override final;
     virtual interface_handle
-    getPublication (federate_id_t federateID, const std::string &key) const override final;
-    virtual interface_handle registerInput (federate_id_t federateID,
+    getPublication (local_federate_id federateID, const std::string &key) const override final;
+    virtual interface_handle registerInput (local_federate_id federateID,
                                             const std::string &key,
                                             const std::string &type,
                                             const std::string &units) override final;
 
-    virtual interface_handle getInput (federate_id_t federateID, const std::string &key) const override final;
+    virtual interface_handle getInput (local_federate_id federateID, const std::string &key) const override final;
 
     virtual const std::string &getHandleName (interface_handle handle) const override final;
 
@@ -127,10 +128,12 @@ class CommonCore : public Core, public BrokerBase
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) override final;
     virtual std::shared_ptr<const data_block> getValue (interface_handle handle) override final;
     virtual std::vector<std::shared_ptr<const data_block>> getAllValues (interface_handle handle) override final;
-    virtual const std::vector<interface_handle> &getValueUpdates (federate_id_t federateID) override final;
+    virtual const std::vector<interface_handle> &getValueUpdates (local_federate_id federateID) override final;
+    virtual interface_handle registerEndpoint (local_federate_id federateID,
+                                               const std::string &name,
+                                               const std::string &type) override final;
     virtual interface_handle
-    registerEndpoint (federate_id_t federateID, const std::string &name, const std::string &type) override final;
-    virtual interface_handle getEndpoint (federate_id_t federateID, const std::string &name) const override final;
+    getEndpoint (local_federate_id federateID, const std::string &name) const override final;
     virtual interface_handle registerFilter (const std::string &filterName,
                                              const std::string &type_in,
                                              const std::string &type_out) override final;
@@ -138,7 +141,7 @@ class CommonCore : public Core, public BrokerBase
                                                     const std::string &type_in,
                                                     const std::string &type_out) override final;
     virtual interface_handle getFilter (const std::string &name) const override final;
-    virtual void addDependency (federate_id_t federateID, const std::string &federateName) override final;
+    virtual void addDependency (local_federate_id federateID, const std::string &federateName) override final;
     virtual void
     registerFrequentCommunicationsPair (const std::string &source, const std::string &dest) override final;
     virtual void makeConnections (const std::string &file) override final;
@@ -159,10 +162,10 @@ class CommonCore : public Core, public BrokerBase
     virtual uint64_t receiveCount (interface_handle destination) override final;
     virtual std::unique_ptr<Message> receive (interface_handle destination) override final;
     virtual std::unique_ptr<Message>
-    receiveAny (federate_id_t federateID, interface_handle &endpoint_id) override final;
-    virtual uint64_t receiveCountAny (federate_id_t federateID) override final;
+    receiveAny (local_federate_id federateID, interface_handle &endpoint_id) override final;
+    virtual uint64_t receiveCountAny (local_federate_id federateID) override final;
     virtual void
-    logMessage (federate_id_t federateID, int logLevel, const std::string &messageToLog) override final;
+    logMessage (local_federate_id federateID, int logLevel, const std::string &messageToLog) override final;
     virtual void
     setFilterOperator (interface_handle filter, std::shared_ptr<FilterOperator> callback) override final;
 
@@ -176,11 +179,11 @@ class CommonCore : public Core, public BrokerBase
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
-      federate_id_t federateID,
+      local_federate_id federateID,
       std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
-    virtual void setQueryCallback (federate_id_t federateID,
+    virtual void setQueryCallback (local_federate_id federateID,
                                    std::function<std::string (const std::string &)> queryFunction) override;
     virtual void setGlobal (const std::string &valueName, const std::string &value) override;
     virtual bool connect () override final;
@@ -227,7 +230,7 @@ class CommonCore : public Core, public BrokerBase
     */
     virtual void removeRoute (route_id rid) = 0;
     /** get the federate Information from the federateID*/
-    FederateState *getFederateAt (federate_id_t federateID) const;
+    FederateState *getFederateAt (local_federate_id federateID) const;
     /** get the federate Information from the federateID*/
     FederateState *getFederate (const std::string &federateName) const;
     /** get the federate Information from a handle
@@ -359,7 +362,7 @@ class CommonCore : public Core, public BrokerBase
     and return a reference to the basicHandle
     */
     const BasicHandleInfo &createBasicHandle (global_federate_id global_federateId,
-                                              federate_id_t local_federateId,
+                                              local_federate_id local_federateId,
                                               handle_type HandleType,
                                               const std::string &key,
                                               const std::string &type,
