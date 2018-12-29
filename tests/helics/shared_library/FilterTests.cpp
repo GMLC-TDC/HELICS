@@ -382,7 +382,7 @@ BOOST_DATA_TEST_CASE (message_filter_function3, bdata::make (core_types), core_t
 
     helicsFederateRegisterEndpoint (fFed, "fout", "", &err);
     CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filter_type_random_delay, "filter3", &err));
-    helicsFilterAddSourceTarget (f3, "filter/fout", nullptr);
+    helicsFilterAddSourceTarget (f3, "filter0/fout", nullptr);
 
     CE (helicsFilterSet (f2, "delay", 2.5, &err));
 
