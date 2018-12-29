@@ -27,7 +27,7 @@ helics::Json::Value loadJson (const std::string &jsonString);
 helics::Json::Value loadJsonStr (const std::string &jsonString);
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const helics::Json::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);
+helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
 std::string getKey (const helics::Json::Value &element);

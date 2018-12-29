@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
     auto echoRun = [&]() {helics::Time grantedTime = helics::timeZero;
-    helics::Time stopTime(100, timeUnits::ns);
+    helics::Time stopTime(100, time_units::ns);
     while (grantedTime < stopTime)
     {
         grantedTime = vFed2->requestTime(stopTime);
@@ -57,8 +57,8 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     
     auto fut = std::async(echoRun);
     helics::Time grantedTime = helics::timeZero;
-    helics::Time requestedTime(10, timeUnits::ns);
-    helics::Time stopTime(100, timeUnits::ns);
+    helics::Time requestedTime(10, time_units::ns);
+    helics::Time stopTime(100, time_units::ns);
     while (grantedTime < stopTime)
     {
         grantedTime=vFed1->requestTime(requestedTime);
@@ -67,11 +67,11 @@ BOOST_AUTO_TEST_CASE (small_time_test)
            
             pub1_a->publish(10.3);
             pub1_b->publish(11.2);
-            requestedTime += helics::Time(10, timeUnits::ns);
+            requestedTime += helics::Time(10, time_units::ns);
         }
         else
         {
-            BOOST_CHECK(grantedTime == requestedTime - helics::Time(9, timeUnits::ns));
+            BOOST_CHECK(grantedTime == requestedTime - helics::Time(9, time_units::ns));
            // printf("grantedTime=%e\n", static_cast<double>(grantedTime));
             if (sub2_a.isUpdated())
             {

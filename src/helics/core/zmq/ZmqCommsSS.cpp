@@ -12,8 +12,8 @@
 #include "ZmqRequestSets.h"
 //#include <boost/asio.hpp>
 //#include <csignal>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 static const int DEFAULT_BROKER_PORT_NUMBER = 23414;  // Todo define a different port number
 static const int TX_RX_MSG_COUNT = 20;
@@ -112,7 +112,7 @@ int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::strin
 
     if (!isValidCommand (M))
     {
-    	std::cerr << "invalid command received" << M.action() << std::endl;
+        std::cerr << "invalid command received" << M.action () << std::endl;
         return 0;
     }
     if (isProtocolCommand (M))
@@ -137,7 +137,7 @@ int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::strin
             status = -1;
             break;
         case CLOSE_RECEIVER:
-        	setRxStatus (connection_status::terminated);
+            setRxStatus (connection_status::terminated);
             status = -1;
             break;
         case RECONNECT_RECEIVER:
@@ -191,7 +191,7 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
     if (serverMode)
     {
         brokerSocket.setsockopt (ZMQ_LINGER, 500);
-    	auto bindsuccess = bindzmqSocket (brokerSocket, localTarget_, brokerPort, connectionTimeout);
+        auto bindsuccess = bindzmqSocket (brokerSocket, localTarget_, brokerPort, connectionTimeout);
         if (!bindsuccess)
         {
             brokerSocket.close ();
@@ -230,8 +230,8 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
 }
 
 bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
-                                        std::map<route_id, std::string> &routes,
-                                        std::map<std::string, std::string> &connection_info)
+                                      std::map<route_id, std::string> &routes,
+                                      std::map<std::string, std::string> &connection_info)
 {
     bool close_tx = false;
 
@@ -372,7 +372,7 @@ void ZmqCommsSS::queue_tx_function ()
             {
                 if (rid == control_route)
                 {
-                	processed = true;
+                    processed = true;
                     close_tx = processTxControlCmd (cmd, routes, connection_info);
 
                     if (close_tx)
@@ -402,7 +402,7 @@ void ZmqCommsSS::queue_tx_function ()
                     status = processIncomingMessage (msg, connection_info);  //----------> ToCheck
                     if (status < 0)
                     {
-                    	goto CLOSE_TX_LOOP;
+                        goto CLOSE_TX_LOOP;
                     }
                 }
                 else
@@ -415,7 +415,7 @@ void ZmqCommsSS::queue_tx_function ()
                         std::string empty = "";
                         // Need to first send identity and empty string
                         brokerSocket.send (route_name.c_str (), route_name.size (), ZMQ_SNDMORE);
-                        brokerSocket.send (empty.c_str(), empty.size (), ZMQ_SNDMORE);
+                        brokerSocket.send (empty.c_str (), empty.size (), ZMQ_SNDMORE);
                         // Send the actual data
                         brokerSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                     }
@@ -423,18 +423,23 @@ void ZmqCommsSS::queue_tx_function ()
                     {
                         if (hasBroker)
                         {
-                        	brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                            brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                         }
                         else
                         {
-                            logWarning ("unknown route and no broker, dropping message");
+                            if (!isDisconnectCommand (cmd))
+                            {
+                                logWarning (std::string ("unknown route and no broker, dropping message ") +
+                                            prettyPrintString (cmd));
+                            }
                         }
                     }
                 }
             }
             tx_count++;
-            if (tx_count < TX_RX_MSG_COUNT) {
-            	tx_msg = txQueue.try_pop ();
+            if (tx_count < TX_RX_MSG_COUNT)
+            {
+                tx_msg = txQueue.try_pop ();
             }
         }
 
@@ -442,7 +447,7 @@ void ZmqCommsSS::queue_tx_function ()
         rc = 1;
         while ((rc > 0) && (count < 5))
         {
-        	rc = zmq::poll (poller, std::chrono::milliseconds (10));
+            rc = zmq::poll (poller, std::chrono::milliseconds (10));
 
             if (rc > 0)
             {
@@ -460,34 +465,34 @@ void ZmqCommsSS::queue_tx_function ()
 
                 if (status < 0)
                 {
-                	goto CLOSE_TX_LOOP;
+                    goto CLOSE_TX_LOOP;
                 }
             }
             count++;
         }
     }
-    CLOSE_TX_LOOP:
-		routes.clear ();
-		connection_info.clear ();
-		if (getRxStatus () == connection_status::connected)
-		{
-			setRxStatus (connection_status::terminated);
-		}
-		if (serverMode)
-		{
-			std::this_thread::sleep_for (std::chrono::milliseconds (50));
-			brokerSocket.close ();
-		}
-		if (hasBroker)
-		{
-			brokerConnection.close ();
-		}
-		setTxStatus (connection_status::terminated);
+CLOSE_TX_LOOP:
+    routes.clear ();
+    connection_info.clear ();
+    if (getRxStatus () == connection_status::connected)
+    {
+        setRxStatus (connection_status::terminated);
+    }
+    if (serverMode)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        brokerSocket.close ();
+    }
+    if (hasBroker)
+    {
+        brokerConnection.close ();
+    }
+    setTxStatus (connection_status::terminated);
 }
 
 int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
-                                    zmq::socket_t &brokerConnection,
-                                    std::map<std::string, std::string> &connection_info)
+                                  zmq::socket_t &brokerConnection,
+                                  std::map<std::string, std::string> &connection_info)
 {
     int status = 0;
     zmq::message_t msg1;
@@ -515,10 +520,10 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
 
 void ZmqCommsSS::closeReceiver ()
 {
-	// Send close message to close Tx and Rx connection
-	ActionMessage cmd (CMD_PROTOCOL);
-	cmd.messageID = CLOSE_RECEIVER;
-	transmit (control_route, cmd);
+    // Send close message to close Tx and Rx connection
+    ActionMessage cmd (CMD_PROTOCOL);
+    cmd.messageID = CLOSE_RECEIVER;
+    transmit (control_route, cmd);
 }
 
 }  // namespace zeromq

@@ -435,7 +435,7 @@ class PingPongFed
 
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
-    if (core_type != "test")
+    if (core_type != std::string ("test"))
     {
         return;
     }

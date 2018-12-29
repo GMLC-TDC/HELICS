@@ -24,7 +24,7 @@ configuration:
                          with the player name
   --separator arg        specify the separator for local publications and
                          endpoints
-  --timeunits arg        the default units on the timestamps used in file based
+  --time_units arg        the default units on the timestamps used in file based
                          input
   --stop arg             the time to stop the player
 
@@ -73,14 +73,14 @@ a simple example of a player file publishing values
 3, pub2, 0.9
 ```
 `#` signifies a comment
-the first column is time in seconds unless otherwise specified via the `--timeunits` flag or other configuration means
+the first column is time in seconds unless otherwise specified via the `--time_units` flag or other configuration means
 the second column is publication name
 the final column is the value
 the optional third column specifies a type valid types are
 
 time specifications are typically numerical with optional units
 `5` or `"500 ms"` or `23.7us` if there is a space between the number and units it must be enclosed in quotes
-if no units are specified the time defaults to units specified via `--timeunits` or seconds if none were specified
+if no units are specified the time defaults to units specified via `--time_units` or seconds if none were specified
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
 
@@ -196,5 +196,5 @@ Example JSON
 }
 ```
 
-some configuration can also be done through JSON through elements of "stop","local","separator","timeunits"
+some configuration can also be done through JSON through elements of "stop","local","separator","time_units"
 and file elements can be used to load up additional files

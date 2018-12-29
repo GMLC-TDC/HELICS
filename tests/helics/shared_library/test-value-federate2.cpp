@@ -30,7 +30,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     char val[600] = "";
     int actualLen = 10;
     FederateTestFixture fixture;
-    fixture.SetupTest (helicsCreateValueFederate, core_type.c_str (), 1);
+    fixture.SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = fixture.GetFederateAt (0);
     auto pubid1 = helicsFederateRegisterTypePublication (vFed1, "pub1", "string", "", &err);
     BOOST_CHECK (pubid1 != nullptr);
@@ -63,7 +63,7 @@ BOOST_DATA_TEST_CASE (test_block_send_receive, bdata::make (core_types), core_ty
     CE (helicsFederateFinalize (vFed1, &err));
 }
 
-BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
+BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types_simple), core_type)
 {
     helics_time gtime;
     helics_time f1time;
@@ -71,7 +71,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), core_type)
 #define STRINGLEN 100
     char s[STRINGLEN] = "";
     FederateTestFixture fixture;
-    fixture.SetupTest (helicsCreateValueFederate, core_type.c_str (), 2);
+    fixture.SetupTest (helicsCreateValueFederate, core_type, 2);
     auto vFed1 = fixture.GetFederateAt (0);
     auto vFed2 = fixture.GetFederateAt (1);
 

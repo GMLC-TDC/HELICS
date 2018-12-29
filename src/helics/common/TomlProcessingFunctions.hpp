@@ -26,7 +26,7 @@ bool hasTomlExtension (const std::string &tomlString);
 toml::Value loadTomlStr (const std::string &tomlString);
 
 /** read a time from a TOML value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);
+helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
 std::string getKey (const toml::Value &element);

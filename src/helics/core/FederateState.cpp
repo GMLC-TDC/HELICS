@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "queryHelpers.hpp"
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 #include "MessageTimer.hpp"
@@ -171,14 +172,10 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     {
         return true;
     }
-    while (!processing.test_and_set ())
-    {
-        ;  // spin
-    }
+    std::lock_guard<FederateState> plock (*this);
     // this function could be called externally in a multi-threaded context
     auto pub = interfaceInformation.getPublication (pub_id);
     auto res = pub->CheckSetValue (data, len);
-    processing.clear (std::memory_order_release);
     return res;
 }
 
@@ -276,10 +273,7 @@ void FederateState::createInterface (handle_type htype,
                                      const std::string &type,
                                      const std::string &units)
 {
-    while (!processing.test_and_set ())
-    {
-        ;  // spin
-    }
+    std::lock_guard<FederateState> plock (*this);
     // this function could be called externally in a multi-threaded context
     switch (htype)
     {
@@ -317,19 +311,13 @@ void FederateState::createInterface (handle_type htype,
     {
         interfaceInformation.createEndpoint (handle, key, type);
     }
-    break;
+    default:
         break;
     }
-    processing.clear (std::memory_order_release);
 }
 
 void FederateState::closeInterface (interface_handle handle, handle_type type)
 {
-    while (!processing.test_and_set ())
-    {
-        ;  // spin
-    }
-    // this function could be called externally in a multi-threaded context
     switch (type)
     {
     case handle_type::publication:
@@ -339,6 +327,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_PUBLICATION);
             rem.setSource (pub->id);
+            rem.actionTime = time_granted;
             for (auto &sub : pub->subscribers)
             {
                 rem.setDestination (sub);
@@ -364,6 +353,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_SUBSCRIBER);
             rem.setSource (ipt->id);
+            rem.actionTime = time_granted;
             for (auto &pub : ipt->input_sources)
             {
                 rem.setDestination (pub);
@@ -377,7 +367,6 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
     default:
         break;
     }
-    processing.clear (std::memory_order_release);
 }
 
 stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/)
@@ -1045,6 +1034,41 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             }
         }
         break;
+    case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_BROKER:
+    case CMD_DISCONNECT_CORE:
+        switch (timeCoord->processTimeMessage (cmd))
+        {
+        case message_process_result::delay_processing:
+            addFederateToDelay (global_federate_id (cmd.source_id));
+            return message_processing_result::delay_message;
+        case message_process_result::no_effect:
+            return message_processing_result::continue_processing;
+        default:
+            break;
+        }
+        if (state != HELICS_EXECUTING)
+        {
+            break;
+        }
+        if (!timeGranted_mode)
+        {
+            auto ret = timeCoord->checkTimeGrant ();
+            if (returnableResult (ret))
+            {
+                time_granted = timeCoord->getGrantedTime ();
+                allowed_send_time = timeCoord->allowedSendTime ();
+                timeGranted_mode = true;
+                return ret;
+            }
+        }
+        break;
+    case CMD_CLOSE_INTERFACE:
+        if (cmd.source_id == global_id.load ())
+        {
+            closeInterface (cmd.source_handle, static_cast<handle_type> (cmd.counter));
+        }
+        break;
     case CMD_TIME_REQUEST:
         if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == parent_broker_id))
         {  // this sets up a time request
@@ -1186,7 +1210,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 subI->inputType = cmd.getString (typeStringLoc);
             }
-            addDependency (global_federate_id (cmd.source_id));
+            addDependency (cmd.source_id);
         }
     }
     break;
@@ -1217,7 +1241,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->removeSource (cmd.getSource (), time_granted);
+            subI->removeSource (cmd.getSource (), (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
         }
         break;
     }

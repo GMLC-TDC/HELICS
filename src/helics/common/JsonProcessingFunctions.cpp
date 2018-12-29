@@ -58,7 +58,7 @@ helics::Json::Value loadJsonStr (const std::string &jsonString)
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const helics::Json::Value &timeElement, timeUnits defaultUnits)
+helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units defaultUnits)
 {
     if (timeElement.isObject ())
     {

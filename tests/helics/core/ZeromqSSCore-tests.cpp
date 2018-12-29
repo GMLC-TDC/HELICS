@@ -4,14 +4,11 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/monomorphic.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/common/GuardedTypes.hpp"
 #include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
@@ -22,7 +19,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/zmq/ZmqBroker.h"
 #include "helics/core/zmq/ZmqCommsSS.h"
 #include "helics/core/zmq/ZmqCore.h"
-#include "helics/common/GuardedTypes.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/monomorphic.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 //#include "boost/process.hpp"
 #include <future>
@@ -31,7 +31,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (ZMQSSCore_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (ZMQSSCore_tests, *utf::label ("ci"))
 
 using helics::Core;
 
@@ -135,8 +135,8 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
         act2 = m;
     });
     comm3.setCallback ([&counter3, &act3](helics::ActionMessage m) {
-		++counter3;
-		act3 = m;
+        ++counter3;
+        act3 = m;
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     std::this_thread::sleep_for (250ms);
     if (counter2 != 1)
     {
-    	std::this_thread::sleep_for (500ms);
+        std::this_thread::sleep_for (500ms);
     }
     BOOST_REQUIRE_EQUAL (counter2, 1);
     BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
@@ -186,15 +186,15 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
     helics::zeromq::ZmqCommsSS comm;
-    comm.loadTargetInfo (host, std::string());
+    comm.loadTargetInfo (host, std::string ());
     comm.setName ("test_broker");
     comm.setPortNumber (ZMQ_SS_BROKER_PORT);
     comm.setServerMode (true);
     comm.setCallback ([&counter, &msgs](helics::ActionMessage m) {
-            ++counter;
-            msgs.push_back(m);
-        });
-    comm.connect();
+        ++counter;
+        msgs.push_back (m);
+    });
+    comm.connect ();
 
     std::string initializationString = "-f 1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
@@ -219,35 +219,37 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
             }
         }
         BOOST_CHECK_GE (counter, 1);
-        if(!msgs.empty()) {
-        	auto rM = msgs.at(0);
-        	BOOST_CHECK_EQUAL (rM.name, "core1");
-        	std::cout << "rM.name: " << rM.name << std::endl;
-        	BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+        if (!msgs.empty ())
+        {
+            auto rM = msgs.at (0);
+            BOOST_CHECK_EQUAL (rM.name, "core1");
+            std::cout << "rM.name: " << rM.name << std::endl;
+            BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
 
         cnt = 0;
         while (counter == 1)
-		{
-			std::this_thread::sleep_for (100ms);
-			++cnt;
-			if (cnt > 30)
-			{
-				break;
-			}
-		}
+        {
+            std::this_thread::sleep_for (100ms);
+            ++cnt;
+            if (cnt > 30)
+            {
+                break;
+            }
+        }
         BOOST_CHECK_GE (counter, 2);
-        if(!msgs.empty()) {
-            auto rM2 = msgs.at(1);
+        if (!msgs.empty ())
+        {
+            auto rM2 = msgs.at (1);
             BOOST_CHECK_EQUAL (rM2.name, "core1");
             std::cout << "rM.name: " << rM2.name << std::endl;
-        	BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
+            BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
         }
     }
     core->disconnect ();
     comm.disconnect ();
     core = nullptr;
-    msgs.clear();
+    msgs.clear ();
     helics::CoreFactory::cleanUpCores (100ms);
 }
 
@@ -278,8 +280,8 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_core_broker_default_test)
 class FedTest
 {
   public:
-    helics::Time deltaTime = helics::Time (10, timeUnits::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (100, timeUnits::ns);  // final time
+    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
+    helics::Time finalTime = helics::Time (100, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -329,8 +331,9 @@ class FedTest
 
             if (vFed->isUpdated (sub))
             {
-            	if (vFed->isUpdated(sub)) {
-            		// get the latest value for the subscription
+                if (vFed->isUpdated (sub))
+                {
+                    // get the latest value for the subscription
                     auto &nstring = vFed->getString (sub);
                     if (nstring != txstring)
                     {
@@ -338,8 +341,7 @@ class FedTest
                         break;
                     }
                     counter++;
-            	}
-
+                }
             }
         }
         BOOST_REQUIRE_EQUAL (counter, 80);
@@ -349,23 +351,25 @@ class FedTest
 
 BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
 {
-	int feds = 20;
-	auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
-	std::vector<std::shared_ptr<helics::Core>> cores (feds);
-	std::vector<FedTest> leafs (feds);
+    int feds = 20;
+    auto broker =
+      helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
+    std::vector<std::shared_ptr<helics::Core>> cores (feds);
+    std::vector<FedTest> leafs (feds);
 
-	for (int ii = 0; ii < feds; ++ii)
-	{
-		std::string initializationString = "-f 1 --name=core" + std::to_string(ii);
-		cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
-		cores[ii]->connect ();
-		int s_index = ii+1;
-		if(ii == feds - 1) {
-			s_index = 0;
-		}
-		leafs[ii].initialize (cores[ii]->getIdentifier (), ii, s_index);
-	}
-	std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+        std::string initializationString = "-f 1 --name=core" + std::to_string (ii);
+        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
+        cores[ii]->connect ();
+        int s_index = ii + 1;
+        if (ii == feds - 1)
+        {
+            s_index = 0;
+        }
+        leafs[ii].initialize (cores[ii]->getIdentifier (), ii, s_index);
+    }
+    std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::vector<std::thread> threads (feds);
     for (int ii = 0; ii < feds; ++ii)
     {

@@ -152,7 +152,8 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
     if (running.compare_exchange_strong (exp, true))
     {
         auto ptr = shared_from_this ();
-		std::packaged_task<void()> serviceTask([ptr=std::move(ptr)]() { serviceProcessingLoop(std::move(ptr)); });
+        std::packaged_task<void()> serviceTask (
+          [ptr = std::move (ptr)]() { serviceProcessingLoop (std::move (ptr)); });
         //   std::cout << "run Service loop " << runCounter << "\n";
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
 
@@ -189,7 +190,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
             }
         }
     }
-    return std::make_unique<servicer> (shared_from_this ());
+    return std::make_unique<Servicer> (shared_from_this ());
 }
 
 void AsioServiceManager::haltServiceLoop ()

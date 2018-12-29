@@ -5,6 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
+#include "../coreTypeLists.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -12,18 +13,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-
-extern const std::vector<std::string> ztypes;
-extern const std::vector<std::string> core_types;
-
-extern const std::vector<std::string> core_types_2;
-
-extern const std::vector<std::string> core_types_simple;
-extern const std::vector<std::string> core_types_single;
-extern const std::vector<std::string> core_types_all;
-extern const std::vector<std::string> core_types_extended;
-
-extern const std::string defaultNamePrefix;
 
 struct FederateTestFixture
 {
@@ -94,11 +83,15 @@ struct FederateTestFixture
         case 1:
         default:
         {
+            size_t offset = federates.size ();
             auto core_type = helics::coreTypeFromString (core_type_name);
+            //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
+            //  (offset),
+            //                                          initString + " --federates " + std::to_string (count));
             auto core =
               helics::CoreFactory::create (core_type, initString + " --federates " + std::to_string (count));
             fi.coreName = core->getIdentifier ();
-            size_t offset = federates.size ();
+
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
@@ -116,6 +109,10 @@ struct FederateTestFixture
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
+                //     auto core =
+                //     helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string (ii +
+                //     offset),
+                //                                    initString + " --federates 1");
                 auto core = helics::CoreFactory::create (core_type, initString + " --federates 1");
                 fi.coreName = core->getIdentifier ();
 
@@ -129,6 +126,8 @@ struct FederateTestFixture
         case 3:
         {
             auto subbroker = AddBroker (core_type_name, initString + " --federates " + std::to_string (count));
+            //	auto subbroker = AddBroker(core_type_name, initString + " --federates " + std::to_string(count) +
+            //		" --name=subbroker_" + name_prefix);
             if (!subbroker->isConnected ())
             {
                 throw (std::runtime_error ("Unable to connect subbroker"));
@@ -150,6 +149,8 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ++ii)
             {
                 auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                //	auto subbroker = AddBroker(core_type_name, initString + " --federates 1 --name=subbroker_" +
+                //		name_prefix + std::to_string(ii));
                 if (!subbroker->isConnected ())
                 {
                     throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));
