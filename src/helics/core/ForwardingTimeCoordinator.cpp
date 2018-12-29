@@ -164,7 +164,7 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
         update = true;
         time_minDe = mTime.minDe;
     }
-    if (mTime.minminDe != time_minminDe)
+    if (mTime.so != time_minminDe)
     {
         time_minminDe = mTime.minminDe;
         update = true;

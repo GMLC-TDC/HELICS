@@ -381,8 +381,8 @@ bool TimeCoordinator::updateTimeFactors ()
     }
 
     bool update = false;
-    time_minminDe = std::min (minDe, minminDe);
-    time_minSo = std::min (minSo, time_minminDe);
+    time_so = std::min (minDe, minminDe);
+    time_minSo = std::min (minSo, time_so);
     Time prev_next = time_next;
     updateNextPossibleEventTime ();
 
@@ -491,7 +491,7 @@ void TimeCoordinator::sendTimeRequest () const
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal ()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
-    upd.Tso = (time_minSo < time_next) ? time_next : time_minSo;
+    upd.Tso = (time_so < time_next) ? time_next : time_so;
     if (iterating)
     {
         setActionFlag (upd, iteration_requested_flag);
@@ -522,10 +522,10 @@ void TimeCoordinator::updateTimeGrant ()
 }
 std::string TimeCoordinator::printTimeStatus () const
 {
-    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} minminDe={} minSo={}",
+    return fmt::format ("exec={} allow={}, value={}, message={}, minDe={} so={} minSo={}",
                         static_cast<double> (time_exec), static_cast<double> (time_allow),
                         static_cast<double> (time_value), static_cast<double> (time_message),
-                        static_cast<double> (time_minDe), static_cast<double> (time_minminDe),
+                        static_cast<double> (time_minDe), static_cast<double> (time_so),
                         static_cast<double> (time_minSo));
 }
 

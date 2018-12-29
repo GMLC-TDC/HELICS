@@ -49,7 +49,7 @@ class TimeCoordinator
     Time time_granted = Time::minVal ();  //!< the most recent time granted
     Time time_requested = Time::maxVal ();  //!< the most recent time requested
     Time time_next = timeZero;  //!< the next possible internal event time
-    Time time_minminDe = timeZero;  //!< the minimum  of the minimum dependency event Time
+    Time time_so = timeZero;  //!< the minimum  of the minimum dependency event Time
     Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
     Time time_minSo = timeZero;  //!< the minimum second order event of the dependencies
     Time time_allow = Time::minVal ();  //!< the current allowable time
