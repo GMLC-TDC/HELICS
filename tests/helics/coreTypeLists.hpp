@@ -12,11 +12,17 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ZMQTEST2 "zmq_2",
 #define ZMQTEST3 "zmq_3",
 #define ZMQTEST4 "zmq_4",
+
+#define ZMQSSTEST "zmq_ss",
+#define ZMQSSTEST2 "zmq_ss_2",
 #else
 #define ZMQTEST
 #define ZMQTEST2
 #define ZMQTEST3
 #define ZMQTEST4
+
+#define ZMQSSTEST
+#define ZMQSSTEST2
 #endif
 
 #ifndef DISABLE_TCP_CORE
@@ -60,22 +66,24 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #endif
 
-constexpr const char *ztypes[] = {ZMQTEST ZMQTEST2 ZMQTEST3 ZMQTEST4};
+constexpr const char *ztypes[] = {ZMQTEST ZMQSSTEST ZMQTEST2 ZMQTEST3 ZMQSSTEST2 ZMQTEST4};
 
 constexpr const char *core_types[] = {"test", ZMQTEST3 IPCTEST2 TCPTEST "test_2",
-                                      ZMQTEST UDPTEST TCPSSTEST "test_3"};
+                                      ZMQTEST UDPTEST TCPSSTEST ZMQSSTEST "test_3"};
 
-constexpr const char *core_types_2[] = {IPCTEST2 TCPTEST2 "test_2", TCPSSTEST2 ZMQTEST2 UDPTEST2};
+constexpr const char *core_types_2[] = {IPCTEST2 TCPTEST2 ZMQSSTEST2 "test_2", TCPSSTEST2 ZMQTEST2 UDPTEST2};
 
-constexpr const char *core_types_simple[] = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
+constexpr const char *core_types_simple[] = {"test", TCPSSTEST ZMQSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST};
 constexpr const char *core_types_single[] = {"test", TCPSSTEST IPCTEST TCPTEST ZMQTEST UDPTEST "test_3",
-                                             ZMQTEST3 TCPTEST3 UDPTEST3};
-constexpr const char *core_types_all[] = {"test", TCPSSTEST IPCTEST2 TCPTEST "test_2",
+                                             ZMQTEST3 TCPTEST3 ZMQSSTEST UDPTEST3};
+constexpr const char *core_types_all[] = {"test", TCPSSTEST ZMQSSTEST IPCTEST2 TCPTEST "test_2",
                                           ZMQTEST UDPTEST TCPSSTEST2 "test_3",
-                                          ZMQTEST3 IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 TCPTEST3 "test_4",
+                                          ZMQTEST3 IPCTEST ZMQTEST2 UDPTEST2 ZMQSSTEST2 TCPTEST2 UDPTEST3 TCPTEST3
+                                          "test_4",
                                           ZMQTEST4 TCPTEST4 UDPTEST4};
 
-constexpr const char *core_types_extended[] = {IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 TCPTEST3 "test_4",
+constexpr const char *core_types_extended[] = {IPCTEST ZMQTEST2 UDPTEST2 TCPTEST2 UDPTEST3 ZMQSSTEST2 TCPTEST3
+                                               "test_4",
                                                ZMQTEST4 TCPTEST4 UDPTEST4};
 
 constexpr const char *defaultNamePrefix = "fed";
