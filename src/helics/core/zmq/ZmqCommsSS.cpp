@@ -63,29 +63,29 @@ void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         return;
     }
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
-        insertProtocol (brokerTarget_, interface_type::tcp);
+        insertProtocol (brokerTargetAddress, interface_type::tcp);
     }
-    if (!localTarget_.empty ())
+    if (!localTargetAddress.empty ())
     {
-        insertProtocol (localTarget_, interface_type::tcp);
+        insertProtocol (localTargetAddress, interface_type::tcp);
     }
-    if (localTarget_ == "tcp://localhost")
+    if (localTargetAddress == "tcp://localhost")
     {
-        localTarget_ = "tcp://127.0.0.1";
+        localTargetAddress = "tcp://127.0.0.1";
     }
-    else if (localTarget_ == "udp://localhost")
+    else if (localTargetAddress == "udp://localhost")
     {
-        localTarget_ = "udp://127.0.0.1";
+        localTargetAddress = "udp://127.0.0.1";
     }
-    if (brokerTarget_ == "tcp://localhost")
+    if (brokerTargetAddress == "tcp://localhost")
     {
-        brokerTarget_ = "tcp://127.0.0.1";
+        brokerTargetAddress = "tcp://127.0.0.1";
     }
-    else if (brokerTarget_ == "udp://localhost")
+    else if (brokerTargetAddress == "udp://localhost")
     {
-        brokerTarget_ = "udp://127.0.0.1";
+        brokerTargetAddress = "udp://127.0.0.1";
     }
     propertyUnLock ();
 }
@@ -191,13 +191,13 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
     if (serverMode)
     {
         brokerSocket.setsockopt (ZMQ_LINGER, 500);
-        auto bindsuccess = bindzmqSocket (brokerSocket, localTarget_, brokerPort, connectionTimeout);
+        auto bindsuccess = bindzmqSocket (brokerSocket, localTargetAddress, brokerPort, connectionTimeout);
         if (!bindsuccess)
         {
             brokerSocket.close ();
             disconnecting = true;
             logError (std::string ("Unable to bind zmq router socket giving up ") +
-                      makePortAddress (localTarget_, brokerPort));
+                      makePortAddress (localTargetAddress, brokerPort));
             setRxStatus (connection_status::error);
             return -1;
         }
@@ -208,12 +208,12 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
         brokerConnection.setsockopt (ZMQ_LINGER, 500);
         try
         {
-            brokerConnection.connect (makePortAddress (brokerTarget_, brokerPort));
+            brokerConnection.connect (makePortAddress (brokerTargetAddress, brokerPort));
         }
         catch (zmq::error_t &ze)
         {
             logError (std::string ("unable to connect with broker at ") +
-                      makePortAddress (brokerTarget_, brokerPort + 1) + ":(" + name + ")" + ze.what ());
+                      makePortAddress (brokerTargetAddress, brokerPort + 1) + ":(" + name + ")" + ze.what ());
             setTxStatus (connection_status::error);
             return -1;
         }
@@ -285,7 +285,7 @@ void ZmqCommsSS::queue_tx_function ()
     auto ctx = zmqContextManager::getContextPointer ();
     zmq::message_t msg;
 
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }

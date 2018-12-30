@@ -41,15 +41,15 @@ void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     // brokerPort = netInfo.brokerPort;
     // PortNumber = netInfo.portNumber;
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
         if (serverMode)
         {
-            localTarget_ = "_ipc_broker";
+            localTargetAddress = "_ipc_broker";
         }
         else
         {
-            localTarget_ = name;
+            localTargetAddress = name;
         }
     }
 
@@ -63,7 +63,7 @@ void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 void IpcComms::queue_rx_function ()
 {
     ownedQueue rxQueue;
-    bool connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
+    bool connected = rxQueue.connect (localTargetAddress, maxMessageCount_, maxMessageSize_);
     if (!connected)
     {
         disconnecting = true;
@@ -87,7 +87,7 @@ void IpcComms::queue_rx_function ()
             ipcbackchannel = 0;
             goto DISCONNECT_RX_QUEUE;
         case IPC_BACKCHANNEL_TRY_RESET:
-            connected = rxQueue.connect (localTarget_, maxMessageCount_, maxMessageSize_);
+            connected = rxQueue.connect (localTargetAddress, maxMessageCount_, maxMessageSize_);
             if (!connected)
             {
                 disconnecting = true;
@@ -154,9 +154,9 @@ void IpcComms::queue_tx_function ()
     std::map<route_id, sendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
-        bool conn = brokerQueue.connect (brokerTarget_, true, 20);
+        bool conn = brokerQueue.connect (brokerTargetAddress, true, 20);
         if (!conn)
         {
             ActionMessage err (CMD_ERROR);
@@ -183,7 +183,7 @@ void IpcComms::queue_tx_function ()
         setTxStatus (connection_status::error);
         return;
     }
-    bool conn = rxQueue.connect (localTarget_, false, 0);
+    bool conn = rxQueue.connect (localTargetAddress, false, 0);
     if (!conn)
     {
         /** lets try a reset of the receiver*/
@@ -198,7 +198,7 @@ void IpcComms::queue_tx_function ()
         }
         if (getRxStatus () == connection_status::connected)
         {
-            conn = rxQueue.connect (localTarget_, false, 0);
+            conn = rxQueue.connect (localTargetAddress, false, 0);
         }
         if (!conn)
         {
@@ -230,12 +230,12 @@ void IpcComms::queue_tx_function ()
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {
-						routes.emplace(route_id{ cmd.getExtraData() }, std::move(newQueue));
+                        routes.emplace (route_id{cmd.getExtraData ()}, std::move (newQueue));
                     }
                     continue;
                 }
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     continue;
                 case DISCONNECT:
                     goto DISCONNECT_TX_QUEUE;
@@ -301,7 +301,7 @@ void IpcComms::closeReceiver ()
         try
         {
             auto rxQueue = std::make_unique<ipc_queue> (boost::interprocess::open_only,
-                                                        stringTranslateToCppName (localTarget_).c_str ());
+                                                        stringTranslateToCppName (localTargetAddress).c_str ());
             std::string buffer = cmd.to_string ();
             rxQueue->send (buffer.data (), buffer.size (), 3);
         }
@@ -316,7 +316,7 @@ void IpcComms::closeReceiver ()
     }
 }
 
-std::string IpcComms::getAddress () const { return localTarget_; }
+std::string IpcComms::getAddress () const { return localTargetAddress; }
 
 }  // namespace ipc
 }  // namespace helics

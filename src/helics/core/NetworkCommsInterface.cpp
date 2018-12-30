@@ -13,7 +13,7 @@ namespace helics
 {
 NetworkCommsInterface::NetworkCommsInterface (interface_type type,
                                               CommsInterface::thread_generation threads) noexcept
-    :CommsInterface(threads), networkType (type)
+    : CommsInterface (threads), networkType (type)
 {
 }
 
@@ -88,34 +88,34 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
     case interface_type::tcp:
     case interface_type::udp:
-        removeProtocol (brokerTarget_);
-        removeProtocol (localTarget_);
+        removeProtocol (brokerTargetAddress);
+        removeProtocol (localTargetAddress);
         break;
     default:
         break;
     }
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
-        auto bTarget = stripProtocol (brokerTarget_);
+        auto bTarget = stripProtocol (brokerTargetAddress);
         if ((bTarget == localHostString) || (bTarget == "127.0.0.1"))
         {
-            localTarget_ = localHostString;
+            localTargetAddress = localHostString;
         }
         else if (bTarget.empty ())
         {
             switch (interfaceNetwork)
             {
             case interface_networks::local:
-                localTarget_ = localHostString;
+                localTargetAddress = localHostString;
                 break;
             default:
-                localTarget_ = "*";
+                localTargetAddress = "*";
                 break;
             }
         }
         else
         {
-            localTarget_ = generateMatchingInterfaceAddress (brokerTarget_, interfaceNetwork);
+            localTargetAddress = generateMatchingInterfaceAddress (brokerTargetAddress, interfaceNetwork);
         }
     }
     if (netInfo.portStart > 0)
@@ -228,22 +228,22 @@ std::string NetworkCommsInterface::getAddress () const
     {
         return name;
     }
-    if ((localTarget_ == "tcp://*") || (localTarget_ == "tcp://0.0.0.0"))
+    if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0"))
     {
         return makePortAddress ("tcp://127.0.0.1", PortNumber);
     }
-    if ((localTarget_ == "*") || (localTarget_ == "0.0.0.0"))
+    if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0"))
     {
         return makePortAddress ("127.0.0.1", PortNumber);
     }
-    return makePortAddress (localTarget_, PortNumber);
+    return makePortAddress (localTargetAddress, PortNumber);
 }
 
 ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
 {
     ActionMessage req (CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
-    req.payload = stripProtocol (localTarget_);
+    req.payload = stripProtocol (localTargetAddress);
     req.counter = cnt;
     return req;
 }

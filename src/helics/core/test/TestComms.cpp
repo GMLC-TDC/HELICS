@@ -33,9 +33,9 @@ void TestComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     // brokerPort = netInfo.brokerPort;
     // PortNumber = netInfo.portNumber;
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
-        localTarget_ = name;
+        localTargetAddress = name;
     }
 
     // if (PortNumber > 0)
@@ -49,14 +49,14 @@ void TestComms::queue_rx_function () {}
 
 void TestComms::queue_tx_function ()
 {
-    // make sure the link to the localTarget_ is in place
-    if (name != localTarget_)
+    // make sure the link to the localTargetAddress is in place
+    if (name != localTargetAddress)
     {
         if (!brokerName_.empty ())
         {
-            if (!CoreFactory::copyCoreIdentifier (name, localTarget_))
+            if (!CoreFactory::copyCoreIdentifier (name, localTargetAddress))
             {
-                if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
+                if (!BrokerFactory::copyBrokerIdentifier (name, localTargetAddress))
                 {
                     setRxStatus (connection_status::error);
                     setTxStatus (connection_status::error);
@@ -66,7 +66,7 @@ void TestComms::queue_tx_function ()
         }
         else
         {
-            if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
+            if (!BrokerFactory::copyBrokerIdentifier (name, localTargetAddress))
             {
                 setRxStatus (connection_status::error);
                 setTxStatus (connection_status::error);
@@ -79,9 +79,9 @@ void TestComms::queue_tx_function ()
 
     if (brokerName_.empty ())
     {
-        if (!brokerTarget_.empty ())
+        if (!brokerTargetAddress.empty ())
         {
-            brokerName_ = brokerTarget_;
+            brokerName_ = brokerTargetAddress;
         }
     }
 
@@ -162,7 +162,7 @@ void TestComms::queue_tx_function ()
     }
     if (tbroker)
     {
-        if (tbroker->getIdentifier () == localTarget_)
+        if (tbroker->getIdentifier () == localTargetAddress)
         {
             logError ("broker == target");
         }
@@ -292,7 +292,7 @@ void TestComms::closeReceiver ()
     }
 }
 
-std::string TestComms::getAddress () const { return localTarget_; }
+std::string TestComms::getAddress () const { return localTargetAddress; }
 
 }  // namespace testcore
 

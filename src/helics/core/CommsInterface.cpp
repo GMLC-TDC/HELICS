@@ -32,8 +32,8 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
     if (propertyLock ())
     {
-        localTarget_ = netInfo.localInterface;
-        brokerTarget_ = netInfo.brokerAddress;
+        localTargetAddress = netInfo.localInterface;
+        brokerTargetAddress = netInfo.brokerAddress;
         brokerName_ = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
         maxMessageSize_ = netInfo.maxMessageSize;
@@ -62,8 +62,8 @@ void CommsInterface::loadTargetInfo (const std::string &localTarget,
 {
     if (propertyLock ())
     {
-        localTarget_ = localTarget;
-        brokerTarget_ = brokerTarget;
+        localTargetAddress = localTarget;
+        brokerTargetAddress = brokerTarget;
         interfaceNetwork = targetNetwork;
         propertyUnLock ();
     }
@@ -226,11 +226,11 @@ bool CommsInterface::connect ()
     std::unique_lock<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
-        name = localTarget_;
+        name = localTargetAddress;
     }
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
-        localTarget_ = name;
+        localTargetAddress = name;
     }
     if (!singleThread)
     {
@@ -273,7 +273,7 @@ bool CommsInterface::connect ()
         }
         if (!singleThread)
         {
-            queue_watcher.join();
+            queue_watcher.join ();
         }
         return false;
     }

@@ -188,7 +188,8 @@ void TcpCommsSS::queue_tx_function ()
 
     if (serverMode)
     {
-        server = TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, true, maxMessageSize_);
+        server =
+          TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber, true, maxMessageSize_);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");
@@ -239,7 +240,7 @@ void TcpCommsSS::queue_tx_function ()
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }
@@ -254,7 +255,7 @@ void TcpCommsSS::queue_tx_function ()
             try
             {
                 brokerConnection =
-                  makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
+                  makeConnection (ioserv->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
                                   maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
                 if (!brokerConnection)
                 {
@@ -282,7 +283,7 @@ void TcpCommsSS::queue_tx_function ()
                 setRxStatus (connection_status::error);
                 return;
             }
-            established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
+            established_routes[makePortAddress (brokerTargetAddress, brokerPort)] = parent_route_id;
         }
     }
 
@@ -312,7 +313,7 @@ void TcpCommsSS::queue_tx_function ()
                             if (!brokerConnection)
                             {  // check if the connection matches the broker
                                 if ((cmd.payload == brokerName_) ||
-                                    (cmd.payload == makePortAddress (brokerTarget_, brokerPort)))
+                                    (cmd.payload == makePortAddress (brokerTargetAddress, brokerPort)))
                                 {
                                     brokerConnection = std::move (conn);
                                 }

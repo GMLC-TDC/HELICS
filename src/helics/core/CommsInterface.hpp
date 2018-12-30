@@ -109,8 +109,8 @@ class CommsInterface
     TriggerVariable rxTrigger;
 
     std::string name;  //!< the name of the object
-    std::string localTarget_;  //!< the base for the receive address
-    std::string brokerTarget_;  //!< the base for the broker address
+    std::string localTargetAddress;  //!< the base for the receive address
+    std::string brokerTargetAddress;  //!< the base for the broker address
     std::string brokerName_;  //!< the identifier for the broker
     std::string brokerInitString_;  //!< the initialization string for any automatically generated broker
   private:
@@ -137,7 +137,7 @@ class CommsInterface
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
       false};  //!< flag indicating that the comm system is in the process of disconnecting
-    interface_networks interfaceNetwork;
+    interface_networks interfaceNetwork = interface_networks::local;
 
   private:
     std::thread queue_transmitter;  //!< single thread for sending data
