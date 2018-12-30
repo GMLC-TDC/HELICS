@@ -32,32 +32,41 @@ void cleanupHelicsLibrary ()
     BrokerFactory::cleanUpBrokers (100ms);
 }
 
-Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (fedName)
+Federate::Federate (const std::string &fedName, const FederateInfo &fi)
+    : singleThreadFederate (fi.checkForFlag (defs::flags::single_thread_federate)), name (fedName)
 {
-    if (fi.coreName.empty ())
+    if (singleThreadFederate)
     {
-        coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
-        if (!coreObject)
-        {
-            coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
-        }
+        coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
     }
     else
     {
-        coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
-        if (!coreObject->isOpenToNewFederates ())
+        if (fi.coreName.empty ())
         {
-            std::cout << "found core object is not open" << std::endl;
-            coreObject = nullptr;
-            CoreFactory::cleanUpCores (200ms);
+            coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
+            if (!coreObject)
+            {
+                coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
+            }
+        }
+        else
+        {
             coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
             if (!coreObject->isOpenToNewFederates ())
             {
-                throw (
-                  RegistrationFailure ("Unable to connect to specified core: core is not open to new Federates"));
+                std::cout << "found core object is not open" << std::endl;
+                coreObject = nullptr;
+                CoreFactory::cleanUpCores (200ms);
+                coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
+                if (!coreObject->isOpenToNewFederates ())
+                {
+                    throw (RegistrationFailure (
+                      "Unable to connect to specified core: core is not open to new Federates"));
+                }
             }
         }
     }
+
     if (!coreObject)
     {
         throw (RegistrationFailure ("Unable to connect to specified core: unable to create specified core"));
@@ -80,29 +89,39 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     fedID = coreObject->registerFederate (name, fi);
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
-    asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    if (!singleThreadFederate)
+    {
+        asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    }
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
-    : coreObject (core), name (fedName)
+    : singleThreadFederate (fi.checkForFlag (defs::flags::single_thread_federate)), coreObject (core),
+      name (fedName)
 {
-    if (!coreObject)
+    if (singleThreadFederate)
     {
-        if (fi.coreName.empty ())
+        coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
+    }
+    else
+    {
+        if (!coreObject)
         {
-            coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
-            if (!coreObject)
+            if (fi.coreName.empty ())
             {
-                coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
+                coreObject = CoreFactory::findJoinableCoreOfType (fi.coreType);
+                if (!coreObject)
+                {
+                    coreObject = CoreFactory::create (fi.coreType, generateFullCoreInitString (fi));
+                }
+            }
+            else
+            {
+                coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
             }
         }
-        else
-        {
-            coreObject = CoreFactory::FindOrCreate (fi.coreType, fi.coreName, generateFullCoreInitString (fi));
-        }
     }
-
     if (!coreObject)
     {
         currentMode = modes::error;
@@ -125,7 +144,10 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
     }
     separator_ = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
-    asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    if (!singleThreadFederate)
+    {
+        asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
+    }
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
 }
 
@@ -202,6 +224,10 @@ void Federate::enterInitializingMode ()
 
 void Federate::enterInitializingModeAsync ()
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async Methods are not available for single thread federates"));
+    }
     auto asyncInfo = asyncCallInfo->lock ();
     if (currentMode == modes::startup)
     {
@@ -221,6 +247,10 @@ void Federate::enterInitializingModeAsync ()
 
 bool Federate::isAsyncOperationCompleted () const
 {
+    if (singleThreadFederate)
+    {
+        return false;
+    }
     auto asyncInfo = asyncCallInfo->lock_shared ();
     switch (currentMode)
     {
@@ -242,6 +272,10 @@ bool Federate::isAsyncOperationCompleted () const
 
 void Federate::enterInitializingModeComplete ()
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     switch (currentMode)
     {
     case modes::pending_init:
@@ -324,6 +358,10 @@ iteration_result Federate::enterExecutingMode (iteration_request iterate)
 
 void Federate::enterExecutingModeAsync (iteration_request iterate)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     switch (currentMode)
     {
     case modes::startup:
@@ -461,6 +499,10 @@ void Federate::finalize ()
 
 void Federate::finalizeAsync ()
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     switch (currentMode)
     {
     case modes::pending_init:
@@ -519,7 +561,7 @@ void Federate::error (int errorcode)
     currentMode = modes::error;
     if (!coreObject)
     {
-        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+        throw (InvalidFunctionCall ("cannot generate error on uninitialized or disconnected Federate"));
     }
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
@@ -530,7 +572,7 @@ void Federate::error (int errorcode, const std::string &message)
     currentMode = modes::error;
     if (!coreObject)
     {
-        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+        throw (InvalidFunctionCall ("cannot generate error on uninitialized or disconnected Federate"));
     }
     coreObject->logMessage (fedID, errorcode, message);
 }
@@ -605,6 +647,10 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto exp = modes::executing;
     if (currentMode.compare_exchange_strong (exp, modes::pending_time))
     {
@@ -624,6 +670,10 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto exp = modes::executing;
     if (currentMode.compare_exchange_strong (exp, modes::pending_iterative_time))
     {
@@ -644,6 +694,10 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
 @return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto exp = modes::pending_time;
     if (currentMode.compare_exchange_strong (exp, modes::executing))
     {
@@ -666,6 +720,10 @@ Time Federate::requestTimeComplete ()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete ()
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto asyncInfo = asyncCallInfo->lock ();
     auto exp = modes::pending_iterative_time;
     if (currentMode.compare_exchange_strong (exp, modes::executing))
@@ -1056,7 +1114,7 @@ std::string Federate::query (const std::string &queryStr)
     {
         if (coreObject)
         {
-            res = coreObject->query(getName(), queryStr);
+            res = coreObject->query (getName (), queryStr);
         }
         else
         {
@@ -1089,6 +1147,10 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto queryFut =
       std::async (std::launch::async, [this, target, queryStr]() { return coreObject->query (target, queryStr); });
     auto asyncInfo = asyncCallInfo->lock ();
@@ -1100,6 +1162,10 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
     auto asyncInfo = asyncCallInfo->lock ();
     int cnt = asyncInfo->queryCounter++;
@@ -1110,6 +1176,10 @@ query_id_t Federate::queryAsync (const std::string &queryStr)
 
 std::string Federate::queryComplete (query_id_t queryIndex)
 {
+    if (singleThreadFederate)
+    {
+        throw (InvalidFunctionCall ("Async/Complete Methods are not available for single thread federates"));
+    }
     auto asyncInfo = asyncCallInfo->lock ();
     auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncInfo->inFlightQueries.end ())
@@ -1121,6 +1191,10 @@ std::string Federate::queryComplete (query_id_t queryIndex)
 
 bool Federate::isQueryCompleted (query_id_t queryIndex) const
 {
+    if (singleThreadFederate)
+    {
+        return false;
+    }
     auto asyncInfo = asyncCallInfo->lock ();
     auto fnd = asyncInfo->inFlightQueries.find (queryIndex.value ());
     if (fnd != asyncInfo->inFlightQueries.end ())
@@ -1138,7 +1212,8 @@ void Federate::setGlobal (const std::string &valueName, const std::string &value
     }
     else
     {
-        throw(InvalidFunctionCall("set set Global cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set set Global cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1181,7 +1256,8 @@ void Federate::addSourceTarget (const Filter &filt, const std::string &targetEnd
     }
     else
     {
-        throw(InvalidFunctionCall("add source target cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "add source target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1193,7 +1269,8 @@ void Federate::addDestinationTarget (const Filter &filt, const std::string &targ
     }
     else
     {
-        throw(InvalidFunctionCall("add destination target cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "add destination target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1245,31 +1322,32 @@ void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOper
 {
     if (coreObject)
     {
-        coreObject->setFilterOperator(filt.getHandle(), std::move(mo));
+        coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
     }
     else
     {
-        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
     }
-    
 }
 
 void Federate::setInterfaceOption (interface_handle handle, int32_t option, bool option_value)
 {
     if (coreObject)
     {
-        coreObject->setHandleOption(handle, option, option_value);
+        coreObject->setHandleOption (handle, option, option_value);
     }
     else
     {
-        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
 /** get the current value for an interface option*/
 bool Federate::getInterfaceOption (interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
+    return (coreObject) ? coreObject->getHandleOption (handle, option) : false;
 }
 
 void Federate::closeInterface (interface_handle handle)
@@ -1278,7 +1356,7 @@ void Federate::closeInterface (interface_handle handle)
     {
         coreObject->closeHandle (handle);
     }
-    //well if there is no core object it already is closed
+    // well if there is no core object it already is closed
 }
 
 void Federate::setInfo (interface_handle handle, const std::string &info)
@@ -1289,7 +1367,7 @@ void Federate::setInfo (interface_handle handle, const std::string &info)
     }
     else
     {
-        throw(InvalidFunctionCall("cannot call set info on uninitialized or disconnected federate"));
+        throw (InvalidFunctionCall ("cannot call set info on uninitialized or disconnected federate"));
     }
 }
 

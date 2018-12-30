@@ -70,8 +70,8 @@ class TimeCoordinator
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    global_federate_id source_id = global_federate_id (
-      0);  //!< the identifier for inserting into the source id field of any generated messages;
+    global_federate_id source_id =
+      global_federate_id{0};  //!< the identifier for inserting into the source id field of any generated messages;
     bool iterating = false;  //!< indicator that the coordinator should be iterating if need be
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
@@ -140,7 +140,7 @@ class TimeCoordinator
     /** get the next possible time that a time coordinator could grant*/
     Time getNextPossibleTime () const;
     Time generateAllowedTime (Time testTime) const;
-
+    /** send an updated time request message to all dependent federates*/
     void sendTimeRequest () const;
     void updateTimeGrant ();
     void transmitTimingMessage (ActionMessage &msg) const;

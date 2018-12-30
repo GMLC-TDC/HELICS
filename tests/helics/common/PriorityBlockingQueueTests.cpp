@@ -363,7 +363,7 @@ BOOST_AUTO_TEST_CASE (pop_callback_tests)
     auto cons = [&](int cnt) {
         for (int ii = 0; ii < cnt; ii++)
         {
-            sq.pop (prod1);
+            sq.popOrCall (prod1);
         }
         return cnt;
     };

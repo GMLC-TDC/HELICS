@@ -59,6 +59,8 @@ class Federate
   protected:
     std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
     char separator_ = '/';  //!< the separator between automatically prependend names
+    const bool singleThreadFederate{false};
+
   private:
     federate_id_t fedID;  //!< the federate ID of the object for use in the core
   protected:

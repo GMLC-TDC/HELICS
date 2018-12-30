@@ -19,18 +19,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal
 operations require a swap, however in high usage the two locks will reduce contention in most cases.
 */
-template <typename T>
+template <typename T, class MUTEX = std::mutex, class COND = std::condition_variable>
 class BlockingPriorityQueue
 {
   private:
-    mutable std::mutex m_pushLock;  //!< lock for operations on the pushElements vector
-    mutable std::mutex m_pullLock;  //!< lock for elements on the pullLock vector
+    mutable MUTEX m_pushLock;  //!< lock for operations on the pushElements vector
+    mutable MUTEX m_pullLock;  //!< lock for elements on the pullLock vector
     std::vector<T> pushElements;  //!< vector of elements being added
     std::vector<T> pullElements;  //!< vector of elements waiting extraction
     std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is empty
     std::queue<T> priorityQueue;  //!< the priority channel
     // the condition variable should be keyed of the pullLock
-    std::condition_variable condition;  //!< condition variable for notification of new data
+    COND condition;  //!< condition variable for notification of new data
   public:
     /** default constructor*/
     BlockingPriorityQueue () = default;
@@ -38,8 +38,8 @@ class BlockingPriorityQueue
     /** clear the queue*/
     void clear ()
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pullElements.clear ();
         pushElements.clear ();
         while (!priorityQueue.empty ())
@@ -71,8 +71,8 @@ class BlockingPriorityQueue
     /** enable the move assignment not the copy assignment*/
     BlockingPriorityQueue &operator= (BlockingPriorityQueue &&sq) noexcept
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pushElements = std::move (sq.pushElements);
         pullElements = std::move (sq.pullElements);
         priorityQueue = std::move (sq.priorityQueue);
@@ -89,8 +89,8 @@ class BlockingPriorityQueue
     */
     void reserve (size_t capacity)
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pullElements.reserve (capacity);
         pushElements.reserve (capacity);
     }
@@ -101,7 +101,7 @@ class BlockingPriorityQueue
     template <class Z>
     void push (Z &&val)  // forwarding reference
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // only one lock on this branch
         if (!pushElements.empty ())
         {
             pushElements.push_back (std::forward<Z> (val));
@@ -113,7 +113,7 @@ class BlockingPriorityQueue
             {
                 // release the push lock so we don't get a potential deadlock condition
                 pushLock.unlock ();
-                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
                 if (pullElements.empty ())
                 {
@@ -148,7 +148,7 @@ class BlockingPriorityQueue
         bool expEmpty = true;
         if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
         {
-            std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+            std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
             queueEmptyFlag = false;  // need to set the flag again just in case after we get the lock
             priorityQueue.push (std::forward<Z> (val));
             // pullLock.unlock ();
@@ -156,7 +156,7 @@ class BlockingPriorityQueue
         }
         else
         {
-            std::unique_lock<std::mutex> pullLock (m_pullLock);
+            std::unique_lock<MUTEX> pullLock (m_pullLock);
             priorityQueue.push (std::forward<Z> (val));
             expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
@@ -170,7 +170,7 @@ class BlockingPriorityQueue
     template <class... Args>
     void emplace (Args &&... args)
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // only one lock on this branch
         if (!pushElements.empty ())
         {
             pushElements.emplace_back (std::forward<Args> (args)...);
@@ -182,7 +182,7 @@ class BlockingPriorityQueue
             {
                 // release the push lock so we don't get a potential deadlock condition
                 pushLock.unlock ();
-                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;  // need to set the flag again after we get the lock
                 if (pullElements.empty ())
                 {
@@ -217,7 +217,7 @@ class BlockingPriorityQueue
         bool expEmpty = true;
         if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
         {
-            std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+            std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
             queueEmptyFlag = false;  // need to set the flag again just in case after we get the lock
             priorityQueue.emplace (std::forward<Args> (args)...);
             // pullLock.unlock ();
@@ -225,7 +225,7 @@ class BlockingPriorityQueue
         }
         else
         {
-            std::unique_lock<std::mutex> pullLock (m_pullLock);
+            std::unique_lock<MUTEX> pullLock (m_pullLock);
             priorityQueue.emplace (std::forward<Args> (args)...);
             expEmpty = true;
             if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
@@ -241,7 +241,7 @@ class BlockingPriorityQueue
     template <typename = std::enable_if<std::is_copy_assignable<T>::value>>
     stx::optional<T> try_peek () const
     {
-        std::lock_guard<std::mutex> lock (m_pullLock);
+        std::lock_guard<MUTEX> lock (m_pullLock);
         if (!priorityQueue.empty ())
         {
             return priorityQueue.front ();
@@ -268,7 +268,7 @@ class BlockingPriorityQueue
         auto val = try_pop ();
         while (!val)
         {
-            std::unique_lock<std::mutex> pullLock (m_pullLock);  // get the lock then wait
+            std::unique_lock<MUTEX> pullLock (m_pullLock);  // get the lock then wait
             if (!priorityQueue.empty ())
             {
                 actval = std::move (priorityQueue.front ());
@@ -298,47 +298,47 @@ class BlockingPriorityQueue
             val = try_pop ();
         }
         // move the value out of the optional
-        actval = std::move(*val);
+        actval = std::move (*val);
         return actval;
     }
 
-
     /** blocking call to wait on an object from the stack with timeout*/
-    stx::optional<T> pop(std::chrono::milliseconds timeout)
+    template <typename TIME>
+    stx::optional<T> pop (TIME timeout)
     {
-        auto val = try_pop();
+        auto val = try_pop ();
         while (!val)
         {
-            std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
-            if (!priorityQueue.empty())
+            std::unique_lock<MUTEX> pullLock (m_pullLock);  // get the lock then wait
+            if (!priorityQueue.empty ())
             {
-                val = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                val = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 break;
             }
-            if (!pullElements.empty())  // make sure we are actually empty;
+            if (!pullElements.empty ())  // make sure we are actually empty;
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            auto res=condition.wait_for(pullLock, timeout);  // now wait
+            auto res = condition.wait_for (pullLock, timeout);  // now wait
 
-            if (!priorityQueue.empty())
+            if (!priorityQueue.empty ())
             {
-                val = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                val = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 break;
             }
-            if (!pullElements.empty())  // check for spurious wake-ups
+            if (!pullElements.empty ())  // check for spurious wake-ups
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            pullLock.unlock();
-            val = try_pop();
-            if (res == std::cv_status::timeout)
+            pullLock.unlock ();
+            val = try_pop ();
+            if (res != std::cv_status::no_timeout)  // std::cv_status::no_timeout
             {
                 break;
             }
@@ -354,13 +354,13 @@ class BlockingPriorityQueue
     will block and wait.
     */
     template <typename Functor>
-    T pop (Functor callOnWaitFunction)
+    T popOrCall (Functor callOnWaitFunction)
     {
         auto val = try_pop ();
         while (!val)  // may be spurious so make sure actually have a value
         {
             callOnWaitFunction ();
-            std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+            std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
             if (!priorityQueue.empty ())
             {
                 auto actval = std::move (priorityQueue.front ());
@@ -401,10 +401,10 @@ depending on the number of consumers
     bool empty () const;
 };
 
-template <typename T>
-stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
+template <typename T, class MUTEX, class COND>
+stx::optional<T> BlockingPriorityQueue<T, MUTEX, COND>::try_pop ()
 {
-    std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+    std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
     if (!priorityQueue.empty ())
     {
         stx::optional<T> val (std::move (priorityQueue.front ()));
@@ -413,7 +413,7 @@ stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
     }
     if (pullElements.empty ())
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // second pushLock
         if (!pushElements.empty ())
         {  // on the off chance the queue got out of sync
             std::swap (pushElements, pullElements);
@@ -445,7 +445,7 @@ stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
     pullElements.pop_back ();
     if (pullElements.empty ())
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // second pushLock
         if (!pushElements.empty ())
         {  // this is the potential for slow operations
             std::swap (pushElements, pullElements);
@@ -461,8 +461,8 @@ stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
     return val;
 }
 
-template <typename T>
-bool BlockingPriorityQueue<T>::empty () const
+template <typename T, class MUTEX, class COND>
+bool BlockingPriorityQueue<T, MUTEX, COND>::empty () const
 {
     return queueEmptyFlag;
 }

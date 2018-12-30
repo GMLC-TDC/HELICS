@@ -25,6 +25,19 @@ class CoreFederateInfo
     void setProperty (int propId, int propVal) { intProps.emplace_back (propId, propVal); }
     void setProperty (int propId, Time propVal) { timeProps.emplace_back (propId, propVal); }
     void setFlagOption (int flagId, bool propVal = true) { flagProps.emplace_back (flagId, propVal); }
+    /** check if a flag is set and return its value otherwise return false*/
+    bool checkForFlag (int flagId) const
+    {
+        bool val = false;
+        for (auto &flg : flagProps)
+        {
+            if (flg.first == flagId)
+            {
+                val = flg.second;
+            }
+        }
+        return val;
+    }
 };
 
 }  // namespace helics

@@ -11,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (timeCoord_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (timeCoord_tests, *utf::label ("ci"))
 using namespace helics;
 
 static constexpr global_federate_id fed2 (2);
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE (dependency_tests)
     TimeCoordinator ftc;
     ftc.addDependency (fed2);
     ftc.addDependency (fed3);
-    
+
     auto deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == fed2);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE (dependency_test_message)
     ftc.processDependencyUpdateMessage (addDep);
     auto deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 2);
-    BOOST_CHECK (deps[0] ==fed2);
+    BOOST_CHECK (deps[0] == fed2);
     BOOST_CHECK (deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage (addDep);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE (dependency_test_message)
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = global_federate_id (10);
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
@@ -96,12 +96,12 @@ BOOST_AUTO_TEST_CASE (dependent_tests)
     BOOST_CHECK (deps[1] == fed3);
 
     ftc.removeDependent (fed2);
-    deps = ftc.getDependents();
+    deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == fed3);
     // remove same one
     ftc.removeDependent (fed2);
-    deps = ftc.getDependents();
+    deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == fed3);
 }
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE (dependent_tests)
 BOOST_AUTO_TEST_CASE (dependent_test_message)
 {
     TimeCoordinator ftc;
-    
+
     ActionMessage addDep (CMD_ADD_DEPENDENT);
     addDep.source_id = fed2;
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE (dependent_test_message)
     BOOST_CHECK (deps[1] == fed3);
     // test redundancy checking
     ftc.processDependencyUpdateMessage (addDep);
-    deps = ftc.getDependents();
+    deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 2);
     BOOST_CHECK (deps[0] == fed2);
     BOOST_CHECK (deps[1] == fed3);
@@ -130,16 +130,25 @@ BOOST_AUTO_TEST_CASE (dependent_test_message)
     ActionMessage remDep (CMD_REMOVE_DEPENDENT);
     remDep.source_id = fed2;
     ftc.processDependencyUpdateMessage (remDep);
-    deps = ftc.getDependents();
+    deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = global_federate_id{10};
     ftc.processDependencyUpdateMessage (remDep);
-    deps = ftc.getDependents();
+    deps = ftc.getDependents ();
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == fed3);
 }
 
+BOOST_AUTO_TEST_CASE (timing_messages)
+{
+    TimeCoordinator ftc;
+    ftc.addDependency (global_federate_id{5});
+    ftc.addDependency (global_federate_id{10});
+
+    auto deps = ftc.getDependencies ();
+    BOOST_CHECK_EQUAL (deps.size (), 2);
+}
 BOOST_AUTO_TEST_SUITE_END ()

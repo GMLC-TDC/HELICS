@@ -16,13 +16,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 /** class for very simple thread safe queue
 @details  uses two vectors for the operations,  once the pull vector is empty it swaps the vectors
 and reverses it so it can pop from the back as well as an atomic flag indicating the queue is empty
-@tparam X the base class of the queue*/
-template <class X>
+@tparam X the base class of the queue
+@tparam MUTEX the type of lock to use*/
+template <class X, class MUTEX = std::mutex>
 class SimpleQueue
 {
   private:
-    mutable std::mutex m_pushLock;  //!< lock for operations on the pushElements vector
-    mutable std::mutex m_pullLock;  //!< lock for elements on the pullLock vector
+    mutable MUTEX m_pushLock;  //!< lock for operations on the pushElements vector
+    mutable MUTEX m_pullLock;  //!< lock for elements on the pullLock vector
     std::vector<X> pushElements;  //!< vector of elements being added
     std::vector<X> pullElements;  //!< vector of elements waiting extraction
     std::atomic<bool> queueEmptyFlag{true};  //!< flag indicating the queue is Empty
@@ -34,8 +35,8 @@ class SimpleQueue
     {
         // these locks are primarily for memory synchronization multiple access in the destructor would be a bad
         // thing
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         /** clear the elements as part of the destruction while the locks are engaged*/
         pushElements.clear ();
         pullElements.clear ();
@@ -57,8 +58,8 @@ class SimpleQueue
     /** enable the move assignment not the copy assignment*/
     SimpleQueue &operator= (SimpleQueue &&sq) noexcept
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pushElements = std::move (sq.pushElements);
         pullElements = std::move (sq.pullElements);
         queueEmptyFlag = pullElements.empty ();
@@ -74,21 +75,21 @@ class SimpleQueue
     */
     bool empty () const
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
         return pullElements.empty ();
     }
     /** get the current size of the queue*/
     size_t size () const
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         return pullElements.size () + pushElements.size ();
     }
     /** clear the queue*/
     void clear ()
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pullElements.clear ();
         pushElements.clear ();
         queueEmptyFlag = true;
@@ -99,8 +100,8 @@ class SimpleQueue
     */
     void reserve (size_t capacity)
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
-        std::lock_guard<std::mutex> pushLock (m_pushLock);  // second pushLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pushLock (m_pushLock);  // second pushLock
         pullElements.reserve (capacity);
         pushElements.reserve (capacity);
     }
@@ -111,7 +112,7 @@ class SimpleQueue
     template <class Z>
     void push (Z &&val)  // forwarding reference
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // only one lock on this branch
         if (!pushElements.empty ())
         {
             pushElements.push_back (std::forward<Z> (val));
@@ -123,7 +124,7 @@ class SimpleQueue
             {
                 // release the push lock
                 pushLock.unlock ();
-                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
                 if (pullElements.empty ())
                 {
@@ -143,39 +144,39 @@ class SimpleQueue
         }
     }
 
-/** push a vector onto the queue
-    val the vector of values to push on the queue
-    */
+    /** push a vector onto the queue
+        val the vector of values to push on the queue
+        */
     void pushVector (const std::vector<X> &val)  // universal reference
     {
-        std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
-        if (!pushElements.empty())
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // only one lock on this branch
+        if (!pushElements.empty ())
         {
-            pushElements.insert(pushElements.end(), val.begin(), val.end());
+            pushElements.insert (pushElements.end (), val.begin (), val.end ());
         }
         else
         {
             bool expEmpty = true;
-            if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
                 // release the push lock
-                pushLock.unlock();
-                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+                pushLock.unlock ();
+                std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
-                if (pullElements.empty())
+                if (pullElements.empty ())
                 {
-                    pullElements.insert(pullElements.end(), val.rbegin(), val.rend());
-                    pullLock.unlock();
+                    pullElements.insert (pullElements.end (), val.rbegin (), val.rend ());
+                    pullLock.unlock ();
                 }
                 else
                 {
-                    pushLock.lock();
-                    pushElements.insert(pushElements.end(), val.begin(), val.end());
+                    pushLock.lock ();
+                    pushElements.insert (pushElements.end (), val.begin (), val.end ());
                 }
             }
             else
             {
-                pushElements.insert(pushElements.end(), val.begin(), val.end());
+                pushElements.insert (pushElements.end (), val.begin (), val.end ());
             }
         }
     }
@@ -186,7 +187,7 @@ class SimpleQueue
     template <class... Args>
     void emplace (Args &&... args)
     {
-        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        std::unique_lock<MUTEX> pushLock (m_pushLock);  // only one lock on this branch
         if (!pushElements.empty ())
         {
             pushElements.emplace_back (std::forward<Args> (args)...);
@@ -198,7 +199,7 @@ class SimpleQueue
             {
                 // release the push lock
                 pushLock.unlock ();
-                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
+                std::unique_lock<MUTEX> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
                 if (pullElements.empty ())
                 {
@@ -227,10 +228,10 @@ class SimpleQueue
     */
     stx::optional<X> pop ()
     {
-        std::lock_guard<std::mutex> pullLock (m_pullLock);  // first pullLock
+        std::lock_guard<MUTEX> pullLock (m_pullLock);  // first pullLock
         if (pullElements.empty ())
         {
-            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            std::unique_lock<MUTEX> pushLock (m_pushLock);  // second pushLock
             if (!pushElements.empty ())
             {  // on the off chance the queue got out of sync
                 std::swap (pushElements, pullElements);
@@ -263,7 +264,7 @@ class SimpleQueue
         pullElements.pop_back ();
         if (pullElements.empty ())
         {
-            std::unique_lock<std::mutex> pushLock (m_pushLock);  // second pushLock
+            std::unique_lock<MUTEX> pushLock (m_pushLock);  // second pushLock
             if (!pushElements.empty ())
             {  // this is the potential for slow operations
                 std::swap (pushElements, pullElements);
@@ -286,7 +287,7 @@ class SimpleQueue
     template <typename = std::enable_if<std::is_copy_assignable<X>::value>>
     stx::optional<X> peek () const
     {
-        std::lock_guard<std::mutex> lock (m_pullLock);
+        std::lock_guard<MUTEX> lock (m_pullLock);
 
         if (pullElements.empty ())
         {
