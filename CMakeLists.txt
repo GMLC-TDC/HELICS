@@ -517,6 +517,7 @@ hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)
 hide_variable(FMT_TEST)
+hide_variable(FMT_WERROR)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

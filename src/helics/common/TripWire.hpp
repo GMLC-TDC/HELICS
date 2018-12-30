@@ -30,7 +30,7 @@ class TripWireDetector
   public:
     TripWireDetector ();
     /** check if the line was tripped*/
-    bool isTripped () const;
+    bool isTripped () const noexcept;
 
   private:
     std::shared_ptr<const std::atomic<bool>> lineDetector;  //!< const pointer to the tripwire

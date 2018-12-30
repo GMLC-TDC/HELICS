@@ -34,77 +34,90 @@ class DelayedDestructor
     }
     ~DelayedDestructor ()
     {
-        int ii = 0;
-        while (!ElementsToBeDestroyed.empty ())
+        try
         {
-            ++ii;
-            destroyObjects ();
-            if (!ElementsToBeDestroyed.empty ())
+            int ii = 0;
+            while (!ElementsToBeDestroyed.empty ())
             {
-                // short circuit if the tripline was triggered
-                if (tripDetect.isTripped ())
+                ++ii;
+                destroyObjects ();
+                if (!ElementsToBeDestroyed.empty ())
                 {
-                    return;
-                }
-                if (ii > 4)
-                {
-                    destroyObjects ();
-                    break;
-                }
-                if (ii % 2 == 0)
-                {
-                    std::this_thread::sleep_for (std::chrono::milliseconds (100));
-                }
-                else
-                {
-                    std::this_thread::yield ();
+                    // short circuit if the tripline was triggered
+                    if (tripDetect.isTripped ())
+                    {
+                        return;
+                    }
+                    if (ii > 4)
+                    {
+                        destroyObjects ();
+                        break;
+                    }
+                    if (ii % 2 == 0)
+                    {
+                        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+                    }
+                    else
+                    {
+                        std::this_thread::yield ();
+                    }
                 }
             }
+        }
+        catch (...)
+        {
         }
     }
     DelayedDestructor (DelayedDestructor &&) noexcept = delete;
     DelayedDestructor &operator= (DelayedDestructor &&) noexcept = delete;
 
-    /** destroy objects that are now longer used*/
-    size_t destroyObjects ()
+    /** destroy objects that are no longer used*/
+    size_t destroyObjects () noexcept
     {
-        std::unique_lock<std::mutex> lock (destructionLock);
-        if (!ElementsToBeDestroyed.empty ())
+        try
         {
-            std::vector<std::shared_ptr<X>> ecall;
-            std::vector<std::string> ename;
-            for (auto &element : ElementsToBeDestroyed)
+            std::unique_lock<std::mutex> lock (destructionLock);
+            if (!ElementsToBeDestroyed.empty ())
             {
-                if (element.use_count () == 1)
+                std::vector<std::shared_ptr<X>> ecall;
+                std::vector<std::string> ename;
+                for (auto &element : ElementsToBeDestroyed)
                 {
-                    ecall.push_back (element);
-                    ename.push_back (element->getIdentifier ());
-                }
-            }
-            if (!ename.empty ())
-            {
-                // so apparently remove_if can actually call the destructor for shared_ptrs so the call function
-                // needs to be before this call
-                auto loc = std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
-                                           [&ename](const auto &element) {
-                                               return ((element.use_count () == 2) &&
-                                                       (std::find (ename.begin (), ename.end (),
-                                                                   element->getIdentifier ()) != ename.end ()));
-                                           });
-                ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
-                auto deleteFunc = callBeforeDeleteFunction;
-                lock.unlock ();
-                // this needs to be done after the lock, so a destructor can never called while under the lock
-                if (deleteFunc)
-                {
-                    for (auto &element : ecall)
+                    if (element.use_count () == 1)
                     {
-                        deleteFunc (element);
+                        ecall.push_back (element);
+                        ename.push_back (element->getIdentifier ());
                     }
                 }
-                ecall.clear ();  // make sure the destructors get called before returning.
-                lock.lock ();  // reengage the lock so the size is correct
+                if (!ename.empty ())
+                {
+                    // so apparently remove_if can actually call the destructor for shared_ptrs so the call
+                    // function needs to be before this call
+                    auto loc =
+                      std::remove_if (ElementsToBeDestroyed.begin (), ElementsToBeDestroyed.end (),
+                                      [&ename](const auto &element) {
+                                          return ((element.use_count () == 2) &&
+                                                  (std::find (ename.begin (), ename.end (),
+                                                              element->getIdentifier ()) != ename.end ()));
+                                      });
+                    ElementsToBeDestroyed.erase (loc, ElementsToBeDestroyed.end ());
+                    auto deleteFunc = callBeforeDeleteFunction;
+                    lock.unlock ();
+                    // this needs to be done after the lock, so a destructor can never called while under the lock
+                    if (deleteFunc)
+                    {
+                        for (auto &element : ecall)
+                        {
+                            deleteFunc (element);
+                        }
+                    }
+                    ecall.clear ();  // make sure the destructors get called before returning.
+                    lock.lock ();  // reengage the lock so the size is correct
+                }
             }
+        }
+        catch (...)
+        {
         }
         return ElementsToBeDestroyed.size ();
     }

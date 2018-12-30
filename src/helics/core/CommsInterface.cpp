@@ -483,6 +483,18 @@ bool CommsInterface::isConnected () const
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
 }
 
+void CommsInterface::logMessage (const std::string &message) const
+{
+    if (loggingCallback)
+    {
+        loggingCallback (3, name, message);
+    }
+    else
+    {
+        std::cout << "commMessage||" << name << ":" << message << std::endl;
+    }
+}
+
 void CommsInterface::logWarning (const std::string &message) const
 {
     if (loggingCallback)

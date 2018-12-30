@@ -115,7 +115,7 @@ extern "C"
         helics_log_level_warning = 1,
         /** warning errors and summary level information*/
         helics_log_level_summary = 2,
-        /** summary+ notices about federate and broker connections*/
+        /** summary+ notices about federate and broker connections +messages about network connections*/
         helics_log_level_connections = 3,
         /** connections+ interface definitions*/
         helics_log_level_interfaces = 4,

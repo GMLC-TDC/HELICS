@@ -37,6 +37,8 @@ class DelayedObjects
     // not movable or copyable;
     DelayedObjects (const DelayedObjects &) = delete;
     DelayedObjects (DelayedObjects &&) = delete;
+    DelayedObjects &operator= (const DelayedObjects &) = delete;
+    DelayedObjects &operator= (DelayedObjects &&) = delete;
 
     void setDelayedValue (int index, const X &val)
     {

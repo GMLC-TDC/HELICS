@@ -89,6 +89,7 @@ class CommsInterface
   protected:
     void logWarning (const std::string &message) const;
     void logError (const std::string &message) const;
+    void logMessage (const std::string &message) const;
 
   protected:
     // enumeration of the connection status flags for more immediate feedback from the processing threads
