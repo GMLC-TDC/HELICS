@@ -34,6 +34,8 @@ class data_block
   public:
     /** default constructor */
     data_block () = default;
+    /**default destructor*/
+    ~data_block () = default;
     /** size allocation constructor */
     explicit data_block (size_t blockSize) { m_data.resize (blockSize); };
     /** size and data */

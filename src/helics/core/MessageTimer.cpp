@@ -9,11 +9,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction) : sendFunction (std::move (sFunction)), servicePtr(AsioServiceManager::getServicePointer ())
+MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
+    : sendFunction (std::move (sFunction)), servicePtr (AsioServiceManager::getServicePointer ())
 {
-  //  std::cout << "getting loop handle for timer" << std::endl;
+    //  std::cout << "getting loop handle for timer" << std::endl;
     loopHandle = servicePtr->startServiceLoop ();
-   // std::cout << "got loop handle for timer" << std::endl;
+    // std::cout << "got loop handle for timer" << std::endl;
 }
 
 static void
@@ -37,11 +38,11 @@ int32_t MessageTimer::addTimerFromNow (std::chrono::nanoseconds time, ActionMess
     return addTimer (std::chrono::steady_clock::now () + time, std::move (mess));
 }
 
-int32_t MessageTimer::addTimer (time_type expireTime, ActionMessage mess)
+int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
 {
     // these two calls need to be before the lock
     auto timer = std::make_shared<boost::asio::steady_timer> (servicePtr->getBaseService ());
-    timer->expires_at (expireTime);
+    timer->expires_at (expirationTime);
     std::lock_guard<std::mutex> lock (timerLock);
     auto index = static_cast<int32_t> (timers.size ());
     auto timerCallback = [ptr = shared_from_this (), index](const boost::system::error_code &ec) {
@@ -51,7 +52,7 @@ int32_t MessageTimer::addTimer (time_type expireTime, ActionMessage mess)
     timer->async_wait (timerCallback);
     timers.push_back (std::move (timer));
     buffers.push_back (std::move (mess));
-    expirationTimes.push_back (expireTime);
+    expirationTimes.push_back (expirationTime);
     return index;
 }
 

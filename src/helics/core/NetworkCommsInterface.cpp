@@ -188,11 +188,11 @@ void NetworkCommsInterface::setFlag (const std::string &flag, bool val)
     }
 }
 
-ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessage &M)
+ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessage &cmd)
 {
-    if (isProtocolCommand (M))
+    if (isProtocolCommand (cmd))
     {
-        switch (M.messageID)
+        switch (cmd.messageID)
         {
         case QUERY_PORTS:
         {
@@ -204,13 +204,14 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
         break;
         case REQUEST_PORTS:
         {
-            int cnt = (M.counter <= 0) ? 2 : M.counter;
-            auto openPort = (M.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, M.name);
+            int cnt = (cmd.counter <= 0) ? 2 : cmd.counter;
+            auto openPort =
+              (cmd.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, cmd.name);
             ActionMessage portReply (CMD_PROTOCOL);
             portReply.messageID = PORT_DEFINITIONS;
             portReply.source_id = global_federate_id (PortNumber);
             portReply.setExtraData (openPort);
-            portReply.counter = M.counter;
+            portReply.counter = cmd.counter;
             return portReply;
         }
         break;
@@ -248,13 +249,13 @@ ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
     return req;
 }
 
-void NetworkCommsInterface::loadPortDefinitions (const ActionMessage &M)
+void NetworkCommsInterface::loadPortDefinitions (const ActionMessage &cmd)
 {
-    if (M.action () == CMD_PROTOCOL)
+    if (cmd.action () == CMD_PROTOCOL)
     {
-        if (M.messageID == PORT_DEFINITIONS)
+        if (cmd.messageID == PORT_DEFINITIONS)
         {
-            PortNumber = M.getExtraData ();
+            PortNumber = cmd.getExtraData ();
             if ((openPorts.getDefaultStartingPort () < 0))
             {
                 if (PortNumber < getDefaultBrokerPort () + 100)

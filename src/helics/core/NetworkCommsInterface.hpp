@@ -12,31 +12,32 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class NetworkCommsInterface : public CommsInterface
 {
-private:
-
+  private:
     class PortAllocator
     {
-    public:
+      public:
         /** get an open port for a particular host*/
-        int findOpenPort(int count, const std::string &host="localhost");
-        void setStartingPortNumber(int startPort) { startingPort = startPort; }
-        int getDefaultStartingPort() const { return startingPort; }
-        void addUsedPort(int port);
-        void addUsedPort(const std::string &host, int port);
-    private:
-        int startingPort=-1;
+        int findOpenPort (int count, const std::string &host = "localhost");
+        void setStartingPortNumber (int startPort) { startingPort = startPort; }
+        int getDefaultStartingPort () const { return startingPort; }
+        void addUsedPort (int port);
+        void addUsedPort (const std::string &host, int port);
+
+      private:
+        int startingPort = -1;
         std::map<std::string, std::set<int>> usedPort;
         std::map<std::string, int> nextPorts;
-        bool isPortUsed(const std::string &host, int port) const;
+        bool isPortUsed (const std::string &host, int port) const;
     };
 
   public:
     /** default constructor*/
-	  explicit NetworkCommsInterface(interface_type type, CommsInterface::thread_generation threads=CommsInterface::thread_generation::dual) noexcept;
+    explicit NetworkCommsInterface (
+      interface_type type,
+      CommsInterface::thread_generation threads = CommsInterface::thread_generation::dual) noexcept;
 
     /** load network information into the comms interface object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
@@ -45,20 +46,23 @@ private:
     void setPortNumber (int localPortNumber);
     void setAutomaticPortStartPort (int startingPort);
     virtual void setFlag (const std::string &flag, bool val) override;
+
   protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
     bool autoPortNumber = true;
     bool useOsPortAllocation = false;
     const interface_type networkType;
-	interface_networks network = interface_networks::ipv4;
+    interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};
-private:
+
+  private:
     PortAllocator openPorts;
-public:
+
+  public:
     /** find an open port for a subBroker*/
     int findOpenPort (int count, const std::string &host);
-	/** for protocol messages some require an immediate reply from the comms interface itself*/
+    /** for protocol messages some require an immediate reply from the comms interface itself*/
     ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
 
@@ -69,12 +73,10 @@ public:
     std::string getAddress () const;
     /** return the default Broker port*/
     virtual int getDefaultBrokerPort () const = 0;
-protected:
-    ActionMessage generatePortRequest(int cnt=1) const;
-    void loadPortDefinitions(const ActionMessage &M);
+
+  protected:
+    ActionMessage generatePortRequest (int cnt = 1) const;
+    void loadPortDefinitions (const ActionMessage &cmd);
 };
 
-
-
 }  // namespace helics
-
