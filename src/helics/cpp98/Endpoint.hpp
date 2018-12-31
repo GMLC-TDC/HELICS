@@ -50,7 +50,7 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const char *data, size_t len)
     {
-        helicsEndpointSendMessageRaw (ep, nullptr, data, static_cast<int> (len), hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, NULL, data, static_cast<int> (len), hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -61,7 +61,7 @@ class Endpoint
 
     void sendMessage (const char *data, size_t len, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, nullptr, data, static_cast<int> (len), time, hThrowOnError ());
+        helicsEndpointSendEventRaw (ep, NULL, data, static_cast<int> (len), time, hThrowOnError ());
     }
 
     void sendMessage (const std::string &dest, const char *data, size_t len, helics_time time)
@@ -71,8 +71,7 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const std::string &data)
     {
-        helicsEndpointSendMessageRaw (ep, nullptr, data.c_str (), static_cast<int> (data.size ()),
-                                      hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -84,7 +83,7 @@ class Endpoint
 
     void sendMessage (const std::string &data, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, nullptr, data.c_str (), static_cast<int> (data.size ()), time,
+        helicsEndpointSendEventRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), time,
                                     hThrowOnError ());
     }
 
@@ -97,8 +96,7 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const std::vector<char> &data)
     {
-        helicsEndpointSendMessageRaw (ep, nullptr, data.data (), static_cast<int> (data.size ()),
-                                      hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -110,7 +108,7 @@ class Endpoint
 
     void sendMessage (const std::vector<char> &data, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, nullptr, data.data (), static_cast<int> (data.size ()), time,
+        helicsEndpointSendEventRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), time,
                                     hThrowOnError ());
     }
 
