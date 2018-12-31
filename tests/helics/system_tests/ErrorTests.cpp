@@ -244,7 +244,7 @@ BOOST_DATA_TEST_CASE (test_duplicate_broker_name, bdata::make (core_types_simple
     helics::cleanupHelicsLibrary ();
 }
 
-const std::string networkCores[] = {"zmq", "tcp", "udp"};
+constexpr const char *networkCores[] = {"zmq", "udp"};
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)

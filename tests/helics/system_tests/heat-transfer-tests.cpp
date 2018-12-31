@@ -54,6 +54,7 @@ class HeatUnitBlock
         helics::FederateInfo fi;
         fi.coreName = coreName;
         fi.setProperty (helics_property_time_delta, deltaTime);
+        fi.setFlagOption (helics_handle_option_connection_optional);
         vFed = std::make_unique<helics::ValueFederate> (name, fi);
         pub = &vFed->registerPublicationIndexed<double> ("temp", x, y);
         if (x - 1 < 0)
@@ -236,7 +237,7 @@ BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
 
 BOOST_AUTO_TEST_CASE (linear_tests)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "22");
+    auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "-f 22 --autobroker");
     Wall w;
     w.initialize ("wallcore");
     int blockCount = 20;
