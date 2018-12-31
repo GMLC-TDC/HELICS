@@ -168,9 +168,9 @@ class Endpoint
     /** add a named filter to an endpoint for all message going to the endpoint*/
     void addDestinationFilter (const std::string &filterName) { fed->addDestinationFilter (*this, filterName); }
     /** set a target destination for unspecified messages*/
-    void setTargetDestination (const std::string &target) { targetDest = target; }
+    void setDefaultDestination (std::string target) { targetDest = std::move (target); }
     /** get the target destination for the endpoint*/
-    const std::string &getDestination() const { return targetDest; }
+    const std::string &getDefaultDestination () const { return targetDest; }
     /** get the name of the endpoint*/
     const std::string &getName () const { return actualName; }
     /** get the name of the endpoint*/

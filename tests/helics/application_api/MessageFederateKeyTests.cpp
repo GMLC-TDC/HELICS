@@ -202,11 +202,9 @@ BOOST_AUTO_TEST_CASE (message_federate_send_receive_2fed_extra)
     BOOST_CHECK_EQUAL (M2->data[245], data[245]);
     mFed1->finalizeAsync ();
     mFed2->finalize ();
-mFed1->finalizeComplete ();
+    mFed1->finalizeComplete ();
     BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
     BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
-    
-
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_obj, bdata::make (core_types), core_type)
@@ -291,10 +289,11 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     helics::data_block data2 (400, 'b');
     helics::data_block data3 (300, 'c');
     helics::data_block data4 (200, 'd');
+    epid.setDefaultDestination ("ep2");
     mFed1->sendMessage (epid, "ep2", data1);
     mFed1->sendMessage (epid, "ep2", data2);
-    mFed1->sendMessage (epid, "ep2", data3);
-    mFed1->sendMessage (epid, "ep2", data4);
+    epid.send (data3);
+    epid.send (data4);
     // move the time to 1.0
     auto f1time = std::async (std::launch::async, [&]() { return mFed1->requestTime (1.0); });
     auto gtime = mFed2->requestTime (1.0);
@@ -308,6 +307,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     auto cnt = mFed2->pendingMessages (epid2);
     BOOST_CHECK_EQUAL (cnt, 4);
 
+    BOOST_CHECK_EQUAL (epid.getDefaultDestination (), "ep2");
     auto M1 = mFed2->getMessage (epid2);
     BOOST_REQUIRE (M1);
     BOOST_REQUIRE_EQUAL (M1->data.size (), data1.size ());
