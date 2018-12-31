@@ -333,9 +333,9 @@ void TimeCoordinator::updateMessageTime (Time messageUpdateTime)
 bool TimeCoordinator::updateTimeFactors ()
 {
     Time minNext = Time::maxVal ();
-    Time minminDe = std::min (time_value, time_message);
-    Time minDe = minminDe;
-    Time minSo = minminDe;
+    Time Tso = std::min (time_value, time_message);
+    Time minDe = Tso;
+    Time minSo = Tso;
     for (auto &dep : dependencies)
     {
         if (dep.Tnext < minNext)
@@ -344,16 +344,16 @@ bool TimeCoordinator::updateTimeFactors ()
         }
         if (dep.Tdemin >= dep.Tnext)
         {
-            if (dep.Tdemin < minminDe)
+            if (dep.Tdemin < Tso)
             {
-                minminDe = dep.Tdemin;
+                Tso = dep.Tdemin;
             }
         }
         else
         {
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
-            minminDe = -1;
+            Tso = -1;
         }
 
         if (dep.Tso >= dep.Tnext)
@@ -381,7 +381,7 @@ bool TimeCoordinator::updateTimeFactors ()
     }
 
     bool update = false;
-    time_so = std::min (minDe, minminDe);
+    time_so = std::min (minDe, Tso);
     time_minSo = std::min (minSo, time_so);
     Time prev_next = time_next;
     updateNextPossibleEventTime ();
@@ -400,6 +400,11 @@ bool TimeCoordinator::updateTimeFactors ()
     {
         update = true;
         time_minDe = minDe;
+    }
+    if (Tso != time_so)
+    {
+        update = true;
+        time_so = Tso;
     }
     if (minSo != time_minSo)
     {
