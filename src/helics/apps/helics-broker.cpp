@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     {
         autorestart = true;
     }
-    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "--help"))
+    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") || (firstarg == "--help"))
     {
         std::cout << "helics_broker term <broker args...> will start a broker and open a terminal control window "
                      "for the broker run help in a terminal for more commands\n";
