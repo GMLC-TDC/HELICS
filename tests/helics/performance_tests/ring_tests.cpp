@@ -27,6 +27,8 @@ class RingTransmit
   public:
     helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
     helics::Time finalTime = helics::Time (100000, time_units::ns);  // final time
+    int loopCount = 0;
+
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication *pub;
@@ -56,6 +58,10 @@ class RingTransmit
         maxIndex_ = maxIndex;
         helics::FederateInfo fi;
         fi.coreName = coreName;
+        if (index == 0)
+        {
+            // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
+        }
         vFed = std::make_unique<helics::ValueFederate> (name, fi);
         pub = &vFed->registerPublicationIndexed<std::string> ("pub", index_);
         if (index_ == 0)
@@ -75,6 +81,7 @@ class RingTransmit
         {
             std::string txstring (100, '1');
             pub->publish (txstring);
+            ++loopCount;
         }
         auto nextTime = deltaTime;
 
@@ -85,6 +92,7 @@ class RingTransmit
             {
                 auto &nstring = vFed->getString (*sub);
                 vFed->publish (*pub, nstring);
+                ++loopCount;
             }
         }
         vFed->finalize ();
@@ -93,12 +101,14 @@ class RingTransmit
 
 BOOST_AUTO_TEST_SUITE (ring_tests)
 
-static constexpr int fedCount[] = {3, 4};
+static constexpr int fedCount[] = {3};
 // const int fedCount[] = { 180 };
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 BOOST_DATA_TEST_CASE (ring_test_single_core, bdata::make (fedCount), feds)
 {
-    auto wcore = helics::CoreFactory::FindOrCreate (CORE_TYPE_TO_TEST, "mcore", std::to_string (feds));
+    auto wcore =
+      helics::CoreFactory::FindOrCreate (CORE_TYPE_TO_TEST, "mcore",
+                                         std::string ("--autobroker --federates=") + std::to_string (feds));
     // this is to delay until the threads are ready
     wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
     std::vector<RingTransmit> links (feds);
@@ -123,6 +133,8 @@ BOOST_DATA_TEST_CASE (ring_test_single_core, bdata::make (fedCount), feds)
     auto stopTime = std::chrono::high_resolution_clock::now ();
     auto diff = stopTime - startTime;
     std::cout << feds << " feds total time=" << diff.count () / 1000000 << "ms \n";
+    std::cout << "loop count=" << links[0].loopCount << '\n';
+    BOOST_CHECK_EQUAL (links[0].loopCount, 100000);
 }
 
 static constexpr int fedCountB[] = {5, 5, 5, 5};

@@ -21,6 +21,7 @@ class ForwardingTimeCoordinator
   private:
     // the variables for time coordination
     Time time_next = timeZero;  //!< the next possible internal event time
+    Time time_event = timeZero;  //!< the next scheduled event
     Time time_minDe = timeZero;  //!< the minimum event time of the dependencies
     Time time_so = timeZero;  //!< the minimum second order dependency event time
 

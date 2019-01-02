@@ -84,8 +84,9 @@ class minTimeSet
 {
   public:
     Time minNext = Time::maxVal ();
-    Time minso = Time::maxVal ();
-    Time minDe = Time::maxVal ();
+    Time minTe = Time::maxVal ();
+    Time minTso = Time::maxVal ();
+    Time minTdemin = Time::maxVal ();
     global_federate_id minFed;
     DependencyInfo::time_state_t tState = DependencyInfo::time_state_t::time_requested;
 };
@@ -114,36 +115,48 @@ generateMinTimeSet (const TimeDependencies &dependencies, global_federate_id ign
         }
         if (dep.Tdemin >= dep.Tnext)
         {
-            if (dep.Tdemin < mTime.minso)
+            if (dep.Tdemin < mTime.minTdemin)
             {
-                mTime.minso = dep.Tdemin;
-                mTime.minFed = dep.fedID;
-            }
-            else if (dep.Tdemin == mTime.minso)
-            {
-                mTime.minFed = global_federate_id ();
+                mTime.minTdemin = dep.Tdemin;
             }
         }
         else
         {
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
-            mTime.minso = -1;
+            mTime.minTdemin = -1;
         }
 
-        if (dep.Te < mTime.minDe)
+        if (dep.Tso >= dep.Tnext)
         {
-            mTime.minDe = dep.Te;
+            if (dep.Tso < mTime.minTso)
+            {
+                mTime.minTso = dep.Tso;
+                mTime.minFed = dep.fedID;
+            }
+            else if (dep.Tso == mTime.minTso)
+            {
+                mTime.minFed = global_federate_id{};
+            }
+        }
+        else
+        {
+            // this minimum dependent event time received was invalid and can't be trusted
+            // therefore it can't be used to determine a time grant
+            mTime.minTso = -1;
+        }
+
+        if (dep.Te < mTime.minTe)
+        {
+            mTime.minTe = dep.Te;
         }
     }
 
-    mTime.minso = std::min (mTime.minDe, mTime.minso);
-
-    if (mTime.minso < Time::maxVal ())
+    if (mTime.minTso < Time::maxVal ())
     {
-        if (mTime.minso > mTime.minNext)
+        if (mTime.minTso > mTime.minNext)
         {
-            mTime.minNext = mTime.minso;
+            mTime.minNext = mTime.minTso;
         }
     }
     return mTime;
@@ -159,14 +172,19 @@ void ForwardingTimeCoordinator::updateTimeFactors ()
     Time prev_next = time_next;
     time_next = mTime.minNext;
 
-    if (mTime.minDe != time_minDe)
+    if (mTime.minTe != time_event)
     {
         update = true;
-        time_minDe = mTime.minDe;
+        time_event = mTime.minTe;
     }
-    if (mTime.minso != time_so)
+    if (mTime.minTdemin != time_minDe)
     {
-        time_so = mTime.minso;
+        update = true;
+        time_minDe = mTime.minTe;
+    }
+    if (mTime.minTso != time_so)
+    {
+        time_so = mTime.minTso;
         update = true;
     }
 
@@ -222,8 +240,9 @@ void ForwardingTimeCoordinator::sendTimeRequest () const
         upd.source_id = source_id;
         //    upd.source_handle = lastMinFed;
         upd.actionTime = time_next;
-        upd.Te = time_minDe;
-        upd.Tdemin = time_so;
+        upd.Te = time_event;
+        upd.Tdemin = time_minDe;
+        upd.Tso = time_so;
         if (iterating)
         {
             setActionFlag (upd, iteration_requested_flag);
@@ -340,8 +359,9 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency (co
     ActionMessage nTime (msg);
 
     nTime.actionTime = mTime.minNext;
-    nTime.Tdemin = mTime.minso;
-    nTime.Te = mTime.minDe;
+    nTime.Tdemin = mTime.minTdemin;
+    nTime.Te = mTime.minTe;
+    nTime.Tso = mTime.minTso;
     nTime.dest_id = iFed;
 
     if (mTime.tState == DependencyInfo::time_state_t::time_granted)

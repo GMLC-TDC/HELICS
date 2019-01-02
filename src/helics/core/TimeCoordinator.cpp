@@ -188,7 +188,7 @@ void TimeCoordinator::updateNextPossibleEventTime ()
     }
     else
     {
-        if (time_minSo < Time::maxVal ())
+        if ((time_minSo < Time::maxVal ()) && (time_minSo >= timeZero))
         {
             if (time_minSo + info.inputDelay > time_next)
             {
@@ -353,7 +353,7 @@ bool TimeCoordinator::updateTimeFactors ()
         {
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
-            Tso = -1;
+            Tso = -1.0;
         }
 
         if (dep.Tso >= dep.Tnext)
@@ -374,10 +374,6 @@ bool TimeCoordinator::updateTimeFactors ()
         {
             minDe = dep.Te;
         }
-        if (dep.Te < minSo)
-        {
-            minSo = dep.Te;
-        }
     }
 
     bool update = false;
@@ -386,8 +382,6 @@ bool TimeCoordinator::updateTimeFactors ()
     Time prev_next = time_next;
     updateNextPossibleEventTime ();
 
-    //	printf("%d UDPATE next=%f, minminDE=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
-    // static_cast<double>(minminDe), static_cast<double>(minDe));
     if (prev_next != time_next)
     {
         update = true;

@@ -544,7 +544,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime ();
         events.clear ();  // clear the event queue
-        LOG_TRACE (timeCoord->printTimeStatus ());
+        LOG_TIMING (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
 
         ActionMessage treq (CMD_TIME_REQUEST);
@@ -564,7 +564,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         }
 
         addAction (treq);
-        LOG_TRACE (timeCoord->printTimeStatus ());
+        LOG_TIMING (timeCoord->printTimeStatus ());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
         if ((realtime) && (rt_lag < Time::maxVal ()))
         {
@@ -1116,6 +1116,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 time_granted = timeCoord->getGrantedTime ();
                 allowed_send_time = timeCoord->allowedSendTime ();
+
                 LOG_TIMING (fmt::format ("Granted Time={}", time_granted));
                 timeGranted_mode = true;
                 return ret;

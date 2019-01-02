@@ -8,7 +8,7 @@
 # Core tests using Boost
 # -----------------------------------------------------------------------------
 
-set(core_test_headers testFixtures.h MessageGenerator.hpp)
+set(core_test_headers testFixtures.h MessageGenerator.hpp MessageDistributor.hpp)
 
 set(
   core_test_sources
@@ -26,6 +26,7 @@ set(
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
   MessageGenerator.cpp
+  MessageDistributor.cpp
 )
 
 if(HELICS_HAVE_ZEROMQ)
