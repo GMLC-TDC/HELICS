@@ -57,7 +57,7 @@ struct input_info
 class ValueFederateManager
 {
   public:
-    ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id);
+    ValueFederateManager (Core *coreOb, ValueFederate *vfed, local_federate_id id);
     ~ValueFederateManager ();
 
     Publication &registerPublication (const std::string &key, const std::string &type, const std::string &units);
@@ -92,17 +92,16 @@ class ValueFederateManager
     */
     void addTarget (const Input &inp, const std::string &target);
 
-	/** remove a destination target from a publication
-	@param id the identifier of the input
-	target the name of the input to remove
-	*/
-	void removeTarget(const Publication &pub, const std::string &target);
-	/** remove a source target from an input/subscription
-	@param id the identifier of the publication
-	target the name of the publication to remove
-	*/
-	void removeTarget(const Input &inp, const std::string &target);
-
+    /** remove a destination target from a publication
+    @param id the identifier of the input
+    target the name of the input to remove
+    */
+    void removeTarget (const Publication &pub, const std::string &target);
+    /** remove a source target from an input/subscription
+    @param id the identifier of the publication
+    target the name of the publication to remove
+    */
+    void removeTarget (const Input &inp, const std::string &target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
@@ -193,7 +192,7 @@ class ValueFederateManager
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     ValueFederate *fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
-    federate_id_t fedID;  //!< the federation ID from the core API
+    local_federate_id fedID;  //!< the federation ID from the core API
     atomic_guarded<std::function<void(Input &, Time)>> allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
       inputData;  //!< the storage for the message queues and other unique Endpoint information

@@ -41,7 +41,10 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual ~CombinationFederate ();
     /** move assignment*/
     CombinationFederate &operator= (CombinationFederate &&fed) noexcept;
-
+    /** delete the copy constructor*/
+    CombinationFederate (const CombinationFederate &fed) = delete;
+    /** copy assignment deleted*/
+    CombinationFederate &operator= (const CombinationFederate &fed) = delete;
     virtual void disconnect () override;
 
   protected:

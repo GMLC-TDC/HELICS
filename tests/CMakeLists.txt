@@ -4,7 +4,7 @@
 # file and DISCLAIMER for more details.
 #
 
-if(BOOST_VERSION_LEVEL GREATER 0)
+if(BOOST_VERSION_LEVEL GREATER 60)
   add_subdirectory(helics)
 else()
   message(

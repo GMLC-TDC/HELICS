@@ -475,7 +475,7 @@ template <>
 inline const std::string &getValueRefImpl (defV &val)
 {
     // don't convert a named point to a string
-    if ((val.index () == namedPointLoc))
+    if ((val.index () == named_point_loc))
     {
         return mpark::get<named_point> (val).name;
     }

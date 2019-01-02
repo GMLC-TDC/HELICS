@@ -14,7 +14,7 @@ triplineType TripWire::getline ()
 }
 
 TripWireDetector::TripWireDetector () : lineDetector (TripWire::getline ()) {}
-bool TripWireDetector::isTripped () const { return lineDetector->load (std::memory_order_acquire); }
+bool TripWireDetector::isTripped () const noexcept { return lineDetector->load (std::memory_order_acquire); }
 
 TripWireTrigger::TripWireTrigger () : lineTrigger (TripWire::getline ()) {}
 

@@ -112,7 +112,7 @@ void Publication::publish (char val)
         break;
     case data_type::helicsString:
     case data_type::helicsNamedPoint:
-        publish (std::string (1,val));
+        publish (std::string (1, val));
         break;
     default:
         publishInt (static_cast<int64_t> (val));
@@ -355,20 +355,20 @@ data_block typeConvert (data_type type, const defV &val)
 {
     switch (val.index ())
     {
-    case doubleLoc:  // double
+    case double_loc:  // double
         return typeConvert (type, mpark::get<double> (val));
-    case intLoc:  // int64_t
+    case int_loc:  // int64_t
         return typeConvert (type, mpark::get<int64_t> (val));
-    case stringLoc:  // string
+    case string_loc:  // string
     default:
         return typeConvert (type, mpark::get<std::string> (val));
-    case complexLoc:  // complex
+    case complex_loc:  // complex
         return typeConvert (type, mpark::get<std::complex<double>> (val));
-    case vectorLoc:  // vector
+    case vector_loc:  // vector
         return typeConvert (type, mpark::get<std::vector<double>> (val));
-    case complexVectorLoc:  // complex
+    case complex_vector_loc:  // complex
         return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
-    case namedPointLoc:
+    case named_point_loc:
         return typeConvert (type, mpark::get<named_point> (val));
     }
 }

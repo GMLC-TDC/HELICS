@@ -88,7 +88,7 @@ class CoreBroker : public Broker, public BrokerBase
     UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
     std::vector<std::pair<std::string, global_federate_id>>
       delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::unordered_map<global_federate_id, federate_id_t>
+    std::unordered_map<global_federate_id, local_federate_id>
       global_id_translation;  //!< map to translate global ids to local ones
     std::unordered_map<global_federate_id, route_id>
       routing_table;  //!< map for external routes  <global federate id, route id>
@@ -260,9 +260,9 @@ class CoreBroker : public Broker, public BrokerBase
 
     void FindandNotifyFilterTargets (BasicHandleInfo &handleInfo);
     void FindandNotifyEndpointTargets (BasicHandleInfo &handleInfo);
-	/** process a disconnect message*/
-	void processDisconnect(ActionMessage &command);
-	/** disconnect a broker/core*/
+    /** process a disconnect message*/
+    void processDisconnect (ActionMessage &command);
+    /** disconnect a broker/core*/
     void disconnectBroker (BasicBrokerInfo &brk);
     /** run a check for a named interface*/
     void checkForNamedInterface (ActionMessage &command);

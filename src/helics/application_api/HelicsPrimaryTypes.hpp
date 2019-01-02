@@ -32,13 +32,13 @@ using defV = mpark::variant<double,
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location
 {
-    doubleLoc = 0,
-    intLoc = 1,
-    stringLoc = 2,
-    complexLoc = 3,
-    vectorLoc = 4,
-    complexVectorLoc = 5,
-    namedPointLoc = 6
+    double_loc = 0,
+    int_loc = 1,
+    string_loc = 2,
+    complex_loc = 3,
+    vector_loc = 4,
+    complex_vector_loc = 5,
+    named_point_loc = 6
 };
 /** detect a change from the previous values*/
 bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
@@ -121,13 +121,13 @@ valueExtract (const defV &dv, X &val)
 {
     switch (dv.index ())
     {
-    case doubleLoc:  // double
+    case double_loc:  // double
         val = static_cast<X> (mpark::get<double> (dv));
         break;
-    case intLoc:  // int64_t
+    case int_loc:  // int64_t
         val = static_cast<X> (mpark::get<int64_t> (dv));
         break;
-    case stringLoc:  // string
+    case string_loc:  // string
     default:
         if
             IF_CONSTEXPR (std::is_integral<X>::value)
@@ -140,22 +140,22 @@ valueExtract (const defV &dv, X &val)
         }
 
         break;
-    case complexLoc:  // complex
+    case complex_loc:  // complex
         val = static_cast<X> (std::abs (mpark::get<std::complex<double>> (dv)));
         break;
-    case vectorLoc:  // vector
+    case vector_loc:  // vector
     {
         auto &vec = mpark::get<std::vector<double>> (dv);
         val = static_cast<X> (vectorNorm (vec));
         break;
     }
-    case complexVectorLoc:  // complex vector
+    case complex_vector_loc:  // complex vector
     {
         auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
         val = static_cast<X> (vectorNorm (vec));
         break;
     }
-    case namedPointLoc:
+    case named_point_loc:
     {
         auto &np = mpark::get<named_point> (dv);
         if (std::isnan (np.value))

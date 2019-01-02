@@ -111,15 +111,7 @@ set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
 
 # Minimum version of Boost required for building test suite
-if (Boost_VERSION LESS 106100)
-  set(BOOST_VERSION_LEVEL 0)
-elseif (Boost_VERSION GREATER 106599)
-	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
-	set(BOOST_VERSION_LEVEL 2)
-else()
-	set(BOOST_VERSION_LEVEL 1)
-endif()
-
+set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")

@@ -26,8 +26,8 @@ class ForwardingTimeCoordinator
 
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
-   global_federate_id lastMinFed;  //!< the latest minimum fed
-    // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a
+    global_federate_id lastMinFed;  //!< the latest minimum fed
+    // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which should also be a
     // ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
@@ -35,8 +35,8 @@ class ForwardingTimeCoordinator
     std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
-    global_federate_id
-      source_id=global_federate_id(0);  //!< the identifier for inserting into the source id field of any generated messages;
+    global_federate_id source_id = global_federate_id (
+      0);  //!< the identifier for inserting into the source id field of any generated messages;
     bool checkingExec = false;  //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode = false;  //!< flag that the coordinator has entered the execution Mode
     bool iterating = false;  //!< flag indicating that the min dependency is iterating
@@ -45,9 +45,9 @@ class ForwardingTimeCoordinator
     ForwardingTimeCoordinator () = default;
 
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
+    void setMessageSender (std::function<void(const ActionMessage &)> userSendMessageFunction)
     {
-        sendMessageFunction = std::move (sendMessageFunction_);
+        sendMessageFunction = std::move (userSendMessageFunction);
     }
 
     /** get a list of actual dependencies*/
@@ -98,7 +98,7 @@ class ForwardingTimeCoordinator
     @param fedID the identifier of the federate to remove*/
     void removeDependent (global_federate_id fedID);
 
-	 /** disconnect*/
+    /** disconnect*/
     void disconnect ();
     /** check if entry to the executing state can be granted*/
     message_processing_result checkExecEntry ();

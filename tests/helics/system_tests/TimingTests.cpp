@@ -53,7 +53,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
-
+    vFed1->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
+    vFed2->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
     vFed1->setProperty (helics_property_time_period, 0.5);
     vFed2->setProperty (helics_property_time_period, 0.5);
 
@@ -86,7 +87,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
 
     vFed1->setProperty (helics_property_time_period, 0.6);
     vFed2->setProperty (helics_property_time_period, 0.45);
-
+    vFed1->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
+    vFed2->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
     auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
     vFed2->registerGlobalEndpoint ("e2");
     vFed1->enterExecutingModeAsync ();

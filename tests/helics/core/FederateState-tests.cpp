@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE (constructor_test)
     // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
     // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
     BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
-    BOOST_CHECK (fs->local_id == helics::federate_id_t{});
+    BOOST_CHECK (fs->local_id == helics::local_federate_id{});
     BOOST_CHECK (fs->global_id.load () == helics::global_federate_id{});
     BOOST_CHECK_EQUAL (fs->init_requested, false);
 
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE (message_test)
 // Test core object usage (if any) - create a dummy core for test purposes
 
 /*
-Core::federate_id_t fedID;
+Core::local_federate_id fedID;
 bool grant=false;
 bool converged=false;
 bool exec_requested = false;
@@ -290,7 +290,7 @@ Time Te=timeZero;		//!< execution time computation
 Time Tdemin=timeZero;	//!< min dependency event time
 
 DependencyInfo() = default;
-DependencyInfo(Core::federate_id_t id) :fedID(id) {};
+DependencyInfo(Core::local_federate_id id) :fedID(id) {};
 */
 
 /*
@@ -302,8 +302,8 @@ DependencyInfo(Core::federate_id_t id) :fedID(id) {};
     std::pair<interface_handle, helics_message*> receiveForFilter();
     bool processQueue();
     void generateKnownDependencies();
-    void addDependency(Core::federate_id_t);
-    void addDependent(Core::federate_id_t);
+    void addDependency(Core::local_federate_id);
+    void addDependent(Core::local_federate_id);
 
     void setCoreObject(CommonCore *parent);
 

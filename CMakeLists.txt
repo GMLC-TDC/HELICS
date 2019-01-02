@@ -322,7 +322,7 @@ endif()
 # -------------------------------------------------------------
 if(MSYS)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if(BOOST_VERSION_LEVEL GREATER 1)
+    if(BOOST_VERSION_LEVEL GREATER 65)
 		set(DISABLE_TCP_CORE FALSE)
 		target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 			set(DISABLE_IPC_CORE TRUE)
@@ -517,6 +517,7 @@ hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)
 hide_variable(FMT_TEST)
+hide_variable(FMT_WERROR)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

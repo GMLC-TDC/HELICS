@@ -86,8 +86,8 @@ class integer_time
     static_assert (N < 8 * sizeof (base), "N must be less than 16");
     static_assert (std::is_signed<base>::value, "base type must be signed");  // to allow negative numbers for time
   private:
-    static constexpr base scalar = (1 << N);
-    static constexpr base fracMask = ((1 << N) - 1);
+    static constexpr base scalar = (1u << N);
+    static constexpr base fracMask = ((1u << N) - 1);
     static constexpr double multiplier = pow2 (N);
     static constexpr double divisor = 1.0 / pow2 (N);
 

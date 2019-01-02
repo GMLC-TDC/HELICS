@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 #include <set>
 
-#if (BOOST_VERSION_LEVEL >= 2)
+#if (BOOST_VERSION_LEVEL >= 66)
 namespace boost
 {
 namespace asio

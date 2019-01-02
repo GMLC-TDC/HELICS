@@ -21,7 +21,7 @@ namespace libguarded
 {
 template <class T, class M>
 class shared_guarded;
-}
+}  // namespace libguarded
 
 /**
  * HELICS Application API
@@ -58,9 +58,9 @@ class Federate
 
   protected:
     std::atomic<modes> currentMode{modes::startup};  //!< the current state of the simulation
-    char separator_ = '/';  //!< the separator between automatically prependend names
+    char nameSegmentSeparator = '/';  //!< the separator between automatically prependend names
   private:
-    federate_id_t fedID;  //!< the federate ID of the object for use in the core
+    local_federate_id fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime;  //!< the current simulation time
@@ -155,7 +155,7 @@ class Federate
     thread safe and should be called before any local interfaces are created otherwise it may not be possible to
     retrieve them without using the full name.  recommended possibilities are ('.','/', ':','-','_')
      */
-    void setSeparator (char separator) { separator_ = separator; }
+    void setSeparator (char separator) { nameSegmentSeparator = separator; }
     /** request a time advancement
     @param[in] the next requested time step
     @return the granted time step*/

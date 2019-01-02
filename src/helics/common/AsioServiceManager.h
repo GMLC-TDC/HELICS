@@ -44,7 +44,8 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
-    AsioServiceManager (const std::string &serviceName);
+    /** constructor*/
+    explicit AsioServiceManager (const std::string &serviceName);
 
     /** servicing helper class to manage lifetimes of a service loop*/
     class Servicer

@@ -14,27 +14,27 @@ namespace helics
 {
 using identififier_base_type = int32_t;
 
-/** class defining a federate_id_t
+/** class defining a local_federate_id
 @details  the intent of this class is to limit the operations available on a federate identifier
 to those that are a actually required and make sense, and make it as low impact as possible.
-it also acts to limit any mistakes of a federate_id_t
+it also acts to limit any mistakes of a local_federate_id
 */
-class federate_id_t
+class local_federate_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
-    constexpr federate_id_t () = default;
+    constexpr local_federate_id () = default;
 
-    constexpr explicit federate_id_t (base_type val) noexcept : _id (val){};
+    constexpr explicit local_federate_id (base_type val) noexcept : _id (val){};
 
     constexpr base_type baseValue () const { return _id; }
     /** equality operator*/
-    bool operator== (federate_id_t id) const noexcept { return (_id == id._id); };
+    bool operator== (local_federate_id id) const noexcept { return (_id == id._id); };
     /** inequality operator*/
-    bool operator!= (federate_id_t id) const noexcept { return (_id != id._id); };
+    bool operator!= (local_federate_id id) const noexcept { return (_id != id._id); };
     /** less than operator for sorting*/
-    bool operator< (federate_id_t id) const noexcept { return (_id < id._id); };
+    bool operator< (local_federate_id id) const noexcept { return (_id < id._id); };
     bool isValid () const { return (_id != -2'000'000'000); }
 
   private:
@@ -43,12 +43,12 @@ class federate_id_t
 
 /** stream operator for a federate_id
  */
-std::ostream &operator<< (std::ostream &os, federate_id_t fid);
+std::ostream &operator<< (std::ostream &os, local_federate_id fid);
 
-/** class defining a federate_id_t
+/** class defining a local_federate_id
 @details  the intent of this class is to limit the operations available on a federate identifier
 to those that are a actually required and make sense, and make it as low impact as possible.
-it also acts to limit any mistakes of a federate_id_t
+it also acts to limit any mistakes of a local_federate_id
 */
 class interface_handle
 {
@@ -91,7 +91,7 @@ constexpr identififier_base_type global_federate_id_shift = 0x0002'0000;
 constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
-constexpr federate_id_t local_core_id (-259);
+constexpr local_federate_id local_core_id (-259);
 
 class global_broker_id
 {
@@ -233,13 +233,13 @@ std::ostream &operator<< (std::ostream &os, route_id id);
 namespace std
 {
 template <>
-struct hash<helics::federate_id_t>
+struct hash<helics::local_federate_id>
 {
-    using argument_type = helics::federate_id_t;
-    using result_type = hash<helics::federate_id_t::base_type>::result_type;
+    using argument_type = helics::local_federate_id;
+    using result_type = hash<helics::local_federate_id::base_type>::result_type;
     result_type operator() (argument_type const &key) const noexcept
     {
-        return std::hash<helics::federate_id_t::base_type>{}(key.baseValue ());
+        return std::hash<helics::local_federate_id::base_type>{}(key.baseValue ());
     }
 };
 
@@ -307,7 +307,7 @@ struct is_easily_hashable<helics::global_federate_id>
 };
 
 template <>
-struct is_easily_hashable<helics::federate_id_t>
+struct is_easily_hashable<helics::local_federate_id>
 {
     static constexpr bool value = true;
 };

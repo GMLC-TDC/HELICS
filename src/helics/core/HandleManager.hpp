@@ -88,7 +88,7 @@ class HandleManager
     BasicHandleInfo *getPublication (interface_handle index);
     BasicHandleInfo *getInput (const std::string &name);
     const BasicHandleInfo *getInput (const std::string &name) const;
-    federate_id_t getLocalFedID (interface_handle id_) const;
+    local_federate_id getLocalFedID (interface_handle id_) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }
     const BasicHandleInfo &operator[] (size_t index) const { return handles[index]; }

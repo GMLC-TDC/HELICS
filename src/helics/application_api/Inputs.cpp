@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
-#include "../core/core-exceptions.hpp"
 #include "Inputs.hpp"
+#include "../core/core-exceptions.hpp"
 
 namespace helics
 {
@@ -60,45 +60,45 @@ void Input::handleCallback (Time time)
     }
     switch (value_callback.index ())
     {
-    case doubleLoc:
+    case double_loc:
     {
         auto val = getValue<double> ();
         mpark::get<std::function<void(const double &, Time)>> (value_callback) (val, time);
     }
     break;
-    case intLoc:
+    case int_loc:
     {
         auto val = getValue<int64_t> ();
         mpark::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
     }
     break;
-    case stringLoc:
+    case string_loc:
     default:
     {
         auto val = getValue<std::string> ();
         mpark::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
     }
     break;
-    case complexLoc:
+    case complex_loc:
     {
         auto val = getValue<std::complex<double>> ();
         mpark::get<std::function<void(const std::complex<double> &, Time)>> (value_callback) (val, time);
     }
     break;
-    case vectorLoc:
+    case vector_loc:
     {
         auto val = getValue<std::vector<double>> ();
         mpark::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
     break;
-    case complexVectorLoc:
+    case complex_vector_loc:
     {
         auto val = getValue<std::vector<std::complex<double>>> ();
         mpark::get<std::function<void(const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
                                                                                                            time);
     }
     break;
-    case namedPointLoc:
+    case named_point_loc:
     {
         auto val = getValue<named_point> ();
         mpark::get<std::function<void(const named_point &, Time)>> (value_callback) (val, time);
@@ -177,7 +177,7 @@ size_t Input::getStringSize ()
     isUpdated ();
     if (hasUpdate && !changeDetectionEnabled)
     {
-        if (lastValue.index () == namedPointLoc)
+        if (lastValue.index () == named_point_loc)
         {
             auto &np = getValueRef<named_point> ();
             if (np.name.empty ())
@@ -198,11 +198,11 @@ size_t Input::getStringSize ()
         }
     }
 
-    if (lastValue.index () == stringLoc)
+    if (lastValue.index () == string_loc)
     {
         return mpark::get<std::string> (lastValue).size ();
     }
-    else if (lastValue.index () == namedPointLoc)
+    else if (lastValue.index () == named_point_loc)
     {
         const auto &np = mpark::get<named_point> (lastValue);
 
@@ -231,14 +231,14 @@ size_t Input::getVectorSize ()
     }
     switch (lastValue.index ())
     {
-    case doubleLoc:
-    case intLoc:
+    case double_loc:
+    case int_loc:
         return 1;
-    case complexLoc:
+    case complex_loc:
         return 2;
-    case vectorLoc:
+    case vector_loc:
         return mpark::get<std::vector<double>> (lastValue).size ();
-    case complexVectorLoc:
+    case complex_vector_loc:
         return mpark::get<std::vector<std::complex<double>>> (lastValue).size () * 2;
     default:
         break;

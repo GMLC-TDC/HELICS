@@ -114,6 +114,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
 
+    helicsFederateSetFlagOption (vFed1, helics_handle_option_connection_optional, helics_true, &err);
     auto subid = helicsFederateRegisterSubscription (vFed1, "sub1", "V", &err);
     auto subid2 = helicsFederateRegisterSubscription (vFed1, "sub2", "", &err);
 
@@ -154,7 +155,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
     auto vFed1 = GetFederateAt (0);
-
+    helicsFederateSetFlagOption (vFed1, helics_handle_option_connection_optional, helics_true, &err);
     // register the publications
     auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", helics_data_type_string, "", &err);
     auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", helics_data_type_int, "volts", &err);
@@ -746,6 +747,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration, bdat
     SetupTest (helicsCreateValueFederate, core_type, 1, 1.0);
     auto vFed = GetFederateAt (0);
 
+    helicsFederateSetFlagOption (vFed, helics_handle_option_connection_optional, true, &err);
     // register the publications
     pubid = helicsFederateRegisterTypePublication (vFed, "pub1", "", "", &err);
     pubid2 = helicsFederateRegisterGlobalTypePublication (vFed, "pub2", "int", "", &err);
@@ -843,7 +845,7 @@ BOOST_DATA_TEST_CASE (test_info_field, bdata::make (core_types_simple), core_typ
 {
     SetupTest (helicsCreateValueFederate, core_type, 1, 1.0);
     auto vFed = GetFederateAt (0);
-
+    helicsFederateSetFlagOption (vFed, helics_handle_option_connection_optional, true, &err);
     // register the publications/subscriptions
 
     auto subid1 = helicsFederateRegisterSubscription (vFed, "sub1", "", &err);
