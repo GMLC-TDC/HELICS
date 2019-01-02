@@ -141,8 +141,11 @@ BOOST_AUTO_TEST_CASE (sine_source_test)
     auto index = src1.addSignalGenerator ("sine", "sine");
     auto gen = src1.getGenerator (index);
     BOOST_CHECK (gen);
-    gen->set ("freq", 0.5);
-    gen->set ("amplitude", 1.0);
+    if (gen)
+    {
+        gen->set("freq", 0.5);
+        gen->set("amplitude", 1.0);
+    }
     src1.addPublication ("pub1", helics::data_type::helicsDouble, 0.5);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);

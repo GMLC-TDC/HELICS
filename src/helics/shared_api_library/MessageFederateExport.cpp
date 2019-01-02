@@ -287,6 +287,7 @@ void helicsEndpointSendMessage (helics_endpoint endpoint, helics_message *messag
             err->error_code = helics_error_invalid_argument;
             err->message = emptyMessageErrorString;
         }
+        return;
     }
 
     try
@@ -388,6 +389,8 @@ static helics_message emptyMessage ()
     empty.original_source = nullptr;
     empty.original_dest = nullptr;
     empty.source = nullptr;
+    empty.messageID = 0;
+    empty.flags = 0;
     return empty;
 }
 

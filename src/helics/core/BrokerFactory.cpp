@@ -322,7 +322,7 @@ bool registerBroker (const std::shared_ptr<Broker> &broker)
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
     }
     cleanUpBrokers ();
-    if (!registered)
+    if ((!registered)&&(tbroker))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
