@@ -47,6 +47,7 @@ jobs:
   allow_failures:
     - os: osx
     - name: "Clang 4 Thread Sanitizer"
+    - stage: trigger dependent repositories
 
   include:
     # XCode 6.4, OS X 10.10
