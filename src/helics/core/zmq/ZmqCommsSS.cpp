@@ -131,6 +131,7 @@ int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::strin
             disconnecting = true;
             setRxStatus (connection_status::terminated);
             status = -1;
+            break;
         case DISCONNECT_ERROR:
             disconnecting = true;
             setRxStatus (connection_status::error);
@@ -171,14 +172,11 @@ int ZmqCommsSS::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock
         sock.send (str.data (), str.size ());
         return 0;
     }
-    else
-    {
-        ActionCallback (std::move (M));
-        ActionMessage resp (CMD_PRIORITY_ACK);
-        auto str = resp.to_string ();
-        sock.send (str.data (), str.size ());
-        return 0;
-    }
+    ActionCallback (std::move (M));
+    ActionMessage resp (CMD_PRIORITY_ACK);
+    auto str = resp.to_string ();
+    sock.send (str.data (), str.size ());
+    return 0;
 }
 
 void ZmqCommsSS::queue_rx_function ()
@@ -282,7 +280,7 @@ bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
 void ZmqCommsSS::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ctx = zmqContextManager::getContextPointer ();
+    auto ctx = ZmqContextManager::getContextPointer ();
     zmq::message_t msg;
 
     if (!brokerTargetAddress.empty ())
@@ -312,9 +310,13 @@ void ZmqCommsSS::queue_tx_function ()
     }
     // Root broker is set
     if (!serverMode)
+    {
         brokerSocket.close ();
+    }
     if (!hasBroker)
+    {
         brokerConnection.close ();
+    }
     setTxStatus (connection_status::connected);
 
     std::vector<zmq::pollitem_t> poller (2);
@@ -367,7 +369,7 @@ void ZmqCommsSS::queue_tx_function ()
         {
             bool processed = false;
             cmd = std::move (tx_msg->second);
-            rid = std::move (tx_msg->first);
+            rid = tx_msg->first;
             if (isProtocolCommand (cmd))
             {
                 if (rid == control_route)
@@ -389,7 +391,7 @@ void ZmqCommsSS::queue_tx_function ()
                 {
                     if (hasBroker)
                     {
-                        std::string empty = "";
+                        std::string empty;
                         brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
                     }
                     else
@@ -412,7 +414,7 @@ void ZmqCommsSS::queue_tx_function ()
                     if (rt_find != routes.end ())
                     {
                         std::string route_name = rt_find->second;
-                        std::string empty = "";
+                        std::string empty;
                         // Need to first send identity and empty string
                         brokerSocket.send (route_name.c_str (), route_name.size (), ZMQ_SNDMORE);
                         brokerSocket.send (empty.c_str (), empty.size (), ZMQ_SNDMORE);
