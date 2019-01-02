@@ -170,6 +170,10 @@ bool InterfaceInfo::setEndpointProperty (interface_handle /*id*/, int /*option*/
 bool InterfaceInfo::getInputProperty (interface_handle id, int option) const
 {
     auto ipt = getInput (id);
+    if (ipt == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::ignore_interrupts:
@@ -202,6 +206,10 @@ bool InterfaceInfo::getInputProperty (interface_handle id, int option) const
 bool InterfaceInfo::getPublicationProperty (interface_handle id, int option) const
 {
     auto pub = getPublication (id);
+    if (pub == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::handle_only_transmit_on_change:

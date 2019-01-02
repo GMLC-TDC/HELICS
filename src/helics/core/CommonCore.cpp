@@ -481,7 +481,11 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
               RegistrationFailure ("duplicate names " + name + "detected multiple federates with the same name"));
         }
     }
-
+    if (fed == nullptr)
+    {
+        throw (
+            RegistrationFailure("unknown allocation error occurred"));
+    }
     // setting up the Logger
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control the level*/
@@ -1556,71 +1560,74 @@ void CommonCore::deliverMessage (ActionMessage &message)
         if (checkActionFlag (*localP, has_dest_filter_flag))
         {
             auto ffunc = getFilterCoordinator (localP->getInterfaceHandle ());
-            if (ffunc->destFilter != nullptr)
+            if (ffunc != nullptr)
             {
-                if (!checkActionFlag (*(ffunc->destFilter), disconnected_flag))
+                if (ffunc->destFilter != nullptr)
                 {
-                    if (ffunc->destFilter->core_id != global_broker_id_local)
-                    {  // now we have deal with non-local processing destination filter
-                        // first block the federate time advancement until the return is received
-                        auto fed_id = localP->getFederateId ();
-                        ActionMessage tblock (CMD_TIME_BLOCK, global_broker_id_local, fed_id);
-                        auto mid = ++messageCounter;
-                        tblock.messageID = mid;
-                        auto fed = getFederateCore (fed_id);
-                        fed->addAction (tblock);
-                        // now send a message to get filtered
-                        message.setAction (CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
-                        message.messageID = mid;
-                        message.source_id = fed_id;
-                        message.source_handle = localP->getInterfaceHandle ();
-                        message.dest_id = ffunc->destFilter->core_id;
-                        message.dest_handle = ffunc->destFilter->handle;
-                        ongoingDestFilterProcesses[fed_id.baseValue ()].emplace (mid);
-                        routeMessage (std::move (message));
-                        return;
-                    }
-                    // the filter is part of this core
-                    auto tempMessage = createMessageFromCommand (std::move (message));
-                    if (ffunc->destFilter->filterOp)
+                    if (!checkActionFlag(*(ffunc->destFilter), disconnected_flag))
                     {
-                        auto nmessage = ffunc->destFilter->filterOp->process (std::move (tempMessage));
-                        message.moveInfo (std::move (nmessage));
-                    }
-                    else
-                    {
-                        message.moveInfo (std::move (tempMessage));
-                    }
-                }
-            }
-            // now go to the cloning filters
-            for (auto clFilter : ffunc->cloningDestFilters)
-            {
-                if (checkActionFlag (*clFilter, disconnected_flag))
-                {
-                    continue;
-                }
-                if (clFilter->core_id == global_broker_id_local)
-                {
-                    auto FiltI = filters.find (global_handle (global_broker_id_local, clFilter->handle));
-                    if (FiltI != nullptr)
-                    {
-                        if (FiltI->filterOp != nullptr)
+                        if (ffunc->destFilter->core_id != global_broker_id_local)
+                        {  // now we have deal with non-local processing destination filter
+                            // first block the federate time advancement until the return is received
+                            auto fed_id = localP->getFederateId();
+                            ActionMessage tblock(CMD_TIME_BLOCK, global_broker_id_local, fed_id);
+                            auto mid = ++messageCounter;
+                            tblock.messageID = mid;
+                            auto fed = getFederateCore(fed_id);
+                            fed->addAction(tblock);
+                            // now send a message to get filtered
+                            message.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
+                            message.messageID = mid;
+                            message.source_id = fed_id;
+                            message.source_handle = localP->getInterfaceHandle();
+                            message.dest_id = ffunc->destFilter->core_id;
+                            message.dest_handle = ffunc->destFilter->handle;
+                            ongoingDestFilterProcesses[fed_id.baseValue()].emplace(mid);
+                            routeMessage(std::move(message));
+                            return;
+                        }
+                        // the filter is part of this core
+                        auto tempMessage = createMessageFromCommand(std::move(message));
+                        if (ffunc->destFilter->filterOp)
                         {
-                            if (FiltI->cloning)
-                            {
-                                FiltI->filterOp->process (createMessageFromCommand (message));
-                            }
+                            auto nmessage = ffunc->destFilter->filterOp->process(std::move(tempMessage));
+                            message.moveInfo(std::move(nmessage));
+                        }
+                        else
+                        {
+                            message.moveInfo(std::move(tempMessage));
                         }
                     }
                 }
-                else
+                // now go to the cloning filters
+                for (auto clFilter : ffunc->cloningDestFilters)
                 {
-                    ActionMessage clone (message);
-                    clone.setAction (CMD_SEND_FOR_FILTER);
-                    clone.dest_id = clFilter->core_id;
-                    clone.dest_handle = clFilter->handle;
-                    routeMessage (clone);
+                    if (checkActionFlag(*clFilter, disconnected_flag))
+                    {
+                        continue;
+                    }
+                    if (clFilter->core_id == global_broker_id_local)
+                    {
+                        auto FiltI = filters.find(global_handle(global_broker_id_local, clFilter->handle));
+                        if (FiltI != nullptr)
+                        {
+                            if (FiltI->filterOp != nullptr)
+                            {
+                                if (FiltI->cloning)
+                                {
+                                    FiltI->filterOp->process(createMessageFromCommand(message));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ActionMessage clone(message);
+                        clone.setAction(CMD_SEND_FOR_FILTER);
+                        clone.dest_id = clFilter->core_id;
+                        clone.dest_handle = clFilter->handle;
+                        routeMessage(clone);
+                    }
                 }
             }
         }
@@ -1633,7 +1640,10 @@ void CommonCore::deliverMessage (ActionMessage &message)
         timeCoord->processTimeMessage (message);
 
         auto fed = getFederateCore (localP->getFederateId ());
-        fed->addAction (std::move (message));
+        if (fed != nullptr)
+        {
+            fed->addAction(std::move(message));
+        }
     }
     break;
     case CMD_SEND_FOR_FILTER:
@@ -2813,10 +2823,14 @@ void CommonCore::registerInterface (ActionMessage &command)
             if (timeCoord->addDependency (command.source_id))
             {
                 auto fed = getFederateCore (command.source_id);
-                ActionMessage add (CMD_ADD_INTERDEPENDENCY, global_broker_id_local, command.source_id);
+                if (fed != nullptr)
+                {
+                    ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, command.source_id);
 
-                fed->addAction (add);
-                timeCoord->addDependent (fed->global_id);
+                    fed->addAction(add);
+                    timeCoord->addDependent(fed->global_id);
+                }
+                
             }
 
             if (!hasTimeDependency)
@@ -3109,25 +3123,28 @@ void CommonCore::disconnectInterface (ActionMessage &command)
     {
         // DO something with filters
         auto *filt = filters.find (command.getSource ());
-        ActionMessage rem (CMD_REMOVE_FILTER);
-        rem.setSource (handleInfo->handle);
-        for (auto &target : filt->sourceTargets)
+        if (filt != nullptr)
         {
-            rem.setDestination (target);
-            routeMessage (rem);
-        }
-        for (auto &target : filt->destTargets)
-        {
-            if (std::find (filt->sourceTargets.begin (), filt->sourceTargets.end (), target) !=
-                filt->sourceTargets.end ())
+            ActionMessage rem(CMD_REMOVE_FILTER);
+            rem.setSource(handleInfo->handle);
+            for (auto &target : filt->sourceTargets)
             {
-                rem.setDestination (target);
-                routeMessage (rem);
+                rem.setDestination(target);
+                routeMessage(rem);
             }
+            for (auto &target : filt->destTargets)
+            {
+                if (std::find(filt->sourceTargets.begin(), filt->sourceTargets.end(), target) !=
+                    filt->sourceTargets.end())
+                {
+                    rem.setDestination(target);
+                    routeMessage(rem);
+                }
+            }
+            filt->sourceTargets.clear();
+            filt->destTargets.clear();
+            setActionFlag(*filt, disconnected_flag);
         }
-        filt->sourceTargets.clear ();
-        filt->destTargets.clear ();
-        setActionFlag (*filt, disconnected_flag);
     }
     else
     {

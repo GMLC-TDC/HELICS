@@ -352,7 +352,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                            int index1,
                            const std::string &units = std::string ())
     {
-        return addTarget (id, target + '_' + std::to_string (index1), units);
+        addTarget (id, target + '_' + std::to_string (index1), units);
     }
 
     /** register an optional subscription for a 2-D array of values
@@ -369,7 +369,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                            int index2,
                            const std::string &units = std::string ())
     {
-        return addTarget (id, target + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
+        addTarget (id, target + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
     }
 
     /** check if a given subscription has an update
