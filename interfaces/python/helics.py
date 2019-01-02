@@ -1507,6 +1507,10 @@ def helicsInputGetType(ipt: 'helics_input') -> "char const *":
     return _helics.helicsInputGetType(ipt)
 helicsInputGetType = _helics.helicsInputGetType
 
+def helicsInputGetPublicationType(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetPublicationType(ipt)
+helicsInputGetPublicationType = _helics.helicsInputGetPublicationType
+
 def helicsPublicationGetType(pub: 'helics_publication') -> "char const *":
     """
 
@@ -1518,12 +1522,12 @@ def helicsInputGetKey(ipt: 'helics_input') -> "char const *":
     return _helics.helicsInputGetKey(ipt)
 helicsInputGetKey = _helics.helicsInputGetKey
 
-def helicsSubscriptionGetKey(sub: 'helics_input') -> "char const *":
+def helicsSubscriptionGetKey(ipt: 'helics_input') -> "char const *":
     """
 
 
     """
-    return _helics.helicsSubscriptionGetKey(sub)
+    return _helics.helicsSubscriptionGetKey(ipt)
 
 def helicsPublicationGetKey(pub: 'helics_publication') -> "char const *":
     """
@@ -1619,6 +1623,10 @@ def helicsEndpointSetDefaultDestination(endpoint: 'helics_endpoint', dest: 'char
 
     """
     return _helics.helicsEndpointSetDefaultDestination(endpoint, dest)
+
+def helicsEndpointGetDefaultDestination(endpoint: 'helics_endpoint') -> "char const *":
+    return _helics.helicsEndpointGetDefaultDestination(endpoint)
+helicsEndpointGetDefaultDestination = _helics.helicsEndpointGetDefaultDestination
 
 def helicsEndpointSendMessageRaw(endpoint: 'helics_endpoint', dest: 'char const *', data: 'void const *') -> "int":
     """

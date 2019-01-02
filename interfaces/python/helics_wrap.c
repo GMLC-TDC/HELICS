@@ -11401,6 +11401,26 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsInputGetPublicationType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsInputGetPublicationType",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetPublicationType" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetPublicationType(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsPublicationGetType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -12191,6 +12211,26 @@ fail:
       return NULL;
     }
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointGetDefaultDestination(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointGetDefaultDestination",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetDefaultDestination" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (char *)helicsEndpointGetDefaultDestination(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -14623,6 +14663,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsInputSetDefaultVector", _wrap_helicsInputSetDefaultVector, METH_VARARGS, NULL},
 	 { (char *)"helicsInputSetDefaultNamedPoint", _wrap_helicsInputSetDefaultNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetType", _wrap_helicsInputGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsInputGetPublicationType", _wrap_helicsInputGetPublicationType, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationGetType", _wrap_helicsPublicationGetType, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -14667,6 +14708,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsEndpointGetDefaultDestination", _wrap_helicsEndpointGetDefaultDestination, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointSendMessageRaw", _wrap_helicsEndpointSendMessageRaw, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"

@@ -6087,6 +6087,20 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsInputGetType(JNI
 }
 
 
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsInputGetPublicationType(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  helics_input arg1 = (helics_input) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_input *)&jarg1; 
+  result = (char *)helicsInputGetPublicationType(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
 SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsPublicationGetType(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -6573,6 +6587,20 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsEndpointSetDefaultD
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsEndpointGetDefaultDestination(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jstring jresult = 0 ;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_endpoint *)&jarg1; 
+  result = (char *)helicsEndpointGetDefaultDestination(arg1);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
 }
 
 

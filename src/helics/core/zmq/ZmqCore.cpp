@@ -23,11 +23,14 @@ ZmqCore::ZmqCore (const std::string &core_name) : NetworkCore (core_name)
 
 bool ZmqCore::brokerConnect ()
 {
-    zmqContextManager::startContext ();
+    ZmqContextManager::startContext ();
     return NetworkCore::brokerConnect ();
 }
 
-ZmqCoreSS::ZmqCoreSS () noexcept { netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated; }
+ZmqCoreSS::ZmqCoreSS () noexcept
+{
+    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+}
 
 ZmqCoreSS::ZmqCoreSS (const std::string &core_name) : NetworkCore (core_name)
 {
@@ -36,7 +39,7 @@ ZmqCoreSS::ZmqCoreSS (const std::string &core_name) : NetworkCore (core_name)
 
 bool ZmqCoreSS::brokerConnect ()
 {
-    zmqContextManager::startContext ();
+    ZmqContextManager::startContext ();
     return NetworkCore::brokerConnect ();
 }
 

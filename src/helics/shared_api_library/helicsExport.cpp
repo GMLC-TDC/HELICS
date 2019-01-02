@@ -931,7 +931,7 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (std::chrono::milliseconds(msToWait));
+    brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
     if (brk->isConnected ())
     {
         return helics_false;
@@ -1032,9 +1032,9 @@ void helicsCloseLibrary ()
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
 #if HELICS_HAVE_ZEROMQ > 0
-    if (zmqContextManager::setContextToLeakOnDelete ())
+    if (ZmqContextManager::setContextToLeakOnDelete ())
     {
-        zmqContextManager::getContext ().close ();
+        ZmqContextManager::getContext ().close ();
     }
 #endif
     helics::LoggerManager::closeLogger ();
@@ -1215,7 +1215,7 @@ void helicsCleanupLibrary ()
     helics::cleanupHelicsLibrary ();
     //  helics::LoggerManager::closeLogger();
 
-    //  zmqContextManager::closeContext();
+    //  ZmqContextManager::closeContext();
 }
 
 MasterObjectHolder::MasterObjectHolder () noexcept {}
@@ -1223,9 +1223,9 @@ MasterObjectHolder::MasterObjectHolder () noexcept {}
 MasterObjectHolder::~MasterObjectHolder ()
 {
 #if HELICS_HAVE_ZEROMQ > 0
-    if (zmqContextManager::setContextToLeakOnDelete ())
+    if (ZmqContextManager::setContextToLeakOnDelete ())
     {
-        zmqContextManager::getContext ().close ();
+        ZmqContextManager::getContext ().close ();
     }
 #endif
     helics::LoggingCore::setFastShutdown ();

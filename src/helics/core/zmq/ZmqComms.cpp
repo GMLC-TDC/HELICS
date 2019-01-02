@@ -153,7 +153,7 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
-    auto ctx = zmqContextManager::getContextPointer ();
+    auto ctx = ZmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
@@ -309,7 +309,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (hasBroker)
     {
-        auto ctx = zmqContextManager::getContextPointer ();
+        auto ctx = ZmqContextManager::getContextPointer ();
         if (brokerPort < 0)
         {
             brokerPort = DEFAULT_BROKER_PORT_NUMBER;
@@ -418,7 +418,7 @@ void ZmqComms::queue_tx_function ()
     {
         hasBroker = true;
     }
-    auto ctx = zmqContextManager::getContextPointer ();
+    auto ctx = ZmqContextManager::getContextPointer ();
     // Setup the control socket for comms with the receiver
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
     controlSocket.setsockopt (ZMQ_LINGER, 200);
@@ -594,7 +594,7 @@ void ZmqComms::closeReceiver ()
         if (!disconnecting)
         {
             // try connecting with the receivers push socket
-            auto ctx = zmqContextManager::getContextPointer ();
+            auto ctx = ZmqContextManager::getContextPointer ();
             zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
             pushSocket.setsockopt (ZMQ_LINGER, 200);
             if (localTargetAddress == "tcp://*")
