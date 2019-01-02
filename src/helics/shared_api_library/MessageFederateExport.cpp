@@ -182,11 +182,29 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     CHECK_NULL_STRING (dest, void());
     try
     {
-        endObj->endPtr->setTargetDestination (dest);
+        endObj->endPtr->setDefaultDestination (dest);
     }
     catch (...)
     {
         helicsErrorHandler (err);
+    }
+}
+
+const char *helicsEndpointGetDefaultDestination (helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint (endpoint, nullptr);
+    if (endObj == nullptr)
+    {
+        return nullcstr;
+    }
+    try
+    {
+        auto &str = endObj->endPtr->getDefaultDestination ();
+        return str.c_str ();
+    }
+    catch (...)
+    {
+        return nullcstr;
     }
 }
 
@@ -507,71 +525,71 @@ int helicsFederateGetEndpointCount (helics_federate fed)
     return static_cast<int> (mfedObj->getEndpointCount ());
 }
 
-const char *helicsEndpointGetInfo(helics_endpoint end)
+const char *helicsEndpointGetInfo (helics_endpoint end)
 {
-    auto endObj = verifyEndpoint(end, nullptr);
+    auto endObj = verifyEndpoint (end, nullptr);
     if (endObj == nullptr)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
     try
     {
-        const std::string &info = endObj->endPtr->getInfo();
-        return info.c_str();
+        const std::string &info = endObj->endPtr->getInfo ();
+        return info.c_str ();
     }
     catch (...)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
 }
 
-void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err)
+void helicsEndpointSetInfo (helics_endpoint end, const char *info, helics_error *err)
 {
-    auto endObj = verifyEndpoint(end, err);
+    auto endObj = verifyEndpoint (end, err);
     if (endObj == nullptr)
     {
         return;
     }
     try
     {
-        endObj->endPtr->setInfo(AS_STRING(info));
+        endObj->endPtr->setInfo (AS_STRING (info));
     }
     catch (...)
     {
-        helicsErrorHandler(err);
+        helicsErrorHandler (err);
     }
 }
 
-helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
+helics_bool helicsEndpointGetOption (helics_endpoint end, int option)
 {
-	auto endObj = verifyEndpoint(end, nullptr);
-	if (endObj == nullptr)
-	{
-		return helics_false;
-	}
-	try
-	{
-		return (endObj->endPtr->getOption(option)) ? helics_true : helics_false;
-	}
-	catch (...)
-	{
-		return helics_false;
-	}
+    auto endObj = verifyEndpoint (end, nullptr);
+    if (endObj == nullptr)
+    {
+        return helics_false;
+    }
+    try
+    {
+        return (endObj->endPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return helics_false;
+    }
 }
 
 void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err)
 {
-	auto endObj = verifyEndpoint(end, err);
-	if (endObj == nullptr)
-	{
-		return;
-	}
-	try
-	{
-		endObj->endPtr->setOption(option, (value == helics_true));
-	}
-	catch (...)
-	{
-		helicsErrorHandler(err);
-	}
+    auto endObj = verifyEndpoint (end, err);
+    if (endObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        endObj->endPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
 }

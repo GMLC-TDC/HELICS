@@ -152,7 +152,7 @@ static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
     replaceIfMember (data, "destination", defTarget);
     if (!defTarget.empty ())
     {
-        ept.setTargetDestination (defTarget);
+        ept.setDefaultDestination (defTarget);
     }
 }
 

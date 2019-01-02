@@ -71,6 +71,13 @@ extern "C"
     */
     HELICS_EXPORT void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest, helics_error *err);
 
+	/** get the default destination for an endpoint
+
+	@param endpoint the endpoint to set the destination for
+	@return a string with the default destination
+	*/
+	HELICS_EXPORT const char * helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
+
     /** send a message to the specified destination
     @param endpoint the endpoint to send the data from
     @param dest the target destination (nullptr to use the default destination)
