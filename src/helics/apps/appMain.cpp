@@ -20,7 +20,7 @@ void showHelp ()
 {
     std::cout << "helics_app <appName> <appArguments>...\n";
     std::cout << "available apps: echo, source, player, recorder, broker, tracer\n";
-    std::cout << " helics_app -? or --help shows this help\n";
+    std::cout << " helics_app -?, -h, or --help shows this help\n";
     std::cout << "helics_app <appName> --help for application specific help\n";
     std::cout << "helics_app --version or -v will show the helics version string\n";
 }
@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
         {
             std::cout << "helics_app\n" << helics::versionString << '\n';
         }
-        else if ((arg1 == "--help") || (arg1 == "-?"))
+        else if ((arg1 == "--help") || (arg1 == "-?") || (arg1 == "-h"))
         {
             showHelp ();
         }

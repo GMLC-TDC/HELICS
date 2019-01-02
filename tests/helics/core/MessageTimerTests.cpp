@@ -28,6 +28,12 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label ("ci"))
     localLock.unlock ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     localLock.lock ();
+    if (M.action() != CMD_PROTOCOL)
+    {
+        localLock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        localLock.lock();
+    }
     BOOST_CHECK (M.action () == CMD_PROTOCOL);
 }
 

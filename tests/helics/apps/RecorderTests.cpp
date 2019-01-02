@@ -254,7 +254,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --core=ipc " + exampleFile);
+    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --coretype=ipc " + exampleFile);
 
     helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 

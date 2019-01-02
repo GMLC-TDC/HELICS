@@ -15,7 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 static const helics::ArgDescriptors InfoArgs{
   {"name,n", "name of the broker"},
-  {"type,t", R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp"))lit"}};
+  {"coretype,t", R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp", "tcp_ss", "zmq_ss"))lit"}};
 
 namespace helics
 {
@@ -68,11 +68,11 @@ void BrokerApp::loadFromArguments (int argc, char *argv[])
     }
 
     std::string name = (vm.count ("name") > 0) ? vm["name"].as<std::string> () : "";
-    if (vm.count ("type") > 0)
+    if (vm.count ("coretype") > 0)
     {
         try
         {
-            type = coreTypeFromString (vm["type"].as<std::string> ());
+            type = coreTypeFromString (vm["coretype"].as<std::string> ());
         }
         catch (std::invalid_argument &ie)
         {

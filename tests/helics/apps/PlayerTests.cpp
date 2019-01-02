@@ -293,7 +293,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --core=ipc " + exampleFile);
+    StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --coretype=ipc " + exampleFile);
 
     helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
 
@@ -349,9 +349,9 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
 
     BOOST_REQUIRE (playerExe.isActive ());
     BOOST_REQUIRE (brokerExe.isActive ());
-    auto res = brokerExe.runAsync ("-f 2 --type=zmq --name=zmq_broker");
+    auto res = brokerExe.runAsync ("-f 2 --coretype=zmq --name=zmq_broker");
     std::string exampleFile = std::string (TEST_DIR) + file;
-    auto res2 = playerExe.runCaptureOutputAsync ("--name=player --core=zmq " + exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync ("--name=player --coretype=zmq " + exampleFile);
 
     helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
@@ -645,9 +645,9 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 
     static exeTestRunner brokerExe (HELICS_BIN_LOC "apps/", "helics_broker");
 
-    auto res = brokerExe.runAsync ("1 --type=ipc --name=ipc_broker");
+    auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";
-    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --core=ipc " + exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc " + exampleFile);
 
     auto val = res2.get ();
     auto val2 = res.get ();

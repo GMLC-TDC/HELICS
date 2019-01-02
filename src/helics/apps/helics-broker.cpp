@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     {
         autorestart = true;
     }
-    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "--help"))
+    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") || (firstarg == "--help"))
     {
         std::cout << "helics_broker term <broker args...> will start a broker and open a terminal control window "
                      "for the broker run help in a terminal for more commands\n";

@@ -24,12 +24,10 @@ namespace helics
 {
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
-  {"broker,b"s, "address of the broker to connect"s},
+  {"broker,b"s, "address or name of the broker to connect"s},
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
-  {"core,c"s, "type of the core to connect to"s},
-  {"type,t"s, "type of the core to connect to"s},
-  {"coretype"s, "type of the core to connect to"s},
+  {"coretype,t"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
   {"timedelta"s, "the time delta of the federate"s},
