@@ -344,7 +344,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
                 poller.events = ZMQ_POLLIN;
-                auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
+                auto rc = zmq::poll (&poller, 1, connectionTimeout);
                 if (rc < 0)
                 {
                     logError ("unable to connect with zmq broker (2)");

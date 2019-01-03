@@ -358,7 +358,7 @@ void ZmqCommsSS::queue_tx_function ()
 
         // Handle Tx messages first
         auto tx_msg = txQueue.try_pop ();
-        rc = zmq::poll (poller, std::chrono::milliseconds (10));
+        rc = zmq::poll (poller, 0l);
         if (!tx_msg || (rc <= 0))
         {
             std::this_thread::yield ();
@@ -449,7 +449,7 @@ void ZmqCommsSS::queue_tx_function ()
         rc = 1;
         while ((rc > 0) && (count < 5))
         {
-            rc = zmq::poll (poller, std::chrono::milliseconds (10));
+            rc = zmq::poll (poller, 0l);
 
             if (rc > 0)
             {
