@@ -344,17 +344,30 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
                 poller.events = ZMQ_POLLIN;
-                auto rc = zmq::poll (&poller, 1, connectionTimeout);
-                if (rc < 0)
+                int rc = 0;
+                int cnt2 = 0;
+                while (rc == 0)
                 {
-                    logError ("unable to connect with zmq broker (2)");
-                    setTxStatus (connection_status::error);
+                    rc = zmq::poll (&poller, 1, connectionTimeout);
+                    if (rc < 0)
+                    {
+                        logError ("unable to connect with zmq broker (2)");
+                        setTxStatus (connection_status::error);
+                        break;
+                    }
+                    else if (rc == 0)
+                    {
+                        logWarning ("zmq broker connection timed out, trying again (2)");
+                    }
+                    ++cnt2;
+                    if (cnt2 > 5)
+                    {
+                        logError ("zmq broker connection timed out after trying 5 times (2)");
+                        setTxStatus (connection_status::error);
+                        break;
+                    }
                 }
-                else if (rc == 0)
-                {
-                    logError ("zmq broker connection timed out (2)");
-                    setTxStatus (connection_status::error);
-                }
+
                 if (getTxStatus () == connection_status::error)
                 {
                     ActionMessage M (CMD_PROTOCOL);
