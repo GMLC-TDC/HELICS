@@ -21,8 +21,9 @@ namespace helics
 static const ArgDescriptors extraArgs{
   {"interface"s, "the local interface to use for the receive ports"s},
   {"local_interface"s, "the local interface to use for the receive ports"s},
-  {"broker"s, "identifier for the broker"s},
-  {"broker_address,b"s, "location of the broker i.e network address"s},
+  {"broker,b"s,
+   "identifier for the broker, this is either the name or network address use --broker_address or --brokername to explicitly set the network address or name the search for the broker is first by name"s},
+  {"broker_address"s, "location of the broker i.e network address"s},
   {"brokername"s, "the name of the broker"s},
   {"brokerinit"s, "the initialization string for the broker"s},
   {"max_size"s, ArgDescriptor::arg_type_t::int_type, "maximum message buffer size (16*1024)"s},
