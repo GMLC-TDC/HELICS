@@ -96,7 +96,7 @@ We are always looking for help adding support for more tools, so please contact 
 
 #### Communication Tools
 
-* [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS fork of ns-3](https://github.com/GMLC-TDC/ns-3-dev-git)
+* [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS ns-3 module](https://github.com/GMLC-TDC/helics-ns3)
 * HELICS also includes built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
 
 #### HELICS helper Apps
