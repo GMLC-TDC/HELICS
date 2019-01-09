@@ -92,12 +92,18 @@ BOOST_AUTO_TEST_CASE (remove_tests)
     BOOST_CHECK_EQUAL (Mvec.size (), 3);
     BOOST_CHECK (Mvec.find ("s2") == nullptr);
     BOOST_CHECK (Mvec.find (63) == nullptr);
+    BOOST_REQUIRE(Mvec[1] != nullptr);
     BOOST_CHECK_EQUAL (*Mvec[1], 9.7);
-    BOOST_CHECK_EQUAL (*Mvec.find ("s4"), 11.4);
+    auto s4 = Mvec.find("s4");
+    BOOST_REQUIRE(s4 != nullptr);
+    BOOST_CHECK_EQUAL (*s4, 11.4);
 
     Mvec.remove ("s1");
     BOOST_CHECK_EQUAL (Mvec.size (), 2);
-    BOOST_CHECK_EQUAL (*Mvec.find ("s4"), 11.4);
+    s4 = Mvec.find("s4");
+    BOOST_REQUIRE(s4 != nullptr);
+    BOOST_CHECK_EQUAL (*s4, 11.4);
+    BOOST_REQUIRE(Mvec[0] != nullptr);
     BOOST_CHECK_EQUAL (*Mvec[0], 9.7);
 
     auto MV2 = std::move (Mvec);

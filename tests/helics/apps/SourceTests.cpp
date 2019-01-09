@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE (simple_source_test)
     helics::apps::Source src1 ("player1", fi);
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto gen = src1.getGenerator (index);
-    BOOST_CHECK (gen);
+    BOOST_REQUIRE (gen);
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
     src1.addPublication ("pub1", helics::data_type::helics_double, 1.0);

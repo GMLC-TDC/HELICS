@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_CASE (iterator_tests)
     BOOST_CHECK_EQUAL (Mvec.size (), 4);
 
     Mvec.transform ([](double val) { return val + 1; });
-
     BOOST_CHECK_EQUAL (Mvec[0], 3.2 + 1.0);
     BOOST_CHECK_EQUAL (Mvec[1], 4.3 + 1.0);
     BOOST_CHECK_EQUAL (Mvec[2], 9.7 + 1.0);

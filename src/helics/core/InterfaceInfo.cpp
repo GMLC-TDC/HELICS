@@ -100,6 +100,10 @@ EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle) { return endp
 bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool value)
 {
     auto ipt = getInput (id);
+    if (ipt == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::ignore_interrupts:
@@ -133,6 +137,10 @@ bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool valu
 bool InterfaceInfo::setPublicationProperty (interface_handle id, int option, bool value)
 {
     auto pub = getPublication (id);
+    if (pub == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::handle_only_transmit_on_change:
