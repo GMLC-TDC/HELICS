@@ -184,25 +184,19 @@ size_t Input::getStringSize ()
             {
                 return 30;  //"#invalid" string +20
             }
-            else
-            {
-                //+20 is just in case the converted string is actually being requested in which case the +20 is for
-                // the string representation of a double
-                return np.name.size () + 20;
-            }
+            //+20 is just in case the converted string is actually being requested in which case the +20 is for
+            // the string representation of a double
+            return np.name.size () + 20;
         }
-        else
-        {
-            auto &out = getValueRef<std::string> ();
-            return out.size ();
-        }
+        auto &out = getValueRef<std::string> ();
+        return out.size ();
     }
 
     if (lastValue.index () == string_loc)
     {
         return mpark::get<std::string> (lastValue).size ();
     }
-    else if (lastValue.index () == named_point_loc)
+    if (lastValue.index () == named_point_loc)
     {
         const auto &np = mpark::get<NamedPoint> (lastValue);
 
@@ -210,12 +204,9 @@ size_t Input::getStringSize ()
         {
             return 30;  //"~length of #invalid" string +20
         }
-        else
-        {
-            //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
-            // for the string representation of a double
-            return np.name.size () + 20;
-        }
+        //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
+        // for the string representation of a double
+        return np.name.size () + 20;
     }
     auto &out = getValueRef<std::string> ();
     return out.size ();

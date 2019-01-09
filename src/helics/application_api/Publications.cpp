@@ -14,7 +14,7 @@ Publication::Publication (ValueFederate *valueFed,
                           const std::string &key,
                           const std::string &type,
                           const std::string &units)
-    : fed (valueFed), handle (id), key_ (key), units_ (units)
+    : fed (valueFed), handle (id), pubKey (key), pubUnits (units)
 {
     pubType = getTypeFromString (type);
 }
@@ -334,7 +334,7 @@ void Publication::publish (const char *name, double val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        NamedPoint np (name, val);
+        NamedPoint np{name, val};
         if (changeDetected (prevValue, np, delta))
         {
             prevValue = std::move (np);

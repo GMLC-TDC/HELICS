@@ -100,7 +100,7 @@ int FilterFederateManager::getFilterCount () const { return static_cast<int> (fi
 
 void FilterFederateManager::closeAllFilters ()
 {
-    if (coreObject)
+    if (coreObject != nullptr)
     {
         auto filts = filters.lock ();
         for (auto &filt : filts)

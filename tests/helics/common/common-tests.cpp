@@ -18,7 +18,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.BrokerFact
 
 struct globalTestConfig
 {
-    globalTestConfig () {}
+    globalTestConfig () = default;
     ~globalTestConfig ()
     {
         helics::CoreFactory::cleanUpCores ();

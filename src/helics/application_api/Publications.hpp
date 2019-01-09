@@ -27,8 +27,8 @@ class Publication
   private:
     size_t customTypeHash = 0;  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
-    std::string key_;  //!< the name of the publication
-    std::string units_;  //!< the defined units of the publication
+    std::string pubKey;  //!< the name of the publication
+    std::string pubUnits;  //!< the defined units of the publication
   public:
     Publication () = default;
     /** constructor for a publication used by the valueFederateManager
@@ -174,11 +174,11 @@ class Publication
     /** get the key for the publication*/
     const std::string &getKey () const { return fed->getInterfaceName (*this); }
     /** get the key for the publication*/
-    const std::string &getName () const { return key_; }
+    const std::string &getName () const { return pubKey; }
     /** get the type for the publication*/
     const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units of the publication*/
-    const std::string &getUnits () const { return units_; }
+    const std::string &getUnits () const { return pubUnits; }
     /** get the interface information field of the publication*/
     const std::string &getInfo () const { return fed->getInfo (handle); }
     /** set the interface information field of the publication*/
@@ -213,7 +213,7 @@ class Publication
     void publish (char val);
     void publish (const NamedPoint &np);
     void publish (const std::string &name, double val);
-    void publish (const char *str, double val);
+    void publish (const char *name, double val);
     /** secondary publish function to allow unit conversion before publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication

@@ -92,7 +92,8 @@ constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr local_federate_id local_core_id (-259);
-
+/** class holding a globally unique identifier for brokers
+@details the class is fully compatible with global_federate_id*/
 class global_broker_id
 {
   public:
@@ -126,7 +127,7 @@ constexpr global_broker_id parent_broker_id (0);
 /** stream operator for a federate_id
  */
 std::ostream &operator<< (std::ostream &os, global_broker_id id);
-
+/** class holder a globally unique identifier for federates*/
 class global_federate_id
 {
   public:
@@ -136,9 +137,9 @@ class global_federate_id
 
     constexpr explicit global_federate_id (base_type val) noexcept : gid (val){};
     /** implicit conversion from global_id*/
-    constexpr global_federate_id (global_broker_id id) noexcept : gid (id.gid){};
+    constexpr global_federate_id (global_broker_id id) noexcept : gid (id.gid){};  // NOLINT
 
-    constexpr operator global_broker_id () const noexcept { return global_broker_id (gid); };
+    constexpr operator global_broker_id () const noexcept { return global_broker_id (gid); };  // NOLINT
     /** conversion to the base_type*/
     constexpr base_type baseValue () const { return gid; };
     /** equality operator*/

@@ -571,7 +571,6 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
         data.resize (0);
         data.push_back (V);
     }
-    return;
 }
 
 data_block emptyBlock (data_type outputType, data_type inputType = data_type::helics_any)
@@ -651,7 +650,7 @@ data_block typeConvert (data_type type, int64_t val)
     case data_type::helics_string:
         return std::to_string (val);
     case data_type::helics_named_point:
-        if (std::abs (val) > (2ll << 51))
+        if (std::abs (val) > (2ull << 51u))  // this checks whether the actual value will fit in a double
         {
             return ValueConverter<NamedPoint>::convert (NamedPoint{std::to_string (val), std::nan ("0")});
         }
@@ -839,7 +838,7 @@ data_block typeConvert (data_type type, const std::vector<std::complex<double>> 
     case data_type::helics_double:
         return ValueConverter<double>::convert (std::abs (val[0]));
     case data_type::helics_int:
-        return ValueConverter<int64_t>::convert (std::abs (val[0]));
+        return ValueConverter<int64_t>::convert (std::abs (val[0]));  // NOLINT
     case data_type::helics_complex:
         return ValueConverter<std::complex<double>>::convert (val[0]);
     case data_type::helics_bool:

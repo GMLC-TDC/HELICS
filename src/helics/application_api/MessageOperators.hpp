@@ -78,7 +78,7 @@ class MessageConditionalOperator : public FilterOperator
     /** set the function to modify the data of the message in the constructor*/
     explicit MessageConditionalOperator (std::function<bool(const Message *)> userConditionalFunction);
     /** set the function to modify the data of the message*/
-    void setConditionFunction (std::function<bool(const Message *)> userConditionalFunction);
+    void setConditionFunction (std::function<bool(const Message *)> userConditionFunction);
 
   private:
     std::function<bool(const Message *)> evalFunction;  //!< the function actually doing the processing
@@ -111,13 +111,15 @@ false if it should be dropped
 class FirewallOperator : public FilterOperator
 {
   public:
-    enum class operations
+    /** enumeration of the possible operations of the firewall*/
+    enum class operations : int
     {
+        none = -1,
         drop = 0,
         pass = 1,
-        setFlag1 = 2,
-        setFlag2 = 3,
-        setFlag3 = 4
+        set_flag1 = 2,
+        set_flag2 = 3,
+        set_flag3 = 4
     };
     /** default constructor*/
     FirewallOperator () = default;
@@ -130,7 +132,7 @@ class FirewallOperator : public FilterOperator
 
   private:
     std::function<bool(const Message *)> checkFunction;  //!< the function actually doing the processing
-    std::atomic<operations> operation;
+    std::atomic<operations> operation{operations::drop};  //!< the operation to perform if the firewall triggers
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 

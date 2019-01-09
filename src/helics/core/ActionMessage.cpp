@@ -452,7 +452,7 @@ int ActionMessage::depacketize (const char *data, int buffer_size)
     message_size += static_cast<unsigned char> (data[2]);
     message_size <<= 8u;
     message_size += static_cast<unsigned char> (data[3]);
-    if (buffer_size < message_size + 2)
+    if (buffer_size < static_cast<int> (message_size + 2))
     {
         return 0;
     }

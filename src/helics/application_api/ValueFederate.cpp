@@ -96,10 +96,10 @@ ValueFederate::registerGlobalInput (const std::string &key, const std::string &t
     return vfManager->registerInput (key, type, units);
 }
 
-Input &ValueFederate::registerSubscription (const std::string &key, const std::string &units)
+Input &ValueFederate::registerSubscription (const std::string &target, const std::string &units)
 {
-    auto &inp = vfManager->registerInput (std::string (), std::string (), units);
-    vfManager->addTarget (inp, key);
+    auto &inp = vfManager->registerInput (std::string{}, std::string{}, units);
+    vfManager->addTarget (inp, target);
     return inp;
 }
 
@@ -192,9 +192,9 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     addTargets (data, "targets", [&objUpdate](const std::string &target) { objUpdate.addTarget (target); });
 }
 
-void ValueFederate::registerValueInterfacesJson (const std::string &configString)
+void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
 {
-    auto doc = loadJson (configString);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("publications"))
     {
@@ -433,12 +433,12 @@ const Input &ValueFederate::getInput (const std::string &key, int index1, int in
     return vfManager->getInput (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-const Input &ValueFederate::getSubscription (const std::string &key) const
+const Input &ValueFederate::getSubscription (const std::string &target) const
 {
-    return vfManager->getSubscription (key);
+    return vfManager->getSubscription (target);
 }
 
-Input &ValueFederate::getSubscription (const std::string &key) { return vfManager->getSubscription (key); }
+Input &ValueFederate::getSubscription (const std::string &target) { return vfManager->getSubscription (target); }
 
 Publication &ValueFederate::getPublication (const std::string &key)
 {
@@ -476,12 +476,12 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
 
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
-    vfManager->setInputNotificationCallback (callback);
+    vfManager->setInputNotificationCallback (std::move (callback));
 }
 
 void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback)
 {
-    vfManager->setInputNotificationCallback (inp, callback);
+    vfManager->setInputNotificationCallback (inp, std::move (callback));
 }
 
 /** get a count of the number publications registered*/

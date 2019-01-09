@@ -420,26 +420,37 @@ void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOpt
 
 bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
-{
+{  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode)
     {
     case modes::startup:
         break;
     case modes::pending_init:
-        enterInitializingModeComplete ();
-        break;
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        try
+        {
+            asyncInfo->initFuture.get ();
+        }
+        catch (const std::exception &e)
+        {
+            currentMode = modes::error;
+            throw;
+        }
+    }
+    break;
     case modes::initializing:
         break;
     case modes::pending_exec:
-        enterExecutingModeComplete ();
+        asyncCallInfo->lock ()->execFuture.get ();
         break;
     case modes::pending_time:
-        requestTimeComplete ();
+        asyncCallInfo->lock ()->timeRequestFuture.get ();
         break;
     case modes::executing:
         break;
     case modes::pending_iterative_time:
-        requestTimeIterativeComplete ();  // I don't care about the return any more
+        asyncCallInfo->lock ()->timeRequestIterativeFuture.get ();  // I don't care about the return any more
         break;
     case modes::finalize:
     case modes::error:
@@ -593,14 +604,11 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         }
         return iterativeTime;
     }
-    else if (currentMode == modes::finalize)
+    if (currentMode == modes::finalize)
     {
-        return iteration_time (Time::maxVal (), iteration_result::halted);
+        return {Time::maxVal (), iteration_result::halted};
     }
-    else
-    {
-        throw (InvalidFunctionCall ("cannot call request time in present state"));
-    }
+    throw (InvalidFunctionCall ("cannot call request time in present state"));
 }
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
@@ -655,11 +663,8 @@ Time Federate::requestTimeComplete ()
         updateTime (newTime, oldTime);
         return newTime;
     }
-    else
-    {
-        throw (InvalidFunctionCall (
-          "cannot call finalize requestTime without first calling requestTimeIterative function"));
-    }
+    throw (InvalidFunctionCall (
+      "cannot call finalize requestTime without first calling requestTimeIterative function"));
 }
 
 /** finalize the time advancement request
@@ -692,11 +697,8 @@ iteration_time Federate::requestTimeIterativeComplete ()
         }
         return iterativeTime;
     }
-    else
-    {
-        throw (InvalidFunctionCall (
-          "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
-    }
+    throw (InvalidFunctionCall (
+      "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
 }
 
 void Federate::updateTime (Time /*newTime*/, Time /*oldTime*/)
@@ -743,24 +745,15 @@ static Filter &generateFilter (Federate *fed,
             return (global) ? fed->registerGlobalCloningFilter (name, inputType, outputType) :
                               fed->registerCloningFilter (name, inputType, outputType);
         }
-        else
-        {
-            return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
-                              fed->registerFilter (name, inputType, outputType);
-        }
+        return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
+                          fed->registerFilter (name, inputType, outputType);
     }
-    else
+    if (cloning)
     {
-        if (cloning)
-        {
-            return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
-                              make_cloning_filter (operation, fed, name);
-        }
-        else
-        {
-            return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
-        }
+        return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
+                          make_cloning_filter (operation, fed, name);
     }
+    return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
 }
 
 const std::string emptyStr;
@@ -1028,7 +1021,7 @@ const Filter &Federate::getFilter (int index) const { return fManager->getFilter
 
 int Federate::filterCount () const { return fManager->getFilterCount (); }
 
-std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string (); }
+std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string{}; }
 
 std::string Federate::query (const std::string &queryStr)
 {

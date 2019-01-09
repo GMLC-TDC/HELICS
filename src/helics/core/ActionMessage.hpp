@@ -54,7 +54,7 @@ class ActionMessage
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
     */
-    /* implicit */ ActionMessage (action_message_def::action_t startingAction);
+    /* implicit */ ActionMessage (action_message_def::action_t startingAction);  // NOLINT
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction,
