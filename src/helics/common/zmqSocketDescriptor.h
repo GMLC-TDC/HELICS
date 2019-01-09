@@ -15,8 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  * LLNS Copyright End
  */
 
-#ifndef ZMQ_SOCKET_DESCRIPTOR_H_
-#define ZMQ_SOCKET_DESCRIPTOR_H_
+#pragma once
 
 #include "cppzmq/zmq_addon.hpp"
 #include <functional>
@@ -53,5 +52,3 @@ class ZmqSocketDescriptor
     std::unique_ptr<zmq::socket_t> makeSocketPtr (zmq::context_t &ctx) const;
     void modifySocket (zmq::socket_t &sock) const;
 };
-
-#endif

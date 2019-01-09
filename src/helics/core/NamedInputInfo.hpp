@@ -19,7 +19,7 @@ class NamedInputInfo
   public:
     struct dataRecord
     {
-        Time time;
+        Time time = Time::minVal ();
         unsigned int iteration = 0;
         std::shared_ptr<const data_block> data;
         dataRecord () = default;
@@ -34,11 +34,11 @@ class NamedInputInfo
     };
 
     /** constructor with all the information*/
-    NamedInputInfo (global_handle id_,
+    NamedInputInfo (global_handle handle,
                     const std::string &key_,
                     const std::string &type_,
                     const std::string &units_)
-        : id (id_), key (key_), type (type_), units (units_)
+        : id (handle), key (key_), type (type_), units (units_)
     {
     }
 
@@ -69,9 +69,9 @@ class NamedInputInfo
     /** get a the most recent data point*/
     std::shared_ptr<const data_block> getData ();
     /** add a data block into the queue*/
-    void addData (global_handle source_handle,
+    void addData (global_handle source_id,
                   Time valueTime,
-                  unsigned int index,
+                  unsigned int iteration,
                   std::shared_ptr<const data_block> data);
 
     /** update current data not including data at the specified time

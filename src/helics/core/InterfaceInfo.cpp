@@ -51,9 +51,9 @@ const PublicationInfo *InterfaceInfo::getPublication (const std::string &pubName
     return publications.lock_shared ()->find (pubName);
 }
 
-const PublicationInfo *InterfaceInfo::getPublication (interface_handle handle_) const
+const PublicationInfo *InterfaceInfo::getPublication (interface_handle handle) const
 {
-    return publications.lock ()->find (handle_);
+    return publications.lock ()->find (handle);
 }
 
 PublicationInfo *InterfaceInfo::getPublication (const std::string &pubName)
@@ -61,33 +61,33 @@ PublicationInfo *InterfaceInfo::getPublication (const std::string &pubName)
     return publications.lock ()->find (pubName);
 }
 
-PublicationInfo *InterfaceInfo::getPublication (interface_handle handle_)
+PublicationInfo *InterfaceInfo::getPublication (interface_handle handle)
 {
-    return publications.lock ()->find (handle_);
+    return publications.lock ()->find (handle);
 }
 
-const NamedInputInfo *InterfaceInfo::getInput (const std::string &pubName) const
+const NamedInputInfo *InterfaceInfo::getInput (const std::string &inputName) const
 {
-    return inputs.lock_shared ()->find (pubName);
+    return inputs.lock_shared ()->find (inputName);
 }
 
-const NamedInputInfo *InterfaceInfo::getInput (interface_handle handle_) const
+const NamedInputInfo *InterfaceInfo::getInput (interface_handle handle) const
 {
-    return inputs.lock ()->find (handle_);
+    return inputs.lock ()->find (handle);
 }
 
-NamedInputInfo *InterfaceInfo::getInput (const std::string &pubName) { return inputs.lock ()->find (pubName); }
+NamedInputInfo *InterfaceInfo::getInput (const std::string &inputName) { return inputs.lock ()->find (inputName); }
 
-NamedInputInfo *InterfaceInfo::getInput (interface_handle handle_) { return inputs.lock ()->find (handle_); }
+NamedInputInfo *InterfaceInfo::getInput (interface_handle handle) { return inputs.lock ()->find (handle); }
 
 const EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName) const
 {
     return endpoints.lock_shared ()->find (endpointName);
 }
 
-const EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle_) const
+const EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle) const
 {
-    return endpoints.lock_shared ()->find (handle_);
+    return endpoints.lock_shared ()->find (handle);
 }
 
 EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName)
@@ -95,11 +95,15 @@ EndpointInfo *InterfaceInfo::getEndpoint (const std::string &endpointName)
     return endpoints.lock ()->find (endpointName);
 }
 
-EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle_) { return endpoints.lock ()->find (handle_); }
+EndpointInfo *InterfaceInfo::getEndpoint (interface_handle handle) { return endpoints.lock ()->find (handle); }
 
 bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool value)
 {
     auto ipt = getInput (id);
+    if (ipt == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::ignore_interrupts:
@@ -133,6 +137,10 @@ bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool valu
 bool InterfaceInfo::setPublicationProperty (interface_handle id, int option, bool value)
 {
     auto pub = getPublication (id);
+    if (pub == nullptr)
+    {
+        return false;
+    }
     switch (option)
     {
     case defs::options::handle_only_transmit_on_change:

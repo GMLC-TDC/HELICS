@@ -232,11 +232,11 @@ void helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, c
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send ((const char *)data, inputDataLength);
+                endObj->endPtr->send (reinterpret_cast<const char *> (data), inputDataLength);
             }
             else
             {
-                endObj->endPtr->send (dest, (const char *)data, inputDataLength);
+                endObj->endPtr->send (dest, reinterpret_cast<const char *> (data), inputDataLength);
             }
         }
     }
@@ -275,11 +275,11 @@ void helicsEndpointSendEventRaw (helics_endpoint endpoint,
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send ((const char *)data, inputDataLength, time);
+                endObj->endPtr->send (reinterpret_cast<const char *> (data), inputDataLength, time);
             }
             else
             {
-                endObj->endPtr->send (dest, (const char *)data, inputDataLength, time);
+                endObj->endPtr->send (dest, reinterpret_cast<const char *> (data), inputDataLength, time);
             }
         }
     }
@@ -464,7 +464,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
     return emptyMessage ();
 }
 
-bool checkOutArgString (char *outputString, int maxlen, helics_error *err)
+bool checkOutArgString (const char *outputString, int maxlen, helics_error *err)
 {
     static constexpr char invalidOutputString[] = "Output string location is invalid";
     if ((outputString == nullptr) || (maxlen <= 0))

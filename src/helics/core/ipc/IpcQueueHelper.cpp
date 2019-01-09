@@ -7,9 +7,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "IpcQueueHelper.h"
 #include <thread>
 
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
+#include <boost/date_time/microsec_time_clock.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace boostipc = boost::interprocess;
 
@@ -17,7 +17,7 @@ namespace helics
 {
 namespace ipc
 {
-ownedQueue::~ownedQueue ()
+OwnedQueue::~OwnedQueue ()
 {
     if (rqueue)
     {
@@ -29,7 +29,7 @@ ownedQueue::~ownedQueue ()
     }
 }
 
-bool ownedQueue::connect (const std::string &connection, int maxMessages, int maxSize)
+bool OwnedQueue::connect (const std::string &connection, int maxMessages, int maxSize)
 {
     // remove the old queue if are connecting again
     if (rqueue)
@@ -57,12 +57,12 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
         errorString = std::string ("Unable to open local state shared memory:") + ipe.what ();
         return false;
     }
-    queue_state->truncate (sizeof (shared_queue_state) + 256);
+    queue_state->truncate (sizeof (SharedQueueState) + 256);
     // Map the whole shared memory in this process
     boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
-    // auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
-    auto *sstate = new (region.get_address ()) shared_queue_state;
+    // auto *sstate = reinterpret_cast<SharedQueueState *> (region.get_address ());
+    auto *sstate = new (region.get_address ()) SharedQueueState;
     sstate->setState (queue_state_t::startup);
 
     try
@@ -82,18 +82,18 @@ bool ownedQueue::connect (const std::string &connection, int maxMessages, int ma
     return true;
 }
 
-void ownedQueue::changeState (queue_state_t newState)
+void OwnedQueue::changeState (queue_state_t newState)
 {
     if (connected)
     {
         boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
-        auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
+        auto *sstate = reinterpret_cast<SharedQueueState *> (region.get_address ());
         sstate->setState (newState);
     }
 }
 
-ActionMessage ownedQueue::getMessage ()
+ActionMessage OwnedQueue::getMessage ()
 {
     if (!connected)
     {
@@ -118,7 +118,7 @@ ActionMessage ownedQueue::getMessage ()
     }
 }
 
-stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
+stx::optional<ActionMessage> OwnedQueue::getMessage (int timeout)
 {
     if (!connected)
     {
@@ -162,7 +162,7 @@ stx::optional<ActionMessage> ownedQueue::getMessage (int timeout)
     }
 }
 
-bool sendToQueue::connect (const std::string &connection, bool initOnly, int retries)
+bool SendToQueue::connect (const std::string &connection, bool initOnly, int retries)
 {
     connectionNameOrig = connection;
     connectionName = stringTranslateToCppName (connection);
@@ -177,7 +177,7 @@ bool sendToQueue::connect (const std::string &connection, bool initOnly, int ret
               std::make_unique<ipc_state> (boostipc::open_only, stateName.c_str (), boostipc::read_write);
             boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
-            auto *sstate = reinterpret_cast<shared_queue_state *> (region.get_address ());
+            auto *sstate = reinterpret_cast<SharedQueueState *> (region.get_address ());
 
             switch (sstate->getState ())
             {
@@ -252,7 +252,7 @@ bool sendToQueue::connect (const std::string &connection, bool initOnly, int ret
     return connected;
 }
 
-void sendToQueue::sendMessage (const ActionMessage &cmd, int priority)
+void SendToQueue::sendMessage (const ActionMessage &cmd, int priority)
 {
     if (connected)
     {

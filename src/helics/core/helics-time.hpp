@@ -29,7 +29,7 @@ constexpr Time timeZero = Time::zeroVal ();
 constexpr Time timeEpsilon = Time::epsilon ();
 constexpr Time negEpsilon = -Time::epsilon ();
 
-constexpr Time operator"" _t (long double val) { return Time (val); }
+constexpr Time operator"" _t (long double val) { return Time (val); }  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time

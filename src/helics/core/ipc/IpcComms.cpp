@@ -62,7 +62,7 @@ void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 
 void IpcComms::queue_rx_function ()
 {
-    ownedQueue rxQueue;
+    OwnedQueue rxQueue;
     bool connected = rxQueue.connect (localTargetAddress, maxMessageCount_, maxMessageSize_);
     if (!connected)
     {
@@ -101,6 +101,8 @@ void IpcComms::queue_rx_function ()
                 return;
             }
             ipcbackchannel = 0;
+            break;
+        default:
             break;
         }
         auto cmdopt = rxQueue.getMessage (2000);
@@ -149,9 +151,9 @@ DISCONNECT_RX_QUEUE:
 
 void IpcComms::queue_tx_function ()
 {
-    sendToQueue brokerQueue;  //!< the queue of the broker
-    sendToQueue rxQueue;
-    std::map<route_id, sendToQueue> routes;  //!< table of the routes to other brokers
+    SendToQueue brokerQueue;  //!< the queue of the broker
+    SendToQueue rxQueue;
+    std::map<route_id, SendToQueue> routes;  //!< table of the routes to other brokers
     bool hasBroker = false;
 
     if (!brokerTargetAddress.empty ())
@@ -226,7 +228,7 @@ void IpcComms::queue_tx_function ()
                 {
                 case NEW_ROUTE:
                 {
-                    sendToQueue newQueue;
+                    SendToQueue newQueue;
                     bool newQconnected = newQueue.connect (cmd.payload, false, 3);
                     if (newQconnected)
                     {

@@ -178,6 +178,8 @@ void HandleManager::setHandleOption (interface_handle handle, int option, bool v
                 clearActionFlag (handles[index], optional_flag);
             }
             break;
+        default:
+            break;
         }
     }
 }
@@ -330,11 +332,11 @@ BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
     return nullptr;
 }
 
-local_federate_id HandleManager::getLocalFedID (interface_handle id_) const
+local_federate_id HandleManager::getLocalFedID (interface_handle handle) const
 {
     // only activate the lock if we not in an operating state
-    auto index = id_.baseValue ();
-    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : local_federate_id ();
+    auto index = handle.baseValue ();
+    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : local_federate_id{};
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)

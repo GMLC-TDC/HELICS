@@ -397,10 +397,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name) const;
+    const Input &getInput (const std::string &key) const;
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput (const std::string &name);
+    Input &getInput (const std::string &key);
     /** get the id of a subscription
     @return ivalid_subscription_id if name is not a recognized*/
     const Input &getInput (int index) const;
@@ -409,20 +409,20 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     Input &getInput (int index);
     /** get the id of a subscription from a vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name, int index1) const;
+    const Input &getInput (const std::string &key, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
     @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name, int index1, int index2) const;
+    const Input &getInput (const std::string &key, int index1, int index2) const;
 
     /** get the input id based on target
     @return an input_id_t from the object, or invalid_id if no input was found
     */
-    const Input &getSubscription (const std::string &key) const;
+    const Input &getSubscription (const std::string &target) const;
 
     /** get the input id based on target
     @return an input_id_t from the object, or invalid_id if no input was found
     */
-    Input &getSubscription (const std::string &key);
+    Input &getSubscription (const std::string &target);
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication

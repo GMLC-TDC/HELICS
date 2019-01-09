@@ -312,7 +312,7 @@ void TcpCommsSS::queue_tx_function ()
                         {
                             if (!brokerConnection)
                             {  // check if the connection matches the broker
-                                if ((cmd.payload == brokerName_) ||
+                                if ((cmd.payload == brokerName) ||
                                     (cmd.payload == makePortAddress (brokerTargetAddress, brokerPort)))
                                 {
                                     brokerConnection = std::move (conn);

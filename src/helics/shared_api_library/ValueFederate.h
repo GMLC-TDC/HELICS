@@ -464,7 +464,7 @@ extern "C"
     */
     HELICS_EXPORT void helicsInputSetDefaultVector (helics_input ipt, const double *vectorInput, int vectorlength, helics_error *err);
 
-    /** set the default as a named_point
+    /** set the default as a NamedPoint
     @param ipt the input to set the default for
     @param str a pointer to a string representing the name
     @param val a double value for the value of the named point

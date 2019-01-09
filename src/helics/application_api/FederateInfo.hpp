@@ -28,7 +28,7 @@ class FederateInfo : public CoreFederateInfo
     /** default constructor*/
     FederateInfo () = default;
     /** construct from the name and type*/
-    FederateInfo (core_type cType) : coreType (cType){};
+    explicit FederateInfo (core_type cType) : coreType (cType){};
     /** load a federateInfo object from command line arguments
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments

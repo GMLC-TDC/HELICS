@@ -100,8 +100,8 @@ void Input::handleCallback (Time time)
     break;
     case named_point_loc:
     {
-        auto val = getValue<named_point> ();
-        mpark::get<std::function<void(const named_point &, Time)>> (value_callback) (val, time);
+        auto val = getValue<NamedPoint> ();
+        mpark::get<std::function<void(const NamedPoint &, Time)>> (value_callback) (val, time);
     }
     break;
     case 7:  // bool loc
@@ -130,7 +130,7 @@ bool Input::isUpdated ()
         if (fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
-            if (type == data_type::helicsUnknown)
+            if (type == data_type::helics_unknown)
             {
                 type = getTypeFromString (fed->getInjectionType (*this));
             }
@@ -179,43 +179,34 @@ size_t Input::getStringSize ()
     {
         if (lastValue.index () == named_point_loc)
         {
-            auto &np = getValueRef<named_point> ();
+            auto &np = getValueRef<NamedPoint> ();
             if (np.name.empty ())
             {
                 return 30;  //"#invalid" string +20
             }
-            else
-            {
-                //+20 is just in case the converted string is actually being requested in which case the +20 is for
-                // the string representation of a double
-                return np.name.size () + 20;
-            }
+            //+20 is just in case the converted string is actually being requested in which case the +20 is for
+            // the string representation of a double
+            return np.name.size () + 20;
         }
-        else
-        {
-            auto &out = getValueRef<std::string> ();
-            return out.size ();
-        }
+        auto &out = getValueRef<std::string> ();
+        return out.size ();
     }
 
     if (lastValue.index () == string_loc)
     {
         return mpark::get<std::string> (lastValue).size ();
     }
-    else if (lastValue.index () == named_point_loc)
+    if (lastValue.index () == named_point_loc)
     {
-        const auto &np = mpark::get<named_point> (lastValue);
+        const auto &np = mpark::get<NamedPoint> (lastValue);
 
         if (np.name.empty ())
         {
             return 30;  //"~length of #invalid" string +20
         }
-        else
-        {
-            //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
-            // for the string representation of a double
-            return np.name.size () + 20;
-        }
+        //+20 is just in case the converted string is actually being requested in which case it the 20 accounts
+        // for the string representation of a double
+        return np.name.size () + 20;
     }
     auto &out = getValueRef<std::string> ();
     return out.size ();
@@ -252,13 +243,13 @@ char Input::getValueChar ()
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == data_type::helicsUnknown)
+        if (type == data_type::helics_unknown)
         {
             type = getTypeFromString (fed->getInjectionType (*this));
         }
 
-        if ((type == data_type::helicsString) || (type == data_type::helicsAny) ||
-            (type == data_type::helicsCustom))
+        if ((type == data_type::helics_string) || (type == data_type::helics_any) ||
+            (type == data_type::helics_custom))
         {
             std::string out;
             valueExtract (dv, type, out);

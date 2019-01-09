@@ -2138,8 +2138,11 @@ void CoreBroker::processDisconnect (ActionMessage &command)
                 {
                     if ((!isRootc) && (brokerState < broker_state_t::operating))
                     {
-                        command.setAction ((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
-                        transmit (parent_route_id, command);
+                        if (brk != nullptr)
+                        {
+                            command.setAction((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
+                            transmit(parent_route_id, command);
+                        }
                     }
                 }
             }

@@ -27,6 +27,8 @@ class DualMappedPointerVector
     DualMappedPointerVector () = default;
     DualMappedPointerVector (DualMappedPointerVector &&mp) = default;
     DualMappedPointerVector &operator= (DualMappedPointerVector &&mp) = default;
+    DualMappedPointerVector (const DualMappedPointerVector &mp) = delete;
+    DualMappedPointerVector &operator= (const DualMappedPointerVector &mp) = delete;
     /** insert a new element into the vector directly from an existing unique ptr*/
     stx::optional<size_t>
     insert (const searchType1 &searchValue1, const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)
@@ -34,8 +36,8 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
                 return stx::nullopt;
             }
@@ -53,8 +55,8 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
                 return stx::nullopt;
             }
@@ -104,12 +106,12 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
                 if (fnd2->second == fnd->second)
                 {
-                    dataStorage[fnd->second] = std::move(ptr);
+                    dataStorage[fnd->second] = std::move (ptr);
                     return fnd->second;
                 }
             }
@@ -127,12 +129,12 @@ class DualMappedPointerVector
         auto fnd = lookup1.find (searchValue1);
         if (fnd != lookup1.end ())
         {
-            auto fnd2 = lookup2.find(searchValue2);
-            if (fnd2 != lookup2.end())
+            auto fnd2 = lookup2.find (searchValue2);
+            if (fnd2 != lookup2.end ())
             {
                 if (fnd2->second == fnd->second)
                 {
-                    dataStorage[fnd->second] = std::make_unique<VType>(std::forward<Us>(data)...);
+                    dataStorage[fnd->second] = std::make_unique<VType> (std::forward<Us> (data)...);
                     return fnd->second;
                 }
             }

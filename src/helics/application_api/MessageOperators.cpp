@@ -125,40 +125,40 @@ std::unique_ptr<Message> FirewallOperator::process (std::unique_ptr<Message> mes
 {
     if (checkFunction)
     {
-        bool res=checkFunction (message.get ());
-		switch (operation)
-		{
+        bool res = checkFunction (message.get ());
+        switch (operation)
+        {
         case operations::drop:
-			if (res)
-			{
+            if (res)
+            {
                 message = nullptr;
-			}
+            }
             break;
         case operations::pass:
-			if (!res)
-			{
+            if (!res)
+            {
                 message = nullptr;
-			}
+            }
             break;
-        case operations::setFlag1:
-			if (res)
-			{
+        case operations::set_flag1:
+            if (res)
+            {
                 setActionFlag (*message, extra_flag1);
-			}
+            }
             break;
-        case operations::setFlag2:
+        case operations::set_flag2:
             if (res)
             {
                 setActionFlag (*message, extra_flag2);
             }
             break;
-        case operations::setFlag3:
+        case operations::set_flag3:
             if (res)
             {
                 setActionFlag (*message, extra_flag3);
             }
             break;
-		}
+        }
     }
     return message;
 }

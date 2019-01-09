@@ -20,17 +20,17 @@ class InterfaceInfo
   public:
     InterfaceInfo () = default;
     const PublicationInfo *getPublication (const std::string &pubName) const;
-    const PublicationInfo *getPublication (interface_handle handle_) const;
+    const PublicationInfo *getPublication (interface_handle handle) const;
     PublicationInfo *getPublication (const std::string &pubName);
-    PublicationInfo *getPublication (interface_handle handle_);
-    const NamedInputInfo *getInput (const std::string &ciName) const;
-    const NamedInputInfo *getInput (interface_handle handle_) const;
-    NamedInputInfo *getInput (const std::string &ciName);
-    NamedInputInfo *getInput (interface_handle handle_);
+    PublicationInfo *getPublication (interface_handle handle);
+    const NamedInputInfo *getInput (const std::string &inputName) const;
+    const NamedInputInfo *getInput (interface_handle handle) const;
+    NamedInputInfo *getInput (const std::string &inputName);
+    NamedInputInfo *getInput (interface_handle handle);
     const EndpointInfo *getEndpoint (const std::string &endpointName) const;
-    const EndpointInfo *getEndpoint (interface_handle handle_) const;
+    const EndpointInfo *getEndpoint (interface_handle handle) const;
     EndpointInfo *getEndpoint (const std::string &endpointName);
-    EndpointInfo *getEndpoint (interface_handle handle_);
+    EndpointInfo *getEndpoint (interface_handle handle);
 
     void createPublication (interface_handle handle,
                             const std::string &key,
@@ -40,7 +40,7 @@ class InterfaceInfo
                       const std::string &key,
                       const std::string &type,
                       const std::string &units);
-    void createEndpoint (interface_handle handle, const std::string &key, const std::string &type);
+    void createEndpoint (interface_handle handle, const std::string &endpointName, const std::string &type);
 
     auto getEndpoints () { return endpoints.lock (); }
     auto getPublications () { return publications.lock (); }

@@ -23,6 +23,7 @@ constexpr route_id control_route (-1);
 class CommsInterface
 {
   public:
+    /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation
     {
         single,
@@ -87,8 +88,11 @@ class CommsInterface
     void setServerMode (bool serverActive);
 
   protected:
+    /** generate a log message as a warning*/
     void logWarning (const std::string &message) const;
+    /** generate a log message as an error*/
     void logError (const std::string &message) const;
+    /** generate a log message as a level above warning or error*/
     void logMessage (const std::string &message) const;
 
   protected:
@@ -112,8 +116,8 @@ class CommsInterface
     std::string name;  //!< the name of the object
     std::string localTargetAddress;  //!< the base for the receive address
     std::string brokerTargetAddress;  //!< the base for the broker address
-    std::string brokerName_;  //!< the identifier for the broker
-    std::string brokerInitString_;  //!< the initialization string for any automatically generated broker
+    std::string brokerName;  //!< the identifier for the broker
+    std::string brokerInitString;  //!< the initialization string for any automatically generated broker
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread

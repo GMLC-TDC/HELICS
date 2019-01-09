@@ -56,10 +56,7 @@ Publication &ValueFederateManager::registerPublication (const std::string &key,
     {
         return pubHandle->back ();
     }
-    else
-    {
-        throw (RegistrationFailure ("Unable to register Publication"));
-    }
+    throw (RegistrationFailure ("Unable to register Publication"));
 }
 
 Input &
@@ -87,10 +84,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
         ref.referenceIndex = static_cast<int> (datHandle->size () - 1);
         return ref;
     }
-    else
-    {
-        throw (RegistrationFailure ("Unable to register Input"));
-    }
+    throw (RegistrationFailure ("Unable to register Input"));
 }
 
 void ValueFederateManager::addAlias (const Input &inp, const std::string &shortcutName)
@@ -158,7 +152,7 @@ void ValueFederateManager::setDefaultValue (const Input &inp, const data_view &b
 {
     if (inp.isValid ())
     {
-        input_info *info = reinterpret_cast<input_info *> (inp.dataReference);
+        auto info = reinterpret_cast<input_info *> (inp.dataReference);
 
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
         info->lastData = data_view (std::make_shared<data_block> (block.data (), block.size ()));
@@ -180,7 +174,7 @@ void ValueFederateManager::getUpdateFromCore (interface_handle updatedHandle)
     if (fid != inpHandle->end ())
     {  // assign the data
 
-        input_info *info = reinterpret_cast<input_info *> (fid->dataReference);
+        auto info = reinterpret_cast<input_info *> (fid->dataReference);
         info->lastData = data_view (std::move (data));
         info->lastUpdate = CurrentTime;
     }
@@ -226,7 +220,7 @@ Time ValueFederateManager::getLastUpdateTime (const Input &inp) const
     {
         return iData->lastUpdate;
     }
-    return false;
+    return Time::minVal ();
 }
 
 void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
@@ -293,8 +287,9 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     }
     else if (queryStr == "publications")
     {
-        ret = generateStringVector_if (publications.lock_shared (), [](const auto &info) { return info.key_; },
-                                       [](const auto &info) { return (!info.key_.empty ()); });
+        ret =
+          generateStringVector_if (publications.lock_shared (), [](const auto &info) { return info.getName (); },
+                                   [](const auto &info) { return (!info.getName ().empty ()); });
     }
     else if (queryStr == "subscriptions")
     {

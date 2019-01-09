@@ -313,12 +313,9 @@ Filter &make_filter (filter_types type, Federate *mFed, const std::string &name)
         dfilt.setString ("delivery", name);
         return dfilt;
     }
-    else
-    {
-        auto &dfilt = mFed->registerFilter (name);
-        addOperations (&dfilt, type, nullptr);
-        return dfilt;
-    }
+    auto &dfilt = mFed->registerFilter (name);
+    addOperations (&dfilt, type, nullptr);
+    return dfilt;
 }
 
 Filter &make_filter (interface_visibility locality, filter_types type, Federate *mFed, const std::string &name)
@@ -332,13 +329,10 @@ Filter &make_filter (interface_visibility locality, filter_types type, Federate 
         dfilt.setString ("delivery", name);
         return dfilt;
     }
-    else
-    {
-        auto &dfilt = (locality == interface_visibility::global) ? mFed->registerGlobalFilter (name) :
-                                                                   mFed->registerFilter (name);
-        addOperations (&dfilt, type, nullptr);
-        return dfilt;
-    }
+    auto &dfilt =
+      (locality == interface_visibility::global) ? mFed->registerGlobalFilter (name) : mFed->registerFilter (name);
+    addOperations (&dfilt, type, nullptr);
+    return dfilt;
 }
 
 std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::string &name)
@@ -351,12 +345,9 @@ std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::str
         dfilt->setString ("delivery", name);
         return dfilt;
     }
-    else
-    {
-        auto dfilt = std::make_unique<Filter> (cr, name);
-        addOperations (dfilt.get (), type, cr);
-        return dfilt;
-    }
+    auto dfilt = std::make_unique<Filter> (cr, name);
+    addOperations (dfilt.get (), type, cr);
+    return dfilt;
 }
 
 CloningFilter &

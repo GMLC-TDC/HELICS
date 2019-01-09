@@ -329,9 +329,9 @@ size_t TcpConnection::send (const std::string &dataString)
     return sz;
 }
 
-size_t TcpConnection::receive (void *buffer, size_t maxDataLength)
+size_t TcpConnection::receive (void *buffer, size_t maxDataSize)
 {
-    return socket_.receive (boost::asio::buffer (buffer, maxDataLength));
+    return socket_.receive (boost::asio::buffer (buffer, maxDataSize));
 }
 
 bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
@@ -679,19 +679,19 @@ bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       const std::string &address,
                                       int PortNum,
-                                      bool port_reuse,
+                                      bool reuse_port,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, PortNum, port_reuse, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, PortNum, reuse_port, nominalBufferSize));
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       const std::string &address,
                                       const std::string &port,
-                                      bool port_reuse,
+                                      bool reuse_port,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, port, port_reuse, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, port, reuse_port, nominalBufferSize));
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)

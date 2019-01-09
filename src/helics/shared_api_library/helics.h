@@ -220,7 +220,7 @@ extern "C"
     @param fi the federate info object that contains details on the federate
     @return an opaque value federate object
     */
-    HELICS_EXPORT helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info fi, helics_error *err);
+    HELICS_EXPORT helics_federate helicsCreateValueFederate (const char *fedName, helics_federate_info fi, helics_error *err);
 
     /** create a value federate from a JSON file, JSON string, or TOML file
     @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
@@ -235,7 +235,7 @@ extern "C"
     @param fi the federate info object that contains details on the federate
     @return an opaque message federate object
     */
-    HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, const helics_federate_info fi, helics_error *err);
+    HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, helics_federate_info fi, helics_error *err);
 
     /** create a message federate from a JSON file or JSON string or TOML file
     @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
@@ -251,7 +251,7 @@ extern "C"
     @param fi the federate info object that contains details on the federate
     @return an opaque value federate object nullptr if the object creation failed
     */
-    HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const char *fedName, const helics_federate_info fi, helics_error *err);
+    HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const char *fedName, helics_federate_info fi, helics_error *err);
 
     /** create a combination federate from a JSON file or JSON string
     @details combination federates are both value federates and message federates, objects can be used in all functions that take a

@@ -18,8 +18,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/argParser.h"
 #include "../common/stringOps.h"
 
-namespace filesystem = boost::filesystem;
-
 namespace helics
 {
 using namespace std::string_literals;

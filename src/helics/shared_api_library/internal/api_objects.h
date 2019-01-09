@@ -38,7 +38,8 @@ enum class vtype : int
     generic_fed,
     value_fed,
     message_fed,
-    combination_fed
+    combination_fed,
+    invalid_fed
 };
 
 /** object wrapping a broker for the c-api*/
@@ -46,8 +47,8 @@ class BrokerObject
 {
   public:
     std::shared_ptr<Broker> brokerptr;
-    int index;
-    int valid;
+    int index = -2;
+    int valid = 0;
 };
 
 /** get the brokerObject from a helics_broker and verify it is valid*/
@@ -58,8 +59,8 @@ class CoreObject
   public:
     std::shared_ptr<Core> coreptr;
     std::vector<std::unique_ptr<FilterObject>> filters;  //!< list of filters created directly through the core
-    int index;
-    int valid;
+    int index = 0;
+    int valid = -2;
     CoreObject () = default;
     ~CoreObject ();
 };
@@ -75,9 +76,9 @@ class EndpointObject;
 class FedObject
 {
   public:
-    vtype type;
-    int valid = 0;
+    vtype type = vtype::invalid_fed;
     int index = -2;
+    int valid = 0;
     std::shared_ptr<Federate> fedptr;
     std::unique_ptr<Message> lastMessage;
     std::vector<std::unique_ptr<InputObject>> inputs;
@@ -97,7 +98,7 @@ class InputObject
   public:
     int valid = 0;
     std::shared_ptr<ValueFederate> fedptr;
-    Input *inputPtr;
+    Input *inputPtr = nullptr;
 };
 
 /** object wrapping a publication*/
@@ -106,13 +107,13 @@ class PublicationObject
   public:
     int valid = 0;
     std::shared_ptr<ValueFederate> fedptr;
-    Publication *pubPtr;
+    Publication *pubPtr = nullptr;
 };
 /** object wrapping and endpoint*/
 class EndpointObject
 {
   public:
-    Endpoint *endPtr;
+    Endpoint *endPtr = nullptr;
     std::shared_ptr<MessageFederate> fedptr;
     std::unique_ptr<Message> lastMessage;
     int valid = 0;
@@ -124,7 +125,7 @@ class FilterObject
   public:
     bool cloning = false;  // indicator that the filter is a cloning filter
     int valid = 0;
-    Filter *filtPtr;
+    Filter *filtPtr = nullptr;
     std::unique_ptr<Filter> uFilter;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
@@ -149,29 +150,29 @@ class QueryObject
 #define HELICS_ERROR_CHECK(err, retval)                                                                                                    \
     do                                                                                                                                     \
     {                                                                                                                                      \
-        if ((err != nullptr) && (err->error_code != 0))                                                                                    \
+        if (((err) != nullptr) && ((err)->error_code != 0))                                                                                \
         {                                                                                                                                  \
-            return retval;                                                                                                                 \
+            return (retval);                                                                                                               \
         }                                                                                                                                  \
-    } while (0)
+    } while (false)
 
 extern const std::string emptyStr;
 extern const std::string nullStringArgument;
-#define AS_STRING(str) (str != nullptr) ? std::string (str) : emptyStr
+#define AS_STRING(str) ((str) != nullptr) ? std::string (str) : emptyStr
 
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do                                                                                                                                     \
     {                                                                                                                                      \
-        if (str == nullptr)                                                                                                                \
+        if ((str) == nullptr)                                                                                                              \
         {                                                                                                                                  \
             if (err != nullptr)                                                                                                            \
             {                                                                                                                              \
                 err->error_code = helics_error_invalid_argument;                                                                           \
                 err->message = nullStringArgument.c_str ();                                                                                \
             }                                                                                                                              \
-            return retval;                                                                                                                 \
+            return (retval);                                                                                                               \
         }                                                                                                                                  \
-    } while (0)
+    } while (false)
 
 helics::Federate *getFed (helics_federate fed, helics_error *err);
 helics::ValueFederate *getValueFed (helics_federate fed, helics_error *err);
@@ -185,8 +186,13 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
 std::shared_ptr<helics::Core> getCoreSharedPtr (helics_core core, helics_error *err);
 /**centralized error handler for the C interface*/
 void helicsErrorHandler (helics_error *err) noexcept;
+/** check if the output argument string is valid
+@details  it takes and const char * since it doesn't modify it but it is intended to checked for output strings
+function checks the output String is not nullptr and if the maxlen >0
+fill the err term if it is not valid and return false,  otherwise return true if everything looks fine
 
-bool checkOutArgString (char *outputString, int maxlen, helics_error *err);
+*/
+bool checkOutArgString (const char *outputString, int maxlen, helics_error *err);
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder

@@ -60,8 +60,15 @@ class Filter
     /** virtual destructor*/
     virtual ~Filter () = default;
 
+    Filter (Filter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object*/
+    Filter (const Filter &filt) = default;
+    Filter &operator= (Filter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object as the original*/
+    Filter &operator= (const Filter &filt) = default;
+    /** check if the Filter links to a valid filter*/
     bool isValid () const { return handle.isValid (); }
-
+    /** check if the filter is a cloning filter*/
     bool isCloningFilter () const { return cloning; }
     /** set a message operator to process the message*/
     void setOperator (std::shared_ptr<FilterOperator> mo);
@@ -133,7 +140,14 @@ class CloningFilter : public Filter
 
     /** constructor used by FilterFederateManager*/
     CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle);
-
+    /** move the filter to a new cloning filter*/
+    CloningFilter (CloningFilter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object*/
+    CloningFilter (const CloningFilter &filt) = default;
+    /** move assign the cloning filter*/
+    CloningFilter &operator= (CloningFilter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object as the original*/
+    CloningFilter &operator= (const CloningFilter &filt) = default;
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
 

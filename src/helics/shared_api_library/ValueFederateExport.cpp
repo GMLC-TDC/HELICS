@@ -1056,7 +1056,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
     }
     try
     {
-        helics::named_point np = inpObj->inputPtr->getValue<helics::named_point> ();
+        helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint> ();
         int length = std::min (static_cast<int> (np.name.size ()), maxStringLen);
         memcpy (outputString, np.name.data (), length);
 
@@ -1267,7 +1267,7 @@ void helicsInputSetDefaultNamedPoint (helics_input inp, const char *str, double 
     }
     try
     {
-        inpObj->inputPtr->setDefault (helics::named_point (AS_STRING (str), val));
+        inpObj->inputPtr->setDefault (helics::NamedPoint (AS_STRING (str), val));
     }
     catch (...)
     {

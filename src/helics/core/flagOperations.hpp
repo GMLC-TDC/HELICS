@@ -60,11 +60,14 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
-inline constexpr uint16_t make_flags (int flag) { return static_cast<uint16_t> (1) << (flag); }
+inline constexpr uint16_t make_flags (unsigned int flag) { return static_cast<uint16_t> (1) << (flag); }
 
-inline constexpr uint16_t make_flags (int flag1, int flag2) { return make_flags (flag1) | make_flags (flag2); }
+inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2)
+{
+    return make_flags (flag1) | make_flags (flag2);
+}
 
-inline constexpr uint16_t make_flags (int flag1, int flag2, int flag3)
+inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2, unsigned int flag3)
 {
     return make_flags (flag1, flag2) | make_flags (flag3);
 }

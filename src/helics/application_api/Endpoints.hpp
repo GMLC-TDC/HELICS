@@ -109,7 +109,7 @@ class Endpoint
     @param[in] dest string name of the destination
     @param[in] data the information to send
     */
-    void send (const std::string &dest, data_view data) const { fed->sendMessage (*this, dest, data); }
+    void send (const std::string &dest, const data_view &data) const { fed->sendMessage (*this, dest, data); }
     /** send a data_view
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
@@ -117,7 +117,7 @@ class Endpoint
     @param[in] data data representation to send
     @param[in] sendTime  the time the message should be sent
     */
-    void send (const std::string &dest, data_view data, Time sendTime) const
+    void send (const std::string &dest, const data_view &data, Time sendTime) const
     {
         fed->sendMessage (*this, dest, data, sendTime);
     }
@@ -127,21 +127,24 @@ class Endpoint
     */
     void send (const char *data, size_t data_size) const
     {
-        fed->sendMessage (*this, targetDest, data_view (data, data_size));
+        fed->sendMessage (*this, targetDest, data_view{data, data_size});
     }
     /** send a data_view to the target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
     @param[in] data the information to send
     */
-    void send (data_view data) const { fed->sendMessage (*this, targetDest, data); }
+    void send (const data_view &data) const { fed->sendMessage (*this, targetDest, data); }
     /** send a data_view to the specified target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
     @param[in] data a representation to send
     @param[in] sendTime  the time the message should be sent
     */
-    void send (data_view data, Time sendTime) const { fed->sendMessage (*this, targetDest, data, sendTime); }
+    void send (const data_view &data, Time sendTime) const
+    {
+        fed->sendMessage (*this, targetDest, data, sendTime);
+    }
     /** send a message object
     @details this is to send a pre-built message
     @param[in] mess a reference to an actual message object

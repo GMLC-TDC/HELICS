@@ -26,19 +26,19 @@ class local_federate_id
     /** default constructor*/
     constexpr local_federate_id () = default;
 
-    constexpr explicit local_federate_id (base_type val) noexcept : _id (val){};
+    constexpr explicit local_federate_id (base_type val) noexcept : fid (val){};
 
-    constexpr base_type baseValue () const { return _id; }
+    constexpr base_type baseValue () const { return fid; }
     /** equality operator*/
-    bool operator== (local_federate_id id) const noexcept { return (_id == id._id); };
+    bool operator== (local_federate_id id) const noexcept { return (fid == id.fid); };
     /** inequality operator*/
-    bool operator!= (local_federate_id id) const noexcept { return (_id != id._id); };
+    bool operator!= (local_federate_id id) const noexcept { return (fid != id.fid); };
     /** less than operator for sorting*/
-    bool operator< (local_federate_id id) const noexcept { return (_id < id._id); };
-    bool isValid () const { return (_id != -2'000'000'000); }
+    bool operator< (local_federate_id id) const noexcept { return (fid < id.fid); };
+    bool isValid () const { return (fid != -2'000'000'000); }
 
   private:
-    base_type _id = -2'000'000'000;  //!< the underlying index value
+    base_type fid = -2'000'000'000;  //!< the underlying index value
 };
 
 /** stream operator for a federate_id
@@ -57,20 +57,20 @@ class interface_handle
     /** default constructor*/
     constexpr interface_handle () = default;
 
-    constexpr explicit interface_handle (base_type val) noexcept : _id (val){};
+    constexpr explicit interface_handle (base_type val) noexcept : hid (val){};
 
-    constexpr base_type baseValue () const { return _id; }
+    constexpr base_type baseValue () const { return hid; }
     /** equality operator*/
-    bool operator== (interface_handle id) const noexcept { return (_id == id._id); };
+    bool operator== (interface_handle id) const noexcept { return (hid == id.hid); };
     /** inequality operator*/
-    bool operator!= (interface_handle id) const noexcept { return (_id != id._id); };
+    bool operator!= (interface_handle id) const noexcept { return (hid != id.hid); };
     /** comparison operator for sorting*/
-    bool operator< (interface_handle id) const noexcept { return (_id < id._id); };
-    bool operator> (interface_handle id) const noexcept { return (_id > id._id); };
-    bool isValid () const { return (_id != -1'700'000'000); }
+    bool operator< (interface_handle id) const noexcept { return (hid < id.hid); };
+    bool operator> (interface_handle id) const noexcept { return (hid > id.hid); };
+    bool isValid () const { return (hid != -1'700'000'000); }
 
   private:
-    base_type _id = -1'700'000'000;  //!< the underlying index value
+    base_type hid = -1'700'000'000;  //!< the underlying index value
 };
 
 /** stream operator for a federate_id
@@ -92,7 +92,8 @@ constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr local_federate_id local_core_id (-259);
-
+/** class holding a globally unique identifier for brokers
+@details the class is fully compatible with global_federate_id*/
 class global_broker_id
 {
   public:
@@ -100,23 +101,23 @@ class global_broker_id
     /** default constructor*/
     constexpr global_broker_id () = default;
 
-    constexpr explicit global_broker_id (base_type val) noexcept : _id (val){};
+    constexpr explicit global_broker_id (base_type val) noexcept : gid (val){};
 
-    constexpr base_type baseValue () const { return _id; }
+    constexpr base_type baseValue () const { return gid; }
     /** equality operator*/
-    bool operator== (global_broker_id id) const noexcept { return (_id == id._id); };
+    bool operator== (global_broker_id id) const noexcept { return (gid == id.gid); };
     /** inequality operator*/
-    bool operator!= (global_broker_id id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_broker_id id) const noexcept { return (gid != id.gid); };
     /** less than operator for sorting*/
-    bool operator< (global_broker_id id) const noexcept { return (_id < id._id); };
+    bool operator< (global_broker_id id) const noexcept { return (gid < id.gid); };
 
-    bool isFederate () const { return ((_id >= global_federate_id_shift) && (_id < global_broker_id_shift)); }
-    bool isBroker () const { return (_id >= global_broker_id_shift); }
-    bool isValid () const { return (_id != -2'010'000'000); }
-    base_type localIndex () const { return _id - global_broker_id_shift; }
+    bool isFederate () const { return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift)); }
+    bool isBroker () const { return (gid >= global_broker_id_shift); }
+    bool isValid () const { return (gid != -2'010'000'000); }
+    base_type localIndex () const { return gid - global_broker_id_shift; }
 
   private:
-    base_type _id = -2'010'000'000;  //!< the underlying index value
+    base_type gid = -2'010'000'000;  //!< the underlying index value
     friend class global_federate_id;  // for allowing comparison operators to work well
 };
 
@@ -126,7 +127,7 @@ constexpr global_broker_id parent_broker_id (0);
 /** stream operator for a federate_id
  */
 std::ostream &operator<< (std::ostream &os, global_broker_id id);
-
+/** class holder a globally unique identifier for federates*/
 class global_federate_id
 {
   public:
@@ -134,36 +135,36 @@ class global_federate_id
     /** default constructor*/
     constexpr global_federate_id () = default;
 
-    constexpr explicit global_federate_id (base_type val) noexcept : _id (val){};
+    constexpr explicit global_federate_id (base_type val) noexcept : gid (val){};
     /** implicit conversion from global_id*/
-    constexpr global_federate_id (global_broker_id id) noexcept : _id (id._id){};
+    constexpr global_federate_id (global_broker_id id) noexcept : gid (id.gid){};  // NOLINT
 
-    constexpr operator global_broker_id () const noexcept { return global_broker_id (_id); };
+    constexpr operator global_broker_id () const noexcept { return global_broker_id (gid); };  // NOLINT
     /** conversion to the base_type*/
-    constexpr base_type baseValue () const { return _id; };
+    constexpr base_type baseValue () const { return gid; };
     /** equality operator*/
-    bool operator== (global_federate_id id) const noexcept { return (_id == id._id); };
+    bool operator== (global_federate_id id) const noexcept { return (gid == id.gid); };
     /** inequality operator*/
-    bool operator!= (global_federate_id id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_federate_id id) const noexcept { return (gid != id.gid); };
     /** less than operator for sorting*/
-    bool operator< (global_federate_id id) const noexcept { return (_id < id._id); };
+    bool operator< (global_federate_id id) const noexcept { return (gid < id.gid); };
     /** greater than operator for sorting*/
-    bool operator> (global_federate_id id) const noexcept { return (_id > id._id); };
+    bool operator> (global_federate_id id) const noexcept { return (gid > id.gid); };
     /** equality operator*/
-    bool operator== (global_broker_id id) const noexcept { return (_id == id._id); };
+    bool operator== (global_broker_id id) const noexcept { return (gid == id.gid); };
     /** inequality operator*/
-    bool operator!= (global_broker_id id) const noexcept { return (_id != id._id); };
+    bool operator!= (global_broker_id id) const noexcept { return (gid != id.gid); };
     /** less than operator for sorting*/
-    bool operator< (global_broker_id id) const noexcept { return (_id < id._id); };
+    bool operator< (global_broker_id id) const noexcept { return (gid < id.gid); };
     /** greater than operator for sorting*/
-    bool operator> (global_broker_id id) const noexcept { return (_id > id._id); };
-    bool isFederate () const { return ((_id >= global_federate_id_shift) && (_id < global_broker_id_shift)); }
-    bool isBroker () const { return (_id >= global_broker_id_shift); }
-    bool isValid () const { return (_id != -2'010'000'000); }
-    constexpr base_type localIndex () const { return _id - global_federate_id_shift; }
+    bool operator> (global_broker_id id) const noexcept { return (gid > id.gid); };
+    bool isFederate () const { return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift)); }
+    bool isBroker () const { return (gid >= global_broker_id_shift); }
+    bool isValid () const { return (gid != -2'010'000'000); }
+    constexpr base_type localIndex () const { return gid - global_federate_id_shift; }
 
   private:
-    base_type _id = -2'010'000'000;  //!< the underlying index value
+    base_type gid = -2'010'000'000;  //!< the underlying index value
 };
 
 /** stream operator for a federate_id
@@ -180,7 +181,7 @@ class global_handle
     constexpr global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
     explicit operator uint64_t () const
     {
-        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32;
+        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32u;
         key += static_cast<uint64_t> (handle.baseValue ()) & (0x0000'0000'FFFF'FFFF);
         return key;
     }
@@ -207,19 +208,19 @@ class route_id
     /** default constructor*/
     constexpr route_id () = default;
 
-    constexpr explicit route_id (base_type val) noexcept : _id (val){};
+    constexpr explicit route_id (base_type val) noexcept : rid (val){};
 
-    constexpr base_type baseValue () const { return _id; }
+    constexpr base_type baseValue () const { return rid; }
     /** equality operator*/
-    bool operator== (route_id id) const noexcept { return (_id == id._id); };
+    bool operator== (route_id id) const noexcept { return (rid == id.rid); };
     /** inequality operator*/
-    bool operator!= (route_id id) const noexcept { return (_id != id._id); };
+    bool operator!= (route_id id) const noexcept { return (rid != id.rid); };
     /** less than operator for sorting*/
-    bool operator< (route_id id) const noexcept { return (_id < id._id); };
-    bool isValid () const { return (_id != -1'295'148'000); }
+    bool operator< (route_id id) const noexcept { return (rid < id.rid); };
+    bool isValid () const { return (rid != -1'295'148'000); }
 
   private:
-    base_type _id = -1'295'148'000;  //!< the underlying index value
+    base_type rid = -1'295'148'000;  //!< the underlying index value
 };
 
 constexpr route_id parent_route_id (0);

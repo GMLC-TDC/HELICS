@@ -1064,8 +1064,8 @@ static helics::QueryObject *getQueryObj (helics_query query, helics_error *err)
 helics_query helicsCreateQuery (const char *target, const char *query)
 {
     auto queryObj = new helics::QueryObject;
-    queryObj->query = (query != nullptr) ? std::string (query) : std::string ();
-    queryObj->target = (target != nullptr) ? std::string (target) : std::string ();
+    queryObj->query = (query != nullptr) ? std::string (query) : std::string{};
+    queryObj->target = (target != nullptr) ? std::string (target) : std::string{};
     return reinterpret_cast<void *> (queryObj);
 }
 

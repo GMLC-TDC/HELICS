@@ -97,7 +97,7 @@ class Player : public App
     @param units the units associated with the publication
     */
     template <class valType>
-    typename std::enable_if_t<helicsType<valType> () != data_type::helicsCustom>
+    typename std::enable_if_t<helicsType<valType> () != data_type::helics_custom>
     addPublication (const std::string &key, const std::string &pubUnits = std::string ())
     {
         if (!useLocal)
@@ -175,9 +175,10 @@ class Player : public App
     /** get the number of endpoints*/
     auto endpointCount () const { return endpoints.size (); }
     /** get the point from an index*/
-    const auto &getPoint(int index) const { return points[index]; }
+    const auto &getPoint (int index) const { return points[index]; }
     /** get the messages from an index*/
-    const auto &getMessage(int index) const { return messages[index]; }
+    const auto &getMessage (int index) const { return messages[index]; }
+
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
@@ -214,7 +215,7 @@ class Player : public App
     std::map<std::string, int> pubids;  //!< publication id map
     std::map<std::string, int> eptids;  //!< endpoint id maps
     helics::data_type defType =
-      helics::data_type::helicsString;  //!< the default data type unless otherwise specified
+      helics::data_type::helics_string;  //!< the default data type unless otherwise specified
     size_t pointIndex = 0;  //!< the current point index
     size_t messageIndex = 0;  //!< the current message index
     time_units units = time_units::sec;

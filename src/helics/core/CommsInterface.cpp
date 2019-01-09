@@ -34,7 +34,7 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         localTargetAddress = netInfo.localInterface;
         brokerTargetAddress = netInfo.brokerAddress;
-        brokerName_ = netInfo.brokerName;
+        brokerName = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
         maxMessageSize_ = netInfo.maxMessageSize;
         maxMessageCount_ = netInfo.maxMessageCount;

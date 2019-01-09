@@ -92,7 +92,7 @@ def test_message_federate_send(mFed):
 
     data = "random-data"
 
-    status = h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1.0)
+    h.helicsEndpointSendEventRaw(epid1, "ep2", data, 1.0)
 
     granted_time = h.helicsFederateRequestTime(mFed, 2.0)
     assert granted_time == 1.0

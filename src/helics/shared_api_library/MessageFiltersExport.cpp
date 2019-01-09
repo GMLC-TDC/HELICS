@@ -518,7 +518,7 @@ helics_bool helicsFilterGetOption (helics_filter filt, int option)
     auto filtObj = getFilterObj (filt, nullptr);
     if (filtObj == nullptr)
     {
-        return false;
+        return helics_false;
     }
     try
     {
@@ -526,6 +526,6 @@ helics_bool helicsFilterGetOption (helics_filter filt, int option)
     }
     catch (...)
     {
-        return false;
+        return helics_false;
     }
 }
