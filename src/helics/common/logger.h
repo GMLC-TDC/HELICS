@@ -66,7 +66,7 @@ class LoggingCore
     */
     int addFileProcessor (std::function<void(std::string &&message)> newFunction);
     /** remove a function callback*/
-    void haltOperations (int);
+    void haltOperations (int loggerIndex);
     /** update a callback for a particular instance*/
     void updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction);
     /** enable a fast shutdown in situations where a thread may be force-ably terminated*/

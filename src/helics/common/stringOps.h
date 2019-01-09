@@ -83,7 +83,7 @@ void appendInteger (std::string &input, X val)
     }
 }
 
-const std::string whiteSpaceCharacters (R"raw(" \t\n\r\0\v\f)raw");
+const std::string whiteSpaceCharacters (" \t\n\r\a\v\f\0");
 
 /** @brief trim whitespace characters from a string at the beginning and end of the string
 @param[in,out] input  the string to convert
