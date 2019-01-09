@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
     rec1.addSubscription ("pub1");
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
     rec1.addSubscription ("pub1");
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
@@ -134,8 +134,8 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     rec1.loadFile (std::string (TEST_DIR) + file);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helics_double);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -192,8 +192,8 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     rec1.loadFile (std::string (TEST_DIR) + file);
 
     helics::CombinationFederate cfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
@@ -262,8 +262,8 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     fi.coreInitString = "1 --broker=ipc_broker";
 
     helics::CombinationFederate cfed ("obj", fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
     rec1.addSubscription ("pub1");
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
@@ -622,7 +622,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     rec1.addSourceEndpointClone ("d1");
     rec1.addSubscription ("pub1");
 
-    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();

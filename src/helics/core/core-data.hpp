@@ -45,22 +45,22 @@ class data_block
     /** move constructor */
     data_block (data_block &&db) noexcept;
     /** construct from char * */
-    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE
     /* implicit */ data_block (const char *s) : m_data (s){};
     /** construct from string */
-    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE
     /* implicit */ data_block (const std::string &str) : m_data (str){};
     /** move from string */
-    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE
     /* implicit */ data_block (std::string &&str) noexcept : m_data (std::move (str)){};
     /** char * and length */
     data_block (const char *s, size_t len) : m_data (s, len){};
     /** construct from a vector object */
-    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE
     /* implicit */ data_block (const std::vector<char> &vdata) : m_data (vdata.data (), vdata.size ()){};
     /** construct from an arbitrary vector*/
     template <class X>
-    // cppcheck-suppress noExplicitConstructor
+    // NOLINTNEXTLINE
     /* implicit */ data_block (const std::vector<X> &vdata)
         : m_data (reinterpret_cast<const char *> (vdata.data ()), vdata.size () * sizeof (X))
     {

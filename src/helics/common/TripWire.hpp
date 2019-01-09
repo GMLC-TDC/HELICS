@@ -42,6 +42,10 @@ class TripWireTrigger
   public:
     TripWireTrigger ();
     ~TripWireTrigger ();
+    TripWireTrigger (TripWireTrigger &&twt) = default;
+    TripWireTrigger (const TripWireTrigger &twt) = delete;
+    TripWireTrigger &operator= (TripWireTrigger &&twt) = default;
+    TripWireTrigger &operator= (const TripWireTrigger &twt) = delete;
 
   private:
     triplineType lineTrigger;  //!< the tripwire

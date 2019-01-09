@@ -36,7 +36,7 @@ static inline bool is_base64 (unsigned char c) { return (b64Map[c] < 0xFF); }
 std::string base64_encode (unsigned char const *bytes_to_encode, int32_t in_len)
 {
     std::string ret;
-    ret.reserve((in_len * 4) / 3 + 2);
+    ret.reserve ((in_len * 4) / 3 + 2);
     int ii = 0;
     unsigned char char_array_3[3];
     unsigned char char_array_4[4];
@@ -46,10 +46,10 @@ std::string base64_encode (unsigned char const *bytes_to_encode, int32_t in_len)
         char_array_3[ii++] = *(bytes_to_encode++);
         if (ii == 3)
         {
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
+            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2u;
+            char_array_4[1] = ((char_array_3[0] & 0x03) << 4u) + ((char_array_3[1] & 0xf0) >> 4u);
+            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2u) + ((char_array_3[2] & 0xc0) >> 6u);
+            char_array_4[3] = char_array_3[2] & 0x3fu;
 
             for (ii = 0; (ii < 4); ii++)
             {
@@ -105,9 +105,9 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
             char_array_4[2] = b64Map[char_array_4[2]];
             char_array_4[3] = b64Map[char_array_4[3]];
 
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+            char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+            char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
 
             ret.push_back (char_array_3[0]);
             ret.push_back (char_array_3[1]);
@@ -128,9 +128,9 @@ std::vector<unsigned char> base64_decode (std::string const &encoded_string, siz
         char_array_4[2] = b64Map[char_array_4[2]];
         char_array_4[3] = b64Map[char_array_4[3]];
 
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+        char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+        char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
 
         for (int j = 0; (j < i - 1); j++)
         {
@@ -161,9 +161,9 @@ std::string base64_decode_to_string (std::string const &encoded_string, size_t o
             char_array_4[2] = b64Map[char_array_4[2]];
             char_array_4[3] = b64Map[char_array_4[3]];
 
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+            char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+            char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
 
             ret.push_back (char_array_3[0]);
             ret.push_back (char_array_3[1]);
@@ -184,9 +184,9 @@ std::string base64_decode_to_string (std::string const &encoded_string, size_t o
         char_array_4[2] = b64Map[char_array_4[2]];
         char_array_4[3] = b64Map[char_array_4[3]];
 
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+        char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+        char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
 
         for (int j = 0; (j < i - 1); j++)
         {
@@ -218,9 +218,9 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
             char_array_4[2] = b64Map[char_array_4[2]];
             char_array_4[3] = b64Map[char_array_4[3]];
 
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+            char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+            char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+            char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
             if (dataIndex + 2 < max_size)
             {
                 outData[dataIndex++] = char_array_3[0];
@@ -254,9 +254,9 @@ size_t base64_decode (std::string const &encoded_string, void *data, size_t max_
         char_array_4[2] = b64Map[char_array_4[2]];
         char_array_4[3] = b64Map[char_array_4[3]];
 
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+        char_array_3[0] = (char_array_4[0] << 2u) + ((char_array_4[1] & 0x30u) >> 4u);
+        char_array_3[1] = ((char_array_4[1] & 0xfu) << 4u) + ((char_array_4[2] & 0x3cu) >> 2u);
+        char_array_3[2] = ((char_array_4[2] & 0x3u) << 6u) + char_array_4[3];
 
         for (int j = 0; (j < i - 1); j++)
         {

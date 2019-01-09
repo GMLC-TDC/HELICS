@@ -699,7 +699,7 @@ void Player::initialize ()
 
 void Player::sendInformation (Time sendTime, int iteration)
 {
-    if (isValidIndex(pointIndex,points))
+    if (isValidIndex (pointIndex, points))
     {
         while (points[pointIndex].time < sendTime)
         {
@@ -710,20 +710,20 @@ void Player::sendInformation (Time sendTime, int iteration)
                 break;
             }
         }
-        if (isValidIndex(pointIndex, points))
+        if (isValidIndex (pointIndex, points))
         {
             while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
             {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                publications[points[pointIndex].index].publish (points[pointIndex].value);
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
     }
-    if (isValidIndex(messageIndex, messages))
+    if (isValidIndex (messageIndex, messages))
     {
         while (messages[messageIndex].sendTime <= sendTime)
         {
@@ -755,7 +755,7 @@ void Player::runTo (Time stopTime_input)
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (isValidIndex(pointIndex,points))
+        if (isValidIndex (pointIndex, points))
         {
             while (points[pointIndex].time <= ctime)
             {
@@ -766,7 +766,7 @@ void Player::runTo (Time stopTime_input)
                 }
             }
         }
-        if (isValidIndex(messageIndex, messages))
+        if (isValidIndex (messageIndex, messages))
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
@@ -787,12 +787,12 @@ void Player::runTo (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-        if (isValidIndex(pointIndex, points))
+        if (isValidIndex (pointIndex, points))
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
             nextIteration = points[pointIndex].iteration;
         }
-        if (isValidIndex(messageIndex, messages))
+        if (isValidIndex (messageIndex, messages))
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
@@ -885,7 +885,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::data_type::helicsCustom)
+        if (defType == helics::data_type::helics_custom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;
@@ -900,7 +900,8 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
         }
         catch (...)
         {
-            std::cerr << vm_map["time_units"].as<std::string> () << " is not recognized as a valid unit of time \n";
+            std::cerr << vm_map["time_units"].as<std::string> ()
+                      << " is not recognized as a valid unit of time \n";
         }
     }
     if (vm_map.count ("marker") > 0)

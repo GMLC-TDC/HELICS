@@ -26,8 +26,6 @@ class AirLock
   public:
     /** default constructor */
     AirLock () = default;
-    /** destructor*/
-    ~AirLock () = default;
     /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>

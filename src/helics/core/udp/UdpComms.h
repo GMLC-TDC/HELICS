@@ -17,20 +17,21 @@ namespace asio
 {
 class io_context;
 using io_service = io_context;
-}
-}
+}  // namespace asio
+}  // namespace boost
 #else
 namespace boost
 {
 namespace asio
 {
 class io_service;
-}
-}
+}  // namespace asio
+}  // namespace boost
 #endif
 namespace helics
 {
-namespace udp {
+namespace udp
+{
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class UdpComms final : public NetworkCommsInterface
 {
@@ -40,9 +41,10 @@ class UdpComms final : public NetworkCommsInterface
     /** destructor*/
     ~UdpComms ();
 
-    virtual void loadNetworkInfo(const NetworkBrokerData &netInfo) override;
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
+
   private:
-    virtual int getDefaultBrokerPort() const override;
+    virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
@@ -54,6 +56,5 @@ class UdpComms final : public NetworkCommsInterface
   public:
 };
 
-} // namespace udp
+}  // namespace udp
 }  // namespace helics
-

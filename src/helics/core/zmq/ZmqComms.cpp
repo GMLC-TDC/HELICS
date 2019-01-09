@@ -194,7 +194,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.messageID == NAME_NOT_FOUND)
             {
-                logError (std::string ("broker name ") + brokerName_ + " does not match broker connection");
+                logError (std::string ("broker name ") + brokerName + " does not match broker connection");
                 disconnecting = true;
                 setRxStatus (connection_status::error);
                 return;

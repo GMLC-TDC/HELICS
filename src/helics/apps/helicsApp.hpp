@@ -20,7 +20,7 @@ namespace helics
 namespace Json
 {
 class Value;
-}
+}  // namespace Json
 namespace apps
 {
 /** class defining a basic helics App

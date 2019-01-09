@@ -64,7 +64,7 @@ void load (Archive &ar, data_view &db)
 }
 
 template <class Archive>
-void serialize (Archive &archive, named_point &m)
+void serialize (Archive &archive, NamedPoint &m)
 {
     archive (m.name, m.value);
 }
@@ -161,7 +161,7 @@ constexpr std::enable_if_t<std::is_convertible<X, std::string>::value, size_t> g
 
 /** min size for a named point*/
 template <>
-constexpr size_t getMinSize<named_point> ()
+constexpr size_t getMinSize<NamedPoint> ()
 {
     return 10;
 }

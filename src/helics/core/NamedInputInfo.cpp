@@ -283,10 +283,11 @@ Time NamedInputInfo::nextValueTime () const
     return nvtime;
 }
 
-static const std::set<std::string> convertible_set{"double_vector", "complex_vector", "vector", "double",    "float",
-                                                   "bool",          "char",           "uchar",     "int32",
-                                                   "int64",         "uint32",         "uint64",    "int16",
-                                                   "string",        "complex",        "complex_f", "named_point"};
+static const std::set<std::string> convertible_set{"double_vector", "complex_vector", "vector",  "double",
+                                                   "float",         "bool",           "char",    "uchar",
+                                                   "int32",         "int64",          "uint32",  "uint64",
+                                                   "int16",         "string",         "complex", "complex_f",
+                                                   "named_point"};
 bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match)
 {
     if ((type1.empty ()) || (type1 == type2) || (type1 == "def") || (type1 == "any") || (type1 == "raw"))
@@ -297,21 +298,16 @@ bool checkTypeMatch (const std::string &type1, const std::string &type2, bool st
     {
         return false;
     }
-    else
+
+    if ((type2.empty ()) || (type2 == "def") || (type2 == "any"))
     {
-        if ((type2.empty ()) || (type2 == "def") || (type2 == "any"))
-        {
-            return true;
-        }
-        if (convertible_set.find (type1) != convertible_set.end ())
-        {
-            return ((convertible_set.find (type2) != convertible_set.end ()));
-        }
-        else
-        {
-            return (type2 == "raw");
-        }
+        return true;
     }
+    if (convertible_set.find (type1) != convertible_set.end ())
+    {
+        return ((convertible_set.find (type2) != convertible_set.end ()));
+    }
+    return (type2 == "raw");
 }
 
 }  // namespace helics

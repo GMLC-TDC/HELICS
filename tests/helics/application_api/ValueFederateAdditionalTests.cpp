@@ -326,10 +326,10 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj10, bdata::make (core_types), core_type)
 {
-    helics::named_point def{"trigger", 0.7};
-    helics::named_point v1{"response", -1e-12};
-    helics::named_point v2{"variance", 45.23};
-    runDualFederateTestObjv2<helics::named_point> (core_type, def, v1, v2);
+    helics::NamedPoint def{"trigger", 0.7};
+    helics::NamedPoint v1{"response", -1e-12};
+    helics::NamedPoint v2{"variance", 45.23};
+    runDualFederateTestObjv2<helics::NamedPoint> (core_type, def, v1, v2);
 }
 
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj11, bdata::make (core_types), core_type)

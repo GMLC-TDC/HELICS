@@ -67,23 +67,22 @@ helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUni
         {
             if (val->is<int64_t> ())
             {
-                return helics::Time (val->as<int64_t> (), defaultUnits);
+                return {val->as<int64_t> (), defaultUnits};
             }
-            return helics::Time (val->as<double> () * toSecondMultiplier (defaultUnits));
+            return {val->as<double> () * toSecondMultiplier (defaultUnits)};
         }
     }
     else if (timeElement.is<int64_t> ())
     {
-        return helics::Time (timeElement.as<int64_t> (), defaultUnits);
+        return {timeElement.as<int64_t> (), defaultUnits};
     }
     else if (timeElement.is<double> ())
     {
-        return helics::Time (timeElement.as<double> () * toSecondMultiplier (defaultUnits));
+        return {timeElement.as<double> () * toSecondMultiplier (defaultUnits)};
     }
     else if (timeElement.is<toml::Time> ())
     {
-        return helics::Time (
-          static_cast<std::chrono::nanoseconds> (timeElement.as<toml::Time> ().time_since_epoch ()));
+        return {static_cast<std::chrono::nanoseconds> (timeElement.as<toml::Time> ().time_since_epoch ())};
     }
     else
     {

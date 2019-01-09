@@ -52,7 +52,7 @@ void TestComms::queue_tx_function ()
     // make sure the link to the localTargetAddress is in place
     if (name != localTargetAddress)
     {
-        if (!brokerName_.empty ())
+        if (!brokerName.empty ())
         {
             if (!CoreFactory::copyCoreIdentifier (name, localTargetAddress))
             {
@@ -77,27 +77,27 @@ void TestComms::queue_tx_function ()
     setRxStatus (connection_status::connected);
     std::shared_ptr<CoreBroker> tbroker;
 
-    if (brokerName_.empty ())
+    if (brokerName.empty ())
     {
         if (!brokerTargetAddress.empty ())
         {
-            brokerName_ = brokerTargetAddress;
+            brokerName = brokerTargetAddress;
         }
     }
 
-    if (!brokerName_.empty ())
+    if (!brokerName.empty ())
     {
         milliseconds totalSleep (0);
         while (!tbroker)
         {
-            auto broker = BrokerFactory::findBroker (brokerName_);
+            auto broker = BrokerFactory::findBroker (brokerName);
             tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
             if (!tbroker)
             {
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, brokerName_, brokerInitString_));
+                      BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
                     tbroker->connect ();
                 }
                 else
@@ -116,7 +116,7 @@ void TestComms::queue_tx_function ()
             {
                 if (!tbroker->isOpenToNewFederates ())
                 {
-                    logError ("broker is not open to new federates " + brokerName_);
+                    logError ("broker is not open to new federates " + brokerName);
                     tbroker = nullptr;
                     broker = nullptr;
                     BrokerFactory::cleanUpBrokers (milliseconds (200));
@@ -143,7 +143,7 @@ void TestComms::queue_tx_function ()
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, "", brokerInitString_));
+                      BrokerFactory::create (core_type::TEST, "", brokerInitString));
                     tbroker->connect ();
                 }
                 else

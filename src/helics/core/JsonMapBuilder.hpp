@@ -12,7 +12,7 @@ namespace helics
 namespace Json
 {
 class Value;
-}
+}  // namespace Json
 class JsonMapBuilder
 {
   private:

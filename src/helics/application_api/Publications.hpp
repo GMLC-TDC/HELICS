@@ -21,7 +21,7 @@ class Publication
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
     double delta = -1.0;  //!< the minimum change to publish
   protected:
-    data_type pubType = data_type::helicsAny;  //!< the type of publication
+    data_type pubType = data_type::helics_any;  //!< the type of publication
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool disableAssign = false;  //!< disable assignment for the object
   private:
@@ -211,7 +211,7 @@ class Publication
     void publish (bool val);
     void publish (Time val);
     void publish (char val);
-    void publish (const named_point &np);
+    void publish (const NamedPoint &np);
     void publish (const std::string &name, double val);
     void publish (const char *str, double val);
     /** secondary publish function to allow unit conversion before publication
@@ -240,7 +240,7 @@ class Publication
                      void>
     publish (const X &val)
     {
-        if (pubType == data_type::helicsCustom)
+        if (pubType == data_type::helics_custom)
         {
             fed->publishRaw (*this, ValueConverter<X>::convert (val));
         }
@@ -283,7 +283,7 @@ class Publication
 @param units optional units for the publication
 */
 template <class X>
-typename std::enable_if_t<helicsType<X> () != data_type::helicsCustom, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != data_type::helics_custom, std::unique_ptr<Publication>>
 make_publication (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
 {
     return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
@@ -297,7 +297,7 @@ make_publication (ValueFederate *valueFed, const std::string &key, const std::st
 @param units optional units for the publication
 */
 template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != data_type::helicsCustom, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != data_type::helics_custom, std::unique_ptr<Publication>>
 make_publication (FedPtr &valueFed, const std::string &key, const std::string &units = std::string ())
 {
     return std::make_unique<Publication> (valueFed, helicsType<X> (), key, units);
@@ -312,7 +312,7 @@ make_publication (FedPtr &valueFed, const std::string &key, const std::string &u
 @param units optional units for the publication
 */
 template <class X>
-typename std::enable_if_t<helicsType<X> () != data_type::helicsCustom, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != data_type::helics_custom, std::unique_ptr<Publication>>
 make_publication (interface_visibility locality,
                   ValueFederate *valueFed,
                   const std::string &key,
@@ -330,7 +330,7 @@ make_publication (interface_visibility locality,
 @param units optional units for the publication
 */
 template <class X, class FedPtr>
-typename std::enable_if_t<helicsType<X> () != data_type::helicsCustom, std::unique_ptr<Publication>>
+typename std::enable_if_t<helicsType<X> () != data_type::helics_custom, std::unique_ptr<Publication>>
 make_publication (interface_visibility locality,
                   FedPtr &valueFed,
                   const std::string &key,

@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     fi.coreInitString = "-f2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-    play1.addPublication ("pub1", helics::data_type::helicsDouble);
+    play1.addPublication ("pub1", helics::data_type::helics_double);
     play1.addPoint (1.0, "pub1", 0.5);
     play1.addPoint (2.0, "pub1", 0.7);
     play1.addPoint (3.0, "pub1", 0.8);
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-    play1.addPublication ("pub1", helics::data_type::helicsDouble);
+    play1.addPublication ("pub1", helics::data_type::helics_double);
     play1.addPoint (1.0, "pub1", "v[3.0,4.0]");
     play1.addPoint (2.0, "pub1", "0.7");
     play1.addPoint (3.0, "pub1", std::complex<double> (0.0, 0.8));
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-    play1.addPublication ("pub1", helics::data_type::helicsDouble);
+    play1.addPublication ("pub1", helics::data_type::helics_double);
     play1.addPoint (1.0, 0, "pub1", 0.5);
     play1.addPoint (1.0, 1, "pub1", 0.7);
     play1.addPoint (1.0, 2, "pub1", 0.8);
@@ -647,7 +647,8 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
 
     auto res = brokerExe.runAsync ("1 --coretype=ipc --name=ipc_broker");
     std::string exampleFile = std::string (TEST_DIR) + "/example1.Player";
-    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc " + exampleFile);
+    auto res2 = playerExe.runCaptureOutputAsync ("--name=Player --broker=ipc_broker --coretype=ipc " +
+exampleFile);
 
     auto val = res2.get ();
     auto val2 = res.get ();

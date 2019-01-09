@@ -54,10 +54,10 @@ class MpiService
     void drainRemainingMessages ();
 
   private:
-    MpiService ();
+    MpiService () = default;
     ~MpiService ();
 
-    int commRank;
+    int commRank = -1;
     static MPI_Comm mpiCommunicator;
     static bool startServiceThread;
 
@@ -66,10 +66,10 @@ class MpiService
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
     BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
 
-    bool helics_initialized_mpi;
-    std::atomic<int> comms_connected;
-    std::atomic<bool> startup_flag;
-    std::atomic<bool> stop_service;
+    bool helics_initialized_mpi{false};
+    std::atomic<int> comms_connected{0};
+    std::atomic<bool> startup_flag{false};
+    std::atomic<bool> stop_service{false};
     std::unique_ptr<std::thread> service_thread;
 
     void startService ();

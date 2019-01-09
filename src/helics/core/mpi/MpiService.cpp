@@ -28,14 +28,6 @@ void MpiService::setMpiCommunicator (MPI_Comm communicator) { mpiCommunicator = 
 
 void MpiService::setStartServiceThread (bool start) { startServiceThread = start; }
 
-MpiService::MpiService () : commRank (-1)
-{
-    comms_connected = 0;
-    stop_service = false;
-    startup_flag = false;
-    helics_initialized_mpi = false;
-}
-
 MpiService::~MpiService ()
 {
     // Stop the service thread
@@ -103,7 +95,7 @@ void MpiService::serviceLoop ()
         MPI_Initialized (&mpi_initialized);
 
         // Probably not a necessary check, a user using MPI should have also initialized it themselves
-        if (mpi_initialized)
+        if (mpi_initialized != 0)
         {
             std::cout << "About to finalize MPI for rank " << commRank << std::endl;
             MPI_Finalize ();
@@ -121,7 +113,9 @@ std::string MpiService::addMpiComms (MpiComms *comm)
     dataLock.unlock ();
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service)
+    {
         ;
+    }
 
     // return the rank:tag for the MpiComms object
     return std::to_string (commRank) + ":" + std::to_string (tag);
@@ -130,11 +124,11 @@ std::string MpiService::addMpiComms (MpiComms *comm)
 void MpiService::removeMpiComms (MpiComms *comm)
 {
     std::unique_lock<std::mutex> dataLock (mpiDataLock);
-    for (unsigned int i = 0; i < comms.size (); i++)
+    for (auto &cm : comms)
     {
-        if (comms[i] == comm)
+        if (cm == comm)
         {
-            comms[i] = nullptr;
+            cm = nullptr;
             --comms_connected;
             break;
         }
@@ -150,7 +144,9 @@ std::string MpiService::getAddress (MpiComms *comm)
         {
             // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
             while (startup_flag && !stop_service)
+            {
                 ;
+            }
 
             return std::to_string (commRank) + ":" + std::to_string (i);
         }
@@ -164,7 +160,9 @@ int MpiService::getRank ()
 {
     // If somehow this gets called while MPI is still initializing, wait until MPI initialization completes
     while (startup_flag && !stop_service)
+    {
         ;
+    }
 
     return commRank;
 }
@@ -191,12 +189,12 @@ bool MpiService::initMPI ()
 
     MPI_Initialized (&mpi_initialized);
 
-    if (!mpi_initialized)
+    if (mpi_initialized == 0)
     {
         MPI_Init_thread (nullptr, nullptr, MPI_THREAD_FUNNELED, &mpi_thread_level);
 
         MPI_Initialized (&mpi_initialized);
-        if (!mpi_initialized)
+        if (mpi_initialized == 0)
         {
             std::cerr << "MPI initialization failed" << std::endl;
             return false;
@@ -235,12 +233,12 @@ void MpiService::sendAndReceiveMessages ()
         int message_waiting = 1;
         MPI_Status status;
 
-        while (message_waiting)
+        while (message_waiting != 0)
         {
             // Check if there is a messages waiting
             MPI_Iprobe (MPI_ANY_SOURCE, i, mpiCommunicator, &message_waiting, &status);
 
-            if (message_waiting)
+            if (message_waiting != 0)
             {
                 // Get the size of the message waiting to be received
                 int recv_size;
@@ -254,8 +252,8 @@ void MpiService::sendAndReceiveMessages ()
                            status.MPI_TAG, mpiCommunicator, &req);
 
                 // Wait until the asynchronous receive request has finished
-                int message_received = false;
-                while (!message_received)
+                int message_received = 0;
+                while (message_received == 0)
                 {
                     MPI_Test (&req, &message_received, MPI_STATUS_IGNORE);
                 }
@@ -327,10 +325,10 @@ void MpiService::drainRemainingMessages ()
     // Post receives for any waiting sends
     int message_waiting = 1;
     MPI_Status status;
-    while (message_waiting)
+    while (message_waiting != 0)
     {
         MPI_Iprobe (MPI_ANY_SOURCE, MPI_ANY_TAG, mpiCommunicator, &message_waiting, &status);
-        if (message_waiting)
+        if (message_waiting != 0)
         {
             // Get the size of the message waiting to be received
             int recv_size;

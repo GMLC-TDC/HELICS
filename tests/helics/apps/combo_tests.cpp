@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     rec1.addSourceEndpointClone ("d1");
     rec1.addSubscription ("pub1");
 
-    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     rec1.addSourceEndpointClone ("d1");
     rec1.addSubscription ("pub1");
 
-    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
 
     auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();

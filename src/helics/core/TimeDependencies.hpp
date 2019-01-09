@@ -100,7 +100,7 @@ class TimeDependencies
     @param requestTime  the time that is being iterated*/
     void resetIteratingTimeRequests (Time requestTime);
     /** reset the tdeMin */
-    void resetDependentEvents (Time minTime);
+    void resetDependentEvents (Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies () const;
 };

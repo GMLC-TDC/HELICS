@@ -107,11 +107,11 @@ void Publication::publish (char val)
 {
     switch (pubType)
     {
-    case data_type::helicsBool:
+    case data_type::helics_bool:
         publish (!((val == '0') || (val == 'f') || (val == 0) || (val == 'F') || (val == '-')));
         break;
-    case data_type::helicsString:
-    case data_type::helicsNamedPoint:
+    case data_type::helics_string:
+    case data_type::helics_named_point:
         publish (std::string (1, val));
         break;
     default:
@@ -286,7 +286,7 @@ void Publication::publish (std::complex<double> val)
     }
 }
 
-void Publication::publish (const named_point &np)
+void Publication::publish (const NamedPoint &np)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -312,7 +312,7 @@ void Publication::publish (const std::string &name, double val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np (name, val);
+        NamedPoint np (name, val);
         if (changeDetected (prevValue, np, delta))
         {
             prevValue = std::move (np);
@@ -334,7 +334,7 @@ void Publication::publish (const char *name, double val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np (name, val);
+        NamedPoint np (name, val);
         if (changeDetected (prevValue, np, delta))
         {
             prevValue = std::move (np);
@@ -369,7 +369,7 @@ data_block typeConvert (data_type type, const defV &val)
     case complex_vector_loc:  // complex
         return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
     case named_point_loc:
-        return typeConvert (type, mpark::get<named_point> (val));
+        return typeConvert (type, mpark::get<NamedPoint> (val));
     }
 }
 

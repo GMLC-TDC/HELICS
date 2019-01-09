@@ -74,21 +74,21 @@ class HandleManager
     const BasicHandleInfo *getEndpoint (const std::string &name) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    BasicHandleInfo *getEndpoint (interface_handle index);
+    BasicHandleInfo *getEndpoint (interface_handle handle);
     const BasicHandleInfo *getFilter (const std::string &name) const;
     BasicHandleInfo *getFilter (const std::string &name);
     // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
-    BasicHandleInfo *getFilter (interface_handle index);
+    BasicHandleInfo *getFilter (interface_handle handle);
     BasicHandleInfo *getPublication (const std::string &name);
     const BasicHandleInfo *getPublication (const std::string &name) const;
     /** get a publication by index
     @return nullptr if the index doesn't point to a valid publication*/
-    BasicHandleInfo *getPublication (interface_handle index);
+    BasicHandleInfo *getPublication (interface_handle handle);
     BasicHandleInfo *getInput (const std::string &name);
     const BasicHandleInfo *getInput (const std::string &name) const;
-    local_federate_id getLocalFedID (interface_handle id_) const;
+    local_federate_id getLocalFedID (interface_handle handle) const;
 
     BasicHandleInfo &operator[] (size_t index) { return handles[index]; }
     const BasicHandleInfo &operator[] (size_t index) const { return handles[index]; }

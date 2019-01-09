@@ -112,8 +112,9 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
         callback)
     {
         socket_.async_receive (boost::asio::buffer (data, data.size ()),
-                               [connection = shared_from_this (), callback](const boost::system::error_code &error,
-                                                                            size_t bytes_transferred) {
+                               [connection = shared_from_this (),
+                                callback = std::move (callback)](const boost::system::error_code &error,
+                                                                 size_t bytes_transferred) {
                                    connection->handle_read (bytes_transferred, error, callback);
                                });
     }
