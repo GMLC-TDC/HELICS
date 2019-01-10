@@ -84,6 +84,7 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     brokerPort = netInfo.brokerPort;
     PortNumber = netInfo.portNumber;
+    maxRetries = netInfo.maxRetries;
     switch (networkType)
     {
     case interface_type::tcp:

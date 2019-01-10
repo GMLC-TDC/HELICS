@@ -43,33 +43,36 @@ class NetworkCommsInterface : public CommsInterface
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
     void setBrokerPort (int brokerPortNumber);
+    /** set the local port number to use for incoming connections*/
     void setPortNumber (int localPortNumber);
+    /** set the automatic port numbering starting port*/
     void setAutomaticPortStartPort (int startingPort);
+    /** set a flag on the communication system*/
     virtual void setFlag (const std::string &flag, bool val) override;
 
   protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
     bool autoPortNumber = true;
-    bool useOsPortAllocation = false;
+    bool useOsPortAllocation = false;  //!< use the operating system to allocate a port number
     const interface_type networkType;
     interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};
+    int maxRetries = 5;  // the maximum number of network retries
 
   private:
-    PortAllocator openPorts;
+    PortAllocator openPorts;  //!< a structure to deal with port allocations
 
   public:
     /** find an open port for a subBroker*/
     int findOpenPort (int count, const std::string &host);
     /** for protocol messages some require an immediate reply from the comms interface itself*/
     ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
-    // promise and future for communicating port number from tx_thread to rx_thread
 
   public:
     /** get the port number of the comms object to push message to*/
     int getPort () const { return PortNumber; };
-
+    /** get the network address of the comms interface*/
     std::string getAddress () const;
     /** return the default Broker port*/
     virtual int getDefaultBrokerPort () const = 0;

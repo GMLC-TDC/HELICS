@@ -10,22 +10,22 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 /** define the network access*/
-enum class interface_networks :char
+enum class interface_networks : char
 {
     local,  //!< just open local ports
     ipv4,  //!< use external ipv4 ports
     ipv6,  //!< use external ipv6 ports
-    all, //!< use all external ports
+    all,  //!< use all external ports
 };
 
 /** define keys for particular interfaces*/
-enum class interface_type :char
+enum class interface_type : char
 {
     tcp = 0,  //!< using tcp ports for communication
     udp = 1,  //!< using udp ports for communication
     ip = 2,  //!< using both types of ports (tcp/or udp) for communication
-    ipc = 3, //!< using ipc locations
-    inproc=4, //!< using inproc sockets for communications
+    ipc = 3,  //!< using ipc locations
+    inproc = 4,  //!< using inproc sockets for communications
 };
 
 /** helper class designed to contain the common elements between networking brokers and cores
@@ -33,15 +33,14 @@ enum class interface_type :char
 class NetworkBrokerData
 {
   public:
-   
-	enum class server_mode_options :char
-	{
-		unspecified = 0,
-		server_default_active=1,
-		server_default_deactivated=2,
-		server_active = 3,
-		server_deactivated=4,
-	};
+    enum class server_mode_options : char
+    {
+        unspecified = 0,
+        server_default_active = 1,
+        server_default_deactivated = 2,
+        server_active = 3,
+        server_deactivated = 4,
+    };
 
     std::string brokerName;  //!< the identifier for the broker
     std::string brokerAddress;  //!< the address or domain name of the broker
@@ -50,13 +49,15 @@ class NetworkBrokerData
     int portNumber = -1;  //!< the port number for the local interface
     int brokerPort = -1;  //!< the port number to use for the main broker interface
     int portStart = -1;  //!< the starting port for automatic port definitions
-	int maxMessageSize = 16 * 256; //!< maximum message size
-	int maxMessageCount = 256; //!< maximum message count
+    int maxMessageSize = 16 * 256;  //!< maximum message size
+    int maxMessageCount = 256;  //!< maximum message count
+    int maxRetries = 5;  //!< the maximum number of retries to establish a network connection
     interface_networks interfaceNetwork = interface_networks::local;
-    bool reuse_address = false; //!< allow reuse of binding address
-    bool use_os_port = false;  //!< specify that any automatic port allocation should use operating system allocation
+    bool reuse_address = false;  //!< allow reuse of binding address
+    bool use_os_port =
+      false;  //!< specify that any automatic port allocation should use operating system allocation
     bool autobroker = false;  //!< flag for specifying an automatic broker generation
-	server_mode_options server_mode = server_mode_options::unspecified; //!< setup a server mode
+    server_mode_options server_mode = server_mode_options::unspecified;  //!< setup a server mode
   public:
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/
@@ -78,7 +79,6 @@ class NetworkBrokerData
     /** do some checking on the brokerAddress*/
     void checkAndUpdateBrokerAddress (const std::string &localAddress);
     interface_type allowedType = interface_type::ip;
-    
 };
 
 /** generate a string with a full address based on an interface string and port number
@@ -110,7 +110,7 @@ std::pair<std::string, std::string> extractInterfaceandPortString (const std::st
 
 /** strip any protocol strings from the interface and return a new string
 @example tcp://127.0.0.1 -> 127.0.0.1*/
-std::string stripProtocol(const std::string &networkAddress);
+std::string stripProtocol (const std::string &networkAddress);
 /** strip any protocol strings from the interface and return a new string*/
 void removeProtocol (std::string &networkAddress);
 
@@ -123,26 +123,27 @@ void insertProtocol (std::string &networkAddress, interface_type interfaceT);
 /** check if a specified address is v6 or v4
 @return true if the address is a v6 address
 */
-bool isipv6(const std::string &address);
+bool isipv6 (const std::string &address);
 
 /** get the external ipv4 address of the current computer
  */
 std::string getLocalExternalAddressV4 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
-std::string getLocalExternalAddress(const std::string &server);
+std::string getLocalExternalAddress (const std::string &server);
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
 std::string getLocalExternalAddressV4 (const std::string &server);
 
 /** get the external ipv4 address of the current computer
-*/
-std::string getLocalExternalAddressV6();
+ */
+std::string getLocalExternalAddressV6 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
-std::string getLocalExternalAddressV6(const std::string &server);
+std::string getLocalExternalAddressV6 (const std::string &server);
 
 /** generate an interface that matches a defined server or network specification
-*/
-std::string generateMatchingInterfaceAddress(const std::string &server, interface_networks network=interface_networks::local);
+ */
+std::string generateMatchingInterfaceAddress (const std::string &server,
+                                              interface_networks network = interface_networks::local);
 }  // namespace helics

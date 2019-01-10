@@ -348,23 +348,34 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 int cnt2 = 0;
                 while (rc == 0)
                 {
+                    ++cnt2;
                     rc = zmq::poll (&poller, 1, connectionTimeout);
                     if (rc < 0)
                     {
-                        logError ("unable to connect with zmq broker (2)");
+                        logError ("ZMQ broker connection error (2)");
                         setTxStatus (connection_status::error);
                         break;
                     }
                     else if (rc == 0)
                     {
-                        logWarning ("zmq broker connection timed out, trying again (2)");
-                    }
-                    ++cnt2;
-                    if (cnt2 > 5)
-                    {
-                        logError ("zmq broker connection timed out after trying 5 times (2)");
-                        setTxStatus (connection_status::error);
-                        break;
+                        if (requestDisconnect.load (std::memory_order::memory_order_acquire))
+                        {
+                            return (-3);
+                        }
+                        if (cnt2 == 1)
+                        {
+                            logWarning ("zmq broker connection timed out, trying again (2)");
+                        }
+                        else if (cnt2 > maxRetries)
+                        {
+                            logError ("zmq broker connection timed out after trying 5 times (2)");
+                            setTxStatus (connection_status::error);
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
 
@@ -400,7 +411,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
 
                 ++cnt;
-                if (cnt > 10)
+                if (cnt > maxRetries)
                 {
                     // we can't get the broker to respond with port numbers
                     setTxStatus (connection_status::error);
@@ -442,7 +453,8 @@ void ZmqComms::queue_tx_function ()
         auto res = initializeBrokerConnections (controlSocket);
         if (res < 0)
         {
-            setTxStatus (connection_status::error);
+            setTxStatus ((res != -3) ? connection_status::error : connection_status::terminated);
+
             controlSocket.close ();
             return;
         }
