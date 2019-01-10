@@ -7,8 +7,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "IpcQueueHelper.h"
 #include <thread>
 
-#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/microsec_time_clock.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 namespace boostipc = boost::interprocess;
