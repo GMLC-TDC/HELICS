@@ -35,6 +35,7 @@ extern "C"
 
     /**
      * Returns true if core/broker type specified is available in current compilation.
+     @param type a string representing a core type
      @details possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
      */
     HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable (const char *type);
@@ -44,7 +45,8 @@ extern "C"
     @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
     @param initString an initialization string to send to the core-the format is similar to command line arguments
     typical options include a broker address  --broker="XSSAF" or the number of federates or the address
-    @return a helics_core object
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return a helics_core object if the core is invalid err will contain some indication
     */
     HELICS_EXPORT helics_core helicsCreateCore (const char *type, const char *name, const char *initString, helics_error *err);
 
@@ -53,6 +55,7 @@ extern "C"
     @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
     @param argc the number of arguments
     @param argv the string values from a command line
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics_core object
     */
     HELICS_EXPORT helics_core
@@ -61,6 +64,7 @@ extern "C"
     /** create a new reference to an existing broker
     @details this will create a new broker object that references the existing broker it must be freed as well
     @param broker an existing helics_broker
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a new reference to the same broker*/
     HELICS_EXPORT helics_core helicsCoreClone (helics_core core, helics_error *err);
 
@@ -73,6 +77,7 @@ extern "C"
     @param name the name of the broker , may be a nullptr or empty string to have a name automatically assigned
     @param initString an initialization string to send to the core-the format is similar to command line arguments
     typical options include a broker address  --broker="XSSAF" if this is a subbroker or the number of federates or the address
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics_core object
     */
     HELICS_EXPORT helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString, helics_error *err);
@@ -81,6 +86,7 @@ extern "C"
     @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
     @param argc the number of arguments
     @param argv the string values from a command line
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics_core object
     */
     HELICS_EXPORT helics_broker
@@ -89,6 +95,7 @@ extern "C"
     /** create a new reference to an existing broker
     @details this will create a new broker object that references the existing broker it must be freed as well
     @param broker an existing helics_broker
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a new reference to the same broker*/
     HELICS_EXPORT helics_broker helicsBrokerClone (helics_broker broker, helics_error *err);
 
@@ -127,6 +134,7 @@ extern "C"
     /** wait for the broker to disconnect
   @param broker the broker to wait for
   @param msToWait the time out in millisecond (<0 for infinite timeout)
+  @param err an error object that will contain an error code and string if any error occurred during the execution of the function
   */
     HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err);
 
@@ -178,12 +186,14 @@ extern "C"
     /** set the core to ready to init
     @details this function is used for cores that have filters but no federates so there needs to be
     a direct signal to the core to trigger the federation initialization
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreSetReadyToInit (helics_core core, helics_error *err);
 
     /** get an identifier for the core
     @param core the core to query
     @return a void enumeration indicating any error condition
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreDisconnect (helics_core core, helics_error *err);
 
@@ -191,11 +201,13 @@ extern "C"
     @details the federate must have been created by one of the other functions and at least one of the objects referencing the created
     federate must still be active in the process
     @param fedName the name of the federate to retrieve
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return NULL if no fed is available by that name otherwise a helics_federate with that name*/
     HELICS_EXPORT helics_federate helicsGetFederateByName (const char *fedName, helics_error *err);
 
     /** disconnect a broker
     @param broker the broker to disconnect
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration indicating any error condition
     */
     HELICS_EXPORT void helicsBrokerDisconnect (helics_broker broker, helics_error *err);
@@ -218,6 +230,7 @@ extern "C"
     /** create a value federate from a federate info object
     @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
     @param fi the federate info object that contains details on the federate
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque value federate object
     */
     HELICS_EXPORT helics_federate helicsCreateValueFederate (const char *fedName, helics_federate_info fi, helics_error *err);
@@ -225,6 +238,7 @@ extern "C"
     /** create a value federate from a JSON file, JSON string, or TOML file
     @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
     @param configFile  a JSON file or a JSON string or TOML file that contains setup and configuration information
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque value federate object
     */
     HELICS_EXPORT helics_federate helicsCreateValueFederateFromConfig (const char *configFile, helics_error *err);
@@ -233,6 +247,7 @@ extern "C"
     @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
     an argument
     @param fi the federate info object that contains details on the federate
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque message federate object
     */
     HELICS_EXPORT helics_federate helicsCreateMessageFederate (const char *fedName, helics_federate_info fi, helics_error *err);
@@ -241,6 +256,7 @@ extern "C"
     @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
     an argument
     @param configFile  a Config(JSON,TOML) file or a JSON string that contains setup and configuration information
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque message federate object
     */
     HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, helics_error *err);
@@ -249,6 +265,7 @@ extern "C"
     @details combination federates are both value federates and message federates, objects can be used in all functions that take a
     helics_federate, helics_message_federate or helics_federate object as an argument
     @param fi the federate info object that contains details on the federate
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque value federate object nullptr if the object creation failed
     */
     HELICS_EXPORT helics_federate helicsCreateCombinationFederate (const char *fedName, helics_federate_info fi, helics_error *err);
@@ -257,6 +274,7 @@ extern "C"
     @details combination federates are both value federates and message federates, objects can be used in all functions that take a
     helics_federate, helics_message_federate or helics_federate object as an argument
     @param configFile  a JSON file or a JSON string or TOML file that contains setup and configuration information
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque combination federate object
     */
     HELICS_EXPORT helics_federate helicsCreateCombinationFederateFromConfig (const char *configFile, helics_error *err);
@@ -264,6 +282,7 @@ extern "C"
     /** create a new reference to an existing federate
     @details this will create a new helics_federate object that references the existing federate it must be freed as well
     @param fed an existing helics_federate
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a new reference to the same federate*/
     HELICS_EXPORT helics_federate helicsFederateClone (helics_federate fed, helics_error *err);
 
@@ -276,6 +295,7 @@ extern "C"
     @param fi a federateInfo object
     @param argc the number of command line arguments
     @param argv an array of strings from the command line
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration indicating success or any potential errors
     */
     HELICS_EXPORT void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const char *const *argv, helics_error *err);
@@ -289,6 +309,7 @@ extern "C"
     /** set the name of the core to link to for a federate
   @param fi the federate info object to alter
   @param corename the identifier for a core to link to
+  @param err an error object that will contain an error code and string if any error occurred during the execution of the function
   @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
   */
     HELICS_EXPORT void helicsFederateInfoSetCoreName (helics_federate_info fi, const char *corename, helics_error *err);
@@ -296,6 +317,7 @@ extern "C"
     /** set the initialization string for the core usually in the form of command line arguments
     @param fi the federate info object to alter
     @param coreInit a string with the core initialization strings
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
     */
     HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *coreInit, helics_error *err);
@@ -304,6 +326,7 @@ extern "C"
     @details valid values available by definitions in api-data.h
     @param fi the federate info object to alter
     @param coretype an numerical code for a core type
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference helics_discard if the string
     is not recognized
     */
@@ -312,6 +335,7 @@ extern "C"
     /** set the core type from a string
     @param fi the federate info object to alter
     @param coretype a string naming a core type
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference helics_discard if the string
     is not recognized
     */
@@ -321,7 +345,8 @@ extern "C"
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
     @param fi the federate info object to alter
     @param coreInit a string with the core initialization strings
-    @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
+   @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+   @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
     */
 
     HELICS_EXPORT void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, helics_error *err);
@@ -330,6 +355,7 @@ extern "C"
     this will only be useful for network broker connections
     @param fi the federate info object to alter
     @param brokerPort the integer port number to use for connection with a broker
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
     */
 
@@ -339,6 +365,7 @@ extern "C"
     @details this is only used if the core is automatically created, the port information will be transferred to the core for connection
     @param fi the federate info object to alter
     @param localPort a string with the port information to use as the local server port can be a number or "auto" or "os_local"
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helicsInvalidReference if fi is not a valid reference
     */
 
@@ -363,6 +390,7 @@ extern "C"
     @param fi the federate info object to alter
     @param flag a numerical index for a flag
     @param value the desired value of the flag helics_true or helics_false
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the
     coretype is not recognized
     */
@@ -373,6 +401,7 @@ extern "C"
     for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
     @param fi the federate info object to alter
     @param separator the character to use as a separator
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the
     coretype is not recognized
     */
@@ -381,6 +410,7 @@ extern "C"
     /** set the output delay for a federate
     @param fi the federate info object to alter
     @param outputDelay the desired output delay of the federate
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the
     specified outputdelay is invalid
     */
@@ -393,6 +423,7 @@ extern "C"
     @param fi the federateInfo object to alter
     @param intProperty an int identifying the property
     @param propertyValue the value to set the property to
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference
     */
     HELICS_EXPORT void
@@ -401,9 +432,10 @@ extern "C"
     /** load interfaces from a file
     @param fed the federate to which to load interfaces
     @param file the name of a file to load the interfaces from either JSON, or TOML
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateRegisterInterfaces (helics_federate fed, const char *file, helics_error *err);
-    /** finalize the federate this halts all communication in the federate and disconnects it from the core
+    /** finalize the federate this function halts all communication in the federate and disconnects it from the core
      */
     HELICS_EXPORT void helicsFederateFinalize (helics_federate fed, helics_error *err);
     /** finalize the federate in an async call*/
@@ -463,8 +495,8 @@ extern "C"
     iteration request and return a time and iteration status
     @param fed the federate to make the request of
     @param iterate the requested iteration mode
-    @param[out] outIterate  the iteration specification of the result
-    @return a void object with a return code of the result
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return an iteration structure with field containing the time and iteration status
     */
     HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterative (helics_federate fed,
                                                                                      helics_iteration_request iterate,
@@ -475,7 +507,7 @@ extern "C"
     iteration request and return a time and iteration status
     @param fed the federate to make the request of
     @param iterate the requested iteration mode
-    @return a void object with a return code of the result
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void
     helicsFederateEnterExecutingModeIterativeAsync (helics_federate fed, helics_iteration_request iterate, helics_error *err);
@@ -483,13 +515,14 @@ extern "C"
     /** complete the asynchronous iterative call into ExecutionModel
     @param fed the federate to make the request of
     @param[out] outIterate  the iteration specification of the result
-    @return a void object with a return code of the result helics_ok if there were no issues
+    @return an iteration object containing the iteration time and iteration_status
     */
     HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterativeComplete (helics_federate fed, helics_error *err);
 
     /** get the current state of a federate
     @param fed the fed to query
-    @param[out] state the resulting state if void return helics_ok*/
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return state the resulting state if void return helics_ok*/
     HELICS_EXPORT helics_federate_state helicsFederateGetState (helics_federate fed, helics_error *err);
 
     /** get the core object associated with a federate
