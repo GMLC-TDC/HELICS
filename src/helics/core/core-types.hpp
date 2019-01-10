@@ -59,7 +59,7 @@ enum class message_processing_result : signed char
     halted = 3,  //!< indicator that the simulation has been halted
     error = 7,  //!< indicator that an error has occurred
 };
-
+/** function to check if the message processing result should be returned or processing continued*/
 inline bool returnableResult (message_processing_result result)
 {
     return (result >= message_processing_result::next_step);
@@ -81,11 +81,6 @@ enum class iteration_request : signed char
     iterate_if_needed = 2,  //!< indicator that the iterations need to continue
 };
 
-#define ITERATION_COMPLETE helics::iteration_request::no_iterations
-#define NO_ITERATION helics::iteration_request::no_iterations
-#define FORCE_ITERATION helics::iteration_request::force_iteration
-#define ITERATE_IF_NEEDED helics::iteration_request::iterate_if_needed
-
 /**generate a string based on the core type*/
 std::string to_string (core_type type);
 
@@ -102,3 +97,13 @@ core_type coreTypeFromString (std::string type) noexcept;
 bool isCoreTypeAvailable (core_type type) noexcept;
 
 }  // namespace helics
+
+constexpr auto ITERATION_COMPLETE =
+  helics::iteration_request::no_iterations;  //!< simplified alias to indicate that iterations have concluded
+constexpr auto NO_ITERATION =
+  helics::iteration_request::no_iterations;  //!< simplified alias to indicate that no iterations are needed
+constexpr auto FORCE_ITERATION =
+  helics::iteration_request::force_iteration;  //!< simplified alias to force an iteration
+constexpr auto ITERATE_IF_NEEDED =
+  helics::iteration_request::iterate_if_needed;  //!< simplified alias to indicate that helics should iterate if
+                                                 //!< warranted

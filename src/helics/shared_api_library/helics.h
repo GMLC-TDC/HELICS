@@ -514,7 +514,7 @@ extern "C"
 
     /** complete the asynchronous iterative call into ExecutionModel
     @param fed the federate to make the request of
-    @param[out] outIterate  the iteration specification of the result
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an iteration object containing the iteration time and iteration_status
     */
     HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterativeComplete (helics_federate fed, helics_error *err);
@@ -527,6 +527,7 @@ extern "C"
 
     /** get the core object associated with a federate
     @param fed a federate object
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a core object, nullptr if invalid
     */
     HELICS_EXPORT helics_core helicsFederateGetCoreObject (helics_federate fed, helics_error *err);
@@ -534,8 +535,8 @@ extern "C"
     /** request the next time for federate execution
     @param fed the federate to make the request of
     @param requestTime the next requested time
-    @param[out]  timeOut the time granted to the federate
-    @return a void if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the time granted to the federate
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestTime, helics_error *err);
 
@@ -543,8 +544,8 @@ extern "C"
     @details feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current
     time plus the minimum time step
     @param fed the federate to make the request of
-    @param[out]  timeOut the time granted to the federate
-    @return a helics_status if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the time granted to the federate
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestNextStep (helics_federate fed, helics_error *err);
 
@@ -554,9 +555,9 @@ extern "C"
     @param fed the federate to make the request of
     @param requestTime the next desired time
     @param iterate the requested iteration mode
-    @param[out] timeOut the granted time
     @param[out] outIterate  the iteration specification of the result
-    @return a void object with a return code of the result
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @returnthe granted time
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterative (helics_federate fed,
                                                                   helics_time requestTime,
@@ -568,22 +569,23 @@ extern "C"
     @details call /ref helicsFederateRequestTimeComplete to finish the call
     @param fed the federate to make the request of
     @param requestTime the next requested time
-    @return a void if the return value is equal to helics_ok*/
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
     HELICS_EXPORT void helicsFederateRequestTimeAsync (helics_federate fed, helics_time requestTime, helics_error *err);
 
     /** complete an asynchronous requestTime call
     @param fed the federate to make the request of
-    @param[out]  timeOut the time granted to the federate
-    @return a void if the return value is equal to helics_ok the timeOut will contain the new granted time, otherwise timeOut is
-    invalid*/
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the time granted to the federate*/
     HELICS_EXPORT helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err);
 
     /** request an iterative time through an asynchronous call
-    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
-    iteration request and return a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
+    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time an
+    iteration request and returns a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
     @param fed the federate to make the request of
     @param requestTime the next desired time
     @param iterate the requested iteration mode
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a void object with a return code of the result
     */
     HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
@@ -593,9 +595,9 @@ extern "C"
 
     /** complete an iterative time request asynchronous call
     @param fed the federate to make the request of
-    @param[out] timeOut the granted time
     @param[out] outIterate  the iteration specification of the result
-    @return a void object with a return code of the result
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the granted time
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed,
                                                                           helics_iteration_result *outIterate,
@@ -603,12 +605,15 @@ extern "C"
 
     /** get the name of the federate
     @param fed the federate object to query
-    @return void object indicating success or error
+    @return a pointer to a string with the name
     */
     HELICS_EXPORT const char *helicsFederateGetName (helics_federate fed);
 
-    /** set the minimum time delta for the federate
-    @param[in] tdelta the minimum time delta to return from a time request function
+    /** set a time based property for a federate
+    @param fed the federate object set the property for
+    @param timeProperty a integer code for a time property
+    @param time the requested value of the property
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateSetTimeProperty (helics_federate fed, int timeProperty, helics_time time, helics_error *err);
 
@@ -616,6 +621,7 @@ extern "C"
     @param fed the federate to alter a flag for
     @param flag the flag to change
     @param flagValue the new value of the flag 0 for false !=0 for true
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateSetFlagOption (helics_federate fed, int flag, helics_bool flagValue, helics_error *err);
 
@@ -624,32 +630,37 @@ extern "C"
     for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
     @param fi the federate info object to alter
     @param separator the character to use as a separator
-    @return a void enumeration helics_ok on success helics_error_invalid_object if fi is not a valid reference helics_discard if the
-    coretype is not recognized
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateSetSeparator (helics_federate fed, char separator, helics_error *err);
 
-    /**  set the logging level for the federate
-    @ details debug and trace only do anything if they were enabled in the compilation
-    @param loggingLevel (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)
+    /**  set an integer based property of a federate
+    @param fed the federate to change the property for
+    @param intProperty the property to set
+    @param propertyVal the value of the property
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateSetIntegerProperty (helics_federate fed, int intProperty, int propertyVal, helics_error *err);
 
-    /** set the minimum time delta for the federate
-    @param[in] tdelta the minimum time delta to return from a time request function
+    /** get the current value of a time based property in a federate
+    @param fed the federate query
+    @param timeProperty the property to query
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT helics_time helicsFederateGetTimeProperty (helics_federate fed, int timeProperty, helics_error *err);
 
-    /** set a flag for the federate
-    @param fed the federate to alter a flag for
-    @param flag the flag to change
-    @param flagValue the new value of the flag 0 for false !=0 for true
+    /** get a flag value for a federate
+    @param fed the federate to get the flag for
+    @param flag the flag to query
+    @return the value of the flag
     */
     HELICS_EXPORT helics_bool helicsFederateGetFlagOption (helics_federate fed, int flag, helics_error *err);
 
     /**  set the logging level for the federate
     @ details debug and trace only do anything if they were enabled in the compilation
+    @param fed the federate to get the flag for
     @param intProperty a code for the property to set
+    @return the value of the property
     */
     HELICS_EXPORT int helicsFederateGetIntegerProperty (helics_federate fed, int intProperty, helics_error *err);
 
@@ -667,10 +678,12 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
 
-    /** set a federation global value
+    /** set a global value in a core
     @details this overwrites any previous value for this name
+    @param core the core to set the global through
     @param valueName the name of the global to set
     @param value the value of the global
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *value, helics_error *err);
 
@@ -678,6 +691,7 @@ extern "C"
     @details this overwrites any previous value for this name
     @param valueName the name of the global to set
     @param value the value of the global
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err);
 
@@ -690,6 +704,7 @@ extern "C"
     @details the call will block until the query finishes which may require communication or other delays
     @param query the query object to use in the query
     @param fed a federate to send the query through
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a pointer to a string.  the string will remain valid until the query is freed or executed again
     the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
     */
@@ -699,6 +714,7 @@ extern "C"
     @details the call will block until the query finishes which may require communication or other delays
     @param query the query object to use in the query
     @param core the core to send the query to
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a pointer to a string.  the string will remain valid until the query is freed or executed again
     the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
     */
@@ -708,6 +724,7 @@ extern "C"
     @details the call will block until the query finishes which may require communication or other delays
     @param query the query object to use in the query
     @param broker the broker to send the query to
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a pointer to a string.  the string will remain valid until the query is freed or executed again
     the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
     */
@@ -716,6 +733,7 @@ extern "C"
     /** Execute a query in a non-blocking call
     @param query the query object to use in the query
     @param fed a federate to send the query through
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics status enumeration with the result of the query specification
     */
     HELICS_EXPORT void helicsQueryExecuteAsync (helics_query query, helics_federate fed, helics_error *err);
@@ -723,20 +741,23 @@ extern "C"
     /** complete the return from a query called with /ref helicsExecuteQueryAsync
     @details the function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or
     not
-    @param query the query object to
+    @param query the query object to complete execution of
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a pointer to a string.  the string will remain valid until the query is freed or executed again
     the return will be nullptr if query is an invalid object
     */
     HELICS_EXPORT const char *helicsQueryExecuteComplete (helics_query query, helics_error *err);
 
     /** check if an asynchronously executed query has completed
+    @details this function should usually be called after a QueryExecuteAsync function has been called
+    @param query the query object to check if completed
     @return will return helics_true if an asynchronous query has complete or a regular query call was made with a result
     and false if an asynchronous query has not completed or is invalid
     */
     HELICS_EXPORT helics_bool helicsQueryIsCompleted (helics_query query);
 
     /** free the memory associated with a query object*/
-    HELICS_EXPORT void helicsQueryFree (helics_query);
+    HELICS_EXPORT void helicsQueryFree (helics_query query);
 
     /** function to do some housekeeping work
     @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
